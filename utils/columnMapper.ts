@@ -65,42 +65,44 @@ export function mapColumnsForLayer(
   const result: Record<string, number> = {};
   
   if (layer === 'L1' || layer === 'L2') {
+    const l1L2Mapping = mapping as { category: string[]; tableName: string[]; dataElement: string[]; description: string[]; whyRequired: string[]; pkFk: string[]; simplificationNote?: string[] };
     console.log(`🔍 [DEBUG] Mapping ${layer} columns...`);
-    result.category = findColumnIndex(headers, mapping.category);
-    console.log(`🔍 [DEBUG] category column index:`, result.category, 'tried:', mapping.category);
+    result.category = findColumnIndex(headers, l1L2Mapping.category);
+    console.log(`🔍 [DEBUG] category column index:`, result.category, 'tried:', l1L2Mapping.category);
     
-    result.tableName = findColumnIndex(headers, mapping.tableName, true);
-    console.log(`🔍 [DEBUG] tableName column index:`, result.tableName, 'tried:', mapping.tableName);
+    result.tableName = findColumnIndex(headers, l1L2Mapping.tableName, true);
+    console.log(`🔍 [DEBUG] tableName column index:`, result.tableName, 'tried:', l1L2Mapping.tableName);
     
-    result.dataElement = findColumnIndex(headers, mapping.dataElement, true);
-    console.log(`🔍 [DEBUG] dataElement column index:`, result.dataElement, 'tried:', mapping.dataElement);
+    result.dataElement = findColumnIndex(headers, l1L2Mapping.dataElement, true);
+    console.log(`🔍 [DEBUG] dataElement column index:`, result.dataElement, 'tried:', l1L2Mapping.dataElement);
     
-    result.description = findColumnIndex(headers, mapping.description);
-    console.log(`🔍 [DEBUG] description column index:`, result.description, 'tried:', mapping.description);
+    result.description = findColumnIndex(headers, l1L2Mapping.description);
+    console.log(`🔍 [DEBUG] description column index:`, result.description, 'tried:', l1L2Mapping.description);
     
-    result.whyRequired = findColumnIndex(headers, mapping.whyRequired);
-    console.log(`🔍 [DEBUG] whyRequired column index:`, result.whyRequired, 'tried:', mapping.whyRequired);
+    result.whyRequired = findColumnIndex(headers, l1L2Mapping.whyRequired);
+    console.log(`🔍 [DEBUG] whyRequired column index:`, result.whyRequired, 'tried:', l1L2Mapping.whyRequired);
     
-    result.pkFk = findColumnIndex(headers, mapping.pkFk);
-    console.log(`🔍 [DEBUG] pkFk column index:`, result.pkFk, 'tried:', mapping.pkFk);
+    result.pkFk = findColumnIndex(headers, l1L2Mapping.pkFk);
+    console.log(`🔍 [DEBUG] pkFk column index:`, result.pkFk, 'tried:', l1L2Mapping.pkFk);
     
-    if (layer === 'L2') {
-      result.simplificationNote = findColumnIndex(headers, mapping.simplificationNote);
-      console.log(`🔍 [DEBUG] simplificationNote column index:`, result.simplificationNote, 'tried:', mapping.simplificationNote);
+    if (layer === 'L2' && l1L2Mapping.simplificationNote) {
+      result.simplificationNote = findColumnIndex(headers, l1L2Mapping.simplificationNote);
+      console.log(`🔍 [DEBUG] simplificationNote column index:`, result.simplificationNote, 'tried:', l1L2Mapping.simplificationNote);
     }
   } else if (layer === 'L3') {
+    const l3Mapping = mapping as { category: string[]; tableName: string[]; field: string[]; dataType: string[]; formula: string[]; sourceTables: string[]; sourceFields: string[]; derivationLogic: string[]; dashboardUsage: string[]; grain: string[]; notes: string[] };
     console.log(`🔍 [DEBUG] Mapping L3 columns...`);
-    result.category = findColumnIndex(headers, mapping.category);
-    result.tableName = findColumnIndex(headers, mapping.tableName, true);
-    result.field = findColumnIndex(headers, mapping.field, true);
-    result.dataType = findColumnIndex(headers, mapping.dataType);
-    result.formula = findColumnIndex(headers, mapping.formula);
-    result.sourceTables = findColumnIndex(headers, mapping.sourceTables);
-    result.sourceFields = findColumnIndex(headers, mapping.sourceFields);
-    result.derivationLogic = findColumnIndex(headers, mapping.derivationLogic);
-    result.dashboardUsage = findColumnIndex(headers, mapping.dashboardUsage);
-    result.grain = findColumnIndex(headers, mapping.grain);
-    result.notes = findColumnIndex(headers, mapping.notes);
+    result.category = findColumnIndex(headers, l3Mapping.category);
+    result.tableName = findColumnIndex(headers, l3Mapping.tableName, true);
+    result.field = findColumnIndex(headers, l3Mapping.field, true);
+    result.dataType = findColumnIndex(headers, l3Mapping.dataType);
+    result.formula = findColumnIndex(headers, l3Mapping.formula);
+    result.sourceTables = findColumnIndex(headers, l3Mapping.sourceTables);
+    result.sourceFields = findColumnIndex(headers, l3Mapping.sourceFields);
+    result.derivationLogic = findColumnIndex(headers, l3Mapping.derivationLogic);
+    result.dashboardUsage = findColumnIndex(headers, l3Mapping.dashboardUsage);
+    result.grain = findColumnIndex(headers, l3Mapping.grain);
+    result.notes = findColumnIndex(headers, l3Mapping.notes);
     console.log(`🔍 [DEBUG] L3 column mapping result:`, result);
   }
   

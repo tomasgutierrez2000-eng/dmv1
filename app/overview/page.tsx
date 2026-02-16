@@ -68,7 +68,7 @@ export default function OverviewPage() {
               </div>
             </div>
             <p className="text-slate-300 mb-4 leading-relaxed">
-              <strong className="text-white">"Here's reality as-is"</strong> — Master reference tables that define
+              <strong className="text-white">&quot;Here&apos;s reality as-is&quot;</strong> — Master reference tables that define
               the core entities: facilities, counterparties, credit agreements, and dimensional hierarchies.
               These are the source of truth for facility terms, counterparty identities, and business taxonomy.
             </p>
@@ -100,7 +100,7 @@ export default function OverviewPage() {
               </div>
             </div>
             <p className="text-slate-300 mb-4 leading-relaxed">
-              <strong className="text-white">"Here's how we simplified it for usability"</strong> — Time-series
+              <strong className="text-white">&quot;Here&apos;s how we simplified it for usability&quot;</strong> — Time-series
               snapshots (monthly exposure readings, collateral valuations) and event records (amendments, rating
               changes). These capture the changing state of facilities over time, simplified from complex source
               systems.
@@ -133,7 +133,7 @@ export default function OverviewPage() {
               </div>
             </div>
             <p className="text-slate-300 mb-4 leading-relaxed">
-              <strong className="text-white">"Here's what we derived for business decisions"</strong> — Calculated
+              <strong className="text-white">&quot;Here&apos;s what we derived for business decisions&quot;</strong> — Calculated
               metrics, roll-ups, and enriched views assembled from L1 and L2. These are the final outputs used
               by dashboards and reports: facility summaries, desk roll-ups, LoB aggregations.
             </p>
@@ -234,7 +234,7 @@ export default function OverviewPage() {
                 </div>
               </div>
               <p className="text-sm text-slate-600 mb-4">
-                Trace a field's journey from L1 source through L2 transformations to L3 derived metrics.
+                Trace a field&apos;s journey from L1 source through L2 transformations to L3 derived metrics.
               </p>
             </div>
 

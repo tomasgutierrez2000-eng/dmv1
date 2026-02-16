@@ -5,7 +5,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { TableDef, SCDType } from './types';
+import { TableDef, SCDType, type ColumnDef } from './types';
 import { L1_TABLES } from './l1-definitions';
 
 const OUT_DIR = path.join(__dirname, 'output');
@@ -88,7 +88,7 @@ function escapeSql(val: unknown): string {
   return "'" + String(val).replace(/'/g, "''") + "'";
 }
 
-function seedValue(col: { name: string; type: string; default?: string }, rowIndex: number, tableName: string): unknown {
+function seedValue(col: ColumnDef, rowIndex: number, tableName: string): unknown {
   const i = rowIndex + 1; // 1-based
   if (col.default && col.default.includes('CURRENT_TIMESTAMP')) return new Date('2024-06-15');
   if (col.name === 'as_of_date') return SEED_AS_OF_DATE;
@@ -109,7 +109,7 @@ function seedValue(col: { name: string; type: string; default?: string }, rowInd
   return null;
 }
 
-function buildInserts(t: TableDef): { sql: string; rows: Record<string, unknown>[] } {
+function buildInserts(t: TableDef): { sql: string; rows: Record<string, unknown>[]; columns: string[] } {
   const rows: Record<string, unknown>[] = [];
   const cols = t.columns.map(c => c.name);
   const scd = t.scd;

@@ -1,36 +1,18 @@
 # Push this project to GitHub
 
-## 1. Create a new repository on GitHub
+The remote is already set to: **https://github.com/tomasgutierrez2000-eng/dmv1.git**
 
-- Go to **https://github.com/new**
-- Repository name: e.g. `120` or `dense-logic` or `data-model-visualizer`
-- Leave it empty (no README, no .gitignore)
-- Click **Create repository**
+## Push from your machine (requires auth)
 
-## 2. Add remote and push (from this folder)
-
-Replace `YOUR_USERNAME` and `YOUR_REPO` with your GitHub username and the repo name you chose:
+From a terminal on your computer:
 
 ```bash
 cd /Users/tomas/120
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git branch -M main
 git push -u origin main
 ```
 
-If you use SSH:
+When prompted, sign in with your GitHub account (or use a [Personal Access Token](https://github.com/settings/tokens) as the password if you use HTTPS).
 
-```bash
-git remote add origin git@github.com:YOUR_USERNAME/YOUR_REPO.git
-git push -u origin main
-```
+## Your repo link
 
-## 3. Your repo link
-
-After pushing, your project will be at:
-
-**https://github.com/YOUR_USERNAME/YOUR_REPO**
-
----
-
-Git is already initialized here with one commit containing the full project (visualizer, L1 schema, sample data, category grouping).
+**https://github.com/tomasgutierrez2000-eng/dmv1**

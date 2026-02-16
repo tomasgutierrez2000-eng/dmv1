@@ -111,7 +111,7 @@ export default function DashboardPage() {
             <div className="text-sm text-left bg-white p-4 rounded border" style={{ color: '#4b5563' }}>
               <p className="font-semibold mb-2">Troubleshooting steps:</p>
               <ol className="list-decimal list-inside space-y-1">
-                <li>Make sure you've generated the data: <code className="bg-gray-100 px-1 rounded">cd facility-summary-mvp && npm run dev</code></li>
+                <li>Make sure you&apos;ve generated the data: <code className="bg-gray-100 px-1 rounded">cd facility-summary-mvp && npm run dev</code></li>
                 <li>Verify the file exists: <code className="bg-gray-100 px-1 rounded">facility-summary-mvp/output/l3/facility-summary.json</code></li>
                 <li>Check the browser console and server terminal for detailed errors</li>
                 <li>Try refreshing the page</li>

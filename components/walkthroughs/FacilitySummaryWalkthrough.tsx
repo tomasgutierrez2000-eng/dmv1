@@ -554,7 +554,7 @@ function Step1({ config }: any) {
     <div>
       <div className="step-title">Where the Data Lives</div>
       <div className="step-intro">
-        The information you see on the dashboard doesn't live in one place. It comes from{" "}
+        The information you see on the dashboard doesn&apos;t live in one place. It comes from{" "}
         <strong style={{ color: "var(--white)" }}>{config.sources.length} different sources</strong>, each
         tracking a different part of this facility. Click any card to see the data it holds for{" "}
         <span className="mono" style={{ color: "var(--amber)" }}>{config.joinValue}</span>.
@@ -711,7 +711,7 @@ function Step3({ config }: any) {
               </div>
             )
           )}
-          {ci < 0 && <div style={{ color: "var(--slate-400)", fontSize: 14, textAlign: "center", padding: 40 }}>Click "Play All" or "Next Source" to begin.</div>}
+          {ci < 0 && <div style={{ color: "var(--slate-400)", fontSize: 14, textAlign: "center", padding: 40 }}>Click &quot;Play All&quot; or &quot;Next Source&quot; to begin.</div>}
         </div>
       </div>
       <div className={`assembly-annotation ${ci >= 0 ? "visible" : ""}`}>
@@ -758,7 +758,7 @@ function Step4({ config }: any) {
                 </div>
                 <div className="calc-result">{c.result}</div>
               </div>
-              <div className="calc-explanation">"{c.explanation}"</div>
+              <div className="calc-explanation">&quot;{c.explanation}&quot;</div>
               {open && (
                 <div className="calc-breakdown">
                   <div className="calc-formula-visual">

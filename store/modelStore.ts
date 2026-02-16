@@ -57,6 +57,7 @@ interface ModelStore {
   setShowMinimap: (show: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
   setDetailPanelOpen: (open: boolean) => void;
+  toggleExpandedDomain: (domain: string) => void;
   setLayoutMode: (mode: 'grid' | 'force' | 'hierarchical' | 'domain' | 'domain-overview') => void;
   setViewMode: (mode: 'compact' | 'standard' | 'detailed') => void;
   setTableSize: (size: 'small' | 'medium' | 'large') => void;

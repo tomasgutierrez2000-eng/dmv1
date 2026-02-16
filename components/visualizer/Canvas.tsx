@@ -138,23 +138,24 @@ export default function Canvas() {
       
       setZoom(newZoom);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded to avoid layout thrash
   }, [model, layoutMode, tableSize, visibleLayers, setTablePosition, setPan, setZoom]);
 
   // Filter tables based on search, layer visibility, and categories
-  const visibleTables = model
-    ? Object.values(model.tables).filter((table) => {
-        if (!visibleLayers[table.layer]) return false;
-        // If categories are selected, table must be in one of them
-        if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          const matchesName = table.name.toLowerCase().includes(query);
-          const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
-          if (!matchesName && !matchesField) return false;
-        }
-        return true;
-      })
-    : [];
+  const visibleTables = useMemo(() => {
+    if (!model) return [];
+    return Object.values(model.tables).filter((table) => {
+      if (!visibleLayers[table.layer]) return false;
+      if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesName = table.name.toLowerCase().includes(query);
+        const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
+        if (!matchesName && !matchesField) return false;
+      }
+      return true;
+    });
+  }, [model, visibleLayers, filterCategories, searchQuery]);
 
   // Filter relationships to only show between visible tables with valid positions
   // Also filter by relationship visibility settings and focus mode
@@ -505,9 +506,9 @@ export default function Canvas() {
                 targetFieldIndex={targetFieldIndex !== undefined && targetFieldIndex >= 0 ? targetFieldIndex : undefined}
                 sourceTableFields={sourceTable?.fields.length || 0}
                 targetTableFields={targetTable?.fields.length || 0}
-                isSelected={selectedRelationship === rel.id || involvesSelectedField}
+                isSelected={selectedRelationship === rel.id || !!involvesSelectedField}
                 isHovered={hoveredRelationship === rel.id}
-                involvesSelectedField={involvesSelectedField}
+                involvesSelectedField={!!involvesSelectedField}
                 onSelect={() => setSelectedRelationship(rel.id)}
                 onHover={(hovered) => setHoveredRelationship(hovered ? rel.id : null)}
               />

@@ -22,7 +22,7 @@ export default function Footer() {
         
         <div className="mt-12 text-center">
           <p className="font-space-mono text-xs uppercase tracking-wider text-aerospace-silver/40">
-            DENSE.LOGIC™ // 2024
+            Bank Data Model Visualizer
           </p>
         </div>
       </div>

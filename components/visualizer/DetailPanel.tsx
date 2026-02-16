@@ -335,7 +335,7 @@ export default function DetailPanel() {
 
         {!table && !relationship && !selectedField && (
           <div className="text-center text-gray-400 mt-8">
-            <p>Click a table, then a column to see field details and relationships</p>
+            <p>Click a table, then a column to see field details and relationships for banking data</p>
           </div>
         )}
       </div>

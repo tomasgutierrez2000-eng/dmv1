@@ -80,7 +80,7 @@ export default function Sidebar() {
     <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">Model Explorer</h2>
+        <h2 className="text-lg font-bold text-white">Bank Data Model Explorer</h2>
         <button
           onClick={() => setSidebarOpen(false)}
           className="text-gray-400 hover:text-white"

@@ -541,9 +541,10 @@ function calculateDomainOverviewLayout(
   });
 
   const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 2400;
-  const availableWidth = viewportWidth - 12;
   const startX = 6;
   const startY = 8;
+  // Use a minimum width so 5 groups per row are each wider
+  const availableWidth = Math.max(viewportWidth - 12, 3200);
 
   let domains = Array.from(byDomain.keys());
 
@@ -561,8 +562,8 @@ function calculateDomainOverviewLayout(
     domains.sort((a, b) => byDomain.get(b)!.length - byDomain.get(a)!.length);
   }
 
-  // Fixed 4 categories per row - equal width for all domains (wider groupings)
-  const DOMAINS_PER_ROW = 4;
+  // 5 categories per row, equal width (wider groupings)
+  const DOMAINS_PER_ROW = 5;
   const totalHorizontalSpacing = (DOMAINS_PER_ROW - 1) * DOMAIN_SPACING;
   const domainWidth = Math.floor((availableWidth - totalHorizontalSpacing - startX * 2) / DOMAINS_PER_ROW);
   const effectiveWidth = domainWidth - DOMAIN_PADDING * 2;
@@ -603,7 +604,7 @@ function calculateDomainOverviewLayout(
     const domainTables = byDomain.get(domain)!;
     const domainHeight = domainHeights.get(domain)!;
 
-    // Wrap to next row after every 4 domains
+    // Wrap to next row after every 5 domains
     if (colIndex > 0 && colIndex % DOMAINS_PER_ROW === 0) {
       currentX = startX;
       currentY = maxYInRow + DOMAIN_SPACING;

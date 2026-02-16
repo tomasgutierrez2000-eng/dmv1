@@ -315,7 +315,7 @@ export default function Canvas() {
   if (!model) {
     return (
       <div className="flex items-center justify-center h-full text-gray-400">
-        <p>Upload an Excel file to visualize the data model</p>
+        <p>Upload a data dictionary (Excel) or load the bank data demo to visualize the model</p>
       </div>
     );
   }
@@ -382,12 +382,12 @@ export default function Canvas() {
               DOMAIN_PADDING: 15,
               headerOffset: 55,
               footerOffset: 15,
-              DOMAINS_PER_ROW: 4,
+              DOMAINS_PER_ROW: 5,
             };
 
             if (layoutMode === 'domain-overview') {
               const viewportW = typeof window !== 'undefined' ? window.innerWidth : 2400;
-              const availableWidth = viewportW - 12;
+              const availableWidth = Math.max(viewportW - 12, 3200);
               const domainWidth = Math.floor(
                 (availableWidth - (DOMAIN_OVERVIEW.DOMAINS_PER_ROW - 1) * DOMAIN_OVERVIEW.DOMAIN_SPACING - DOMAIN_OVERVIEW.startX * 2) / DOMAIN_OVERVIEW.DOMAINS_PER_ROW
               );

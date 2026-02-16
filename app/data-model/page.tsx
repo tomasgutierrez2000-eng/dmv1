@@ -136,7 +136,7 @@ export default function DataModelPage() {
       const response = await fetch('/api/data-dictionary');
       if (!response.ok) {
         if (response.status === 404) {
-          setError('No data dictionary found. Please upload and parse an Excel file first.');
+          setError('No data dictionary found. Use the Interactive Visualizer and load the L1 demo to explore the bank data model.');
         } else {
           setError('Failed to load data dictionary');
         }
@@ -207,7 +207,7 @@ export default function DataModelPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f9fafb' }}>
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading data model...</p>
+          <p className="text-gray-600">Loading bank data model...</p>
         </div>
       </div>
     );
@@ -218,7 +218,7 @@ export default function DataModelPage() {
       <div className="min-h-screen" style={{ backgroundColor: '#f9fafb', color: '#111827' }}>
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <h1 className="text-3xl font-bold" style={{ color: '#111827' }}>Data Model</h1>
+            <h1 className="text-3xl font-bold" style={{ color: '#111827' }}>Bank Data Model</h1>
           </div>
         </div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -229,10 +229,10 @@ export default function DataModelPage() {
                 <h3 className="font-semibold text-yellow-900 mb-2">No Data Dictionary Found</h3>
                 <p className="text-yellow-800 mb-4">{error}</p>
                 <Link
-                  href="/upload"
+                  href="/visualizer"
                   className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Go to Upload Page
+                  Open Interactive Visualizer
                 </Link>
               </div>
             </div>
@@ -248,7 +248,7 @@ export default function DataModelPage() {
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold" style={{ color: '#111827' }}>Data Model</h1>
+              <h1 className="text-3xl font-bold" style={{ color: '#111827' }}>Bank Data Model</h1>
               <p className="mt-2 text-sm" style={{ color: '#4b5563' }}>
                 {tableDefinitions.length} tables from parsed Excel workbook
               </p>
@@ -257,24 +257,24 @@ export default function DataModelPage() {
               <button
                 onClick={loadDataDictionary}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm flex items-center space-x-2"
-                title="Refresh data model"
+                title="Refresh bank data model"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Refresh</span>
               </button>
               <div className="flex items-center space-x-2">
                 <Link
-                  href="/upload"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-                >
-                  Upload Excel
-                </Link>
-                <Link
                   href="/visualizer"
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm flex items-center space-x-2"
                 >
                   <Link2 className="w-4 h-4" />
                   <span>Interactive Visualizer</span>
+                </Link>
+                <Link
+                  href="/overview"
+                  className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 text-sm"
+                >
+                  Overview
                 </Link>
               </div>
             </div>

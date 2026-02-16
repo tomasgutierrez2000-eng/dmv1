@@ -27,7 +27,7 @@ export default function HeroSection() {
         >
           <div className="w-full h-full flex items-center justify-center border border-[0.5px] border-aerospace-silver/20 m-2">
             <div className="text-aerospace-silver/20 text-xs font-space-mono uppercase tracking-widest">
-              PRODUCT
+              BANK DATA
             </div>
           </div>
         </motion.div>
@@ -41,7 +41,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          DENSE.LOGIC™ // PROTOCOL: MARINE.MATRIX
+          Bank Data Model Visualizer
         </motion.h1>
         
         <motion.p
@@ -50,11 +50,11 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Engineering the first bio-available, zero-fluff nutrition vehicle.
+          Explore L1/L2/L3 banking and financial services data schema, counterparties, facilities, and credit data.
         </motion.p>
 
         <motion.a
-          href="#briefing"
+          href="/visualizer"
           className="group relative px-8 py-4 bg-aerospace-silver text-matte-black font-space-mono uppercase text-sm tracking-widest border border-[0.5px] border-aerospace-silver hover:scale-105 transition-transform duration-300 flex items-center gap-2 mx-auto w-fit cursor-pointer"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function HeroSection() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
         >
-          INITIATE LAUNCH
+          Open Visualizer
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </motion.a>
       </div>

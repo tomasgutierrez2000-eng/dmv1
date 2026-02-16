@@ -101,14 +101,14 @@ export default function VisualizerPage() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="max-w-md w-full p-8">
                 <div className="mb-6 p-4 bg-gray-800/80 border border-gray-600 rounded-lg">
-                  <p className="text-sm text-gray-300 mb-3">View L1 schema and sample data (no upload required):</p>
+                  <p className="text-sm text-gray-300 mb-3">View L1 banking data schema and sample data (no upload required):</p>
                   <button
                     type="button"
                     onClick={loadL1Demo}
                     disabled={demoLoading}
                     className="w-full py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium text-sm"
                   >
-                    {demoLoading ? 'Loading…' : 'Load L1 demo (78 tables)'}
+                    {demoLoading ? 'Loading…' : 'Load L1 bank data demo (78 tables)'}
                   </button>
                 </div>
                 <FileUpload

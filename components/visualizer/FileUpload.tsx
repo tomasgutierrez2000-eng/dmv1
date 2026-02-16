@@ -64,8 +64,8 @@ export default function FileUpload({ onFileSelect, currentFile }: FileUploadProp
       ) : (
         <>
           <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-          <p className="text-sm text-gray-300 mb-2">Drop Excel file here or click to browse</p>
-          <p className="text-xs text-gray-500">Supports .xlsx and .xls formats</p>
+          <p className="text-sm text-gray-300 mb-2">Drop bank data dictionary (Excel) here or click to browse</p>
+          <p className="text-xs text-gray-500">L1/L2/L3 schema in .xlsx or .xls</p>
         </>
       )}
     </div>

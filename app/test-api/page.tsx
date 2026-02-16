@@ -76,10 +76,10 @@ export default function TestAPIPage() {
 
         <div className="mt-4">
           <a
-            href="/dashboard"
+            href="/overview"
             className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Go to Dashboard →
+            Go to Overview →
           </a>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, FileText, ArrowRight, Play, Upload, Eye, BarChart3, Network } from 'lucide-react';
+import { Database, Layers, FileText, ArrowRight, Play, Eye, Network } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewPage() {
@@ -19,8 +19,8 @@ export default function OverviewPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Data Model Overview</h1>
-              <p className="text-sm text-slate-400 mt-1">Understanding the three-layer architecture</p>
+              <h1 className="text-2xl font-bold">Bank Data Model Overview</h1>
+              <p className="text-sm text-slate-400 mt-1">Three-layer architecture for banking and financial services data</p>
             </div>
             <div className="flex items-center gap-3">
               <Link
@@ -29,13 +29,6 @@ export default function OverviewPage() {
               >
                 <Network className="w-4 h-4" />
                 Interactive Visualizer
-              </Link>
-              <Link
-                href="/upload"
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" />
-                Upload Excel
               </Link>
             </div>
           </div>
@@ -46,11 +39,11 @@ export default function OverviewPage() {
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Three-Layer Data Architecture
+            Three-Layer Bank Data Architecture
           </h2>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Our data model is organized into three distinct layers, each serving a specific purpose in transforming
-            raw source data into actionable business insights.
+            The banking data model is organized into three layers: reference and master data (L1), snapshots and events (L2),
+            and derived metrics and reporting (L3)—transforming raw financial data into regulatory and business insights.
           </p>
         </div>
 
@@ -258,30 +251,14 @@ export default function OverviewPage() {
         {/* Quick Actions */}
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
           <h3 className="text-2xl font-bold mb-6 text-center">Quick Actions</h3>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-1 gap-4 max-w-md mx-auto">
             <Link
               href="/visualizer"
               className="bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-blue-500/50 group"
             >
               <Network className="w-8 h-8 mx-auto mb-3 text-blue-400" />
               <h4 className="font-semibold mb-2">Interactive Visualizer</h4>
-              <p className="text-sm text-slate-400">Explore the full data model with interactive ERD</p>
-            </Link>
-            <Link
-              href="/upload"
-              className="bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-green-500/50 group"
-            >
-              <Upload className="w-8 h-8 mx-auto mb-3 text-green-400" />
-              <h4 className="font-semibold mb-2">Upload Excel</h4>
-              <p className="text-sm text-slate-400">Upload your data dictionary to visualize</p>
-            </Link>
-            <Link
-              href="/dashboard"
-              className="bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-purple-500/50 group"
-            >
-              <BarChart3 className="w-8 h-8 mx-auto mb-3 text-purple-400" />
-              <h4 className="font-semibold mb-2">View Dashboard</h4>
-              <p className="text-sm text-slate-400">See the final L3 data in action</p>
+              <p className="text-sm text-slate-400">Explore the full bank data model with interactive ERD and L1 sample data</p>
             </Link>
           </div>
         </div>

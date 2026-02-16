@@ -8,7 +8,7 @@ export default function StatusBar() {
       <div className="flex items-center gap-4">
         <div className="w-2 h-2 rounded-full bg-safety-orange animate-pulse" />
         <span className="font-space-mono text-[10px] uppercase tracking-[0.2em] text-aerospace-silver/80">
-          SYSTEM.STATUS: OPERATIONAL // PROTOCOL: MARINE.MATRIX
+          SYSTEM.STATUS: OPERATIONAL
         </span>
       </div>
       <div className="hidden md:block">

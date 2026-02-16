@@ -14,8 +14,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'DENSE.LOGIC™ // PROTOCOL: MARINE.MATRIX',
-  description: 'Engineering the first bio-available, zero-fluff nutrition vehicle.',
+  title: 'Bank Data Model Visualizer',
+  description: 'Visualize and explore L1/L2/L3 banking and financial services data model schema, relationships, and sample data.',
 }
 
 export default function RootLayout({

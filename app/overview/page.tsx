@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, FileText, ArrowRight, Play, Eye, Network } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewPage() {

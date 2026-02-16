@@ -1,0 +1,52 @@
+[
+  {
+    "industry_id": "IND-001",
+    "industry_name": "Technology",
+    "industry_code": "5112"
+  },
+  {
+    "industry_id": "IND-002",
+    "industry_name": "Healthcare",
+    "industry_code": "6211"
+  },
+  {
+    "industry_id": "IND-003",
+    "industry_name": "Energy",
+    "industry_code": "2111"
+  },
+  {
+    "industry_id": "IND-004",
+    "industry_name": "Financial Services",
+    "industry_code": "5221"
+  },
+  {
+    "industry_id": "IND-005",
+    "industry_name": "Manufacturing",
+    "industry_code": "3361"
+  },
+  {
+    "industry_id": "IND-006",
+    "industry_name": "Real Estate",
+    "industry_code": "5311"
+  },
+  {
+    "industry_id": "IND-007",
+    "industry_name": "Consumer Goods",
+    "industry_code": "4451"
+  },
+  {
+    "industry_id": "IND-008",
+    "industry_name": "Telecommunications",
+    "industry_code": "5171"
+  },
+  {
+    "industry_id": "IND-009",
+    "industry_name": "Utilities",
+    "industry_code": "2211"
+  },
+  {
+    "industry_id": "IND-010",
+    "industry_name": "Transportation",
+    "industry_code": "4811"
+  }
+]

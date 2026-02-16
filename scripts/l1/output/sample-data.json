@@ -1,0 +1,8608 @@
+{
+  "L1.currency_dim": {
+    "columns": [
+      "currency_code",
+      "currency_name",
+      "currency_symbol",
+      "is_active",
+      "iso_numeric",
+      "minor_unit_decimals"
+    ],
+    "rows": [
+      [
+        "USD",
+        "currency_name_1",
+        "currency_symbol_1",
+        "is_active_1",
+        "iso_numeric_1",
+        1
+      ],
+      [
+        "EUR",
+        "currency_name_2",
+        "currency_symbol_2",
+        "is_active_2",
+        "iso_numeric_2",
+        2
+      ],
+      [
+        "GBP",
+        "currency_name_3",
+        "currency_symbol_3",
+        "is_active_3",
+        "iso_numeric_3",
+        3
+      ],
+      [
+        "CHF",
+        "currency_name_4",
+        "currency_symbol_4",
+        "is_active_4",
+        "iso_numeric_4",
+        4
+      ],
+      [
+        "JPY",
+        "currency_name_5",
+        "currency_symbol_5",
+        "is_active_5",
+        "iso_numeric_5",
+        5
+      ],
+      [
+        "CAD",
+        "currency_name_6",
+        "currency_symbol_6",
+        "is_active_6",
+        "iso_numeric_6",
+        6
+      ],
+      [
+        "AUD",
+        "currency_name_7",
+        "currency_symbol_7",
+        "is_active_7",
+        "iso_numeric_7",
+        7
+      ],
+      [
+        "CNY",
+        "currency_name_8",
+        "currency_symbol_8",
+        "is_active_8",
+        "iso_numeric_8",
+        8
+      ],
+      [
+        "INR",
+        "currency_name_9",
+        "currency_symbol_9",
+        "is_active_9",
+        "iso_numeric_9",
+        9
+      ],
+      [
+        "BRL",
+        "currency_name_10",
+        "currency_symbol_10",
+        "is_active_10",
+        "iso_numeric_10",
+        10
+      ]
+    ]
+  },
+  "L1.country_dim": {
+    "columns": [
+      "country_code",
+      "country_name",
+      "is_active",
+      "region_code",
+      "basel_country_risk_weight",
+      "is_developed_market",
+      "is_fatf_high_risk",
+      "is_ofac_sanctioned",
+      "iso_alpha_3",
+      "iso_numeric",
+      "jurisdiction_id"
+    ],
+    "rows": [
+      [
+        "01",
+        "country_name_1",
+        "is_active_1",
+        "region_code_1",
+        "basel_country_risk_weight_1",
+        "is_developed_market_1",
+        "is_fatf_high_risk_1",
+        "is_ofac_sanctioned_1",
+        "iso_alpha_3_1",
+        "iso_numeric_1",
+        1
+      ],
+      [
+        "02",
+        "country_name_2",
+        "is_active_2",
+        "region_code_2",
+        "basel_country_risk_weight_2",
+        "is_developed_market_2",
+        "is_fatf_high_risk_2",
+        "is_ofac_sanctioned_2",
+        "iso_alpha_3_2",
+        "iso_numeric_2",
+        2
+      ],
+      [
+        "03",
+        "country_name_3",
+        "is_active_3",
+        "region_code_3",
+        "basel_country_risk_weight_3",
+        "is_developed_market_3",
+        "is_fatf_high_risk_3",
+        "is_ofac_sanctioned_3",
+        "iso_alpha_3_3",
+        "iso_numeric_3",
+        3
+      ],
+      [
+        "04",
+        "country_name_4",
+        "is_active_4",
+        "region_code_4",
+        "basel_country_risk_weight_4",
+        "is_developed_market_4",
+        "is_fatf_high_risk_4",
+        "is_ofac_sanctioned_4",
+        "iso_alpha_3_4",
+        "iso_numeric_4",
+        4
+      ],
+      [
+        "05",
+        "country_name_5",
+        "is_active_5",
+        "region_code_5",
+        "basel_country_risk_weight_5",
+        "is_developed_market_5",
+        "is_fatf_high_risk_5",
+        "is_ofac_sanctioned_5",
+        "iso_alpha_3_5",
+        "iso_numeric_5",
+        5
+      ],
+      [
+        "06",
+        "country_name_6",
+        "is_active_6",
+        "region_code_6",
+        "basel_country_risk_weight_6",
+        "is_developed_market_6",
+        "is_fatf_high_risk_6",
+        "is_ofac_sanctioned_6",
+        "iso_alpha_3_6",
+        "iso_numeric_6",
+        6
+      ],
+      [
+        "07",
+        "country_name_7",
+        "is_active_7",
+        "region_code_7",
+        "basel_country_risk_weight_7",
+        "is_developed_market_7",
+        "is_fatf_high_risk_7",
+        "is_ofac_sanctioned_7",
+        "iso_alpha_3_7",
+        "iso_numeric_7",
+        7
+      ],
+      [
+        "08",
+        "country_name_8",
+        "is_active_8",
+        "region_code_8",
+        "basel_country_risk_weight_8",
+        "is_developed_market_8",
+        "is_fatf_high_risk_8",
+        "is_ofac_sanctioned_8",
+        "iso_alpha_3_8",
+        "iso_numeric_8",
+        8
+      ],
+      [
+        "09",
+        "country_name_9",
+        "is_active_9",
+        "region_code_9",
+        "basel_country_risk_weight_9",
+        "is_developed_market_9",
+        "is_fatf_high_risk_9",
+        "is_ofac_sanctioned_9",
+        "iso_alpha_3_9",
+        "iso_numeric_9",
+        9
+      ],
+      [
+        "10",
+        "country_name_10",
+        "is_active_10",
+        "region_code_10",
+        "basel_country_risk_weight_10",
+        "is_developed_market_10",
+        "is_fatf_high_risk_10",
+        "is_ofac_sanctioned_10",
+        "iso_alpha_3_10",
+        "iso_numeric_10",
+        10
+      ]
+    ]
+  },
+  "L1.region_dim": {
+    "columns": [
+      "region_code",
+      "region_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "region_dim_1",
+        "region_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_2",
+        "region_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_3",
+        "region_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_4",
+        "region_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_5",
+        "region_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_6",
+        "region_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_7",
+        "region_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_8",
+        "region_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_9",
+        "region_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "region_dim_10",
+        "region_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.regulatory_jurisdiction": {
+    "columns": [
+      "jurisdiction_code",
+      "jurisdiction_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "regulatory_jurisdiction_1",
+        "jurisdiction_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_2",
+        "jurisdiction_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_3",
+        "jurisdiction_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_4",
+        "jurisdiction_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_5",
+        "jurisdiction_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_6",
+        "jurisdiction_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_7",
+        "jurisdiction_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_8",
+        "jurisdiction_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_9",
+        "jurisdiction_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "regulatory_jurisdiction_10",
+        "jurisdiction_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.entity_type_dim": {
+    "columns": [
+      "entity_type_code",
+      "entity_type_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "entity_type_dim_1",
+        "entity_type_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_2",
+        "entity_type_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_3",
+        "entity_type_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_4",
+        "entity_type_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_5",
+        "entity_type_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_6",
+        "entity_type_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_7",
+        "entity_type_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_8",
+        "entity_type_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_9",
+        "entity_type_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "entity_type_dim_10",
+        "entity_type_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.credit_event_type_dim": {
+    "columns": [
+      "credit_event_type_code",
+      "credit_event_type_id",
+      "credit_event_type_name",
+      "default_trigger_flag",
+      "active_flag"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "credit_event_type_name_1",
+        "Y",
+        "Y"
+      ],
+      [
+        2,
+        2,
+        "credit_event_type_name_2",
+        "N",
+        "N"
+      ],
+      [
+        3,
+        3,
+        "credit_event_type_name_3",
+        "Y",
+        "Y"
+      ],
+      [
+        4,
+        4,
+        "credit_event_type_name_4",
+        "N",
+        "N"
+      ],
+      [
+        5,
+        5,
+        "credit_event_type_name_5",
+        "Y",
+        "Y"
+      ],
+      [
+        6,
+        6,
+        "credit_event_type_name_6",
+        "N",
+        "N"
+      ],
+      [
+        7,
+        7,
+        "credit_event_type_name_7",
+        "Y",
+        "Y"
+      ],
+      [
+        8,
+        8,
+        "credit_event_type_name_8",
+        "N",
+        "N"
+      ],
+      [
+        9,
+        9,
+        "credit_event_type_name_9",
+        "Y",
+        "Y"
+      ],
+      [
+        10,
+        10,
+        "credit_event_type_name_10",
+        "N",
+        "N"
+      ]
+    ]
+  },
+  "L1.credit_status_dim": {
+    "columns": [
+      "credit_status_code",
+      "credit_status_name",
+      "default_flag",
+      "delinquency_bucket",
+      "status_category"
+    ],
+    "rows": [
+      [
+        1,
+        "credit_status_name_1",
+        "Y",
+        "delinquency_bucket_1",
+        "status_category_1"
+      ],
+      [
+        2,
+        "credit_status_name_2",
+        "N",
+        "delinquency_bucket_2",
+        "status_category_2"
+      ],
+      [
+        3,
+        "credit_status_name_3",
+        "Y",
+        "delinquency_bucket_3",
+        "status_category_3"
+      ],
+      [
+        4,
+        "credit_status_name_4",
+        "N",
+        "delinquency_bucket_4",
+        "status_category_4"
+      ],
+      [
+        5,
+        "credit_status_name_5",
+        "Y",
+        "delinquency_bucket_5",
+        "status_category_5"
+      ],
+      [
+        6,
+        "credit_status_name_6",
+        "N",
+        "delinquency_bucket_6",
+        "status_category_6"
+      ],
+      [
+        7,
+        "credit_status_name_7",
+        "Y",
+        "delinquency_bucket_7",
+        "status_category_7"
+      ],
+      [
+        8,
+        "credit_status_name_8",
+        "N",
+        "delinquency_bucket_8",
+        "status_category_8"
+      ],
+      [
+        9,
+        "credit_status_name_9",
+        "Y",
+        "delinquency_bucket_9",
+        "status_category_9"
+      ],
+      [
+        10,
+        "credit_status_name_10",
+        "N",
+        "delinquency_bucket_10",
+        "status_category_10"
+      ]
+    ]
+  },
+  "L1.exposure_type_dim": {
+    "columns": [
+      "exposure_type_id",
+      "exposure_type_code",
+      "exposure_type_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "exposure_type_code_1",
+        "exposure_type_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "exposure_type_code_2",
+        "exposure_type_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "exposure_type_code_3",
+        "exposure_type_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "exposure_type_code_4",
+        "exposure_type_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "exposure_type_code_5",
+        "exposure_type_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "exposure_type_code_6",
+        "exposure_type_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "exposure_type_code_7",
+        "exposure_type_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "exposure_type_code_8",
+        "exposure_type_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "exposure_type_code_9",
+        "exposure_type_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "exposure_type_code_10",
+        "exposure_type_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.amendment_status_dim": {
+    "columns": [
+      "amendment_status_code",
+      "amendment_status_name",
+      "status_group",
+      "is_terminal_flag",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "amendment_status_dim_1",
+        "amendment_status_name_1",
+        "status_group_1",
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_2",
+        "amendment_status_name_2",
+        "status_group_2",
+        "N",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_3",
+        "amendment_status_name_3",
+        "status_group_3",
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_4",
+        "amendment_status_name_4",
+        "status_group_4",
+        "N",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_5",
+        "amendment_status_name_5",
+        "status_group_5",
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_6",
+        "amendment_status_name_6",
+        "status_group_6",
+        "N",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_7",
+        "amendment_status_name_7",
+        "status_group_7",
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_8",
+        "amendment_status_name_8",
+        "status_group_8",
+        "N",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_9",
+        "amendment_status_name_9",
+        "status_group_9",
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_status_dim_10",
+        "amendment_status_name_10",
+        "status_group_10",
+        "N",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.amendment_type_dim": {
+    "columns": [
+      "amendment_type_code",
+      "amendment_type_name",
+      "description",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "amendment_type_dim_1",
+        "amendment_type_name_1",
+        "description_1",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_2",
+        "amendment_type_name_2",
+        "description_2",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_3",
+        "amendment_type_name_3",
+        "description_3",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_4",
+        "amendment_type_name_4",
+        "description_4",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_5",
+        "amendment_type_name_5",
+        "description_5",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_6",
+        "amendment_type_name_6",
+        "description_6",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_7",
+        "amendment_type_name_7",
+        "description_7",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_8",
+        "amendment_type_name_8",
+        "description_8",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_9",
+        "amendment_type_name_9",
+        "description_9",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "amendment_type_dim_10",
+        "amendment_type_name_10",
+        "description_10",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.default_definition_dim": {
+    "columns": [
+      "default_definition_id",
+      "default_definition_code",
+      "description",
+      "jurisdiction_code",
+      "days_past_due_threshold",
+      "credit_event_trigger_flag",
+      "materiality_threshold_amt"
+    ],
+    "rows": [
+      [
+        1,
+        "default_definition_code_1",
+        "description_1",
+        "jurisdiction_code_1",
+        "days_past_due_threshold_1",
+        "Y",
+        100.5
+      ],
+      [
+        2,
+        "default_definition_code_2",
+        "description_2",
+        "jurisdiction_code_2",
+        "days_past_due_threshold_2",
+        "N",
+        100.5
+      ],
+      [
+        3,
+        "default_definition_code_3",
+        "description_3",
+        "jurisdiction_code_3",
+        "days_past_due_threshold_3",
+        "Y",
+        100.5
+      ],
+      [
+        4,
+        "default_definition_code_4",
+        "description_4",
+        "jurisdiction_code_4",
+        "days_past_due_threshold_4",
+        "N",
+        100.5
+      ],
+      [
+        5,
+        "default_definition_code_5",
+        "description_5",
+        "jurisdiction_code_5",
+        "days_past_due_threshold_5",
+        "Y",
+        100.5
+      ],
+      [
+        6,
+        "default_definition_code_6",
+        "description_6",
+        "jurisdiction_code_6",
+        "days_past_due_threshold_6",
+        "N",
+        100.5
+      ],
+      [
+        7,
+        "default_definition_code_7",
+        "description_7",
+        "jurisdiction_code_7",
+        "days_past_due_threshold_7",
+        "Y",
+        100.5
+      ],
+      [
+        8,
+        "default_definition_code_8",
+        "description_8",
+        "jurisdiction_code_8",
+        "days_past_due_threshold_8",
+        "N",
+        100.5
+      ],
+      [
+        9,
+        "default_definition_code_9",
+        "description_9",
+        "jurisdiction_code_9",
+        "days_past_due_threshold_9",
+        "Y",
+        100.5
+      ],
+      [
+        10,
+        "default_definition_code_10",
+        "description_10",
+        "jurisdiction_code_10",
+        "days_past_due_threshold_10",
+        "N",
+        100.5
+      ]
+    ]
+  },
+  "L1.maturity_bucket_dim": {
+    "columns": [
+      "maturity_bucket_id",
+      "bucket_code",
+      "bucket_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "bucket_code_1",
+        "bucket_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "bucket_code_2",
+        "bucket_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "bucket_code_3",
+        "bucket_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "bucket_code_4",
+        "bucket_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "bucket_code_5",
+        "bucket_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "bucket_code_6",
+        "bucket_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "bucket_code_7",
+        "bucket_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "bucket_code_8",
+        "bucket_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "bucket_code_9",
+        "bucket_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "bucket_code_10",
+        "bucket_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.fr2590_category_dim": {
+    "columns": [
+      "fr2590_category_code",
+      "category_name",
+      "definition",
+      "display_order",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "category_name_1",
+        "definition_1",
+        "display_order_1",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "category_name_2",
+        "definition_2",
+        "display_order_2",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "category_name_3",
+        "definition_3",
+        "display_order_3",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "category_name_4",
+        "definition_4",
+        "display_order_4",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "category_name_5",
+        "definition_5",
+        "display_order_5",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "category_name_6",
+        "definition_6",
+        "display_order_6",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "category_name_7",
+        "definition_7",
+        "display_order_7",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "category_name_8",
+        "definition_8",
+        "display_order_8",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "category_name_9",
+        "definition_9",
+        "display_order_9",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "category_name_10",
+        "definition_10",
+        "display_order_10",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.counterparty_role_dim": {
+    "columns": [
+      "counterparty_role_code",
+      "role_name",
+      "role_category",
+      "is_risk_bearing_flag",
+      "description",
+      "is_active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "counterparty_role_dim_1",
+        "role_name_1",
+        "role_category_1",
+        "Y",
+        "description_1",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_2",
+        "role_name_2",
+        "role_category_2",
+        "N",
+        "description_2",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_3",
+        "role_name_3",
+        "role_category_3",
+        "Y",
+        "description_3",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_4",
+        "role_name_4",
+        "role_category_4",
+        "N",
+        "description_4",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_5",
+        "role_name_5",
+        "role_category_5",
+        "Y",
+        "description_5",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_6",
+        "role_name_6",
+        "role_category_6",
+        "N",
+        "description_6",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_7",
+        "role_name_7",
+        "role_category_7",
+        "Y",
+        "description_7",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_8",
+        "role_name_8",
+        "role_category_8",
+        "N",
+        "description_8",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_9",
+        "role_name_9",
+        "role_category_9",
+        "Y",
+        "description_9",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "counterparty_role_dim_10",
+        "role_name_10",
+        "role_category_10",
+        "N",
+        "description_10",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.rating_scale_dim": {
+    "columns": [
+      "rating_scale_id",
+      "scale_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "scale_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "scale_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "scale_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "scale_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "scale_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "scale_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "scale_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "scale_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "scale_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "scale_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.crm_type_dim": {
+    "columns": [
+      "crm_type_code",
+      "crm_type_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "crm_type_dim_1",
+        "crm_type_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_2",
+        "crm_type_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_3",
+        "crm_type_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_4",
+        "crm_type_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_5",
+        "crm_type_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_6",
+        "crm_type_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_7",
+        "crm_type_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_8",
+        "crm_type_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_9",
+        "crm_type_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "crm_type_dim_10",
+        "crm_type_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.source_system_registry": {
+    "columns": [
+      "source_system_id",
+      "source_system_name",
+      "data_domain",
+      "ingestion_frequency",
+      "system_owner",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "source_system_name_1",
+        "data_domain_1",
+        "ingestion_frequency_1",
+        "system_owner_1",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "source_system_name_2",
+        "data_domain_2",
+        "ingestion_frequency_2",
+        "system_owner_2",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "source_system_name_3",
+        "data_domain_3",
+        "ingestion_frequency_3",
+        "system_owner_3",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "source_system_name_4",
+        "data_domain_4",
+        "ingestion_frequency_4",
+        "system_owner_4",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "source_system_name_5",
+        "data_domain_5",
+        "ingestion_frequency_5",
+        "system_owner_5",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "source_system_name_6",
+        "data_domain_6",
+        "ingestion_frequency_6",
+        "system_owner_6",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "source_system_name_7",
+        "data_domain_7",
+        "ingestion_frequency_7",
+        "system_owner_7",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "source_system_name_8",
+        "data_domain_8",
+        "ingestion_frequency_8",
+        "system_owner_8",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "source_system_name_9",
+        "data_domain_9",
+        "ingestion_frequency_9",
+        "system_owner_9",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "source_system_name_10",
+        "data_domain_10",
+        "ingestion_frequency_10",
+        "system_owner_10",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.date_dim": {
+    "columns": [
+      "date_id",
+      "calendar_date",
+      "calendar_year",
+      "calendar_quarter",
+      "calendar_month",
+      "day_of_month",
+      "day_of_week",
+      "day_name",
+      "fiscal_year",
+      "fiscal_quarter",
+      "fiscal_month",
+      "is_weekend",
+      "is_month_end",
+      "is_quarter_end",
+      "is_year_end",
+      "is_us_business_day",
+      "is_us_bank_holiday"
+    ],
+    "rows": [
+      [
+        1,
+        "2024-06-15",
+        "calendar_year_1",
+        "calendar_quarter_1",
+        "calendar_month_1",
+        "day_of_month_1",
+        "day_of_week_1",
+        "day_name_1",
+        "fiscal_year_1",
+        "fiscal_quarter_1",
+        "fiscal_month_1",
+        "is_weekend_1",
+        "is_month_end_1",
+        "is_quarter_end_1",
+        "is_year_end_1",
+        "is_us_business_day_1",
+        "is_us_bank_holiday_1"
+      ],
+      [
+        2,
+        "2024-06-15",
+        "calendar_year_2",
+        "calendar_quarter_2",
+        "calendar_month_2",
+        "day_of_month_2",
+        "day_of_week_2",
+        "day_name_2",
+        "fiscal_year_2",
+        "fiscal_quarter_2",
+        "fiscal_month_2",
+        "is_weekend_2",
+        "is_month_end_2",
+        "is_quarter_end_2",
+        "is_year_end_2",
+        "is_us_business_day_2",
+        "is_us_bank_holiday_2"
+      ],
+      [
+        3,
+        "2024-06-15",
+        "calendar_year_3",
+        "calendar_quarter_3",
+        "calendar_month_3",
+        "day_of_month_3",
+        "day_of_week_3",
+        "day_name_3",
+        "fiscal_year_3",
+        "fiscal_quarter_3",
+        "fiscal_month_3",
+        "is_weekend_3",
+        "is_month_end_3",
+        "is_quarter_end_3",
+        "is_year_end_3",
+        "is_us_business_day_3",
+        "is_us_bank_holiday_3"
+      ],
+      [
+        4,
+        "2024-06-15",
+        "calendar_year_4",
+        "calendar_quarter_4",
+        "calendar_month_4",
+        "day_of_month_4",
+        "day_of_week_4",
+        "day_name_4",
+        "fiscal_year_4",
+        "fiscal_quarter_4",
+        "fiscal_month_4",
+        "is_weekend_4",
+        "is_month_end_4",
+        "is_quarter_end_4",
+        "is_year_end_4",
+        "is_us_business_day_4",
+        "is_us_bank_holiday_4"
+      ],
+      [
+        5,
+        "2024-06-15",
+        "calendar_year_5",
+        "calendar_quarter_5",
+        "calendar_month_5",
+        "day_of_month_5",
+        "day_of_week_5",
+        "day_name_5",
+        "fiscal_year_5",
+        "fiscal_quarter_5",
+        "fiscal_month_5",
+        "is_weekend_5",
+        "is_month_end_5",
+        "is_quarter_end_5",
+        "is_year_end_5",
+        "is_us_business_day_5",
+        "is_us_bank_holiday_5"
+      ],
+      [
+        6,
+        "2024-06-15",
+        "calendar_year_6",
+        "calendar_quarter_6",
+        "calendar_month_6",
+        "day_of_month_6",
+        "day_of_week_6",
+        "day_name_6",
+        "fiscal_year_6",
+        "fiscal_quarter_6",
+        "fiscal_month_6",
+        "is_weekend_6",
+        "is_month_end_6",
+        "is_quarter_end_6",
+        "is_year_end_6",
+        "is_us_business_day_6",
+        "is_us_bank_holiday_6"
+      ],
+      [
+        7,
+        "2024-06-15",
+        "calendar_year_7",
+        "calendar_quarter_7",
+        "calendar_month_7",
+        "day_of_month_7",
+        "day_of_week_7",
+        "day_name_7",
+        "fiscal_year_7",
+        "fiscal_quarter_7",
+        "fiscal_month_7",
+        "is_weekend_7",
+        "is_month_end_7",
+        "is_quarter_end_7",
+        "is_year_end_7",
+        "is_us_business_day_7",
+        "is_us_bank_holiday_7"
+      ],
+      [
+        8,
+        "2024-06-15",
+        "calendar_year_8",
+        "calendar_quarter_8",
+        "calendar_month_8",
+        "day_of_month_8",
+        "day_of_week_8",
+        "day_name_8",
+        "fiscal_year_8",
+        "fiscal_quarter_8",
+        "fiscal_month_8",
+        "is_weekend_8",
+        "is_month_end_8",
+        "is_quarter_end_8",
+        "is_year_end_8",
+        "is_us_business_day_8",
+        "is_us_bank_holiday_8"
+      ],
+      [
+        9,
+        "2024-06-15",
+        "calendar_year_9",
+        "calendar_quarter_9",
+        "calendar_month_9",
+        "day_of_month_9",
+        "day_of_week_9",
+        "day_name_9",
+        "fiscal_year_9",
+        "fiscal_quarter_9",
+        "fiscal_month_9",
+        "is_weekend_9",
+        "is_month_end_9",
+        "is_quarter_end_9",
+        "is_year_end_9",
+        "is_us_business_day_9",
+        "is_us_bank_holiday_9"
+      ],
+      [
+        10,
+        "2024-06-15",
+        "calendar_year_10",
+        "calendar_quarter_10",
+        "calendar_month_10",
+        "day_of_month_10",
+        "day_of_week_10",
+        "day_name_10",
+        "fiscal_year_10",
+        "fiscal_quarter_10",
+        "fiscal_month_10",
+        "is_weekend_10",
+        "is_month_end_10",
+        "is_quarter_end_10",
+        "is_year_end_10",
+        "is_us_business_day_10",
+        "is_us_bank_holiday_10"
+      ]
+    ]
+  },
+  "L1.date_time_dim": {
+    "columns": [
+      "date_time_id",
+      "date_id",
+      "timestamp_utc",
+      "hour_of_day",
+      "minute_of_hour",
+      "second_of_minute",
+      "timezone_code",
+      "is_dst"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-06-15 12:00:00",
+        "hour_of_day_1",
+        "minute_of_hour_1",
+        "second_of_minute_1",
+        "timezone_code_1",
+        "is_dst_1"
+      ],
+      [
+        2,
+        2,
+        "2024-06-15 12:00:00",
+        "hour_of_day_2",
+        "minute_of_hour_2",
+        "second_of_minute_2",
+        "timezone_code_2",
+        "is_dst_2"
+      ],
+      [
+        3,
+        3,
+        "2024-06-15 12:00:00",
+        "hour_of_day_3",
+        "minute_of_hour_3",
+        "second_of_minute_3",
+        "timezone_code_3",
+        "is_dst_3"
+      ],
+      [
+        4,
+        4,
+        "2024-06-15 12:00:00",
+        "hour_of_day_4",
+        "minute_of_hour_4",
+        "second_of_minute_4",
+        "timezone_code_4",
+        "is_dst_4"
+      ],
+      [
+        5,
+        5,
+        "2024-06-15 12:00:00",
+        "hour_of_day_5",
+        "minute_of_hour_5",
+        "second_of_minute_5",
+        "timezone_code_5",
+        "is_dst_5"
+      ],
+      [
+        6,
+        6,
+        "2024-06-15 12:00:00",
+        "hour_of_day_6",
+        "minute_of_hour_6",
+        "second_of_minute_6",
+        "timezone_code_6",
+        "is_dst_6"
+      ],
+      [
+        7,
+        7,
+        "2024-06-15 12:00:00",
+        "hour_of_day_7",
+        "minute_of_hour_7",
+        "second_of_minute_7",
+        "timezone_code_7",
+        "is_dst_7"
+      ],
+      [
+        8,
+        8,
+        "2024-06-15 12:00:00",
+        "hour_of_day_8",
+        "minute_of_hour_8",
+        "second_of_minute_8",
+        "timezone_code_8",
+        "is_dst_8"
+      ],
+      [
+        9,
+        9,
+        "2024-06-15 12:00:00",
+        "hour_of_day_9",
+        "minute_of_hour_9",
+        "second_of_minute_9",
+        "timezone_code_9",
+        "is_dst_9"
+      ],
+      [
+        10,
+        10,
+        "2024-06-15 12:00:00",
+        "hour_of_day_10",
+        "minute_of_hour_10",
+        "second_of_minute_10",
+        "timezone_code_10",
+        "is_dst_10"
+      ]
+    ]
+  },
+  "L1.regulatory_capital_basis_dim": {
+    "columns": [
+      "regulatory_capital_basis_id",
+      "basis_code",
+      "basis_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "basis_code_1",
+        "basis_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "basis_code_2",
+        "basis_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "basis_code_3",
+        "basis_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "basis_code_4",
+        "basis_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "basis_code_5",
+        "basis_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "basis_code_6",
+        "basis_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "basis_code_7",
+        "basis_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "basis_code_8",
+        "basis_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "basis_code_9",
+        "basis_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "basis_code_10",
+        "basis_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.industry_dim": {
+    "columns": [
+      "industry_id",
+      "industry_code",
+      "industry_name",
+      "industry_level",
+      "industry_standard",
+      "parent_industry_id",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "industry_code_1",
+        "industry_name_1",
+        "industry_level_1",
+        "industry_standard_1",
+        1,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "industry_code_2",
+        "industry_name_2",
+        "industry_level_2",
+        "industry_standard_2",
+        2,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "industry_code_3",
+        "industry_name_3",
+        "industry_level_3",
+        "industry_standard_3",
+        3,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "industry_code_4",
+        "industry_name_4",
+        "industry_level_4",
+        "industry_standard_4",
+        4,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "industry_code_5",
+        "industry_name_5",
+        "industry_level_5",
+        "industry_standard_5",
+        5,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "industry_code_6",
+        "industry_name_6",
+        "industry_level_6",
+        "industry_standard_6",
+        6,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "industry_code_7",
+        "industry_name_7",
+        "industry_level_7",
+        "industry_standard_7",
+        7,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "industry_code_8",
+        "industry_name_8",
+        "industry_level_8",
+        "industry_standard_8",
+        8,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "industry_code_9",
+        "industry_name_9",
+        "industry_level_9",
+        "industry_standard_9",
+        9,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "industry_code_10",
+        "industry_name_10",
+        "industry_level_10",
+        "industry_standard_10",
+        10,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.enterprise_business_taxonomy": {
+    "columns": [
+      "managed_segment_id",
+      "segment_code",
+      "segment_name",
+      "parent_segment_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "segment_code_1",
+        "segment_name_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "segment_code_2",
+        "segment_name_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "segment_code_3",
+        "segment_name_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "segment_code_4",
+        "segment_name_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "segment_code_5",
+        "segment_name_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "segment_code_6",
+        "segment_name_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "segment_code_7",
+        "segment_name_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "segment_code_8",
+        "segment_name_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "segment_code_9",
+        "segment_name_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "segment_code_10",
+        "segment_name_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.enterprise_product_taxonomy": {
+    "columns": [
+      "product_node_id",
+      "product_code",
+      "product_name",
+      "parent_node_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "product_code_1",
+        "product_name_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "product_code_2",
+        "product_name_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "product_code_3",
+        "product_name_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "product_code_4",
+        "product_name_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "product_code_5",
+        "product_name_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "product_code_6",
+        "product_name_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "product_code_7",
+        "product_name_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "product_code_8",
+        "product_name_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "product_code_9",
+        "product_name_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "product_code_10",
+        "product_name_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.portfolio_dim": {
+    "columns": [
+      "portfolio_id",
+      "portfolio_code",
+      "portfolio_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "portfolio_code_1",
+        "portfolio_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "portfolio_code_2",
+        "portfolio_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "portfolio_code_3",
+        "portfolio_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "portfolio_code_4",
+        "portfolio_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "portfolio_code_5",
+        "portfolio_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "portfolio_code_6",
+        "portfolio_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "portfolio_code_7",
+        "portfolio_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "portfolio_code_8",
+        "portfolio_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "portfolio_code_9",
+        "portfolio_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "portfolio_code_10",
+        "portfolio_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.org_unit_dim": {
+    "columns": [
+      "org_unit_id",
+      "org_unit_code",
+      "org_unit_name",
+      "parent_org_unit_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "org_unit_code_1",
+        "org_unit_name_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "org_unit_code_2",
+        "org_unit_name_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "org_unit_code_3",
+        "org_unit_name_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "org_unit_code_4",
+        "org_unit_name_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "org_unit_code_5",
+        "org_unit_name_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "org_unit_code_6",
+        "org_unit_name_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "org_unit_code_7",
+        "org_unit_name_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "org_unit_code_8",
+        "org_unit_name_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "org_unit_code_9",
+        "org_unit_name_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "org_unit_code_10",
+        "org_unit_name_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.rating_source": {
+    "columns": [
+      "rating_source_id",
+      "source_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "source_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "source_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "source_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "source_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "source_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "source_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "source_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "source_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "source_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "source_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.rating_grade_dim": {
+    "columns": [
+      "rating_grade_id",
+      "rating_scale_id",
+      "grade_code",
+      "grade_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "grade_code_1",
+        "grade_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "grade_code_2",
+        "grade_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "grade_code_3",
+        "grade_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "grade_code_4",
+        "grade_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "grade_code_5",
+        "grade_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "grade_code_6",
+        "grade_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "grade_code_7",
+        "grade_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "grade_code_8",
+        "grade_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "grade_code_9",
+        "grade_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "grade_code_10",
+        "grade_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.collateral_type": {
+    "columns": [
+      "collateral_type_id",
+      "name",
+      "collateral_category",
+      "description",
+      "active_flag",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "name_1",
+        "collateral_category_1",
+        "description_1",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "name_2",
+        "collateral_category_2",
+        "description_2",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "name_3",
+        "collateral_category_3",
+        "description_3",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "name_4",
+        "collateral_category_4",
+        "description_4",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "name_5",
+        "collateral_category_5",
+        "description_5",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "name_6",
+        "collateral_category_6",
+        "description_6",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "name_7",
+        "collateral_category_7",
+        "description_7",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "name_8",
+        "collateral_category_8",
+        "description_8",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "name_9",
+        "collateral_category_9",
+        "description_9",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "name_10",
+        "collateral_category_10",
+        "description_10",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.interest_rate_index_dim": {
+    "columns": [
+      "rate_index_id",
+      "index_code",
+      "index_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "index_code_1",
+        "index_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "index_code_2",
+        "index_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "index_code_3",
+        "index_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "index_code_4",
+        "index_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "index_code_5",
+        "index_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "index_code_6",
+        "index_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "index_code_7",
+        "index_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "index_code_8",
+        "index_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "index_code_9",
+        "index_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "index_code_10",
+        "index_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.ledger_account_dim": {
+    "columns": [
+      "ledger_account_id",
+      "account_code",
+      "account_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "account_code_1",
+        "account_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "account_code_2",
+        "account_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "account_code_3",
+        "account_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "account_code_4",
+        "account_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "account_code_5",
+        "account_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "account_code_6",
+        "account_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "account_code_7",
+        "account_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "account_code_8",
+        "account_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "account_code_9",
+        "account_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "account_code_10",
+        "account_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.context_dim": {
+    "columns": [
+      "context_id",
+      "context_domain",
+      "context_code",
+      "context_name",
+      "description",
+      "is_active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "context_domain_1",
+        "context_code_1",
+        "context_name_1",
+        "description_1",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "context_domain_2",
+        "context_code_2",
+        "context_name_2",
+        "description_2",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "context_domain_3",
+        "context_code_3",
+        "context_name_3",
+        "description_3",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "context_domain_4",
+        "context_code_4",
+        "context_name_4",
+        "description_4",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "context_domain_5",
+        "context_code_5",
+        "context_name_5",
+        "description_5",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "context_domain_6",
+        "context_code_6",
+        "context_name_6",
+        "description_6",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "context_domain_7",
+        "context_code_7",
+        "context_name_7",
+        "description_7",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "context_domain_8",
+        "context_code_8",
+        "context_name_8",
+        "description_8",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "context_domain_9",
+        "context_code_9",
+        "context_name_9",
+        "description_9",
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "context_domain_10",
+        "context_code_10",
+        "context_name_10",
+        "description_10",
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.metric_definition_dim": {
+    "columns": [
+      "metric_definition_id",
+      "metric_code",
+      "metric_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "metric_code_1",
+        "metric_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "metric_code_2",
+        "metric_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "metric_code_3",
+        "metric_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "metric_code_4",
+        "metric_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "metric_code_5",
+        "metric_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "metric_code_6",
+        "metric_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "metric_code_7",
+        "metric_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "metric_code_8",
+        "metric_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "metric_code_9",
+        "metric_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "metric_code_10",
+        "metric_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.counterparty": {
+    "columns": [
+      "counterparty_id",
+      "legal_name",
+      "counterparty_type",
+      "country_code",
+      "entity_type_code",
+      "industry_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "legal_name_1",
+        "counterparty_type_1",
+        "01",
+        "counterparty_1",
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "legal_name_2",
+        "counterparty_type_2",
+        "02",
+        "counterparty_2",
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "legal_name_3",
+        "counterparty_type_3",
+        "03",
+        "counterparty_3",
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "legal_name_4",
+        "counterparty_type_4",
+        "04",
+        "counterparty_4",
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "legal_name_5",
+        "counterparty_type_5",
+        "05",
+        "counterparty_5",
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "legal_name_6",
+        "counterparty_type_6",
+        "06",
+        "counterparty_6",
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "legal_name_7",
+        "counterparty_type_7",
+        "07",
+        "counterparty_7",
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "legal_name_8",
+        "counterparty_type_8",
+        "08",
+        "counterparty_8",
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "legal_name_9",
+        "counterparty_type_9",
+        "09",
+        "counterparty_9",
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "legal_name_10",
+        "counterparty_type_10",
+        "10",
+        "counterparty_10",
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.legal_entity": {
+    "columns": [
+      "legal_entity_id",
+      "legal_name",
+      "country_code",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "legal_name_1",
+        "01",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "legal_name_2",
+        "02",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "legal_name_3",
+        "03",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "legal_name_4",
+        "04",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "legal_name_5",
+        "05",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "legal_name_6",
+        "06",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "legal_name_7",
+        "07",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "legal_name_8",
+        "08",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "legal_name_9",
+        "09",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "legal_name_10",
+        "10",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.instrument_master": {
+    "columns": [
+      "instrument_id",
+      "country_code",
+      "currency_code",
+      "active_flag",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "01",
+        "USD",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "02",
+        "EUR",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "03",
+        "GBP",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "04",
+        "CHF",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "05",
+        "JPY",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "06",
+        "CAD",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "07",
+        "AUD",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "08",
+        "CNY",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "09",
+        "INR",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "10",
+        "BRL",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.instrument_identifier": {
+    "columns": [
+      "instrument_id",
+      "id_type",
+      "effective_start_date",
+      "effective_end_date",
+      "id_value",
+      "source_system_id",
+      "created_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "instrument_identifier_1",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "instrument_identifier_2",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "instrument_identifier_3",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "instrument_identifier_4",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "instrument_identifier_5",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "instrument_identifier_6",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "instrument_identifier_7",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "instrument_identifier_8",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "instrument_identifier_9",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "instrument_identifier_10",
+        "2024-06-15",
+        "2024-06-15",
+        "id_value_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.credit_agreement_master": {
+    "columns": [
+      "credit_agreement_id",
+      "borrower_counterparty_id",
+      "lender_legal_entity_id",
+      "currency_code",
+      "agreement_type",
+      "origination_date",
+      "maturity_date",
+      "status_code",
+      "agreement_reference",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "USD",
+        "agreement_type_1",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_1",
+        "agreement_reference_1",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "EUR",
+        "agreement_type_2",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_2",
+        "agreement_reference_2",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "GBP",
+        "agreement_type_3",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_3",
+        "agreement_reference_3",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "CHF",
+        "agreement_type_4",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_4",
+        "agreement_reference_4",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "JPY",
+        "agreement_type_5",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_5",
+        "agreement_reference_5",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "CAD",
+        "agreement_type_6",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_6",
+        "agreement_reference_6",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "AUD",
+        "agreement_type_7",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_7",
+        "agreement_reference_7",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "CNY",
+        "agreement_type_8",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_8",
+        "agreement_reference_8",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "INR",
+        "agreement_type_9",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_9",
+        "agreement_reference_9",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "BRL",
+        "agreement_type_10",
+        "2024-06-15",
+        "2024-06-15",
+        "status_code_10",
+        "agreement_reference_10",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.facility_master": {
+    "columns": [
+      "facility_id",
+      "credit_agreement_id",
+      "counterparty_id",
+      "currency_code",
+      "facility_name",
+      "facility_type",
+      "facility_status",
+      "committed_facility_amt",
+      "origination_date",
+      "maturity_date",
+      "portfolio_id",
+      "industry_code",
+      "lob_segment_id",
+      "product_node_id",
+      "rate_index_id",
+      "ledger_account_id",
+      "created_ts",
+      "updated_ts",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "USD",
+        "facility_name_1",
+        "facility_type_1",
+        "facility_status_1",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        1,
+        "industry_code_1",
+        1,
+        1,
+        1,
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "EUR",
+        "facility_name_2",
+        "facility_type_2",
+        "facility_status_2",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        2,
+        "industry_code_2",
+        2,
+        2,
+        2,
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "GBP",
+        "facility_name_3",
+        "facility_type_3",
+        "facility_status_3",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        3,
+        "industry_code_3",
+        3,
+        3,
+        3,
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "CHF",
+        "facility_name_4",
+        "facility_type_4",
+        "facility_status_4",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        4,
+        "industry_code_4",
+        4,
+        4,
+        4,
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "JPY",
+        "facility_name_5",
+        "facility_type_5",
+        "facility_status_5",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        5,
+        "industry_code_5",
+        5,
+        5,
+        5,
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "CAD",
+        "facility_name_6",
+        "facility_type_6",
+        "facility_status_6",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        6,
+        "industry_code_6",
+        6,
+        6,
+        6,
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "AUD",
+        "facility_name_7",
+        "facility_type_7",
+        "facility_status_7",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        7,
+        "industry_code_7",
+        7,
+        7,
+        7,
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "CNY",
+        "facility_name_8",
+        "facility_type_8",
+        "facility_status_8",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        8,
+        "industry_code_8",
+        8,
+        8,
+        8,
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "INR",
+        "facility_name_9",
+        "facility_type_9",
+        "facility_status_9",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        9,
+        "industry_code_9",
+        9,
+        9,
+        9,
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "BRL",
+        "facility_name_10",
+        "facility_type_10",
+        "facility_status_10",
+        100.5,
+        "2024-06-15",
+        "2024-06-15",
+        10,
+        "industry_code_10",
+        10,
+        10,
+        10,
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.contract_master": {
+    "columns": [
+      "contract_id",
+      "contract_type",
+      "contract_status",
+      "effective_start_date",
+      "created_ts",
+      "updated_ts",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "contract_type_1",
+        "contract_status_1",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "contract_type_2",
+        "contract_status_2",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "contract_type_3",
+        "contract_status_3",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "contract_type_4",
+        "contract_status_4",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "contract_type_5",
+        "contract_status_5",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "contract_type_6",
+        "contract_status_6",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "contract_type_7",
+        "contract_status_7",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "contract_type_8",
+        "contract_status_8",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "contract_type_9",
+        "contract_status_9",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "contract_type_10",
+        "contract_status_10",
+        "2024-01-01",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.netting_agreement": {
+    "columns": [
+      "netting_agreement_id",
+      "counterparty_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.netting_set": {
+    "columns": [
+      "netting_set_id",
+      "netting_agreement_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.netting_set_link": {
+    "columns": [
+      "netting_set_link_id",
+      "netting_set_id",
+      "facility_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.csa_master": {
+    "columns": [
+      "csa_id",
+      "counterparty_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.margin_agreement": {
+    "columns": [
+      "margin_agreement_id",
+      "counterparty_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.collateral_asset_master": {
+    "columns": [
+      "collateral_asset_id",
+      "collateral_type_id",
+      "counterparty_id",
+      "country_code",
+      "currency_code",
+      "legal_entity_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "01",
+        "USD",
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "02",
+        "EUR",
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "03",
+        "GBP",
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "04",
+        "CHF",
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "05",
+        "JPY",
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "06",
+        "CAD",
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "07",
+        "AUD",
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "08",
+        "CNY",
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "09",
+        "INR",
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "10",
+        "BRL",
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.collateral_link": {
+    "columns": [
+      "collateral_link_id",
+      "collateral_asset_id",
+      "anchor_id",
+      "anchor_type",
+      "source_system_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "anchor_type_1",
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "anchor_type_2",
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "anchor_type_3",
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "anchor_type_4",
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "anchor_type_5",
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "anchor_type_6",
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "anchor_type_7",
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "anchor_type_8",
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "anchor_type_9",
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "anchor_type_10",
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.collateral_eligibility_dim": {
+    "columns": [
+      "collateral_eligibility_id",
+      "collateral_type_id",
+      "effective_from_date",
+      "effective_to_date",
+      "eligible_flag",
+      "jurisdiction_code",
+      "regulatory_capital_basis_id",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "collateral_eligibility_dim_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "collateral_eligibility_dim_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "collateral_eligibility_dim_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "collateral_eligibility_dim_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "collateral_eligibility_dim_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "collateral_eligibility_dim_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "collateral_eligibility_dim_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "collateral_eligibility_dim_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "collateral_eligibility_dim_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "collateral_eligibility_dim_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.collateral_haircut_dim": {
+    "columns": [
+      "collateral_haircut_id",
+      "collateral_type_id",
+      "effective_from_date",
+      "effective_to_date",
+      "haircut_pct",
+      "jurisdiction_code",
+      "maturity_bucket_id",
+      "regulatory_capital_basis_id",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_1",
+        1,
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_2",
+        2,
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_3",
+        3,
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_4",
+        4,
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_5",
+        5,
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_6",
+        6,
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_7",
+        7,
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_8",
+        8,
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_9",
+        9,
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "2024-06-15",
+        "2024-06-15",
+        100.5,
+        "collateral_haircut_dim_10",
+        10,
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.crm_eligibility_dim": {
+    "columns": [
+      "crm_eligibility_id",
+      "crm_type_code",
+      "effective_from_date",
+      "effective_to_date",
+      "eligible_flag",
+      "jurisdiction_code",
+      "regulatory_capital_basis_id",
+      "source_system_id",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "crm_eligibility_dim_1",
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "crm_eligibility_dim_1",
+        1,
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "crm_eligibility_dim_2",
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "crm_eligibility_dim_2",
+        2,
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "crm_eligibility_dim_3",
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "crm_eligibility_dim_3",
+        3,
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "crm_eligibility_dim_4",
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "crm_eligibility_dim_4",
+        4,
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "crm_eligibility_dim_5",
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "crm_eligibility_dim_5",
+        5,
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "crm_eligibility_dim_6",
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "crm_eligibility_dim_6",
+        6,
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "crm_eligibility_dim_7",
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "crm_eligibility_dim_7",
+        7,
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "crm_eligibility_dim_8",
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "crm_eligibility_dim_8",
+        8,
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "crm_eligibility_dim_9",
+        "2024-06-15",
+        "2024-06-15",
+        "Y",
+        "crm_eligibility_dim_9",
+        9,
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "crm_eligibility_dim_10",
+        "2024-06-15",
+        "2024-06-15",
+        "N",
+        "crm_eligibility_dim_10",
+        10,
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.crm_protection_master": {
+    "columns": [
+      "protection_id",
+      "crm_type_code",
+      "beneficiary_legal_entity_id",
+      "currency_code",
+      "notional_amount",
+      "maturity_date",
+      "enforceable_flag",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "crm_protection_master_1",
+        1,
+        "USD",
+        100.5,
+        "2024-06-15",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "crm_protection_master_2",
+        2,
+        "EUR",
+        100.5,
+        "2024-06-15",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "crm_protection_master_3",
+        3,
+        "GBP",
+        100.5,
+        "2024-06-15",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "crm_protection_master_4",
+        4,
+        "CHF",
+        100.5,
+        "2024-06-15",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "crm_protection_master_5",
+        5,
+        "JPY",
+        100.5,
+        "2024-06-15",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "crm_protection_master_6",
+        6,
+        "CAD",
+        100.5,
+        "2024-06-15",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "crm_protection_master_7",
+        7,
+        "AUD",
+        100.5,
+        "2024-06-15",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "crm_protection_master_8",
+        8,
+        "CNY",
+        100.5,
+        "2024-06-15",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "crm_protection_master_9",
+        9,
+        "INR",
+        100.5,
+        "2024-06-15",
+        "Y",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "crm_protection_master_10",
+        10,
+        "BRL",
+        100.5,
+        "2024-06-15",
+        "N",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.protection_link": {
+    "columns": [
+      "protection_link_id",
+      "protection_id",
+      "facility_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.risk_mitigant_type_dim": {
+    "columns": [
+      "risk_mitigant_subtype_code",
+      "subtype_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        "risk_mitigant_type_dim_1",
+        "subtype_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_2",
+        "subtype_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_3",
+        "subtype_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_4",
+        "subtype_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_5",
+        "subtype_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_6",
+        "subtype_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_7",
+        "subtype_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_8",
+        "subtype_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_9",
+        "subtype_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        "risk_mitigant_type_dim_10",
+        "subtype_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.risk_mitigant_master": {
+    "columns": [
+      "risk_mitigant_id",
+      "counterparty_id",
+      "risk_mitigant_subtype_code",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "risk_mitigant_master_1",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "risk_mitigant_master_2",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "risk_mitigant_master_3",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "risk_mitigant_master_4",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "risk_mitigant_master_5",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "risk_mitigant_master_6",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "risk_mitigant_master_7",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "risk_mitigant_master_8",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "risk_mitigant_master_9",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "risk_mitigant_master_10",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.risk_mitigant_link": {
+    "columns": [
+      "risk_mitigant_link_id",
+      "risk_mitigant_id",
+      "facility_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.collateral_portfolio": {
+    "columns": [
+      "collateral_portfolio_id",
+      "portfolio_id",
+      "description",
+      "lob_segment_id",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "description_1",
+        1,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "description_2",
+        2,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "description_3",
+        3,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "description_4",
+        4,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "description_5",
+        5,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "description_6",
+        6,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "description_7",
+        7,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "description_8",
+        8,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "description_9",
+        9,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "description_10",
+        10,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.counterparty_hierarchy": {
+    "columns": [
+      "counterparty_id",
+      "as_of_date",
+      "immediate_parent_id",
+      "ultimate_parent_id",
+      "ownership_pct"
+    ],
+    "rows": [
+      [
+        1,
+        "2025-01-31",
+        1,
+        1,
+        100.5
+      ],
+      [
+        2,
+        "2025-01-31",
+        2,
+        2,
+        100.5
+      ],
+      [
+        3,
+        "2025-01-31",
+        3,
+        3,
+        100.5
+      ],
+      [
+        4,
+        "2025-01-31",
+        4,
+        4,
+        100.5
+      ],
+      [
+        5,
+        "2025-01-31",
+        5,
+        5,
+        100.5
+      ],
+      [
+        6,
+        "2025-01-31",
+        6,
+        6,
+        100.5
+      ],
+      [
+        7,
+        "2025-01-31",
+        7,
+        7,
+        100.5
+      ],
+      [
+        8,
+        "2025-01-31",
+        8,
+        8,
+        100.5
+      ],
+      [
+        9,
+        "2025-01-31",
+        9,
+        9,
+        100.5
+      ],
+      [
+        10,
+        "2025-01-31",
+        10,
+        10,
+        100.5
+      ]
+    ]
+  },
+  "L1.legal_entity_hierarchy": {
+    "columns": [
+      "hierarchy_id",
+      "legal_entity_id",
+      "parent_legal_entity_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.control_relationship": {
+    "columns": [
+      "control_relationship_id",
+      "parent_counterparty_id",
+      "subsidiary_counterparty_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.economic_interdependence_relationship": {
+    "columns": [
+      "econ_interdep_relationship_id",
+      "counterparty_id_1",
+      "counterparty_id_2",
+      "source_system_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.credit_agreement_counterparty_participation": {
+    "columns": [
+      "agreement_participation_id",
+      "credit_agreement_id",
+      "counterparty_id",
+      "counterparty_role_code",
+      "is_primary_flag",
+      "participation_pct",
+      "source_record_id",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "credit_agreement_counterparty_participation_1",
+        "Y",
+        100.5,
+        1,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "credit_agreement_counterparty_participation_2",
+        "N",
+        100.5,
+        2,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "credit_agreement_counterparty_participation_3",
+        "Y",
+        100.5,
+        3,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "credit_agreement_counterparty_participation_4",
+        "N",
+        100.5,
+        4,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "credit_agreement_counterparty_participation_5",
+        "Y",
+        100.5,
+        5,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "credit_agreement_counterparty_participation_6",
+        "N",
+        100.5,
+        6,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "credit_agreement_counterparty_participation_7",
+        "Y",
+        100.5,
+        7,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "credit_agreement_counterparty_participation_8",
+        "N",
+        100.5,
+        8,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "credit_agreement_counterparty_participation_9",
+        "Y",
+        100.5,
+        9,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "credit_agreement_counterparty_participation_10",
+        "N",
+        100.5,
+        10,
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.facility_counterparty_participation": {
+    "columns": [
+      "facility_participation_id",
+      "facility_id",
+      "counterparty_id",
+      "counterparty_role_code",
+      "effective_start_date",
+      "effective_end_date",
+      "is_current_flag",
+      "created_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "facility_counterparty_participation_1",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "facility_counterparty_participation_2",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "facility_counterparty_participation_3",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "facility_counterparty_participation_4",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "facility_counterparty_participation_5",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "facility_counterparty_participation_6",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "facility_counterparty_participation_7",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "facility_counterparty_participation_8",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "facility_counterparty_participation_9",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "facility_counterparty_participation_10",
+        "2024-01-01",
+        null,
+        "Y",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.sccl_counterparty_group": {
+    "columns": [
+      "sccl_group_id",
+      "group_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "group_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "group_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "group_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "group_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "group_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "group_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "group_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "group_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "group_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "group_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.sccl_counterparty_group_member": {
+    "columns": [
+      "member_id",
+      "sccl_group_id",
+      "counterparty_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.limit_rule": {
+    "columns": [
+      "limit_rule_id",
+      "rule_code",
+      "rule_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "rule_code_1",
+        "rule_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "rule_code_2",
+        "rule_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "rule_code_3",
+        "rule_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "rule_code_4",
+        "rule_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "rule_code_5",
+        "rule_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "rule_code_6",
+        "rule_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "rule_code_7",
+        "rule_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "rule_code_8",
+        "rule_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "rule_code_9",
+        "rule_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "rule_code_10",
+        "rule_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.limit_threshold": {
+    "columns": [
+      "limit_threshold_id",
+      "limit_rule_id",
+      "threshold_value",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        100.5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.fx_rate": {
+    "columns": [
+      "fx_rate_id",
+      "as_of_date",
+      "from_currency_code",
+      "to_currency_code",
+      "rate",
+      "rate_type",
+      "effective_ts",
+      "loaded_ts",
+      "provider"
+    ],
+    "rows": [
+      [
+        1,
+        "2025-01-31",
+        "fx_rate_1",
+        "fx_rate_1",
+        100.5,
+        "rate_type_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_1"
+      ],
+      [
+        2,
+        "2025-01-31",
+        "fx_rate_2",
+        "fx_rate_2",
+        100.5,
+        "rate_type_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_2"
+      ],
+      [
+        3,
+        "2025-01-31",
+        "fx_rate_3",
+        "fx_rate_3",
+        100.5,
+        "rate_type_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_3"
+      ],
+      [
+        4,
+        "2025-01-31",
+        "fx_rate_4",
+        "fx_rate_4",
+        100.5,
+        "rate_type_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_4"
+      ],
+      [
+        5,
+        "2025-01-31",
+        "fx_rate_5",
+        "fx_rate_5",
+        100.5,
+        "rate_type_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_5"
+      ],
+      [
+        6,
+        "2025-01-31",
+        "fx_rate_6",
+        "fx_rate_6",
+        100.5,
+        "rate_type_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_6"
+      ],
+      [
+        7,
+        "2025-01-31",
+        "fx_rate_7",
+        "fx_rate_7",
+        100.5,
+        "rate_type_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_7"
+      ],
+      [
+        8,
+        "2025-01-31",
+        "fx_rate_8",
+        "fx_rate_8",
+        100.5,
+        "rate_type_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_8"
+      ],
+      [
+        9,
+        "2025-01-31",
+        "fx_rate_9",
+        "fx_rate_9",
+        100.5,
+        "rate_type_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_9"
+      ],
+      [
+        10,
+        "2025-01-31",
+        "fx_rate_10",
+        "fx_rate_10",
+        100.5,
+        "rate_type_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "provider_10"
+      ]
+    ]
+  },
+  "L1.run_control": {
+    "columns": [
+      "run_control_id",
+      "run_name",
+      "as_of_date",
+      "source_system_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "run_name_1",
+        "2025-01-31",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "run_name_2",
+        "2025-01-31",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "run_name_3",
+        "2025-01-31",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "run_name_4",
+        "2025-01-31",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "run_name_5",
+        "2025-01-31",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "run_name_6",
+        "2025-01-31",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "run_name_7",
+        "2025-01-31",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "run_name_8",
+        "2025-01-31",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "run_name_9",
+        "2025-01-31",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "run_name_10",
+        "2025-01-31",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.report_registry": {
+    "columns": [
+      "report_id",
+      "report_code",
+      "report_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "report_code_1",
+        "report_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "report_code_2",
+        "report_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "report_code_3",
+        "report_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "report_code_4",
+        "report_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "report_code_5",
+        "report_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "report_code_6",
+        "report_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "report_code_7",
+        "report_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "report_code_8",
+        "report_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "report_code_9",
+        "report_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "report_code_10",
+        "report_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.reporting_calendar_dim": {
+    "columns": [
+      "reporting_calendar_id",
+      "calendar_code",
+      "calendar_name",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "calendar_code_1",
+        "calendar_name_1",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "calendar_code_2",
+        "calendar_name_2",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "calendar_code_3",
+        "calendar_name_3",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "calendar_code_4",
+        "calendar_name_4",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "calendar_code_5",
+        "calendar_name_5",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "calendar_code_6",
+        "calendar_name_6",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "calendar_code_7",
+        "calendar_name_7",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "calendar_code_8",
+        "calendar_name_8",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "calendar_code_9",
+        "calendar_name_9",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "calendar_code_10",
+        "calendar_name_10",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.reporting_entity_dim": {
+    "columns": [
+      "reporting_entity_id",
+      "entity_code",
+      "entity_name",
+      "legal_entity_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "entity_code_1",
+        "entity_name_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "entity_code_2",
+        "entity_name_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "entity_code_3",
+        "entity_name_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "entity_code_4",
+        "entity_name_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "entity_code_5",
+        "entity_name_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "entity_code_6",
+        "entity_name_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "entity_code_7",
+        "entity_name_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "entity_code_8",
+        "entity_name_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "entity_code_9",
+        "entity_name_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "entity_code_10",
+        "entity_name_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.model_registry_dim": {
+    "columns": [
+      "model_id",
+      "model_code",
+      "model_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "model_code_1",
+        "model_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "model_code_2",
+        "model_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "model_code_3",
+        "model_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "model_code_4",
+        "model_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "model_code_5",
+        "model_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "model_code_6",
+        "model_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "model_code_7",
+        "model_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "model_code_8",
+        "model_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "model_code_9",
+        "model_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "model_code_10",
+        "model_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.rule_registry": {
+    "columns": [
+      "rule_id",
+      "rule_code",
+      "rule_name",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "rule_code_1",
+        "rule_name_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "rule_code_2",
+        "rule_name_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "rule_code_3",
+        "rule_name_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "rule_code_4",
+        "rule_name_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "rule_code_5",
+        "rule_name_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "rule_code_6",
+        "rule_name_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "rule_code_7",
+        "rule_name_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "rule_code_8",
+        "rule_name_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "rule_code_9",
+        "rule_name_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "rule_code_10",
+        "rule_name_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.validation_check_registry": {
+    "columns": [
+      "check_id",
+      "check_name",
+      "check_type",
+      "check_rule_id",
+      "target_table",
+      "target_column",
+      "severity",
+      "owner_id",
+      "active_flag",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "check_name_1",
+        "check_type_1",
+        1,
+        "target_table_1",
+        "target_column_1",
+        "severity_1",
+        1,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "check_name_2",
+        "check_type_2",
+        2,
+        "target_table_2",
+        "target_column_2",
+        "severity_2",
+        2,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "check_name_3",
+        "check_type_3",
+        3,
+        "target_table_3",
+        "target_column_3",
+        "severity_3",
+        3,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "check_name_4",
+        "check_type_4",
+        4,
+        "target_table_4",
+        "target_column_4",
+        "severity_4",
+        4,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "check_name_5",
+        "check_type_5",
+        5,
+        "target_table_5",
+        "target_column_5",
+        "severity_5",
+        5,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "check_name_6",
+        "check_type_6",
+        6,
+        "target_table_6",
+        "target_column_6",
+        "severity_6",
+        6,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "check_name_7",
+        "check_type_7",
+        7,
+        "target_table_7",
+        "target_column_7",
+        "severity_7",
+        7,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "check_name_8",
+        "check_type_8",
+        8,
+        "target_table_8",
+        "target_column_8",
+        "severity_8",
+        8,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "check_name_9",
+        "check_type_9",
+        9,
+        "target_table_9",
+        "target_column_9",
+        "severity_9",
+        9,
+        "Y",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "check_name_10",
+        "check_type_10",
+        10,
+        "target_table_10",
+        "target_column_10",
+        "severity_10",
+        10,
+        "N",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.reconciliation_control": {
+    "columns": [
+      "reconciliation_control_id",
+      "control_name",
+      "source_system_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "control_name_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "control_name_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "control_name_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "control_name_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "control_name_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "control_name_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "control_name_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "control_name_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "control_name_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "control_name_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.regulatory_mapping": {
+    "columns": [
+      "regulatory_mapping_id",
+      "mapping_code",
+      "jurisdiction_code",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "mapping_code_1",
+        "regulatory_mapping_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "mapping_code_2",
+        "regulatory_mapping_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "mapping_code_3",
+        "regulatory_mapping_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "mapping_code_4",
+        "regulatory_mapping_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "mapping_code_5",
+        "regulatory_mapping_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "mapping_code_6",
+        "regulatory_mapping_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "mapping_code_7",
+        "regulatory_mapping_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "mapping_code_8",
+        "regulatory_mapping_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "mapping_code_9",
+        "regulatory_mapping_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "mapping_code_10",
+        "regulatory_mapping_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.report_cell_definition": {
+    "columns": [
+      "report_cell_id",
+      "report_id",
+      "cell_code",
+      "cell_definition",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        "cell_code_1",
+        "cell_definition_1",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        "cell_code_2",
+        "cell_definition_2",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        "cell_code_3",
+        "cell_definition_3",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        "cell_code_4",
+        "cell_definition_4",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        "cell_code_5",
+        "cell_definition_5",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        "cell_code_6",
+        "cell_definition_6",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        "cell_code_7",
+        "cell_definition_7",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        "cell_code_8",
+        "cell_definition_8",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        "cell_code_9",
+        "cell_definition_9",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        "cell_code_10",
+        "cell_definition_10",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.rating_mapping": {
+    "columns": [
+      "rating_mapping_id",
+      "rating_scale_id",
+      "rating_source_id",
+      "external_rating",
+      "internal_grade_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        1,
+        1,
+        "external_rating_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        2,
+        2,
+        "external_rating_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        3,
+        3,
+        "external_rating_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        4,
+        4,
+        "external_rating_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        5,
+        5,
+        "external_rating_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        6,
+        6,
+        "external_rating_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        7,
+        7,
+        "external_rating_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        8,
+        8,
+        "external_rating_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        9,
+        9,
+        "external_rating_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        10,
+        10,
+        "external_rating_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  },
+  "L1.scenario_dim": {
+    "columns": [
+      "scenario_id",
+      "scenario_code",
+      "scenario_name",
+      "scenario_type",
+      "source_system_id",
+      "created_ts",
+      "updated_ts",
+      "created_ts",
+      "updated_ts"
+    ],
+    "rows": [
+      [
+        1,
+        "scenario_code_1",
+        "scenario_name_1",
+        "scenario_type_1",
+        1,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        2,
+        "scenario_code_2",
+        "scenario_name_2",
+        "scenario_type_2",
+        2,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        3,
+        "scenario_code_3",
+        "scenario_name_3",
+        "scenario_type_3",
+        3,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        4,
+        "scenario_code_4",
+        "scenario_name_4",
+        "scenario_type_4",
+        4,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        5,
+        "scenario_code_5",
+        "scenario_name_5",
+        "scenario_type_5",
+        5,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        6,
+        "scenario_code_6",
+        "scenario_name_6",
+        "scenario_type_6",
+        6,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        7,
+        "scenario_code_7",
+        "scenario_name_7",
+        "scenario_type_7",
+        7,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        8,
+        "scenario_code_8",
+        "scenario_name_8",
+        "scenario_type_8",
+        8,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        9,
+        "scenario_code_9",
+        "scenario_name_9",
+        "scenario_type_9",
+        9,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ],
+      [
+        10,
+        "scenario_code_10",
+        "scenario_name_10",
+        "scenario_type_10",
+        10,
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00",
+        "2024-06-15 12:00:00"
+      ]
+    ]
+  }
+}

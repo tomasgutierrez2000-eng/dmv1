@@ -1,0 +1,602 @@
+[
+  {
+    "observation_id": "CRO-000001",
+    "counterparty_id": "CP-00001",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-06-10",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000002",
+    "counterparty_id": "CP-00001",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-06-10",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000003",
+    "counterparty_id": "CP-00002",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-07-11",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000004",
+    "counterparty_id": "CP-00002",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-07-11",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000005",
+    "counterparty_id": "CP-00003",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-08-12",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000006",
+    "counterparty_id": "CP-00003",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-08-12",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000007",
+    "counterparty_id": "CP-00004",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "1",
+    "rating_date": "2025-09-13",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000008",
+    "counterparty_id": "CP-00004",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "AA",
+    "prior_rating_value": "A",
+    "rating_date": "2025-09-13",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000009",
+    "counterparty_id": "CP-00005",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-10-14",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000010",
+    "counterparty_id": "CP-00005",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-10-14",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000011",
+    "counterparty_id": "CP-00006",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "3",
+    "rating_date": "2025-11-15",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000012",
+    "counterparty_id": "CP-00006",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "AA",
+    "prior_rating_value": "AA",
+    "rating_date": "2025-11-15",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000013",
+    "counterparty_id": "CP-00007",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-06-16",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000014",
+    "counterparty_id": "CP-00007",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-06-16",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000015",
+    "counterparty_id": "CP-00008",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-07-17",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000016",
+    "counterparty_id": "CP-00008",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "AA",
+    "prior_rating_value": "AA",
+    "rating_date": "2025-07-17",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000017",
+    "counterparty_id": "CP-00009",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "4",
+    "prior_rating_value": "3",
+    "rating_date": "2025-08-18",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000018",
+    "counterparty_id": "CP-00009",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "BB",
+    "prior_rating_value": "B",
+    "rating_date": "2025-08-18",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000019",
+    "counterparty_id": "CP-00010",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "5",
+    "prior_rating_value": "5",
+    "rating_date": "2025-09-19",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000020",
+    "counterparty_id": "CP-00010",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "CCC",
+    "prior_rating_value": "CCC",
+    "rating_date": "2025-09-19",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000021",
+    "counterparty_id": "CP-00011",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-10-20",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000022",
+    "counterparty_id": "CP-00011",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-10-20",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000023",
+    "counterparty_id": "CP-00012",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-11-21",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000024",
+    "counterparty_id": "CP-00012",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-11-21",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000025",
+    "counterparty_id": "CP-00013",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "3",
+    "rating_date": "2025-06-22",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000026",
+    "counterparty_id": "CP-00013",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "A",
+    "prior_rating_value": "AA",
+    "rating_date": "2025-06-22",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000027",
+    "counterparty_id": "CP-00014",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-07-23",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000028",
+    "counterparty_id": "CP-00014",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-07-23",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000029",
+    "counterparty_id": "CP-00015",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-08-24",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000030",
+    "counterparty_id": "CP-00015",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-08-24",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000031",
+    "counterparty_id": "CP-00016",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "2",
+    "rating_date": "2025-09-25",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000032",
+    "counterparty_id": "CP-00016",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "BBB",
+    "prior_rating_value": "BB",
+    "rating_date": "2025-09-25",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000033",
+    "counterparty_id": "CP-00017",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-10-26",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000034",
+    "counterparty_id": "CP-00017",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-10-26",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000035",
+    "counterparty_id": "CP-00018",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "4",
+    "prior_rating_value": "4",
+    "rating_date": "2025-11-27",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000036",
+    "counterparty_id": "CP-00018",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "B",
+    "prior_rating_value": "B",
+    "rating_date": "2025-11-27",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000037",
+    "counterparty_id": "CP-00019",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-06-28",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000038",
+    "counterparty_id": "CP-00019",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-06-28",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000039",
+    "counterparty_id": "CP-00020",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-07-29",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000040",
+    "counterparty_id": "CP-00020",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "AA",
+    "prior_rating_value": "AA",
+    "rating_date": "2025-07-29",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000041",
+    "counterparty_id": "CP-00021",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "4",
+    "rating_date": "2025-08-10",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000042",
+    "counterparty_id": "CP-00021",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "BBB",
+    "prior_rating_value": "A",
+    "rating_date": "2025-08-10",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000043",
+    "counterparty_id": "CP-00022",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-09-11",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000044",
+    "counterparty_id": "CP-00022",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "AA",
+    "prior_rating_value": "AA",
+    "rating_date": "2025-09-11",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000045",
+    "counterparty_id": "CP-00023",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "4",
+    "prior_rating_value": "3",
+    "rating_date": "2025-10-12",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000046",
+    "counterparty_id": "CP-00023",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "BB",
+    "prior_rating_value": "B",
+    "rating_date": "2025-10-12",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000047",
+    "counterparty_id": "CP-00024",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "5",
+    "prior_rating_value": "5",
+    "rating_date": "2025-11-13",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000048",
+    "counterparty_id": "CP-00024",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "CCC",
+    "prior_rating_value": "CCC",
+    "rating_date": "2025-11-13",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000049",
+    "counterparty_id": "CP-00025",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-06-14",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000050",
+    "counterparty_id": "CP-00025",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-06-14",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000051",
+    "counterparty_id": "CP-00026",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-07-15",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000052",
+    "counterparty_id": "CP-00026",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-07-15",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000053",
+    "counterparty_id": "CP-00027",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "2",
+    "rating_date": "2025-08-16",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000054",
+    "counterparty_id": "CP-00027",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "A",
+    "prior_rating_value": "A",
+    "rating_date": "2025-08-16",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000055",
+    "counterparty_id": "CP-00028",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "3",
+    "prior_rating_value": "3",
+    "rating_date": "2025-09-17",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000056",
+    "counterparty_id": "CP-00028",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "S&P",
+    "rating_value": "BBB",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-09-17",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000057",
+    "counterparty_id": "CP-00029",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "2",
+    "prior_rating_value": "1",
+    "rating_date": "2025-10-18",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000058",
+    "counterparty_id": "CP-00029",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Moodys",
+    "rating_value": "A",
+    "prior_rating_value": "BBB",
+    "rating_date": "2025-10-18",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000059",
+    "counterparty_id": "CP-00030",
+    "rating_type": "INTERNAL",
+    "rating_agency": "Internal",
+    "rating_value": "4",
+    "prior_rating_value": "4",
+    "rating_date": "2025-11-19",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "CRO-000060",
+    "counterparty_id": "CP-00030",
+    "rating_type": "EXTERNAL",
+    "rating_agency": "Fitch",
+    "rating_value": "B",
+    "prior_rating_value": "B",
+    "rating_date": "2025-11-19",
+    "as_of_date": "2026-02-28"
+  }
+]

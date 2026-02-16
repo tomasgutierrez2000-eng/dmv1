@@ -1,0 +1,157 @@
+'use client';
+
+import { useMemo } from 'react';
+import { ChevronDown, ChevronRight, Database, Layers } from 'lucide-react';
+import type { TableDef } from '../../types/model';
+import { useModelStore } from '../../store/modelStore';
+import { getCategoryColor } from '../../utils/colors';
+
+interface DomainContainerProps {
+  domain: string;
+  tables: TableDef[];
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
+export default function DomainContainer({
+  domain,
+  tables,
+  position,
+  width,
+  height,
+  isExpanded,
+  onToggle,
+}: DomainContainerProps) {
+  const { model, visibleLayers, layoutMode } = useModelStore();
+  const categoryColor = getCategoryColor(domain);
+  
+  // Calculate domain statistics
+  const stats = useMemo(() => {
+    const visibleTables = tables.filter(t => visibleLayers[t.layer]);
+    const byLayer = {
+      L1: visibleTables.filter(t => t.layer === 'L1').length,
+      L2: visibleTables.filter(t => t.layer === 'L2').length,
+      L3: visibleTables.filter(t => t.layer === 'L3').length,
+    };
+    const totalFields = visibleTables.reduce((sum, t) => sum + t.fields.length, 0);
+    const relationships = model ? model.relationships.filter(r => {
+      const sourceTable = visibleTables.find(t => t.key === r.source.tableKey);
+      const targetTable = visibleTables.find(t => t.key === r.target.tableKey);
+      return sourceTable || targetTable;
+    }).length : 0;
+    
+    return { byLayer, totalFields, relationships, tableCount: visibleTables.length };
+  }, [tables, visibleLayers, model]);
+
+  const isOverview = layoutMode === 'domain-overview';
+  const headerHeight = isOverview ? 45 : 80;
+
+  return (
+    <g transform={`translate(${position.x}, ${position.y})`}>
+      {/* Domain Container Background */}
+      <rect
+        x="0"
+        y="0"
+        width={width}
+        height={height}
+        rx={isOverview ? 10 : 16}
+        fill="rgba(31, 41, 55, 0.75)"
+        stroke={categoryColor.color}
+        strokeWidth={isOverview ? 2 : 4}
+        className="drop-shadow-2xl"
+        style={{ 
+          filter: isOverview
+            ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
+            : 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4))',
+          strokeOpacity: 0.8,
+        }}
+      />
+      
+      {/* Domain Header */}
+      <foreignObject x="0" y="0" width={width} height={headerHeight}>
+        <div
+          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-gray-700/40`}
+          onClick={onToggle}
+          style={{
+            background: `linear-gradient(135deg, ${categoryColor.color}20 0%, ${categoryColor.color}10 100%)`,
+            borderBottom: `${isOverview ? 2 : 3}px solid ${categoryColor.color}60`,
+          }}
+        >
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2 flex-1 min-w-0">
+              <div
+                className={`${isOverview ? 'w-3 h-3' : 'w-5 h-5'} rounded-full shadow-lg flex-shrink-0 border-2 border-white/20`}
+                style={{ backgroundColor: categoryColor.color }}
+              />
+              <div className="flex-1 min-w-0">
+                <h3 className={`${isOverview ? 'text-sm' : 'text-xl'} font-bold text-white truncate ${isOverview ? '' : 'mb-1'}`}>{domain}</h3>
+                {!isOverview && (
+                  <div className="flex items-center space-x-5 text-sm text-gray-200">
+                    <span className="flex items-center space-x-1.5 font-medium">
+                      <Database className="w-4 h-4" />
+                      <span>{stats.tableCount} tables</span>
+                    </span>
+                    <span className="flex items-center space-x-1.5 font-medium">
+                      <Layers className="w-4 h-4" />
+                      <span>{stats.totalFields} fields</span>
+                    </span>
+                    {stats.relationships > 0 && (
+                      <span className="font-medium">{stats.relationships} rels</span>
+                    )}
+                  </div>
+                )}
+                {isOverview && (
+                  <div className="flex items-center space-x-2 text-xs text-gray-300">
+                    <span>{stats.tableCount} tables</span>
+                    <span className="text-gray-500">|</span>
+                    <span>{stats.totalFields} fields</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {!isOverview && (
+              <div className="flex items-center space-x-3 flex-shrink-0">
+                <div className="flex items-center space-x-1.5">
+                  {stats.byLayer.L1 > 0 && (
+                    <span className="px-2 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-md font-semibold border border-blue-400/30">
+                      L1:{stats.byLayer.L1}
+                    </span>
+                  )}
+                  {stats.byLayer.L2 > 0 && (
+                    <span className="px-2 py-1 bg-green-500/30 text-green-200 text-xs rounded-md font-semibold border border-green-400/30">
+                      L2:{stats.byLayer.L2}
+                    </span>
+                  )}
+                  {stats.byLayer.L3 > 0 && (
+                    <span className="px-2 py-1 bg-purple-500/30 text-purple-200 text-xs rounded-md font-semibold border border-purple-400/30">
+                      L3:{stats.byLayer.L3}
+                    </span>
+                  )}
+                </div>
+                <button className="text-gray-300 hover:text-white transition-colors p-1 hover:bg-gray-700/50 rounded">
+                  {isExpanded ? (
+                    <ChevronDown className="w-6 h-6" />
+                  ) : (
+                    <ChevronRight className="w-6 h-6" />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </foreignObject>
+      
+      {/* Collapsed state indicator */}
+      {!isExpanded && !isOverview && (
+        <foreignObject x="0" y={headerHeight} width={width} height={height - headerHeight}>
+          <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+            Click to expand and view tables
+          </div>
+        </foreignObject>
+      )}
+    </g>
+  );
+}

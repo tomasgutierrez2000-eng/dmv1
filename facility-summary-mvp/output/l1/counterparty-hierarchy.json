@@ -1,0 +1,212 @@
+[
+  {
+    "counterparty_id": "CP-00001",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00001",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00002",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00002",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00003",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00003",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00004",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00004",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00005",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00005",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00006",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00006",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00007",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00007",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00008",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00008",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00009",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00009",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00010",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": null,
+    "ultimate_parent_id": "CP-00010",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00011",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00001",
+    "ultimate_parent_id": "CP-00001",
+    "ownership_pct": 60
+  },
+  {
+    "counterparty_id": "CP-00012",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00002",
+    "ultimate_parent_id": "CP-00002",
+    "ownership_pct": 70
+  },
+  {
+    "counterparty_id": "CP-00013",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00003",
+    "ultimate_parent_id": "CP-00003",
+    "ownership_pct": 80
+  },
+  {
+    "counterparty_id": "CP-00014",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00004",
+    "ultimate_parent_id": "CP-00004",
+    "ownership_pct": 90
+  },
+  {
+    "counterparty_id": "CP-00015",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00005",
+    "ultimate_parent_id": "CP-00005",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00016",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00006",
+    "ultimate_parent_id": "CP-00006",
+    "ownership_pct": 60
+  },
+  {
+    "counterparty_id": "CP-00017",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00007",
+    "ultimate_parent_id": "CP-00007",
+    "ownership_pct": 70
+  },
+  {
+    "counterparty_id": "CP-00018",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00008",
+    "ultimate_parent_id": "CP-00008",
+    "ownership_pct": 80
+  },
+  {
+    "counterparty_id": "CP-00019",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00009",
+    "ultimate_parent_id": "CP-00009",
+    "ownership_pct": 90
+  },
+  {
+    "counterparty_id": "CP-00020",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00010",
+    "ultimate_parent_id": "CP-00010",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00021",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00001",
+    "ultimate_parent_id": "CP-00001",
+    "ownership_pct": 60
+  },
+  {
+    "counterparty_id": "CP-00022",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00002",
+    "ultimate_parent_id": "CP-00002",
+    "ownership_pct": 70
+  },
+  {
+    "counterparty_id": "CP-00023",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00003",
+    "ultimate_parent_id": "CP-00003",
+    "ownership_pct": 80
+  },
+  {
+    "counterparty_id": "CP-00024",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00004",
+    "ultimate_parent_id": "CP-00004",
+    "ownership_pct": 90
+  },
+  {
+    "counterparty_id": "CP-00025",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00005",
+    "ultimate_parent_id": "CP-00005",
+    "ownership_pct": 100
+  },
+  {
+    "counterparty_id": "CP-00026",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00006",
+    "ultimate_parent_id": "CP-00006",
+    "ownership_pct": 60
+  },
+  {
+    "counterparty_id": "CP-00027",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00007",
+    "ultimate_parent_id": "CP-00007",
+    "ownership_pct": 70
+  },
+  {
+    "counterparty_id": "CP-00028",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00008",
+    "ultimate_parent_id": "CP-00008",
+    "ownership_pct": 80
+  },
+  {
+    "counterparty_id": "CP-00029",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00009",
+    "ultimate_parent_id": "CP-00009",
+    "ownership_pct": 90
+  },
+  {
+    "counterparty_id": "CP-00030",
+    "as_of_date": "2026-02-28",
+    "immediate_parent_id": "CP-00010",
+    "ultimate_parent_id": "CP-00010",
+    "ownership_pct": 100
+  }
+]

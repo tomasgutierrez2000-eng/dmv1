@@ -1,0 +1,1502 @@
+[
+  {
+    "profitability_snapshot_id": "FPS-000001",
+    "facility_id": "FAC-2024-00001",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.02,
+    "total_revenue_amt": 0.02,
+    "nim_pct": 2,
+    "roa_pct": 0.8,
+    "roe_pct": 8
+  },
+  {
+    "profitability_snapshot_id": "FPS-000002",
+    "facility_id": "FAC-2024-00001",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.02,
+    "total_revenue_amt": 0.02,
+    "nim_pct": 2,
+    "roa_pct": 0.8,
+    "roe_pct": 8
+  },
+  {
+    "profitability_snapshot_id": "FPS-000003",
+    "facility_id": "FAC-2024-00001",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.02,
+    "total_revenue_amt": 0.02,
+    "nim_pct": 2,
+    "roa_pct": 0.8,
+    "roe_pct": 8
+  },
+  {
+    "profitability_snapshot_id": "FPS-000004",
+    "facility_id": "FAC-2024-00002",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.06,
+    "total_revenue_amt": 0.07,
+    "nim_pct": 2.22,
+    "roa_pct": 0.9,
+    "roe_pct": 9.98
+  },
+  {
+    "profitability_snapshot_id": "FPS-000005",
+    "facility_id": "FAC-2024-00002",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.06,
+    "total_revenue_amt": 0.07,
+    "nim_pct": 2.22,
+    "roa_pct": 0.9,
+    "roe_pct": 9.98
+  },
+  {
+    "profitability_snapshot_id": "FPS-000006",
+    "facility_id": "FAC-2024-00002",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.06,
+    "total_revenue_amt": 0.07,
+    "nim_pct": 2.22,
+    "roa_pct": 0.9,
+    "roe_pct": 9.98
+  },
+  {
+    "profitability_snapshot_id": "FPS-000007",
+    "facility_id": "FAC-2024-00003",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.11,
+    "total_revenue_amt": 0.13,
+    "nim_pct": 2.02,
+    "roa_pct": 0.83,
+    "roe_pct": 10.28
+  },
+  {
+    "profitability_snapshot_id": "FPS-000008",
+    "facility_id": "FAC-2024-00003",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.11,
+    "total_revenue_amt": 0.13,
+    "nim_pct": 2.02,
+    "roa_pct": 0.83,
+    "roe_pct": 10.28
+  },
+  {
+    "profitability_snapshot_id": "FPS-000009",
+    "facility_id": "FAC-2024-00003",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.11,
+    "total_revenue_amt": 0.13,
+    "nim_pct": 2.02,
+    "roa_pct": 0.83,
+    "roe_pct": 10.28
+  },
+  {
+    "profitability_snapshot_id": "FPS-000010",
+    "facility_id": "FAC-2024-00004",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.18,
+    "total_revenue_amt": 0.21,
+    "nim_pct": 2.03,
+    "roa_pct": 0.84,
+    "roe_pct": 11.42
+  },
+  {
+    "profitability_snapshot_id": "FPS-000011",
+    "facility_id": "FAC-2024-00004",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.18,
+    "total_revenue_amt": 0.21,
+    "nim_pct": 2.03,
+    "roa_pct": 0.84,
+    "roe_pct": 11.42
+  },
+  {
+    "profitability_snapshot_id": "FPS-000012",
+    "facility_id": "FAC-2024-00004",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.18,
+    "total_revenue_amt": 0.21,
+    "nim_pct": 2.03,
+    "roa_pct": 0.84,
+    "roe_pct": 11.42
+  },
+  {
+    "profitability_snapshot_id": "FPS-000013",
+    "facility_id": "FAC-2024-00005",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.3,
+    "total_revenue_amt": 0.34,
+    "nim_pct": 2.28,
+    "roa_pct": 0.95,
+    "roe_pct": 13.52
+  },
+  {
+    "profitability_snapshot_id": "FPS-000014",
+    "facility_id": "FAC-2024-00005",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.3,
+    "total_revenue_amt": 0.34,
+    "nim_pct": 2.28,
+    "roa_pct": 0.95,
+    "roe_pct": 13.52
+  },
+  {
+    "profitability_snapshot_id": "FPS-000015",
+    "facility_id": "FAC-2024-00005",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.3,
+    "total_revenue_amt": 0.34,
+    "nim_pct": 2.28,
+    "roa_pct": 0.95,
+    "roe_pct": 13.52
+  },
+  {
+    "profitability_snapshot_id": "FPS-000016",
+    "facility_id": "FAC-2024-00006",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.12,
+    "total_revenue_amt": 0.14,
+    "nim_pct": 2.05,
+    "roa_pct": 0.87,
+    "roe_pct": 8.7
+  },
+  {
+    "profitability_snapshot_id": "FPS-000017",
+    "facility_id": "FAC-2024-00006",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.12,
+    "total_revenue_amt": 0.14,
+    "nim_pct": 2.05,
+    "roa_pct": 0.87,
+    "roe_pct": 8.7
+  },
+  {
+    "profitability_snapshot_id": "FPS-000018",
+    "facility_id": "FAC-2024-00006",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.12,
+    "total_revenue_amt": 0.14,
+    "nim_pct": 2.05,
+    "roa_pct": 0.87,
+    "roe_pct": 8.7
+  },
+  {
+    "profitability_snapshot_id": "FPS-000019",
+    "facility_id": "FAC-2024-00007",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.23,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.32,
+    "roa_pct": 0.99,
+    "roe_pct": 10.88
+  },
+  {
+    "profitability_snapshot_id": "FPS-000020",
+    "facility_id": "FAC-2024-00007",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.23,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.32,
+    "roa_pct": 0.99,
+    "roe_pct": 10.88
+  },
+  {
+    "profitability_snapshot_id": "FPS-000021",
+    "facility_id": "FAC-2024-00007",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.23,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.32,
+    "roa_pct": 0.99,
+    "roe_pct": 10.88
+  },
+  {
+    "profitability_snapshot_id": "FPS-000022",
+    "facility_id": "FAC-2024-00008",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.31,
+    "total_revenue_amt": 0.36,
+    "nim_pct": 2.09,
+    "roa_pct": 0.91,
+    "roe_pct": 11.06
+  },
+  {
+    "profitability_snapshot_id": "FPS-000023",
+    "facility_id": "FAC-2024-00008",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.31,
+    "total_revenue_amt": 0.36,
+    "nim_pct": 2.09,
+    "roa_pct": 0.91,
+    "roe_pct": 11.06
+  },
+  {
+    "profitability_snapshot_id": "FPS-000024",
+    "facility_id": "FAC-2024-00008",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.31,
+    "total_revenue_amt": 0.36,
+    "nim_pct": 2.09,
+    "roa_pct": 0.91,
+    "roe_pct": 11.06
+  },
+  {
+    "profitability_snapshot_id": "FPS-000025",
+    "facility_id": "FAC-2024-00009",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.59,
+    "total_revenue_amt": 0.67,
+    "nim_pct": 2.86,
+    "roa_pct": 1.22,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000026",
+    "facility_id": "FAC-2024-00009",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.59,
+    "total_revenue_amt": 0.67,
+    "nim_pct": 2.86,
+    "roa_pct": 1.22,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000027",
+    "facility_id": "FAC-2024-00009",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.59,
+    "total_revenue_amt": 0.67,
+    "nim_pct": 2.86,
+    "roa_pct": 1.22,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000028",
+    "facility_id": "FAC-2024-00010",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 1.86,
+    "total_revenue_amt": 2.14,
+    "nim_pct": 2.88,
+    "roa_pct": 1.24,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000029",
+    "facility_id": "FAC-2024-00010",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 1.86,
+    "total_revenue_amt": 2.14,
+    "nim_pct": 2.88,
+    "roa_pct": 1.24,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000030",
+    "facility_id": "FAC-2024-00010",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 1.86,
+    "total_revenue_amt": 2.14,
+    "nim_pct": 2.88,
+    "roa_pct": 1.24,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000031",
+    "facility_id": "FAC-2024-00011",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.27,
+    "total_revenue_amt": 0.31,
+    "nim_pct": 2.15,
+    "roa_pct": 0.86,
+    "roe_pct": 8.6
+  },
+  {
+    "profitability_snapshot_id": "FPS-000032",
+    "facility_id": "FAC-2024-00011",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.27,
+    "total_revenue_amt": 0.31,
+    "nim_pct": 2.15,
+    "roa_pct": 0.86,
+    "roe_pct": 8.6
+  },
+  {
+    "profitability_snapshot_id": "FPS-000033",
+    "facility_id": "FAC-2024-00011",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.27,
+    "total_revenue_amt": 0.31,
+    "nim_pct": 2.15,
+    "roa_pct": 0.86,
+    "roe_pct": 8.6
+  },
+  {
+    "profitability_snapshot_id": "FPS-000034",
+    "facility_id": "FAC-2024-00012",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.46,
+    "total_revenue_amt": 0.52,
+    "nim_pct": 2.42,
+    "roa_pct": 0.98,
+    "roe_pct": 10.78
+  },
+  {
+    "profitability_snapshot_id": "FPS-000035",
+    "facility_id": "FAC-2024-00012",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.46,
+    "total_revenue_amt": 0.52,
+    "nim_pct": 2.42,
+    "roa_pct": 0.98,
+    "roe_pct": 10.78
+  },
+  {
+    "profitability_snapshot_id": "FPS-000036",
+    "facility_id": "FAC-2024-00012",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.46,
+    "total_revenue_amt": 0.52,
+    "nim_pct": 2.42,
+    "roa_pct": 0.98,
+    "roe_pct": 10.78
+  },
+  {
+    "profitability_snapshot_id": "FPS-000037",
+    "facility_id": "FAC-2024-00013",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.57,
+    "total_revenue_amt": 0.65,
+    "nim_pct": 2.19,
+    "roa_pct": 0.9,
+    "roe_pct": 10.96
+  },
+  {
+    "profitability_snapshot_id": "FPS-000038",
+    "facility_id": "FAC-2024-00013",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.57,
+    "total_revenue_amt": 0.65,
+    "nim_pct": 2.19,
+    "roa_pct": 0.9,
+    "roe_pct": 10.96
+  },
+  {
+    "profitability_snapshot_id": "FPS-000039",
+    "facility_id": "FAC-2024-00013",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.57,
+    "total_revenue_amt": 0.65,
+    "nim_pct": 2.19,
+    "roa_pct": 0.9,
+    "roe_pct": 10.96
+  },
+  {
+    "profitability_snapshot_id": "FPS-000040",
+    "facility_id": "FAC-2024-00014",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.15,
+    "nim_pct": 2.46,
+    "roa_pct": 1.01,
+    "roe_pct": 13.14
+  },
+  {
+    "profitability_snapshot_id": "FPS-000041",
+    "facility_id": "FAC-2024-00014",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.15,
+    "nim_pct": 2.46,
+    "roa_pct": 1.01,
+    "roe_pct": 13.14
+  },
+  {
+    "profitability_snapshot_id": "FPS-000042",
+    "facility_id": "FAC-2024-00014",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.15,
+    "nim_pct": 2.46,
+    "roa_pct": 1.01,
+    "roe_pct": 13.14
+  },
+  {
+    "profitability_snapshot_id": "FPS-000043",
+    "facility_id": "FAC-2024-00015",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.06,
+    "total_revenue_amt": 0.07,
+    "nim_pct": 2.23,
+    "roa_pct": 0.93,
+    "roe_pct": 13.32
+  },
+  {
+    "profitability_snapshot_id": "FPS-000044",
+    "facility_id": "FAC-2024-00015",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.06,
+    "total_revenue_amt": 0.07,
+    "nim_pct": 2.23,
+    "roa_pct": 0.93,
+    "roe_pct": 13.32
+  },
+  {
+    "profitability_snapshot_id": "FPS-000045",
+    "facility_id": "FAC-2024-00015",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.06,
+    "total_revenue_amt": 0.07,
+    "nim_pct": 2.23,
+    "roa_pct": 0.93,
+    "roe_pct": 13.32
+  },
+  {
+    "profitability_snapshot_id": "FPS-000046",
+    "facility_id": "FAC-2024-00016",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.14,
+    "nim_pct": 2.35,
+    "roa_pct": 0.99,
+    "roe_pct": 9.9
+  },
+  {
+    "profitability_snapshot_id": "FPS-000047",
+    "facility_id": "FAC-2024-00016",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.14,
+    "nim_pct": 2.35,
+    "roa_pct": 0.99,
+    "roe_pct": 9.9
+  },
+  {
+    "profitability_snapshot_id": "FPS-000048",
+    "facility_id": "FAC-2024-00016",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.14,
+    "nim_pct": 2.35,
+    "roa_pct": 0.99,
+    "roe_pct": 9.9
+  },
+  {
+    "profitability_snapshot_id": "FPS-000049",
+    "facility_id": "FAC-2024-00017",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.19,
+    "total_revenue_amt": 0.21,
+    "nim_pct": 2.12,
+    "roa_pct": 0.91,
+    "roe_pct": 10.08
+  },
+  {
+    "profitability_snapshot_id": "FPS-000050",
+    "facility_id": "FAC-2024-00017",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.19,
+    "total_revenue_amt": 0.21,
+    "nim_pct": 2.12,
+    "roa_pct": 0.91,
+    "roe_pct": 10.08
+  },
+  {
+    "profitability_snapshot_id": "FPS-000051",
+    "facility_id": "FAC-2024-00017",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.19,
+    "total_revenue_amt": 0.21,
+    "nim_pct": 2.12,
+    "roa_pct": 0.91,
+    "roe_pct": 10.08
+  },
+  {
+    "profitability_snapshot_id": "FPS-000052",
+    "facility_id": "FAC-2024-00018",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.37,
+    "total_revenue_amt": 0.43,
+    "nim_pct": 2.89,
+    "roa_pct": 1.23,
+    "roe_pct": 14.26
+  },
+  {
+    "profitability_snapshot_id": "FPS-000053",
+    "facility_id": "FAC-2024-00018",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.37,
+    "total_revenue_amt": 0.43,
+    "nim_pct": 2.89,
+    "roa_pct": 1.23,
+    "roe_pct": 14.26
+  },
+  {
+    "profitability_snapshot_id": "FPS-000054",
+    "facility_id": "FAC-2024-00018",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.37,
+    "total_revenue_amt": 0.43,
+    "nim_pct": 2.89,
+    "roa_pct": 1.23,
+    "roe_pct": 14.26
+  },
+  {
+    "profitability_snapshot_id": "FPS-000055",
+    "facility_id": "FAC-2024-00019",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.43,
+    "total_revenue_amt": 0.5,
+    "nim_pct": 2.41,
+    "roa_pct": 1.04,
+    "roe_pct": 13.44
+  },
+  {
+    "profitability_snapshot_id": "FPS-000056",
+    "facility_id": "FAC-2024-00019",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.43,
+    "total_revenue_amt": 0.5,
+    "nim_pct": 2.41,
+    "roa_pct": 1.04,
+    "roe_pct": 13.44
+  },
+  {
+    "profitability_snapshot_id": "FPS-000057",
+    "facility_id": "FAC-2024-00019",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.43,
+    "total_revenue_amt": 0.5,
+    "nim_pct": 2.41,
+    "roa_pct": 1.04,
+    "roe_pct": 13.44
+  },
+  {
+    "profitability_snapshot_id": "FPS-000058",
+    "facility_id": "FAC-2024-00020",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.63,
+    "total_revenue_amt": 0.72,
+    "nim_pct": 2.18,
+    "roa_pct": 0.96,
+    "roe_pct": 13.62
+  },
+  {
+    "profitability_snapshot_id": "FPS-000059",
+    "facility_id": "FAC-2024-00020",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.63,
+    "total_revenue_amt": 0.72,
+    "nim_pct": 2.18,
+    "roa_pct": 0.96,
+    "roe_pct": 13.62
+  },
+  {
+    "profitability_snapshot_id": "FPS-000060",
+    "facility_id": "FAC-2024-00020",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.63,
+    "total_revenue_amt": 0.72,
+    "nim_pct": 2.18,
+    "roa_pct": 0.96,
+    "roe_pct": 13.62
+  },
+  {
+    "profitability_snapshot_id": "FPS-000061",
+    "facility_id": "FAC-2024-00021",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.32,
+    "total_revenue_amt": 0.37,
+    "nim_pct": 2.45,
+    "roa_pct": 0.98,
+    "roe_pct": 9.8
+  },
+  {
+    "profitability_snapshot_id": "FPS-000062",
+    "facility_id": "FAC-2024-00021",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.32,
+    "total_revenue_amt": 0.37,
+    "nim_pct": 2.45,
+    "roa_pct": 0.98,
+    "roe_pct": 9.8
+  },
+  {
+    "profitability_snapshot_id": "FPS-000063",
+    "facility_id": "FAC-2024-00021",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.32,
+    "total_revenue_amt": 0.37,
+    "nim_pct": 2.45,
+    "roa_pct": 0.98,
+    "roe_pct": 9.8
+  },
+  {
+    "profitability_snapshot_id": "FPS-000064",
+    "facility_id": "FAC-2024-00022",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 2.22,
+    "roa_pct": 0.9,
+    "roe_pct": 9.98
+  },
+  {
+    "profitability_snapshot_id": "FPS-000065",
+    "facility_id": "FAC-2024-00022",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 2.22,
+    "roa_pct": 0.9,
+    "roe_pct": 9.98
+  },
+  {
+    "profitability_snapshot_id": "FPS-000066",
+    "facility_id": "FAC-2024-00022",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 2.22,
+    "roa_pct": 0.9,
+    "roe_pct": 9.98
+  },
+  {
+    "profitability_snapshot_id": "FPS-000067",
+    "facility_id": "FAC-2024-00023",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.75,
+    "total_revenue_amt": 0.87,
+    "nim_pct": 2.99,
+    "roa_pct": 1.22,
+    "roe_pct": 14.16
+  },
+  {
+    "profitability_snapshot_id": "FPS-000068",
+    "facility_id": "FAC-2024-00023",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.75,
+    "total_revenue_amt": 0.87,
+    "nim_pct": 2.99,
+    "roa_pct": 1.22,
+    "roe_pct": 14.16
+  },
+  {
+    "profitability_snapshot_id": "FPS-000069",
+    "facility_id": "FAC-2024-00023",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.75,
+    "total_revenue_amt": 0.87,
+    "nim_pct": 2.99,
+    "roa_pct": 1.22,
+    "roe_pct": 14.16
+  },
+  {
+    "profitability_snapshot_id": "FPS-000070",
+    "facility_id": "FAC-2024-00024",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.98,
+    "total_revenue_amt": 1.13,
+    "nim_pct": 3.01,
+    "roa_pct": 1.23,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000071",
+    "facility_id": "FAC-2024-00024",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.98,
+    "total_revenue_amt": 1.13,
+    "nim_pct": 3.01,
+    "roa_pct": 1.23,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000072",
+    "facility_id": "FAC-2024-00024",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.98,
+    "total_revenue_amt": 1.13,
+    "nim_pct": 3.01,
+    "roa_pct": 1.23,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000073",
+    "facility_id": "FAC-2024-00025",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.35,
+    "total_revenue_amt": 0.41,
+    "nim_pct": 2.28,
+    "roa_pct": 0.95,
+    "roe_pct": 13.52
+  },
+  {
+    "profitability_snapshot_id": "FPS-000074",
+    "facility_id": "FAC-2024-00025",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.35,
+    "total_revenue_amt": 0.41,
+    "nim_pct": 2.28,
+    "roa_pct": 0.95,
+    "roe_pct": 13.52
+  },
+  {
+    "profitability_snapshot_id": "FPS-000075",
+    "facility_id": "FAC-2024-00025",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.35,
+    "total_revenue_amt": 0.41,
+    "nim_pct": 2.28,
+    "roa_pct": 0.95,
+    "roe_pct": 13.52
+  },
+  {
+    "profitability_snapshot_id": "FPS-000076",
+    "facility_id": "FAC-2024-00026",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.08,
+    "total_revenue_amt": 0.09,
+    "nim_pct": 2.43,
+    "roa_pct": 1.02,
+    "roe_pct": 10.2
+  },
+  {
+    "profitability_snapshot_id": "FPS-000077",
+    "facility_id": "FAC-2024-00026",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.08,
+    "total_revenue_amt": 0.09,
+    "nim_pct": 2.43,
+    "roa_pct": 1.02,
+    "roe_pct": 10.2
+  },
+  {
+    "profitability_snapshot_id": "FPS-000078",
+    "facility_id": "FAC-2024-00026",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.08,
+    "total_revenue_amt": 0.09,
+    "nim_pct": 2.43,
+    "roa_pct": 1.02,
+    "roe_pct": 10.2
+  },
+  {
+    "profitability_snapshot_id": "FPS-000079",
+    "facility_id": "FAC-2024-00027",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.15,
+    "nim_pct": 2.19,
+    "roa_pct": 0.94,
+    "roe_pct": 10.38
+  },
+  {
+    "profitability_snapshot_id": "FPS-000080",
+    "facility_id": "FAC-2024-00027",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.15,
+    "nim_pct": 2.19,
+    "roa_pct": 0.94,
+    "roe_pct": 10.38
+  },
+  {
+    "profitability_snapshot_id": "FPS-000081",
+    "facility_id": "FAC-2024-00027",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.13,
+    "total_revenue_amt": 0.15,
+    "nim_pct": 2.19,
+    "roa_pct": 0.94,
+    "roe_pct": 10.38
+  },
+  {
+    "profitability_snapshot_id": "FPS-000082",
+    "facility_id": "FAC-2024-00028",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.24,
+    "total_revenue_amt": 0.28,
+    "nim_pct": 2.47,
+    "roa_pct": 1.06,
+    "roe_pct": 12.56
+  },
+  {
+    "profitability_snapshot_id": "FPS-000083",
+    "facility_id": "FAC-2024-00028",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.24,
+    "total_revenue_amt": 0.28,
+    "nim_pct": 2.47,
+    "roa_pct": 1.06,
+    "roe_pct": 12.56
+  },
+  {
+    "profitability_snapshot_id": "FPS-000084",
+    "facility_id": "FAC-2024-00028",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.24,
+    "total_revenue_amt": 0.28,
+    "nim_pct": 2.47,
+    "roa_pct": 1.06,
+    "roe_pct": 12.56
+  },
+  {
+    "profitability_snapshot_id": "FPS-000085",
+    "facility_id": "FAC-2024-00029",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.1,
+    "total_revenue_amt": 0.12,
+    "nim_pct": 2.24,
+    "roa_pct": 0.97,
+    "roe_pct": 12.74
+  },
+  {
+    "profitability_snapshot_id": "FPS-000086",
+    "facility_id": "FAC-2024-00029",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.1,
+    "total_revenue_amt": 0.12,
+    "nim_pct": 2.24,
+    "roa_pct": 0.97,
+    "roe_pct": 12.74
+  },
+  {
+    "profitability_snapshot_id": "FPS-000087",
+    "facility_id": "FAC-2024-00029",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.1,
+    "total_revenue_amt": 0.12,
+    "nim_pct": 2.24,
+    "roa_pct": 0.97,
+    "roe_pct": 12.74
+  },
+  {
+    "profitability_snapshot_id": "FPS-000088",
+    "facility_id": "FAC-2024-00030",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 1.28,
+    "total_revenue_amt": 1.47,
+    "nim_pct": 3.01,
+    "roa_pct": 1.29,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000089",
+    "facility_id": "FAC-2024-00030",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 1.28,
+    "total_revenue_amt": 1.47,
+    "nim_pct": 3.01,
+    "roa_pct": 1.29,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000090",
+    "facility_id": "FAC-2024-00030",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 1.28,
+    "total_revenue_amt": 1.47,
+    "nim_pct": 3.01,
+    "roa_pct": 1.29,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000091",
+    "facility_id": "FAC-2024-00031",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.26,
+    "total_revenue_amt": 0.3,
+    "nim_pct": 2.13,
+    "roa_pct": 0.85,
+    "roe_pct": 8.5
+  },
+  {
+    "profitability_snapshot_id": "FPS-000092",
+    "facility_id": "FAC-2024-00031",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.26,
+    "total_revenue_amt": 0.3,
+    "nim_pct": 2.13,
+    "roa_pct": 0.85,
+    "roe_pct": 8.5
+  },
+  {
+    "profitability_snapshot_id": "FPS-000093",
+    "facility_id": "FAC-2024-00031",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.26,
+    "total_revenue_amt": 0.3,
+    "nim_pct": 2.13,
+    "roa_pct": 0.85,
+    "roe_pct": 8.5
+  },
+  {
+    "profitability_snapshot_id": "FPS-000094",
+    "facility_id": "FAC-2024-00032",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 2.39,
+    "roa_pct": 0.97,
+    "roe_pct": 10.68
+  },
+  {
+    "profitability_snapshot_id": "FPS-000095",
+    "facility_id": "FAC-2024-00032",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 2.39,
+    "roa_pct": 0.97,
+    "roe_pct": 10.68
+  },
+  {
+    "profitability_snapshot_id": "FPS-000096",
+    "facility_id": "FAC-2024-00032",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 2.39,
+    "roa_pct": 0.97,
+    "roe_pct": 10.68
+  },
+  {
+    "profitability_snapshot_id": "FPS-000097",
+    "facility_id": "FAC-2024-00033",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.5,
+    "total_revenue_amt": 0.58,
+    "nim_pct": 2.17,
+    "roa_pct": 0.89,
+    "roe_pct": 10.86
+  },
+  {
+    "profitability_snapshot_id": "FPS-000098",
+    "facility_id": "FAC-2024-00033",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.5,
+    "total_revenue_amt": 0.58,
+    "nim_pct": 2.17,
+    "roa_pct": 0.89,
+    "roe_pct": 10.86
+  },
+  {
+    "profitability_snapshot_id": "FPS-000099",
+    "facility_id": "FAC-2024-00033",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.5,
+    "total_revenue_amt": 0.58,
+    "nim_pct": 2.17,
+    "roa_pct": 0.89,
+    "roe_pct": 10.86
+  },
+  {
+    "profitability_snapshot_id": "FPS-000100",
+    "facility_id": "FAC-2024-00034",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.24,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.19,
+    "roa_pct": 0.9,
+    "roe_pct": 12.04
+  },
+  {
+    "profitability_snapshot_id": "FPS-000101",
+    "facility_id": "FAC-2024-00034",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.24,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.19,
+    "roa_pct": 0.9,
+    "roe_pct": 12.04
+  },
+  {
+    "profitability_snapshot_id": "FPS-000102",
+    "facility_id": "FAC-2024-00034",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.24,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.19,
+    "roa_pct": 0.9,
+    "roe_pct": 12.04
+  },
+  {
+    "profitability_snapshot_id": "FPS-000103",
+    "facility_id": "FAC-2024-00035",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.4,
+    "total_revenue_amt": 0.46,
+    "nim_pct": 2.46,
+    "roa_pct": 1.02,
+    "roe_pct": 14.22
+  },
+  {
+    "profitability_snapshot_id": "FPS-000104",
+    "facility_id": "FAC-2024-00035",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.4,
+    "total_revenue_amt": 0.46,
+    "nim_pct": 2.46,
+    "roa_pct": 1.02,
+    "roe_pct": 14.22
+  },
+  {
+    "profitability_snapshot_id": "FPS-000105",
+    "facility_id": "FAC-2024-00035",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.4,
+    "total_revenue_amt": 0.46,
+    "nim_pct": 2.46,
+    "roa_pct": 1.02,
+    "roe_pct": 14.22
+  },
+  {
+    "profitability_snapshot_id": "FPS-000106",
+    "facility_id": "FAC-2024-00036",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.51,
+    "total_revenue_amt": 0.59,
+    "nim_pct": 2.22,
+    "roa_pct": 0.94,
+    "roe_pct": 9.4
+  },
+  {
+    "profitability_snapshot_id": "FPS-000107",
+    "facility_id": "FAC-2024-00036",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.51,
+    "total_revenue_amt": 0.59,
+    "nim_pct": 2.22,
+    "roa_pct": 0.94,
+    "roe_pct": 9.4
+  },
+  {
+    "profitability_snapshot_id": "FPS-000108",
+    "facility_id": "FAC-2024-00036",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.51,
+    "total_revenue_amt": 0.59,
+    "nim_pct": 2.22,
+    "roa_pct": 0.94,
+    "roe_pct": 9.4
+  },
+  {
+    "profitability_snapshot_id": "FPS-000109",
+    "facility_id": "FAC-2024-00037",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.75,
+    "total_revenue_amt": 0.87,
+    "nim_pct": 2.5,
+    "roa_pct": 1.06,
+    "roe_pct": 11.58
+  },
+  {
+    "profitability_snapshot_id": "FPS-000110",
+    "facility_id": "FAC-2024-00037",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.75,
+    "total_revenue_amt": 0.87,
+    "nim_pct": 2.5,
+    "roa_pct": 1.06,
+    "roe_pct": 11.58
+  },
+  {
+    "profitability_snapshot_id": "FPS-000111",
+    "facility_id": "FAC-2024-00037",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.75,
+    "total_revenue_amt": 0.87,
+    "nim_pct": 2.5,
+    "roa_pct": 1.06,
+    "roe_pct": 11.58
+  },
+  {
+    "profitability_snapshot_id": "FPS-000112",
+    "facility_id": "FAC-2024-00038",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.03,
+    "total_revenue_amt": 0.04,
+    "nim_pct": 2.26,
+    "roa_pct": 0.98,
+    "roe_pct": 11.76
+  },
+  {
+    "profitability_snapshot_id": "FPS-000113",
+    "facility_id": "FAC-2024-00038",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.03,
+    "total_revenue_amt": 0.04,
+    "nim_pct": 2.26,
+    "roa_pct": 0.98,
+    "roe_pct": 11.76
+  },
+  {
+    "profitability_snapshot_id": "FPS-000114",
+    "facility_id": "FAC-2024-00038",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.03,
+    "total_revenue_amt": 0.04,
+    "nim_pct": 2.26,
+    "roa_pct": 0.98,
+    "roe_pct": 11.76
+  },
+  {
+    "profitability_snapshot_id": "FPS-000115",
+    "facility_id": "FAC-2024-00039",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.11,
+    "total_revenue_amt": 0.12,
+    "nim_pct": 3.04,
+    "roa_pct": 1.29,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000116",
+    "facility_id": "FAC-2024-00039",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.11,
+    "total_revenue_amt": 0.12,
+    "nim_pct": 3.04,
+    "roa_pct": 1.29,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000117",
+    "facility_id": "FAC-2024-00039",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.11,
+    "total_revenue_amt": 0.12,
+    "nim_pct": 3.04,
+    "roa_pct": 1.29,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000118",
+    "facility_id": "FAC-2024-00040",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 1.78,
+    "total_revenue_amt": 2.05,
+    "nim_pct": 3.06,
+    "roa_pct": 1.31,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000119",
+    "facility_id": "FAC-2024-00040",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 1.78,
+    "total_revenue_amt": 2.05,
+    "nim_pct": 3.06,
+    "roa_pct": 1.31,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000120",
+    "facility_id": "FAC-2024-00040",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 1.78,
+    "total_revenue_amt": 2.05,
+    "nim_pct": 3.06,
+    "roa_pct": 1.31,
+    "roe_pct": 15
+  },
+  {
+    "profitability_snapshot_id": "FPS-000121",
+    "facility_id": "FAC-2024-00041",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.23,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.33,
+    "roa_pct": 0.93,
+    "roe_pct": 9.3
+  },
+  {
+    "profitability_snapshot_id": "FPS-000122",
+    "facility_id": "FAC-2024-00041",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.23,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.33,
+    "roa_pct": 0.93,
+    "roe_pct": 9.3
+  },
+  {
+    "profitability_snapshot_id": "FPS-000123",
+    "facility_id": "FAC-2024-00041",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.23,
+    "total_revenue_amt": 0.27,
+    "nim_pct": 2.33,
+    "roa_pct": 0.93,
+    "roe_pct": 9.3
+  },
+  {
+    "profitability_snapshot_id": "FPS-000124",
+    "facility_id": "FAC-2024-00042",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.38,
+    "total_revenue_amt": 0.43,
+    "nim_pct": 2.6,
+    "roa_pct": 1.05,
+    "roe_pct": 11.48
+  },
+  {
+    "profitability_snapshot_id": "FPS-000125",
+    "facility_id": "FAC-2024-00042",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.38,
+    "total_revenue_amt": 0.43,
+    "nim_pct": 2.6,
+    "roa_pct": 1.05,
+    "roe_pct": 11.48
+  },
+  {
+    "profitability_snapshot_id": "FPS-000126",
+    "facility_id": "FAC-2024-00042",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.38,
+    "total_revenue_amt": 0.43,
+    "nim_pct": 2.6,
+    "roa_pct": 1.05,
+    "roe_pct": 11.48
+  },
+  {
+    "profitability_snapshot_id": "FPS-000127",
+    "facility_id": "FAC-2024-00043",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.16,
+    "total_revenue_amt": 0.18,
+    "nim_pct": 2.37,
+    "roa_pct": 0.97,
+    "roe_pct": 11.66
+  },
+  {
+    "profitability_snapshot_id": "FPS-000128",
+    "facility_id": "FAC-2024-00043",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.16,
+    "total_revenue_amt": 0.18,
+    "nim_pct": 2.37,
+    "roa_pct": 0.97,
+    "roe_pct": 11.66
+  },
+  {
+    "profitability_snapshot_id": "FPS-000129",
+    "facility_id": "FAC-2024-00043",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.16,
+    "total_revenue_amt": 0.18,
+    "nim_pct": 2.37,
+    "roa_pct": 0.97,
+    "roe_pct": 11.66
+  },
+  {
+    "profitability_snapshot_id": "FPS-000130",
+    "facility_id": "FAC-2024-00044",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.29,
+    "total_revenue_amt": 0.33,
+    "nim_pct": 2.64,
+    "roa_pct": 1.08,
+    "roe_pct": 13.84
+  },
+  {
+    "profitability_snapshot_id": "FPS-000131",
+    "facility_id": "FAC-2024-00044",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.29,
+    "total_revenue_amt": 0.33,
+    "nim_pct": 2.64,
+    "roa_pct": 1.08,
+    "roe_pct": 13.84
+  },
+  {
+    "profitability_snapshot_id": "FPS-000132",
+    "facility_id": "FAC-2024-00044",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.29,
+    "total_revenue_amt": 0.33,
+    "nim_pct": 2.64,
+    "roa_pct": 1.08,
+    "roe_pct": 13.84
+  },
+  {
+    "profitability_snapshot_id": "FPS-000133",
+    "facility_id": "FAC-2024-00045",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.39,
+    "total_revenue_amt": 0.44,
+    "nim_pct": 2.41,
+    "roa_pct": 1,
+    "roe_pct": 14.02
+  },
+  {
+    "profitability_snapshot_id": "FPS-000134",
+    "facility_id": "FAC-2024-00045",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.39,
+    "total_revenue_amt": 0.44,
+    "nim_pct": 2.41,
+    "roa_pct": 1,
+    "roe_pct": 14.02
+  },
+  {
+    "profitability_snapshot_id": "FPS-000135",
+    "facility_id": "FAC-2024-00045",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.39,
+    "total_revenue_amt": 0.44,
+    "nim_pct": 2.41,
+    "roa_pct": 1,
+    "roe_pct": 14.02
+  },
+  {
+    "profitability_snapshot_id": "FPS-000136",
+    "facility_id": "FAC-2024-00046",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.55,
+    "total_revenue_amt": 0.64,
+    "nim_pct": 2.53,
+    "roa_pct": 1.06,
+    "roe_pct": 10.6
+  },
+  {
+    "profitability_snapshot_id": "FPS-000137",
+    "facility_id": "FAC-2024-00046",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.55,
+    "total_revenue_amt": 0.64,
+    "nim_pct": 2.53,
+    "roa_pct": 1.06,
+    "roe_pct": 10.6
+  },
+  {
+    "profitability_snapshot_id": "FPS-000138",
+    "facility_id": "FAC-2024-00046",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.55,
+    "total_revenue_amt": 0.64,
+    "nim_pct": 2.53,
+    "roa_pct": 1.06,
+    "roe_pct": 10.6
+  },
+  {
+    "profitability_snapshot_id": "FPS-000139",
+    "facility_id": "FAC-2024-00047",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.66,
+    "total_revenue_amt": 0.76,
+    "nim_pct": 2.3,
+    "roa_pct": 0.98,
+    "roe_pct": 10.78
+  },
+  {
+    "profitability_snapshot_id": "FPS-000140",
+    "facility_id": "FAC-2024-00047",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.66,
+    "total_revenue_amt": 0.76,
+    "nim_pct": 2.3,
+    "roa_pct": 0.98,
+    "roe_pct": 10.78
+  },
+  {
+    "profitability_snapshot_id": "FPS-000141",
+    "facility_id": "FAC-2024-00047",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.66,
+    "total_revenue_amt": 0.76,
+    "nim_pct": 2.3,
+    "roa_pct": 0.98,
+    "roe_pct": 10.78
+  },
+  {
+    "profitability_snapshot_id": "FPS-000142",
+    "facility_id": "FAC-2024-00048",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 3.07,
+    "roa_pct": 1.3,
+    "roe_pct": 14.96
+  },
+  {
+    "profitability_snapshot_id": "FPS-000143",
+    "facility_id": "FAC-2024-00048",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 3.07,
+    "roa_pct": 1.3,
+    "roe_pct": 14.96
+  },
+  {
+    "profitability_snapshot_id": "FPS-000144",
+    "facility_id": "FAC-2024-00048",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.42,
+    "total_revenue_amt": 0.48,
+    "nim_pct": 3.07,
+    "roa_pct": 1.3,
+    "roe_pct": 14.96
+  },
+  {
+    "profitability_snapshot_id": "FPS-000145",
+    "facility_id": "FAC-2024-00049",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 0.52,
+    "total_revenue_amt": 0.6,
+    "nim_pct": 2.58,
+    "roa_pct": 1.11,
+    "roe_pct": 14.14
+  },
+  {
+    "profitability_snapshot_id": "FPS-000146",
+    "facility_id": "FAC-2024-00049",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 0.52,
+    "total_revenue_amt": 0.6,
+    "nim_pct": 2.58,
+    "roa_pct": 1.11,
+    "roe_pct": 14.14
+  },
+  {
+    "profitability_snapshot_id": "FPS-000147",
+    "facility_id": "FAC-2024-00049",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 0.52,
+    "total_revenue_amt": 0.6,
+    "nim_pct": 2.58,
+    "roa_pct": 1.11,
+    "roe_pct": 14.14
+  },
+  {
+    "profitability_snapshot_id": "FPS-000148",
+    "facility_id": "FAC-2024-00050",
+    "as_of_date": "2025-12-31",
+    "net_interest_income_amt": 1.8,
+    "total_revenue_amt": 2.07,
+    "nim_pct": 2.36,
+    "roa_pct": 1.03,
+    "roe_pct": 14.32
+  },
+  {
+    "profitability_snapshot_id": "FPS-000149",
+    "facility_id": "FAC-2024-00050",
+    "as_of_date": "2026-01-31",
+    "net_interest_income_amt": 1.8,
+    "total_revenue_amt": 2.07,
+    "nim_pct": 2.36,
+    "roa_pct": 1.03,
+    "roe_pct": 14.32
+  },
+  {
+    "profitability_snapshot_id": "FPS-000150",
+    "facility_id": "FAC-2024-00050",
+    "as_of_date": "2026-02-28",
+    "net_interest_income_amt": 1.8,
+    "total_revenue_amt": 2.07,
+    "nim_pct": 2.36,
+    "roa_pct": 1.03,
+    "roe_pct": 14.32
+  }
+]

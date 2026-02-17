@@ -175,7 +175,7 @@ export default function DetailPanel() {
                 <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">Table</div>
                 <div className="font-semibold text-sm text-gray-900">{fieldTable.name}</div>
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${layerColors[fieldTable.layer].badge}`}>
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${layerColors[fieldTable.layer as keyof typeof layerColors]?.badge ?? 'bg-gray-100 text-gray-800'}`}>
                     {fieldTable.layer}
                   </span>
                   <span className="text-[10px] text-gray-400">{fieldTable.category}</span>
@@ -259,7 +259,7 @@ export default function DetailPanel() {
                 <h3 className="text-base font-bold text-gray-900 truncate">{table.name}</h3>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${layerColors[table.layer].badge}`}>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${layerColors[table.layer as keyof typeof layerColors]?.badge ?? 'bg-gray-100 text-gray-800'}`}>
                   {table.layer}
                 </span>
                 <span className="text-xs text-gray-400">{table.category}</span>

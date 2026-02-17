@@ -98,6 +98,7 @@ export default function Canvas() {
       const centerY = (minY + maxY) / 2;
       const width = maxX - minX;
       const height = maxY - minY;
+      if (width <= 0 || height <= 0 || !Number.isFinite(width) || !Number.isFinite(height)) return;
 
       const viewportWidth = containerRef.current?.clientWidth || 1200;
       const viewportHeight = containerRef.current?.clientHeight || 800;
@@ -126,12 +127,13 @@ export default function Canvas() {
         newZoom = Math.max(0.75, newZoom);
       }
 
-      const panX = -(centerX * newZoom - viewportWidth / 2);
-      const panY = -(centerY * newZoom - viewportHeight / 2);
-      const minPanX = -(minX * newZoom - padding);
+      const safeZoom = Number.isFinite(newZoom) ? Math.max(0.05, Math.min(4, newZoom)) : 1;
+      const panX = -(centerX * safeZoom - viewportWidth / 2);
+      const panY = -(centerY * safeZoom - viewportHeight / 2);
+      const minPanX = -(minX * safeZoom - padding);
       const finalPanX = Math.max(panX, minPanX);
-      setPan({ x: finalPanX, y: panY });
-      setZoom(newZoom);
+      setPan({ x: Number.isFinite(finalPanX) ? finalPanX : 0, y: Number.isFinite(panY) ? panY : 0 });
+      setZoom(safeZoom);
     },
     [layoutMode, tableSize, setPan, setZoom]
   );
@@ -380,8 +382,10 @@ export default function Canvas() {
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
         return;
       }
+      const canvas = canvasRef.current;
       const hitEmptyCanvas =
-        e.target === canvasRef.current || canvasRef.current?.firstElementChild === e.target;
+        e.target === canvas ||
+        (canvas?.firstElementChild != null && e.target === canvas.firstElementChild);
       if (e.button === 0 && hitEmptyCanvas) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
@@ -479,11 +483,14 @@ export default function Canvas() {
   // Click on empty canvas: clear selections and exit focus mode.
   // Clicks on "empty" space often hit the transform <g> (first child of SVG), not the SVG itself.
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    const target = e.target as Node;
+    const target = e.target as Node | null;
+    if (!target) return;
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
     const hitCanvas =
-      target === containerRef.current ||
-      target === canvasRef.current ||
-      (canvasRef.current?.firstElementChild === target);
+      target === container ||
+      target === canvas ||
+      (canvas?.firstElementChild != null && target === canvas.firstElementChild);
     if (hitCanvas) {
       setSelectedField(null);
       setSelectedTable(null);

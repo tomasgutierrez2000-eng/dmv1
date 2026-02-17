@@ -49,7 +49,7 @@ export default function TableNode({
   onFieldSelect,
 }: TableNodeProps) {
   const { tableSize, viewMode, fieldDisplayMode, model, zoom, layoutMode } = useModelStore();
-  const colors = layerColors[table.layer];
+  const colors = layerColors[table.layer as keyof typeof layerColors] ?? layerColors.L1;
   const categoryColor = getCategoryColor(table.category);
   
   // Calculate relationship counts if not provided

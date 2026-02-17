@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search, X, ChevronDown, ChevronRight, ArrowLeft, ExternalLink,
   Layers, Zap, Info, Grid3x3, Hash,
-  TrendingUp, Table2, Tag, AlertTriangle,
+  TrendingUp, Table2, Tag, AlertTriangle, FileCode, FolderOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -13,6 +13,17 @@ import {
   type L3Metric, type DashboardPage, type PageInfo,
   type LineageNode, type LineageEdge, type DimensionInteraction,
 } from '@/data/l3-metrics';
+import {
+  L3_TABLES,
+  getL3Categories,
+  type L3TableDef,
+  type L3Tier,
+} from '@/data/l3-tables';
+
+// Sample values in L3 metrics align with the same reference scenario as L1/L2 sample data
+// (e.g. visualizer and Facility Summary). No L1/L2 APIs or store are used here — L3 is display-only.
+const SAMPLE_DATA_CONTEXT =
+  'Sample values align with L1/L2 reference scenario (e.g. facility_id = FAC-2024-00847). Use the Visualizer to explore the same data at L1/L2.';
 
 // ═══════════════════════════════════════════════════════════════
 // Layer styling
@@ -277,12 +288,17 @@ function MetricCard({ metric, pageInfo }: { metric: L3Metric; pageInfo: PageInfo
           {/* Description */}
           <p className="text-sm text-gray-400 leading-relaxed">{metric.description}</p>
 
-          {/* Formula box */}
+          {/* How this value is calculated — formula and result */}
           <div className="bg-black/20 rounded-lg px-4 py-3">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 mb-1.5">Formula</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 mb-1.5">How this value is calculated</div>
             <div className="text-sm font-mono text-purple-300">{metric.formula}</div>
+            <div className="mt-2 text-xs text-gray-400">
+              With sample data: <span className="text-emerald-400 font-mono font-medium">{metric.formula}</span>
+              <span className="text-gray-500"> → </span>
+              <span className="text-emerald-400 font-mono font-semibold">{metric.sampleValue ?? '—'}</span>
+            </div>
             {metric.formulaSQL && (
-              <div className="text-xs font-mono text-gray-500 mt-1">
+              <div className="text-xs font-mono text-gray-500 mt-2 pt-2 border-t border-white/5">
                 <span className="text-gray-600">SQL: </span>{metric.formulaSQL}
               </div>
             )}
@@ -334,12 +350,21 @@ function MetricCard({ metric, pageInfo }: { metric: L3Metric; pageInfo: PageInfo
             </div>
           )}
 
-          {/* Equation breakdown */}
-          {hasLineage && (
+          {/* Equation breakdown (with lineage) or simple calculation (no lineage) */}
+          {hasLineage ? (
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 mb-2">Equation Breakdown (Sample Data)</div>
               <div className="bg-black/10 rounded-lg p-3">
                 <EquationBreakdown metric={metric} />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 mb-2">Calculation (sample data)</div>
+              <div className="bg-black/10 rounded-lg p-3 text-sm font-mono text-gray-300">
+                <span className="text-purple-300">{metric.formula}</span>
+                <span className="text-gray-500 mx-1">→</span>
+                <span className="text-emerald-400 font-semibold">{metric.sampleValue ?? '—'}</span>
               </div>
             </div>
           )}
@@ -353,7 +378,10 @@ function MetricCard({ metric, pageInfo }: { metric: L3Metric; pageInfo: PageInfo
 // Main Explorer Component
 // ═══════════════════════════════════════════════════════════════
 
+type ViewMode = 'metrics' | 'tables';
+
 export default function LineageExplorer() {
+  const [viewMode, setViewMode] = useState<ViewMode>('metrics');
   const [activePage, setActivePage] = useState<DashboardPage>('P1');
   const [search, setSearch] = useState('');
 
@@ -401,37 +429,69 @@ export default function LineageExplorer() {
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </Link>
-          <h1 className="text-sm font-bold flex items-center gap-2">
+          <h1 className="text-sm font-bold flex items-center gap-2 mb-2">
             <Layers className="w-4 h-4 text-purple-400" />
-            L3 Metric View
+            L3
           </h1>
-          <p className="text-[10px] text-gray-600 mt-1">Dashboard pages &amp; metrics</p>
+          <div className="flex rounded-lg bg-white/[0.04] p-0.5 mb-3">
+            <button
+              onClick={() => setViewMode('metrics')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+                viewMode === 'metrics' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              Metrics
+            </button>
+            <button
+              onClick={() => setViewMode('tables')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+                viewMode === 'tables' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              <Table2 className="w-3.5 h-3.5" />
+              Tables
+            </button>
+          </div>
         </div>
         <nav className="flex-1 py-2 overflow-y-auto">
-          {DASHBOARD_PAGES.map(page => {
-            const count = metricsByPage(page.id).length;
-            const isActive = activePage === page.id;
-            return (
-              <button
-                key={page.id}
-                onClick={() => { setActivePage(page.id); setSearch(''); }}
-                className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-all ${
-                  isActive
-                    ? 'bg-white/[0.06] border-l-2'
-                    : 'hover:bg-white/[0.02] border-l-2 border-transparent'
-                }`}
-                style={isActive ? { borderLeftColor: page.color } : undefined}
-              >
-                <span className="text-base">{page.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <div className={`text-xs font-medium truncate ${isActive ? 'text-white' : 'text-gray-400'}`}>
-                    {page.shortName}
-                  </div>
-                  <div className="text-[10px] text-gray-600">{page.id} · {count} metrics</div>
-                </div>
-              </button>
-            );
-          })}
+          {viewMode === 'tables' ? (
+            <div className="px-3 text-[10px] text-gray-500">
+              <div className="font-semibold text-gray-400 mb-1">49 L3 tables</div>
+              <div className="space-y-0.5">
+                {([1, 2, 3, 4] as L3Tier[]).map(t => (
+                  <div key={t}>Tier {t}: {L3_TABLES.filter(tbl => tbl.tier === t).length} tables</div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {DASHBOARD_PAGES.map(page => {
+                const count = metricsByPage(page.id).length;
+                const isActive = activePage === page.id;
+                return (
+                  <button
+                    key={page.id}
+                    onClick={() => { setActivePage(page.id); setSearch(''); }}
+                    className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-all ${
+                      isActive
+                        ? 'bg-white/[0.06] border-l-2'
+                        : 'hover:bg-white/[0.02] border-l-2 border-transparent'
+                    }`}
+                    style={isActive ? { borderLeftColor: page.color } : undefined}
+                  >
+                    <span className="text-base">{page.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs font-medium truncate ${isActive ? 'text-white' : 'text-gray-400'}`}>
+                        {page.shortName}
+                      </div>
+                      <div className="text-[10px] text-gray-600">{page.id} · {count} metrics</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </>
+          )}
         </nav>
         {/* Legend */}
         <div className="p-3 border-t border-white/[0.04]">
@@ -450,85 +510,166 @@ export default function LineageExplorer() {
 
       {/* ── Main Content ── */}
       <main className="flex-1 overflow-y-auto">
-        {/* Page header */}
-        <header className="sticky top-0 z-30 bg-[#0a0e1a]/95 backdrop-blur-xl border-b border-white/[0.04]">
-          <div className="px-6 py-4">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">{pageInfo.icon}</span>
-              <div>
-                <h2 className="text-lg font-bold" style={{ color: pageInfo.color }}>
-                  {pageInfo.id}: {pageInfo.name}
-                </h2>
-                <p className="text-xs text-gray-500">{pageInfo.description}</p>
+        {viewMode === 'tables' ? (
+          <>
+            <header className="sticky top-0 z-30 bg-[#0a0e1a]/95 backdrop-blur-xl border-b border-white/[0.04]">
+              <div className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <FolderOpen className="w-6 h-6 text-emerald-400" />
+                  <div>
+                    <h2 className="text-lg font-bold text-white">L3 Table View</h2>
+                    <p className="text-xs text-gray-500">49 reporting tables · DDL &amp; population in sql/l3/</p>
+                  </div>
+                  <div className="ml-auto flex items-center gap-2">
+                    <a
+                      href="/api/l3/sql?file=00_README.md"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-gray-400 hover:text-white transition-colors"
+                    >
+                      <FileCode className="w-3.5 h-3.5" />
+                      README
+                    </a>
+                    <a
+                      href="/api/l3/sql?file=01_DDL_all_tables.sql"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-gray-400 hover:text-white transition-colors"
+                    >
+                      <FileCode className="w-3.5 h-3.5" />
+                      DDL
+                    </a>
+                    <Link href="/visualizer" className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-gray-500 transition-colors">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      ERD
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="ml-auto flex items-center gap-4 text-xs text-gray-500">
-                <span>{stats.total} metrics</span>
-                <span>{stats.withLineage} with lineage</span>
-                <Link
-                  href="/visualizer"
-                  className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  ERD
-                </Link>
+            </header>
+            <div className="px-6 py-5">
+              <div className="mb-4 flex items-center gap-2 text-[10px] text-gray-500">
+                <span>Tier 1 = L1+L2 only → Tier 2 → Tier 3 → Tier 4 (see 06_ORCHESTRATOR.sql)</span>
               </div>
+              {getL3Categories().map(cat => {
+                const tables = L3_TABLES.filter(t => t.category === cat);
+                return (
+                  <div key={cat} className="mb-6">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-2">
+                      <div className="w-1 h-4 rounded-full bg-emerald-500/50" />
+                      {cat}
+                      <span className="text-gray-600">({tables.length})</span>
+                    </h3>
+                    <div className="space-y-1.5">
+                      {tables.map(t => (
+                        <div
+                          key={t.id}
+                          className="flex items-center gap-3 px-4 py-2.5 rounded-lg border border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                        >
+                          <span className="text-[10px] font-bold font-mono w-10 text-gray-500">{t.id}</span>
+                          <span className="text-sm font-medium text-white font-mono">l3.{t.name}</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/15 text-purple-300">
+                            Tier {t.tier}
+                          </span>
+                          <a
+                            href="/api/l3/sql?file=01_DDL_all_tables.sql"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-auto text-[10px] text-gray-500 hover:text-purple-400 transition-colors flex items-center gap-1"
+                          >
+                            <FileCode className="w-3 h-3" />
+                            DDL
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            {/* Search */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder={`Search ${pageInfo.shortName} metrics...`}
-                className="w-full pl-9 pr-8 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-purple-500/40"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-        </header>
+          </>
+        ) : (
+          <>
+            <header className="sticky top-0 z-30 bg-[#0a0e1a]/95 backdrop-blur-xl border-b border-white/[0.04]">
+              <div className="px-6 py-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">{pageInfo.icon}</span>
+                  <div>
+                    <h2 className="text-lg font-bold" style={{ color: pageInfo.color }}>
+                      {pageInfo.id}: {pageInfo.name}
+                    </h2>
+                    <p className="text-xs text-gray-500">{pageInfo.description}</p>
+                  </div>
+                  <div className="ml-auto flex items-center gap-4 text-xs text-gray-500">
+                    <span>{stats.total} metrics</span>
+                    <span>{stats.withLineage} with lineage</span>
+                    <Link
+                      href="/visualizer"
+                      className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      ERD
+                    </Link>
+                  </div>
+                </div>
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder={`Search ${pageInfo.shortName} metrics...`}
+                    className="w-full pl-9 pr-8 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-purple-500/40"
+                  />
+                  {search && (
+                    <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </header>
 
-        <div className="px-6 py-5">
-          {/* Metric type legend */}
-          <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Types:</span>
-            {stats.types.map(t => (
-              <span key={t} className="inline-flex items-center gap-1 text-[10px] text-gray-500">
-                {METRIC_TYPE_ICON[t]} {t}
-              </span>
-            ))}
-            <span className="flex items-center gap-1 text-[10px] text-purple-400 ml-2">
-              <span className="w-2 h-2 rounded-full bg-purple-500" /> = Has visual lineage
-            </span>
-          </div>
-
-          {/* Metric sections */}
-          {pageMetrics.length === 0 && (
-            <div className="text-center py-16 text-gray-600">
-              <Search className="w-8 h-8 mx-auto mb-3 opacity-50" />
-              <p>No metrics match &ldquo;{search}&rdquo;</p>
-            </div>
-          )}
-
-          {Array.from(sections.entries()).map(([section, metrics]) => (
-            <div key={section} className="mb-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-2">
-                <div className="w-1 h-4 rounded-full" style={{ backgroundColor: pageInfo.color }} />
-                {section}
-                <span className="text-gray-600">({metrics.length})</span>
-              </h3>
-              <div className="space-y-2">
-                {metrics.map(m => (
-                  <MetricCard key={m.id} metric={m} pageInfo={pageInfo} />
+            <div className="px-6 py-5">
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 mb-4">
+                <p className="text-[11px] text-emerald-200/90">{SAMPLE_DATA_CONTEXT}</p>
+              </div>
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600">Types:</span>
+                {stats.types.map(t => (
+                  <span key={t} className="inline-flex items-center gap-1 text-[10px] text-gray-500">
+                    {METRIC_TYPE_ICON[t]} {t}
+                  </span>
                 ))}
+                <span className="flex items-center gap-1 text-[10px] text-purple-400 ml-2">
+                  <span className="w-2 h-2 rounded-full bg-purple-500" /> = Has visual lineage
+                </span>
               </div>
+
+              {pageMetrics.length === 0 && (
+                <div className="text-center py-16 text-gray-600">
+                  <Search className="w-8 h-8 mx-auto mb-3 opacity-50" />
+                  <p>No metrics match &ldquo;{search}&rdquo;</p>
+                </div>
+              )}
+
+              {Array.from(sections.entries()).map(([section, metrics]) => (
+                <div key={section} className="mb-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-2">
+                    <div className="w-1 h-4 rounded-full" style={{ backgroundColor: pageInfo.color }} />
+                    {section}
+                    <span className="text-gray-600">({metrics.length})</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {metrics.map(m => (
+                      <MetricCard key={m.id} metric={m} pageInfo={pageInfo} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

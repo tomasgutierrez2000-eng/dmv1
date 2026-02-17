@@ -22,6 +22,11 @@ export default function Canvas() {
   const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
   const isInteractingRef = useRef(false);
 
+  // Focus-compact: when a field is selected, we bring related tables closer together.
+  // These refs persist across renders without causing dependency cascades.
+  const savedPositionsRef = useRef<Record<string, TablePosition> | null>(null);
+  const focusFieldKeyRef = useRef<string | null>(null);
+
   const {
     model,
     zoom,
@@ -141,9 +146,11 @@ export default function Canvas() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
   }, [model, layoutMode, tableSize, visibleLayers, setTablePosition]);
 
-  // Fit to visible tables when layout or filters change (animated)
+  // Fit to visible tables when layout or filters change (animated).
+  // Skipped when focus-compact is active — that effect handles its own camera.
   useEffect(() => {
     if (!model || visibleTables.length === 0) return;
+    if (savedPositionsRef.current) return; // focus-compact owns the camera right now
     const positionsForFit = visibleTables
       .map((t) => tablePositions[t.key])
       .filter((p): p is TablePosition => !!p);
@@ -152,17 +159,6 @@ export default function Canvas() {
     runFitToView(positionsForFit, visibleTables.length);
     setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, layoutMode, tableSize, runFitToView]);
-
-  // Fit to view when user clicks toolbar "Fit to View" (animated)
-  useEffect(() => {
-    if (!model || !requestFitToView) return;
-    const positionsForFit = visibleTables
-      .map((t) => tablePositions[t.key])
-      .filter((p): p is TablePosition => !!p);
-    setIsAnimating(true);
-    runFitToView(positionsForFit, visibleTables.length);
-    setTimeout(() => setIsAnimating(false), 350);
-  }, [requestFitToView, model, visibleTables, tablePositions, runFitToView]);
 
   // Filter relationships to only show between visible tables with valid positions.
   // Memoized so downstream consumers (focusVisibleTableKeys, JSX) don't recompute every render.
@@ -234,6 +230,139 @@ export default function Canvas() {
     }
     return keys.size > 0 ? keys : null;
   }, [focusMode, model, selectedField, selectedTable, selectedRelationship, visibleRelationships]);
+
+  // Fit to view when user clicks toolbar "Fit to View" (animated).
+  // During focus-compact, fit only the focused tables instead of all visible tables.
+  useEffect(() => {
+    if (!model || !requestFitToView) return;
+    let positionsForFit: TablePosition[];
+    let count: number;
+    if (savedPositionsRef.current && focusVisibleTableKeys) {
+      positionsForFit = Array.from(focusVisibleTableKeys)
+        .map((k) => tablePositions[k])
+        .filter((p): p is TablePosition => !!p);
+      count = positionsForFit.length;
+    } else {
+      positionsForFit = visibleTables
+        .map((t) => tablePositions[t.key])
+        .filter((p): p is TablePosition => !!p);
+      count = visibleTables.length;
+    }
+    if (positionsForFit.length === 0) return;
+    setIsAnimating(true);
+    runFitToView(positionsForFit, count);
+    setTimeout(() => setIsAnimating(false), 350);
+  }, [requestFitToView, model, visibleTables, tablePositions, runFitToView, focusVisibleTableKeys]);
+
+  // ── Focus-compact: bring related tables closer when a field is selected ──
+  useEffect(() => {
+    const shouldCompact =
+      focusMode && !!selectedField && focusVisibleTableKeys != null && focusVisibleTableKeys.size > 0;
+
+    // ─ EXIT focus-compact: restore original positions ─
+    if (!shouldCompact) {
+      if (savedPositionsRef.current) {
+        const saved = savedPositionsRef.current;
+        focusFieldKeyRef.current = null;
+        // Restore all saved positions
+        Object.entries(saved).forEach(([key, pos]) => setTablePosition(key, pos));
+        // Animate camera back to fit all visible tables
+        setIsAnimating(true);
+        const allPositions = visibleTables
+          .map((t) => saved[t.key])
+          .filter((p): p is TablePosition => !!p);
+        if (allPositions.length > 0) {
+          runFitToView(allPositions, visibleTables.length);
+        }
+        // Clear the ref AFTER a delay so the general fit-to-view effect
+        // doesn't fight with this restore during the same render cycle.
+        setTimeout(() => {
+          savedPositionsRef.current = null;
+          setIsAnimating(false);
+        }, 400);
+      }
+      return;
+    }
+
+    // ─ SAME field already compacted — skip ─
+    const fieldKey = `${selectedField.tableKey}:${selectedField.fieldName}`;
+    if (fieldKey === focusFieldKeyRef.current) return;
+
+    // ─ ENTER / UPDATE focus-compact ─
+    // Save original positions only on first entry (not when switching fields)
+    if (!savedPositionsRef.current) {
+      savedPositionsRef.current = { ...useModelStore.getState().tablePositions };
+    }
+    focusFieldKeyRef.current = fieldKey;
+
+    // Compute table dimensions for current layout mode
+    const overviewDims = getOverviewTableDimensions(tableSize);
+    const BASE_TW = 560;
+    const BASE_TH = 320;
+    const SM: Record<string, { w: number; h: number }> = {
+      small: { w: 0.8, h: 0.9 },
+      medium: { w: 1.0, h: 1.0 },
+      large: { w: 1.35, h: 1.25 },
+    };
+    const isOverview = layoutMode === 'domain-overview';
+    const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
+    const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
+
+    // Classify connected tables by relationship direction relative to the anchor
+    const anchorKey = selectedField.tableKey;
+    const leftKeys: string[] = [];  // incoming: other → anchor
+    const rightKeys: string[] = []; // outgoing: anchor → other
+    for (const rel of visibleRelationships) {
+      if (rel.source.tableKey === anchorKey && rel.target.tableKey !== anchorKey) {
+        if (!rightKeys.includes(rel.target.tableKey)) rightKeys.push(rel.target.tableKey);
+      }
+      if (rel.target.tableKey === anchorKey && rel.source.tableKey !== anchorKey) {
+        if (!leftKeys.includes(rel.source.tableKey)) leftKeys.push(rel.source.tableKey);
+      }
+    }
+
+    // Layout: anchor centred at origin, sources left, targets right
+    const hGap = isOverview ? tw * 0.7 : tw * 0.5;
+    const vGap = th * 0.25;
+    const cx = 0;
+    const cy = 0;
+    const stackY = (count: number, idx: number) => {
+      const totalH = count * th + (count - 1) * vGap;
+      return cy + (th - totalH) / 2 + idx * (th + vGap);
+    };
+
+    const compact: { key: string; x: number; y: number }[] = [];
+    compact.push({ key: anchorKey, x: cx, y: cy });
+    leftKeys.forEach((key, i) =>
+      compact.push({ key, x: cx - tw - hGap, y: stackY(leftKeys.length, i) })
+    );
+    rightKeys.forEach((key, i) =>
+      compact.push({ key, x: cx + tw + hGap, y: stackY(rightKeys.length, i) })
+    );
+
+    // Apply compact positions
+    for (const { key, x, y } of compact) {
+      setTablePosition(key, { x, y });
+    }
+
+    // Fit camera to the compact group
+    setIsAnimating(true);
+    runFitToView(
+      compact.map((p) => ({ x: p.x, y: p.y })),
+      compact.length
+    );
+    setTimeout(() => setIsAnimating(false), 400);
+  }, [
+    focusMode, selectedField, focusVisibleTableKeys,
+    visibleRelationships, visibleTables,
+    layoutMode, tableSize, setTablePosition, runFitToView,
+  ]);
+
+  // Clear focus-compact state when layout fundamentals change (prevents stale saved positions)
+  useEffect(() => {
+    savedPositionsRef.current = null;
+    focusFieldKeyRef.current = null;
+  }, [model, layoutMode, tableSize, visibleLayers]);
 
   // Canvas panning (left-click on empty area or middle-click anywhere)
   const handleMouseDown = useCallback(
@@ -329,9 +458,11 @@ export default function Canvas() {
     [zoom, pan, setZoom, setPan]
   );
 
-  // Double-click: fit to view with smooth animation
+  // Double-click: fit to view with smooth animation.
+  // During focus-compact the canvas click will exit focus, so skip the redundant fit here.
   const handleDoubleClick = useCallback(() => {
     if (!model || visibleTables.length === 0) return;
+    if (savedPositionsRef.current) return; // focus-compact handles its own camera
     setIsAnimating(true);
     const positions = visibleTables.map((t) => tablePositions[t.key]).filter(Boolean) as TablePosition[];
     if (positions.length === 0) return;
@@ -459,8 +590,9 @@ export default function Canvas() {
           transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
           style={isAnimating && !prefersReducedMotion ? { transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' } : undefined}
         >
-          {/* Domain Containers - In domain and domain-overview layout modes */}
-          {(layoutMode === 'domain' || layoutMode === 'domain-overview') && model && (() => {
+          {/* Domain Containers - In domain and domain-overview layout modes.
+              Hidden during focus-compact because tables are repositioned outside their domains. */}
+          {(layoutMode === 'domain' || layoutMode === 'domain-overview') && model && !savedPositionsRef.current && (() => {
             const domains = new Set(visibleTables.map(t => t.category));
             const domainPositions = new Map<string, { x: number; y: number; width: number; height: number }>();
             

@@ -161,14 +161,6 @@ export default function Canvas() {
   // Also filter by relationship visibility settings and focus mode
   const visibleRelationships = model
     ? model.relationships.filter((rel) => {
-        // Overview mode: hide relationships unless user clicked a field or relationship (then show those arrows)
-        if (layoutMode === 'domain-overview') {
-          if (!selectedField && !selectedRelationship) return false;
-          // When a field or relationship is selected, show only the relevant relationship(s)
-          if (selectedRelationship && rel.id !== selectedRelationship) return false;
-          if (selectedField && !(rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName) && !(rel.target.tableKey === selectedField.tableKey && rel.target.field === selectedField.fieldName)) return false;
-        }
-        
         // Check if relationships are enabled
         if (!showRelationships) return false;
         

@@ -137,7 +137,6 @@ export default function TableNode({
   const pkFields = table.fields.filter((f) => f.isPK);
   const fkFields = table.fields.filter((f) => f.isFK);
   const regularFields = table.fields.filter((f) => !f.isPK && !f.isFK);
-  const previewFields = table.fields.slice(0, 2);
 
   const highlightMatch = (text: string) => {
     if (!searchQuery) return text;
@@ -230,13 +229,24 @@ export default function TableNode({
           {/* Content */}
           <div className="flex flex-col bg-gradient-to-b from-gray-50 to-white overflow-hidden" style={{ height: TABLE_HEIGHT - HEADER_HEIGHT }}>
             {isOverviewMode ? (
-              <div className="flex-1 px-2 py-1 overflow-hidden">
-                <div className="space-y-1">
-                  {previewFields.length > 0 ? (
-                    previewFields.map((field, idx) => (
-                      <div
+              <div
+                className="flex-1 overflow-y-auto px-1.5 py-1 scrollbar-thin"
+                style={{ maxHeight: COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT }}
+                onWheel={(e) => {
+                  e.stopPropagation(); // keep wheel scrolling inside the card
+                }}
+              >
+                <div className="space-y-0.5">
+                  {table.fields.length > 0 ? (
+                    table.fields.map((field, idx) => (
+                      <button
                         key={idx}
-                        className={`text-[10px] rounded border px-1.5 py-0.5 truncate ${
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onFieldSelect) onFieldSelect(table.key, field.name);
+                        }}
+                        className={`w-full text-left text-[10px] rounded border px-1.5 py-0.5 truncate ${
                           field.isPK
                             ? 'bg-yellow-50 border-yellow-300 text-yellow-900'
                             : field.isFK
@@ -246,15 +256,10 @@ export default function TableNode({
                         title={field.name}
                       >
                         {field.name}
-                      </div>
+                      </button>
                     ))
                   ) : (
                     <div className="text-[10px] text-gray-400 italic px-1">No fields</div>
-                  )}
-                  {table.fields.length > previewFields.length && (
-                    <div className="text-[9px] text-gray-500 px-1">
-                      +{table.fields.length - previewFields.length} more
-                    </div>
                   )}
                 </div>
               </div>
@@ -385,26 +390,28 @@ export default function TableNode({
               </div>
               
               {/* Expand/Collapse Button - Dynamic size */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleExpand();
-                }}
-                className={`${isCompact ? 'px-1.5 py-0.5 text-[9px]' : isDetailed ? 'px-2.5 py-1 text-[11px]' : 'px-2 py-0.5 text-[10px]'} font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors flex items-center ${isCompact ? 'gap-0.5' : 'gap-1'}`}
-                title={isExpanded ? "Collapse" : "Expand for descriptions"}
-              >
-                {isExpanded ? (
-                  <>
-                    <ChevronDown className={isCompact ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
-                    {!isCompact && <span>Less</span>}
-                  </>
-                ) : (
-                  <>
-                    <ChevronRight className={isCompact ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
-                    {!isCompact && <span>More</span>}
-                  </>
-                )}
-              </button>
+              {!isOverviewMode && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleExpand();
+                  }}
+                  className={`${isCompact ? 'px-1.5 py-0.5 text-[9px]' : isDetailed ? 'px-2.5 py-1 text-[11px]' : 'px-2 py-0.5 text-[10px]'} font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors flex items-center ${isCompact ? 'gap-0.5' : 'gap-1'}`}
+                  title={isExpanded ? "Collapse" : "Expand for descriptions"}
+                >
+                  {isExpanded ? (
+                    <>
+                      <ChevronDown className={isCompact ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
+                      {!isCompact && <span>Less</span>}
+                    </>
+                  ) : (
+                    <>
+                      <ChevronRight className={isCompact ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
+                      {!isCompact && <span>More</span>}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>

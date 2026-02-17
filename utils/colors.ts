@@ -1,43 +1,45 @@
+/* Layer colors – work on white/light background */
 export const layerColors = {
   L1: {
-    primary: '#3b82f6',
-    bg: '#dbeafe',
+    primary: '#2563eb',
+    bg: '#eff6ff',
     text: '#1e40af',
-    border: '#3b82f6',
-    badge: 'bg-blue-100 text-blue-800',
+    border: '#2563eb',
+    badge: 'bg-blue-100 text-blue-800 border border-blue-200',
   },
   L2: {
-    primary: '#22c55e',
-    bg: '#dcfce7',
-    text: '#166534',
-    border: '#22c55e',
-    badge: 'bg-green-100 text-green-800',
+    primary: '#059669',
+    bg: '#ecfdf5',
+    text: '#047857',
+    border: '#059669',
+    badge: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
   },
   L3: {
-    primary: '#a855f7',
-    bg: '#f3e8ff',
-    text: '#6b21a8',
-    border: '#a855f7',
-    badge: 'bg-purple-100 text-purple-800',
+    primary: '#7c3aed',
+    bg: '#f5f3ff',
+    text: '#5b21b6',
+    border: '#7c3aed',
+    badge: 'bg-violet-100 text-violet-800 border border-violet-200',
   },
 };
 
+/* Category colors – distinct colors for each category on white background */
 export const categoryColors = [
-  { name: 'amber', color: '#f59e0b', bg: '#fef3c7', text: '#92400e' },
-  { name: 'red', color: '#ef4444', bg: '#fee2e2', text: '#991b1b' },
-  { name: 'blue', color: '#3b82f6', bg: '#dbeafe', text: '#1e40af' },
-  { name: 'green', color: '#22c55e', bg: '#dcfce7', text: '#166534' },
-  { name: 'purple', color: '#a855f7', bg: '#f3e8ff', text: '#6b21a8' },
-  { name: 'pink', color: '#ec4899', bg: '#fce7f3', text: '#9f1239' },
-  { name: 'teal', color: '#14b8a6', bg: '#ccfbf1', text: '#134e4a' },
-  { name: 'orange', color: '#f97316', bg: '#ffedd5', text: '#9a3412' },
-  { name: 'indigo', color: '#6366f1', bg: '#e0e7ff', text: '#3730a3' },
-  { name: 'lime', color: '#84cc16', bg: '#ecfccb', text: '#365314' },
-  { name: 'cyan', color: '#06b6d4', bg: '#cffafe', text: '#164e63' },
-  { name: 'rose', color: '#f43f5e', bg: '#ffe4e6', text: '#9f1239' },
+  { name: 'blue', color: '#2563eb', bg: '#eff6ff', text: '#1e40af' },
+  { name: 'emerald', color: '#059669', bg: '#ecfdf5', text: '#047857' },
+  { name: 'violet', color: '#7c3aed', bg: '#f5f3ff', text: '#5b21b6' },
+  { name: 'amber', color: '#d97706', bg: '#fffbeb', text: '#b45309' },
+  { name: 'rose', color: '#e11d48', bg: '#fff1f2', text: '#be123c' },
+  { name: 'cyan', color: '#0891b2', bg: '#ecfeff', text: '#0e7490' },
+  { name: 'indigo', color: '#4f46e5', bg: '#eef2ff', text: '#3730a3' },
+  { name: 'teal', color: '#0d9488', bg: '#f0fdfa', text: '#0f766e' },
+  { name: 'fuchsia', color: '#c026d3', bg: '#fdf4ff', text: '#a21caf' },
+  { name: 'lime', color: '#65a30d', bg: '#f7fee7', text: '#4d7c0f' },
+  { name: 'sky', color: '#0284c7', bg: '#f0f9ff', text: '#0369a1' },
+  { name: 'orange', color: '#ea580c', bg: '#fff7ed', text: '#c2410c' },
 ];
 
-export function getCategoryColor(category: string): typeof categoryColors[0] {
+export function getCategoryColor(category: string): (typeof categoryColors)[0] {
   const index = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return categoryColors[index % categoryColors.length];
 }

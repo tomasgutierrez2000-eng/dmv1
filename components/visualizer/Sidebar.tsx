@@ -69,7 +69,7 @@ export default function Sidebar() {
     return (
       <button
         onClick={() => setSidebarOpen(true)}
-        className="absolute left-0 top-1/2 z-10 p-2 bg-gray-800 text-white rounded-r-lg"
+        className="absolute left-0 top-1/2 z-10 p-2 bg-white border border-gray-200 text-gray-700 rounded-r-lg shadow-sm"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
@@ -77,13 +77,13 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col h-full">
+    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full shadow-lg">
       {/* Header */}
-      <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">Bank Data Model Explorer</h2>
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-gray-900">Bank Data Model Explorer</h2>
         <button
           onClick={() => setSidebarOpen(false)}
-          className="text-gray-400 hover:text-white"
+          className="text-gray-500 hover:text-gray-900"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -91,23 +91,23 @@ export default function Sidebar() {
 
       {/* Statistics */}
       {statistics && (
-        <div className="p-4 border-b border-gray-700 space-y-3">
+        <div className="p-4 border-b border-gray-200 space-y-3">
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="bg-gray-700/50 rounded p-2">
-              <div className="text-gray-400 text-xs">Tables</div>
-              <div className="text-white font-bold">{statistics.totalTables}</div>
+            <div className="bg-gray-50 rounded p-2 border border-gray-100">
+              <div className="text-gray-500 text-xs">Tables</div>
+              <div className="text-gray-900 font-bold">{statistics.totalTables}</div>
             </div>
-            <div className="bg-gray-700/50 rounded p-2">
-              <div className="text-gray-400 text-xs">Fields</div>
-              <div className="text-white font-bold">{statistics.totalFields}</div>
+            <div className="bg-gray-50 rounded p-2 border border-gray-100">
+              <div className="text-gray-500 text-xs">Fields</div>
+              <div className="text-gray-900 font-bold">{statistics.totalFields}</div>
             </div>
-            <div className="bg-gray-700/50 rounded p-2">
-              <div className="text-gray-400 text-xs">Relationships</div>
-              <div className="text-white font-bold">{statistics.totalRelationships}</div>
+            <div className="bg-gray-50 rounded p-2 border border-gray-100">
+              <div className="text-gray-500 text-xs">Relationships</div>
+              <div className="text-gray-900 font-bold">{statistics.totalRelationships}</div>
             </div>
-            <div className="bg-gray-700/50 rounded p-2">
-              <div className="text-gray-400 text-xs">Categories</div>
-              <div className="text-white font-bold">{statistics.totalCategories}</div>
+            <div className="bg-gray-50 rounded p-2 border border-gray-100">
+              <div className="text-gray-500 text-xs">Categories</div>
+              <div className="text-gray-900 font-bold">{statistics.totalCategories}</div>
             </div>
           </div>
           {/* Relationship Debug Info */}
@@ -120,20 +120,20 @@ export default function Sidebar() {
             
             if (debug.invalid.length > 0 || debug.missingTables.length > 0 || visibleRels.length < model.relationships.length) {
               return (
-                <div className="mt-3 bg-yellow-900/30 border border-yellow-700 rounded p-2">
+                <div className="mt-3 bg-amber-50 border border-amber-200 rounded p-2">
                   <div className="flex items-center space-x-2 mb-1">
-                    <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                    <span className="text-xs font-semibold text-yellow-400">Relationship Status</span>
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-semibold text-amber-800">Relationship Status</span>
                   </div>
-                  <div className="text-xs text-yellow-300 space-y-1">
+                  <div className="text-xs text-amber-700 space-y-1">
                     <div>Total: {model.relationships.length}</div>
                     <div>Valid: {debug.valid.length}</div>
                     <div>Visible: {visibleRels.length}</div>
                     {debug.invalid.length > 0 && (
-                      <div className="text-yellow-400">Invalid: {debug.invalid.length}</div>
+                      <div className="text-amber-600">Invalid: {debug.invalid.length}</div>
                     )}
                     {debug.missingTables.length > 0 && (
-                      <div className="mt-1 text-yellow-400 text-xs">
+                      <div className="mt-1 text-amber-600 text-xs">
                         Missing: {debug.missingTables.slice(0, 2).join(', ')}
                         {debug.missingTables.length > 2 && ` +${debug.missingTables.length - 2}`}
                       </div>
@@ -143,8 +143,8 @@ export default function Sidebar() {
               );
             }
             return (
-              <div className="mt-3 bg-green-900/30 border border-green-700 rounded p-2">
-                <div className="text-xs text-green-300">
+              <div className="mt-3 bg-emerald-50 border border-emerald-200 rounded p-2">
+                <div className="text-xs text-emerald-700">
                   ✓ {model.relationships.length} relationships mapped
                 </div>
               </div>
@@ -154,10 +154,10 @@ export default function Sidebar() {
       )}
 
       {/* Layer Toggles */}
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-2 mb-3">
-          <Layers className="w-4 h-4 text-gray-400" />
-          <span className="text-sm font-semibold text-gray-300">Layers</span>
+          <Layers className="w-4 h-4 text-gray-500" />
+          <span className="text-sm font-semibold text-gray-900">Layers</span>
         </div>
         <div className="space-y-2">
           {(['L1', 'L2', 'L3'] as const).map((layer) => {
@@ -166,8 +166,8 @@ export default function Sidebar() {
               <button
                 key={layer}
                 onClick={() => setVisibleLayer(layer, !visibleLayers[layer])}
-                className={`w-full px-3 py-2 rounded flex items-center justify-between transition-colors ${
-                  visibleLayers[layer] ? 'bg-gray-700' : 'bg-gray-700/50'
+                className={`w-full px-3 py-2 rounded flex items-center justify-between transition-colors border ${
+                  visibleLayers[layer] ? 'bg-gray-100 border-gray-300' : 'bg-gray-50 border-gray-100'
                 }`}
               >
                 <div className="flex items-center space-x-2">
@@ -175,11 +175,11 @@ export default function Sidebar() {
                     className="w-3 h-3 rounded"
                     style={{ backgroundColor: colors.primary }}
                   />
-                  <span className="text-sm text-white">{layer}</span>
+                  <span className="text-sm text-gray-800">{layer}</span>
                 </div>
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    visibleLayers[layer] ? 'bg-green-500' : 'bg-gray-600'
+                    visibleLayers[layer] ? 'bg-blue-500' : 'bg-gray-300'
                   }`}
                 />
               </button>
@@ -189,7 +189,7 @@ export default function Sidebar() {
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b border-gray-200">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -197,23 +197,23 @@ export default function Sidebar() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search tables..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 text-gray-900 rounded border border-gray-200 focus:border-blue-500 focus:outline-none text-sm"
           />
         </div>
       </div>
 
       {/* Category Filter - Multiple Selection */}
       {model && (
-        <div className="p-4 border-b border-gray-700">
+        <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
-              <Filter className="w-4 h-4 text-gray-400" />
-              <span className="text-sm font-semibold text-gray-300">Categories</span>
+              <Filter className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-semibold text-gray-900">Categories</span>
             </div>
             {filterCategories.size > 0 && (
               <button
                 onClick={() => toggleFilterCategory('')}
-                className="text-xs text-blue-400 hover:text-blue-300"
+                className="text-xs text-blue-600 hover:text-blue-700"
               >
                 Clear All
               </button>
@@ -226,17 +226,17 @@ export default function Sidebar() {
                 <label
                   key={cat}
                   className={`flex items-center space-x-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${
-                    isSelected ? 'bg-blue-900/30 border border-blue-700' : 'hover:bg-gray-700/50'
+                    isSelected ? 'bg-blue-50 border border-blue-300' : 'hover:bg-gray-50'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggleFilterCategory(cat)}
-                    className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                   />
-                  <span className="text-sm text-white flex-1">{cat}</span>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-sm text-gray-800 flex-1">{cat}</span>
+                  <span className="text-xs text-gray-500">
                     ({tablesByCategory.get(cat)?.length || 0})
                   </span>
                 </label>
@@ -252,8 +252,8 @@ export default function Sidebar() {
       {/* Table Tree */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="flex items-center space-x-2 mb-3">
-          <Database className="w-4 h-4 text-gray-400" />
-          <span className="text-sm font-semibold text-gray-300">Tables</span>
+          <Database className="w-4 h-4 text-gray-500" />
+          <span className="text-sm font-semibold text-gray-900">Tables</span>
         </div>
         <div className="space-y-1">
           {Array.from(tablesByCategory.entries()).map(([category, tables]) => {
@@ -270,7 +270,7 @@ export default function Sidebar() {
                     }
                     setExpandedCategories(newExpanded);
                   }}
-                  className="w-full px-2 py-1 text-left text-sm text-gray-300 hover:bg-gray-700 rounded flex items-center space-x-1"
+                  className="w-full px-2 py-1 text-left text-sm text-gray-800 hover:bg-gray-100 rounded flex items-center space-x-1"
                 >
                   {isExpanded ? (
                     <ChevronDown className="w-3 h-3" />
@@ -288,7 +288,7 @@ export default function Sidebar() {
                         <button
                           key={table.key}
                           onClick={() => setSelectedTable(table.key)}
-                          className="w-full px-2 py-1 text-left text-xs text-gray-400 hover:bg-gray-700 rounded flex items-center space-x-2"
+                          className="w-full px-2 py-1 text-left text-xs text-gray-600 hover:bg-gray-100 rounded flex items-center space-x-2"
                         >
                           <div
                             className="w-2 h-2 rounded"

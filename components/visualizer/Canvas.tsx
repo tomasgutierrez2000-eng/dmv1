@@ -16,6 +16,8 @@ export default function Canvas() {
   const [isDraggingTable, setIsDraggingTable] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [hoveredRelationship, setHoveredRelationship] = useState<string | null>(null);
+  const DRAG_THRESHOLD_PX = 6;
+  const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
 
   const {
     model,
@@ -220,6 +222,16 @@ export default function Canvas() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      const pending = pendingDragRef.current;
+      if (pending) {
+        const dx = e.clientX - pending.startX;
+        const dy = e.clientY - pending.startY;
+        if (Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD_PX) {
+          setIsDraggingTable(pending.tableKey);
+          setDragStart({ x: e.clientX, y: e.clientY });
+          pendingDragRef.current = null;
+        }
+      }
       if (isPanning) {
         setPan({
           x: e.clientX - panStart.x,
@@ -245,6 +257,7 @@ export default function Canvas() {
   const handleMouseUp = useCallback(() => {
     setIsPanning(false);
     setIsDraggingTable(null);
+    pendingDragRef.current = null;
   }, []);
 
   // Handle zoom with mouse wheel
@@ -323,7 +336,7 @@ export default function Canvas() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+      className="relative w-full h-full overflow-hidden bg-gray-100"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -340,8 +353,8 @@ export default function Canvas() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px)
+            linear-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.25) 1px, transparent 1px)
           `,
           backgroundSize: `${25 * zoom}px ${25 * zoom}px`,
           backgroundPosition: `${pan.x % (25 * zoom)}px ${pan.y % (25 * zoom)}px`,
@@ -545,8 +558,7 @@ export default function Canvas() {
                   }
                 }}
                 onMouseDown={(e) => {
-                  setIsDraggingTable(table.key);
-                  setDragStart({ x: e.clientX, y: e.clientY });
+                  pendingDragRef.current = { tableKey: table.key, startX: e.clientX, startY: e.clientY };
                 }}
                 searchQuery={searchQuery}
                 relationshipCounts={relationshipCounts}

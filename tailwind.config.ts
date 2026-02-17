@@ -9,9 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'matte-black': '#050505',
-        'aerospace-silver': '#C0C0C0',
-        'safety-orange': '#FF6600',
+        /* PwC brand */
+        'pwc-orange': '#D04A02',
+        'pwc-orange-light': '#E87722',
+        'pwc-black': '#000000',
+        'pwc-gray': '#2D2D2D',
+        'pwc-gray-light': '#6E6E6E',
+        'pwc-white': '#FFFFFF',
+        /* Legacy aliases mapped to PwC */
+        'matte-black': '#000000',
+        'aerospace-silver': '#B3B3B3',
+        'safety-orange': '#D04A02',
       },
       fontFamily: {
         'space-mono': ['var(--font-space-mono)', 'monospace'],

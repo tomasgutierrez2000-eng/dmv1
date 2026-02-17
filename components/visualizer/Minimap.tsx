@@ -66,7 +66,7 @@ export default function Minimap() {
   const viewportY = (-pan.y / zoom - bounds.minY) * scale;
 
   return (
-    <div className="absolute bottom-4 right-4 w-48 h-48 bg-gray-800 border border-gray-700 rounded-lg p-2 shadow-lg">
+    <div className="absolute bottom-4 right-4 w-48 h-48 bg-white border border-gray-200 rounded-lg p-2 shadow-lg">
       <div className="relative w-full h-full">
         <svg width="100%" height="100%" className="absolute inset-0">
           {/* Tables as dots */}
@@ -100,7 +100,7 @@ export default function Minimap() {
             width={viewportWidth * scale}
             height={viewportHeight * scale}
             fill="none"
-            stroke="#fbbf24"
+            stroke="#2563eb"
             strokeWidth="2"
             strokeDasharray="4,4"
             className="cursor-move"

@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { TableDef, SCDType, type ColumnDef } from './types';
 import { L1_TABLES } from './l1-definitions';
+import { getSeedValue } from './seed-data';
 
 const OUT_DIR = path.join(__dirname, 'output');
 const ROWS_PER_TABLE = 10;
@@ -90,15 +91,14 @@ function escapeSql(val: unknown): string {
 
 function seedValue(col: ColumnDef, rowIndex: number, tableName: string): unknown {
   const i = rowIndex + 1; // 1-based
+  const realistic = getSeedValue(tableName, col.name, rowIndex);
+  if (realistic !== null) return realistic;
+
   if (col.default && col.default.includes('CURRENT_TIMESTAMP')) return new Date('2024-06-15');
   if (col.name === 'as_of_date') return SEED_AS_OF_DATE;
   if (col.pk || col.fk) {
     if (col.type.includes('INT') || col.type.includes('BIGINT') || col.type === 'SERIAL') return i;
-    if (col.type.startsWith('VARCHAR') || col.type === 'TEXT') {
-      if (col.name === 'currency_code') return ['USD', 'EUR', 'GBP', 'CHF', 'JPY', 'CAD', 'AUD', 'CNY', 'INR', 'BRL'][rowIndex % 10];
-      if (col.name === 'country_code') return String(i).padStart(2, '0'); // or use 1-10 if BIGINT
-      return `${tableName}_${i}`;
-    }
+    if (col.type.startsWith('VARCHAR') || col.type === 'TEXT') return `${tableName}_${i}`;
   }
   if (col.type.includes('CHAR(1)')) return ['Y', 'N'][rowIndex % 2];
   if (col.type === 'DATE' || col.type.includes('DATE')) return '2024-06-15';
@@ -138,6 +138,52 @@ function buildInserts(t: TableDef): { sql: string; rows: Record<string, unknown>
   return { sql: lines.join('\n'), rows, columns: cols };
 }
 
+/** Build relationships for visualizer from L1 table definitions (FK columns). */
+function buildRelationships(): Array<{
+  id: string;
+  source: { layer: string; table: string; field: string; tableKey: string };
+  target: { layer: string; table: string; field: string; tableKey: string };
+  isCrossLayer: boolean;
+  relationshipType: 'primary' | 'secondary';
+}> {
+  const relationships: Array<{
+    id: string;
+    source: { layer: string; table: string; field: string; tableKey: string };
+    target: { layer: string; table: string; field: string; tableKey: string };
+    isCrossLayer: boolean;
+    relationshipType: 'primary' | 'secondary';
+  }> = [];
+  for (const t of L1_TABLES) {
+    const sourceTableKey = `L1.${t.tableName}`;
+    for (const col of t.columns) {
+      if (!col.fk) continue;
+      const match = col.fk.match(/l1\.(\w+)\((\w+)\)/);
+      if (!match) continue;
+      const [, refTable, refCol] = match;
+      const targetTableKey = `L1.${refTable}`;
+      const id = `L1.${t.tableName}.${col.name}->L1.${refTable}.${refCol}`;
+      relationships.push({
+        id,
+        source: {
+          layer: 'L1',
+          table: t.tableName,
+          field: col.name,
+          tableKey: sourceTableKey,
+        },
+        target: {
+          layer: 'L1',
+          table: refTable,
+          field: refCol,
+          tableKey: targetTableKey,
+        },
+        isCrossLayer: false,
+        relationshipType: 'primary',
+      });
+    }
+  }
+  return relationships;
+}
+
 function main() {
   if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -169,12 +215,15 @@ function main() {
     };
   }
 
+  const relationships = buildRelationships();
+
   fs.writeFileSync(path.join(OUT_DIR, 'ddl.sql'), ddlParts.join('\n'), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'seed.sql'), seedParts.join('\n'), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'sample-data.json'), JSON.stringify(sampleData, null, 2), 'utf-8');
+  fs.writeFileSync(path.join(OUT_DIR, 'relationships.json'), JSON.stringify(relationships, null, 2), 'utf-8');
 
-  console.log(`Generated: ${OUT_DIR}/ddl.sql, seed.sql, sample-data.json`);
-  console.log(`Tables: ${L1_TABLES.length}`);
+  console.log(`Generated: ${OUT_DIR}/ddl.sql, seed.sql, sample-data.json, relationships.json`);
+  console.log(`Tables: ${L1_TABLES.length}, Relationships: ${relationships.length}`);
 }
 
 main();

@@ -62,9 +62,9 @@ interface TableDefinition {
 }
 
 const layerColors = {
-  L1: { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af', badge: 'bg-blue-100 text-blue-800' },
-  L2: { bg: '#dcfce7', border: '#22c55e', text: '#166534', badge: 'bg-green-100 text-green-800' },
-  L3: { bg: '#f3e8ff', border: '#a855f7', text: '#6b21a8', badge: 'bg-purple-100 text-purple-800' },
+  L1: { bg: '#D04A02', border: '#D04A02', text: '#ffffff', badge: 'bg-pwc-orange/20 text-pwc-orange' },
+  L2: { bg: '#E87722', border: '#E87722', text: '#ffffff', badge: 'bg-pwc-orange-light/20 text-pwc-orange-light' },
+  L3: { bg: '#6B7280', border: '#6B7280', text: '#ffffff', badge: 'bg-pwc-gray/50 text-pwc-gray-light' },
 };
 
 // Transform parsed data dictionary to visualization format
@@ -206,7 +206,7 @@ export default function DataModelPage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f9fafb' }}>
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-pwc-orange" />
           <p className="text-gray-600">Loading bank data model...</p>
         </div>
       </div>
@@ -230,7 +230,7 @@ export default function DataModelPage() {
                 <p className="text-yellow-800 mb-4">{error}</p>
                 <Link
                   href="/visualizer"
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-block px-4 py-2 bg-pwc-orange text-pwc-white rounded-lg hover:bg-pwc-orange-light transition-colors"
                 >
                   Open Interactive Visualizer
                 </Link>
@@ -272,7 +272,7 @@ export default function DataModelPage() {
                 </Link>
                 <Link
                   href="/overview"
-                  className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 text-sm"
+                  className="px-4 py-2 bg-pwc-gray text-pwc-white rounded-lg hover:bg-pwc-gray-light text-sm"
                 >
                   Overview
                 </Link>
@@ -281,13 +281,13 @@ export default function DataModelPage() {
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-pwc-gray-light" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tables..."
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-2 w-full border border-pwc-gray-light rounded-lg focus:ring-2 focus:ring-pwc-orange focus:border-pwc-orange"
               />
             </div>
             <div className="flex space-x-2">
@@ -295,8 +295,8 @@ export default function DataModelPage() {
                 onClick={() => setViewMode('layers')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium ${
                   viewMode === 'layers'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-pwc-orange text-pwc-white'
+                    : 'bg-pwc-gray text-pwc-gray-light hover:bg-pwc-gray-light'
                 }`}
               >
                 <Layers className="w-4 h-4 inline mr-2" />
@@ -306,8 +306,8 @@ export default function DataModelPage() {
                 onClick={() => setViewMode('relationships')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium ${
                   viewMode === 'relationships'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-pwc-orange text-pwc-white'
+                    : 'bg-pwc-gray text-pwc-gray-light hover:bg-pwc-gray-light'
                 }`}
               >
                 <Link2 className="w-4 h-4 inline mr-2" />
@@ -345,7 +345,7 @@ export default function DataModelPage() {
                       <h2 className="text-xl font-bold">
                         {layer} - {layer === 'L1' ? 'Master Data' : layer === 'L2' ? 'Snapshots & Events' : 'Roll-ups'}
                       </h2>
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-pwc-gray/50 text-pwc-gray-light">
                         {tables.length} tables
                       </span>
                     </div>
@@ -391,12 +391,12 @@ export default function DataModelPage() {
                               <div className="space-y-2 text-xs">
                                 <div className="flex items-center space-x-1">
                                   <Key className="w-3 h-3 text-gray-500" />
-                                  <span className="font-mono text-gray-700">{table.primaryKey}</span>
+                                  <span className="font-mono text-pwc-gray-light">{table.primaryKey}</span>
                                 </div>
                                 {hasFKs && (
                                   <div className="flex items-center space-x-1">
                                     <Link2 className="w-3 h-3 text-gray-500" />
-                                    <span className="text-gray-700">
+                                    <span className="text-pwc-gray-light">
                                       {table.foreignKeys.length} relationship{table.foreignKeys.length > 1 ? 's' : ''}
                                     </span>
                                   </div>
@@ -408,7 +408,7 @@ export default function DataModelPage() {
                                   e.stopPropagation();
                                   toggleTable(table.id);
                                 }}
-                                className="mt-3 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                className="mt-3 text-xs text-pwc-orange hover:text-pwc-orange-light font-medium"
                               >
                                 {isTableExpanded ? 'Hide' : 'Show'} fields ({table.fields.length})
                               </button>
@@ -451,8 +451,8 @@ export default function DataModelPage() {
                         </span>
                       </div>
                       <div className="flex items-center space-x-2 flex-1">
-                        <span className="font-mono text-sm font-semibold text-blue-600">{rel.from_field}</span>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <span className="font-mono text-sm font-semibold text-pwc-orange">{rel.from_field}</span>
+                        <ChevronRight className="w-4 h-4 text-pwc-gray-light" />
                         <span className="font-mono text-sm">{rel.to_field}</span>
                         <span className="text-gray-500">in</span>
                         <span className="font-semibold text-gray-900">{rel.to_table}</span>
@@ -476,7 +476,7 @@ export default function DataModelPage() {
               <h2 className="text-2xl font-bold">{selectedTableData.name}</h2>
               <button
                 onClick={() => setSelectedTable(null)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className="text-pwc-gray-light hover:text-gray-600 text-2xl"
               >
                 ×
               </button>
@@ -516,7 +516,7 @@ export default function DataModelPage() {
                         className="text-sm bg-gray-50 p-3 rounded border border-gray-200 cursor-pointer hover:bg-gray-100"
                         onClick={() => setSelectedTable(fk.table)}
                       >
-                        <div className="font-mono font-semibold text-blue-600">{fk.field}</div>
+                        <div className="font-mono font-semibold text-pwc-orange">{fk.field}</div>
                         <div className="text-gray-600 mt-1">
                           → <span className="font-semibold">{fk.references}</span> in{' '}
                           <span className="font-semibold text-purple-600">{fk.table}</span>

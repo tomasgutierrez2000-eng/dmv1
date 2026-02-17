@@ -3,7 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import { tableKeyToDbTable } from '@/lib/db-table-mapping';
 
-const SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
+const L1_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
+const L2_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l2/output/sample-data.json');
 
 export async function GET(request: NextRequest) {
   const tableKey = request.nextUrl.searchParams.get('tableKey');
@@ -15,16 +16,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid tableKey' }, { status: 400 });
   }
 
-  // Serves from generated sample-data.json. To use a live DB, install 'pg', set DATABASE_URL,
-  // and add a separate API route that queries the database.
-  if (!fs.existsSync(SAMPLE_DATA_PATH)) {
+  const isL2 = tableKey.startsWith('L2.');
+  const samplePath = isL2 ? L2_SAMPLE_DATA_PATH : L1_SAMPLE_DATA_PATH;
+  const hint = isL2 ? 'npx tsx scripts/l2/generate.ts' : 'npx tsx scripts/l1/generate.ts';
+
+  if (!fs.existsSync(samplePath)) {
     return NextResponse.json(
-      { error: 'Sample data not generated. Run: npx tsx scripts/l1/generate.ts' },
+      { error: `Sample data not generated. Run: ${hint}` },
       { status: 404 }
     );
   }
 
-  const data = JSON.parse(fs.readFileSync(SAMPLE_DATA_PATH, 'utf-8'));
+  const data = JSON.parse(fs.readFileSync(samplePath, 'utf-8'));
   const entry = data[tableKey];
   if (!entry) {
     return NextResponse.json(

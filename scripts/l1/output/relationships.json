@@ -1,0 +1,1498 @@
+[
+  {
+    "id": "L1.date_time_dim.date_id->L1.date_dim.date_id",
+    "source": {
+      "layer": "L1",
+      "table": "date_time_dim",
+      "field": "date_id",
+      "tableKey": "L1.date_time_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "date_dim",
+      "field": "date_id",
+      "tableKey": "L1.date_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.industry_dim.parent_industry_id->L1.industry_dim.industry_id",
+    "source": {
+      "layer": "L1",
+      "table": "industry_dim",
+      "field": "parent_industry_id",
+      "tableKey": "L1.industry_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "industry_dim",
+      "field": "industry_id",
+      "tableKey": "L1.industry_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.rating_grade_dim.rating_scale_id->L1.rating_scale_dim.rating_scale_id",
+    "source": {
+      "layer": "L1",
+      "table": "rating_grade_dim",
+      "field": "rating_scale_id",
+      "tableKey": "L1.rating_grade_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "rating_scale_dim",
+      "field": "rating_scale_id",
+      "tableKey": "L1.rating_scale_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.counterparty.country_code->L1.country_dim.country_code",
+    "source": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "country_code",
+      "tableKey": "L1.counterparty"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "country_dim",
+      "field": "country_code",
+      "tableKey": "L1.country_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.counterparty.entity_type_code->L1.entity_type_dim.entity_type_code",
+    "source": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "entity_type_code",
+      "tableKey": "L1.counterparty"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "entity_type_dim",
+      "field": "entity_type_code",
+      "tableKey": "L1.entity_type_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.counterparty.industry_id->L1.industry_dim.industry_id",
+    "source": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "industry_id",
+      "tableKey": "L1.counterparty"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "industry_dim",
+      "field": "industry_id",
+      "tableKey": "L1.industry_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.legal_entity.country_code->L1.country_dim.country_code",
+    "source": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "country_code",
+      "tableKey": "L1.legal_entity"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "country_dim",
+      "field": "country_code",
+      "tableKey": "L1.country_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.instrument_master.country_code->L1.country_dim.country_code",
+    "source": {
+      "layer": "L1",
+      "table": "instrument_master",
+      "field": "country_code",
+      "tableKey": "L1.instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "country_dim",
+      "field": "country_code",
+      "tableKey": "L1.country_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.instrument_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "instrument_master",
+      "field": "currency_code",
+      "tableKey": "L1.instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.instrument_identifier.instrument_id->L1.instrument_master.instrument_id",
+    "source": {
+      "layer": "L1",
+      "table": "instrument_identifier",
+      "field": "instrument_id",
+      "tableKey": "L1.instrument_identifier"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "instrument_master",
+      "field": "instrument_id",
+      "tableKey": "L1.instrument_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.instrument_identifier.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "instrument_identifier",
+      "field": "source_system_id",
+      "tableKey": "L1.instrument_identifier"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.credit_agreement_master.borrower_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "credit_agreement_master",
+      "field": "borrower_counterparty_id",
+      "tableKey": "L1.credit_agreement_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.credit_agreement_master.lender_legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "credit_agreement_master",
+      "field": "lender_legal_entity_id",
+      "tableKey": "L1.credit_agreement_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.credit_agreement_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "credit_agreement_master",
+      "field": "currency_code",
+      "tableKey": "L1.credit_agreement_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.credit_agreement_id->L1.credit_agreement_master.credit_agreement_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "credit_agreement_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "credit_agreement_master",
+      "field": "credit_agreement_id",
+      "tableKey": "L1.credit_agreement_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "counterparty_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "currency_code",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.portfolio_id->L1.portfolio_dim.portfolio_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "portfolio_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "portfolio_dim",
+      "field": "portfolio_id",
+      "tableKey": "L1.portfolio_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.lob_segment_id->L1.enterprise_business_taxonomy.managed_segment_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "lob_segment_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_business_taxonomy",
+      "field": "managed_segment_id",
+      "tableKey": "L1.enterprise_business_taxonomy"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.product_node_id->L1.enterprise_product_taxonomy.product_node_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "product_node_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_product_taxonomy",
+      "field": "product_node_id",
+      "tableKey": "L1.enterprise_product_taxonomy"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.rate_index_id->L1.interest_rate_index_dim.rate_index_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "rate_index_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "interest_rate_index_dim",
+      "field": "rate_index_id",
+      "tableKey": "L1.interest_rate_index_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_master.ledger_account_id->L1.ledger_account_dim.ledger_account_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "ledger_account_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "ledger_account_dim",
+      "field": "ledger_account_id",
+      "tableKey": "L1.ledger_account_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.netting_agreement.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "netting_agreement",
+      "field": "counterparty_id",
+      "tableKey": "L1.netting_agreement"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.netting_set.netting_agreement_id->L1.netting_agreement.netting_agreement_id",
+    "source": {
+      "layer": "L1",
+      "table": "netting_set",
+      "field": "netting_agreement_id",
+      "tableKey": "L1.netting_set"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "netting_agreement",
+      "field": "netting_agreement_id",
+      "tableKey": "L1.netting_agreement"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.netting_set_link.netting_set_id->L1.netting_set.netting_set_id",
+    "source": {
+      "layer": "L1",
+      "table": "netting_set_link",
+      "field": "netting_set_id",
+      "tableKey": "L1.netting_set_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "netting_set",
+      "field": "netting_set_id",
+      "tableKey": "L1.netting_set"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.netting_set_link.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L1",
+      "table": "netting_set_link",
+      "field": "facility_id",
+      "tableKey": "L1.netting_set_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.csa_master.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "csa_master",
+      "field": "counterparty_id",
+      "tableKey": "L1.csa_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.margin_agreement.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "margin_agreement",
+      "field": "counterparty_id",
+      "tableKey": "L1.margin_agreement"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_asset_master.collateral_type_id->L1.collateral_type.collateral_type_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "collateral_type_id",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "collateral_type",
+      "field": "collateral_type_id",
+      "tableKey": "L1.collateral_type"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_asset_master.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "counterparty_id",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_asset_master.country_code->L1.country_dim.country_code",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "country_code",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "country_dim",
+      "field": "country_code",
+      "tableKey": "L1.country_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_asset_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "currency_code",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_asset_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_link.collateral_asset_id->L1.collateral_asset_master.collateral_asset_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_link",
+      "field": "collateral_asset_id",
+      "tableKey": "L1.collateral_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "collateral_asset_id",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_link.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_link",
+      "field": "source_system_id",
+      "tableKey": "L1.collateral_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_eligibility_dim.collateral_type_id->L1.collateral_type.collateral_type_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_eligibility_dim",
+      "field": "collateral_type_id",
+      "tableKey": "L1.collateral_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "collateral_type",
+      "field": "collateral_type_id",
+      "tableKey": "L1.collateral_type"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_eligibility_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_eligibility_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.collateral_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_eligibility_dim.regulatory_capital_basis_id->L1.regulatory_capital_basis_dim.regulatory_capital_basis_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_eligibility_dim",
+      "field": "regulatory_capital_basis_id",
+      "tableKey": "L1.collateral_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_capital_basis_dim",
+      "field": "regulatory_capital_basis_id",
+      "tableKey": "L1.regulatory_capital_basis_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_haircut_dim.collateral_type_id->L1.collateral_type.collateral_type_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_haircut_dim",
+      "field": "collateral_type_id",
+      "tableKey": "L1.collateral_haircut_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "collateral_type",
+      "field": "collateral_type_id",
+      "tableKey": "L1.collateral_type"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_haircut_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_haircut_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.collateral_haircut_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_haircut_dim.maturity_bucket_id->L1.maturity_bucket_dim.maturity_bucket_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_haircut_dim",
+      "field": "maturity_bucket_id",
+      "tableKey": "L1.collateral_haircut_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "maturity_bucket_dim",
+      "field": "maturity_bucket_id",
+      "tableKey": "L1.maturity_bucket_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_haircut_dim.regulatory_capital_basis_id->L1.regulatory_capital_basis_dim.regulatory_capital_basis_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_haircut_dim",
+      "field": "regulatory_capital_basis_id",
+      "tableKey": "L1.collateral_haircut_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_capital_basis_dim",
+      "field": "regulatory_capital_basis_id",
+      "tableKey": "L1.regulatory_capital_basis_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_eligibility_dim.crm_type_code->L1.crm_type_dim.crm_type_code",
+    "source": {
+      "layer": "L1",
+      "table": "crm_eligibility_dim",
+      "field": "crm_type_code",
+      "tableKey": "L1.crm_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "crm_type_dim",
+      "field": "crm_type_code",
+      "tableKey": "L1.crm_type_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_eligibility_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "crm_eligibility_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.crm_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_eligibility_dim.regulatory_capital_basis_id->L1.regulatory_capital_basis_dim.regulatory_capital_basis_id",
+    "source": {
+      "layer": "L1",
+      "table": "crm_eligibility_dim",
+      "field": "regulatory_capital_basis_id",
+      "tableKey": "L1.crm_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_capital_basis_dim",
+      "field": "regulatory_capital_basis_id",
+      "tableKey": "L1.regulatory_capital_basis_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_eligibility_dim.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "crm_eligibility_dim",
+      "field": "source_system_id",
+      "tableKey": "L1.crm_eligibility_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_protection_master.crm_type_code->L1.crm_type_dim.crm_type_code",
+    "source": {
+      "layer": "L1",
+      "table": "crm_protection_master",
+      "field": "crm_type_code",
+      "tableKey": "L1.crm_protection_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "crm_type_dim",
+      "field": "crm_type_code",
+      "tableKey": "L1.crm_type_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_protection_master.beneficiary_legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "crm_protection_master",
+      "field": "beneficiary_legal_entity_id",
+      "tableKey": "L1.crm_protection_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.crm_protection_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "crm_protection_master",
+      "field": "currency_code",
+      "tableKey": "L1.crm_protection_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.protection_link.protection_id->L1.crm_protection_master.protection_id",
+    "source": {
+      "layer": "L1",
+      "table": "protection_link",
+      "field": "protection_id",
+      "tableKey": "L1.protection_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "crm_protection_master",
+      "field": "protection_id",
+      "tableKey": "L1.crm_protection_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.protection_link.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L1",
+      "table": "protection_link",
+      "field": "facility_id",
+      "tableKey": "L1.protection_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.risk_mitigant_master.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "risk_mitigant_master",
+      "field": "counterparty_id",
+      "tableKey": "L1.risk_mitigant_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.risk_mitigant_master.risk_mitigant_subtype_code->L1.risk_mitigant_type_dim.risk_mitigant_subtype_code",
+    "source": {
+      "layer": "L1",
+      "table": "risk_mitigant_master",
+      "field": "risk_mitigant_subtype_code",
+      "tableKey": "L1.risk_mitigant_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "risk_mitigant_type_dim",
+      "field": "risk_mitigant_subtype_code",
+      "tableKey": "L1.risk_mitigant_type_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.risk_mitigant_link.risk_mitigant_id->L1.risk_mitigant_master.risk_mitigant_id",
+    "source": {
+      "layer": "L1",
+      "table": "risk_mitigant_link",
+      "field": "risk_mitigant_id",
+      "tableKey": "L1.risk_mitigant_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "risk_mitigant_master",
+      "field": "risk_mitigant_id",
+      "tableKey": "L1.risk_mitigant_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.risk_mitigant_link.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L1",
+      "table": "risk_mitigant_link",
+      "field": "facility_id",
+      "tableKey": "L1.risk_mitigant_link"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_portfolio.portfolio_id->L1.portfolio_dim.portfolio_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_portfolio",
+      "field": "portfolio_id",
+      "tableKey": "L1.collateral_portfolio"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "portfolio_dim",
+      "field": "portfolio_id",
+      "tableKey": "L1.portfolio_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.collateral_portfolio.lob_segment_id->L1.enterprise_business_taxonomy.managed_segment_id",
+    "source": {
+      "layer": "L1",
+      "table": "collateral_portfolio",
+      "field": "lob_segment_id",
+      "tableKey": "L1.collateral_portfolio"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_business_taxonomy",
+      "field": "managed_segment_id",
+      "tableKey": "L1.enterprise_business_taxonomy"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.counterparty_hierarchy.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "counterparty_hierarchy",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty_hierarchy"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.counterparty_hierarchy.immediate_parent_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "counterparty_hierarchy",
+      "field": "immediate_parent_id",
+      "tableKey": "L1.counterparty_hierarchy"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.counterparty_hierarchy.ultimate_parent_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "counterparty_hierarchy",
+      "field": "ultimate_parent_id",
+      "tableKey": "L1.counterparty_hierarchy"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.legal_entity_hierarchy.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "legal_entity_hierarchy",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity_hierarchy"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.legal_entity_hierarchy.parent_legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "legal_entity_hierarchy",
+      "field": "parent_legal_entity_id",
+      "tableKey": "L1.legal_entity_hierarchy"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.control_relationship.parent_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "control_relationship",
+      "field": "parent_counterparty_id",
+      "tableKey": "L1.control_relationship"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.control_relationship.subsidiary_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "control_relationship",
+      "field": "subsidiary_counterparty_id",
+      "tableKey": "L1.control_relationship"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.economic_interdependence_relationship.counterparty_id_1->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "economic_interdependence_relationship",
+      "field": "counterparty_id_1",
+      "tableKey": "L1.economic_interdependence_relationship"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.economic_interdependence_relationship.counterparty_id_2->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "economic_interdependence_relationship",
+      "field": "counterparty_id_2",
+      "tableKey": "L1.economic_interdependence_relationship"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.economic_interdependence_relationship.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "economic_interdependence_relationship",
+      "field": "source_system_id",
+      "tableKey": "L1.economic_interdependence_relationship"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.credit_agreement_counterparty_participation.credit_agreement_id->L1.credit_agreement_master.credit_agreement_id",
+    "source": {
+      "layer": "L1",
+      "table": "credit_agreement_counterparty_participation",
+      "field": "credit_agreement_id",
+      "tableKey": "L1.credit_agreement_counterparty_participation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "credit_agreement_master",
+      "field": "credit_agreement_id",
+      "tableKey": "L1.credit_agreement_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.credit_agreement_counterparty_participation.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "credit_agreement_counterparty_participation",
+      "field": "counterparty_id",
+      "tableKey": "L1.credit_agreement_counterparty_participation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.credit_agreement_counterparty_participation.counterparty_role_code->L1.counterparty_role_dim.counterparty_role_code",
+    "source": {
+      "layer": "L1",
+      "table": "credit_agreement_counterparty_participation",
+      "field": "counterparty_role_code",
+      "tableKey": "L1.credit_agreement_counterparty_participation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty_role_dim",
+      "field": "counterparty_role_code",
+      "tableKey": "L1.counterparty_role_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_counterparty_participation.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_counterparty_participation",
+      "field": "facility_id",
+      "tableKey": "L1.facility_counterparty_participation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_counterparty_participation.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_counterparty_participation",
+      "field": "counterparty_id",
+      "tableKey": "L1.facility_counterparty_participation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_counterparty_participation.counterparty_role_code->L1.counterparty_role_dim.counterparty_role_code",
+    "source": {
+      "layer": "L1",
+      "table": "facility_counterparty_participation",
+      "field": "counterparty_role_code",
+      "tableKey": "L1.facility_counterparty_participation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty_role_dim",
+      "field": "counterparty_role_code",
+      "tableKey": "L1.counterparty_role_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.sccl_counterparty_group_member.sccl_group_id->L1.sccl_counterparty_group.sccl_group_id",
+    "source": {
+      "layer": "L1",
+      "table": "sccl_counterparty_group_member",
+      "field": "sccl_group_id",
+      "tableKey": "L1.sccl_counterparty_group_member"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "sccl_counterparty_group",
+      "field": "sccl_group_id",
+      "tableKey": "L1.sccl_counterparty_group"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.sccl_counterparty_group_member.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "sccl_counterparty_group_member",
+      "field": "counterparty_id",
+      "tableKey": "L1.sccl_counterparty_group_member"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.limit_threshold.limit_rule_id->L1.limit_rule.limit_rule_id",
+    "source": {
+      "layer": "L1",
+      "table": "limit_threshold",
+      "field": "limit_rule_id",
+      "tableKey": "L1.limit_threshold"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "limit_rule",
+      "field": "limit_rule_id",
+      "tableKey": "L1.limit_rule"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.fx_rate.from_currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "fx_rate",
+      "field": "from_currency_code",
+      "tableKey": "L1.fx_rate"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.fx_rate.to_currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "fx_rate",
+      "field": "to_currency_code",
+      "tableKey": "L1.fx_rate"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.run_control.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "run_control",
+      "field": "source_system_id",
+      "tableKey": "L1.run_control"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.reporting_entity_dim.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "reporting_entity_dim",
+      "field": "legal_entity_id",
+      "tableKey": "L1.reporting_entity_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.validation_check_registry.check_rule_id->L1.rule_registry.rule_id",
+    "source": {
+      "layer": "L1",
+      "table": "validation_check_registry",
+      "field": "check_rule_id",
+      "tableKey": "L1.validation_check_registry"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "rule_registry",
+      "field": "rule_id",
+      "tableKey": "L1.rule_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.reconciliation_control.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "reconciliation_control",
+      "field": "source_system_id",
+      "tableKey": "L1.reconciliation_control"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.regulatory_mapping.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "regulatory_mapping",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_mapping"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.report_cell_definition.report_id->L1.report_registry.report_id",
+    "source": {
+      "layer": "L1",
+      "table": "report_cell_definition",
+      "field": "report_id",
+      "tableKey": "L1.report_cell_definition"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "report_registry",
+      "field": "report_id",
+      "tableKey": "L1.report_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.rating_mapping.rating_scale_id->L1.rating_scale_dim.rating_scale_id",
+    "source": {
+      "layer": "L1",
+      "table": "rating_mapping",
+      "field": "rating_scale_id",
+      "tableKey": "L1.rating_mapping"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "rating_scale_dim",
+      "field": "rating_scale_id",
+      "tableKey": "L1.rating_scale_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.rating_mapping.rating_source_id->L1.rating_source.rating_source_id",
+    "source": {
+      "layer": "L1",
+      "table": "rating_mapping",
+      "field": "rating_source_id",
+      "tableKey": "L1.rating_mapping"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "rating_source",
+      "field": "rating_source_id",
+      "tableKey": "L1.rating_source"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.rating_mapping.internal_grade_id->L1.rating_grade_dim.rating_grade_id",
+    "source": {
+      "layer": "L1",
+      "table": "rating_mapping",
+      "field": "internal_grade_id",
+      "tableKey": "L1.rating_mapping"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "rating_grade_dim",
+      "field": "rating_grade_id",
+      "tableKey": "L1.rating_grade_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.scenario_dim.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L1",
+      "table": "scenario_dim",
+      "field": "source_system_id",
+      "tableKey": "L1.scenario_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  }
+]

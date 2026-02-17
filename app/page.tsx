@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import OverviewContent from '@/components/overview/OverviewContent';
 
 export default function Home() {
-  redirect('/overview');
+  return <OverviewContent />;
 }

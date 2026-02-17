@@ -34,7 +34,7 @@ export default function FileUpload({ onFileSelect, currentFile }: FileUploadProp
     <div
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      className="border-2 border-dashed border-gray-400 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition-colors bg-gray-900/50"
+      className="border-2 border-dashed border-pwc-gray-light rounded-lg p-8 text-center cursor-pointer hover:border-pwc-orange transition-colors bg-pwc-black/50"
       onClick={() => fileInputRef.current?.click()}
     >
       <input

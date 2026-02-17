@@ -53,29 +53,29 @@ export default function Toolbar() {
   };
 
   return (
-    <div className="h-14 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4">
+    <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm">
       <div className="flex items-center space-x-2">
         {/* Zoom Controls */}
         <button
           onClick={() => setZoom(zoom * 0.9)}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
           title="Zoom Out"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
-        <span className="text-sm text-gray-400 min-w-[60px] text-center">
+        <span className="text-sm text-gray-600 min-w-[60px] text-center">
           {Math.round(zoom * 100)}%
         </span>
         <button
           onClick={() => setZoom(zoom * 1.1)}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
           title="Zoom In"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
         <button
           onClick={resetView}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
           title="Reset Zoom"
         >
           <RotateCcw className="w-4 h-4" />
@@ -85,22 +85,22 @@ export default function Toolbar() {
             // Fit to view - will be handled by canvas
             resetView();
           }}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
           title="Fit to View"
         >
           <Maximize2 className="w-4 h-4" />
         </button>
 
-        <div className="w-px h-6 bg-gray-700 mx-2" />
+        <div className="w-px h-6 bg-gray-200 mx-2" />
 
         {/* View Presets - Quick Access with Active State */}
-        <div className="flex items-center gap-0.5 bg-gray-700/50 rounded-lg p-0.5">
+        <div className="flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5">
           <button
             onClick={() => applyViewPreset('overview')}
             className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal'
                 ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
             title="Overview - See everything at once (Compact + Small + Minimal)"
           >
@@ -112,7 +112,7 @@ export default function Toolbar() {
             className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               viewMode === 'detailed' && tableSize === 'large' && fieldDisplayMode === 'full'
                 ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
             title="Detailed - Full information (Detailed + Large + Full)"
           >
@@ -124,7 +124,7 @@ export default function Toolbar() {
             className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' && zoom === 1
                 ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
             title="Compact - Minimal view (Compact + Small + Minimal)"
           >
@@ -136,7 +136,7 @@ export default function Toolbar() {
             className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               viewMode === 'standard' && tableSize === 'medium' && fieldDisplayMode === 'standard'
                 ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
             title="Focus - Standard view (Standard + Medium + Standard)"
           >
@@ -145,14 +145,14 @@ export default function Toolbar() {
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-700 mx-2" />
+        <div className="w-px h-6 bg-gray-200 mx-2" />
 
         {/* View Mode */}
         <div className="relative">
           <select
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value as any)}
-            className="px-3 py-1.5 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
+            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
             title="View detail level"
           >
             <option value="compact">Compact View</option>
@@ -162,14 +162,14 @@ export default function Toolbar() {
           <Eye className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>
 
-        <div className="w-px h-6 bg-gray-700 mx-2" />
+        <div className="w-px h-6 bg-gray-200 mx-2" />
 
         {/* Table Size */}
         <div className="relative">
           <select
             value={tableSize}
             onChange={(e) => setTableSize(e.target.value as any)}
-            className="px-3 py-1.5 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
+            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
             title="Table card size"
           >
             <option value="small">Small Tables</option>
@@ -179,14 +179,14 @@ export default function Toolbar() {
           <Grid3x3 className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>
 
-        <div className="w-px h-6 bg-gray-700 mx-2" />
+        <div className="w-px h-6 bg-gray-200 mx-2" />
 
         {/* Field Display Mode */}
         <div className="relative">
           <select
             value={fieldDisplayMode}
             onChange={(e) => setFieldDisplayMode(e.target.value as any)}
-            className="px-3 py-1.5 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
+            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
             title="Field information level"
           >
             <option value="minimal">Minimal Fields</option>
@@ -196,16 +196,16 @@ export default function Toolbar() {
           <List className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>
 
-        <div className="w-px h-6 bg-gray-700 mx-2" />
+        <div className="w-px h-6 bg-pwc-gray mx-2" />
 
         {/* Relationship Visibility Controls */}
-        <div className="flex items-center gap-1 bg-gray-700/50 rounded-lg p-0.5">
+        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
           <button
             onClick={() => setShowRelationships(!showRelationships)}
             className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
               showRelationships
                 ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
             }`}
             title="Toggle all relationships"
           >
@@ -214,13 +214,13 @@ export default function Toolbar() {
           </button>
           {showRelationships && (
             <>
-              <div className="w-px h-4 bg-gray-600 mx-0.5" />
+              <div className="w-px h-4 bg-gray-200 mx-0.5" />
               <button
                 onClick={() => setShowPrimaryRelationships(!showPrimaryRelationships)}
                 className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
                   showPrimaryRelationships
-                    ? 'bg-green-600 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-600'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                 }`}
                 title="Toggle primary relationships (direct FK->PK)"
               >
@@ -231,8 +231,8 @@ export default function Toolbar() {
                 onClick={() => setShowSecondaryRelationships(!showSecondaryRelationships)}
                 className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
                   showSecondaryRelationships
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-600'
+                    ? 'bg-violet-600 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                 }`}
                 title="Toggle secondary relationships (derived/complex)"
               >
@@ -243,7 +243,7 @@ export default function Toolbar() {
           )}
         </div>
 
-        <div className="w-px h-6 bg-gray-700 mx-2" />
+        <div className="w-px h-6 bg-gray-200 mx-2" />
 
         {/* Export */}
         <div className="relative">
@@ -254,7 +254,7 @@ export default function Toolbar() {
                 e.target.value = '';
               }
             }}
-            className="px-3 py-1.5 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
+            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
             defaultValue=""
           >
             <option value="" disabled>
@@ -276,8 +276,8 @@ export default function Toolbar() {
           onClick={() => setShowMinimap(!showMinimap)}
           className={`p-2 rounded transition-colors ${
             showMinimap
-              ? 'text-blue-400 bg-blue-900/20'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              ? 'text-blue-600 bg-blue-100'
+              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
           }`}
           title="Toggle Minimap"
         >
@@ -287,7 +287,7 @@ export default function Toolbar() {
         {/* Theme Toggle */}
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
           title="Toggle Theme"
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

@@ -8,14 +8,14 @@
   }
   
   body {
-    @apply bg-matte-black text-aerospace-silver;
+    @apply bg-pwc-black text-pwc-white;
   }
 }
 
-/* Dashboard override - light theme */
+/* Dashboard override - PwC light */
 body.dashboard-active {
-  background-color: #f9fafb !important;
-  color: #111827 !important;
+  background-color: #f5f5f5 !important;
+  color: #2D2D2D !important;
 }
 
 body.dashboard-active * {

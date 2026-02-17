@@ -181,7 +181,7 @@ export default function TableNode({
       >
         <div
           className={`rounded-xl shadow-2xl transition-all duration-200 ${
-            isSelected ? 'ring-4 ring-amber-400 ring-opacity-60 shadow-amber-400/20' : 'shadow-gray-900/20'
+            isSelected ? 'ring-4 ring-amber-400 ring-opacity-60 shadow-amber-400/20' : 'shadow-gray-300/50'
           }`}
           style={{
             backgroundColor: '#ffffff',
@@ -217,12 +217,12 @@ export default function TableNode({
               {(relCounts.incoming > 0 || relCounts.outgoing > 0) && !isCompact && (
                 <div className={`flex items-center ${isCompact ? 'gap-0.5' : 'gap-1'} ml-1`} title={`${relCounts.incoming} incoming, ${relCounts.outgoing} outgoing relationships`}>
                   {relCounts.incoming > 0 && (
-                    <span className={`${isDetailed ? 'text-[10px]' : 'text-[9px]'} text-blue-300 font-semibold`} title={`${relCounts.incoming} incoming`}>
+                    <span className={`${isDetailed ? 'text-[10px]' : 'text-[9px]'} text-amber-200 font-semibold`} title={`${relCounts.incoming} incoming`}>
                       ←{relCounts.incoming}
                     </span>
                   )}
                   {relCounts.outgoing > 0 && (
-                    <span className={`${isDetailed ? 'text-[10px]' : 'text-[9px]'} text-green-300 font-semibold`} title={`${relCounts.outgoing} outgoing`}>
+                    <span className={`${isDetailed ? 'text-[10px]' : 'text-[9px]'} text-emerald-200 font-semibold`} title={`${relCounts.outgoing} outgoing`}>
                       →{relCounts.outgoing}
                     </span>
                   )}
@@ -239,8 +239,10 @@ export default function TableNode({
                 style={{ 
                   maxHeight: isOverviewMode ? COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT : (isExpanded ? SCROLLABLE_AREA_HEIGHT : COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT),
                 }}
-                onWheel={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
+                onWheel={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
               >
                 {/* Compact table-like display for better horizontal scanning */}
                 <div className={isCompact ? 'space-y-0.5' : isDetailed ? 'space-y-1.5' : 'space-y-1'}>
@@ -267,7 +269,7 @@ export default function TableNode({
                           : isPK 
                           ? 'bg-gradient-to-r from-yellow-50/90 to-yellow-50/70 border-yellow-300/70 hover:bg-gradient-to-r hover:from-yellow-100 hover:to-yellow-50 hover:border-yellow-400' 
                           : isFK
-                          ? 'bg-gradient-to-r from-blue-50/90 to-blue-50/70 border-blue-300/70 hover:bg-gradient-to-r hover:from-blue-100 hover:to-blue-50 hover:border-blue-400'
+                          ? 'bg-gradient-to-r from-blue-50 to-blue-50/80 border-blue-300/70 hover:bg-gradient-to-r hover:from-blue-100 hover:to-blue-50 hover:border-blue-400'
                           : 'bg-gradient-to-r from-gray-50/70 to-gray-50/50 border-gray-300/50 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:border-gray-400'
                       }`}
                     >
@@ -291,7 +293,7 @@ export default function TableNode({
                         
                         {/* Field Name - Dynamic size with better contrast and visual hierarchy */}
                         <span 
-                          className={`font-mono ${isPK ? 'font-bold text-yellow-900' : isFK ? 'font-semibold text-blue-900' : 'font-medium text-gray-800'} flex-1 min-w-0 truncate ${fieldTextSize}`}
+                          className={`font-mono ${isPK ? 'font-bold text-yellow-900' : isFK ? 'font-semibold text-blue-700' : 'font-medium text-gray-800'} flex-1 min-w-0 truncate ${fieldTextSize}`}
                           title={field.description || field.name}
                         >
                           {highlightMatch(field.name)}
@@ -307,7 +309,7 @@ export default function TableNode({
                       
                       {/* Description - Based on view mode with better styling */}
                       {showFieldDescriptions && field.description && (
-                        <div className={`text-gray-700 ${isCompact ? 'text-[9px]' : isDetailed ? 'text-[10px]' : 'text-[9px]'} mt-1.5 ${isCompact ? 'ml-5' : 'ml-7'} ${showFullInfo ? 'leading-relaxed' : 'line-clamp-2'} bg-gray-50/50 rounded px-1.5 py-0.5 border-l-2 ${isPK ? 'border-l-yellow-400' : isFK ? 'border-l-blue-400' : 'border-l-gray-300'}`}>
+                        <div className={`text-gray-700 ${isCompact ? 'text-[9px]' : isDetailed ? 'text-[10px]' : 'text-[9px]'} mt-1.5 ${isCompact ? 'ml-5' : 'ml-7'} ${showFullInfo ? 'leading-relaxed' : 'line-clamp-2'} bg-gray-50/50 rounded px-1.5 py-0.5 border-l-2 ${isPK ? 'border-l-yellow-400' : isFK ? 'border-l-blue-500' : 'border-l-gray-300'}`}>
                           {field.description}
                         </div>
                       )}

@@ -51,7 +51,7 @@ export default function DomainContainer({
 
   return (
     <g transform={`translate(${position.x}, ${position.y})`}>
-      {/* Domain Container Background */}
+      {/* Domain Container Background - in overview let clicks pass through to tables */}
       <rect
         x="0"
         y="0"
@@ -62,18 +62,19 @@ export default function DomainContainer({
         stroke={categoryColor.color}
         strokeWidth={isOverview ? 2 : 4}
         className="drop-shadow-2xl"
-        style={{ 
+        style={{
+          pointerEvents: isOverview ? 'none' : 'auto',
           filter: isOverview
             ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
             : 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4))',
           strokeOpacity: 0.8,
         }}
       />
-      
-      {/* Domain Header */}
-      <foreignObject x="0" y="0" width={width} height={headerHeight}>
+
+      {/* Domain Header - keep pointer-events so header click still toggles */}
+      <foreignObject x="0" y="0" width={width} height={headerHeight} style={{ pointerEvents: 'auto' }}>
         <div
-          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-gray-700/40`}
+          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-white/30`}
           onClick={onToggle}
           style={{
             background: `linear-gradient(135deg, ${categoryColor.color}20 0%, ${categoryColor.color}10 100%)`,
@@ -87,9 +88,9 @@ export default function DomainContainer({
                 style={{ backgroundColor: categoryColor.color }}
               />
               <div className="flex-1 min-w-0">
-                <h3 className={`${isOverview ? 'text-sm' : 'text-xl'} font-bold text-white truncate ${isOverview ? '' : 'mb-1'}`}>{domain}</h3>
+                <h3 className={`${isOverview ? 'text-sm' : 'text-xl'} font-bold text-gray-900 truncate ${isOverview ? '' : 'mb-1'}`}>{domain}</h3>
                 {!isOverview && (
-                  <div className="flex items-center space-x-5 text-sm text-gray-200">
+                  <div className="flex items-center space-x-5 text-sm text-gray-600">
                     <span className="flex items-center space-x-1.5 font-medium">
                       <Database className="w-4 h-4" />
                       <span>{stats.tableCount} tables</span>
@@ -104,7 +105,7 @@ export default function DomainContainer({
                   </div>
                 )}
                 {isOverview && (
-                  <div className="flex items-center space-x-2 text-xs text-gray-300">
+                  <div className="flex items-center space-x-2 text-xs text-gray-600">
                     <span>{stats.tableCount} tables</span>
                     <span className="text-gray-500">|</span>
                     <span>{stats.totalFields} fields</span>
@@ -116,22 +117,22 @@ export default function DomainContainer({
               <div className="flex items-center space-x-3 flex-shrink-0">
                 <div className="flex items-center space-x-1.5">
                   {stats.byLayer.L1 > 0 && (
-                    <span className="px-2 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-md font-semibold border border-blue-400/30">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md font-semibold border border-blue-200">
                       L1:{stats.byLayer.L1}
                     </span>
                   )}
                   {stats.byLayer.L2 > 0 && (
-                    <span className="px-2 py-1 bg-green-500/30 text-green-200 text-xs rounded-md font-semibold border border-green-400/30">
+                    <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-md font-semibold border border-emerald-200">
                       L2:{stats.byLayer.L2}
                     </span>
                   )}
                   {stats.byLayer.L3 > 0 && (
-                    <span className="px-2 py-1 bg-purple-500/30 text-purple-200 text-xs rounded-md font-semibold border border-purple-400/30">
+                    <span className="px-2 py-1 bg-violet-100 text-violet-800 text-xs rounded-md font-semibold border border-violet-200">
                       L3:{stats.byLayer.L3}
                     </span>
                   )}
                 </div>
-                <button className="text-gray-300 hover:text-white transition-colors p-1 hover:bg-gray-700/50 rounded">
+                <button className="text-gray-600 hover:text-gray-900 transition-colors p-1 hover:bg-white/50 rounded">
                   {isExpanded ? (
                     <ChevronDown className="w-6 h-6" />
                   ) : (

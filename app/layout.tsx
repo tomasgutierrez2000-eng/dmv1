@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${spaceMono.variable} ${inter.variable}`}>
-      <body className="font-inter bg-matte-black text-aerospace-silver antialiased overflow-x-hidden">
+      <body className="font-inter bg-pwc-black text-pwc-white antialiased overflow-x-hidden">
         {children}
         <div className="noise-overlay" />
       </body>

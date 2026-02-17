@@ -264,13 +264,17 @@ export default function Canvas() {
       if (savedPositionsRef.current) {
         const saved = savedPositionsRef.current;
         focusFieldKeyRef.current = null;
-        // Restore all saved positions
-        Object.entries(saved).forEach(([key, pos]) => setTablePosition(key, pos));
+        // Restore only valid positions so we never call setTablePosition(key, undefined)
+        Object.entries(saved).forEach(([key, pos]) => {
+          if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+            setTablePosition(key, pos);
+          }
+        });
         // Animate camera back to fit all visible tables
         setIsAnimating(true);
         const allPositions = visibleTables
           .map((t) => saved[t.key])
-          .filter((p): p is TablePosition => !!p);
+          .filter((p): p is TablePosition => !!p && typeof p.x === 'number' && typeof p.y === 'number');
         if (allPositions.length > 0) {
           runFitToView(allPositions, visibleTables.length);
         }
@@ -376,7 +380,9 @@ export default function Canvas() {
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
         return;
       }
-      if (e.button === 0 && e.target === canvasRef.current) {
+      const hitEmptyCanvas =
+        e.target === canvasRef.current || canvasRef.current?.firstElementChild === e.target;
+      if (e.button === 0 && hitEmptyCanvas) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
         setSelectedTable(null);
@@ -470,9 +476,15 @@ export default function Canvas() {
     setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, runFitToView]);
 
-  // Click on empty canvas: clear selections and exit focus mode
+  // Click on empty canvas: clear selections and exit focus mode.
+  // Clicks on "empty" space often hit the transform <g> (first child of SVG), not the SVG itself.
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === canvasRef.current || e.target === containerRef.current) {
+    const target = e.target as Node;
+    const hitCanvas =
+      target === containerRef.current ||
+      target === canvasRef.current ||
+      (canvasRef.current?.firstElementChild === target);
+    if (hitCanvas) {
       setSelectedField(null);
       setSelectedTable(null);
       setSelectedRelationship(null);

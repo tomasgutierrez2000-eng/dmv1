@@ -137,6 +137,12 @@ export default function TableNode({
   const pkFields = table.fields.filter((f) => f.isPK);
   const fkFields = table.fields.filter((f) => f.isFK);
   const regularFields = table.fields.filter((f) => !f.isPK && !f.isFK);
+  const overviewFieldText = table.fields
+    .map((field) => {
+      const prefix = field.isPK ? 'PK ' : field.isFK ? 'FK ' : '';
+      return `${prefix}${field.name}`;
+    })
+    .join('\n');
 
   const highlightMatch = (text: string) => {
     if (!searchQuery) return text;
@@ -236,32 +242,13 @@ export default function TableNode({
                   e.stopPropagation(); // keep wheel scrolling inside the card
                 }}
               >
-                <div className="space-y-0.5">
-                  {table.fields.length > 0 ? (
-                    table.fields.map((field, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onFieldSelect) onFieldSelect(table.key, field.name);
-                        }}
-                        className={`w-full text-left text-[10px] rounded border px-1.5 py-0.5 truncate ${
-                          field.isPK
-                            ? 'bg-yellow-50 border-yellow-300 text-yellow-900'
-                            : field.isFK
-                            ? 'bg-blue-50 border-blue-300 text-blue-800'
-                            : 'bg-gray-50 border-gray-300 text-gray-700'
-                        }`}
-                        title={field.name}
-                      >
-                        {field.name}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="text-[10px] text-gray-400 italic px-1">No fields</div>
-                  )}
-                </div>
+                {table.fields.length > 0 ? (
+                  <pre className="m-0 text-[10px] leading-4 font-mono text-gray-700 whitespace-pre-wrap break-all">
+                    {overviewFieldText}
+                  </pre>
+                ) : (
+                  <div className="text-[10px] text-gray-400 italic px-1">No fields</div>
+                )}
               </div>
             ) : showFields ? (
               <div 

@@ -94,6 +94,7 @@ export default function TableNode({
   const FOOTER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(12, Math.round(overviewDims.height * 0.16))
     : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height * zoomMultiplier));
+  const TABLE_HEIGHT = isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT);
   const SCROLLABLE_AREA_HEIGHT = EXPANDED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT;
   
   // Progressive disclosure based on zoom level
@@ -171,22 +172,27 @@ export default function TableNode({
     >
       <foreignObject 
         width={TABLE_WIDTH} 
-        height={isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT)} 
+        height={TABLE_HEIGHT}
         x="0" 
         y="0"
         style={{ 
           minWidth: TABLE_WIDTH,
-          minHeight: isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT)
+          minHeight: TABLE_HEIGHT,
+          maxHeight: TABLE_HEIGHT,
+          overflow: 'hidden',
         }}
       >
         <div
-          className={`rounded-xl shadow-2xl transition-all duration-200 ${
+          className={`rounded-xl shadow-2xl transition-all duration-200 overflow-hidden ${
             isSelected ? 'ring-4 ring-amber-400 ring-opacity-60 shadow-amber-400/20' : 'shadow-gray-300/50'
           }`}
           style={{
             backgroundColor: '#ffffff',
             border: `2px solid ${isSelected ? '#fbbf24' : colors.border}`,
-            minHeight: isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT,
+            height: TABLE_HEIGHT,
+            minHeight: TABLE_HEIGHT,
+            maxHeight: TABLE_HEIGHT,
+            overflow: 'hidden',
           }}
         >
           {/* Header - Dynamic sizing based on view mode */}
@@ -232,7 +238,7 @@ export default function TableNode({
           </div>
 
           {/* Content */}
-          <div className="flex flex-col bg-gradient-to-b from-gray-50 to-white" style={{ height: isOverviewMode ? COLLAPSED_HEIGHT - HEADER_HEIGHT : (isExpanded ? EXPANDED_HEIGHT - HEADER_HEIGHT : COLLAPSED_HEIGHT - HEADER_HEIGHT) }}>
+          <div className="flex flex-col bg-gradient-to-b from-gray-50 to-white overflow-hidden" style={{ height: TABLE_HEIGHT - HEADER_HEIGHT }}>
             {showFields ? (
               <div 
                 className={`flex-1 overflow-y-auto ${isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-3' : 'px-3 py-2'} scrollbar-thin`}

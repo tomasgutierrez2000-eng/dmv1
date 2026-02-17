@@ -50,9 +50,10 @@ function main() {
   const withLineage = metricWithLineage(metricWithoutLineage);
   assert(!!withLineage.nodes && withLineage.nodes.length >= 2, 'metricWithLineage adds nodes (source + transform + L3)');
   assert(!!withLineage.edges && withLineage.edges.length >= 1, 'metricWithLineage adds edges');
-  const hasTransform = withLineage.nodes.some((n) => n.layer === 'transform');
+  const nodes = withLineage.nodes!;
+  const hasTransform = nodes.some((n) => n.layer === 'transform');
   assert(hasTransform, 'lineage includes transform node');
-  const hasL3 = withLineage.nodes.some((n) => n.layer === 'L3');
+  const hasL3 = nodes.some((n) => n.layer === 'L3');
   assert(hasL3, 'lineage includes L3 output node');
 
   // 3) metricWithLineage: empty sourceFields yields no nodes

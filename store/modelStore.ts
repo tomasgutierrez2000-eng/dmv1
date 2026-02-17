@@ -145,9 +145,10 @@ export const useModelStore = create<ModelStore>((set) => ({
   }),
   setSelectedField: (field) => set({ 
     selectedField: field, 
+    selectedTable: field ? field.tableKey : null, // Keep in sync with the field's parent table
     selectedRelationship: null,
     focusMode: field !== null,
-    detailPanelOpen: field !== null, // Open detail panel when column/field is selected
+    detailPanelOpen: field !== null,
   }),
   setFocusMode: (focus) => set({ focusMode: focus }),
   toggleExpandedTable: (tableKey) =>

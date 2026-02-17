@@ -136,13 +136,6 @@ export default function TableNode({
 
   const pkFields = table.fields.filter((f) => f.isPK);
   const fkFields = table.fields.filter((f) => f.isFK);
-  const regularFields = table.fields.filter((f) => !f.isPK && !f.isFK);
-  const overviewFieldText = table.fields
-    .map((field) => {
-      const prefix = field.isPK ? 'PK ' : field.isFK ? 'FK ' : '';
-      return `${prefix}${field.name}`;
-    })
-    .join('\n');
 
   const highlightMatch = (text: string) => {
     if (!searchQuery) return text;
@@ -439,27 +432,11 @@ export default function TableNode({
 
           {/* Content */}
           <div className="flex flex-col bg-gradient-to-b from-gray-50 to-white overflow-hidden" style={{ height: TABLE_HEIGHT - HEADER_HEIGHT }}>
-            {isOverviewMode ? (
-              <div
-                className="flex-1 overflow-y-auto px-1.5 py-1 scrollbar-thin"
-                style={{ maxHeight: COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT }}
-                onWheel={(e) => {
-                  e.stopPropagation(); // keep wheel scrolling inside the card
-                }}
-              >
-                {table.fields.length > 0 ? (
-                  <pre className="m-0 text-[10px] leading-4 font-mono text-gray-700 whitespace-pre-wrap break-all">
-                    {overviewFieldText}
-                  </pre>
-                ) : (
-                  <div className="text-[10px] text-gray-400 italic px-1">No fields</div>
-                )}
-              </div>
-            ) : showFields ? (
+            {showFields ? (
               <div 
                 className={`flex-1 overflow-y-auto ${isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-3' : 'px-3 py-2'} scrollbar-thin`}
                 style={{ 
-                  maxHeight: isOverviewMode ? COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT : (isExpanded ? SCROLLABLE_AREA_HEIGHT : COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT),
+                  maxHeight: isExpanded ? SCROLLABLE_AREA_HEIGHT : COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT,
                 }}
                 onWheel={(e) => {
                   e.stopPropagation(); // prevent canvas zoom; do NOT preventDefault so this div can scroll

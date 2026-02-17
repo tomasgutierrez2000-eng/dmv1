@@ -54,6 +54,7 @@ export default function Canvas() {
     setPan,
     setTablePosition,
     setTablePositionsBulk,
+    setTablePositionsReplace,
     setRequestFitToView,
     setSelectedTable,
     setSelectedRelationship,
@@ -178,15 +179,19 @@ export default function Canvas() {
     if (!model) return;
     const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
     const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers, compactOverview);
-    setTablePositionsBulk(newPositions);
     const isOverviewLayout = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+    if (isOverviewLayout) {
+      setTablePositionsReplace(newPositions);
+    } else {
+      setTablePositionsBulk(newPositions);
+    }
     if (isOverviewLayout) {
       // Defer fit so React has committed new positions; zoom directly to diagram so user doesn't need to scroll
       const t = setTimeout(() => setRequestFitToView(), 120);
       return () => clearTimeout(t);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
-  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setRequestFitToView]);
+  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setTablePositionsReplace, setRequestFitToView]);
 
   // Fit to visible tables when layout or full-view state change. Skipped when focus-compact
   // or when search/filter is active (delayed effect below handles those for one consistent fit).
@@ -765,11 +770,11 @@ export default function Canvas() {
             let headerOffset: number;
             let footerOffset: number;
             if (viewMode === 'compact') {
-              domainPadding = 6;
+              domainPadding = 8;
               headerOffset = 28;
               footerOffset = 8;
             } else {
-              domainPadding = 10;
+              domainPadding = 12;
               headerOffset = 45;
               footerOffset = 10;
             }

@@ -52,6 +52,7 @@ interface ModelStore {
   setTablePosition: (tableKey: string, position: TablePosition) => void;
   setTablePositions: (tableKey: string, position: TablePosition) => void;
   setTablePositionsBulk: (positions: Record<string, TablePosition>) => void;
+  setTablePositionsReplace: (positions: Record<string, TablePosition>) => void;
   setSelectedTable: (tableKey: string | null) => void;
   setSelectedRelationship: (relId: string | null) => void;
   setSelectedField: (field: { tableKey: string; fieldName: string } | null) => void;
@@ -139,6 +140,8 @@ export const useModelStore = create<ModelStore>((set) => ({
     set((state) => ({
       tablePositions: { ...state.tablePositions, ...positions },
     })),
+  setTablePositionsReplace: (positions) =>
+    set({ tablePositions: positions }),
   setSelectedTable: (tableKey) => set({ 
     selectedTable: tableKey, 
     detailPanelOpen: tableKey !== null, 

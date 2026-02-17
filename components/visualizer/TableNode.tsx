@@ -61,15 +61,10 @@ export default function TableNode({
   // OVERVIEW MODE: Use fixed small size for all tables
   const isOverviewMode = layoutMode === 'domain-overview';
   
-  // Zoom-based scaling with semantic zoom principles
-  // At low zoom (< 0.5): Very compact, minimal details
-  // At medium zoom (0.5-1.0): Standard size
-  // At high zoom (> 1.0): Larger, more details visible
-  const zoomMultiplier = Math.max(0.4, Math.min(1.5, zoom)); // Clamp between 0.4x and 1.5x
-  const isZoomedOut = zoom < 0.6;
-  const isZoomedIn = zoom > 1.2;
+  // Keep geometry stable; canvas already scales with zoom.
+  // Zoom only controls semantic detail levels (what content is shown), not card size.
   
-  // Calculate dimensions based on size setting AND zoom
+  // Calculate dimensions based on size setting
   let sizeMultiplier = SIZE_MULTIPLIERS[tableSize];
   const overviewDims = isOverviewMode ? getOverviewTableDimensions(tableSize) : null;
   
@@ -81,19 +76,19 @@ export default function TableNode({
   // OVERVIEW MODE: Use small/medium/large dimensions from layout engine
   const TABLE_WIDTH = isOverviewMode && overviewDims
     ? overviewDims.width
-    : Math.max(200, Math.round(baseWidth * zoomMultiplier));
+    : Math.max(200, Math.round(baseWidth));
   const COLLAPSED_HEIGHT = isOverviewMode && overviewDims
     ? overviewDims.height
-    : Math.max(120, Math.round(baseCollapsedHeight * zoomMultiplier));
+    : Math.max(120, Math.round(baseCollapsedHeight));
   const EXPANDED_HEIGHT = isOverviewMode && overviewDims
     ? overviewDims.height
-    : Math.max(200, Math.round(baseExpandedHeight * zoomMultiplier));
+    : Math.max(200, Math.round(baseExpandedHeight));
   const HEADER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(20, Math.round(overviewDims.height * 0.28))
-    : Math.max(32, Math.round(baseHeaderHeight * zoomMultiplier));
+    : Math.max(32, Math.round(baseHeaderHeight));
   const FOOTER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(12, Math.round(overviewDims.height * 0.16))
-    : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height * zoomMultiplier));
+    : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
   const TABLE_HEIGHT = isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT);
   const SCROLLABLE_AREA_HEIGHT = EXPANDED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT;
   
@@ -175,12 +170,6 @@ export default function TableNode({
         height={TABLE_HEIGHT}
         x="0" 
         y="0"
-        style={{ 
-          minWidth: TABLE_WIDTH,
-          minHeight: TABLE_HEIGHT,
-          maxHeight: TABLE_HEIGHT,
-          overflow: 'hidden',
-        }}
       >
         <div
           className={`rounded-xl shadow-2xl transition-all duration-200 overflow-hidden ${

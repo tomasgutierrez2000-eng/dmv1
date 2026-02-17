@@ -242,6 +242,7 @@ export const useModelStore = create<ModelStore>((set) => ({
         break;
       case 'compact':
         set({
+          layoutMode: 'domain-overview',
           viewMode: 'compact',
           tableSize: 'small',
           fieldDisplayMode: 'minimal',

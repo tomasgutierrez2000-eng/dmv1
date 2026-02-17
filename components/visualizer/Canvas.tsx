@@ -5,7 +5,7 @@ import { useModelStore } from '../../store/modelStore';
 import TableNode from './TableNode';
 import RelationshipLine from './RelationshipLine';
 import DomainContainer from './DomainContainer';
-import { calculateLayout, getOverviewTableDimensions } from '../../utils/layoutEngine';
+import { calculateLayout, getOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
 import type { TablePosition } from '../../types/model';
 
 export default function Canvas() {
@@ -45,6 +45,7 @@ export default function Canvas() {
     l3CategoryExcluded,
     layoutMode,
     tableSize,
+    viewMode,
     showRelationships,
     showPrimaryRelationships,
     showSecondaryRelationships,
@@ -102,7 +103,10 @@ export default function Canvas() {
       };
       const overviewDims = getOverviewTableDimensions(tableSize);
       const tableWidth = layoutMode === 'domain-overview' ? overviewDims.width : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
-      const tableHeight = layoutMode === 'domain-overview' ? overviewDims.height : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
+      const compactHeight = layoutMode === 'domain-overview' ? (OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6) : 84;
+      const tableHeight = viewMode === 'compact'
+        ? compactHeight
+        : (layoutMode === 'domain-overview' ? overviewDims.height : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height);
 
       const minX = Math.min(...positionsToFit.map((p) => p.x));
       const maxX = Math.max(...positionsToFit.map((p) => p.x + tableWidth));
@@ -149,7 +153,7 @@ export default function Canvas() {
       setPan({ x: Number.isFinite(finalPanX) ? finalPanX : 0, y: Number.isFinite(panY) ? panY : 0 });
       setZoom(safeZoom);
     },
-    [layoutMode, tableSize, setPan, setZoom]
+    [layoutMode, tableSize, viewMode, setPan, setZoom]
   );
 
   // Single helper: fit camera to a set of tables (reads latest positions from store).
@@ -739,11 +743,11 @@ export default function Canvas() {
             if (layoutMode === 'domain-overview') {
               const dims = getOverviewTableDimensions(tableSize);
               tableWidth = dims.width;
-              tableHeight = dims.height;
+              tableHeight = viewMode === 'compact' ? (OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6) : dims.height;
             } else {
               const multiplier = SIZE_MULTIPLIERS[tableSize];
               tableWidth = BASE_TABLE_WIDTH * multiplier.width;
-              tableHeight = BASE_TABLE_HEIGHT * multiplier.height;
+              tableHeight = viewMode === 'compact' ? 84 : (BASE_TABLE_HEIGHT * multiplier.height);
             }
             
             // Domain-overview: use same grid as layout engine so all groupings have uniform width
@@ -878,8 +882,12 @@ export default function Canvas() {
             // Find field indices for connection points
             const sourceTable = model.tables[rel.source.tableKey];
             const targetTable = model.tables[rel.target.tableKey];
-            const sourceFieldIndex = sourceTable?.fields.findIndex(f => f.name === rel.source.field);
-            const targetFieldIndex = targetTable?.fields.findIndex(f => f.name === rel.target.field);
+            const sourceFieldIndex = viewMode === 'compact'
+              ? undefined
+              : sourceTable?.fields.findIndex(f => f.name === rel.source.field);
+            const targetFieldIndex = viewMode === 'compact'
+              ? undefined
+              : targetTable?.fields.findIndex(f => f.name === rel.target.field);
             
             // Check if this relationship involves the selected field
             const involvesSelectedField = selectedField && (

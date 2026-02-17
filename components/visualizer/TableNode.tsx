@@ -89,7 +89,12 @@ export default function TableNode({
   const FOOTER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(12, Math.round(overviewDims.height * 0.16))
     : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
-  const TABLE_HEIGHT = isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT);
+  const compactTableHeight = isOverviewMode
+    ? Math.max(56, OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6)
+    : Math.max(84, HEADER_HEIGHT + FOOTER_HEIGHT);
+  const TABLE_HEIGHT = viewMode === 'compact'
+    ? compactTableHeight
+    : (isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT));
   const SCROLLABLE_AREA_HEIGHT = EXPANDED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT;
   
   // Progressive disclosure based on zoom level
@@ -103,7 +108,8 @@ export default function TableNode({
   
   // Determine what to show based on zoom level
   const zoomLevel = zoom; // Use actual zoom value from store
-  const showFields = zoomLevel >= ZOOM_THRESHOLDS.VERY_LOW; // Show fields if zoom >= 25%
+  const hideFieldsForCompactView = viewMode === 'compact';
+  const showFields = !hideFieldsForCompactView && zoomLevel >= ZOOM_THRESHOLDS.VERY_LOW; // Compact preset hides field rows
   const showFieldNames = zoomLevel >= ZOOM_THRESHOLDS.VERY_LOW; // Always show names if fields are visible
   const showDataTypes = zoomLevel >= ZOOM_THRESHOLDS.MEDIUM && (fieldDisplayMode !== 'minimal'); // Show types if zoom >= 60%
   const showFieldDescriptions = zoomLevel >= ZOOM_THRESHOLDS.HIGH && (viewMode === 'detailed' || (viewMode === 'standard' && isExpanded)); // Show descriptions if zoom >= 100%
@@ -246,7 +252,7 @@ export default function TableNode({
                 minHeight: 0,
               }}
             >
-              {table.fields.length > 0 ? (
+              {!hideFieldsForCompactView && table.fields.length > 0 ? (
                 <div
                   data-scrollable-table-fields
                   className="overflow-y-auto overflow-x-hidden scrollbar-thin px-2 py-1 box-border"
@@ -302,7 +308,7 @@ export default function TableNode({
                   className="flex items-center justify-center text-gray-400 text-xs italic"
                   style={{ height: contentH }}
                 >
-                  No fields
+                  {hideFieldsForCompactView ? 'Compact view' : 'No fields'}
                 </div>
               )}
             </div>
@@ -530,8 +536,14 @@ export default function TableNode({
               </div>
             ) : (
               <div className="flex items-center justify-center h-full text-gray-400 text-xs flex-col gap-1">
-                <div>Zoom in to see fields</div>
-                <div className="text-[10px] opacity-75">Current zoom: {Math.round(zoom * 100)}%</div>
+                {hideFieldsForCompactView ? (
+                  <div>Compact view hides fields</div>
+                ) : (
+                  <>
+                    <div>Zoom in to see fields</div>
+                    <div className="text-[10px] opacity-75">Current zoom: {Math.round(zoom * 100)}%</div>
+                  </>
+                )}
               </div>
             )}
 
@@ -556,7 +568,7 @@ export default function TableNode({
               </div>
               
               {/* Expand/Collapse Button - Dynamic size */}
-              {!isOverviewMode && (
+              {!isOverviewMode && !hideFieldsForCompactView && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

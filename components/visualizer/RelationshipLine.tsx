@@ -79,8 +79,15 @@ export default function RelationshipLine({
   const targetTable = model?.tables[relationship.target.tableKey];
   const sourceIsExpanded = sourceTable && !isOverviewMode ? expandedTables.has(sourceTable.key) : false;
   const targetIsExpanded = targetTable && !isOverviewMode ? expandedTables.has(targetTable.key) : false;
-  const sourceTableHeight = sourceIsExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT;
-  const targetTableHeight = targetIsExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT;
+  const compactTableHeight = isOverviewMode
+    ? Math.max(56, OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6)
+    : Math.max(84, HEADER_HEIGHT + FOOTER_HEIGHT);
+  const sourceTableHeight = viewMode === 'compact'
+    ? compactTableHeight
+    : (sourceIsExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT);
+  const targetTableHeight = viewMode === 'compact'
+    ? compactTableHeight
+    : (targetIsExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT);
 
   const ZOOM_THRESHOLDS = { VERY_LOW: 0.25, LOW: 0.4, MEDIUM: 0.6, HIGH: 1.0 };
   const zoomLevel = zoom;

@@ -1,0 +1,2822 @@
+{
+  "L1.currency_dim": {
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "currency_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_symbol": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "iso_numeric": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "minor_unit_decimals": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.country_dim": {
+    "country_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "country_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "region_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "basel_country_risk_weight": {
+      "type": "VARCHAR(255)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_developed_market": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_fatf_high_risk": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_ofac_sanctioned": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "iso_alpha_3": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "iso_numeric": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.region_dim": {
+    "region_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "region_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.regulatory_jurisdiction": {
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "jurisdiction_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.entity_type_dim": {
+    "entity_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "entity_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.credit_event_type_dim": {
+    "credit_event_type_code": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "credit_event_type_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "credit_event_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "default_trigger_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.credit_status_dim": {
+    "credit_status_code": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "credit_status_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "default_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "delinquency_bucket": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "status_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.exposure_type_dim": {
+    "exposure_type_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "exposure_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exposure_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.amendment_status_dim": {
+    "amendment_status_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "amendment_status_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "status_group": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_terminal_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.amendment_type_dim": {
+    "amendment_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "amendment_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.default_definition_dim": {
+    "default_definition_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "default_definition_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "days_past_due_threshold": {
+      "type": "VARCHAR(255)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "credit_event_trigger_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "materiality_threshold_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.maturity_bucket_dim": {
+    "maturity_bucket_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "bucket_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "bucket_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.fr2590_category_dim": {
+    "fr2590_category_code": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "category_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "definition": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "display_order": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.counterparty_role_dim": {
+    "counterparty_role_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "role_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "role_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_risk_bearing_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.rating_scale_dim": {
+    "rating_scale_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "scale_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.crm_type_dim": {
+    "crm_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "crm_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.source_system_registry": {
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "source_system_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "data_domain": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ingestion_frequency": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "system_owner": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.date_dim": {
+    "date_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "calendar_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "calendar_year": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "calendar_quarter": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "calendar_month": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "day_of_month": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "day_of_week": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "day_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fiscal_year": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fiscal_quarter": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fiscal_month": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_weekend": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_month_end": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_quarter_end": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_year_end": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_us_business_day": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_us_bank_holiday": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.date_time_dim": {
+    "date_time_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "date_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.date_dim(date_id)",
+      "nullable": false
+    },
+    "timestamp_utc": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hour_of_day": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "minute_of_hour": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "second_of_minute": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "timezone_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_dst": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.regulatory_capital_basis_dim": {
+    "regulatory_capital_basis_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "basis_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "basis_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.industry_dim": {
+    "industry_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "industry_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "industry_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "industry_level": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "industry_standard": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "parent_industry_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.industry_dim(industry_id)",
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.enterprise_business_taxonomy": {
+    "managed_segment_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "segment_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "segment_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "parent_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.enterprise_product_taxonomy": {
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "product_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "product_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "parent_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.portfolio_dim": {
+    "portfolio_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "portfolio_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "portfolio_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.org_unit_dim": {
+    "org_unit_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "org_unit_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "org_unit_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "parent_org_unit_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.rating_source": {
+    "rating_source_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "source_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.rating_grade_dim": {
+    "rating_grade_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "rating_scale_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.rating_scale_dim(rating_scale_id)",
+      "nullable": false
+    },
+    "grade_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "grade_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.collateral_type": {
+    "collateral_type_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.interest_rate_index_dim": {
+    "rate_index_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "index_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "index_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.ledger_account_dim": {
+    "ledger_account_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "account_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "account_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.context_dim": {
+    "context_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "context_domain": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "context_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "context_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.metric_definition_dim": {
+    "metric_definition_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "metric_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.counterparty": {
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "legal_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.country_dim(country_code)",
+      "nullable": false
+    },
+    "entity_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.entity_type_dim(entity_type_code)",
+      "nullable": false
+    },
+    "industry_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.industry_dim(industry_id)",
+      "nullable": false
+    }
+  },
+  "L1.legal_entity": {
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "legal_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.country_dim(country_code)",
+      "nullable": false
+    }
+  },
+  "L1.instrument_master": {
+    "instrument_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.country_dim(country_code)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.instrument_identifier": {
+    "instrument_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": "l1.instrument_master(instrument_id)",
+      "nullable": false
+    },
+    "id_type": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "effective_start_date": {
+      "type": "DATE",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "effective_end_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "id_value": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.credit_agreement_master": {
+    "credit_agreement_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "borrower_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "lender_legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "agreement_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "origination_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "status_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "agreement_reference": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.facility_master": {
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "credit_agreement_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.credit_agreement_master(credit_agreement_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "facility_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "facility_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "committed_facility_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "origination_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "portfolio_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.portfolio_dim(portfolio_id)",
+      "nullable": false
+    },
+    "industry_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_business_taxonomy(managed_segment_id)",
+      "nullable": false
+    },
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_product_taxonomy(product_node_id)",
+      "nullable": false
+    },
+    "rate_index_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.interest_rate_index_dim(rate_index_id)",
+      "nullable": false
+    },
+    "ledger_account_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.ledger_account_dim(ledger_account_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.contract_master": {
+    "contract_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "contract_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "contract_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "effective_start_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.netting_agreement": {
+    "netting_agreement_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    }
+  },
+  "L1.netting_set": {
+    "netting_set_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "netting_agreement_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.netting_agreement(netting_agreement_id)",
+      "nullable": false
+    }
+  },
+  "L1.netting_set_link": {
+    "netting_set_link_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "netting_set_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.netting_set(netting_set_id)",
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    }
+  },
+  "L1.csa_master": {
+    "csa_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    }
+  },
+  "L1.margin_agreement": {
+    "margin_agreement_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    }
+  },
+  "L1.collateral_asset_master": {
+    "collateral_asset_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "collateral_type_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.collateral_type(collateral_type_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.country_dim(country_code)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    }
+  },
+  "L1.collateral_link": {
+    "collateral_link_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "collateral_asset_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.collateral_asset_master(collateral_asset_id)",
+      "nullable": false
+    },
+    "anchor_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "anchor_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    }
+  },
+  "L1.collateral_eligibility_dim": {
+    "collateral_eligibility_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "collateral_type_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.collateral_type(collateral_type_id)",
+      "nullable": false
+    },
+    "effective_from_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "effective_to_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "eligible_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": false
+    },
+    "regulatory_capital_basis_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.regulatory_capital_basis_dim(regulatory_capital_basis_id)",
+      "nullable": false
+    }
+  },
+  "L1.collateral_haircut_dim": {
+    "collateral_haircut_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "collateral_type_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.collateral_type(collateral_type_id)",
+      "nullable": false
+    },
+    "effective_from_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "effective_to_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "haircut_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": false
+    },
+    "maturity_bucket_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.maturity_bucket_dim(maturity_bucket_id)",
+      "nullable": false
+    },
+    "regulatory_capital_basis_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.regulatory_capital_basis_dim(regulatory_capital_basis_id)",
+      "nullable": false
+    }
+  },
+  "L1.crm_eligibility_dim": {
+    "crm_eligibility_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "crm_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.crm_type_dim(crm_type_code)",
+      "nullable": false
+    },
+    "effective_from_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "effective_to_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "eligible_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": false
+    },
+    "regulatory_capital_basis_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.regulatory_capital_basis_dim(regulatory_capital_basis_id)",
+      "nullable": false
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    }
+  },
+  "L1.crm_protection_master": {
+    "protection_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "crm_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.crm_type_dim(crm_type_code)",
+      "nullable": false
+    },
+    "beneficiary_legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "notional_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "enforceable_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.protection_link": {
+    "protection_link_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "protection_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.crm_protection_master(protection_id)",
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    }
+  },
+  "L1.risk_mitigant_type_dim": {
+    "risk_mitigant_subtype_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "subtype_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.risk_mitigant_master": {
+    "risk_mitigant_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "risk_mitigant_subtype_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.risk_mitigant_type_dim(risk_mitigant_subtype_code)",
+      "nullable": false
+    }
+  },
+  "L1.risk_mitigant_link": {
+    "risk_mitigant_link_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "risk_mitigant_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.risk_mitigant_master(risk_mitigant_id)",
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    }
+  },
+  "L1.collateral_portfolio": {
+    "collateral_portfolio_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "portfolio_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.portfolio_dim(portfolio_id)",
+      "nullable": false
+    },
+    "description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_business_taxonomy(managed_segment_id)",
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.counterparty_hierarchy": {
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "immediate_parent_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "ultimate_parent_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "ownership_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.legal_entity_hierarchy": {
+    "hierarchy_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "parent_legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    }
+  },
+  "L1.control_relationship": {
+    "control_relationship_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "parent_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "subsidiary_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    }
+  },
+  "L1.economic_interdependence_relationship": {
+    "econ_interdep_relationship_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id_1": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "counterparty_id_2": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    }
+  },
+  "L1.credit_agreement_counterparty_participation": {
+    "agreement_participation_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "credit_agreement_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.credit_agreement_master(credit_agreement_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "counterparty_role_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.counterparty_role_dim(counterparty_role_code)",
+      "nullable": false
+    },
+    "is_primary_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "participation_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "source_record_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.facility_counterparty_participation": {
+    "facility_participation_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "counterparty_role_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.counterparty_role_dim(counterparty_role_code)",
+      "nullable": false
+    }
+  },
+  "L1.sccl_counterparty_group": {
+    "sccl_group_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "group_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.sccl_counterparty_group_member": {
+    "member_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "sccl_group_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.sccl_counterparty_group(sccl_group_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.limit_rule": {
+    "limit_rule_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "rule_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rule_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.limit_threshold": {
+    "limit_threshold_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "limit_rule_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.limit_rule(limit_rule_id)",
+      "nullable": false
+    },
+    "threshold_value": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.fx_rate": {
+    "fx_rate_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "from_currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "to_currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "rate": {
+      "type": "DECIMAL(18,10)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "effective_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "loaded_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "provider": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.run_control": {
+    "run_control_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "run_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.report_registry": {
+    "report_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "report_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "report_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.reporting_calendar_dim": {
+    "reporting_calendar_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "calendar_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "calendar_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.reporting_entity_dim": {
+    "reporting_entity_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "entity_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "entity_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.model_registry_dim": {
+    "model_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "model_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "model_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.rule_registry": {
+    "rule_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "rule_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rule_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.validation_check_registry": {
+    "check_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "check_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "check_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "check_rule_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.rule_registry(rule_id)",
+      "nullable": false
+    },
+    "target_table": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "target_column": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "severity": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "owner_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.reconciliation_control": {
+    "reconciliation_control_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "control_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.regulatory_mapping": {
+    "regulatory_mapping_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "mapping_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.report_cell_definition": {
+    "report_cell_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "report_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.report_registry(report_id)",
+      "nullable": false
+    },
+    "cell_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "cell_definition": {
+      "type": "TEXT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.rating_mapping": {
+    "rating_mapping_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "rating_scale_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.rating_scale_dim(rating_scale_id)",
+      "nullable": false
+    },
+    "rating_source_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.rating_source(rating_source_id)",
+      "nullable": false
+    },
+    "external_rating": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "internal_grade_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.rating_grade_dim(rating_grade_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.scenario_dim": {
+    "scenario_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "scenario_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "scenario_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "scenario_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "source_system_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.source_system_registry(source_system_id)",
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  }
+}

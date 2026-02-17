@@ -184,6 +184,25 @@ function buildRelationships(): Array<{
   return relationships;
 }
 
+/** Build per-table, per-column metadata (types, PKs, FKs) for the API to use. */
+function buildTableMetadata(): Record<string, Record<string, { type: string; pk: boolean; fk: string | null; nullable: boolean }>> {
+  const metadata: Record<string, Record<string, { type: string; pk: boolean; fk: string | null; nullable: boolean }>> = {};
+  for (const t of L1_TABLES) {
+    const tableKey = `L1.${t.tableName}`;
+    const cols: Record<string, { type: string; pk: boolean; fk: string | null; nullable: boolean }> = {};
+    for (const col of t.columns) {
+      cols[col.name] = {
+        type: col.type,
+        pk: !!col.pk,
+        fk: col.fk || null,
+        nullable: col.nullable !== false,
+      };
+    }
+    metadata[tableKey] = cols;
+  }
+  return metadata;
+}
+
 function main() {
   if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -216,13 +235,15 @@ function main() {
   }
 
   const relationships = buildRelationships();
+  const tableMetadata = buildTableMetadata();
 
   fs.writeFileSync(path.join(OUT_DIR, 'ddl.sql'), ddlParts.join('\n'), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'seed.sql'), seedParts.join('\n'), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'sample-data.json'), JSON.stringify(sampleData, null, 2), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'relationships.json'), JSON.stringify(relationships, null, 2), 'utf-8');
+  fs.writeFileSync(path.join(OUT_DIR, 'table-metadata.json'), JSON.stringify(tableMetadata, null, 2), 'utf-8');
 
-  console.log(`Generated: ${OUT_DIR}/ddl.sql, seed.sql, sample-data.json, relationships.json`);
+  console.log(`Generated: ${OUT_DIR}/ddl.sql, seed.sql, sample-data.json, relationships.json, table-metadata.json`);
   console.log(`Tables: ${L1_TABLES.length}, Relationships: ${relationships.length}`);
 }
 

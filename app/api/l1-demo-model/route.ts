@@ -9,8 +9,13 @@ const L1_OUTPUT_DIR = path.join(process.cwd(), 'scripts/l1/output');
 const L2_OUTPUT_DIR = path.join(process.cwd(), 'scripts/l2/output');
 const L1_SAMPLE_DATA_PATH = path.join(L1_OUTPUT_DIR, 'sample-data.json');
 const L1_RELATIONSHIPS_PATH = path.join(L1_OUTPUT_DIR, 'relationships.json');
+const L1_METADATA_PATH = path.join(L1_OUTPUT_DIR, 'table-metadata.json');
 const L2_SAMPLE_DATA_PATH = path.join(L2_OUTPUT_DIR, 'sample-data.json');
 const L2_RELATIONSHIPS_PATH = path.join(L2_OUTPUT_DIR, 'relationships.json');
+const L2_METADATA_PATH = path.join(L2_OUTPUT_DIR, 'table-metadata.json');
+
+type ColumnMeta = { type: string; pk: boolean; fk: string | null; nullable: boolean };
+type TableMetadata = Record<string, Record<string, ColumnMeta>>;
 
 function loadJsonIfExists<T>(filePath: string, defaultValue: T): T {
   if (!fs.existsSync(filePath)) return defaultValue;
@@ -78,17 +83,21 @@ export async function GET() {
     {}
   );
   let l1Relationships: Relationship[] = loadJsonIfExists(L1_RELATIONSHIPS_PATH, []);
+  const l1Meta: TableMetadata = loadJsonIfExists(L1_METADATA_PATH, {});
 
   let l2Data: Record<string, { columns: string[]; rows: unknown[][] }> = {};
   let l2Relationships: Relationship[] = [];
+  let l2Meta: TableMetadata = {};
   const hasL2 = fs.existsSync(L2_SAMPLE_DATA_PATH);
   if (hasL2) {
     l2Data = loadJsonIfExists(L2_SAMPLE_DATA_PATH, {});
     l2Relationships = loadJsonIfExists(L2_RELATIONSHIPS_PATH, []);
+    l2Meta = loadJsonIfExists(L2_METADATA_PATH, {});
   }
 
   const data = { ...l1Data, ...l2Data };
   const relationships = [...l1Relationships, ...l2Relationships];
+  const allMeta: TableMetadata = { ...l1Meta, ...l2Meta };
 
   const tables: DataModel['tables'] = {};
   const categorySet = new Set<string>();
@@ -112,19 +121,22 @@ export async function GET() {
         });
       }
     }
+    const tableMeta = allMeta[tableKey] ?? {};
     tables[tableKey] = {
       key: tableKey,
       name: tableName,
       layer: layer as 'L1' | 'L2',
       category,
       fields: columns.map((name, i) => {
-        const isFK = sourceFieldSet.has(`${tableKey}.${name}`);
+        const meta = tableMeta[name];
+        const isFK = sourceFieldSet.has(`${tableKey}.${name}`) || (meta?.fk ? true : false);
         const fkTarget = fkTargetByField.get(name);
         return {
           name,
           description: '',
-          isPK: i === 0,
+          isPK: meta ? meta.pk : (i === 0),
           isFK,
+          dataType: meta?.type ?? '',
           ...(fkTarget && { fkTarget }),
         };
       }),

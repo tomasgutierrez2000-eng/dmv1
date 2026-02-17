@@ -306,6 +306,9 @@ export default function Canvas() {
         }
       }
 
+      // In compact view, only show primary (FK→PK) relationships; hide secondary/derived
+      if (viewMode === 'compact' && rel.relationshipType !== 'primary') return false;
+
       // Respect relationship type filters (primary/secondary)
       if (rel.relationshipType === 'primary' && !showPrimaryRelationships) return false;
       if (rel.relationshipType === 'secondary' && !showSecondaryRelationships) return false;
@@ -318,7 +321,7 @@ export default function Canvas() {
       return sourceVisible && targetVisible && sourceHasPos && targetHasPos;
     });
   }, [
-    model, focusMode, showRelationships, showPrimaryRelationships, showSecondaryRelationships,
+    model, focusMode, viewMode, showRelationships, showPrimaryRelationships, showSecondaryRelationships,
     selectedRelationship, selectedField, selectedTable, visibleTables, tablePositions,
   ]);
 

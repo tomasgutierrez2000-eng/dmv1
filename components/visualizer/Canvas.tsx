@@ -164,6 +164,24 @@ export default function Canvas() {
     setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, layoutMode, tableSize, runFitToView]);
 
+  // When user searches: fit view to search results so they're in view without scrolling.
+  // Run after a short delay so positions are ready and the filter has been applied.
+  useEffect(() => {
+    if (!searchQuery.trim() || !model || visibleTables.length === 0 || savedPositionsRef.current) return;
+    const tablesToFit = visibleTables;
+    const id = setTimeout(() => {
+      const currentPositions = useModelStore.getState().tablePositions;
+      const positions = tablesToFit
+        .map((t) => currentPositions[t.key])
+        .filter((p): p is TablePosition => !!p);
+      if (positions.length === 0) return;
+      setIsAnimating(true);
+      runFitToView(positions, tablesToFit.length);
+      setTimeout(() => setIsAnimating(false), 350);
+    }, 100);
+    return () => clearTimeout(id);
+  }, [searchQuery, model, visibleTables, runFitToView]);
+
   // Filter relationships to only show between visible tables with valid positions.
   // Memoized so downstream consumers (focusVisibleTableKeys, JSX) don't recompute every render.
   const visibleRelationships = useMemo(() => {
@@ -440,6 +458,11 @@ export default function Canvas() {
     const el = containerRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      // Let wheel scroll table card field lists instead of zooming (native listener runs before React)
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.('[data-scrollable-table-fields]')) {
+        return; // don't preventDefault so the card content can scroll
+      }
       e.preventDefault();
       e.stopPropagation();
       isInteractingRef.current = true;

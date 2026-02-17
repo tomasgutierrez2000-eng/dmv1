@@ -8,23 +8,27 @@
 export interface ColumnMapping {
   // L1 Sheet columns
   L1: {
-    category: string[]; // e.g., ['uni', 'category', 'table category']
-    tableName: string[]; // e.g., ['table name', 'table_name']
-    dataElement: string[]; // e.g., ['data element', 'data_element', 'field']
-    description: string[]; // e.g., ['description', 'data element description']
-    whyRequired: string[]; // e.g., ['why required', 'why_required', 'business justification']
-    pkFk: string[]; // e.g., ['pk/fk mapping', 'pk_fk', 'key mapping']
+    category: string[];
+    tableName: string[];
+    dataElement: string[];
+    description: string[];
+    whyRequired: string[];
+    pkFk: string[];
+    type?: string[]; // e.g. ['type', 'TYPE', 'metric type'] -> "Metric L1" / "Metric L2" / "Metric L3"
+    dataType?: string[]; // e.g. ['data type', 'data_type', 'sql data type']
   };
-  
+
   // L2 Sheet columns
   L2: {
-    category: string[]; // e.g., ['table category', 'category', 'uni']
-    tableName: string[]; // e.g., ['table name', 'table_name']
-    dataElement: string[]; // e.g., ['data element', 'data_element', 'field']
-    description: string[]; // e.g., ['description', 'data element description']
-    whyRequired: string[]; // e.g., ['why required', 'why_required', 'business justification']
-    pkFk: string[]; // e.g., ['pk/fk mapping', 'pk_fk', 'key mapping']
-    simplificationNote: string[]; // e.g., ['simplification note', 'simplification_note', 'notes']
+    category: string[];
+    tableName: string[];
+    dataElement: string[];
+    description: string[];
+    whyRequired: string[];
+    pkFk: string[];
+    simplificationNote: string[];
+    type?: string[];
+    dataType?: string[];
   };
   
   // L3 Sheet columns
@@ -51,6 +55,8 @@ export const DEFAULT_COLUMN_MAPPING: ColumnMapping = {
     description: ['description', 'data element description', 'field description'],
     whyRequired: ['why required', 'why_required', 'business justification', 'justification'],
     pkFk: ['pk/fk mapping', 'pk_fk', 'pk_fk mapping', 'key mapping', 'key'],
+    type: ['type', 'TYPE', 'metric type', 'metric type level', 'row type', 'layer type'],
+    dataType: ['data type', 'data_type', 'sql data type', 'column type'],
   },
   L2: {
     category: ['table category', 'category', 'uni'],
@@ -60,6 +66,8 @@ export const DEFAULT_COLUMN_MAPPING: ColumnMapping = {
     whyRequired: ['why required', 'why_required', 'business justification', 'justification'],
     pkFk: ['pk/fk mapping', 'pk_fk', 'pk_fk mapping', 'key mapping', 'key'],
     simplificationNote: ['simplification note', 'simplification_note', 'notes', 'simplification'],
+    type: ['type', 'TYPE', 'metric type', 'metric type level', 'row type', 'layer type'],
+    dataType: ['data type', 'data_type', 'sql data type', 'column type'],
   },
   L3: {
     category: ['derived category', 'category', 'table category'],

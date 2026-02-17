@@ -20,6 +20,8 @@ interface FieldDefinition {
   why_required?: string;
   simplification_note?: string;
   data_type?: string;
+  /** Row/metric type from TYPE column (e.g. "Metric L1", "Metric L2", "Metric L3") */
+  metric_type?: string;
   formula?: string;
   source_tables?: Array<{ layer: string; table: string }>;
   source_fields?: string;
@@ -183,6 +185,8 @@ export async function POST(request: NextRequest) {
           const descriptionIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.description);
           const whyRequiredIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.whyRequired);
           const pkFkIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.pkFk);
+          const typeIdx = 'type' in EXCEL_TEMPLATE_COLUMN_MAPPING.L1 ? findColumnIndex(headers, (EXCEL_TEMPLATE_COLUMN_MAPPING.L1 as { type?: string[] }).type ?? []) : -1;
+          const dataTypeIdx = 'dataType' in EXCEL_TEMPLATE_COLUMN_MAPPING.L1 ? findColumnIndex(headers, (EXCEL_TEMPLATE_COLUMN_MAPPING.L1 as { dataType?: string[] }).dataType ?? []) : -1;
 
           // Group by table name
           const tableMap = new Map<string, { fields: FieldDefinition[]; category: string }>();
@@ -204,6 +208,8 @@ export async function POST(request: NextRequest) {
               description: row[descriptionIdx] ? String(row[descriptionIdx]).trim() : '',
               category: rowCategory,
               why_required: row[whyRequiredIdx] ? String(row[whyRequiredIdx]).trim() : undefined,
+              data_type: dataTypeIdx >= 0 && row[dataTypeIdx] ? String(row[dataTypeIdx]).trim() : undefined,
+              metric_type: typeIdx >= 0 && row[typeIdx] ? String(row[typeIdx]).trim() : undefined,
             };
 
             const pkFkValue = row[pkFkIdx] ? String(row[pkFkIdx]).trim() : null;
@@ -272,6 +278,8 @@ export async function POST(request: NextRequest) {
           const whyRequiredIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.whyRequired);
           const pkFkIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.pkFk);
           const simplificationIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.simplificationNote);
+          const typeIdxL2 = 'type' in EXCEL_TEMPLATE_COLUMN_MAPPING.L2 ? findColumnIndex(headers, (EXCEL_TEMPLATE_COLUMN_MAPPING.L2 as { type?: string[] }).type ?? []) : -1;
+          const dataTypeIdxL2 = 'dataType' in EXCEL_TEMPLATE_COLUMN_MAPPING.L2 ? findColumnIndex(headers, (EXCEL_TEMPLATE_COLUMN_MAPPING.L2 as { dataType?: string[] }).dataType ?? []) : -1;
 
           const tableMap = new Map<string, { fields: FieldDefinition[]; category: string }>();
 
@@ -293,6 +301,8 @@ export async function POST(request: NextRequest) {
               category: rowCategory,
               why_required: row[whyRequiredIdx] ? String(row[whyRequiredIdx]).trim() : undefined,
               simplification_note: row[simplificationIdx] ? String(row[simplificationIdx]).trim() : undefined,
+              data_type: dataTypeIdxL2 >= 0 && row[dataTypeIdxL2] ? String(row[dataTypeIdxL2]).trim() : undefined,
+              metric_type: typeIdxL2 >= 0 && row[typeIdxL2] ? String(row[typeIdxL2]).trim() : undefined,
             };
 
             const pkFkValue = row[pkFkIdx] ? String(row[pkFkIdx]).trim() : null;

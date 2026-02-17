@@ -80,6 +80,25 @@ export const EXCEL_TEMPLATE_COLUMN_MAPPING = {
       // ADD YOUR COLUMN NAMES HERE:
       // 'primary_key_foreign_key',
     ],
+
+    // Column that contains metric/row type (e.g. "Metric L1", "Metric L2", "Metric L3")
+    type: [
+      'type',
+      'TYPE',
+      'metric type',
+      'metric type level',
+      'row type',
+      'layer type',
+    ],
+
+    // Column that contains the field data type (e.g. VARCHAR(64), NUMERIC(20,4), DATE)
+    dataType: [
+      'data type',
+      'data_type',
+      'type',
+      'sql data type',
+      'column type',
+    ],
   },
 
   /**
@@ -146,6 +165,24 @@ export const EXCEL_TEMPLATE_COLUMN_MAPPING = {
       'notes',
       'simplification',
       // ADD YOUR COLUMN NAMES HERE:
+    ],
+
+    // Column that contains metric/row type (e.g. "Metric L1", "Metric L2", "Metric L3")
+    type: [
+      'type',
+      'TYPE',
+      'metric type',
+      'metric type level',
+      'row type',
+      'layer type',
+    ],
+
+    // Column that contains the field data type (e.g. VARCHAR(64), NUMERIC(20,4), DATE)
+    dataType: [
+      'data type',
+      'data_type',
+      'sql data type',
+      'column type',
     ],
   },
 

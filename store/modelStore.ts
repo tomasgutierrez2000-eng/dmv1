@@ -67,6 +67,8 @@ interface ModelStore {
   setShowSecondaryRelationships: (show: boolean) => void;
   applyViewPreset: (preset: 'overview' | 'detailed' | 'compact' | 'focus') => void;
   resetView: () => void;
+  requestFitToView: number;
+  setRequestFitToView: () => void;
 }
 
 export const useModelStore = create<ModelStore>((set) => ({
@@ -90,8 +92,9 @@ export const useModelStore = create<ModelStore>((set) => ({
   layoutMode: 'domain-overview',
   expandedDomains: new Set<string>(), // All domains expanded by default
   viewMode: 'standard',
-  tableSize: 'medium',
+  tableSize: 'large',
   fieldDisplayMode: 'standard',
+  requestFitToView: 0,
   showRelationships: true, // Show relationships by default
   showPrimaryRelationships: true, // Show primary relationships by default
   showSecondaryRelationships: true, // Show secondary relationships by default
@@ -236,4 +239,5 @@ export const useModelStore = create<ModelStore>((set) => ({
       selectedField: null,
       focusMode: false,
     }),
+  setRequestFitToView: () => set({ requestFitToView: Date.now() }),
 }));

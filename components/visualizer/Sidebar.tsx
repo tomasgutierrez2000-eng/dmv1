@@ -22,22 +22,6 @@ export default function Sidebar() {
 
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
-  const statistics = useMemo(() => {
-    if (!model) return null;
-    const tables = Object.values(model.tables);
-    return {
-      totalTables: tables.length,
-      totalFields: tables.reduce((sum, t) => sum + t.fields.length, 0),
-      totalRelationships: model.relationships.length,
-      totalCategories: model.categories.length,
-      byLayer: {
-        L1: tables.filter((t) => t.layer === 'L1').length,
-        L2: tables.filter((t) => t.layer === 'L2').length,
-        L3: tables.filter((t) => t.layer === 'L3').length,
-      },
-    };
-  }, [model]);
-
   const filteredTables = useMemo(() => {
     if (!model) return [];
     return Object.values(model.tables).filter((table) => {
@@ -65,6 +49,27 @@ export default function Sidebar() {
     return grouped;
   }, [filteredTables]);
 
+  // Dynamic stats: reflect current layer/category/search filters
+  const visibleStatistics = useMemo(() => {
+    if (!model) return null;
+    const visibleKeys = new Set(filteredTables.map((t) => t.key));
+    const visibleRels = model.relationships.filter(
+      (r) => visibleKeys.has(r.source.tableKey) && visibleKeys.has(r.target.tableKey)
+    );
+    const visibleCats = new Set(filteredTables.map((t) => t.category));
+    return {
+      totalTables: filteredTables.length,
+      totalFields: filteredTables.reduce((sum, t) => sum + t.fields.length, 0),
+      totalRelationships: visibleRels.length,
+      totalCategories: visibleCats.size,
+      byLayer: {
+        L1: filteredTables.filter((t) => t.layer === 'L1').length,
+        L2: filteredTables.filter((t) => t.layer === 'L2').length,
+        L3: filteredTables.filter((t) => t.layer === 'L3').length,
+      },
+    };
+  }, [model, filteredTables]);
+
   if (!sidebarOpen) {
     return (
       <button
@@ -77,10 +82,10 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full shadow-lg">
+    <div className="w-96 bg-white border-r border-gray-200 flex flex-col h-full shadow-lg">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">Bank Data Model Explorer</h2>
+        <h2 className="text-xl font-bold text-gray-900">Bank Data Model Explorer</h2>
         <button
           onClick={() => setSidebarOpen(false)}
           className="text-gray-500 hover:text-gray-900"
@@ -89,32 +94,32 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Statistics */}
-      {statistics && (
+      {/* Statistics - dynamic based on layer/category/search filters */}
+      {visibleStatistics && (
         <div className="p-4 border-b border-gray-200 space-y-3">
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="bg-gray-50 rounded p-2 border border-gray-100">
-              <div className="text-gray-500 text-xs">Tables</div>
-              <div className="text-gray-900 font-bold">{statistics.totalTables}</div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <div className="text-gray-500 text-xs uppercase tracking-wide">Tables</div>
+              <div className="text-gray-900 font-bold text-lg mt-0.5">{visibleStatistics.totalTables}</div>
             </div>
-            <div className="bg-gray-50 rounded p-2 border border-gray-100">
-              <div className="text-gray-500 text-xs">Fields</div>
-              <div className="text-gray-900 font-bold">{statistics.totalFields}</div>
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <div className="text-gray-500 text-xs uppercase tracking-wide">Fields</div>
+              <div className="text-gray-900 font-bold text-lg mt-0.5">{visibleStatistics.totalFields}</div>
             </div>
-            <div className="bg-gray-50 rounded p-2 border border-gray-100">
-              <div className="text-gray-500 text-xs">Relationships</div>
-              <div className="text-gray-900 font-bold">{statistics.totalRelationships}</div>
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <div className="text-gray-500 text-xs uppercase tracking-wide">Relationships</div>
+              <div className="text-gray-900 font-bold text-lg mt-0.5">{visibleStatistics.totalRelationships}</div>
             </div>
-            <div className="bg-gray-50 rounded p-2 border border-gray-100">
-              <div className="text-gray-500 text-xs">Categories</div>
-              <div className="text-gray-900 font-bold">{statistics.totalCategories}</div>
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <div className="text-gray-500 text-xs uppercase tracking-wide">Categories</div>
+              <div className="text-gray-900 font-bold text-lg mt-0.5">{visibleStatistics.totalCategories}</div>
             </div>
           </div>
           {/* Relationship Debug Info */}
           {model && (() => {
             const debug = debugRelationships(model);
             const visibleTableKeys = new Set(filteredTables.map((t) => t.key));
-            const visibleRels = model.relationships.filter((rel) => 
+            const visibleRels = model.relationships.filter((rel) =>
               visibleTableKeys.has(rel.source.tableKey) && visibleTableKeys.has(rel.target.tableKey)
             );
             

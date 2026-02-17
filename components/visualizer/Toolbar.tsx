@@ -28,6 +28,7 @@ export default function Toolbar() {
     zoom,
     setZoom,
     resetView,
+    setRequestFitToView,
     viewMode,
     setViewMode,
     tableSize,
@@ -81,12 +82,9 @@ export default function Toolbar() {
           <RotateCcw className="w-4 h-4" />
         </button>
         <button
-          onClick={() => {
-            // Fit to view - will be handled by canvas
-            resetView();
-          }}
+          onClick={() => setRequestFitToView()}
           className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title="Fit to View"
+          title="Fit to View (fits visible tables and zooms in when filtered)"
         >
           <Maximize2 className="w-4 h-4" />
         </button>

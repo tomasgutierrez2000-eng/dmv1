@@ -98,15 +98,15 @@ export default function VisualizerPage() {
         {/* Canvas Area */}
         <div className="flex-1 relative">
           {!model && !loading && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="max-w-md w-full p-8">
-                <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                  <p className="text-sm text-gray-600 mb-3">View L1 banking data schema and sample data (no upload required):</p>
+            <div className="absolute inset-0 flex items-center justify-center p-6">
+              <div className="max-w-2xl w-full">
+                <div className="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow-md">
+                  <p className="text-lg text-gray-700 mb-4">View L1 banking data schema and sample data (no upload required):</p>
                   <button
                     type="button"
                     onClick={loadL1Demo}
                     disabled={demoLoading}
-                    className="w-full py-2.5 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium text-sm"
+                    className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-base"
                   >
                     {demoLoading ? 'Loading…' : 'Load L1 bank data demo (78 tables)'}
                   </button>
@@ -116,20 +116,20 @@ export default function VisualizerPage() {
                   currentFile={null}
                 />
                 {result?.error && (
-                  <div className="mt-4 bg-red-900/30 border border-red-700 rounded-lg p-4">
-                    <div className="flex items-start space-x-3">
-                      <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-5">
+                    <div className="flex items-start space-x-4">
+                      <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <h3 className="font-semibold text-red-400 mb-1">Parse Error</h3>
-                        <p className="text-sm text-red-300">{result.error}</p>
+                        <h3 className="font-semibold text-red-800 mb-1 text-base">Parse Error</h3>
+                        <p className="text-base text-red-700">{result.error}</p>
                       </div>
                     </div>
                   </div>
                 )}
                 {result?.statistics && (
-                  <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-green-800 mb-2">Parse Successful!</h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                  <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-5">
+                    <h3 className="font-semibold text-green-800 mb-3 text-base">Parse successful</h3>
+                    <div className="grid grid-cols-2 gap-3 text-base text-gray-700">
                       <div><span className="text-gray-500">Tables:</span> <span className="font-bold">{result.statistics.tables}</span></div>
                       <div><span className="text-gray-500">Fields:</span> <span className="font-bold">{result.statistics.fields}</span></div>
                       <div><span className="text-gray-500">Relationships:</span> <span className="font-bold">{result.statistics.relationships}</span></div>
@@ -142,10 +142,10 @@ export default function VisualizerPage() {
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/90">
               <div className="text-center">
-                <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-                <p className="text-gray-600">Parsing Excel file...</p>
+                <Loader className="w-12 h-12 animate-spin mx-auto mb-5 text-blue-600" />
+                <p className="text-lg text-gray-600 font-medium">Parsing Excel file…</p>
               </div>
             </div>
           )}

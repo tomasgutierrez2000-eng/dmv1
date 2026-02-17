@@ -6,28 +6,28 @@ export type TableSize = 'small' | 'medium' | 'large';
 
 export type VisibleLayers = { L1: boolean; L2: boolean; L3: boolean };
 
-/** Overview table dimensions by size (used by layout, Canvas, and TableNode) */
+/** Overview table dimensions by size (used by layout, Canvas, and TableNode) - larger for readability */
 export function getOverviewTableDimensions(tableSize: TableSize): { width: number; height: number } {
   switch (tableSize) {
-    case 'small': return { width: 130, height: 70 };
-    case 'medium': return { width: 150, height: 80 };
-    case 'large': return { width: 170, height: 92 };
-    default: return { width: 150, height: 80 };
+    case 'small': return { width: 150, height: 82 };
+    case 'medium': return { width: 180, height: 96 };
+    case 'large': return { width: 200, height: 108 };
+    default: return { width: 180, height: 96 };
   }
 }
 
 // Base dimensions - will be adjusted by view mode
 // Note: Actual table dimensions are now dynamic based on tableSize setting
 // These are used for layout calculations
-const BASE_TABLE_WIDTH = 480;
-const BASE_TABLE_HEIGHT = 280;
-const BASE_SPACING = 80;
+const BASE_TABLE_WIDTH = 560;
+const BASE_TABLE_HEIGHT = 320;
+const BASE_SPACING = 88;
 
-// Size multipliers for layout calculations
+// Size multipliers for layout calculations (aligned with TableNode)
 const SIZE_MULTIPLIERS = {
-  small: { width: 0.75, height: 0.85, spacing: 0.7 },
+  small: { width: 0.8, height: 0.9, spacing: 0.8 },
   medium: { width: 1.0, height: 1.0, spacing: 1.0 },
-  large: { width: 1.3, height: 1.2, spacing: 1.2 },
+  large: { width: 1.35, height: 1.25, spacing: 1.2 },
 };
 
 // Default to medium for layout calculations (can be made dynamic later)

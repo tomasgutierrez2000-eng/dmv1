@@ -21,18 +21,18 @@ interface TableNodeProps {
   onFieldSelect?: (tableKey: string, fieldName: string) => void;
 }
 
-// Base dimensions - will be adjusted by view mode
-const BASE_TABLE_WIDTH = 480;
-const BASE_COLLAPSED_HEIGHT = 280;
-const BASE_EXPANDED_HEIGHT = 520;
-const BASE_HEADER_HEIGHT = 52;
-const BASE_FOOTER_HEIGHT = 44;
+// Base dimensions - larger defaults so boxes and text use more screen
+const BASE_TABLE_WIDTH = 560;
+const BASE_COLLAPSED_HEIGHT = 320;
+const BASE_EXPANDED_HEIGHT = 600;
+const BASE_HEADER_HEIGHT = 56;
+const BASE_FOOTER_HEIGHT = 48;
 
-// Size multipliers
+// Size multipliers (large = noticeably bigger for focus/detailed use)
 const SIZE_MULTIPLIERS = {
-  small: { width: 0.75, height: 0.85 },
+  small: { width: 0.8, height: 0.9 },
   medium: { width: 1.0, height: 1.0 },
-  large: { width: 1.3, height: 1.2 },
+  large: { width: 1.35, height: 1.25 },
 };
 
 export default function TableNode({
@@ -119,14 +119,14 @@ export default function TableNode({
   const isDetailed = !isOverviewMode && viewMode === 'detailed' && zoomLevel >= ZOOM_THRESHOLDS.HIGH;
   
   // Dynamic sizing based on view mode
-  const headerPadding = isCompact ? 'px-2.5 py-1.5' : isDetailed ? 'px-4 py-3' : 'px-3 py-2';
+  const headerPadding = isCompact ? 'px-2.5 py-1.5' : isDetailed ? 'px-4 py-3' : 'px-3.5 py-2.5';
   const headerIconSize = isCompact ? 'w-3 h-3' : isDetailed ? 'w-5 h-5' : 'w-4 h-4';
-  const headerTextSize = isCompact ? 'text-xs' : isDetailed ? 'text-base' : 'text-sm';
-  const fieldPadding = isCompact ? 'px-1.5 py-1' : isDetailed ? 'px-3 py-2' : 'px-2 py-1.5';
-  const fieldTextSize = isCompact ? 'text-[10px]' : isDetailed ? 'text-xs' : 'text-[10px]';
-  const fieldIconSize = isCompact ? 'w-2.5 h-2.5' : isDetailed ? 'w-3.5 h-3.5' : 'w-3 h-3';
+  const headerTextSize = isCompact ? 'text-xs' : isDetailed ? 'text-lg' : 'text-base';
+  const fieldPadding = isCompact ? 'px-1.5 py-1' : isDetailed ? 'px-3 py-2' : 'px-2.5 py-1.5';
+  const fieldTextSize = isCompact ? 'text-[10px]' : isDetailed ? 'text-sm' : 'text-xs';
+  const fieldIconSize = isCompact ? 'w-2.5 h-2.5' : isDetailed ? 'w-4 h-4' : 'w-3.5 h-3.5';
   const footerPadding = isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-2' : 'px-3 py-1.5';
-  const footerTextSize = isCompact ? 'text-[9px]' : isDetailed ? 'text-[11px]' : 'text-[10px]';
+  const footerTextSize = isCompact ? 'text-[9px]' : isDetailed ? 'text-xs' : 'text-[11px]';
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -240,8 +240,7 @@ export default function TableNode({
                   maxHeight: isOverviewMode ? COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT : (isExpanded ? SCROLLABLE_AREA_HEIGHT : COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT),
                 }}
                 onWheel={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
+                  e.stopPropagation(); // prevent canvas zoom; do NOT preventDefault so this div can scroll
                 }}
               >
                 {/* Compact table-like display for better horizontal scanning */}

@@ -48,102 +48,10 @@ export default function Canvas() {
     setFocusMode,
     toggleExpandedTable,
     resetView,
+    requestFitToView,
   } = useModelStore();
 
-  // Apply layout when model, layout mode, or table size changes
-  useEffect(() => {
-    if (!model) return;
-    
-    // Recalculate layout - force recalculation to spread tables horizontally
-    const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers);
-    
-    // Update all positions to ensure proper horizontal spread
-    // This ensures tables are spread across the page when layout mode changes
-    Object.entries(newPositions).forEach(([key, pos]) => {
-      setTablePosition(key, pos);
-    });
-    
-    // Auto-focus: Calculate center of all tables and pan/zoom to show them
-    const positions = Object.values(newPositions);
-    if (positions.length > 0) {
-      // Get dynamic table dimensions based on tableSize
-      const BASE_TABLE_WIDTH = 480;
-      const BASE_TABLE_HEIGHT = 280;
-      const SIZE_MULTIPLIERS = {
-        small: { width: 0.75, height: 0.85 },
-        medium: { width: 1.0, height: 1.0 },
-        large: { width: 1.3, height: 1.2 },
-      };
-      const overviewDims = getOverviewTableDimensions(tableSize);
-      const tableWidth = layoutMode === 'domain-overview' ? overviewDims.width : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
-      const tableHeight = layoutMode === 'domain-overview' ? overviewDims.height : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
-      
-      const minX = Math.min(...positions.map(p => p.x));
-      const maxX = Math.max(...positions.map(p => p.x + tableWidth));
-      const minY = Math.min(...positions.map(p => p.y));
-      const maxY = Math.max(...positions.map(p => p.y + tableHeight));
-      
-      const centerX = (minX + maxX) / 2;
-      const centerY = (minY + maxY) / 2;
-      const width = maxX - minX;
-      const height = maxY - minY;
-      
-      // Calculate zoom to fit all tables with padding
-      // Prioritize horizontal fit for better UX with horizontal layouts
-      const viewportWidth = containerRef.current?.clientWidth || 1200;
-      const viewportHeight = containerRef.current?.clientHeight || 800;
-      const padding = 80; // Reduced padding for better horizontal utilization
-      const zoomX = (viewportWidth - padding * 2) / width;
-      const zoomY = (viewportHeight - padding * 2) / height;
-      
-      // For horizontal layouts (especially domain view), prioritize horizontal visibility
-      const aspectRatio = width / height;
-      const viewportAspectRatio = viewportWidth / viewportHeight;
-      
-      let newZoom: number;
-      if (layoutMode === 'domain-overview') {
-        // Domain overview - zoom out significantly to see all domains at once
-        newZoom = Math.min(zoomX * 0.7, 0.5); // Zoom out to see overview
-      } else if (layoutMode === 'domain') {
-        // Domain view - prioritize showing maximum horizontal content
-        // Zoom out more to see all domains horizontally
-        newZoom = Math.min(zoomX * 0.85, 0.75); // Zoom out to see more horizontally
-      } else if (aspectRatio > viewportAspectRatio * 1.2) {
-        // Very horizontal layout - prioritize width fit
-        newZoom = Math.min(zoomX, 0.9);
-      } else {
-        // More balanced layout - use standard fit
-        newZoom = Math.min(zoomX, zoomY, 1.0);
-      }
-      
-      // Pan to center, ensuring we show the left edge for horizontal layouts
-      const panX = -(centerX * newZoom - viewportWidth / 2);
-      const panY = -(centerY * newZoom - viewportHeight / 2);
-      
-      // For domain view, ensure we show from the left edge
-      if (layoutMode === 'domain') {
-        const minPanX = -(minX * newZoom - padding);
-        const finalPanX = Math.max(panX, minPanX);
-        setPan({
-          x: finalPanX,
-          y: panY,
-        });
-      } else {
-        // Ensure we don't pan too far left (show start of horizontal layout)
-        const minPanX = -(minX * newZoom - padding);
-        const finalPanX = Math.max(panX, minPanX);
-        setPan({
-          x: finalPanX,
-          y: panY,
-        });
-      }
-      
-      setZoom(newZoom);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded to avoid layout thrash
-  }, [model, layoutMode, tableSize, visibleLayers, setTablePosition, setPan, setZoom]);
-
-  // Filter tables based on search, layer visibility, and categories
+  // Visible tables for fit-to-view (same filter as below)
   const visibleTables = useMemo(() => {
     if (!model) return [];
     return Object.values(model.tables).filter((table) => {
@@ -158,6 +66,96 @@ export default function Canvas() {
       return true;
     });
   }, [model, visibleLayers, filterCategories, searchQuery]);
+
+  // Fit view to a set of positions; when visible count is low, zoom in so boxes fill the screen
+  const runFitToView = useCallback(
+    (positionsToFit: Array<{ x: number; y: number }>, visibleCount: number) => {
+      if (positionsToFit.length === 0) return;
+      const BASE_TABLE_WIDTH = 560;
+      const BASE_TABLE_HEIGHT = 320;
+      const SIZE_MULTIPLIERS = {
+        small: { width: 0.8, height: 0.9 },
+        medium: { width: 1.0, height: 1.0 },
+        large: { width: 1.35, height: 1.25 },
+      };
+      const overviewDims = getOverviewTableDimensions(tableSize);
+      const tableWidth = layoutMode === 'domain-overview' ? overviewDims.width : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
+      const tableHeight = layoutMode === 'domain-overview' ? overviewDims.height : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
+
+      const minX = Math.min(...positionsToFit.map((p) => p.x));
+      const maxX = Math.max(...positionsToFit.map((p) => p.x + tableWidth));
+      const minY = Math.min(...positionsToFit.map((p) => p.y));
+      const maxY = Math.max(...positionsToFit.map((p) => p.y + tableHeight));
+      const centerX = (minX + maxX) / 2;
+      const centerY = (minY + maxY) / 2;
+      const width = maxX - minX;
+      const height = maxY - minY;
+
+      const viewportWidth = containerRef.current?.clientWidth || 1200;
+      const viewportHeight = containerRef.current?.clientHeight || 800;
+      const padding = 72;
+      const zoomX = (viewportWidth - padding * 2) / width;
+      const zoomY = (viewportHeight - padding * 2) / height;
+      const aspectRatio = width / height;
+      const viewportAspectRatio = viewportWidth / viewportHeight;
+
+      let newZoom: number;
+      if (layoutMode === 'domain-overview') {
+        newZoom = Math.min(zoomX * 0.72, 0.55);
+      } else if (layoutMode === 'domain') {
+        newZoom = Math.min(zoomX * 0.88, 0.8);
+      } else if (aspectRatio > viewportAspectRatio * 1.2) {
+        newZoom = Math.min(zoomX, 0.95);
+      } else {
+        newZoom = Math.min(zoomX, zoomY, 1.05);
+      }
+      // When few tables are visible (e.g. after filter), zoom in so boxes take more screen
+      if (visibleCount <= 6) {
+        newZoom = Math.max(0.95, Math.min(newZoom, 1.4));
+      } else if (visibleCount <= 15) {
+        newZoom = Math.max(0.88, Math.min(newZoom, 1.2));
+      } else if (visibleCount <= 30) {
+        newZoom = Math.max(0.75, newZoom);
+      }
+
+      const panX = -(centerX * newZoom - viewportWidth / 2);
+      const panY = -(centerY * newZoom - viewportHeight / 2);
+      const minPanX = -(minX * newZoom - padding);
+      const finalPanX = Math.max(panX, minPanX);
+      setPan({ x: finalPanX, y: panY });
+      setZoom(newZoom);
+    },
+    [layoutMode, tableSize, setPan, setZoom]
+  );
+
+  // Apply layout when model, layout mode, table size, or visible layers change
+  useEffect(() => {
+    if (!model) return;
+    const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers);
+    Object.entries(newPositions).forEach(([key, pos]) => {
+      setTablePosition(key, pos);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
+  }, [model, layoutMode, tableSize, visibleLayers, setTablePosition]);
+
+  // Fit to visible tables when layout or filters change (so filtered/small sets fill the screen)
+  useEffect(() => {
+    if (!model || visibleTables.length === 0) return;
+    const positionsForFit = visibleTables
+      .map((t) => tablePositions[t.key])
+      .filter((p): p is TablePosition => !!p);
+    if (positionsForFit.length === 0) return;
+    runFitToView(positionsForFit, visibleTables.length);
+  }, [model, visibleTables, tablePositions, layoutMode, tableSize, runFitToView]);
+
+  // Fit to view when user clicks toolbar "Fit to View"
+  useEffect(() => {
+    if (!model || !requestFitToView) return;
+    const positionsForFit = visibleTables
+      .map((t) => tablePositions[t.key])
+      .filter((p): p is TablePosition => !!p);
+    runFitToView(positionsForFit, visibleTables.length);
+  }, [requestFitToView, model, visibleTables, tablePositions, runFitToView]);
 
   // Filter relationships to only show between visible tables with valid positions
   // Also filter by relationship visibility settings and focus mode
@@ -294,25 +292,10 @@ export default function Canvas() {
   // Handle double-click to fit view
   const handleDoubleClick = useCallback(() => {
     if (!model || visibleTables.length === 0) return;
-    resetView();
-    // Calculate bounding box and fit
-    const positions = visibleTables.map((t) => tablePositions[t.key] || { x: 0, y: 0 });
+    const positions = visibleTables.map((t) => tablePositions[t.key]).filter(Boolean) as TablePosition[];
     if (positions.length === 0) return;
-    const minX = Math.min(...positions.map((p) => p.x));
-    const maxX = Math.max(...positions.map((p) => p.x + 280));
-    const minY = Math.min(...positions.map((p) => p.y));
-    const maxY = Math.max(...positions.map((p) => p.y + 400));
-    const width = maxX - minX;
-    const height = maxY - minY;
-    const containerWidth = containerRef.current?.clientWidth || 1200;
-    const containerHeight = containerRef.current?.clientHeight || 800;
-    const scale = Math.min(containerWidth / width, containerHeight / height, 1) * 0.9;
-    setZoom(scale);
-    setPan({
-      x: (containerWidth - (minX + maxX) * scale) / 2,
-      y: (containerHeight - (minY + maxY) * scale) / 2,
-    });
-  }, [model, visibleTables, tablePositions, resetView, setZoom, setPan]);
+    runFitToView(positions, visibleTables.length);
+  }, [model, visibleTables, tablePositions, runFitToView]);
 
   // Handle canvas click to clear selections and exit focus mode
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
@@ -367,12 +350,12 @@ export default function Canvas() {
             const domainPositions = new Map<string, { x: number; y: number; width: number; height: number }>();
             
             // Get dynamic table dimensions based on tableSize and layout mode
-            const BASE_TABLE_WIDTH = 480;
-            const BASE_TABLE_HEIGHT = 280;
+            const BASE_TABLE_WIDTH = 560;
+            const BASE_TABLE_HEIGHT = 320;
             const SIZE_MULTIPLIERS = {
-              small: { width: 0.75, height: 0.85 },
+              small: { width: 0.8, height: 0.9 },
               medium: { width: 1.0, height: 1.0 },
-              large: { width: 1.3, height: 1.2 },
+              large: { width: 1.35, height: 1.25 },
             };
             
             let tableWidth: number;

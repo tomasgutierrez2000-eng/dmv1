@@ -91,7 +91,7 @@ export default function DetailPanel() {
     <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-full shadow-lg">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">Details</h2>
+        <h2 className="text-xl font-bold text-gray-900">Details</h2>
         <button
           onClick={() => {
             setDetailPanelOpen(false);
@@ -110,20 +110,20 @@ export default function DetailPanel() {
         {relationship && model && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-pwc-white mb-4">Relationship</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Relationship</h3>
               <div className="space-y-3">
-                <div className="bg-gray-50 rounded p-3 border border-gray-200">
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                   <div className="text-sm text-gray-500 mb-1">Source</div>
-                  <div className="font-mono text-gray-900">
+                  <div className="font-mono text-base text-gray-900">
                     {relationship.source.layer}.{relationship.source.table}.{relationship.source.field}
                   </div>
                 </div>
                 <div className="text-center text-gray-400">
                   <Link2 className="w-6 h-6 mx-auto" />
                 </div>
-                <div className="bg-gray-50 rounded p-3 border border-gray-200">
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                   <div className="text-sm text-gray-500 mb-1">Target</div>
-                  <div className="font-mono text-gray-900">
+                  <div className="font-mono text-base text-gray-900">
                     {relationship.target.layer}.{relationship.target.table}.{relationship.target.field}
                   </div>
                 </div>
@@ -140,13 +140,13 @@ export default function DetailPanel() {
         {!relationship && selectedField && fieldTable && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-pwc-white mb-2 flex items-center gap-2">
-                <Key className="w-5 h-5 text-yellow-500" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <Key className="w-5 h-5 text-yellow-600" />
                 Field & relationships
               </h3>
-              <div className="bg-gray-50 rounded p-3 border border-gray-200 mb-3">
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 mb-3">
                 <div className="text-sm text-gray-500 mb-0.5">Table</div>
-                <div className="font-semibold text-gray-900">{fieldTable.name}</div>
+                <div className="font-semibold text-base text-gray-900">{fieldTable.name}</div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className={`px-2 py-0.5 rounded text-xs ${layerColors[fieldTable.layer].badge}`}>
                     {fieldTable.layer}
@@ -154,12 +154,12 @@ export default function DetailPanel() {
                   <span className="text-xs text-gray-500">{fieldTable.category}</span>
                 </div>
                 <div className="text-sm text-gray-500 mt-2 mb-0.5">Column</div>
-                <div className="font-mono text-gray-900 flex items-center gap-2">
-                  {fieldDef?.isPK && <Key className="w-4 h-4 text-yellow-500" />}
-                  {fieldDef?.isFK && <Link2 className="w-4 h-4 text-pwc-orange" />}
+                <div className="font-mono text-base text-gray-900 flex items-center gap-2">
+                  {fieldDef?.isPK && <Key className="w-4 h-4 text-yellow-600" />}
+                  {fieldDef?.isFK && <Link2 className="w-4 h-4 text-blue-600" />}
                   {selectedField.fieldName}
                   {fieldDef?.dataType && (
-                    <span className="text-xs text-pwc-gray-light">({fieldDef.dataType})</span>
+                    <span className="text-sm text-gray-500">({fieldDef.dataType})</span>
                   )}
                 </div>
                 {fieldDef?.description && (
@@ -168,7 +168,7 @@ export default function DetailPanel() {
               </div>
             </div>
             <div ref={fieldRelationshipsRef}>
-              <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <Link2 className="w-4 h-4" />
                 Relationships ({fieldRelationships.length})
               </h4>
@@ -196,7 +196,7 @@ export default function DetailPanel() {
                             {rel.relationshipType}
                           </span>
                         </div>
-                        <div className="font-mono text-sm text-pwc-white mt-1">
+                        <div className="font-mono text-sm text-gray-900 mt-1">
                           {other.layer}.{other.table}.{other.field}
                         </div>
                         {otherTable && (
@@ -292,7 +292,7 @@ export default function DetailPanel() {
 
             {/* Sample data (when table is selected) */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <Table2 className="w-4 h-4" />
                 Sample data
               </h4>
@@ -305,11 +305,11 @@ export default function DetailPanel() {
               {!sampleDataLoading && !sampleDataError && sampleData && sampleData.rows.length > 0 && (
                 <div className="rounded border border-gray-200 overflow-hidden">
                   <div className="overflow-x-auto max-h-64 overflow-y-auto">
-                    <table className="w-full text-xs border-collapse">
+                    <table className="w-full text-sm border-collapse">
                       <thead className="bg-gray-100 sticky top-0">
                         <tr>
                           {sampleData.columns.map((col) => (
-                            <th key={col} className="text-left px-2 py-1.5 text-gray-700 font-medium border-b border-gray-200 whitespace-nowrap">
+                            <th key={col} className="text-left px-3 py-2 text-gray-700 font-medium border-b border-gray-200 whitespace-nowrap">
                               {col}
                             </th>
                           ))}
@@ -319,7 +319,7 @@ export default function DetailPanel() {
                         {sampleData.rows.map((row, rIdx) => (
                           <tr key={rIdx} className="border-b border-gray-100 hover:bg-gray-50">
                             {sampleData.columns.map((col, cIdx) => (
-                              <td key={col} className="px-2 py-1 text-gray-600 whitespace-nowrap max-w-[120px] truncate" title={String(row[cIdx] ?? '')}>
+                              <td key={col} className="px-3 py-2 text-gray-600 whitespace-nowrap max-w-[160px] truncate" title={String(row[cIdx] ?? '')}>
                                 {row[cIdx] != null ? String(row[cIdx]) : '—'}
                               </td>
                             ))}
@@ -328,7 +328,7 @@ export default function DetailPanel() {
                       </tbody>
                     </table>
                   </div>
-                  <div className="px-2 py-1 bg-gray-100 text-xs text-gray-500 border-t border-gray-200">
+                  <div className="px-3 py-2 bg-gray-100 text-sm text-gray-500 border-t border-gray-200">
                     {sampleData.rows.length} row{sampleData.rows.length !== 1 ? 's' : ''} · {sampleData.source === 'database' ? 'Live DB' : 'Generated sample'}
                   </div>
                 </div>

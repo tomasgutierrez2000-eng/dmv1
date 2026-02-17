@@ -3,7 +3,7 @@
 import type { Relationship } from '../../types/model';
 import type { TablePosition } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
 
 interface RelationshipLineProps {
   relationship: Relationship;
@@ -45,7 +45,9 @@ export default function RelationshipLine({
 }: RelationshipLineProps) {
   const { tableSize, viewMode, zoom, model, expandedTables, layoutMode } = useModelStore();
   const isOverviewMode = layoutMode === 'domain-overview';
-  const overviewDims = isOverviewMode ? getOverviewTableDimensions(tableSize) : null;
+  const overviewDims = isOverviewMode
+    ? (viewMode === 'compact' ? getCompactOverviewTableDimensions() : getOverviewTableDimensions(tableSize))
+    : null;
 
   // CRITICAL: Use EXACT same calculations as TableNode (and overview dimensions when in domain-overview)
   const sizeMultiplier = SIZE_MULTIPLIERS[tableSize];
@@ -79,7 +81,9 @@ export default function RelationshipLine({
   const targetTable = model?.tables[relationship.target.tableKey];
   const sourceIsExpanded = sourceTable && !isOverviewMode ? expandedTables.has(sourceTable.key) : false;
   const targetIsExpanded = targetTable && !isOverviewMode ? expandedTables.has(targetTable.key) : false;
-  const compactTableHeight = isOverviewMode
+  const compactTableHeight = isOverviewMode && viewMode === 'compact'
+    ? getCompactOverviewTableDimensions().height
+    : isOverviewMode
     ? Math.max(56, OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6)
     : Math.max(84, HEADER_HEIGHT + FOOTER_HEIGHT);
   const sourceTableHeight = viewMode === 'compact'

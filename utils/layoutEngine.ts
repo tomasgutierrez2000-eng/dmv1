@@ -27,6 +27,11 @@ export const OVERVIEW_CARD = {
   FIELD_OFFSET: 11, // baseline offset from content-area top to first field text
 } as const;
 
+/** Compact overview: smaller cards and tighter spacing so more tables fit on screen; height fits header + PK/FK lines + footer */
+export function getCompactOverviewTableDimensions(): { width: number; height: number } {
+  return { width: 148, height: 70 };
+}
+
 // Base dimensions - will be adjusted by view mode
 // Note: Actual table dimensions are now dynamic based on tableSize setting
 // These are used for layout calculations
@@ -52,7 +57,8 @@ export function calculateLayout(
   existingPositions: Record<string, TablePosition>,
   zoom?: number,
   tableSize?: TableSize,
-  visibleLayers?: VisibleLayers
+  visibleLayers?: VisibleLayers,
+  compactOverview?: boolean
 ): Record<string, TablePosition> {
   const positions: Record<string, TablePosition> = { ...existingPositions };
   let tables = Object.values(model.tables);
@@ -64,7 +70,7 @@ export function calculateLayout(
     if (visibleLayers) {
       tables = tables.filter((t) => visibleLayers[t.layer]);
     }
-    return calculateDomainOverviewLayout(tables, positions, model, zoomSpacingMultiplier, size);
+    return calculateDomainOverviewLayout(tables, positions, model, zoomSpacingMultiplier, size, compactOverview ?? false);
   }
   if (mode === 'grid') {
     return calculateGridLayout(tables, positions, zoomSpacingMultiplier);
@@ -528,7 +534,8 @@ function calculateDomainOverviewLayout(
   existingPositions: Record<string, TablePosition>,
   model?: DataModel,
   spacingMultiplier: number = 1.0,
-  tableSize: TableSize = 'medium'
+  tableSize: TableSize = 'medium',
+  compactView: boolean = false
 ): Record<string, TablePosition> {
   const positions: Record<string, TablePosition> = {};
   
@@ -536,12 +543,14 @@ function calculateDomainOverviewLayout(
     return calculateGridLayout(tables, existingPositions);
   }
 
-  const { width: OVERVIEW_TABLE_WIDTH, height: OVERVIEW_TABLE_HEIGHT } = getOverviewTableDimensions(tableSize);
-  const TABLE_SPACING = 10;
-  const DOMAIN_SPACING = 8;
-  const DOMAIN_PADDING = 15;
-  const DOMAIN_HEADER_HEIGHT = 40;
-  const LAYER_GAP = 15;
+  const { width: OVERVIEW_TABLE_WIDTH, height: OVERVIEW_TABLE_HEIGHT } = compactView
+    ? getCompactOverviewTableDimensions()
+    : getOverviewTableDimensions(tableSize);
+  const TABLE_SPACING = compactView ? 4 : 10;
+  const DOMAIN_SPACING = compactView ? 4 : 8;
+  const DOMAIN_PADDING = compactView ? 8 : 15;
+  const DOMAIN_HEADER_HEIGHT = compactView ? 26 : 40;
+  const LAYER_GAP = compactView ? 6 : 15;
 
   // Group tables by domain
   const byDomain = new Map<string, TableDef[]>();
@@ -573,8 +582,7 @@ function calculateDomainOverviewLayout(
     domains.sort((a, b) => byDomain.get(b)!.length - byDomain.get(a)!.length);
   }
 
-  // 5 categories per row, equal width (wider groupings)
-  const DOMAINS_PER_ROW = 5;
+  const DOMAINS_PER_ROW = compactView ? 7 : 5;
   const totalHorizontalSpacing = (DOMAINS_PER_ROW - 1) * DOMAIN_SPACING;
   const domainWidth = Math.floor((availableWidth - totalHorizontalSpacing - startX * 2) / DOMAINS_PER_ROW);
   const effectiveWidth = domainWidth - DOMAIN_PADDING * 2;

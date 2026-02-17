@@ -5,7 +5,7 @@ import type { TableDef } from '../../types/model';
 import { layerColors } from '../../utils/colors';
 import { getCategoryColor } from '../../utils/colors';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
 
 interface TableNodeProps {
   table: TableDef;
@@ -66,7 +66,9 @@ export default function TableNode({
   
   // Calculate dimensions based on size setting
   let sizeMultiplier = SIZE_MULTIPLIERS[tableSize];
-  const overviewDims = isOverviewMode ? getOverviewTableDimensions(tableSize) : null;
+  const overviewDims = isOverviewMode
+    ? (viewMode === 'compact' ? getCompactOverviewTableDimensions() : getOverviewTableDimensions(tableSize))
+    : null;
   
   const baseWidth = BASE_TABLE_WIDTH * sizeMultiplier.width;
   const baseCollapsedHeight = BASE_COLLAPSED_HEIGHT * sizeMultiplier.height;
@@ -90,7 +92,7 @@ export default function TableNode({
     ? Math.max(12, Math.round(overviewDims.height * 0.16))
     : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
   const compactTableHeight = isOverviewMode
-    ? Math.max(56, OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6)
+    ? (viewMode === 'compact' ? getCompactOverviewTableDimensions().height : Math.max(56, OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6))
     : Math.max(84, HEADER_HEIGHT + FOOTER_HEIGHT);
   const TABLE_HEIGHT = viewMode === 'compact'
     ? compactTableHeight
@@ -109,7 +111,8 @@ export default function TableNode({
   // Determine what to show based on zoom level
   const zoomLevel = zoom; // Use actual zoom value from store
   const hideFieldsForCompactView = viewMode === 'compact';
-  const showFields = !hideFieldsForCompactView && zoomLevel >= ZOOM_THRESHOLDS.VERY_LOW; // Compact preset hides field rows
+  const showOnlyPkFkInCompact = viewMode === 'compact';
+  const showFields = !hideFieldsForCompactView && zoomLevel >= ZOOM_THRESHOLDS.VERY_LOW; // Compact shows only PK/FK below
   const showFieldNames = zoomLevel >= ZOOM_THRESHOLDS.VERY_LOW; // Always show names if fields are visible
   const showDataTypes = zoomLevel >= ZOOM_THRESHOLDS.MEDIUM && (fieldDisplayMode !== 'minimal'); // Show types if zoom >= 60%
   const showFieldDescriptions = zoomLevel >= ZOOM_THRESHOLDS.HIGH && (viewMode === 'detailed' || (viewMode === 'standard' && isExpanded)); // Show descriptions if zoom >= 100%
@@ -171,7 +174,8 @@ export default function TableNode({
   // ─── OVERVIEW MODE: SVG header/footer + scrollable foreignObject for fields ───
   if (isOverviewMode) {
     const OV = OVERVIEW_CARD;
-    const contentH = TABLE_HEIGHT - OV.HEADER_H - OV.FOOTER_H;
+    const compactOv = showOnlyPkFkInCompact ? { HEADER_H: 22, FOOTER_H: 10 } : OV;
+    const contentH = TABLE_HEIGHT - compactOv.HEADER_H - compactOv.FOOTER_H;
     const safeId = table.key.replace(/[^a-zA-Z0-9]/g, '_');
     const maxNameChars = Math.floor((TABLE_WIDTH - OV.PAD_X * 2 - 36) / 7);
 
@@ -203,18 +207,18 @@ export default function TableNode({
           <rect width={TABLE_WIDTH} height={TABLE_HEIGHT} fill="white" />
 
           {/* Header with gradient */}
-          <rect width={TABLE_WIDTH} height={OV.HEADER_H} fill={colors.border} />
+          <rect width={TABLE_WIDTH} height={compactOv.HEADER_H} fill={colors.border} />
           <rect
-            width={TABLE_WIDTH} height={OV.HEADER_H}
+            width={TABLE_WIDTH} height={compactOv.HEADER_H}
             fill={colors.primary} opacity="0.35"
           />
           <circle
-            cx={OV.PAD_X + 5} cy={OV.HEADER_H / 2}
-            r="4" fill={categoryColor.color} opacity="0.9"
+            cx={OV.PAD_X + 5} cy={compactOv.HEADER_H / 2}
+            r={showOnlyPkFkInCompact ? 3 : 4} fill={categoryColor.color} opacity="0.9"
           />
           <text
-            x={OV.PAD_X + 14} y={OV.HEADER_H / 2 + 4}
-            fill="white" fontSize="12" fontWeight="bold"
+            x={OV.PAD_X + 14} y={compactOv.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
+            fill="white" fontSize={showOnlyPkFkInCompact ? 10 : 12} fontWeight="bold"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
             {table.name.length > maxNameChars
@@ -222,11 +226,11 @@ export default function TableNode({
               : table.name}
           </text>
           <rect
-            x={TABLE_WIDTH - OV.PAD_X - 28} y={(OV.HEADER_H - 16) / 2}
+            x={TABLE_WIDTH - OV.PAD_X - 28} y={(compactOv.HEADER_H - 16) / 2}
             width="28" height="16" rx="3" fill="rgba(255,255,255,0.25)"
           />
           <text
-            x={TABLE_WIDTH - OV.PAD_X - 14} y={OV.HEADER_H / 2 + 4}
+            x={TABLE_WIDTH - OV.PAD_X - 14} y={compactOv.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
             fill="white" fontSize="10" fontWeight="bold" textAnchor="middle"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
@@ -236,7 +240,7 @@ export default function TableNode({
           {/* Scrollable field list (foreignObject so we can use overflow-y) */}
           <foreignObject
             x={0}
-            y={OV.HEADER_H}
+            y={compactOv.HEADER_H}
             width={TABLE_WIDTH}
             height={contentH}
             requiredExtensions="http://www.w3.org/1999/xhtml"
@@ -252,7 +256,53 @@ export default function TableNode({
                 minHeight: 0,
               }}
             >
-              {!hideFieldsForCompactView && table.fields.length > 0 ? (
+              {showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0) ? (
+                <div
+                  data-scrollable-table-fields
+                  className="overflow-y-auto overflow-x-hidden scrollbar-thin px-1.5 py-0.5 box-border"
+                  style={{
+                    width: TABLE_WIDTH,
+                    height: contentH,
+                    minHeight: 0,
+                  }}
+                  onWheel={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  title="PK / FK only"
+                >
+                  <div className="space-y-0.5">
+                    {pkFields.map((field, i) => {
+                      const fieldName = field.name ?? '';
+                      const isThisFieldSelected = selectedField?.tableKey === table.key && selectedField?.fieldName === fieldName;
+                      return (
+                        <div
+                          key={`pk-${fieldName}-${i}`}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
+                          className={`truncate rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
+                          title={fieldName}
+                        >
+                          PK {highlightMatch(fieldName)}
+                        </div>
+                      );
+                    })}
+                    {fkFields.map((field, i) => {
+                      const fieldName = field.name ?? '';
+                      const isThisFieldSelected = selectedField?.tableKey === table.key && selectedField?.fieldName === fieldName;
+                      return (
+                        <div
+                          key={`fk-${fieldName}-${i}`}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
+                          className={`truncate rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
+                          title={fieldName}
+                        >
+                          FK {highlightMatch(fieldName)}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : !hideFieldsForCompactView && table.fields.length > 0 ? (
                 <div
                   data-scrollable-table-fields
                   className="overflow-y-auto overflow-x-hidden scrollbar-thin px-2 py-1 box-border"
@@ -308,7 +358,7 @@ export default function TableNode({
                   className="flex items-center justify-center text-gray-400 text-xs italic"
                   style={{ height: contentH }}
                 >
-                  {hideFieldsForCompactView ? 'Compact view' : 'No fields'}
+                  {pkFields.length === 0 && fkFields.length === 0 ? 'No PK/FK' : 'No fields'}
                 </div>
               )}
             </div>
@@ -316,24 +366,24 @@ export default function TableNode({
 
           {/* Footer separator */}
           <line
-            x1="0" y1={TABLE_HEIGHT - OV.FOOTER_H}
-            x2={TABLE_WIDTH} y2={TABLE_HEIGHT - OV.FOOTER_H}
+            x1="0" y1={TABLE_HEIGHT - compactOv.FOOTER_H}
+            x2={TABLE_WIDTH} y2={TABLE_HEIGHT - compactOv.FOOTER_H}
             stroke="#e5e7eb" strokeWidth="0.5"
           />
           <text
-            x={OV.PAD_X} y={TABLE_HEIGHT - OV.FOOTER_H / 2 + 3}
-            fill="#6b7280" fontSize="9"
+            x={OV.PAD_X} y={TABLE_HEIGHT - compactOv.FOOTER_H / 2 + 3}
+            fill="#6b7280" fontSize={showOnlyPkFkInCompact ? 8 : 9}
             fontFamily="system-ui, -apple-system, sans-serif"
           >
             {pkFields.length > 0 ? `${pkFields.length} PK` : ''}
             {pkFields.length > 0 && fkFields.length > 0 ? ' \u00b7 ' : ''}
             {fkFields.length > 0 ? `${fkFields.length} FK` : ''}
-            {(pkFields.length > 0 || fkFields.length > 0) ? ' \u00b7 ' : ''}
-            {table.fields.length} fields
+            {!showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0) ? ' \u00b7 ' : ''}
+            {!showOnlyPkFkInCompact ? `${table.fields.length} fields` : ''}
           </text>
           {(relCounts.incoming > 0 || relCounts.outgoing > 0) && (
             <text
-              x={TABLE_WIDTH - OV.PAD_X} y={TABLE_HEIGHT - OV.FOOTER_H / 2 + 3}
+              x={TABLE_WIDTH - OV.PAD_X} y={TABLE_HEIGHT - compactOv.FOOTER_H / 2 + 3}
               fill="#9ca3af" fontSize="8" textAnchor="end"
               fontFamily="system-ui, -apple-system, sans-serif"
             >
@@ -431,7 +481,7 @@ export default function TableNode({
             className="flex flex-col bg-gradient-to-b from-gray-50 to-white overflow-hidden min-h-0"
             style={{ height: TABLE_HEIGHT - HEADER_HEIGHT }}
           >
-            {showFields ? (
+            {(showFields || (showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0))) ? (
               <div
                 data-scrollable-table-fields
                 className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden ${isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-3' : 'px-3 py-2'} scrollbar-thin`}
@@ -442,11 +492,10 @@ export default function TableNode({
                 onWheel={(e) => {
                   e.stopPropagation(); // prevent canvas zoom; do NOT preventDefault so this div can scroll
                 }}
-                title="Scroll to see all fields"
+                title={showOnlyPkFkInCompact ? 'PK / FK only' : 'Scroll to see all fields'}
               >
-                {/* Compact table-like display for better horizontal scanning */}
                 <div className={isCompact ? 'space-y-0.5' : isDetailed ? 'space-y-1.5' : 'space-y-1'}>
-                  {table.fields.map((field, idx) => {
+                  {(showOnlyPkFkInCompact ? table.fields.filter(f => f.isPK || f.isFK) : table.fields).map((field, idx) => {
                   const isPK = field.isPK;
                   const isFK = field.isFK;
                   const fieldName = field.name ?? '';
@@ -536,8 +585,8 @@ export default function TableNode({
               </div>
             ) : (
               <div className="flex items-center justify-center h-full text-gray-400 text-xs flex-col gap-1">
-                {hideFieldsForCompactView ? (
-                  <div>Compact view hides fields</div>
+                {showOnlyPkFkInCompact ? (
+                  <div>No PK/FK</div>
                 ) : (
                   <>
                     <div>Zoom in to see fields</div>

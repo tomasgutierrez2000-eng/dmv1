@@ -15,7 +15,7 @@ import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
 
 export default function VisualizerPage() {
-  const { model, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers } = useModelStore();
+  const { model, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers, viewMode } = useModelStore();
   const { parseExcel, loading, result } = useExcelParser();
   const { toast } = useToast();
   const [initialLoad, setInitialLoad] = useState(true);
@@ -40,14 +40,15 @@ export default function VisualizerPage() {
       setModel(result.model);
       const { calculateLayout } = require('../../utils/layoutEngine');
       const existingPositions = tablePositions;
-      const positions = calculateLayout(result.model, layoutMode, existingPositions, undefined, tableSize, visibleLayers);
+      const compactOverview = layoutMode === 'domain-overview' && viewMode === 'compact';
+      const positions = calculateLayout(result.model, layoutMode, existingPositions, undefined, tableSize, visibleLayers, compactOverview);
       Object.entries(positions).forEach(([key, pos]) => {
         if (!existingPositions[key]) {
           setTablePositions(key, pos as any);
         }
       });
     }
-  }, [result, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers]);
+  }, [result, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers, viewMode]);
 
   const handleFileSelect = async (file: File | null) => {
     if (file) {
@@ -69,7 +70,8 @@ export default function VisualizerPage() {
       const model = (await res.json()) as DataModel;
       setModel(model);
       const { calculateLayout } = require('../../utils/layoutEngine');
-      const positions = calculateLayout(model, layoutMode, tablePositions, undefined, tableSize, visibleLayers);
+      const compactOverview = layoutMode === 'domain-overview' && viewMode === 'compact';
+      const positions = calculateLayout(model, layoutMode, tablePositions, undefined, tableSize, visibleLayers, compactOverview);
       Object.entries(positions).forEach(([key, pos]) => {
         if (!tablePositions[key]) {
           setTablePositions(key, pos as any);

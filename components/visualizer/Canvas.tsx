@@ -5,7 +5,7 @@ import { useModelStore } from '../../store/modelStore';
 import TableNode from './TableNode';
 import RelationshipLine from './RelationshipLine';
 import DomainContainer from './DomainContainer';
-import { calculateLayout, getOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
+import { calculateLayout, getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
 import type { TablePosition } from '../../types/model';
 
 export default function Canvas() {
@@ -102,11 +102,13 @@ export default function Canvas() {
         large: { width: 1.35, height: 1.25 },
       };
       const overviewDims = getOverviewTableDimensions(tableSize);
-      const tableWidth = layoutMode === 'domain-overview' ? overviewDims.width : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
-      const compactHeight = layoutMode === 'domain-overview' ? (OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6) : 84;
-      const tableHeight = viewMode === 'compact'
-        ? compactHeight
-        : (layoutMode === 'domain-overview' ? overviewDims.height : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height);
+      const compactDims = getCompactOverviewTableDimensions();
+      const tableWidth = layoutMode === 'domain-overview'
+        ? (viewMode === 'compact' ? compactDims.width : overviewDims.width)
+        : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
+      const tableHeight = layoutMode === 'domain-overview'
+        ? (viewMode === 'compact' ? compactDims.height : overviewDims.height)
+        : (viewMode === 'compact' ? 84 : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height);
 
       const minX = Math.min(...positionsToFit.map((p) => p.x));
       const maxX = Math.max(...positionsToFit.map((p) => p.x + tableWidth));
@@ -172,15 +174,16 @@ export default function Canvas() {
     [runFitToView]
   );
 
-  // Apply layout when model, layout mode, table size, or visible layers change
+  // Apply layout when model, layout mode, table size, visible layers, or compact view change
   useEffect(() => {
     if (!model) return;
-    const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers);
+    const compactOverview = layoutMode === 'domain-overview' && viewMode === 'compact';
+    const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers, compactOverview);
     Object.entries(newPositions).forEach(([key, pos]) => {
       setTablePosition(key, pos);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
-  }, [model, layoutMode, tableSize, visibleLayers, setTablePosition]);
+  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition]);
 
   // Fit to visible tables when layout or full-view state change. Skipped when focus-compact
   // or when search/filter is active (delayed effect below handles those for one consistent fit).
@@ -741,9 +744,15 @@ export default function Canvas() {
             let tableWidth: number;
             let tableHeight: number;
             if (layoutMode === 'domain-overview') {
-              const dims = getOverviewTableDimensions(tableSize);
-              tableWidth = dims.width;
-              tableHeight = viewMode === 'compact' ? (OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6) : dims.height;
+              if (viewMode === 'compact') {
+                const compactDims = getCompactOverviewTableDimensions();
+                tableWidth = compactDims.width;
+                tableHeight = compactDims.height;
+              } else {
+                const dims = getOverviewTableDimensions(tableSize);
+                tableWidth = dims.width;
+                tableHeight = dims.height;
+              }
             } else {
               const multiplier = SIZE_MULTIPLIERS[tableSize];
               tableWidth = BASE_TABLE_WIDTH * multiplier.width;
@@ -815,9 +824,15 @@ export default function Canvas() {
               let headerOffset: number;
               let footerOffset: number;
               if (layoutMode === 'domain-overview') {
-                domainPadding = DOMAIN_OVERVIEW.DOMAIN_PADDING;
-                headerOffset = DOMAIN_OVERVIEW.headerOffset;
-                footerOffset = DOMAIN_OVERVIEW.footerOffset;
+                if (viewMode === 'compact') {
+                  domainPadding = 6;
+                  headerOffset = 28;
+                  footerOffset = 8;
+                } else {
+                  domainPadding = DOMAIN_OVERVIEW.DOMAIN_PADDING;
+                  headerOffset = DOMAIN_OVERVIEW.headerOffset;
+                  footerOffset = DOMAIN_OVERVIEW.footerOffset;
+                }
               } else {
                 domainPadding = 25;
                 headerOffset = 105;

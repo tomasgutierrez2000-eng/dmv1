@@ -125,7 +125,7 @@ export function schemaExportToModel(exported: SchemaExport): DataModel {
         tableKey: targetTableKey,
       },
       isCrossLayer: r.sourceLayer !== r.targetLayer,
-      relationshipType: r.relationshipType,
+      relationshipType: r.relationshipType ?? 'primary',
     };
   });
 

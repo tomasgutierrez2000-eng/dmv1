@@ -164,20 +164,23 @@ export default function Canvas() {
         // Check if relationships are enabled
         if (!showRelationships) return false;
         
-        // Focus mode: only show selected relationship or relationships connected to selected table/field
+        // Focus mode: only show selected relationship or relationships connected to selected field/table
+        // IMPORTANT: selectedField must be checked BEFORE selectedTable because clicking a
+        // field also sets selectedTable (from mouseDown on the card), and we want field-level
+        // filtering to take priority.
         if (focusMode) {
           if (selectedRelationship) {
             // Show only the selected relationship
             if (rel.id !== selectedRelationship) return false;
-          } else if (selectedTable) {
-            // Show only relationships connected to the selected table
-            if (rel.source.tableKey !== selectedTable && rel.target.tableKey !== selectedTable) return false;
           } else if (selectedField) {
             // Show only relationships involving the selected field
             if (
               !(rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName) &&
               !(rel.target.tableKey === selectedField.tableKey && rel.target.field === selectedField.fieldName)
             ) return false;
+          } else if (selectedTable) {
+            // Show only relationships connected to the selected table
+            if (rel.source.tableKey !== selectedTable && rel.target.tableKey !== selectedTable) return false;
           } else {
             // Focus mode but nothing selected - show nothing
             return false;

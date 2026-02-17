@@ -22,6 +22,7 @@ export default function DetailPanel() {
     setSelectedTable,
     setSelectedRelationship,
     setSelectedField,
+    uploadedSampleData,
   } = useModelStore();
 
   const [sampleData, setSampleData] = useState<SampleDataState>(null);
@@ -39,6 +40,17 @@ export default function DetailPanel() {
     if (!selectedTable) {
       setSampleData(null);
       setSampleDataError(null);
+      return;
+    }
+    const uploaded = uploadedSampleData[selectedTable];
+    if (uploaded?.columns && Array.isArray(uploaded.rows)) {
+      setSampleDataLoading(false);
+      setSampleDataError(null);
+      setSampleData({
+        columns: uploaded.columns,
+        rows: uploaded.rows,
+        source: 'uploaded',
+      });
       return;
     }
     setSampleDataLoading(true);
@@ -67,7 +79,7 @@ export default function DetailPanel() {
         setSampleDataError(err.message || 'Failed to load sample data');
       })
       .finally(() => setSampleDataLoading(false));
-  }, [selectedTable]);
+  }, [selectedTable, uploadedSampleData]);
 
   if (!detailPanelOpen) return null;
 

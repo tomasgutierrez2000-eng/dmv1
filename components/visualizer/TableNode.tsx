@@ -246,14 +246,18 @@ export default function TableNode({
             {table.layer}
           </text>
 
-          {/* Fields (clipped to content area) */}
+          {/* Fields (clipped to content area) — each row is clickable */}
           <g clipPath={`url(#ov-fields-${safeId})`}>
             {table.fields.length > 0 ? (
               <>
                 {fieldsToShow.map((field, i) => {
                   const y = OV.HEADER_H + OV.PAD_Y + OV.FIELD_OFFSET + i * OV.LINE_H;
+                  const rowTop = y - OV.FIELD_OFFSET + 1;
                   const isPK = field.isPK;
                   const isFK = field.isFK;
+                  const isThisFieldSelected =
+                    selectedField?.tableKey === table.key &&
+                    selectedField?.fieldName === field.name;
                   const prefix = isPK ? 'PK ' : isFK ? 'FK ' : '';
                   const name = field.name;
                   const maxChars = maxFieldChars - prefix.length;
@@ -262,16 +266,39 @@ export default function TableNode({
                     : name);
 
                   return (
-                    <text
+                    <g
                       key={i}
-                      x={OV.PAD_X} y={y}
-                      fill={isPK ? '#92400e' : isFK ? '#1e40af' : '#374151'}
-                      fontSize="10"
-                      fontWeight={isPK ? 'bold' : isFK ? '600' : 'normal'}
-                      fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onFieldSelect) onFieldSelect(table.key, field.name);
+                      }}
+                      style={{ cursor: 'pointer' }}
                     >
-                      {displayText}
-                    </text>
+                      {/* Hit target + selection / hover highlight */}
+                      <rect
+                        x="1" y={rowTop}
+                        width={TABLE_WIDTH - 2} height={OV.LINE_H}
+                        rx="2"
+                        fill={isThisFieldSelected
+                          ? (isPK ? '#fef3c7' : isFK ? '#dbeafe' : '#f3f4f6')
+                          : 'transparent'}
+                        stroke={isThisFieldSelected
+                          ? (isPK ? '#fbbf24' : isFK ? '#60a5fa' : '#9ca3af')
+                          : 'none'}
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={OV.PAD_X} y={y}
+                        fill={isPK ? '#92400e' : isFK ? '#1e40af' : '#374151'}
+                        fontSize="10"
+                        fontWeight={isPK ? 'bold' : isFK ? '600' : 'normal'}
+                        fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace"
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {displayText}
+                      </text>
+                    </g>
                   );
                 })}
                 {remaining > 0 && (
@@ -447,8 +474,9 @@ export default function TableNode({
                   return (
                     <div
                       key={idx}
+                      onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent table selection
+                        e.stopPropagation();
                         if (onFieldSelect) {
                           onFieldSelect(table.key, field.name);
                         }

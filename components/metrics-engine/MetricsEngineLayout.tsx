@@ -188,7 +188,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               onDuplicate={() => onDuplicate(selectedMetric)}
             />
           )}
-          {view === 'edit' && selectedMetric && (selectedMetric as MetricWithSource).source === 'custom' && (
+          {view === 'edit' && selectedMetric && (
             <MetricForm metric={selectedMetric} isCreate={false} onSave={handleSaveEdit} onCancel={() => setView('detail')} />
           )}
           {view === 'create' && (

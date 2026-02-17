@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Info, Plus, Trash2, X } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { ArrowLeft, Info, Layers, Plus, Trash2, X } from 'lucide-react';
 import { DASHBOARD_PAGES } from '@/data/l3-metrics';
 import type { L3Metric, DashboardPage, MetricType, SourceField } from '@/data/l3-metrics';
 import { deriveDimensionsFromSourceFields, suggestTogglesFromSourceFields } from '@/lib/metric-derivation';
+import { metricWithLineage } from '@/lib/lineage-generator';
+import LineageFlowView from '@/components/lineage/LineageFlowView';
 
 const PAGES = DASHBOARD_PAGES.map(p => ({ id: p.id as DashboardPage, name: p.name }));
 const METRIC_TYPES: MetricType[] = ['Aggregate', 'Ratio', 'Count', 'Derived', 'Status', 'Trend', 'Table', 'Categorical'];
@@ -49,6 +51,7 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
   const [schema, setSchema] = useState<DataModel | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formulaSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     fetch('/api/l1-demo-model')
@@ -56,6 +59,12 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
       .then(data => data && setSchema(data))
       .catch(() => setSchema(null));
   }, []);
+
+  useEffect(() => {
+    if (error && formulaSectionRef.current && /formula|step 3/i.test(error)) {
+      formulaSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [error]);
 
   const tablesByLayer = React.useMemo(() => {
     if (!schema?.tables) return { L1: [] as TableDef[], L2: [] as TableDef[] };
@@ -105,12 +114,32 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
     setFormula((prev) => (prev ? `${prev} + ${fieldName}` : fieldName));
   };
 
+  const draftMetricWithLineage = useMemo(() => {
+    const fields = sourceFields.filter((sf) => sf.table && sf.field);
+    if (fields.length === 0 || !formula.trim()) return null;
+    const draft: L3Metric = {
+      id: metric?.id ?? 'draft',
+      name: name.trim() || 'Draft',
+      description: description.trim(),
+      page,
+      section: section.trim(),
+      metricType,
+      formula: formula.trim(),
+      formulaSQL: formulaSQL.trim() || undefined,
+      displayFormat: displayFormat.trim(),
+      sampleValue: sampleValue.trim(),
+      sourceFields: fields,
+      dimensions: [],
+    };
+    return metricWithLineage(draft);
+  }, [metric?.id, name, description, page, section, metricType, formula, formulaSQL, displayFormat, sampleValue, sourceFields]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     const fields = sourceFields.filter(sf => sf.table && sf.field);
     if (fields.length === 0) {
-      setError('Add at least one source field (layer, table, field).');
+      setError('Add at least one source field in step 2: choose Layer, Table, and Field for each row.');
       return;
     }
     if (!name.trim()) {
@@ -118,7 +147,7 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
       return;
     }
     if (!formula.trim()) {
-      setError('Formula is required.');
+      setError('Formula is required. Use step 3: click a chip (e.g. SUM(field)) or type your formula in the formula box.');
       return;
     }
     const derivedDimensions = deriveDimensionsFromSourceFields(fields, schema, 'GROUP_BY');
@@ -186,7 +215,7 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
 
         <section className="space-y-4" aria-labelledby="basic-heading">
           <h2 id="basic-heading" className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-            <span className="w-4 h-0.5 bg-gray-600 rounded" />
+            <span className="w-5 h-5 rounded bg-white/10 text-[10px] font-bold text-gray-400 flex items-center justify-center">1</span>
             Basic info
           </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -251,12 +280,15 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
         </div>
         </section>
 
-        {/* Source fields first so user can build formula from them */}
+        {/* Source fields: what the metric is built from */}
         <section className="space-y-3" aria-labelledby="sources-heading">
           <h2 id="sources-heading" className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-            <span className="w-4 h-0.5 bg-gray-600 rounded" />
+            <span className="w-5 h-5 rounded bg-white/10 text-[10px] font-bold text-gray-400 flex items-center justify-center">2</span>
             Source fields *
           </h2>
+          <p className="text-[11px] text-gray-500">
+            Choose where the data comes from (layer, table, field). These fields are what you can use in the formula below.
+          </p>
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="block text-xs font-medium text-gray-400 sr-only">Add or remove source fields</label>
@@ -338,23 +370,28 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
         </div>
         </section>
 
-        {/* Formula: build from inputs (aggregates + fields) or type manually */}
-        <section className="rounded-lg border border-white/10 bg-white/[0.02] p-4 space-y-3" aria-labelledby="formula-heading">
+        {/* Formula: how to calculate the metric from source fields */}
+        <section ref={formulaSectionRef} className="rounded-lg border border-white/10 bg-white/[0.02] p-4 space-y-3" aria-labelledby="formula-heading">
           <h2 id="formula-heading" className="text-xs font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-            <span className="w-4 h-0.5 bg-gray-600 rounded" />
+            <span className="w-5 h-5 rounded bg-white/10 text-[10px] font-bold text-gray-400 flex items-center justify-center">3</span>
             Formula (human-readable) *
           </h2>
+          <div className="rounded-lg bg-purple-500/5 border border-purple-500/20 px-3 py-2 text-[11px] text-purple-200/90">
+            <strong>What to put in the formula:</strong> Use an aggregate on a source field (e.g. <code className="font-mono text-purple-300">SUM(field_name)</code>, <code className="font-mono text-purple-300">AVG(field_name)</code>), or type expressions like <code className="font-mono text-purple-300">field_a / field_b</code> for ratios. Field names must match the source fields you added above.
+          </div>
           {filledSourceFields.length === 0 ? (
             <p className="text-sm text-gray-500">
-              Select at least one source field above, then return here to build your formula with the aggregate buttons or by typing.
+              Add at least one source field in step 2 (table + field), then come back here. You can click the chips to build the formula or type it in the box.
             </p>
           ) : (
           <>
           <p className="text-[11px] text-gray-500">
-            Click a chip to insert into the formula, or type in the box below.
+            <strong>Fields you can use:</strong>{' '}
+            <span className="font-mono text-gray-400">{filledSourceFields.map(sf => sf.field).join(', ')}</span>
+            {' — '}click a chip below to insert, or type in the box.
           </p>
             <div className="space-y-2">
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider">Click to insert</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-wider">Click to insert into formula</p>
               <div className="flex flex-wrap gap-3">
                 {aggregateFunctions.map((agg) => (
                   <div key={agg} className="flex flex-wrap items-center gap-1.5">
@@ -396,7 +433,7 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
               value={formula}
               onChange={e => setFormula(e.target.value)}
               className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white font-mono placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-500/50 text-sm"
-              placeholder="e.g. SUM(gross_exposure_usd)"
+              placeholder={filledSourceFields.length > 0 ? `e.g. SUM(${filledSourceFields[0].field})` : 'e.g. SUM(field_name) — add source fields above first'}
               required
               aria-invalid={!!error && !formula.trim()}
               aria-describedby={error ? 'form-error' : undefined}
@@ -448,6 +485,21 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
             />
           </div>
         </div>
+
+        {draftMetricWithLineage?.nodes && draftMetricWithLineage.nodes.length > 0 && (
+          <section className="rounded-lg border border-white/10 bg-black/10 p-4" aria-labelledby="lineage-preview-heading">
+            <h2 id="lineage-preview-heading" className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+              <Layers className="w-3.5 h-3.5" />
+              Lineage preview
+            </h2>
+            <p className="text-[11px] text-gray-500 mb-3">
+              This is how the lineage will look when saved. It updates as you change source fields and formula.
+            </p>
+            <div className="rounded-lg overflow-hidden border border-white/5 bg-black/20">
+              <LineageFlowView metric={draftMetricWithLineage} />
+            </div>
+          </section>
+        )}
 
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-200/90 text-sm">
           <Info className="w-4 h-4 shrink-0 text-blue-400" aria-hidden />

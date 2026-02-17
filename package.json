@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate:l1": "tsx scripts/l1/generate.ts",
-    "generate:l2": "tsx scripts/l2/generate.ts"
+    "generate:l2": "tsx scripts/l2/generate.ts",
+    "test:metrics": "tsx scripts/test-metrics.ts"
   },
   "dependencies": {
     "framer-motion": "^11.0.0",

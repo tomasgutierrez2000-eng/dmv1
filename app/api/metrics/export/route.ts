@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readCustomMetrics } from '@/lib/metrics-store';
-import { L3_METRICS } from '@/data/l3-metrics';
+import { getMergedMetrics } from '@/lib/metrics-store';
 import type { L3Metric } from '@/data/l3-metrics';
 
 const PAGES = 'P1, P2, P3, P4, P5, P6, P7';
@@ -67,11 +66,10 @@ async function buildWorkbook(metrics: L3Metric[]) {
   return wb;
 }
 
-/** GET ?format=json|xlsx|template — export custom metrics or download template */
+/** GET ?format=json|xlsx|template — export all metrics (merged) or download template */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') || 'json';
-  const custom = readCustomMetrics();
 
   if (format === 'template') {
     const wb = await buildWorkbook([
@@ -101,7 +99,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (format === 'xlsx') {
-    const metrics = custom.length ? custom : [];
+    const metrics = getMergedMetrics();
     const wb = await buildWorkbook(metrics);
     const XLSX = await import('xlsx');
     const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
@@ -116,7 +114,7 @@ export async function GET(request: NextRequest) {
 
   // json
   const date = new Date().toISOString().slice(0, 10);
-  return new NextResponse(JSON.stringify({ version: 1, metrics: custom }, null, 2), {
+  return new NextResponse(JSON.stringify({ version: 1, metrics: getMergedMetrics() }, null, 2), {
     headers: {
       'Content-Type': 'application/json',
       'Content-Disposition': `attachment; filename="metrics_export_${date}.json"`,

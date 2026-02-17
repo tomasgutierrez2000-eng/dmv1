@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { L3_METRICS } from '@/data/l3-metrics';
-import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
+import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
 import type { L3Metric, DashboardPage, MetricType } from '@/data/l3-metrics';
 
 export type MetricSource = 'builtin' | 'custom';
@@ -53,21 +53,19 @@ function validateMetric(m: Partial<L3Metric>): { ok: boolean; error?: string } {
 
 /** GET: merged list of built-in + custom metrics. Query: ?page=P1 | ?id=M007 */
 export async function GET(request: NextRequest) {
-  const custom = readCustomMetrics();
-  const builtinIds = new Set(L3_METRICS.map(m => m.id));
-  const customList: MetricWithSource[] = custom.map(m => ({ ...m, source: 'custom' as MetricSource }));
-  const builtinList: MetricWithSource[] = L3_METRICS.map(m => ({ ...m, source: 'builtin' as MetricSource }));
-  const merged: MetricWithSource[] = [...builtinList];
-  for (const m of customList) {
-    if (!builtinIds.has(m.id)) merged.push(m);
-  }
+  const merged = getMergedMetrics();
+  const customIds = new Set(readCustomMetrics().map(m => m.id));
+  const withSource: MetricWithSource[] = merged.map(m => ({
+    ...m,
+    source: (customIds.has(m.id) ? 'custom' : 'builtin') as MetricSource,
+  }));
 
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page');
   const id = searchParams.get('id');
-  let result: MetricWithSource[] = merged;
-  if (id) result = merged.filter(m => m.id === id);
-  else if (page && PAGES.includes(page as DashboardPage)) result = merged.filter(m => m.page === page);
+  let result: MetricWithSource[] = withSource;
+  if (id) result = withSource.filter(m => m.id === id);
+  else if (page && PAGES.includes(page as DashboardPage)) result = withSource.filter(m => m.page === page);
 
   return NextResponse.json(result);
 }
@@ -87,14 +85,10 @@ export async function POST(request: NextRequest) {
   }
 
   const custom = readCustomMetrics();
-  const builtinIds = new Set(L3_METRICS.map(m => m.id));
   const customIds = new Set(custom.map(m => m.id));
 
   let id = (body.id ?? '').trim();
   if (!id) id = nextCustomMetricId(custom);
-  else if (builtinIds.has(id)) {
-    return NextResponse.json({ error: 'Cannot create a metric with a reserved built-in id. Use a custom id (e.g. C001).' }, { status: 400 });
-  }
   if (customIds.has(id)) {
     return NextResponse.json({ error: `A custom metric with id "${id}" already exists. Use PUT to update.` }, { status: 400 });
   }

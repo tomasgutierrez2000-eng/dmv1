@@ -58,15 +58,14 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           Back to list
         </button>
         <div className="ml-auto flex items-center gap-2">
-          {source === 'custom' && (
-            <button
-              onClick={onEdit}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium"
-            >
-              <Edit className="w-3.5 h-3.5" />
-              Edit
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onEdit}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium"
+          >
+            <Edit className="w-3.5 h-3.5" />
+            Edit
+          </button>
           <button
             onClick={onDuplicate}
             type="button"
@@ -80,8 +79,8 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
       </div>
 
       {source === 'builtin' && (
-        <p className="mb-4 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-200 text-sm">
-          This is a built-in metric and cannot be edited. Use <strong>Copy as custom</strong> to create your own editable version.
+        <p className="mb-4 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm">
+          Edits are saved as your custom version (overriding the built-in). To revert to the original, delete this metric from the list.
         </p>
       )}
       <header className="border-b border-white/10 pb-6 mb-6">

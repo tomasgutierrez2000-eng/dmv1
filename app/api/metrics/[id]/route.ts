@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { L3_METRICS } from '@/data/l3-metrics';
-import { readCustomMetrics, writeCustomMetrics } from '@/lib/metrics-store';
+import { getMergedMetrics, readCustomMetrics, writeCustomMetrics } from '@/lib/metrics-store';
 import type { L3Metric, DashboardPage, MetricType } from '@/data/l3-metrics';
 
 const PAGES: DashboardPage[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
@@ -45,18 +44,18 @@ function validateMetric(m: Partial<L3Metric>): { ok: boolean; error?: string } {
   return { ok: true };
 }
 
-/** GET one metric (built-in or custom) */
+/** GET one metric (merged: custom overrides built-in) */
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const builtin = L3_METRICS.find(m => m.id === id);
-  if (builtin) return NextResponse.json({ ...builtin, source: 'builtin' });
-  const custom = readCustomMetrics();
-  const customMetric = custom.find(m => m.id === id);
-  if (customMetric) return NextResponse.json({ ...customMetric, source: 'custom' });
-  return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
+  const merged = getMergedMetrics();
+  const metric = merged.find(m => m.id === id);
+  if (!metric) return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
+  const customIds = new Set(readCustomMetrics().map(m => m.id));
+  const source = customIds.has(id) ? 'custom' : 'builtin';
+  return NextResponse.json({ ...metric, source });
 }
 
 /** PUT: update a custom metric */
@@ -79,12 +78,13 @@ export async function PUT(
 
   const custom = readCustomMetrics();
   const index = custom.findIndex(m => m.id === id);
-  if (index === -1) {
-    return NextResponse.json({ error: 'Metric not found or is built-in (only custom metrics can be updated)' }, { status: 404 });
+  const existing = index >= 0 ? custom[index] : null;
+  const metric = normalizeMetric({ ...existing, ...body }, id);
+  if (index >= 0) {
+    custom[index] = metric;
+  } else {
+    custom.push(metric);
   }
-
-  const metric = normalizeMetric({ ...custom[index], ...body }, id);
-  custom[index] = metric;
   writeCustomMetrics(custom);
   return NextResponse.json({ ...metric, source: 'custom' });
 }

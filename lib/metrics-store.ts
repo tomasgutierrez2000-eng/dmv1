@@ -5,6 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { L3_METRICS } from '@/data/l3-metrics';
 import type { L3Metric } from '@/data/l3-metrics';
 
 const METRICS_CUSTOM_PATH = path.join(process.cwd(), 'data', 'metrics-custom.json');
@@ -50,4 +51,13 @@ export function nextCustomMetricId(existing: L3Metric[]): string {
     .filter(n => !Number.isNaN(n));
   const max = customIds.length ? Math.max(...customIds) : 0;
   return `C${String(max + 1).padStart(3, '0')}`;
+}
+
+/** Merged list: built-in + custom, with custom overriding built-in when same id. */
+export function getMergedMetrics(): L3Metric[] {
+  const byId = new Map(L3_METRICS.map(m => [m.id, m]));
+  for (const m of readCustomMetrics()) {
+    byId.set(m.id, m);
+  }
+  return Array.from(byId.values());
 }

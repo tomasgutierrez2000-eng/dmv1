@@ -265,6 +265,7 @@ export default function Canvas() {
     if (!shouldCompact) {
       if (savedPositionsRef.current) {
         const saved = savedPositionsRef.current;
+        savedPositionsRef.current = null; // Clear immediately to prevent effect from re-running restore (avoids React #185 infinite loop)
         focusFieldKeyRef.current = null;
         // Restore only valid positions so we never call setTablePosition(key, undefined)
         Object.entries(saved).forEach(([key, pos]) => {
@@ -280,12 +281,7 @@ export default function Canvas() {
         if (allPositions.length > 0) {
           runFitToView(allPositions, visibleTables.length);
         }
-        // Clear the ref AFTER a delay so the general fit-to-view effect
-        // doesn't fight with this restore during the same render cycle.
-        setTimeout(() => {
-          savedPositionsRef.current = null;
-          setIsAnimating(false);
-        }, 400);
+        setTimeout(() => setIsAnimating(false), 400);
       }
       return;
     }
@@ -436,37 +432,36 @@ export default function Canvas() {
     isInteractingRef.current = false;
   }, []);
 
-  // Smooth zoom toward cursor with variable speed based on scroll magnitude
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
+  // Smooth zoom toward cursor. Use native listener with { passive: false } so preventDefault works
+  // (React's onWheel is passive by default, which causes "Unable to preventDefault" console errors).
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       e.stopPropagation();
       isInteractingRef.current = true;
       setShowHint(false);
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
+      const { zoom: z, pan: p } = useModelStore.getState();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      // Normalize across browsers: trackpad = small deltaY, mouse wheel = large
       const absDelta = Math.abs(e.deltaY);
-      const speed = e.ctrlKey
-        ? 0.01 // pinch-to-zoom (trackpad) – fine control
-        : absDelta > 50
-          ? 0.08 // mouse wheel
-          : 0.04; // trackpad scroll
+      const speed = e.ctrlKey ? 0.01 : absDelta > 50 ? 0.08 : 0.04;
       const direction = e.deltaY > 0 ? -1 : 1;
       const factor = 1 + direction * speed;
-      const newZoom = Math.max(0.05, Math.min(4, zoom * factor));
-      const zoomChange = newZoom / zoom;
-      const newPan = {
-        x: mouseX - (mouseX - pan.x) * zoomChange,
-        y: mouseY - (mouseY - pan.y) * zoomChange,
-      };
+      const newZoom = Math.max(0.05, Math.min(4, z * factor));
+      const zoomChange = newZoom / z;
+      setPan({
+        x: mouseX - (mouseX - p.x) * zoomChange,
+        y: mouseY - (mouseY - p.y) * zoomChange,
+      });
       setZoom(newZoom);
-      setPan(newPan);
-    },
-    [zoom, pan, setZoom, setPan]
-  );
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [setZoom, setPan]);
 
   // Double-click: fit to view with smooth animation.
   // During focus-compact the canvas click will exit focus, so skip the redundant fit here.
@@ -567,7 +562,6 @@ export default function Canvas() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      onWheel={handleWheel}
       onDoubleClick={handleDoubleClick}
       onClick={handleCanvasClick}
       onContextMenu={(e) => e.preventDefault()}

@@ -215,7 +215,7 @@ export default function OverviewContent() {
             </div>
 
             <Link
-              href="/lineage"
+              href="/metrics"
               className="bg-pwc-gray/80 border border-pwc-gray rounded-xl p-6 cursor-pointer hover:border-purple-500 hover:bg-pwc-gray/70 transition-all group"
             >
               <div className="flex items-start gap-4 mb-4">
@@ -223,17 +223,39 @@ export default function OverviewContent() {
                   <Eye className="w-6 h-6 text-purple-400" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-lg mb-1">L3 Metric Lineage</h4>
-                  <p className="text-sm text-pwc-gray-light">Trace transformations &amp; equations</p>
+                  <h4 className="font-bold text-lg mb-1">Metrics Engine</h4>
+                  <p className="text-sm text-pwc-gray-light">View, edit &amp; manage metrics</p>
                 </div>
               </div>
               <p className="text-sm text-pwc-white/90 mb-4 leading-relaxed">
-                Select metrics and dimensions to visualize how they are derived from L1/L2 atomic elements — see every formula, transformation, and source field.
+                See all metrics, walk through how each is calculated, edit formulas and source fields, create new metrics, and visualize lineage. Export and import via Excel or JSON.
               </p>
               <div className="flex items-center gap-2 text-purple-400 font-medium text-sm group-hover:gap-3 transition-all">
                 <Play className="w-4 h-4" />
-                <span>Explore Lineage</span>
+                <span>Open Metrics Engine</span>
                 <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+
+            <Link
+              href="/lineage"
+              className="bg-pwc-gray/80 border border-pwc-gray rounded-xl p-6 cursor-pointer hover:border-purple-500 hover:bg-pwc-gray/70 transition-all group"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-lg bg-pwc-gray/60 flex items-center justify-center flex-shrink-0 group-hover:bg-pwc-gray/50 transition-colors">
+                  <Eye className="w-6 h-6 text-pwc-gray-light" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-lg mb-1">L3 Metric Lineage</h4>
+                  <p className="text-sm text-pwc-gray-light">Read-only lineage explorer</p>
+                </div>
+              </div>
+              <p className="text-sm text-pwc-white/90 mb-4 leading-relaxed">
+                Browse metrics by dashboard page with formula and source field details.
+              </p>
+              <div className="flex items-center gap-2 text-pwc-gray-light font-medium text-sm group-hover:gap-3 transition-all">
+                <ArrowRight className="w-4 h-4" />
+                <span>Explore Lineage</span>
               </div>
             </Link>
 

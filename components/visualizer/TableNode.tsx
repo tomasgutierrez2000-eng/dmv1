@@ -183,6 +183,7 @@ export default function TableNode({
       <g
         transform={`translate(${position.x}, ${position.y})`}
         onMouseDown={handleMouseDown}
+        onClick={(e) => e.stopPropagation()}
         style={{ cursor: 'grab' }}
       >
         <defs>
@@ -411,6 +412,7 @@ export default function TableNode({
     <g
       transform={`translate(${position.x}, ${position.y})`}
       onMouseDown={handleMouseDown}
+      onClick={(e) => e.stopPropagation()}
       style={{ cursor: 'grab' }}
     >
       <foreignObject 

@@ -101,9 +101,9 @@ export const useModelStore = create<ModelStore>((set) => ({
   tableSize: 'large',
   fieldDisplayMode: 'standard',
   requestFitToView: 0,
-  showRelationships: true, // Show relationships by default
-  showPrimaryRelationships: true, // Show primary relationships by default
-  showSecondaryRelationships: true, // Show secondary relationships by default
+  showRelationships: false, // Off by default; user can toggle on
+  showPrimaryRelationships: true, // Active when relationships toggled on
+  showSecondaryRelationships: true, // Active when relationships toggled on
   
   // Actions
   setModel: (model) => set({ model }),

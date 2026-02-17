@@ -74,7 +74,7 @@ export default function DomainContainer({
       {/* Domain Header - keep pointer-events so header click still toggles */}
       <foreignObject x="0" y="0" width={width} height={headerHeight} style={{ pointerEvents: 'auto' }}>
         <div
-          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-white/30`}
+          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-white/10`}
           onClick={onToggle}
           style={{
             background: `linear-gradient(135deg, ${categoryColor.color}20 0%, ${categoryColor.color}10 100%)`,
@@ -88,9 +88,14 @@ export default function DomainContainer({
                 style={{ backgroundColor: categoryColor.color }}
               />
               <div className="flex-1 min-w-0">
-                <h3 className={`${isOverview ? 'text-sm' : 'text-xl'} font-bold text-gray-900 truncate ${isOverview ? '' : 'mb-1'}`}>{domain}</h3>
+                <h3
+                  className={`${isOverview ? 'text-base leading-tight' : 'text-2xl'} font-extrabold text-white truncate ${isOverview ? '' : 'mb-1'}`}
+                  style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}
+                >
+                  {domain}
+                </h3>
                 {!isOverview && (
-                  <div className="flex items-center space-x-5 text-sm text-gray-600">
+                  <div className="flex items-center space-x-5 text-sm text-white/70">
                     <span className="flex items-center space-x-1.5 font-medium">
                       <Database className="w-4 h-4" />
                       <span>{stats.tableCount} tables</span>
@@ -105,9 +110,9 @@ export default function DomainContainer({
                   </div>
                 )}
                 {isOverview && (
-                  <div className="flex items-center space-x-2 text-xs text-gray-600">
+                  <div className="flex items-center space-x-2 text-xs text-white/60 font-medium">
                     <span>{stats.tableCount} tables</span>
-                    <span className="text-gray-500">|</span>
+                    <span className="text-white/40">|</span>
                     <span>{stats.totalFields} fields</span>
                   </div>
                 )}
@@ -117,22 +122,22 @@ export default function DomainContainer({
               <div className="flex items-center space-x-3 flex-shrink-0">
                 <div className="flex items-center space-x-1.5">
                   {stats.byLayer.L1 > 0 && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md font-semibold border border-blue-200">
+                    <span className="px-2 py-1 bg-pwc-orange/25 text-pwc-orange-light text-xs rounded-md font-semibold border border-pwc-orange/40">
                       L1:{stats.byLayer.L1}
                     </span>
                   )}
                   {stats.byLayer.L2 > 0 && (
-                    <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs rounded-md font-semibold border border-emerald-200">
+                    <span className="px-2 py-1 bg-pwc-orange/15 text-white/80 text-xs rounded-md font-semibold border border-pwc-orange/30">
                       L2:{stats.byLayer.L2}
                     </span>
                   )}
                   {stats.byLayer.L3 > 0 && (
-                    <span className="px-2 py-1 bg-violet-100 text-violet-800 text-xs rounded-md font-semibold border border-violet-200">
+                    <span className="px-2 py-1 bg-white/10 text-white/70 text-xs rounded-md font-semibold border border-white/20">
                       L3:{stats.byLayer.L3}
                     </span>
                   )}
                 </div>
-                <button className="text-gray-600 hover:text-gray-900 transition-colors p-1 hover:bg-white/50 rounded">
+                <button className="text-white/60 hover:text-white transition-colors p-1 hover:bg-white/20 rounded">
                   {isExpanded ? (
                     <ChevronDown className="w-6 h-6" />
                   ) : (
@@ -148,7 +153,7 @@ export default function DomainContainer({
       {/* Collapsed state indicator */}
       {!isExpanded && !isOverview && (
         <foreignObject x="0" y={headerHeight} width={width} height={height - headerHeight}>
-          <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-full flex items-center justify-center text-white/50 text-sm font-medium">
             Click to expand and view tables
           </div>
         </foreignObject>

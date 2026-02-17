@@ -16,8 +16,11 @@ export default function Canvas() {
   const [isDraggingTable, setIsDraggingTable] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [hoveredRelationship, setHoveredRelationship] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showHint, setShowHint] = useState(true);
   const DRAG_THRESHOLD_PX = 6;
   const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
+  const isInteractingRef = useRef(false);
 
   const {
     model,
@@ -138,23 +141,27 @@ export default function Canvas() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
   }, [model, layoutMode, tableSize, visibleLayers, setTablePosition]);
 
-  // Fit to visible tables when layout or filters change (so filtered/small sets fill the screen)
+  // Fit to visible tables when layout or filters change (animated)
   useEffect(() => {
     if (!model || visibleTables.length === 0) return;
     const positionsForFit = visibleTables
       .map((t) => tablePositions[t.key])
       .filter((p): p is TablePosition => !!p);
     if (positionsForFit.length === 0) return;
+    setIsAnimating(true);
     runFitToView(positionsForFit, visibleTables.length);
+    setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, layoutMode, tableSize, runFitToView]);
 
-  // Fit to view when user clicks toolbar "Fit to View"
+  // Fit to view when user clicks toolbar "Fit to View" (animated)
   useEffect(() => {
     if (!model || !requestFitToView) return;
     const positionsForFit = visibleTables
       .map((t) => tablePositions[t.key])
       .filter((p): p is TablePosition => !!p);
+    setIsAnimating(true);
     runFitToView(positionsForFit, visibleTables.length);
+    setTimeout(() => setIsAnimating(false), 350);
   }, [requestFitToView, model, visibleTables, tablePositions, runFitToView]);
 
   // Filter relationships to only show between visible tables with valid positions
@@ -200,9 +207,18 @@ export default function Canvas() {
       })
     : [];
 
-  // Handle canvas panning
+  // Canvas panning (left-click on empty area or middle-click anywhere)
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      setShowHint(false);
+      isInteractingRef.current = true;
+      // Middle mouse button: always pan
+      if (e.button === 1) {
+        e.preventDefault();
+        setIsPanning(true);
+        setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+        return;
+      }
       if (e.button === 0 && e.target === canvasRef.current) {
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
@@ -235,11 +251,10 @@ export default function Canvas() {
         const deltaY = (e.clientY - dragStart.y) / zoom;
         const currentPos = tablePositions[isDraggingTable];
         if (currentPos) {
-          const newPos = {
+          setTablePosition(isDraggingTable, {
             x: currentPos.x + deltaX,
             y: currentPos.y + deltaY,
-          };
-          setTablePosition(isDraggingTable, newPos);
+          });
           setDragStart({ x: e.clientX, y: e.clientY });
         }
       }
@@ -251,57 +266,101 @@ export default function Canvas() {
     setIsPanning(false);
     setIsDraggingTable(null);
     pendingDragRef.current = null;
+    isInteractingRef.current = false;
   }, []);
 
-  // Handle zoom with mouse wheel
+  // Smooth zoom toward cursor with variable speed based on scroll magnitude
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      
-      // Get mouse position relative to canvas
+      isInteractingRef.current = true;
+      setShowHint(false);
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
-      
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      
-      // Calculate zoom delta
-      const zoomSpeed = 0.1;
-      const delta = e.deltaY > 0 ? 1 - zoomSpeed : 1 + zoomSpeed;
-      const newZoom = Math.max(0.1, Math.min(3, zoom * delta));
-      
-      // Zoom towards mouse position
+      // Normalize across browsers: trackpad = small deltaY, mouse wheel = large
+      const absDelta = Math.abs(e.deltaY);
+      const speed = e.ctrlKey
+        ? 0.01 // pinch-to-zoom (trackpad) – fine control
+        : absDelta > 50
+          ? 0.08 // mouse wheel
+          : 0.04; // trackpad scroll
+      const direction = e.deltaY > 0 ? -1 : 1;
+      const factor = 1 + direction * speed;
+      const newZoom = Math.max(0.05, Math.min(4, zoom * factor));
       const zoomChange = newZoom / zoom;
       const newPan = {
         x: mouseX - (mouseX - pan.x) * zoomChange,
         y: mouseY - (mouseY - pan.y) * zoomChange,
       };
-      
       setZoom(newZoom);
       setPan(newPan);
     },
     [zoom, pan, setZoom, setPan]
   );
 
-  // Handle double-click to fit view
+  // Double-click: fit to view with smooth animation
   const handleDoubleClick = useCallback(() => {
     if (!model || visibleTables.length === 0) return;
+    setIsAnimating(true);
     const positions = visibleTables.map((t) => tablePositions[t.key]).filter(Boolean) as TablePosition[];
     if (positions.length === 0) return;
     runFitToView(positions, visibleTables.length);
+    setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, runFitToView]);
 
-  // Handle canvas click to clear selections and exit focus mode
+  // Click on empty canvas: clear selections and exit focus mode
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    // Only clear if clicking directly on canvas (not on a table or relationship)
     if (e.target === canvasRef.current || e.target === containerRef.current) {
       setSelectedField(null);
       setSelectedTable(null);
       setSelectedRelationship(null);
-      setFocusMode(false); // Exit focus mode to show all relationships
+      setFocusMode(false);
     }
   }, [setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Don't capture if user is typing in an input/select
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === '=' || e.key === '+') {
+        e.preventDefault();
+        setIsAnimating(true);
+        setZoom(Math.min(4, zoom * 1.15));
+        setTimeout(() => setIsAnimating(false), 200);
+      } else if (e.key === '-' || e.key === '_') {
+        e.preventDefault();
+        setIsAnimating(true);
+        setZoom(Math.max(0.05, zoom * 0.85));
+        setTimeout(() => setIsAnimating(false), 200);
+      } else if (e.key === '0') {
+        e.preventDefault();
+        setIsAnimating(true);
+        if (model && visibleTables.length > 0) {
+          const positions = visibleTables.map((t) => tablePositions[t.key]).filter(Boolean) as TablePosition[];
+          runFitToView(positions, visibleTables.length);
+        }
+        setTimeout(() => setIsAnimating(false), 350);
+      } else if (e.key === 'Escape') {
+        setSelectedField(null);
+        setSelectedTable(null);
+        setSelectedRelationship(null);
+        setFocusMode(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode]);
+
+  // Auto-hide navigation hint after first interaction or 6 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowHint(false), 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!model) {
     return (
@@ -311,10 +370,16 @@ export default function Canvas() {
     );
   }
 
+  const cursorStyle = isPanning
+    ? 'grabbing'
+    : isDraggingTable
+      ? 'move'
+      : 'grab';
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-gray-100"
+      className="relative w-full h-full overflow-hidden bg-gray-100 select-none"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -322,8 +387,15 @@ export default function Canvas() {
       onWheel={handleWheel}
       onDoubleClick={handleDoubleClick}
       onClick={handleCanvasClick}
-      style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+      onContextMenu={(e) => e.preventDefault()}
+      style={{ cursor: cursorStyle }}
     >
+      {/* Navigation hint – auto-fades */}
+      {showHint && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 bg-black/60 text-white text-xs font-medium rounded-full backdrop-blur-sm pointer-events-none animate-pulse">
+          Scroll to zoom · Drag to pan · Double-click to fit · +/- keys to zoom · 0 to fit · Esc to deselect
+        </div>
+      )}
       <svg
         ref={canvasRef}
         width="100%"
@@ -331,14 +403,17 @@ export default function Canvas() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.25) 1px, transparent 1px)
+            linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px)
           `,
           backgroundSize: `${25 * zoom}px ${25 * zoom}px`,
           backgroundPosition: `${pan.x % (25 * zoom)}px ${pan.y % (25 * zoom)}px`,
         }}
       >
-        <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+        <g
+          transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
+          style={isAnimating ? { transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' } : undefined}
+        >
           {/* Domain Containers - In domain and domain-overview layout modes */}
           {(layoutMode === 'domain' || layoutMode === 'domain-overview') && model && (() => {
             const domains = new Set(visibleTables.map(t => t.category));
@@ -521,28 +596,36 @@ export default function Canvas() {
               outgoing: model.relationships.filter(r => r.source.tableKey === table.key).length,
             } : { incoming: 0, outgoing: 0 };
             
+            const beingDragged = isDraggingTable === table.key;
             return (
-              <TableNode
+              <g
                 key={table.key}
-                table={table}
-                position={position}
-                isSelected={selectedTable === table.key}
-                isExpanded={layoutMode === 'domain-overview' ? false : expandedTables.has(table.key)}
-                onSelect={() => setSelectedTable(table.key)}
-                onToggleExpand={() => {
-                  // Prevent expansion in overview mode
-                  if (layoutMode !== 'domain-overview') {
-                    toggleExpandedTable(table.key);
-                  }
+                style={{
+                  opacity: beingDragged ? 0.85 : 1,
+                  filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
+                  transition: beingDragged ? 'none' : 'opacity 0.15s ease',
                 }}
-                onMouseDown={(e) => {
-                  pendingDragRef.current = { tableKey: table.key, startX: e.clientX, startY: e.clientY };
-                }}
-                searchQuery={searchQuery}
-                relationshipCounts={relationshipCounts}
-                selectedField={selectedField}
-                onFieldSelect={(tableKey, fieldName) => setSelectedField({ tableKey, fieldName })}
-              />
+              >
+                <TableNode
+                  table={table}
+                  position={position}
+                  isSelected={selectedTable === table.key}
+                  isExpanded={layoutMode === 'domain-overview' ? false : expandedTables.has(table.key)}
+                  onSelect={() => setSelectedTable(table.key)}
+                  onToggleExpand={() => {
+                    if (layoutMode !== 'domain-overview') {
+                      toggleExpandedTable(table.key);
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    pendingDragRef.current = { tableKey: table.key, startX: e.clientX, startY: e.clientY };
+                  }}
+                  searchQuery={searchQuery}
+                  relationshipCounts={relationshipCounts}
+                  selectedField={selectedField}
+                  onFieldSelect={(tableKey, fieldName) => setSelectedField({ tableKey, fieldName })}
+                />
+              </g>
             );
           })}
         </g>

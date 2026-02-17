@@ -26,6 +26,7 @@ export default function Canvas() {
   // These refs persist across renders without causing dependency cascades.
   const savedPositionsRef = useRef<Record<string, TablePosition> | null>(null);
   const focusFieldKeyRef = useRef<string | null>(null);
+  const savedSearchPositionsRef = useRef<Record<string, TablePosition> | null>(null);
 
   const {
     model,
@@ -194,6 +195,80 @@ export default function Canvas() {
     const id = setTimeout(() => fitToTablesNow(tablesToFit), 300);
     return () => clearTimeout(id);
   }, [searchQuery, filtersNarrowing, model, visibleTables, layoutMode, tableSize, fitToTablesNow]);
+
+  // Search compact mode: temporarily cluster matched tables for a denser, easier-to-read view.
+  // Restores original positions once search is cleared.
+  useEffect(() => {
+    const activeSearch = searchQuery.trim();
+    if (!model) return;
+
+    // Restore original positions when search is cleared.
+    if (!activeSearch) {
+      if (savedSearchPositionsRef.current) {
+        const saved = savedSearchPositionsRef.current;
+        savedSearchPositionsRef.current = null;
+        Object.entries(saved).forEach(([key, pos]) => {
+          if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+            setTablePosition(key, pos);
+          }
+        });
+      }
+      return;
+    }
+
+    // Avoid conflicting with field focus compact mode.
+    if (savedPositionsRef.current || visibleTables.length === 0) return;
+
+    if (!savedSearchPositionsRef.current) {
+      savedSearchPositionsRef.current = { ...useModelStore.getState().tablePositions };
+    }
+
+    const overviewDims = getOverviewTableDimensions(tableSize);
+    const BASE_TW = 560;
+    const BASE_TH = 320;
+    const SM: Record<string, { w: number; h: number }> = {
+      small: { w: 0.8, h: 0.9 },
+      medium: { w: 1.0, h: 1.0 },
+      large: { w: 1.35, h: 1.25 },
+    };
+    const isOverview = layoutMode === 'domain-overview';
+    const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
+    const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
+    const hGap = Math.round(tw * (isOverview ? 0.24 : 0.16));
+    const vGap = Math.round(th * (isOverview ? 0.24 : 0.18));
+
+    const n = visibleTables.length;
+    const cols = n <= 4 ? n : Math.max(2, Math.ceil(Math.sqrt(n)));
+    const rows = Math.max(1, Math.ceil(n / cols));
+    const stepX = tw + hGap;
+    const stepY = th + vGap;
+    const gridW = cols * stepX - hGap;
+    const gridH = rows * stepY - vGap;
+    const startX = -gridW / 2;
+    const startY = -gridH / 2;
+
+    const compactPositions = visibleTables
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((table, idx) => {
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        return {
+          key: table.key,
+          x: startX + col * stepX,
+          y: startY + row * stepY,
+        };
+      });
+
+    compactPositions.forEach(({ key, x, y }) => setTablePosition(key, { x, y }));
+
+    setIsAnimating(true);
+    runFitToView(
+      compactPositions.map((p) => ({ x: p.x, y: p.y })),
+      compactPositions.length
+    );
+    setTimeout(() => setIsAnimating(false), 320);
+  }, [searchQuery, model, visibleTables, layoutMode, tableSize, runFitToView, setTablePosition]);
 
   // Filter relationships to only show between visible tables with valid positions.
   // Memoized so downstream consumers (focusVisibleTableKeys, JSX) don't recompute every render.
@@ -397,6 +472,7 @@ export default function Canvas() {
   useEffect(() => {
     savedPositionsRef.current = null;
     focusFieldKeyRef.current = null;
+    savedSearchPositionsRef.current = null;
   }, [model, layoutMode, tableSize, visibleLayers]);
 
   // Canvas panning (left-click on empty area or middle-click anywhere)

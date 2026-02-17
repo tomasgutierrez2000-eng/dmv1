@@ -233,7 +233,8 @@ export default function TableNode({
             y={OV.HEADER_H}
             width={TABLE_WIDTH}
             height={contentH}
-            className="overflow-hidden"
+            requiredExtensions="http://www.w3.org/1999/xhtml"
+            style={{ overflow: 'hidden' }}
           >
             <div
               className="overflow-hidden bg-white box-border"
@@ -361,6 +362,8 @@ export default function TableNode({
         height={TABLE_HEIGHT}
         x="0" 
         y="0"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+        style={{ overflow: 'hidden' }}
       >
         <div
           className={`rounded-xl shadow-2xl transition-all duration-200 overflow-hidden ${

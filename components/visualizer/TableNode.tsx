@@ -138,22 +138,26 @@ export default function TableNode({
   const fkFields = table.fields.filter((f) => f.isFK);
 
   const highlightMatch = (text: string) => {
-    if (!searchQuery) return text;
-    const regex = new RegExp(`(${searchQuery})`, 'gi');
-    const parts = text.split(regex);
-    return (
-      <>
-        {parts.map((part, i) =>
-          regex.test(part) ? (
-            <mark key={i} className="bg-yellow-300 text-yellow-900 px-0.5 rounded">
-              {part}
-            </mark>
-          ) : (
-            part
-          )
-        )}
-      </>
-    );
+    if (!searchQuery || !text) return text ?? '';
+    try {
+      const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      const parts = text.split(regex);
+      return (
+        <>
+          {parts.map((part, i) =>
+            part.toLowerCase() === searchQuery.toLowerCase() ? (
+              <mark key={i} className="bg-yellow-300 text-yellow-900 px-0.5 rounded">
+                {part}
+              </mark>
+            ) : (
+              part
+            )
+          )}
+        </>
+      );
+    } catch {
+      return text;
+    }
   };
 
   // All fields are now always visible and scrollable
@@ -231,12 +235,25 @@ export default function TableNode({
             height={contentH}
             className="overflow-hidden"
           >
-            <div className="h-full w-full overflow-hidden bg-white" style={{ fontSize: 10, contain: 'layout' }}>
+            <div
+              className="overflow-hidden bg-white box-border"
+              style={{
+                fontSize: 10,
+                width: TABLE_WIDTH,
+                height: contentH,
+                minWidth: 0,
+                minHeight: 0,
+              }}
+            >
               {table.fields.length > 0 ? (
                 <div
                   data-scrollable-table-fields
-                  className="h-full overflow-y-auto overflow-x-hidden scrollbar-thin px-2 py-1"
-                  style={{ minHeight: 0 }}
+                  className="overflow-y-auto overflow-x-hidden scrollbar-thin px-2 py-1 box-border"
+                  style={{
+                    width: TABLE_WIDTH,
+                    height: contentH,
+                    minHeight: 0,
+                  }}
                   onWheel={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
                   title="Scroll to see all fields"
@@ -245,17 +262,18 @@ export default function TableNode({
                     {table.fields.map((field, i) => {
                       const isPK = field.isPK;
                       const isFK = field.isFK;
+                      const fieldName = field.name ?? '';
                       const isThisFieldSelected =
                         selectedField?.tableKey === table.key &&
-                        selectedField?.fieldName === field.name;
+                        selectedField?.fieldName === fieldName;
                       const prefix = isPK ? 'PK ' : isFK ? 'FK ' : '';
                       return (
                         <div
-                          key={i}
+                          key={`${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (onFieldSelect) onFieldSelect(table.key, field.name);
+                            if (onFieldSelect) onFieldSelect(table.key, fieldName);
                           }}
                           className={`truncate rounded px-1 py-0.5 cursor-pointer font-mono ${
                             isThisFieldSelected
@@ -270,16 +288,19 @@ export default function TableNode({
                                   ? 'text-blue-800 font-semibold hover:bg-blue-50'
                                   : 'text-gray-700 hover:bg-gray-50'
                           }`}
-                          title={field.name}
+                          title={fieldName}
                         >
-                          {prefix}{highlightMatch(field.name)}
+                          {prefix}{highlightMatch(fieldName)}
                         </div>
                       );
                     })}
                   </div>
                 </div>
               ) : (
-                <div className="h-full flex items-center justify-center text-gray-400 text-xs italic">
+                <div
+                  className="flex items-center justify-center text-gray-400 text-xs italic"
+                  style={{ height: contentH }}
+                >
                   No fields
                 </div>
               )}
@@ -419,19 +440,19 @@ export default function TableNode({
                   {table.fields.map((field, idx) => {
                   const isPK = field.isPK;
                   const isFK = field.isFK;
-                  
+                  const fieldName = field.name ?? '';
                   return (
                     <div
-                      key={idx}
+                      key={`${fieldName}-${idx}`}
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (onFieldSelect) {
-                          onFieldSelect(table.key, field.name);
+                          onFieldSelect(table.key, fieldName);
                         }
                       }}
                       className={`group ${fieldTextSize} ${fieldPadding} rounded border transition-all hover:shadow-sm hover:scale-[1.02] cursor-pointer ${
-                        selectedField?.tableKey === table.key && selectedField?.fieldName === field.name
+                        selectedField?.tableKey === table.key && selectedField?.fieldName === fieldName
                           ? isPK
                             ? 'bg-gradient-to-r from-yellow-200 to-yellow-100 border-yellow-500 shadow-md ring-2 ring-yellow-400 ring-opacity-50'
                             : isFK
@@ -465,9 +486,9 @@ export default function TableNode({
                         {/* Field Name - Dynamic size with better contrast and visual hierarchy */}
                         <span 
                           className={`font-mono ${isPK ? 'font-bold text-yellow-900' : isFK ? 'font-semibold text-blue-700' : 'font-medium text-gray-800'} flex-1 min-w-0 truncate ${fieldTextSize}`}
-                          title={field.description || field.name}
+                          title={field.description || fieldName}
                         >
-                          {highlightMatch(field.name)}
+                          {highlightMatch(fieldName)}
                         </span>
                         
                         {/* Data Type - Show based on zoom level and field display mode */}

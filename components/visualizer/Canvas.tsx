@@ -77,6 +77,17 @@ export default function Canvas() {
     });
   }, [model, visibleLayers, filterCategories, l3CategoryExcluded, searchQuery]);
 
+  // True when user has applied filters that narrow the visible set (category, layer, or L3 exclusion).
+  const filtersNarrowing = useMemo(
+    () =>
+      filterCategories.size > 0 ||
+      !visibleLayers.L1 ||
+      !visibleLayers.L2 ||
+      !visibleLayers.L3 ||
+      l3CategoryExcluded.size > 0,
+    [filterCategories, visibleLayers, l3CategoryExcluded]
+  );
+
   // Fit view to a set of positions; when visible count is low, zoom in so boxes fill the screen
   const runFitToView = useCallback(
     (positionsToFit: Array<{ x: number; y: number }>, visibleCount: number) => {
@@ -140,6 +151,22 @@ export default function Canvas() {
     [layoutMode, tableSize, setPan, setZoom]
   );
 
+  // Single helper: fit camera to a set of tables (reads latest positions from store).
+  // Used by both full-view and search/filter fit effects for consistent behavior and no duplication.
+  const fitToTablesNow = useCallback(
+    (tables: typeof visibleTables) => {
+      if (tables.length === 0) return;
+      const positions = tables
+        .map((t) => useModelStore.getState().tablePositions[t.key])
+        .filter((p): p is TablePosition => !!p);
+      if (positions.length === 0) return;
+      setIsAnimating(true);
+      runFitToView(positions, tables.length);
+      setTimeout(() => setIsAnimating(false), 350);
+    },
+    [runFitToView]
+  );
+
   // Apply layout when model, layout mode, table size, or visible layers change
   useEffect(() => {
     if (!model) return;
@@ -150,37 +177,23 @@ export default function Canvas() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
   }, [model, layoutMode, tableSize, visibleLayers, setTablePosition]);
 
-  // Fit to visible tables when layout or filters change (animated).
-  // Skipped when focus-compact is active — that effect handles its own camera.
+  // Fit to visible tables when layout or full-view state change. Skipped when focus-compact
+  // or when search/filter is active (delayed effect below handles those for one consistent fit).
   useEffect(() => {
-    if (!model || visibleTables.length === 0) return;
-    if (savedPositionsRef.current) return; // focus-compact owns the camera right now
-    const positionsForFit = visibleTables
-      .map((t) => tablePositions[t.key])
-      .filter((p): p is TablePosition => !!p);
-    if (positionsForFit.length === 0) return;
-    setIsAnimating(true);
-    runFitToView(positionsForFit, visibleTables.length);
-    setTimeout(() => setIsAnimating(false), 350);
-  }, [model, visibleTables, tablePositions, layoutMode, tableSize, runFitToView]);
+    if (!model || visibleTables.length === 0 || savedPositionsRef.current) return;
+    if (searchQuery.trim() || filtersNarrowing) return;
+    fitToTablesNow(visibleTables);
+  }, [model, visibleTables, layoutMode, tableSize, searchQuery, filtersNarrowing, fitToTablesNow]);
 
-  // When user searches: fit view to search results so they're in view without scrolling.
-  // Run after a short delay so positions are ready and the filter has been applied.
+  // When user searches or applies filters: fit view to the narrowed set (closer view, no scroll).
+  // Debounced (300ms) so typing doesn’t trigger repeated fits; single filter change still fits once.
   useEffect(() => {
-    if (!searchQuery.trim() || !model || visibleTables.length === 0 || savedPositionsRef.current) return;
+    const searchOrFilterActive = !!searchQuery.trim() || filtersNarrowing;
+    if (!searchOrFilterActive || !model || visibleTables.length === 0 || savedPositionsRef.current) return;
     const tablesToFit = visibleTables;
-    const id = setTimeout(() => {
-      const currentPositions = useModelStore.getState().tablePositions;
-      const positions = tablesToFit
-        .map((t) => currentPositions[t.key])
-        .filter((p): p is TablePosition => !!p);
-      if (positions.length === 0) return;
-      setIsAnimating(true);
-      runFitToView(positions, tablesToFit.length);
-      setTimeout(() => setIsAnimating(false), 350);
-    }, 100);
+    const id = setTimeout(() => fitToTablesNow(tablesToFit), 300);
     return () => clearTimeout(id);
-  }, [searchQuery, model, visibleTables, runFitToView]);
+  }, [searchQuery, filtersNarrowing, model, visibleTables, layoutMode, tableSize, fitToTablesNow]);
 
   // Filter relationships to only show between visible tables with valid positions.
   // Memoized so downstream consumers (focusVisibleTableKeys, JSX) don't recompute every render.

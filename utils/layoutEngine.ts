@@ -546,11 +546,11 @@ function calculateDomainOverviewLayout(
   const { width: OVERVIEW_TABLE_WIDTH, height: OVERVIEW_TABLE_HEIGHT } = compactView
     ? getCompactOverviewTableDimensions()
     : getOverviewTableDimensions(tableSize);
-  const TABLE_SPACING = compactView ? 4 : 10;
-  const DOMAIN_SPACING = compactView ? 4 : 8;
-  const DOMAIN_PADDING = compactView ? 8 : 15;
-  const DOMAIN_HEADER_HEIGHT = compactView ? 26 : 40;
-  const LAYER_GAP = compactView ? 6 : 15;
+  const TABLE_SPACING = compactView ? 4 : 6;
+  const DOMAIN_SPACING = compactView ? 4 : 6;
+  const DOMAIN_PADDING = compactView ? 6 : 10;
+  const DOMAIN_HEADER_HEIGHT = compactView ? 26 : 36;
+  const LAYER_GAP = compactView ? 6 : 8;
 
   // Group tables by domain
   const byDomain = new Map<string, TableDef[]>();
@@ -582,24 +582,31 @@ function calculateDomainOverviewLayout(
     domains.sort((a, b) => byDomain.get(b)!.length - byDomain.get(a)!.length);
   }
 
-  const DOMAINS_PER_ROW = compactView ? 7 : 5;
-  const totalHorizontalSpacing = (DOMAINS_PER_ROW - 1) * DOMAIN_SPACING;
-  const domainWidth = Math.floor((availableWidth - totalHorizontalSpacing - startX * 2) / DOMAINS_PER_ROW);
-  const effectiveWidth = domainWidth - DOMAIN_PADDING * 2;
-  const tablesPerRow = Math.max(1, Math.floor(effectiveWidth / (OVERVIEW_TABLE_WIDTH + TABLE_SPACING)));
+  const maxTablesPerRow = Math.max(1, Math.floor((availableWidth - startX * 2 - DOMAIN_PADDING * 2) / (OVERVIEW_TABLE_WIDTH + TABLE_SPACING)));
+  const maxDomainWidth = availableWidth - startX * 2;
 
-  // Calculate per-domain heights (width is uniform)
+  // Per-domain: width from content (so category boxes size to their tables), height from content
   const domainHeights = new Map<string, number>();
+  const domainWidths = new Map<string, number>();
 
   domains.forEach((domain) => {
     const domainTables = byDomain.get(domain)!;
     const byLayer = { L1: [] as TableDef[], L2: [] as TableDef[], L3: [] as TableDef[] };
     domainTables.forEach(t => byLayer[t.layer].push(t));
+    const maxTablesInLayer = Math.max(byLayer.L1.length, byLayer.L2.length, byLayer.L3.length);
+    const tablesPerRow = Math.min(maxTablesInLayer, maxTablesPerRow);
+    const contentWidth = tablesPerRow * (OVERVIEW_TABLE_WIDTH + TABLE_SPACING) - TABLE_SPACING;
+    const minDomainWidth = OVERVIEW_TABLE_WIDTH + DOMAIN_PADDING * 2;
+    const domainWidth = Math.max(minDomainWidth, Math.min(contentWidth + DOMAIN_PADDING * 2, maxDomainWidth));
+    domainWidths.set(domain, domainWidth);
+
+    const effectiveWidth = domainWidth - DOMAIN_PADDING * 2;
+    const actualTablesPerRow = Math.max(1, Math.min(maxTablesInLayer, Math.floor(effectiveWidth / (OVERVIEW_TABLE_WIDTH + TABLE_SPACING))));
 
     let cumulativeY = DOMAIN_HEADER_HEIGHT + DOMAIN_PADDING;
     (['L1', 'L2', 'L3'] as const).forEach((layer) => {
       if (byLayer[layer].length > 0) {
-        const layerRows = Math.ceil(byLayer[layer].length / tablesPerRow);
+        const layerRows = Math.ceil(byLayer[layer].length / actualTablesPerRow);
         const layerHeight = layerRows * OVERVIEW_TABLE_HEIGHT + (layerRows - 1) * TABLE_SPACING;
         cumulativeY += layerHeight + LAYER_GAP;
       }
@@ -613,28 +620,29 @@ function calculateDomainOverviewLayout(
     domainHeights.set(domain, Math.max(domainHeight, minHeight));
   });
 
-  // Place domains in a 4-column grid
+  // Place domains back-to-back (variable width), wrap when row full
   let currentX = startX;
   let currentY = startY;
   let maxYInRow = startY;
-  let colIndex = 0;
 
   domains.forEach((domain) => {
     const domainTables = byDomain.get(domain)!;
     const domainHeight = domainHeights.get(domain)!;
+    const domainWidth = domainWidths.get(domain)!;
 
-    // Wrap to next row after every 5 domains
-    if (colIndex > 0 && colIndex % DOMAINS_PER_ROW === 0) {
+    // Wrap to next row if this domain would overflow
+    if (currentX > startX && currentX + domainWidth > startX + maxDomainWidth) {
       currentX = startX;
       currentY = maxYInRow + DOMAIN_SPACING;
       maxYInRow = currentY;
     }
 
-    // Separate tables by layer
     const byLayer = { L1: [] as TableDef[], L2: [] as TableDef[], L3: [] as TableDef[] };
     domainTables.forEach(t => byLayer[t.layer].push(t));
+    const maxTablesInLayer = Math.max(byLayer.L1.length, byLayer.L2.length, byLayer.L3.length);
+    const effectiveWidth = domainWidth - DOMAIN_PADDING * 2;
+    const tablesPerRow = Math.max(1, Math.min(maxTablesInLayer, Math.floor(effectiveWidth / (OVERVIEW_TABLE_WIDTH + TABLE_SPACING))));
 
-    // Calculate dynamic layer Y offsets
     let cumulativeLayerY = DOMAIN_HEADER_HEIGHT + DOMAIN_PADDING;
 
     (['L1', 'L2', 'L3'] as const).forEach((layer) => {
@@ -646,9 +654,9 @@ function calculateDomainOverviewLayout(
       let rowY = currentY + layerStartY;
       let rowCount = 0;
 
-      // Center single tables
       if (layerTables.length === 1) {
-        x = currentX + DOMAIN_PADDING + (effectiveWidth - OVERVIEW_TABLE_WIDTH) / 2;
+        const centerOffset = Math.max(0, (effectiveWidth - OVERVIEW_TABLE_WIDTH) / 2);
+        x = currentX + DOMAIN_PADDING + centerOffset;
       }
 
       layerTables.forEach((table, idx) => {
@@ -669,10 +677,8 @@ function calculateDomainOverviewLayout(
       cumulativeLayerY += layerHeight + LAYER_GAP;
     });
 
-    // Track domain bottom edge for row wrapping
     maxYInRow = Math.max(maxYInRow, currentY + domainHeight);
     currentX += domainWidth + DOMAIN_SPACING;
-    colIndex++;
   });
 
   return positions;

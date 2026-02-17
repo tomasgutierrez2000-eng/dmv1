@@ -759,105 +759,47 @@ export default function Canvas() {
               tableHeight = viewMode === 'compact' ? 84 : (BASE_TABLE_HEIGHT * multiplier.height);
             }
             
-            // Domain-overview: use same grid as layout engine so all groupings have uniform width
-            const DOMAIN_OVERVIEW = {
-              startX: 6,
-              startY: 8,
-              DOMAIN_SPACING: 8,
-              DOMAIN_PADDING: 15,
-              headerOffset: 55,
-              footerOffset: 15,
-              DOMAINS_PER_ROW: 5,
-            };
-
-            if (layoutMode === 'domain-overview' && !hasNarrowedView) {
-              const viewportW = typeof window !== 'undefined' ? window.innerWidth : 2400;
-              const availableWidth = Math.max(viewportW - 12, 3200);
-              const domainWidth = Math.floor(
-                (availableWidth - (DOMAIN_OVERVIEW.DOMAINS_PER_ROW - 1) * DOMAIN_OVERVIEW.DOMAIN_SPACING - DOMAIN_OVERVIEW.startX * 2) / DOMAIN_OVERVIEW.DOMAINS_PER_ROW
-              );
-              // Use model.categories order so domain boxes align with layout engine (group by category)
-              const orderedDomains = model.categories?.length
-                ? [
-                    ...model.categories.filter((c) => domains.has(c)),
-                    ...Array.from(domains).filter((c) => !model.categories!.includes(c)).sort(),
-                  ]
-                : Array.from(domains).sort(
-                    (a, b) => visibleTables.filter(t => t.category === b).length - visibleTables.filter(t => t.category === a).length
-                  );
-              let cx = DOMAIN_OVERVIEW.startX;
-              let cy = DOMAIN_OVERVIEW.startY;
-              let maxYInRow = DOMAIN_OVERVIEW.startY;
-              let colIndex = 0;
-
-              orderedDomains.forEach((domain) => {
-                const domainTables = visibleTables.filter(t => t.category === domain);
-                if (domainTables.length === 0) return;
-                const positions = domainTables
-                  .map(t => tablePositions[t.key])
-                  .filter(p => p) as TablePosition[];
-                if (positions.length === 0) return;
-
-                if (colIndex > 0 && colIndex % DOMAIN_OVERVIEW.DOMAINS_PER_ROW === 0) {
-                  cx = DOMAIN_OVERVIEW.startX;
-                  cy = maxYInRow + DOMAIN_OVERVIEW.DOMAIN_SPACING;
-                  maxYInRow = cy;
-                }
-                const minY = Math.min(...positions.map(p => p.y));
-                const maxY = Math.max(...positions.map(p => p.y + tableHeight));
-                const boxHeight = DOMAIN_OVERVIEW.headerOffset + (maxY - minY) + DOMAIN_OVERVIEW.footerOffset;
-                domainPositions.set(domain, {
-                  x: cx,
-                  y: cy,
-                  width: domainWidth,
-                  height: boxHeight,
-                });
-                maxYInRow = Math.max(maxYInRow, cy + boxHeight);
-                cx += domainWidth + DOMAIN_OVERVIEW.DOMAIN_SPACING;
-                colIndex++;
-              });
-            } else {
-              // Domain bounds from actual visible table positions.
-              // In domain-overview we switch to this path while narrowed (search/filter)
-              // so frames track temporary compacted/reduced table positions.
-              let domainPadding: number;
-              let headerOffset: number;
-              let footerOffset: number;
-              if (layoutMode === 'domain-overview') {
-                if (viewMode === 'compact') {
-                  domainPadding = 6;
-                  headerOffset = 28;
-                  footerOffset = 8;
-                } else {
-                  domainPadding = DOMAIN_OVERVIEW.DOMAIN_PADDING;
-                  headerOffset = DOMAIN_OVERVIEW.headerOffset;
-                  footerOffset = DOMAIN_OVERVIEW.footerOffset;
-                }
+            // Domain bounds from actual table positions so category boxes resize to content and sit closer
+            let domainPadding: number;
+            let headerOffset: number;
+            let footerOffset: number;
+            if (layoutMode === 'domain-overview') {
+              if (viewMode === 'compact') {
+                domainPadding = 6;
+                headerOffset = 28;
+                footerOffset = 8;
               } else {
-                domainPadding = 25;
-                headerOffset = 105;
-                footerOffset = 25;
+                domainPadding = 10;
+                headerOffset = 45; // match DomainContainer overview header height when !compactFrame
+                footerOffset = 10;
               }
-
-              Array.from(domains).forEach((domain) => {
-                const domainTables = visibleTables.filter(t => t.category === domain);
-                if (domainTables.length === 0) return;
-                const positions = domainTables
-                  .map(t => tablePositions[t.key])
-                  .filter(p => p) as TablePosition[];
-                if (positions.length === 0) return;
-                const minX = Math.min(...positions.map(p => p.x));
-                const maxX = Math.max(...positions.map(p => p.x + tableWidth));
-                const minY = Math.min(...positions.map(p => p.y));
-                const maxY = Math.max(...positions.map(p => p.y + tableHeight));
-                domainPositions.set(domain, {
-                  x: minX - domainPadding,
-                  y: minY - headerOffset,
-                  width: maxX - minX + (domainPadding * 2),
-                  height: maxY - minY + headerOffset + footerOffset,
-                });
-              });
+            } else {
+              domainPadding = 25;
+              headerOffset = 105;
+              footerOffset = 25;
             }
+
+            Array.from(domains).forEach((domain) => {
+              const domainTables = visibleTables.filter(t => t.category === domain);
+              if (domainTables.length === 0) return;
+              const positions = domainTables
+                .map(t => tablePositions[t.key])
+                .filter((p): p is TablePosition => !!p && Number.isFinite(p.x) && Number.isFinite(p.y));
+              if (positions.length === 0) return;
+              const minX = Math.min(...positions.map(p => p.x));
+              const maxX = Math.max(...positions.map(p => p.x + tableWidth));
+              const minY = Math.min(...positions.map(p => p.y));
+              const maxY = Math.max(...positions.map(p => p.y + tableHeight));
+              const width = maxX - minX + domainPadding * 2;
+              const height = maxY - minY + headerOffset + footerOffset;
+              if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return;
+              domainPositions.set(domain, {
+                x: minX - domainPadding,
+                y: minY - headerOffset,
+                width: Math.max(1, width),
+                height: Math.max(1, height),
+              });
+            });
             
             return Array.from(domainPositions.entries()).map(([domain, pos]) => {
               const domainHasFocusTable = !focusVisibleTableKeys ||
@@ -878,6 +820,7 @@ export default function Canvas() {
                     height={pos.height}
                     isExpanded={expandedDomains.has(domain)}
                     onToggle={() => toggleExpandedDomain(domain)}
+                    compactFrame={layoutMode === 'domain-overview' && viewMode === 'compact'}
                   />
                 </g>
               );

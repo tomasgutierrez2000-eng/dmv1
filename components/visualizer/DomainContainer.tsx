@@ -14,6 +14,8 @@ interface DomainContainerProps {
   height: number;
   isExpanded: boolean;
   onToggle: () => void;
+  /** When true (compact overview), use a shorter header so the frame fits tightly */
+  compactFrame?: boolean;
 }
 
 export default function DomainContainer({
@@ -24,6 +26,7 @@ export default function DomainContainer({
   height,
   isExpanded,
   onToggle,
+  compactFrame = false,
 }: DomainContainerProps) {
   const { model, visibleLayers, layoutMode } = useModelStore();
   const categoryColor = getCategoryColor(domain);
@@ -47,7 +50,7 @@ export default function DomainContainer({
   }, [tables, visibleLayers, model]);
 
   const isOverview = layoutMode === 'domain-overview';
-  const headerHeight = isOverview ? 45 : 80;
+  const headerHeight = isOverview ? (compactFrame ? 28 : 45) : 80;
 
   return (
     <g

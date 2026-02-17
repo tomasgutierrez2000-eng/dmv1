@@ -47,6 +47,120 @@
       "pk": false,
       "fk": "l1.source_system_registry(source_system_id)",
       "nullable": true
+    },
+    "accrued_interest_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "book_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contractual_maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "credit_agreement_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "credit_status_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "effective_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exposure_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "external_risk_rating": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "internal_risk_rating": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lgd_estimate": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "market_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "netting_set_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "notional_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pd_estimate": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "position_currency": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "trading_banking_book_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ultimate_parent_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.position_detail": {
@@ -82,6 +196,144 @@
     },
     "maturity_date": {
       "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "cash_leg_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ccf": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "current_balance": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "days_past_due": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "delinquency_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "derivative_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fair_value": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "funded_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "haircut_applied_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "insured_balance": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_rate": {
+      "type": "DECIMAL(8,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "mark_to_market": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "origination_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pfe": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "quantity": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_index": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_type": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "replacement_cost": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "sft_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "spread_bps": {
+      "type": "DECIMAL(8,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "total_commitment": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "unfunded_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "unrealized_gain_loss": {
+      "type": "VARCHAR(100)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -122,6 +374,42 @@
       "type": "VARCHAR(20)",
       "pk": false,
       "fk": "l1.currency_dim(currency_code)",
+      "nullable": true
+    },
+    "attributed_exposure_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "attribution_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_role_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_risk_shifted_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_shifted_from_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
       "nullable": true
     }
   },
@@ -167,6 +455,72 @@
       "pk": false,
       "fk": "l1.source_system_registry(source_system_id)",
       "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "coverage_ratio_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exposure_amount_local": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_exposure_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fr2590_category_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "gross_exposure_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "net_exposure_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.netting_set_exposure_snapshot": {
@@ -198,6 +552,42 @@
       "type": "VARCHAR(20)",
       "pk": false,
       "fk": "l1.currency_dim(currency_code)",
+      "nullable": true
+    },
+    "collateral_held_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "gross_mtm_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "netting_set_exposure_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pfe_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
       "nullable": true
     }
   },
@@ -234,6 +624,18 @@
     },
     "attributed_amount": {
       "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "attribution_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "attribution_type": {
+      "type": "VARCHAR(50)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -275,6 +677,66 @@
       "pk": false,
       "fk": "l1.source_system_registry(source_system_id)",
       "nullable": true
+    },
+    "allocated_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_snapshot_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "crm_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "current_valuation_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "mitigant_group_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "mitigant_subtype": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "original_valuation_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_shifting_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.cash_flow": {
@@ -313,6 +775,66 @@
       "pk": false,
       "fk": "l1.currency_dim(currency_code)",
       "nullable": true
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contractual_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contractual_amt_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flow_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flow_direction": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flow_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flow_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_bucket_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "position_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.facility_delinquency_snapshot": {
@@ -342,6 +864,60 @@
     },
     "watch_list_flag": {
       "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "days_past_due_max": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "delinquency_bucket_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "delinquency_snapshot_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "delinquency_status_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "last_payment_received_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_interest_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_principal_amt": {
+      "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -383,6 +959,54 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "base_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_pricing_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "min_spread_threshold_bps": {
+      "type": "DECIMAL(8,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "payment_frequency": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "prepayment_penalty_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_cap_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_index_code": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.facility_profitability_snapshot": {
@@ -414,6 +1038,48 @@
       "type": "BIGINT",
       "pk": false,
       "fk": "l1.ledger_account_dim(ledger_account_id)",
+      "nullable": true
+    },
+    "allocated_equity_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "avg_earning_assets_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "base_currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fee_income_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_expense_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_income_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "profitability_snapshot_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
       "nullable": true
     }
   },
@@ -447,6 +1113,30 @@
       "pk": false,
       "fk": "l1.currency_dim(currency_code)",
       "nullable": true
+    },
+    "contribution_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contribution_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contribution_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.limit_utilization_event": {
@@ -475,6 +1165,24 @@
       "nullable": true
     },
     "available_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "reporting_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilization_event_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilized_amount_usd": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
@@ -508,6 +1216,30 @@
     },
     "new_value": {
       "type": "TEXT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amendment_event_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "change_currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "change_field_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "change_seq": {
+      "type": "BIGINT",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -555,6 +1287,66 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "amendment_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amendment_event_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amendment_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amendment_subtype": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amendment_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "completed_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "identified_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "last_updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.credit_event": {
@@ -593,6 +1385,42 @@
       "pk": false,
       "fk": "l1.default_definition_dim(default_definition_id)",
       "nullable": true
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "event_risk_rating": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "event_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "event_summary": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "loss_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "recovery_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.credit_event_facility_link": {
@@ -616,6 +1444,24 @@
     },
     "exposure_at_default": {
       "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "estimated_loss_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "impact_pct": {
+      "type": "DECIMAL(10,4)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -657,6 +1503,48 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "breach_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "breach_severity": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "control_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "control_owner": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "failure_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "stress_test_result_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.stress_test_result": {
@@ -691,6 +1579,60 @@
       "nullable": true
     },
     "pnl_impact": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "capital_impact_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "execution_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_loss_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "result_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "result_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "scenario_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "stress_test_result_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "total_breaches": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "total_exposure_usd": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
@@ -733,6 +1675,90 @@
       "pk": false,
       "fk": "l1.currency_dim(currency_code)",
       "nullable": true
+    },
+    "expected_all_in_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_close_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_committed_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_coverage_ratio": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_exposure_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_internal_risk_grade": {
+      "type": "VARCHAR(255)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_spread_bps": {
+      "type": "DECIMAL(8,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_tenor_months": {
+      "type": "VARCHAR(255)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pipeline_deal_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pipeline_stage": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pipeline_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "record_level_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.counterparty_rating_observation": {
@@ -768,6 +1794,42 @@
     },
     "is_internal_flag": {
       "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pd_implied": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "prior_rating_value": {
+      "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rating_agency": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rating_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rating_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rating_value": {
+      "type": "DECIMAL(18,4)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -815,6 +1877,48 @@
       "pk": false,
       "fk": "l1.context_dim(context_id)",
       "nullable": true
+    },
+    "credit_agreement_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_code": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_value": {
+      "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_value_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "period_end_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.metric_threshold": {
@@ -850,6 +1954,108 @@
     },
     "effective_to_date": {
       "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "inner_threshold_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "last_threshold_updated_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "limit_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "limit_value": {
+      "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lod1_sponsor": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lod2_sponsor": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_id_display": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_owner": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_threshold_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "outer_threshold_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "report_deadline": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "report_frequency": {
+      "type": "VARCHAR(30)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -897,6 +2103,114 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "actual_remediation_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "approver": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "breach_amount_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "breach_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "days_open": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_owner": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_severity": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_value": {
+      "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "identified_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "limit_rule_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lod_sponsor": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "metric_threshold_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "remediation_plan": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "target_remediation_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "threshold_value": {
+      "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.risk_flag": {
@@ -941,6 +2255,42 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flag_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flag_description": {
+      "type": "VARCHAR(2000)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flag_scope": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flag_severity": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "flag_trigger_value": {
+      "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.data_quality_score_snapshot": {
@@ -982,6 +2332,60 @@
     },
     "overall_score": {
       "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "dimension_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "dimension_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "dq_score_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "dq_score_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "impact_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "impacted_report_codes": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "issue_count": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "reconciliation_break_count": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "score_dimension": {
+      "type": "VARCHAR(30)",
       "pk": false,
       "fk": null,
       "nullable": true

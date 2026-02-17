@@ -8,7 +8,26 @@
       "position_type",
       "balance_amount",
       "currency_code",
-      "source_system_id"
+      "source_system_id",
+      "accrued_interest_amt",
+      "book_value_amt",
+      "contractual_maturity_date",
+      "counterparty_id",
+      "credit_agreement_id",
+      "credit_status_code",
+      "effective_date",
+      "exposure_type_code",
+      "external_risk_rating",
+      "internal_risk_rating",
+      "legal_entity_id",
+      "lgd_estimate",
+      "market_value_amt",
+      "netting_set_id",
+      "notional_amount",
+      "pd_estimate",
+      "position_currency",
+      "trading_banking_book_flag",
+      "ultimate_parent_id"
     ],
     "rows": [
       [
@@ -19,6 +38,25 @@
         "LOAN",
         120000000,
         "USD",
+        1,
+        100.5,
+        100.5,
+        "2025-01-31",
+        1,
+        1,
+        "credit_status_code_1",
+        "2025-01-31",
+        "exposure_type_code_1",
+        "external_risk_rating_1",
+        "internal_risk_rating_1",
+        1,
+        "lgd_estimate_1",
+        100.5,
+        1,
+        100.5,
+        "pd_estimate_1",
+        "position_currency_1",
+        "Y",
         1
       ],
       [
@@ -29,6 +67,25 @@
         "REV",
         450000000,
         "EUR",
+        2,
+        100.5,
+        100.5,
+        "2025-01-31",
+        2,
+        2,
+        "credit_status_code_2",
+        "2025-01-31",
+        "exposure_type_code_2",
+        "external_risk_rating_2",
+        "internal_risk_rating_2",
+        2,
+        "lgd_estimate_2",
+        100.5,
+        2,
+        100.5,
+        "pd_estimate_2",
+        "position_currency_2",
+        "N",
         2
       ],
       [
@@ -39,6 +96,25 @@
         "COMMIT",
         800000000,
         "USD",
+        3,
+        100.5,
+        100.5,
+        "2025-01-31",
+        3,
+        3,
+        "credit_status_code_3",
+        "2025-01-31",
+        "exposure_type_code_3",
+        "external_risk_rating_3",
+        "internal_risk_rating_3",
+        3,
+        "lgd_estimate_3",
+        100.5,
+        3,
+        100.5,
+        "pd_estimate_3",
+        "position_currency_3",
+        "Y",
         3
       ],
       [
@@ -49,6 +125,25 @@
         "LOAN",
         0,
         "GBP",
+        4,
+        100.5,
+        100.5,
+        "2025-01-31",
+        4,
+        4,
+        "credit_status_code_4",
+        "2025-01-31",
+        "exposure_type_code_4",
+        "external_risk_rating_4",
+        "internal_risk_rating_4",
+        4,
+        "lgd_estimate_4",
+        100.5,
+        4,
+        100.5,
+        "pd_estimate_4",
+        "position_currency_4",
+        "N",
         4
       ],
       [
@@ -59,6 +154,25 @@
         "REV",
         275000000,
         "USD",
+        5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        5,
+        5,
+        "credit_status_code_5",
+        "2025-01-31",
+        "exposure_type_code_5",
+        "external_risk_rating_5",
+        "internal_risk_rating_5",
+        5,
+        "lgd_estimate_5",
+        100.5,
+        5,
+        100.5,
+        "pd_estimate_5",
+        "position_currency_5",
+        "Y",
         5
       ],
       [
@@ -69,6 +183,25 @@
         "LOAN",
         1200000000,
         "USD",
+        6,
+        100.5,
+        100.5,
+        "2025-01-31",
+        6,
+        6,
+        "credit_status_code_6",
+        "2025-01-31",
+        "exposure_type_code_6",
+        "external_risk_rating_6",
+        "internal_risk_rating_6",
+        6,
+        "lgd_estimate_6",
+        100.5,
+        6,
+        100.5,
+        "pd_estimate_6",
+        "position_currency_6",
+        "N",
         6
       ],
       [
@@ -79,6 +212,25 @@
         "COMMIT",
         0,
         "EUR",
+        7,
+        100.5,
+        100.5,
+        "2025-01-31",
+        7,
+        7,
+        "credit_status_code_7",
+        "2025-01-31",
+        "exposure_type_code_7",
+        "external_risk_rating_7",
+        "internal_risk_rating_7",
+        7,
+        "lgd_estimate_7",
+        100.5,
+        7,
+        100.5,
+        "pd_estimate_7",
+        "position_currency_7",
+        "Y",
         7
       ],
       [
@@ -89,6 +241,25 @@
         "REV",
         90000000,
         "USD",
+        8,
+        100.5,
+        100.5,
+        "2025-01-31",
+        8,
+        8,
+        "credit_status_code_8",
+        "2025-01-31",
+        "exposure_type_code_8",
+        "external_risk_rating_8",
+        "internal_risk_rating_8",
+        8,
+        "lgd_estimate_8",
+        100.5,
+        8,
+        100.5,
+        "pd_estimate_8",
+        "position_currency_8",
+        "N",
         8
       ],
       [
@@ -99,6 +270,25 @@
         "LOAN",
         600000000,
         "GBP",
+        9,
+        100.5,
+        100.5,
+        "2025-01-31",
+        9,
+        9,
+        "credit_status_code_9",
+        "2025-01-31",
+        "exposure_type_code_9",
+        "external_risk_rating_9",
+        "internal_risk_rating_9",
+        9,
+        "lgd_estimate_9",
+        100.5,
+        9,
+        100.5,
+        "pd_estimate_9",
+        "position_currency_9",
+        "Y",
         9
       ],
       [
@@ -109,6 +299,25 @@
         "REV",
         2100000000,
         "USD",
+        10,
+        100.5,
+        100.5,
+        "2025-01-31",
+        10,
+        10,
+        "credit_status_code_10",
+        "2025-01-31",
+        "exposure_type_code_10",
+        "external_risk_rating_10",
+        "internal_risk_rating_10",
+        10,
+        "lgd_estimate_10",
+        100.5,
+        10,
+        100.5,
+        "pd_estimate_10",
+        "position_currency_10",
+        "N",
         10
       ],
       [
@@ -119,7 +328,26 @@
         "LOAN",
         350000000,
         "USD",
-        1
+        1,
+        100.5,
+        100.5,
+        "2025-01-31",
+        11,
+        11,
+        "credit_status_code_11",
+        "2025-01-31",
+        "exposure_type_code_11",
+        "external_risk_rating_11",
+        "internal_risk_rating_11",
+        11,
+        "lgd_estimate_11",
+        100.5,
+        11,
+        100.5,
+        "pd_estimate_11",
+        "position_currency_11",
+        "Y",
+        11
       ],
       [
         12,
@@ -129,7 +357,26 @@
         "COMMIT",
         0,
         "EUR",
-        2
+        2,
+        100.5,
+        100.5,
+        "2025-01-31",
+        12,
+        12,
+        "credit_status_code_12",
+        "2025-01-31",
+        "exposure_type_code_12",
+        "external_risk_rating_12",
+        "internal_risk_rating_12",
+        12,
+        "lgd_estimate_12",
+        100.5,
+        12,
+        100.5,
+        "pd_estimate_12",
+        "position_currency_12",
+        "N",
+        12
       ]
     ]
   },
@@ -140,7 +387,30 @@
       "as_of_date",
       "detail_type",
       "amount",
-      "maturity_date"
+      "maturity_date",
+      "cash_leg_amount",
+      "ccf",
+      "current_balance",
+      "days_past_due",
+      "delinquency_status",
+      "derivative_type",
+      "fair_value",
+      "funded_amount",
+      "haircut_applied_pct",
+      "insured_balance",
+      "interest_rate",
+      "mark_to_market",
+      "origination_date",
+      "pfe",
+      "quantity",
+      "rate_index",
+      "rate_type",
+      "replacement_cost",
+      "sft_type",
+      "spread_bps",
+      "total_commitment",
+      "unfunded_amount",
+      "unrealized_gain_loss"
     ],
     "rows": [
       [
@@ -149,7 +419,30 @@
         "2025-01-31",
         "PRINCIPAL",
         100000,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_1",
+        100.5,
+        1,
+        "delinquency_status_1",
+        "derivative_type_1",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_1",
+        1,
+        100.5,
+        "Y",
+        100.5,
+        "sft_type_1",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_1"
       ],
       [
         2,
@@ -157,7 +450,30 @@
         "2025-01-30",
         "INTEREST",
         2500,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_2",
+        100.5,
+        2,
+        "delinquency_status_2",
+        "derivative_type_2",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_2",
+        2,
+        100.5,
+        "N",
+        100.5,
+        "sft_type_2",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_2"
       ],
       [
         3,
@@ -165,7 +481,30 @@
         "2025-01-29",
         "FEE",
         500,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_3",
+        100.5,
+        3,
+        "delinquency_status_3",
+        "derivative_type_3",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_3",
+        3,
+        100.5,
+        "Y",
+        100.5,
+        "sft_type_3",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_3"
       ],
       [
         4,
@@ -173,7 +512,30 @@
         "2025-01-28",
         "PRINCIPAL",
         200000,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_4",
+        100.5,
+        4,
+        "delinquency_status_4",
+        "derivative_type_4",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_4",
+        4,
+        100.5,
+        "N",
+        100.5,
+        "sft_type_4",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_4"
       ],
       [
         5,
@@ -181,7 +543,30 @@
         "2025-01-27",
         "INTEREST",
         3200,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_5",
+        100.5,
+        5,
+        "delinquency_status_5",
+        "derivative_type_5",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_5",
+        5,
+        100.5,
+        "Y",
+        100.5,
+        "sft_type_5",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_5"
       ],
       [
         6,
@@ -189,7 +574,30 @@
         "2025-01-24",
         "FEE",
         800,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_6",
+        100.5,
+        6,
+        "delinquency_status_6",
+        "derivative_type_6",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_6",
+        6,
+        100.5,
+        "N",
+        100.5,
+        "sft_type_6",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_6"
       ],
       [
         7,
@@ -197,7 +605,30 @@
         "2025-01-23",
         "PRINCIPAL",
         150000,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_7",
+        100.5,
+        7,
+        "delinquency_status_7",
+        "derivative_type_7",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_7",
+        7,
+        100.5,
+        "Y",
+        100.5,
+        "sft_type_7",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_7"
       ],
       [
         8,
@@ -205,7 +636,30 @@
         "2025-01-22",
         "INTEREST",
         1800,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_8",
+        100.5,
+        8,
+        "delinquency_status_8",
+        "derivative_type_8",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_8",
+        8,
+        100.5,
+        "N",
+        100.5,
+        "sft_type_8",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_8"
       ],
       [
         9,
@@ -213,7 +667,30 @@
         "2025-01-21",
         "FEE",
         400,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_9",
+        100.5,
+        9,
+        "delinquency_status_9",
+        "derivative_type_9",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_9",
+        9,
+        100.5,
+        "Y",
+        100.5,
+        "sft_type_9",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_9"
       ],
       [
         10,
@@ -221,7 +698,30 @@
         "2025-01-20",
         "PRINCIPAL",
         300000,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_10",
+        100.5,
+        10,
+        "delinquency_status_10",
+        "derivative_type_10",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_10",
+        10,
+        100.5,
+        "N",
+        100.5,
+        "sft_type_10",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_10"
       ],
       [
         11,
@@ -229,7 +729,30 @@
         "2025-01-17",
         "INTEREST",
         4000,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_11",
+        100.5,
+        11,
+        "delinquency_status_11",
+        "derivative_type_11",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_11",
+        11,
+        100.5,
+        "Y",
+        100.5,
+        "sft_type_11",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_11"
       ],
       [
         12,
@@ -237,7 +760,30 @@
         "2025-01-16",
         "FEE",
         600,
-        "2027-06-30"
+        "2027-06-30",
+        100.5,
+        "ccf_12",
+        100.5,
+        12,
+        "delinquency_status_12",
+        "derivative_type_12",
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        100.5,
+        "2025-01-31",
+        "pfe_12",
+        12,
+        100.5,
+        "N",
+        100.5,
+        "sft_type_12",
+        100.5,
+        100.5,
+        100.5,
+        "unrealized_gain_loss_12"
       ]
     ]
   },
@@ -248,7 +794,13 @@
       "exposure_type_id",
       "counterparty_id",
       "exposure_amount",
-      "currency_code"
+      "currency_code",
+      "attributed_exposure_usd",
+      "attribution_pct",
+      "counterparty_role_code",
+      "facility_id",
+      "is_risk_shifted_flag",
+      "risk_shifted_from_counterparty_id"
     ],
     "rows": [
       [
@@ -257,7 +809,13 @@
         1,
         1,
         120000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_1",
+        1,
+        "Y",
+        1
       ],
       [
         2,
@@ -265,7 +823,13 @@
         2,
         2,
         450000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_2",
+        2,
+        "N",
+        2
       ],
       [
         3,
@@ -273,7 +837,13 @@
         3,
         3,
         800000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_3",
+        3,
+        "Y",
+        3
       ],
       [
         4,
@@ -281,7 +851,13 @@
         4,
         4,
         0,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_4",
+        4,
+        "N",
+        4
       ],
       [
         5,
@@ -289,7 +865,13 @@
         5,
         5,
         275000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_5",
+        5,
+        "Y",
+        5
       ],
       [
         6,
@@ -297,7 +879,13 @@
         6,
         6,
         1200000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_6",
+        6,
+        "N",
+        6
       ],
       [
         7,
@@ -305,7 +893,13 @@
         7,
         7,
         0,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_7",
+        7,
+        "Y",
+        7
       ],
       [
         8,
@@ -313,7 +907,13 @@
         8,
         8,
         90000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_8",
+        8,
+        "N",
+        8
       ],
       [
         9,
@@ -321,7 +921,13 @@
         9,
         9,
         600000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_9",
+        9,
+        "Y",
+        9
       ],
       [
         10,
@@ -329,7 +935,13 @@
         10,
         10,
         2100000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_10",
+        10,
+        "N",
+        10
       ],
       [
         11,
@@ -337,7 +949,13 @@
         1,
         1,
         350000000,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_11",
+        11,
+        "Y",
+        11
       ],
       [
         12,
@@ -345,7 +963,13 @@
         2,
         2,
         0,
-        "USD"
+        "USD",
+        100.5,
+        100.5,
+        "counterparty_role_code_12",
+        12,
+        "N",
+        12
       ]
     ]
   },
@@ -357,7 +981,18 @@
       "drawn_amount",
       "committed_amount",
       "undrawn_amount",
-      "source_system_id"
+      "source_system_id",
+      "counterparty_id",
+      "coverage_ratio_pct",
+      "currency_code",
+      "exposure_amount_local",
+      "facility_exposure_id",
+      "fr2590_category_code",
+      "gross_exposure_usd",
+      "legal_entity_id",
+      "lob_segment_id",
+      "net_exposure_usd",
+      "product_node_id"
     ],
     "rows": [
       [
@@ -367,6 +1002,17 @@
         120000000,
         250000000,
         130000000,
+        1,
+        1,
+        100.5,
+        "currency_code_1",
+        100.5,
+        1,
+        "fr2590_category_code_1",
+        100.5,
+        1,
+        1,
+        100.5,
         1
       ],
       [
@@ -376,6 +1022,17 @@
         450000000,
         500000000,
         50000000,
+        2,
+        2,
+        100.5,
+        "currency_code_2",
+        100.5,
+        2,
+        "fr2590_category_code_2",
+        100.5,
+        2,
+        2,
+        100.5,
         2
       ],
       [
@@ -385,6 +1042,17 @@
         800000000,
         1000000000,
         200000000,
+        3,
+        3,
+        100.5,
+        "currency_code_3",
+        100.5,
+        3,
+        "fr2590_category_code_3",
+        100.5,
+        3,
+        3,
+        100.5,
         3
       ],
       [
@@ -394,6 +1062,17 @@
         0,
         2500000000,
         2500000000,
+        4,
+        4,
+        100.5,
+        "currency_code_4",
+        100.5,
+        4,
+        "fr2590_category_code_4",
+        100.5,
+        4,
+        4,
+        100.5,
         4
       ],
       [
@@ -403,6 +1082,17 @@
         275000000,
         750000000,
         475000000,
+        5,
+        5,
+        100.5,
+        "currency_code_5",
+        100.5,
+        5,
+        "fr2590_category_code_5",
+        100.5,
+        5,
+        5,
+        100.5,
         5
       ],
       [
@@ -412,6 +1102,17 @@
         1200000000,
         1500000000,
         300000000,
+        6,
+        6,
+        100.5,
+        "currency_code_6",
+        100.5,
+        6,
+        "fr2590_category_code_6",
+        100.5,
+        6,
+        6,
+        100.5,
         6
       ],
       [
@@ -421,6 +1122,17 @@
         0,
         3000000000,
         3000000000,
+        7,
+        7,
+        100.5,
+        "currency_code_7",
+        100.5,
+        7,
+        "fr2590_category_code_7",
+        100.5,
+        7,
+        7,
+        100.5,
         7
       ],
       [
@@ -430,6 +1142,17 @@
         90000000,
         400000000,
         310000000,
+        8,
+        8,
+        100.5,
+        "currency_code_8",
+        100.5,
+        8,
+        "fr2590_category_code_8",
+        100.5,
+        8,
+        8,
+        100.5,
         8
       ],
       [
@@ -439,6 +1162,17 @@
         600000000,
         600000000,
         0,
+        9,
+        9,
+        100.5,
+        "currency_code_9",
+        100.5,
+        9,
+        "fr2590_category_code_9",
+        100.5,
+        9,
+        9,
+        100.5,
         9
       ],
       [
@@ -448,6 +1182,17 @@
         2100000000,
         5000000000,
         2900000000,
+        10,
+        10,
+        100.5,
+        "currency_code_10",
+        100.5,
+        10,
+        "fr2590_category_code_10",
+        100.5,
+        10,
+        10,
+        100.5,
         10
       ],
       [
@@ -457,7 +1202,18 @@
         350000000,
         500000000,
         150000000,
-        1
+        1,
+        11,
+        100.5,
+        "currency_code_11",
+        100.5,
+        11,
+        "fr2590_category_code_11",
+        100.5,
+        11,
+        11,
+        100.5,
+        11
       ],
       [
         2,
@@ -466,7 +1222,18 @@
         0,
         1200000000,
         1200000000,
-        2
+        2,
+        12,
+        100.5,
+        "currency_code_12",
+        100.5,
+        12,
+        "fr2590_category_code_12",
+        100.5,
+        12,
+        12,
+        100.5,
+        12
       ]
     ]
   },
@@ -476,7 +1243,13 @@
       "as_of_date",
       "netted_exposure_amount",
       "gross_exposure_amount",
-      "currency_code"
+      "currency_code",
+      "collateral_held_usd",
+      "counterparty_id",
+      "gross_mtm_usd",
+      "legal_entity_id",
+      "netting_set_exposure_id",
+      "pfe_usd"
     ],
     "rows": [
       [
@@ -484,84 +1257,156 @@
         "2025-01-31",
         10000000,
         45000000,
-        "USD"
+        "USD",
+        100.5,
+        1,
+        100.5,
+        1,
+        1,
+        100.5
       ],
       [
         2,
         "2025-01-30",
         25000000,
         80000000,
-        "USD"
+        "USD",
+        100.5,
+        2,
+        100.5,
+        2,
+        2,
+        100.5
       ],
       [
         3,
         "2025-01-29",
         0,
         22000000,
-        "USD"
+        "USD",
+        100.5,
+        3,
+        100.5,
+        3,
+        3,
+        100.5
       ],
       [
         4,
         "2025-01-28",
         15000000,
         60000000,
-        "USD"
+        "USD",
+        100.5,
+        4,
+        100.5,
+        4,
+        4,
+        100.5
       ],
       [
         5,
         "2025-01-27",
         40000000,
         120000000,
-        "USD"
+        "USD",
+        100.5,
+        5,
+        100.5,
+        5,
+        5,
+        100.5
       ],
       [
         6,
         "2025-01-24",
         5000000,
         35000000,
-        "USD"
+        "USD",
+        100.5,
+        6,
+        100.5,
+        6,
+        6,
+        100.5
       ],
       [
         7,
         "2025-01-23",
         30000000,
         90000000,
-        "USD"
+        "USD",
+        100.5,
+        7,
+        100.5,
+        7,
+        7,
+        100.5
       ],
       [
         8,
         "2025-01-22",
         0,
         18000000,
-        "USD"
+        "USD",
+        100.5,
+        8,
+        100.5,
+        8,
+        8,
+        100.5
       ],
       [
         9,
         "2025-01-21",
         20000000,
         70000000,
-        "USD"
+        "USD",
+        100.5,
+        9,
+        100.5,
+        9,
+        9,
+        100.5
       ],
       [
         10,
         "2025-01-20",
         50000000,
         150000000,
-        "USD"
+        "USD",
+        100.5,
+        10,
+        100.5,
+        10,
+        10,
+        100.5
       ],
       [
         1,
         "2025-01-17",
         8000000,
         40000000,
-        "USD"
+        "USD",
+        100.5,
+        11,
+        100.5,
+        11,
+        11,
+        100.5
       ],
       [
         2,
         "2025-01-16",
         12000000,
         55000000,
-        "USD"
+        "USD",
+        100.5,
+        12,
+        100.5,
+        12,
+        12,
+        100.5
       ]
     ]
   },
@@ -572,7 +1417,9 @@
       "as_of_date",
       "lob_segment_id",
       "attribution_pct",
-      "attributed_amount"
+      "attributed_amount",
+      "attribution_amount_usd",
+      "attribution_type"
     ],
     "rows": [
       [
@@ -581,7 +1428,9 @@
         "2025-01-31",
         1,
         100,
-        120000000
+        120000000,
+        100.5,
+        "attribution_type_1"
       ],
       [
         2,
@@ -589,7 +1438,9 @@
         "2025-01-30",
         2,
         100,
-        450000000
+        450000000,
+        100.5,
+        "attribution_type_2"
       ],
       [
         3,
@@ -597,7 +1448,9 @@
         "2025-01-29",
         3,
         100,
-        800000000
+        800000000,
+        100.5,
+        "attribution_type_3"
       ],
       [
         4,
@@ -605,7 +1458,9 @@
         "2025-01-28",
         4,
         100,
-        0
+        0,
+        100.5,
+        "attribution_type_4"
       ],
       [
         5,
@@ -613,7 +1468,9 @@
         "2025-01-27",
         5,
         100,
-        275000000
+        275000000,
+        100.5,
+        "attribution_type_5"
       ],
       [
         6,
@@ -621,7 +1478,9 @@
         "2025-01-24",
         6,
         100,
-        1200000000
+        1200000000,
+        100.5,
+        "attribution_type_6"
       ],
       [
         7,
@@ -629,7 +1488,9 @@
         "2025-01-23",
         7,
         100,
-        0
+        0,
+        100.5,
+        "attribution_type_7"
       ],
       [
         8,
@@ -637,7 +1498,9 @@
         "2025-01-22",
         8,
         100,
-        90000000
+        90000000,
+        100.5,
+        "attribution_type_8"
       ],
       [
         9,
@@ -645,7 +1508,9 @@
         "2025-01-21",
         9,
         100,
-        600000000
+        600000000,
+        100.5,
+        "attribution_type_9"
       ],
       [
         10,
@@ -653,7 +1518,9 @@
         "2025-01-20",
         10,
         100,
-        2100000000
+        2100000000,
+        100.5,
+        "attribution_type_10"
       ],
       [
         11,
@@ -661,7 +1528,9 @@
         "2025-01-17",
         1,
         100,
-        350000000
+        350000000,
+        100.5,
+        "attribution_type_11"
       ],
       [
         12,
@@ -669,7 +1538,9 @@
         "2025-01-16",
         2,
         100,
-        0
+        0,
+        100.5,
+        "attribution_type_12"
       ]
     ]
   },
@@ -680,7 +1551,17 @@
       "valuation_amount",
       "haircut_pct",
       "eligible_collateral_amount",
-      "source_system_id"
+      "source_system_id",
+      "allocated_amount_usd",
+      "collateral_snapshot_id",
+      "counterparty_id",
+      "crm_type_code",
+      "current_valuation_usd",
+      "facility_id",
+      "mitigant_group_code",
+      "mitigant_subtype",
+      "original_valuation_usd",
+      "risk_shifting_flag"
     ],
     "rows": [
       [
@@ -689,7 +1570,17 @@
         50000000,
         0,
         50000000,
-        1
+        1,
+        100.5,
+        1,
+        1,
+        "crm_type_code_1",
+        100.5,
+        1,
+        "mitigant_group_code_1",
+        "mitigant_subtype_1",
+        100.5,
+        "Y"
       ],
       [
         2,
@@ -697,7 +1588,17 @@
         120000000,
         2.5,
         117000000,
-        2
+        2,
+        100.5,
+        2,
+        2,
+        "crm_type_code_2",
+        100.5,
+        2,
+        "mitigant_group_code_2",
+        "mitigant_subtype_2",
+        100.5,
+        "N"
       ],
       [
         3,
@@ -705,7 +1606,17 @@
         85000000,
         4,
         81600000,
-        3
+        3,
+        100.5,
+        3,
+        3,
+        "crm_type_code_3",
+        100.5,
+        3,
+        "mitigant_group_code_3",
+        "mitigant_subtype_3",
+        100.5,
+        "Y"
       ],
       [
         4,
@@ -713,7 +1624,17 @@
         200000000,
         15,
         170000000,
-        4
+        4,
+        100.5,
+        4,
+        4,
+        "crm_type_code_4",
+        100.5,
+        4,
+        "mitigant_group_code_4",
+        "mitigant_subtype_4",
+        100.5,
+        "N"
       ],
       [
         5,
@@ -721,7 +1642,17 @@
         30000000,
         25,
         22500000,
-        5
+        5,
+        100.5,
+        5,
+        5,
+        "crm_type_code_5",
+        100.5,
+        5,
+        "mitigant_group_code_5",
+        "mitigant_subtype_5",
+        100.5,
+        "Y"
       ],
       [
         6,
@@ -729,7 +1660,17 @@
         450000000,
         0,
         450000000,
-        6
+        6,
+        100.5,
+        6,
+        6,
+        "crm_type_code_6",
+        100.5,
+        6,
+        "mitigant_group_code_6",
+        "mitigant_subtype_6",
+        100.5,
+        "N"
       ],
       [
         7,
@@ -737,7 +1678,17 @@
         75000000,
         5,
         71250000,
-        7
+        7,
+        100.5,
+        7,
+        7,
+        "crm_type_code_7",
+        100.5,
+        7,
+        "mitigant_group_code_7",
+        "mitigant_subtype_7",
+        100.5,
+        "Y"
       ],
       [
         8,
@@ -745,7 +1696,17 @@
         95000000,
         8,
         87400000,
-        8
+        8,
+        100.5,
+        8,
+        8,
+        "crm_type_code_8",
+        100.5,
+        8,
+        "mitigant_group_code_8",
+        "mitigant_subtype_8",
+        100.5,
+        "N"
       ],
       [
         9,
@@ -753,7 +1714,17 @@
         110000000,
         12,
         96800000,
-        9
+        9,
+        100.5,
+        9,
+        9,
+        "crm_type_code_9",
+        100.5,
+        9,
+        "mitigant_group_code_9",
+        "mitigant_subtype_9",
+        100.5,
+        "Y"
       ],
       [
         10,
@@ -761,7 +1732,17 @@
         320000000,
         20,
         256000000,
-        10
+        10,
+        100.5,
+        10,
+        10,
+        "crm_type_code_10",
+        100.5,
+        10,
+        "mitigant_group_code_10",
+        "mitigant_subtype_10",
+        100.5,
+        "N"
       ],
       [
         1,
@@ -769,7 +1750,17 @@
         60000000,
         3,
         58200000,
-        1
+        1,
+        100.5,
+        11,
+        11,
+        "crm_type_code_11",
+        100.5,
+        11,
+        "mitigant_group_code_11",
+        "mitigant_subtype_11",
+        100.5,
+        "Y"
       ],
       [
         2,
@@ -777,7 +1768,17 @@
         140000000,
         6,
         131600000,
-        2
+        2,
+        100.5,
+        12,
+        12,
+        "crm_type_code_12",
+        100.5,
+        12,
+        "mitigant_group_code_12",
+        "mitigant_subtype_12",
+        100.5,
+        "N"
       ]
     ]
   },
@@ -788,7 +1789,17 @@
       "cash_flow_date",
       "cash_flow_type",
       "amount",
-      "currency_code"
+      "currency_code",
+      "as_of_date",
+      "contractual_amt",
+      "contractual_amt_usd",
+      "counterparty_id",
+      "flow_date",
+      "flow_direction",
+      "flow_id",
+      "flow_type",
+      "maturity_bucket_id",
+      "position_id"
     ],
     "rows": [
       [
@@ -797,7 +1808,17 @@
         "2025-01-31",
         "DRAW",
         5000000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        1,
+        "2025-01-31",
+        "flow_direction_1",
+        1,
+        "flow_type_1",
+        1,
+        1
       ],
       [
         2,
@@ -805,7 +1826,17 @@
         "2025-01-30",
         "REPAY",
         -2000000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        2,
+        "2025-01-31",
+        "flow_direction_2",
+        2,
+        "flow_type_2",
+        2,
+        2
       ],
       [
         3,
@@ -813,7 +1844,17 @@
         "2025-01-29",
         "INTEREST",
         125000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        3,
+        "2025-01-31",
+        "flow_direction_3",
+        3,
+        "flow_type_3",
+        3,
+        3
       ],
       [
         4,
@@ -821,7 +1862,17 @@
         "2025-01-28",
         "FEE",
         50000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        4,
+        "2025-01-31",
+        "flow_direction_4",
+        4,
+        "flow_type_4",
+        4,
+        4
       ],
       [
         5,
@@ -829,7 +1880,17 @@
         "2025-01-27",
         "DRAW",
         10000000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        5,
+        "2025-01-31",
+        "flow_direction_5",
+        5,
+        "flow_type_5",
+        5,
+        5
       ],
       [
         6,
@@ -837,7 +1898,17 @@
         "2025-01-24",
         "REPAY",
         -1500000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        6,
+        "2025-01-31",
+        "flow_direction_6",
+        6,
+        "flow_type_6",
+        6,
+        6
       ],
       [
         7,
@@ -845,7 +1916,17 @@
         "2025-01-23",
         "INTEREST",
         200000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        7,
+        "2025-01-31",
+        "flow_direction_7",
+        7,
+        "flow_type_7",
+        7,
+        7
       ],
       [
         8,
@@ -853,7 +1934,17 @@
         "2025-01-22",
         "FEE",
         75000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        8,
+        "2025-01-31",
+        "flow_direction_8",
+        8,
+        "flow_type_8",
+        8,
+        8
       ],
       [
         9,
@@ -861,7 +1952,17 @@
         "2025-01-21",
         "DRAW",
         3000000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        9,
+        "2025-01-31",
+        "flow_direction_9",
+        9,
+        "flow_type_9",
+        9,
+        9
       ],
       [
         10,
@@ -869,7 +1970,17 @@
         "2025-01-20",
         "REPAY",
         -3000000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        10,
+        "2025-01-31",
+        "flow_direction_10",
+        10,
+        "flow_type_10",
+        10,
+        10
       ],
       [
         11,
@@ -877,7 +1988,17 @@
         "2025-01-17",
         "INTEREST",
         90000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        11,
+        "2025-01-31",
+        "flow_direction_11",
+        11,
+        "flow_type_11",
+        11,
+        11
       ],
       [
         12,
@@ -885,7 +2006,17 @@
         "2025-01-16",
         "FEE",
         25000,
-        "USD"
+        "USD",
+        "2025-01-31",
+        100.5,
+        100.5,
+        12,
+        "2025-01-31",
+        "flow_direction_12",
+        12,
+        "flow_type_12",
+        12,
+        12
       ]
     ]
   },
@@ -895,7 +2026,16 @@
       "as_of_date",
       "credit_status_code",
       "days_past_due",
-      "watch_list_flag"
+      "watch_list_flag",
+      "counterparty_id",
+      "currency_code",
+      "days_past_due_max",
+      "delinquency_bucket_code",
+      "delinquency_snapshot_id",
+      "delinquency_status_code",
+      "last_payment_received_date",
+      "overdue_interest_amt",
+      "overdue_principal_amt"
     ],
     "rows": [
       [
@@ -903,84 +2043,192 @@
         "2025-01-31",
         1,
         0,
-        "N"
+        "N",
+        1,
+        "currency_code_1",
+        1,
+        "delinquency_bucket_code_1",
+        1,
+        "delinquency_status_code_1",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         2,
         "2025-01-30",
         1,
         0,
-        "N"
+        "N",
+        2,
+        "currency_code_2",
+        2,
+        "delinquency_bucket_code_2",
+        2,
+        "delinquency_status_code_2",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         3,
         "2025-01-29",
         1,
         0,
-        "N"
+        "N",
+        3,
+        "currency_code_3",
+        3,
+        "delinquency_bucket_code_3",
+        3,
+        "delinquency_status_code_3",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         4,
         "2025-01-28",
         1,
         0,
-        "N"
+        "N",
+        4,
+        "currency_code_4",
+        4,
+        "delinquency_bucket_code_4",
+        4,
+        "delinquency_status_code_4",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         5,
         "2025-01-27",
         2,
         15,
-        "Y"
+        "Y",
+        5,
+        "currency_code_5",
+        5,
+        "delinquency_bucket_code_5",
+        5,
+        "delinquency_status_code_5",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         6,
         "2025-01-24",
         1,
         0,
-        "N"
+        "N",
+        6,
+        "currency_code_6",
+        6,
+        "delinquency_bucket_code_6",
+        6,
+        "delinquency_status_code_6",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         7,
         "2025-01-23",
         1,
         0,
-        "N"
+        "N",
+        7,
+        "currency_code_7",
+        7,
+        "delinquency_bucket_code_7",
+        7,
+        "delinquency_status_code_7",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         8,
         "2025-01-22",
         1,
         0,
-        "N"
+        "N",
+        8,
+        "currency_code_8",
+        8,
+        "delinquency_bucket_code_8",
+        8,
+        "delinquency_status_code_8",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         9,
         "2025-01-21",
         1,
         0,
-        "N"
+        "N",
+        9,
+        "currency_code_9",
+        9,
+        "delinquency_bucket_code_9",
+        9,
+        "delinquency_status_code_9",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         10,
         "2025-01-20",
         1,
         0,
-        "N"
+        "N",
+        10,
+        "currency_code_10",
+        10,
+        "delinquency_bucket_code_10",
+        10,
+        "delinquency_status_code_10",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         1,
         "2025-01-17",
         2,
         8,
-        "Y"
+        "Y",
+        11,
+        "currency_code_11",
+        11,
+        "delinquency_bucket_code_11",
+        11,
+        "delinquency_status_code_11",
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         2,
         "2025-01-16",
         1,
         0,
-        "N"
+        "N",
+        12,
+        "currency_code_12",
+        12,
+        "delinquency_bucket_code_12",
+        12,
+        "delinquency_status_code_12",
+        "2025-01-31",
+        100.5,
+        100.5
       ]
     ]
   },
@@ -991,7 +2239,15 @@
       "spread_bps",
       "rate_index_id",
       "all_in_rate_pct",
-      "floor_pct"
+      "floor_pct",
+      "base_rate_pct",
+      "currency_code",
+      "facility_pricing_id",
+      "min_spread_threshold_bps",
+      "payment_frequency",
+      "prepayment_penalty_flag",
+      "rate_cap_pct",
+      "rate_index_code"
     ],
     "rows": [
       [
@@ -1000,7 +2256,15 @@
         175,
         1,
         6.25,
-        0
+        0,
+        100.5,
+        "currency_code_1",
+        1,
+        100.5,
+        "payment_frequency_1",
+        "Y",
+        100.5,
+        100.5
       ],
       [
         2,
@@ -1008,7 +2272,15 @@
         250,
         2,
         7.5,
-        0
+        0,
+        100.5,
+        "currency_code_2",
+        2,
+        100.5,
+        "payment_frequency_2",
+        "N",
+        100.5,
+        100.5
       ],
       [
         3,
@@ -1016,7 +2288,15 @@
         325,
         3,
         8.25,
-        0.25
+        0.25,
+        100.5,
+        "currency_code_3",
+        3,
+        100.5,
+        "payment_frequency_3",
+        "Y",
+        100.5,
+        100.5
       ],
       [
         4,
@@ -1024,7 +2304,15 @@
         200,
         4,
         6.75,
-        0
+        0,
+        100.5,
+        "currency_code_4",
+        4,
+        100.5,
+        "payment_frequency_4",
+        "N",
+        100.5,
+        100.5
       ],
       [
         5,
@@ -1032,7 +2320,15 @@
         400,
         5,
         9,
-        0.5
+        0.5,
+        100.5,
+        "currency_code_5",
+        5,
+        100.5,
+        "payment_frequency_5",
+        "Y",
+        100.5,
+        100.5
       ],
       [
         6,
@@ -1040,7 +2336,15 @@
         150,
         6,
         5.75,
-        0
+        0,
+        100.5,
+        "currency_code_6",
+        6,
+        100.5,
+        "payment_frequency_6",
+        "N",
+        100.5,
+        100.5
       ],
       [
         7,
@@ -1048,7 +2352,15 @@
         275,
         7,
         7.25,
-        0.25
+        0.25,
+        100.5,
+        "currency_code_7",
+        7,
+        100.5,
+        "payment_frequency_7",
+        "Y",
+        100.5,
+        100.5
       ],
       [
         8,
@@ -1056,7 +2368,15 @@
         225,
         8,
         6.95,
-        0
+        0,
+        100.5,
+        "currency_code_8",
+        8,
+        100.5,
+        "payment_frequency_8",
+        "N",
+        100.5,
+        100.5
       ],
       [
         9,
@@ -1064,7 +2384,15 @@
         300,
         9,
         8,
-        0
+        0,
+        100.5,
+        "currency_code_9",
+        9,
+        100.5,
+        "payment_frequency_9",
+        "Y",
+        100.5,
+        100.5
       ],
       [
         10,
@@ -1072,7 +2400,15 @@
         125,
         10,
         5.5,
-        0
+        0,
+        100.5,
+        "currency_code_10",
+        10,
+        100.5,
+        "payment_frequency_10",
+        "N",
+        100.5,
+        100.5
       ],
       [
         1,
@@ -1080,7 +2416,15 @@
         350,
         1,
         8.5,
-        0.25
+        0.25,
+        100.5,
+        "currency_code_11",
+        11,
+        100.5,
+        "payment_frequency_11",
+        "Y",
+        100.5,
+        100.5
       ],
       [
         2,
@@ -1088,7 +2432,15 @@
         190,
         2,
         6.4,
-        0
+        0,
+        100.5,
+        "currency_code_12",
+        12,
+        100.5,
+        "payment_frequency_12",
+        "N",
+        100.5,
+        100.5
       ]
     ]
   },
@@ -1098,7 +2450,14 @@
       "as_of_date",
       "nii_ytd",
       "fee_income_ytd",
-      "ledger_account_id"
+      "ledger_account_id",
+      "allocated_equity_amt",
+      "avg_earning_assets_amt",
+      "base_currency_code",
+      "fee_income_amt",
+      "interest_expense_amt",
+      "interest_income_amt",
+      "profitability_snapshot_id"
     ],
     "rows": [
       [
@@ -1106,6 +2465,13 @@
         "2025-01-31",
         1250,
         85,
+        1,
+        100.5,
+        100.5,
+        "base_currency_code_1",
+        100.5,
+        100.5,
+        100.5,
         1
       ],
       [
@@ -1113,6 +2479,13 @@
         "2025-01-30",
         3200,
         120,
+        2,
+        100.5,
+        100.5,
+        "base_currency_code_2",
+        100.5,
+        100.5,
+        100.5,
         2
       ],
       [
@@ -1120,6 +2493,13 @@
         "2025-01-29",
         5800,
         250,
+        3,
+        100.5,
+        100.5,
+        "base_currency_code_3",
+        100.5,
+        100.5,
+        100.5,
         3
       ],
       [
@@ -1127,6 +2507,13 @@
         "2025-01-28",
         0,
         50,
+        4,
+        100.5,
+        100.5,
+        "base_currency_code_4",
+        100.5,
+        100.5,
+        100.5,
         4
       ],
       [
@@ -1134,6 +2521,13 @@
         "2025-01-27",
         2100,
         90,
+        5,
+        100.5,
+        100.5,
+        "base_currency_code_5",
+        100.5,
+        100.5,
+        100.5,
         5
       ],
       [
@@ -1141,6 +2535,13 @@
         "2025-01-24",
         9200,
         400,
+        6,
+        100.5,
+        100.5,
+        "base_currency_code_6",
+        100.5,
+        100.5,
+        100.5,
         6
       ],
       [
@@ -1148,6 +2549,13 @@
         "2025-01-23",
         0,
         30,
+        7,
+        100.5,
+        100.5,
+        "base_currency_code_7",
+        100.5,
+        100.5,
+        100.5,
         7
       ],
       [
@@ -1155,6 +2563,13 @@
         "2025-01-22",
         450,
         60,
+        8,
+        100.5,
+        100.5,
+        "base_currency_code_8",
+        100.5,
+        100.5,
+        100.5,
         8
       ],
       [
@@ -1162,6 +2577,13 @@
         "2025-01-21",
         4100,
         180,
+        9,
+        100.5,
+        100.5,
+        "base_currency_code_9",
+        100.5,
+        100.5,
+        100.5,
         9
       ],
       [
@@ -1169,6 +2591,13 @@
         "2025-01-20",
         18500,
         600,
+        10,
+        100.5,
+        100.5,
+        "base_currency_code_10",
+        100.5,
+        100.5,
+        100.5,
         10
       ],
       [
@@ -1176,14 +2605,28 @@
         "2025-01-17",
         2200,
         110,
-        1
+        1,
+        100.5,
+        100.5,
+        "base_currency_code_11",
+        100.5,
+        100.5,
+        100.5,
+        11
       ],
       [
         2,
         "2025-01-16",
         800,
         75,
-        2
+        2,
+        100.5,
+        100.5,
+        "base_currency_code_12",
+        100.5,
+        100.5,
+        100.5,
+        12
       ]
     ]
   },
@@ -1193,7 +2636,11 @@
       "counterparty_id",
       "as_of_date",
       "contribution_amount",
-      "currency_code"
+      "currency_code",
+      "contribution_amount_usd",
+      "contribution_id",
+      "contribution_pct",
+      "facility_id"
     ],
     "rows": [
       [
@@ -1201,84 +2648,132 @@
         1,
         "2025-01-31",
         120000000,
-        "USD"
+        "USD",
+        100.5,
+        1,
+        100.5,
+        1
       ],
       [
         2,
         2,
         "2025-01-30",
         450000000,
-        "USD"
+        "USD",
+        100.5,
+        2,
+        100.5,
+        2
       ],
       [
         3,
         3,
         "2025-01-29",
         0,
-        "USD"
+        "USD",
+        100.5,
+        3,
+        100.5,
+        3
       ],
       [
         4,
         4,
         "2025-01-28",
         200000000,
-        "USD"
+        "USD",
+        100.5,
+        4,
+        100.5,
+        4
       ],
       [
         5,
         5,
         "2025-01-27",
         100000000,
-        "USD"
+        "USD",
+        100.5,
+        5,
+        100.5,
+        5
       ],
       [
         6,
         6,
         "2025-01-24",
         800000000,
-        "USD"
+        "USD",
+        100.5,
+        6,
+        100.5,
+        6
       ],
       [
         7,
         7,
         "2025-01-23",
         300000000,
-        "USD"
+        "USD",
+        100.5,
+        7,
+        100.5,
+        7
       ],
       [
         8,
         8,
         "2025-01-22",
         50000000,
-        "USD"
+        "USD",
+        100.5,
+        8,
+        100.5,
+        8
       ],
       [
         9,
         9,
         "2025-01-21",
         400000000,
-        "USD"
+        "USD",
+        100.5,
+        9,
+        100.5,
+        9
       ],
       [
         10,
         10,
         "2025-01-20",
         1500000000,
-        "USD"
+        "USD",
+        100.5,
+        10,
+        100.5,
+        10
       ],
       [
         1,
         1,
         "2025-01-17",
         200000000,
-        "USD"
+        "USD",
+        100.5,
+        11,
+        100.5,
+        11
       ],
       [
         2,
         2,
         "2025-01-16",
         350000000,
-        "USD"
+        "USD",
+        100.5,
+        12,
+        100.5,
+        12
       ]
     ]
   },
@@ -1288,7 +2783,10 @@
       "as_of_date",
       "counterparty_id",
       "utilized_amount",
-      "available_amount"
+      "available_amount",
+      "reporting_ts",
+      "utilization_event_id",
+      "utilized_amount_usd"
     ],
     "rows": [
       [
@@ -1296,84 +2794,120 @@
         "2025-01-31",
         1,
         120000000,
-        380000000
+        380000000,
+        "2025-01-15 12:00:00",
+        1,
+        100.5
       ],
       [
         2,
         "2025-01-30",
         2,
         450000000,
-        550000000
+        550000000,
+        "2025-01-15 12:00:00",
+        2,
+        100.5
       ],
       [
         3,
         "2025-01-29",
         3,
         0,
-        750000000
+        750000000,
+        "2025-01-15 12:00:00",
+        3,
+        100.5
       ],
       [
         4,
         "2025-01-28",
         4,
         1200000000,
-        800000000
+        800000000,
+        "2025-01-15 12:00:00",
+        4,
+        100.5
       ],
       [
         5,
         "2025-01-27",
         5,
         100000000,
-        300000000
+        300000000,
+        "2025-01-15 12:00:00",
+        5,
+        100.5
       ],
       [
         6,
         "2025-01-24",
         6,
         800000000,
-        700000000
+        700000000,
+        "2025-01-15 12:00:00",
+        6,
+        100.5
       ],
       [
         7,
         "2025-01-23",
         7,
         300000000,
-        300000000
+        300000000,
+        "2025-01-15 12:00:00",
+        7,
+        100.5
       ],
       [
         8,
         "2025-01-22",
         8,
         50000000,
-        300000000
+        300000000,
+        "2025-01-15 12:00:00",
+        8,
+        100.5
       ],
       [
         9,
         "2025-01-21",
         9,
         400000000,
-        500000000
+        500000000,
+        "2025-01-15 12:00:00",
+        9,
+        100.5
       ],
       [
         10,
         "2025-01-20",
         10,
         2100000000,
-        900000000
+        900000000,
+        "2025-01-15 12:00:00",
+        10,
+        100.5
       ],
       [
         1,
         "2025-01-17",
         1,
         200000000,
-        350000000
+        350000000,
+        "2025-01-15 12:00:00",
+        11,
+        100.5
       ],
       [
         2,
         "2025-01-16",
         2,
         350000000,
-        450000000
+        450000000,
+        "2025-01-15 12:00:00",
+        12,
+        100.5
       ]
     ]
   },
@@ -1383,7 +2917,11 @@
       "amendment_id",
       "change_type",
       "old_value",
-      "new_value"
+      "new_value",
+      "amendment_event_id",
+      "change_currency_code",
+      "change_field_name",
+      "change_seq"
     ],
     "rows": [
       [
@@ -1391,84 +2929,132 @@
         1,
         "COMMITMENT",
         "Prior value",
-        "New value"
+        "New value",
+        1,
+        "change_currency_code_1",
+        "change_field_name_1",
+        1
       ],
       [
         2,
         2,
         "PRICING",
         "Prior value",
-        "New value"
+        "New value",
+        2,
+        "change_currency_code_2",
+        "change_field_name_2",
+        2
       ],
       [
         3,
         3,
         "MATURITY",
         "Prior value",
-        "New value"
+        "New value",
+        3,
+        "change_currency_code_3",
+        "change_field_name_3",
+        3
       ],
       [
         4,
         4,
         "COVENANT",
         "Prior value",
-        "New value"
+        "New value",
+        4,
+        "change_currency_code_4",
+        "change_field_name_4",
+        4
       ],
       [
         5,
         5,
         "PARTY",
         "Prior value",
-        "New value"
+        "New value",
+        5,
+        "change_currency_code_5",
+        "change_field_name_5",
+        5
       ],
       [
         6,
         6,
         "COMMITMENT",
         "Prior value",
-        "New value"
+        "New value",
+        6,
+        "change_currency_code_6",
+        "change_field_name_6",
+        6
       ],
       [
         7,
         7,
         "PRICING",
         "Prior value",
-        "New value"
+        "New value",
+        7,
+        "change_currency_code_7",
+        "change_field_name_7",
+        7
       ],
       [
         8,
         8,
         "MATURITY",
         "Prior value",
-        "New value"
+        "New value",
+        8,
+        "change_currency_code_8",
+        "change_field_name_8",
+        8
       ],
       [
         9,
         9,
         "COVENANT",
         "Prior value",
-        "New value"
+        "New value",
+        9,
+        "change_currency_code_9",
+        "change_field_name_9",
+        9
       ],
       [
         10,
         10,
         "PARTY",
         "Prior value",
-        "New value"
+        "New value",
+        10,
+        "change_currency_code_10",
+        "change_field_name_10",
+        10
       ],
       [
         11,
         11,
         "COMMITMENT",
         "Prior value",
-        "New value"
+        "New value",
+        11,
+        "change_currency_code_11",
+        "change_field_name_11",
+        11
       ],
       [
         12,
         12,
         "PRICING",
         "Prior value",
-        "New value"
+        "New value",
+        12,
+        "change_currency_code_12",
+        "change_field_name_12",
+        12
       ]
     ]
   },
@@ -1480,7 +3066,17 @@
       "amendment_type_code",
       "amendment_status_code",
       "effective_date",
-      "event_ts"
+      "event_ts",
+      "amendment_description",
+      "amendment_event_id",
+      "amendment_status",
+      "amendment_subtype",
+      "amendment_type",
+      "as_of_date",
+      "completed_date",
+      "counterparty_id",
+      "identified_date",
+      "last_updated_ts"
     ],
     "rows": [
       [
@@ -1490,7 +3086,17 @@
         "INCREASE",
         "EFFECTIVE",
         "2024-11-01",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_1",
+        1,
+        "amendment_status_1",
+        "amendment_subtype_1",
+        "amendment_type_1",
+        "2025-01-31",
+        "2025-01-31",
+        1,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         2,
@@ -1499,7 +3105,17 @@
         "EXTENSION",
         "COMPLETED",
         "2024-12-15",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_2",
+        2,
+        "amendment_status_2",
+        "amendment_subtype_2",
+        "amendment_type_2",
+        "2025-01-31",
+        "2025-01-31",
+        2,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         3,
@@ -1508,7 +3124,17 @@
         "PRICING",
         "APPROVED",
         "2025-01-01",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_3",
+        3,
+        "amendment_status_3",
+        "amendment_subtype_3",
+        "amendment_type_3",
+        "2025-01-31",
+        "2025-01-31",
+        3,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         4,
@@ -1517,7 +3143,17 @@
         "COVENANT",
         "EFFECTIVE",
         "2024-10-20",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_4",
+        4,
+        "amendment_status_4",
+        "amendment_subtype_4",
+        "amendment_type_4",
+        "2025-01-31",
+        "2025-01-31",
+        4,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         5,
@@ -1526,7 +3162,17 @@
         "PARTY",
         "PENDING",
         "2025-02-01",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_5",
+        5,
+        "amendment_status_5",
+        "amendment_subtype_5",
+        "amendment_type_5",
+        "2025-01-31",
+        "2025-01-31",
+        5,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         6,
@@ -1535,7 +3181,17 @@
         "FACILITY",
         "COMPLETED",
         "2024-09-01",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_6",
+        6,
+        "amendment_status_6",
+        "amendment_subtype_6",
+        "amendment_type_6",
+        "2025-01-31",
+        "2025-01-31",
+        6,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         7,
@@ -1544,7 +3200,17 @@
         "SECURITY",
         "EFFECTIVE",
         "2025-01-15",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_7",
+        7,
+        "amendment_status_7",
+        "amendment_subtype_7",
+        "amendment_type_7",
+        "2025-01-31",
+        "2025-01-31",
+        7,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         8,
@@ -1553,7 +3219,17 @@
         "OTHER",
         "APPROVED",
         "2024-08-01",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_8",
+        8,
+        "amendment_status_8",
+        "amendment_subtype_8",
+        "amendment_type_8",
+        "2025-01-31",
+        "2025-01-31",
+        8,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         9,
@@ -1562,7 +3238,17 @@
         "INCREASE",
         "COMPLETED",
         "2024-12-01",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_9",
+        9,
+        "amendment_status_9",
+        "amendment_subtype_9",
+        "amendment_type_9",
+        "2025-01-31",
+        "2025-01-31",
+        9,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         10,
@@ -1571,7 +3257,17 @@
         "EXTENSION",
         "EFFECTIVE",
         "2025-01-10",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_10",
+        10,
+        "amendment_status_10",
+        "amendment_subtype_10",
+        "amendment_type_10",
+        "2025-01-31",
+        "2025-01-31",
+        10,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         11,
@@ -1580,7 +3276,17 @@
         "PRICING",
         "PENDING",
         "2025-02-15",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_11",
+        11,
+        "amendment_status_11",
+        "amendment_subtype_11",
+        "amendment_type_11",
+        "2025-01-31",
+        "2025-01-31",
+        11,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ],
       [
         12,
@@ -1589,7 +3295,17 @@
         "COVENANT",
         "EFFECTIVE",
         "2024-07-15",
-        "2025-01-15 14:30:00"
+        "2025-01-15 14:30:00",
+        "amendment_description_12",
+        12,
+        "amendment_status_12",
+        "amendment_subtype_12",
+        "amendment_type_12",
+        "2025-01-31",
+        "2025-01-31",
+        12,
+        "2025-01-31",
+        "2025-01-15 12:00:00"
       ]
     ]
   },
@@ -1600,7 +3316,13 @@
       "credit_event_type_code",
       "event_date",
       "event_ts",
-      "default_definition_id"
+      "default_definition_id",
+      "as_of_date",
+      "event_risk_rating",
+      "event_status",
+      "event_summary",
+      "loss_amount_usd",
+      "recovery_amount_usd"
     ],
     "rows": [
       [
@@ -1609,7 +3331,13 @@
         1,
         "2025-01-31",
         "2025-01-15 10:00:00",
-        1
+        1,
+        "2025-01-31",
+        "event_risk_rating_1",
+        "event_status_1",
+        "event_summary_1",
+        100.5,
+        100.5
       ],
       [
         2,
@@ -1617,7 +3345,13 @@
         2,
         "2025-01-30",
         "2025-01-15 10:00:00",
-        2
+        2,
+        "2025-01-31",
+        "event_risk_rating_2",
+        "event_status_2",
+        "event_summary_2",
+        100.5,
+        100.5
       ],
       [
         3,
@@ -1625,7 +3359,13 @@
         3,
         "2025-01-29",
         "2025-01-15 10:00:00",
-        3
+        3,
+        "2025-01-31",
+        "event_risk_rating_3",
+        "event_status_3",
+        "event_summary_3",
+        100.5,
+        100.5
       ],
       [
         4,
@@ -1633,7 +3373,13 @@
         4,
         "2025-01-28",
         "2025-01-15 10:00:00",
-        4
+        4,
+        "2025-01-31",
+        "event_risk_rating_4",
+        "event_status_4",
+        "event_summary_4",
+        100.5,
+        100.5
       ],
       [
         5,
@@ -1641,7 +3387,13 @@
         5,
         "2025-01-27",
         "2025-01-15 10:00:00",
-        5
+        5,
+        "2025-01-31",
+        "event_risk_rating_5",
+        "event_status_5",
+        "event_summary_5",
+        100.5,
+        100.5
       ],
       [
         6,
@@ -1649,7 +3401,13 @@
         6,
         "2025-01-24",
         "2025-01-15 10:00:00",
-        6
+        6,
+        "2025-01-31",
+        "event_risk_rating_6",
+        "event_status_6",
+        "event_summary_6",
+        100.5,
+        100.5
       ],
       [
         7,
@@ -1657,7 +3415,13 @@
         7,
         "2025-01-23",
         "2025-01-15 10:00:00",
-        7
+        7,
+        "2025-01-31",
+        "event_risk_rating_7",
+        "event_status_7",
+        "event_summary_7",
+        100.5,
+        100.5
       ],
       [
         8,
@@ -1665,7 +3429,13 @@
         8,
         "2025-01-22",
         "2025-01-15 10:00:00",
-        8
+        8,
+        "2025-01-31",
+        "event_risk_rating_8",
+        "event_status_8",
+        "event_summary_8",
+        100.5,
+        100.5
       ],
       [
         9,
@@ -1673,7 +3443,13 @@
         9,
         "2025-01-21",
         "2025-01-15 10:00:00",
-        9
+        9,
+        "2025-01-31",
+        "event_risk_rating_9",
+        "event_status_9",
+        "event_summary_9",
+        100.5,
+        100.5
       ],
       [
         10,
@@ -1681,7 +3457,13 @@
         10,
         "2025-01-20",
         "2025-01-15 10:00:00",
-        10
+        10,
+        "2025-01-31",
+        "event_risk_rating_10",
+        "event_status_10",
+        "event_summary_10",
+        100.5,
+        100.5
       ],
       [
         11,
@@ -1689,7 +3471,13 @@
         1,
         "2025-01-17",
         "2025-01-15 10:00:00",
-        1
+        1,
+        "2025-01-31",
+        "event_risk_rating_11",
+        "event_status_11",
+        "event_summary_11",
+        100.5,
+        100.5
       ],
       [
         12,
@@ -1697,7 +3485,13 @@
         2,
         "2025-01-16",
         "2025-01-15 10:00:00",
-        2
+        2,
+        "2025-01-31",
+        "event_risk_rating_12",
+        "event_status_12",
+        "event_summary_12",
+        100.5,
+        100.5
       ]
     ]
   },
@@ -1706,80 +3500,119 @@
       "link_id",
       "credit_event_id",
       "facility_id",
-      "exposure_at_default"
+      "exposure_at_default",
+      "as_of_date",
+      "estimated_loss_usd",
+      "impact_pct"
     ],
     "rows": [
       [
         1,
         1,
         1,
-        120000000
+        120000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         2,
         2,
         2,
-        450000000
+        450000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         3,
         3,
         3,
-        800000000
+        800000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         4,
         4,
         4,
-        0
+        0,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         5,
         5,
         5,
-        275000000
+        275000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         6,
         6,
         6,
-        1200000000
+        1200000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         7,
         7,
         7,
-        0
+        0,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         8,
         8,
         8,
-        90000000
+        90000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         9,
         9,
         9,
-        600000000
+        600000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         10,
         10,
         10,
-        2100000000
+        2100000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         11,
         11,
         1,
-        350000000
+        350000000,
+        "2025-01-31",
+        100.5,
+        100.5
       ],
       [
         12,
         12,
         2,
-        0
+        0,
+        "2025-01-31",
+        100.5,
+        100.5
       ]
     ]
   },
@@ -1790,7 +3623,14 @@
       "as_of_date",
       "limit_rule_id",
       "counterparty_id",
-      "breach_amount"
+      "breach_amount",
+      "breach_amount_usd",
+      "breach_severity",
+      "control_description",
+      "control_owner",
+      "failure_description",
+      "lob_segment_id",
+      "stress_test_result_id"
     ],
     "rows": [
       [
@@ -1799,7 +3639,14 @@
         "2025-01-31",
         1,
         1,
-        5000000
+        5000000,
+        100.5,
+        "breach_severity_1",
+        "control_description_1",
+        "control_owner_1",
+        "failure_description_1",
+        1,
+        1
       ],
       [
         2,
@@ -1807,7 +3654,14 @@
         "2025-01-30",
         2,
         2,
-        0
+        0,
+        100.5,
+        "breach_severity_2",
+        "control_description_2",
+        "control_owner_2",
+        "failure_description_2",
+        2,
+        2
       ],
       [
         3,
@@ -1815,7 +3669,14 @@
         "2025-01-29",
         3,
         3,
-        12000000
+        12000000,
+        100.5,
+        "breach_severity_3",
+        "control_description_3",
+        "control_owner_3",
+        "failure_description_3",
+        3,
+        3
       ],
       [
         4,
@@ -1823,7 +3684,14 @@
         "2025-01-28",
         4,
         4,
-        0
+        0,
+        100.5,
+        "breach_severity_4",
+        "control_description_4",
+        "control_owner_4",
+        "failure_description_4",
+        4,
+        4
       ],
       [
         5,
@@ -1831,7 +3699,14 @@
         "2025-01-27",
         5,
         5,
-        3000000
+        3000000,
+        100.5,
+        "breach_severity_5",
+        "control_description_5",
+        "control_owner_5",
+        "failure_description_5",
+        5,
+        5
       ],
       [
         6,
@@ -1839,7 +3714,14 @@
         "2025-01-24",
         6,
         6,
-        0
+        0,
+        100.5,
+        "breach_severity_6",
+        "control_description_6",
+        "control_owner_6",
+        "failure_description_6",
+        6,
+        6
       ],
       [
         7,
@@ -1847,7 +3729,14 @@
         "2025-01-23",
         7,
         7,
-        8000000
+        8000000,
+        100.5,
+        "breach_severity_7",
+        "control_description_7",
+        "control_owner_7",
+        "failure_description_7",
+        7,
+        7
       ],
       [
         8,
@@ -1855,7 +3744,14 @@
         "2025-01-22",
         8,
         8,
-        0
+        0,
+        100.5,
+        "breach_severity_8",
+        "control_description_8",
+        "control_owner_8",
+        "failure_description_8",
+        8,
+        8
       ],
       [
         9,
@@ -1863,7 +3759,14 @@
         "2025-01-21",
         9,
         9,
-        0
+        0,
+        100.5,
+        "breach_severity_9",
+        "control_description_9",
+        "control_owner_9",
+        "failure_description_9",
+        9,
+        9
       ],
       [
         10,
@@ -1871,7 +3774,14 @@
         "2025-01-20",
         10,
         10,
-        15000000
+        15000000,
+        100.5,
+        "breach_severity_10",
+        "control_description_10",
+        "control_owner_10",
+        "failure_description_10",
+        10,
+        10
       ],
       [
         11,
@@ -1879,7 +3789,14 @@
         "2025-01-17",
         1,
         1,
-        0
+        0,
+        100.5,
+        "breach_severity_11",
+        "control_description_11",
+        "control_owner_11",
+        "failure_description_11",
+        11,
+        11
       ],
       [
         12,
@@ -1887,7 +3804,14 @@
         "2025-01-16",
         2,
         2,
-        2000000
+        2000000,
+        100.5,
+        "breach_severity_12",
+        "control_description_12",
+        "control_owner_12",
+        "failure_description_12",
+        12,
+        12
       ]
     ]
   },
@@ -1898,7 +3822,16 @@
       "as_of_date",
       "portfolio_id",
       "loss_amount",
-      "pnl_impact"
+      "pnl_impact",
+      "capital_impact_pct",
+      "execution_date",
+      "expected_loss_usd",
+      "result_description",
+      "result_status",
+      "scenario_type",
+      "stress_test_result_id",
+      "total_breaches",
+      "total_exposure_usd"
     ],
     "rows": [
       [
@@ -1907,7 +3840,16 @@
         "2025-01-31",
         1,
         10000000,
-        -10000000
+        -10000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_1",
+        "result_status_1",
+        "scenario_type_1",
+        1,
+        1,
+        100.5
       ],
       [
         2,
@@ -1915,7 +3857,16 @@
         "2025-01-30",
         2,
         25000000,
-        -25000000
+        -25000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_2",
+        "result_status_2",
+        "scenario_type_2",
+        2,
+        2,
+        100.5
       ],
       [
         3,
@@ -1923,7 +3874,16 @@
         "2025-01-29",
         3,
         5000000,
-        -5000000
+        -5000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_3",
+        "result_status_3",
+        "scenario_type_3",
+        3,
+        3,
+        100.5
       ],
       [
         4,
@@ -1931,7 +3891,16 @@
         "2025-01-28",
         4,
         50000000,
-        -50000000
+        -50000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_4",
+        "result_status_4",
+        "scenario_type_4",
+        4,
+        4,
+        100.5
       ],
       [
         5,
@@ -1939,7 +3908,16 @@
         "2025-01-27",
         5,
         15000000,
-        -15000000
+        -15000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_5",
+        "result_status_5",
+        "scenario_type_5",
+        5,
+        5,
+        100.5
       ],
       [
         6,
@@ -1947,7 +3925,16 @@
         "2025-01-24",
         6,
         30000000,
-        -30000000
+        -30000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_6",
+        "result_status_6",
+        "scenario_type_6",
+        6,
+        6,
+        100.5
       ],
       [
         7,
@@ -1955,7 +3942,16 @@
         "2025-01-23",
         7,
         8000000,
-        -8000000
+        -8000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_7",
+        "result_status_7",
+        "scenario_type_7",
+        7,
+        7,
+        100.5
       ],
       [
         8,
@@ -1963,7 +3959,16 @@
         "2025-01-22",
         8,
         40000000,
-        -40000000
+        -40000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_8",
+        "result_status_8",
+        "scenario_type_8",
+        8,
+        8,
+        100.5
       ],
       [
         9,
@@ -1971,7 +3976,16 @@
         "2025-01-21",
         9,
         12000000,
-        -12000000
+        -12000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_9",
+        "result_status_9",
+        "scenario_type_9",
+        9,
+        9,
+        100.5
       ],
       [
         10,
@@ -1979,7 +3993,16 @@
         "2025-01-20",
         10,
         60000000,
-        -60000000
+        -60000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_10",
+        "result_status_10",
+        "scenario_type_10",
+        10,
+        10,
+        100.5
       ],
       [
         11,
@@ -1987,7 +4010,16 @@
         "2025-01-17",
         1,
         7000000,
-        -7000000
+        -7000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_11",
+        "result_status_11",
+        "scenario_type_11",
+        11,
+        11,
+        100.5
       ],
       [
         12,
@@ -1995,7 +4027,16 @@
         "2025-01-16",
         2,
         20000000,
-        -20000000
+        -20000000,
+        100.5,
+        "2025-01-31",
+        100.5,
+        "result_description_12",
+        "result_status_12",
+        "scenario_type_12",
+        12,
+        12,
+        100.5
       ]
     ]
   },
@@ -2006,7 +4047,21 @@
       "as_of_date",
       "stage_code",
       "proposed_amount",
-      "currency_code"
+      "currency_code",
+      "expected_all_in_rate_pct",
+      "expected_close_date",
+      "expected_committed_amt",
+      "expected_coverage_ratio",
+      "expected_exposure_amt",
+      "expected_internal_risk_grade",
+      "expected_spread_bps",
+      "expected_tenor_months",
+      "facility_id",
+      "lob_segment_id",
+      "pipeline_deal_id",
+      "pipeline_stage",
+      "pipeline_status",
+      "record_level_code"
     ],
     "rows": [
       [
@@ -2015,7 +4070,21 @@
         "2025-01-31",
         "PITCH",
         100000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_1",
+        100.5,
+        "expected_tenor_months_1",
+        1,
+        1,
+        1,
+        "pipeline_stage_1",
+        "pipeline_status_1",
+        "record_level_code_1"
       ],
       [
         2,
@@ -2023,7 +4092,21 @@
         "2025-01-30",
         "TERM_SHEET",
         250000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_2",
+        100.5,
+        "expected_tenor_months_2",
+        2,
+        2,
+        2,
+        "pipeline_stage_2",
+        "pipeline_status_2",
+        "record_level_code_2"
       ],
       [
         3,
@@ -2031,7 +4114,21 @@
         "2025-01-29",
         "DOCS",
         500000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_3",
+        100.5,
+        "expected_tenor_months_3",
+        3,
+        3,
+        3,
+        "pipeline_stage_3",
+        "pipeline_status_3",
+        "record_level_code_3"
       ],
       [
         4,
@@ -2039,7 +4136,21 @@
         "2025-01-28",
         "CLOSING",
         75000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_4",
+        100.5,
+        "expected_tenor_months_4",
+        4,
+        4,
+        4,
+        "pipeline_stage_4",
+        "pipeline_status_4",
+        "record_level_code_4"
       ],
       [
         5,
@@ -2047,7 +4158,21 @@
         "2025-01-27",
         "PITCH",
         300000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_5",
+        100.5,
+        "expected_tenor_months_5",
+        5,
+        5,
+        5,
+        "pipeline_stage_5",
+        "pipeline_status_5",
+        "record_level_code_5"
       ],
       [
         6,
@@ -2055,7 +4180,21 @@
         "2025-01-24",
         "TERM_SHEET",
         150000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_6",
+        100.5,
+        "expected_tenor_months_6",
+        6,
+        6,
+        6,
+        "pipeline_stage_6",
+        "pipeline_status_6",
+        "record_level_code_6"
       ],
       [
         7,
@@ -2063,7 +4202,21 @@
         "2025-01-23",
         "DOCS",
         400000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_7",
+        100.5,
+        "expected_tenor_months_7",
+        7,
+        7,
+        7,
+        "pipeline_stage_7",
+        "pipeline_status_7",
+        "record_level_code_7"
       ],
       [
         8,
@@ -2071,7 +4224,21 @@
         "2025-01-22",
         "CLOSING",
         80000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_8",
+        100.5,
+        "expected_tenor_months_8",
+        8,
+        8,
+        8,
+        "pipeline_stage_8",
+        "pipeline_status_8",
+        "record_level_code_8"
       ],
       [
         9,
@@ -2079,7 +4246,21 @@
         "2025-01-21",
         "PITCH",
         200000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_9",
+        100.5,
+        "expected_tenor_months_9",
+        9,
+        9,
+        9,
+        "pipeline_stage_9",
+        "pipeline_status_9",
+        "record_level_code_9"
       ],
       [
         10,
@@ -2087,7 +4268,21 @@
         "2025-01-20",
         "TERM_SHEET",
         600000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_10",
+        100.5,
+        "expected_tenor_months_10",
+        10,
+        10,
+        10,
+        "pipeline_stage_10",
+        "pipeline_status_10",
+        "record_level_code_10"
       ],
       [
         11,
@@ -2095,7 +4290,21 @@
         "2025-01-17",
         "DOCS",
         90000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_11",
+        100.5,
+        "expected_tenor_months_11",
+        11,
+        11,
+        11,
+        "pipeline_stage_11",
+        "pipeline_status_11",
+        "record_level_code_11"
       ],
       [
         12,
@@ -2103,7 +4312,21 @@
         "2025-01-16",
         "CLOSING",
         350000000,
-        "USD"
+        "USD",
+        100.5,
+        "2025-01-31",
+        100.5,
+        100.5,
+        100.5,
+        "expected_internal_risk_grade_12",
+        100.5,
+        "expected_tenor_months_12",
+        12,
+        12,
+        12,
+        "pipeline_stage_12",
+        "pipeline_status_12",
+        "record_level_code_12"
       ]
     ]
   },
@@ -2114,7 +4337,13 @@
       "as_of_date",
       "rating_grade_id",
       "rating_source_id",
-      "is_internal_flag"
+      "is_internal_flag",
+      "pd_implied",
+      "prior_rating_value",
+      "rating_agency",
+      "rating_date",
+      "rating_type",
+      "rating_value"
     ],
     "rows": [
       [
@@ -2123,7 +4352,13 @@
         "2025-01-31",
         1,
         1,
-        "Y"
+        "Y",
+        "pd_implied_1",
+        100.5,
+        "rating_agency_1",
+        "2025-01-31",
+        "rating_type_1",
+        100.5
       ],
       [
         2,
@@ -2131,7 +4366,13 @@
         "2025-01-30",
         2,
         2,
-        "N"
+        "N",
+        "pd_implied_2",
+        100.5,
+        "rating_agency_2",
+        "2025-01-31",
+        "rating_type_2",
+        100.5
       ],
       [
         3,
@@ -2139,7 +4380,13 @@
         "2025-01-29",
         3,
         3,
-        "Y"
+        "Y",
+        "pd_implied_3",
+        100.5,
+        "rating_agency_3",
+        "2025-01-31",
+        "rating_type_3",
+        100.5
       ],
       [
         4,
@@ -2147,7 +4394,13 @@
         "2025-01-28",
         4,
         4,
-        "N"
+        "N",
+        "pd_implied_4",
+        100.5,
+        "rating_agency_4",
+        "2025-01-31",
+        "rating_type_4",
+        100.5
       ],
       [
         5,
@@ -2155,7 +4408,13 @@
         "2025-01-27",
         5,
         5,
-        "Y"
+        "Y",
+        "pd_implied_5",
+        100.5,
+        "rating_agency_5",
+        "2025-01-31",
+        "rating_type_5",
+        100.5
       ],
       [
         6,
@@ -2163,7 +4422,13 @@
         "2025-01-24",
         6,
         6,
-        "N"
+        "N",
+        "pd_implied_6",
+        100.5,
+        "rating_agency_6",
+        "2025-01-31",
+        "rating_type_6",
+        100.5
       ],
       [
         7,
@@ -2171,7 +4436,13 @@
         "2025-01-23",
         7,
         7,
-        "Y"
+        "Y",
+        "pd_implied_7",
+        100.5,
+        "rating_agency_7",
+        "2025-01-31",
+        "rating_type_7",
+        100.5
       ],
       [
         8,
@@ -2179,7 +4450,13 @@
         "2025-01-22",
         8,
         8,
-        "N"
+        "N",
+        "pd_implied_8",
+        100.5,
+        "rating_agency_8",
+        "2025-01-31",
+        "rating_type_8",
+        100.5
       ],
       [
         9,
@@ -2187,7 +4464,13 @@
         "2025-01-21",
         9,
         9,
-        "Y"
+        "Y",
+        "pd_implied_9",
+        100.5,
+        "rating_agency_9",
+        "2025-01-31",
+        "rating_type_9",
+        100.5
       ],
       [
         10,
@@ -2195,7 +4478,13 @@
         "2025-01-20",
         10,
         10,
-        "N"
+        "N",
+        "pd_implied_10",
+        100.5,
+        "rating_agency_10",
+        "2025-01-31",
+        "rating_type_10",
+        100.5
       ],
       [
         11,
@@ -2203,7 +4492,13 @@
         "2025-01-17",
         1,
         1,
-        "Y"
+        "Y",
+        "pd_implied_11",
+        100.5,
+        "rating_agency_11",
+        "2025-01-31",
+        "rating_type_11",
+        100.5
       ],
       [
         12,
@@ -2211,7 +4506,13 @@
         "2025-01-16",
         2,
         2,
-        "N"
+        "N",
+        "pd_implied_12",
+        100.5,
+        "rating_agency_12",
+        "2025-01-31",
+        "rating_type_12",
+        100.5
       ]
     ]
   },
@@ -2223,7 +4524,14 @@
       "as_of_date",
       "metric_definition_id",
       "value",
-      "context_id"
+      "context_id",
+      "credit_agreement_id",
+      "metric_category",
+      "metric_code",
+      "metric_name",
+      "metric_value",
+      "metric_value_usd",
+      "period_end_date"
     ],
     "rows": [
       [
@@ -2233,7 +4541,14 @@
         "2025-01-31",
         1,
         0.42,
-        1
+        1,
+        1,
+        "metric_category_1",
+        100.5,
+        "metric_name_1",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         2,
@@ -2242,7 +4557,14 @@
         "2025-01-30",
         2,
         1.85,
-        2
+        2,
+        2,
+        "metric_category_2",
+        100.5,
+        "metric_name_2",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         3,
@@ -2251,7 +4573,14 @@
         "2025-01-29",
         3,
         2.1,
-        3
+        3,
+        3,
+        "metric_category_3",
+        100.5,
+        "metric_name_3",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         4,
@@ -2260,7 +4589,14 @@
         "2025-01-28",
         4,
         0.95,
-        4
+        4,
+        4,
+        "metric_category_4",
+        100.5,
+        "metric_name_4",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         5,
@@ -2269,7 +4605,14 @@
         "2025-01-27",
         5,
         3.2,
-        5
+        5,
+        5,
+        "metric_category_5",
+        100.5,
+        "metric_name_5",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         6,
@@ -2278,7 +4621,14 @@
         "2025-01-24",
         6,
         1.5,
-        6
+        6,
+        6,
+        "metric_category_6",
+        100.5,
+        "metric_name_6",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         7,
@@ -2287,7 +4637,14 @@
         "2025-01-23",
         7,
         2.75,
-        7
+        7,
+        7,
+        "metric_category_7",
+        100.5,
+        "metric_name_7",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         8,
@@ -2296,7 +4653,14 @@
         "2025-01-22",
         8,
         0.6,
-        8
+        8,
+        8,
+        "metric_category_8",
+        100.5,
+        "metric_name_8",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         9,
@@ -2305,7 +4669,14 @@
         "2025-01-21",
         9,
         1.9,
-        9
+        9,
+        9,
+        "metric_category_9",
+        100.5,
+        "metric_name_9",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         10,
@@ -2314,7 +4685,14 @@
         "2025-01-20",
         10,
         4,
-        10
+        10,
+        10,
+        "metric_category_10",
+        100.5,
+        "metric_name_10",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         11,
@@ -2323,7 +4701,14 @@
         "2025-01-17",
         1,
         1.2,
-        1
+        1,
+        11,
+        "metric_category_11",
+        100.5,
+        "metric_name_11",
+        100.5,
+        100.5,
+        "2025-01-31"
       ],
       [
         12,
@@ -2332,7 +4717,14 @@
         "2025-01-16",
         2,
         2.3,
-        2
+        2,
+        12,
+        "metric_category_12",
+        100.5,
+        "metric_name_12",
+        100.5,
+        100.5,
+        "2025-01-31"
       ]
     ]
   },
@@ -2343,7 +4735,24 @@
       "threshold_type",
       "threshold_value",
       "effective_from_date",
-      "effective_to_date"
+      "effective_to_date",
+      "active_flag",
+      "inner_threshold_pct",
+      "last_threshold_updated_date",
+      "limit_type",
+      "limit_value",
+      "lod1_sponsor",
+      "lod2_sponsor",
+      "metric_category",
+      "metric_code",
+      "metric_description",
+      "metric_id_display",
+      "metric_name",
+      "metric_owner",
+      "metric_threshold_id",
+      "outer_threshold_pct",
+      "report_deadline",
+      "report_frequency"
     ],
     "rows": [
       [
@@ -2352,7 +4761,24 @@
         "MIN",
         0.5,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "Y",
+        100.5,
+        "2025-01-31",
+        "limit_type_1",
+        100.5,
+        "lod1_sponsor_1",
+        "lod2_sponsor_1",
+        "metric_category_1",
+        "metric_code_1",
+        "metric_description_1",
+        "metric_id_display_1",
+        "metric_name_1",
+        "metric_owner_1",
+        1,
+        100.5,
+        "report_deadline_1",
+        "report_frequency_1"
       ],
       [
         2,
@@ -2360,7 +4786,24 @@
         "MAX",
         2,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "N",
+        100.5,
+        "2025-01-31",
+        "limit_type_2",
+        100.5,
+        "lod1_sponsor_2",
+        "lod2_sponsor_2",
+        "metric_category_2",
+        "metric_code_2",
+        "metric_description_2",
+        "metric_id_display_2",
+        "metric_name_2",
+        "metric_owner_2",
+        2,
+        100.5,
+        "report_deadline_2",
+        "report_frequency_2"
       ],
       [
         3,
@@ -2368,7 +4811,24 @@
         "MIN",
         1,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "Y",
+        100.5,
+        "2025-01-31",
+        "limit_type_3",
+        100.5,
+        "lod1_sponsor_3",
+        "lod2_sponsor_3",
+        "metric_category_3",
+        "metric_code_3",
+        "metric_description_3",
+        "metric_id_display_3",
+        "metric_name_3",
+        "metric_owner_3",
+        3,
+        100.5,
+        "report_deadline_3",
+        "report_frequency_3"
       ],
       [
         4,
@@ -2376,7 +4836,24 @@
         "MAX",
         3,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "N",
+        100.5,
+        "2025-01-31",
+        "limit_type_4",
+        100.5,
+        "lod1_sponsor_4",
+        "lod2_sponsor_4",
+        "metric_category_4",
+        "metric_code_4",
+        "metric_description_4",
+        "metric_id_display_4",
+        "metric_name_4",
+        "metric_owner_4",
+        4,
+        100.5,
+        "report_deadline_4",
+        "report_frequency_4"
       ],
       [
         5,
@@ -2384,7 +4861,24 @@
         "MIN",
         0.25,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "Y",
+        100.5,
+        "2025-01-31",
+        "limit_type_5",
+        100.5,
+        "lod1_sponsor_5",
+        "lod2_sponsor_5",
+        "metric_category_5",
+        "metric_code_5",
+        "metric_description_5",
+        "metric_id_display_5",
+        "metric_name_5",
+        "metric_owner_5",
+        5,
+        100.5,
+        "report_deadline_5",
+        "report_frequency_5"
       ],
       [
         6,
@@ -2392,7 +4886,24 @@
         "MAX",
         1.5,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "N",
+        100.5,
+        "2025-01-31",
+        "limit_type_6",
+        100.5,
+        "lod1_sponsor_6",
+        "lod2_sponsor_6",
+        "metric_category_6",
+        "metric_code_6",
+        "metric_description_6",
+        "metric_id_display_6",
+        "metric_name_6",
+        "metric_owner_6",
+        6,
+        100.5,
+        "report_deadline_6",
+        "report_frequency_6"
       ],
       [
         7,
@@ -2400,7 +4911,24 @@
         "MIN",
         0.75,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "Y",
+        100.5,
+        "2025-01-31",
+        "limit_type_7",
+        100.5,
+        "lod1_sponsor_7",
+        "lod2_sponsor_7",
+        "metric_category_7",
+        "metric_code_7",
+        "metric_description_7",
+        "metric_id_display_7",
+        "metric_name_7",
+        "metric_owner_7",
+        7,
+        100.5,
+        "report_deadline_7",
+        "report_frequency_7"
       ],
       [
         8,
@@ -2408,7 +4936,24 @@
         "MAX",
         2.5,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "N",
+        100.5,
+        "2025-01-31",
+        "limit_type_8",
+        100.5,
+        "lod1_sponsor_8",
+        "lod2_sponsor_8",
+        "metric_category_8",
+        "metric_code_8",
+        "metric_description_8",
+        "metric_id_display_8",
+        "metric_name_8",
+        "metric_owner_8",
+        8,
+        100.5,
+        "report_deadline_8",
+        "report_frequency_8"
       ],
       [
         9,
@@ -2416,7 +4961,24 @@
         "MIN",
         0.1,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "Y",
+        100.5,
+        "2025-01-31",
+        "limit_type_9",
+        100.5,
+        "lod1_sponsor_9",
+        "lod2_sponsor_9",
+        "metric_category_9",
+        "metric_code_9",
+        "metric_description_9",
+        "metric_id_display_9",
+        "metric_name_9",
+        "metric_owner_9",
+        9,
+        100.5,
+        "report_deadline_9",
+        "report_frequency_9"
       ],
       [
         10,
@@ -2424,7 +4986,24 @@
         "MAX",
         4,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "N",
+        100.5,
+        "2025-01-31",
+        "limit_type_10",
+        100.5,
+        "lod1_sponsor_10",
+        "lod2_sponsor_10",
+        "metric_category_10",
+        "metric_code_10",
+        "metric_description_10",
+        "metric_id_display_10",
+        "metric_name_10",
+        "metric_owner_10",
+        10,
+        100.5,
+        "report_deadline_10",
+        "report_frequency_10"
       ],
       [
         11,
@@ -2432,7 +5011,24 @@
         "MIN",
         1.25,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "Y",
+        100.5,
+        "2025-01-31",
+        "limit_type_11",
+        100.5,
+        "lod1_sponsor_11",
+        "lod2_sponsor_11",
+        "metric_category_11",
+        "metric_code_11",
+        "metric_description_11",
+        "metric_id_display_11",
+        "metric_name_11",
+        "metric_owner_11",
+        11,
+        100.5,
+        "report_deadline_11",
+        "report_frequency_11"
       ],
       [
         12,
@@ -2440,7 +5036,24 @@
         "MAX",
         3.5,
         "2024-01-01",
-        "2025-01-31"
+        "2025-01-31",
+        "N",
+        100.5,
+        "2025-01-31",
+        "limit_type_12",
+        100.5,
+        "lod1_sponsor_12",
+        "lod2_sponsor_12",
+        "metric_category_12",
+        "metric_code_12",
+        "metric_description_12",
+        "metric_id_display_12",
+        "metric_name_12",
+        "metric_owner_12",
+        12,
+        100.5,
+        "report_deadline_12",
+        "report_frequency_12"
       ]
     ]
   },
@@ -2452,7 +5065,25 @@
       "facility_id",
       "counterparty_id",
       "raised_ts",
-      "resolved_ts"
+      "resolved_ts",
+      "actual_remediation_date",
+      "approver",
+      "breach_amount_usd",
+      "breach_pct",
+      "days_open",
+      "exception_description",
+      "exception_owner",
+      "exception_severity",
+      "exception_status",
+      "exception_value",
+      "identified_date",
+      "limit_rule_id",
+      "lob_segment_id",
+      "lod_sponsor",
+      "metric_threshold_id",
+      "remediation_plan",
+      "target_remediation_date",
+      "threshold_value"
     ],
     "rows": [
       [
@@ -2462,7 +5093,25 @@
         1,
         1,
         "2025-01-15 09:00:00",
-        "2025-01-15 14:00:00"
+        "2025-01-15 14:00:00",
+        "2025-01-31",
+        "approver_1",
+        100.5,
+        100.5,
+        1,
+        "exception_description_1",
+        "exception_owner_1",
+        "exception_severity_1",
+        "exception_status_1",
+        100.5,
+        "2025-01-31",
+        1,
+        1,
+        "lod_sponsor_1",
+        1,
+        "remediation_plan_1",
+        "2025-01-31",
+        100.5
       ],
       [
         2,
@@ -2471,7 +5120,25 @@
         2,
         2,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_2",
+        100.5,
+        100.5,
+        2,
+        "exception_description_2",
+        "exception_owner_2",
+        "exception_severity_2",
+        "exception_status_2",
+        100.5,
+        "2025-01-31",
+        2,
+        2,
+        "lod_sponsor_2",
+        2,
+        "remediation_plan_2",
+        "2025-01-31",
+        100.5
       ],
       [
         3,
@@ -2480,7 +5147,25 @@
         3,
         3,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_3",
+        100.5,
+        100.5,
+        3,
+        "exception_description_3",
+        "exception_owner_3",
+        "exception_severity_3",
+        "exception_status_3",
+        100.5,
+        "2025-01-31",
+        3,
+        3,
+        "lod_sponsor_3",
+        3,
+        "remediation_plan_3",
+        "2025-01-31",
+        100.5
       ],
       [
         4,
@@ -2489,7 +5174,25 @@
         4,
         4,
         "2025-01-15 09:00:00",
-        "2025-01-15 14:00:00"
+        "2025-01-15 14:00:00",
+        "2025-01-31",
+        "approver_4",
+        100.5,
+        100.5,
+        4,
+        "exception_description_4",
+        "exception_owner_4",
+        "exception_severity_4",
+        "exception_status_4",
+        100.5,
+        "2025-01-31",
+        4,
+        4,
+        "lod_sponsor_4",
+        4,
+        "remediation_plan_4",
+        "2025-01-31",
+        100.5
       ],
       [
         5,
@@ -2498,7 +5201,25 @@
         5,
         5,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_5",
+        100.5,
+        100.5,
+        5,
+        "exception_description_5",
+        "exception_owner_5",
+        "exception_severity_5",
+        "exception_status_5",
+        100.5,
+        "2025-01-31",
+        5,
+        5,
+        "lod_sponsor_5",
+        5,
+        "remediation_plan_5",
+        "2025-01-31",
+        100.5
       ],
       [
         6,
@@ -2507,7 +5228,25 @@
         6,
         6,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_6",
+        100.5,
+        100.5,
+        6,
+        "exception_description_6",
+        "exception_owner_6",
+        "exception_severity_6",
+        "exception_status_6",
+        100.5,
+        "2025-01-31",
+        6,
+        6,
+        "lod_sponsor_6",
+        6,
+        "remediation_plan_6",
+        "2025-01-31",
+        100.5
       ],
       [
         7,
@@ -2516,7 +5255,25 @@
         7,
         7,
         "2025-01-15 09:00:00",
-        "2025-01-15 14:00:00"
+        "2025-01-15 14:00:00",
+        "2025-01-31",
+        "approver_7",
+        100.5,
+        100.5,
+        7,
+        "exception_description_7",
+        "exception_owner_7",
+        "exception_severity_7",
+        "exception_status_7",
+        100.5,
+        "2025-01-31",
+        7,
+        7,
+        "lod_sponsor_7",
+        7,
+        "remediation_plan_7",
+        "2025-01-31",
+        100.5
       ],
       [
         8,
@@ -2525,7 +5282,25 @@
         8,
         8,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_8",
+        100.5,
+        100.5,
+        8,
+        "exception_description_8",
+        "exception_owner_8",
+        "exception_severity_8",
+        "exception_status_8",
+        100.5,
+        "2025-01-31",
+        8,
+        8,
+        "lod_sponsor_8",
+        8,
+        "remediation_plan_8",
+        "2025-01-31",
+        100.5
       ],
       [
         9,
@@ -2534,7 +5309,25 @@
         9,
         9,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_9",
+        100.5,
+        100.5,
+        9,
+        "exception_description_9",
+        "exception_owner_9",
+        "exception_severity_9",
+        "exception_status_9",
+        100.5,
+        "2025-01-31",
+        9,
+        9,
+        "lod_sponsor_9",
+        9,
+        "remediation_plan_9",
+        "2025-01-31",
+        100.5
       ],
       [
         10,
@@ -2543,7 +5336,25 @@
         10,
         10,
         "2025-01-15 09:00:00",
-        "2025-01-15 14:00:00"
+        "2025-01-15 14:00:00",
+        "2025-01-31",
+        "approver_10",
+        100.5,
+        100.5,
+        10,
+        "exception_description_10",
+        "exception_owner_10",
+        "exception_severity_10",
+        "exception_status_10",
+        100.5,
+        "2025-01-31",
+        10,
+        10,
+        "lod_sponsor_10",
+        10,
+        "remediation_plan_10",
+        "2025-01-31",
+        100.5
       ],
       [
         11,
@@ -2552,7 +5363,25 @@
         1,
         1,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_11",
+        100.5,
+        100.5,
+        11,
+        "exception_description_11",
+        "exception_owner_11",
+        "exception_severity_11",
+        "exception_status_11",
+        100.5,
+        "2025-01-31",
+        11,
+        11,
+        "lod_sponsor_11",
+        11,
+        "remediation_plan_11",
+        "2025-01-31",
+        100.5
       ],
       [
         12,
@@ -2561,7 +5390,25 @@
         2,
         2,
         "2025-01-15 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-31",
+        "approver_12",
+        100.5,
+        100.5,
+        12,
+        "exception_description_12",
+        "exception_owner_12",
+        "exception_severity_12",
+        "exception_status_12",
+        100.5,
+        "2025-01-31",
+        12,
+        12,
+        "lod_sponsor_12",
+        12,
+        "remediation_plan_12",
+        "2025-01-31",
+        100.5
       ]
     ]
   },
@@ -2573,7 +5420,13 @@
       "flag_type",
       "as_of_date",
       "raised_ts",
-      "cleared_ts"
+      "cleared_ts",
+      "created_ts",
+      "flag_code",
+      "flag_description",
+      "flag_scope",
+      "flag_severity",
+      "flag_trigger_value"
     ],
     "rows": [
       [
@@ -2583,7 +5436,13 @@
         "CONCENTRATION",
         "2025-01-31",
         "2025-01-10 09:00:00",
-        "2025-01-14 16:00:00"
+        "2025-01-14 16:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_1",
+        "flag_description_1",
+        "flag_scope_1",
+        "flag_severity_1",
+        100.5
       ],
       [
         2,
@@ -2592,7 +5451,13 @@
         "WATCH_LIST",
         "2025-01-30",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_2",
+        "flag_description_2",
+        "flag_scope_2",
+        "flag_severity_2",
+        100.5
       ],
       [
         3,
@@ -2601,7 +5466,13 @@
         "COVENANT_BREACH",
         "2025-01-29",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_3",
+        "flag_description_3",
+        "flag_scope_3",
+        "flag_severity_3",
+        100.5
       ],
       [
         4,
@@ -2610,7 +5481,13 @@
         "MATURITY_1Y",
         "2025-01-28",
         "2025-01-10 09:00:00",
-        "2025-01-14 16:00:00"
+        "2025-01-14 16:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_4",
+        "flag_description_4",
+        "flag_scope_4",
+        "flag_severity_4",
+        100.5
       ],
       [
         5,
@@ -2619,7 +5496,13 @@
         "CONCENTRATION",
         "2025-01-27",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_5",
+        "flag_description_5",
+        "flag_scope_5",
+        "flag_severity_5",
+        100.5
       ],
       [
         6,
@@ -2628,7 +5511,13 @@
         "WATCH_LIST",
         "2025-01-24",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_6",
+        "flag_description_6",
+        "flag_scope_6",
+        "flag_severity_6",
+        100.5
       ],
       [
         7,
@@ -2637,7 +5526,13 @@
         "SECTOR",
         "2025-01-23",
         "2025-01-10 09:00:00",
-        "2025-01-14 16:00:00"
+        "2025-01-14 16:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_7",
+        "flag_description_7",
+        "flag_scope_7",
+        "flag_severity_7",
+        100.5
       ],
       [
         8,
@@ -2646,7 +5541,13 @@
         "COUNTRY",
         "2025-01-22",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_8",
+        "flag_description_8",
+        "flag_scope_8",
+        "flag_severity_8",
+        100.5
       ],
       [
         9,
@@ -2655,7 +5556,13 @@
         "CONCENTRATION",
         "2025-01-21",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_9",
+        "flag_description_9",
+        "flag_scope_9",
+        "flag_severity_9",
+        100.5
       ],
       [
         10,
@@ -2664,7 +5571,13 @@
         "WATCH_LIST",
         "2025-01-20",
         "2025-01-10 09:00:00",
-        "2025-01-14 16:00:00"
+        "2025-01-14 16:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_10",
+        "flag_description_10",
+        "flag_scope_10",
+        "flag_severity_10",
+        100.5
       ],
       [
         11,
@@ -2673,7 +5586,13 @@
         "MATURITY_1Y",
         "2025-01-17",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_11",
+        "flag_description_11",
+        "flag_scope_11",
+        "flag_severity_11",
+        100.5
       ],
       [
         12,
@@ -2682,7 +5601,13 @@
         "SECTOR",
         "2025-01-16",
         "2025-01-10 09:00:00",
-        "2025-01-15 12:00:00"
+        "2025-01-15 12:00:00",
+        "2025-01-15 12:00:00",
+        "flag_code_12",
+        "flag_description_12",
+        "flag_scope_12",
+        "flag_severity_12",
+        100.5
       ]
     ]
   },
@@ -2694,7 +5619,16 @@
       "source_system_id",
       "completeness_pct",
       "validity_pct",
-      "overall_score"
+      "overall_score",
+      "dimension_id",
+      "dimension_name",
+      "dq_score_id",
+      "dq_score_pct",
+      "impact_pct",
+      "impacted_report_codes",
+      "issue_count",
+      "reconciliation_break_count",
+      "score_dimension"
     ],
     "rows": [
       [
@@ -2704,7 +5638,16 @@
         1,
         98.5,
         99,
-        98.8
+        98.8,
+        1,
+        "dimension_name_1",
+        1,
+        100.5,
+        100.5,
+        "impacted_report_codes_1",
+        1,
+        1,
+        "score_dimension_1"
       ],
       [
         2,
@@ -2713,7 +5656,16 @@
         2,
         99.2,
         98.5,
-        98.9
+        98.9,
+        2,
+        "dimension_name_2",
+        2,
+        100.5,
+        100.5,
+        "impacted_report_codes_2",
+        2,
+        2,
+        "score_dimension_2"
       ],
       [
         3,
@@ -2722,7 +5674,16 @@
         3,
         97.8,
         99.2,
-        98.5
+        98.5,
+        3,
+        "dimension_name_3",
+        3,
+        100.5,
+        100.5,
+        "impacted_report_codes_3",
+        3,
+        3,
+        "score_dimension_3"
       ],
       [
         4,
@@ -2731,7 +5692,16 @@
         4,
         99,
         97.8,
-        98.4
+        98.4,
+        4,
+        "dimension_name_4",
+        4,
+        100.5,
+        100.5,
+        "impacted_report_codes_4",
+        4,
+        4,
+        "score_dimension_4"
       ],
       [
         5,
@@ -2740,7 +5710,16 @@
         5,
         98,
         99,
-        98.5
+        98.5,
+        5,
+        "dimension_name_5",
+        5,
+        100.5,
+        100.5,
+        "impacted_report_codes_5",
+        5,
+        5,
+        "score_dimension_5"
       ],
       [
         6,
@@ -2749,7 +5728,16 @@
         6,
         99.5,
         98,
-        98.8
+        98.8,
+        6,
+        "dimension_name_6",
+        6,
+        100.5,
+        100.5,
+        "impacted_report_codes_6",
+        6,
+        6,
+        "score_dimension_6"
       ],
       [
         7,
@@ -2758,7 +5746,16 @@
         7,
         97,
         99.5,
-        98.2
+        98.2,
+        7,
+        "dimension_name_7",
+        7,
+        100.5,
+        100.5,
+        "impacted_report_codes_7",
+        7,
+        7,
+        "score_dimension_7"
       ],
       [
         8,
@@ -2767,7 +5764,16 @@
         8,
         98.8,
         97,
-        97.9
+        97.9,
+        8,
+        "dimension_name_8",
+        8,
+        100.5,
+        100.5,
+        "impacted_report_codes_8",
+        8,
+        8,
+        "score_dimension_8"
       ],
       [
         9,
@@ -2776,7 +5782,16 @@
         9,
         99.1,
         98.8,
-        98.9
+        98.9,
+        9,
+        "dimension_name_9",
+        9,
+        100.5,
+        100.5,
+        "impacted_report_codes_9",
+        9,
+        9,
+        "score_dimension_9"
       ],
       [
         10,
@@ -2785,7 +5800,16 @@
         10,
         96.5,
         99.1,
-        97.8
+        97.8,
+        10,
+        "dimension_name_10",
+        10,
+        100.5,
+        100.5,
+        "impacted_report_codes_10",
+        10,
+        10,
+        "score_dimension_10"
       ],
       [
         11,
@@ -2794,7 +5818,16 @@
         1,
         98.2,
         96.5,
-        97.4
+        97.4,
+        11,
+        "dimension_name_11",
+        11,
+        100.5,
+        100.5,
+        "impacted_report_codes_11",
+        11,
+        11,
+        "score_dimension_11"
       ],
       [
         12,
@@ -2803,7 +5836,16 @@
         2,
         99.8,
         98.2,
-        99
+        99,
+        12,
+        "dimension_name_12",
+        12,
+        100.5,
+        100.5,
+        "impacted_report_codes_12",
+        12,
+        12,
+        "score_dimension_12"
       ]
     ]
   }

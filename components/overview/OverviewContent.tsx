@@ -214,20 +214,28 @@ export default function OverviewContent() {
               </div>
             </div>
 
-            <div className="bg-pwc-gray/30 border border-pwc-gray/50 rounded-xl p-6 opacity-50 cursor-default" aria-disabled="true">
+            <Link
+              href="/lineage"
+              className="bg-pwc-gray/80 border border-pwc-gray rounded-xl p-6 cursor-pointer hover:border-purple-500 hover:bg-pwc-gray/70 transition-all group"
+            >
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-pwc-gray/60 flex items-center justify-center flex-shrink-0">
-                  <Eye className="w-6 h-6 text-pwc-gray-light" />
+                <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500/30 transition-colors">
+                  <Eye className="w-6 h-6 text-purple-400" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-lg mb-1 text-pwc-gray-light">Lineage Flow</h4>
-                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-pwc-gray-light bg-pwc-gray/60 px-2 py-0.5 rounded">Coming soon</span>
+                  <h4 className="font-bold text-lg mb-1">L3 Metric Lineage</h4>
+                  <p className="text-sm text-pwc-gray-light">Trace transformations &amp; equations</p>
                 </div>
               </div>
-              <p className="text-sm text-pwc-gray-light mb-4">
-                Trace a field&apos;s journey from L1 source through L2 transformations to L3 derived metrics.
+              <p className="text-sm text-pwc-white/90 mb-4 leading-relaxed">
+                Select metrics and dimensions to visualize how they are derived from L1/L2 atomic elements — see every formula, transformation, and source field.
               </p>
-            </div>
+              <div className="flex items-center gap-2 text-purple-400 font-medium text-sm group-hover:gap-3 transition-all">
+                <Play className="w-4 h-4" />
+                <span>Explore Lineage</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
 
             <div className="bg-pwc-gray/30 border border-pwc-gray/50 rounded-xl p-6 opacity-50 cursor-default" aria-disabled="true">
               <div className="flex items-start gap-4 mb-4">

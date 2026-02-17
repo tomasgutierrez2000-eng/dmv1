@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Upload, FileSpreadsheet, X } from 'lucide-react';
 
 interface FileUploadProps {
@@ -10,6 +10,7 @@ interface FileUploadProps {
 
 export default function FileUpload({ onFileSelect, currentFile }: FileUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -20,22 +21,28 @@ export default function FileUpload({ onFileSelect, currentFile }: FileUploadProp
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOver(false);
     const file = e.dataTransfer.files[0];
     if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
       onFileSelect(file);
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
   return (
     <div
       onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      className="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center cursor-pointer hover:border-blue-400 hover:bg-gray-50/80 transition-colors bg-gray-50/50"
+      onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+      onDragLeave={() => setIsDragOver(false)}
+      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+        isDragOver
+          ? 'border-blue-400 bg-blue-50/60 scale-[1.01]'
+          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 bg-white'
+      }`}
       onClick={() => fileInputRef.current?.click()}
+      role="button"
+      tabIndex={0}
+      aria-label="Upload data dictionary file"
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
     >
       <input
         ref={fileInputRef}
@@ -43,29 +50,37 @@ export default function FileUpload({ onFileSelect, currentFile }: FileUploadProp
         accept=".xlsx,.xls"
         onChange={handleFileChange}
         className="hidden"
+        aria-hidden="true"
       />
       {currentFile ? (
-        <div className="flex items-center justify-center space-x-3">
-          <FileSpreadsheet className="w-8 h-8 text-green-500" />
+        <div className="flex items-center justify-center gap-3">
+          <FileSpreadsheet className="w-6 h-6 text-emerald-500" />
           <div className="text-left">
-            <p className="text-base font-semibold text-gray-800">{currentFile.name}</p>
-            <p className="text-sm text-gray-500">{(currentFile.size / 1024).toFixed(2)} KB</p>
+            <p className="text-sm font-medium text-gray-800">{currentFile.name}</p>
+            <p className="text-xs text-gray-400">{(currentFile.size / 1024).toFixed(1)} KB</p>
           </div>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onFileSelect(null as any);
             }}
-            className="ml-4 text-gray-500 hover:text-gray-800"
+            className="ml-3 p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            aria-label="Remove file"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       ) : (
         <>
-          <Upload className="w-14 h-14 mx-auto mb-4 text-gray-500" />
-          <p className="text-base text-gray-700 mb-2">Drop bank data dictionary (Excel) here or click to browse</p>
-          <p className="text-sm text-gray-500">L1/L2/L3 schema in .xlsx or .xls</p>
+          <div className={`w-10 h-10 mx-auto mb-3 rounded-xl flex items-center justify-center transition-colors ${
+            isDragOver ? 'bg-blue-100' : 'bg-gray-100'
+          }`}>
+            <Upload className={`w-5 h-5 ${isDragOver ? 'text-blue-500' : 'text-gray-400'}`} />
+          </div>
+          <p className="text-sm text-gray-600 mb-1">
+            {isDragOver ? 'Drop file here' : 'Drop data dictionary here or click to browse'}
+          </p>
+          <p className="text-xs text-gray-400">.xlsx or .xls format</p>
         </>
       )}
     </div>

@@ -164,48 +164,76 @@ export default function Canvas() {
     setTimeout(() => setIsAnimating(false), 350);
   }, [requestFitToView, model, visibleTables, tablePositions, runFitToView]);
 
-  // Filter relationships to only show between visible tables with valid positions
-  // Also filter by relationship visibility settings and focus mode
-  const visibleRelationships = model
-    ? model.relationships.filter((rel) => {
-        // Check if relationships are enabled
-        if (!showRelationships) return false;
-        
-        // Focus mode: only show selected relationship or relationships connected to selected field/table
-        // IMPORTANT: selectedField must be checked BEFORE selectedTable because clicking a
-        // field also sets selectedTable (from mouseDown on the card), and we want field-level
-        // filtering to take priority.
-        if (focusMode) {
-          if (selectedRelationship) {
-            // Show only the selected relationship
-            if (rel.id !== selectedRelationship) return false;
-          } else if (selectedField) {
-            // Show only relationships involving the selected field
-            if (
-              !(rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName) &&
-              !(rel.target.tableKey === selectedField.tableKey && rel.target.field === selectedField.fieldName)
-            ) return false;
-          } else if (selectedTable) {
-            // Show only relationships connected to the selected table
-            if (rel.source.tableKey !== selectedTable && rel.target.tableKey !== selectedTable) return false;
-          } else {
-            // Focus mode but nothing selected - show nothing
-            return false;
-          }
+  // Filter relationships to only show between visible tables with valid positions.
+  // Memoized so downstream consumers (focusVisibleTableKeys, JSX) don't recompute every render.
+  const visibleRelationships = useMemo(() => {
+    if (!model) return [];
+    return model.relationships.filter((rel) => {
+      // Focus mode OVERRIDES the global showRelationships toggle — when the user
+      // clicks a field/table to focus, we always show the relevant relationships
+      // even if the toolbar toggle is off. Outside focus mode, respect the toggle.
+      if (!focusMode && !showRelationships) return false;
+
+      // Focus mode: only show selected relationship or relationships connected to selected field/table.
+      // IMPORTANT: selectedField is checked BEFORE selectedTable because clicking a
+      // field also sets selectedTable (from mouseDown on the card), and we want
+      // field-level filtering to take priority.
+      if (focusMode) {
+        if (selectedRelationship) {
+          if (rel.id !== selectedRelationship) return false;
+        } else if (selectedField) {
+          if (
+            !(rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName) &&
+            !(rel.target.tableKey === selectedField.tableKey && rel.target.field === selectedField.fieldName)
+          ) return false;
+        } else if (selectedTable) {
+          if (rel.source.tableKey !== selectedTable && rel.target.tableKey !== selectedTable) return false;
+        } else {
+          return false;
         }
-        
-        // Check relationship type visibility
-        if (rel.relationshipType === 'primary' && !showPrimaryRelationships) return false;
-        if (rel.relationshipType === 'secondary' && !showSecondaryRelationships) return false;
-        
-        // Check table visibility
-        const sourceVisible = visibleTables.some((t) => t.key === rel.source.tableKey);
-        const targetVisible = visibleTables.some((t) => t.key === rel.target.tableKey);
-        const sourceHasPos = !!tablePositions[rel.source.tableKey];
-        const targetHasPos = !!tablePositions[rel.target.tableKey];
-        return sourceVisible && targetVisible && sourceHasPos && targetHasPos;
-      })
-    : [];
+      }
+
+      // Respect relationship type filters (primary/secondary)
+      if (rel.relationshipType === 'primary' && !showPrimaryRelationships) return false;
+      if (rel.relationshipType === 'secondary' && !showSecondaryRelationships) return false;
+
+      // Both tables must be visible on screen with valid positions
+      const sourceVisible = visibleTables.some((t) => t.key === rel.source.tableKey);
+      const targetVisible = visibleTables.some((t) => t.key === rel.target.tableKey);
+      const sourceHasPos = !!tablePositions[rel.source.tableKey];
+      const targetHasPos = !!tablePositions[rel.target.tableKey];
+      return sourceVisible && targetVisible && sourceHasPos && targetHasPos;
+    });
+  }, [
+    model, focusMode, showRelationships, showPrimaryRelationships, showSecondaryRelationships,
+    selectedRelationship, selectedField, selectedTable, visibleTables, tablePositions,
+  ]);
+
+  // When a field (or table) is selected in focus mode, determine which tables are relevant
+  // so we can dim/hide everything else to make the relationships stand out.
+  const focusVisibleTableKeys = useMemo(() => {
+    if (!focusMode || !model) return null; // null = show all tables normally
+    const keys = new Set<string>();
+    if (selectedField) {
+      keys.add(selectedField.tableKey);
+      for (const rel of visibleRelationships) {
+        keys.add(rel.source.tableKey);
+        keys.add(rel.target.tableKey);
+      }
+    } else if (selectedTable) {
+      keys.add(selectedTable);
+      for (const rel of visibleRelationships) {
+        keys.add(rel.source.tableKey);
+        keys.add(rel.target.tableKey);
+      }
+    } else if (selectedRelationship) {
+      for (const rel of visibleRelationships) {
+        keys.add(rel.source.tableKey);
+        keys.add(rel.target.tableKey);
+      }
+    }
+    return keys.size > 0 ? keys : null;
+  }, [focusMode, model, selectedField, selectedTable, selectedRelationship, visibleRelationships]);
 
   // Canvas panning (left-click on empty area or middle-click anywhere)
   const handleMouseDown = useCallback(
@@ -356,9 +384,14 @@ export default function Canvas() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode]);
 
-  // Auto-hide navigation hint after first interaction or 6 seconds
+  // Respect prefers-reduced-motion
+  const prefersReducedMotion = typeof window !== 'undefined'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+
+  // Auto-hide navigation hint after first interaction or 8 seconds
   useEffect(() => {
-    const timer = setTimeout(() => setShowHint(false), 6000);
+    const timer = setTimeout(() => setShowHint(false), 8000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -390,10 +423,20 @@ export default function Canvas() {
       onContextMenu={(e) => e.preventDefault()}
       style={{ cursor: cursorStyle }}
     >
-      {/* Navigation hint – auto-fades */}
+      {/* Navigation hint – auto-fades with better visual (Google Maps style) */}
       {showHint && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 bg-black/60 text-white text-xs font-medium rounded-full backdrop-blur-sm pointer-events-none animate-pulse">
-          Scroll to zoom · Drag to pan · Double-click to fit · +/- keys to zoom · 0 to fit · Esc to deselect
+        <div
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 px-5 py-2.5 bg-gray-900/80 text-white text-xs font-medium rounded-xl backdrop-blur-md pointer-events-none shadow-lg transition-opacity duration-700"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-3">
+            <span>Scroll to zoom</span>
+            <span className="w-px h-3 bg-white/30" />
+            <span>Drag to pan</span>
+            <span className="w-px h-3 bg-white/30" />
+            <span>Press <kbd className="px-1.5 py-0.5 bg-white/15 rounded text-[10px] font-bold">?</kbd> for shortcuts</span>
+          </div>
         </div>
       )}
       <svg
@@ -401,6 +444,8 @@ export default function Canvas() {
         width="100%"
         height="100%"
         className="absolute inset-0"
+        role="img"
+        aria-label="Data model visualization canvas. Use scroll to zoom, drag to pan."
         style={{
           backgroundImage: `
             linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
@@ -412,7 +457,7 @@ export default function Canvas() {
       >
         <g
           transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
-          style={isAnimating ? { transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' } : undefined}
+          style={isAnimating && !prefersReducedMotion ? { transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' } : undefined}
         >
           {/* Domain Containers - In domain and domain-overview layout modes */}
           {(layoutMode === 'domain' || layoutMode === 'domain-overview') && model && (() => {
@@ -526,18 +571,29 @@ export default function Canvas() {
               });
             }
             
-            return Array.from(domainPositions.entries()).map(([domain, pos]) => (
-              <DomainContainer
-                key={domain}
-                domain={domain}
-                tables={visibleTables.filter(t => t.category === domain)}
-                position={pos}
-                width={pos.width}
-                height={pos.height}
-                isExpanded={expandedDomains.has(domain)}
-                onToggle={() => toggleExpandedDomain(domain)}
-              />
-            ));
+            return Array.from(domainPositions.entries()).map(([domain, pos]) => {
+              const domainHasFocusTable = !focusVisibleTableKeys ||
+                visibleTables.some(t => t.category === domain && focusVisibleTableKeys.has(t.key));
+              return (
+                <g
+                  key={domain}
+                  style={{
+                    opacity: domainHasFocusTable ? 1 : 0.08,
+                    transition: 'opacity 0.2s ease',
+                  }}
+                >
+                  <DomainContainer
+                    domain={domain}
+                    tables={visibleTables.filter(t => t.category === domain)}
+                    position={pos}
+                    width={pos.width}
+                    height={pos.height}
+                    isExpanded={expandedDomains.has(domain)}
+                    onToggle={() => toggleExpandedDomain(domain)}
+                  />
+                </g>
+              );
+            });
           })()}
           
           {/* Relationship Lines - Render behind tables */}
@@ -597,13 +653,15 @@ export default function Canvas() {
             } : { incoming: 0, outgoing: 0 };
             
             const beingDragged = isDraggingTable === table.key;
+            const isFocusRelevant = !focusVisibleTableKeys || focusVisibleTableKeys.has(table.key);
             return (
               <g
                 key={table.key}
                 style={{
-                  opacity: beingDragged ? 0.85 : 1,
+                  opacity: beingDragged ? 0.85 : isFocusRelevant ? 1 : 0.08,
                   filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
-                  transition: beingDragged ? 'none' : 'opacity 0.15s ease',
+                  transition: beingDragged ? 'none' : 'opacity 0.2s ease',
+                  pointerEvents: isFocusRelevant ? 'auto' : 'none',
                 }}
               >
                 <TableNode

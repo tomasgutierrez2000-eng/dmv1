@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { X, Key, Link2, Database, FileText, Table2 } from 'lucide-react';
+import { X, Key, Link2, Database, FileText, Table2, ChevronRight, MousePointerClick } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
 
@@ -100,10 +100,14 @@ export default function DetailPanel() {
     : [];
 
   return (
-    <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-full shadow-lg">
+    <div
+      className="w-96 bg-white border-l border-gray-200 flex flex-col h-full shadow-sm"
+      role="complementary"
+      aria-label="Detail panel"
+    >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Details</h2>
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+        <h2 className="text-sm font-semibold text-gray-900 tracking-tight">Details</h2>
         <button
           onClick={() => {
             setDetailPanelOpen(false);
@@ -111,37 +115,45 @@ export default function DetailPanel() {
             setSelectedRelationship(null);
             setSelectedField(null);
           }}
-          className="text-gray-500 hover:text-gray-900"
+          className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          aria-label="Close detail panel"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Content: show one of relationship / field / table */}
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
+        {/* Relationship view */}
         {relationship && model && (
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Relationship</h3>
-              <div className="space-y-3">
-                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                  <div className="text-sm text-gray-500 mb-1">Source</div>
-                  <div className="font-mono text-base text-gray-900">
+              <div className="flex items-center gap-2 mb-3">
+                <Link2 className="w-4 h-4 text-gray-500" />
+                <h3 className="text-sm font-semibold text-gray-900">Relationship</h3>
+              </div>
+              <div className="space-y-2">
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">Source</div>
+                  <div className="font-mono text-sm text-gray-900">
                     {relationship.source.layer}.{relationship.source.table}.{relationship.source.field}
                   </div>
                 </div>
-                <div className="text-center text-gray-400">
-                  <Link2 className="w-6 h-6 mx-auto" />
+                <div className="flex justify-center">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                    <ChevronRight className="w-4 h-4 text-gray-400 rotate-90" />
+                  </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                  <div className="text-sm text-gray-500 mb-1">Target</div>
-                  <div className="font-mono text-base text-gray-900">
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">Target</div>
+                  <div className="font-mono text-sm text-gray-900">
                     {relationship.target.layer}.{relationship.target.table}.{relationship.target.field}
                   </div>
                 </div>
                 {relationship.isCrossLayer && (
-                  <div className="bg-amber-900/30 border border-amber-700 rounded p-2">
-                    <p className="text-xs text-amber-400">Cross-layer relationship</p>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <p className="text-xs text-amber-700 font-medium">Cross-layer relationship</p>
                   </div>
                 )}
               </div>
@@ -149,45 +161,58 @@ export default function DetailPanel() {
           </div>
         )}
 
+        {/* Field view */}
         {!relationship && selectedField && fieldTable && (
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <Key className="w-5 h-5 text-yellow-600" />
-                Field & relationships
-              </h3>
-              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 mb-3">
-                <div className="text-sm text-gray-500 mb-0.5">Table</div>
-                <div className="font-semibold text-base text-gray-900">{fieldTable.name}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className={`px-2 py-0.5 rounded text-xs ${layerColors[fieldTable.layer].badge}`}>
+              <div className="flex items-center gap-2 mb-3">
+                <Key className="w-4 h-4 text-amber-500" />
+                <h3 className="text-sm font-semibold text-gray-900">Field details</h3>
+              </div>
+
+              {/* Table context */}
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 mb-3">
+                <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">Table</div>
+                <div className="font-semibold text-sm text-gray-900">{fieldTable.name}</div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${layerColors[fieldTable.layer].badge}`}>
                     {fieldTable.layer}
                   </span>
-                  <span className="text-xs text-gray-500">{fieldTable.category}</span>
+                  <span className="text-[10px] text-gray-400">{fieldTable.category}</span>
                 </div>
-                <div className="text-sm text-gray-500 mt-2 mb-0.5">Column</div>
-                <div className="font-mono text-base text-gray-900 flex items-center gap-2">
-                  {fieldDef?.isPK && <Key className="w-4 h-4 text-yellow-600" />}
-                  {fieldDef?.isFK && <Link2 className="w-4 h-4 text-blue-600" />}
+              </div>
+
+              {/* Field info */}
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-1">Column</div>
+                <div className="font-mono text-sm text-gray-900 flex items-center gap-2">
+                  {fieldDef?.isPK && <Key className="w-3.5 h-3.5 text-amber-500" />}
+                  {fieldDef?.isFK && <Link2 className="w-3.5 h-3.5 text-blue-600" />}
                   {selectedField.fieldName}
                   {fieldDef?.dataType && (
-                    <span className="text-sm text-gray-500">({fieldDef.dataType})</span>
+                    <span className="text-[10px] text-gray-400 font-sans px-1.5 py-0.5 bg-gray-200/60 rounded">
+                      {fieldDef.dataType}
+                    </span>
                   )}
                 </div>
                 {fieldDef?.description && (
-                  <p className="text-sm text-gray-600 mt-2">{fieldDef.description}</p>
+                  <p className="text-xs text-gray-600 mt-2 leading-relaxed">{fieldDef.description}</p>
                 )}
               </div>
             </div>
+
+            {/* Field relationships */}
             <div ref={fieldRelationshipsRef}>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Link2 className="w-4 h-4" />
-                Relationships ({fieldRelationships.length})
-              </h4>
+              <div className="flex items-center gap-2 mb-2">
+                <Link2 className="w-3.5 h-3.5 text-gray-400" />
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Relationships ({fieldRelationships.length})
+                </h4>
+              </div>
               {fieldRelationships.length === 0 ? (
-                <p className="text-sm text-gray-500">No relationships for this field</p>
+                <p className="text-xs text-gray-400 px-1">No relationships for this field</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {fieldRelationships.map((rel) => {
                     const isSource = rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName;
                     const other = isSource ? rel.target : rel.source;
@@ -196,23 +221,24 @@ export default function DetailPanel() {
                       <button
                         key={rel.id}
                         onClick={() => setSelectedRelationship(rel.id)}
-                        className="w-full text-left bg-gray-50 hover:bg-gray-100 rounded p-3 border border-gray-200 hover:border-blue-400 transition-colors"
+                        className="w-full text-left bg-gray-50 hover:bg-gray-100 rounded-lg p-3 border border-gray-100 hover:border-gray-200 transition-all duration-150"
+                        aria-label={`Relationship to ${other.table}`}
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs text-gray-500">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="text-[10px] text-gray-400">
                             {isSource ? 'Source → Target' : 'Target ← Source'}
                           </span>
-                          <span className={`text-xs px-1.5 py-0.5 rounded ${
-                            rel.relationshipType === 'primary' ? 'bg-green-900/50 text-green-300' : 'bg-amber-900/50 text-amber-300'
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${
+                            rel.relationshipType === 'primary' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
                           }`}>
                             {rel.relationshipType}
                           </span>
                         </div>
-                        <div className="font-mono text-sm text-gray-900 mt-1">
+                        <div className="font-mono text-xs text-gray-900">
                           {other.layer}.{other.table}.{other.field}
                         </div>
                         {otherTable && (
-                          <div className="text-xs text-gray-500 mt-0.5">{otherTable.name} · {otherTable.category}</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">{otherTable.name} · {otherTable.category}</div>
                         )}
                       </button>
                     );
@@ -223,68 +249,69 @@ export default function DetailPanel() {
           </div>
         )}
 
+        {/* Table view */}
         {!relationship && !selectedField && table && (
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             {/* Table Header */}
             <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Database className="w-5 h-5 text-gray-700" />
-                <h3 className="text-xl font-bold text-gray-900">{table.name}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <Database className="w-4 h-4 text-gray-500" />
+                <h3 className="text-base font-bold text-gray-900 truncate">{table.name}</h3>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${layerColors[table.layer].badge}`}>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${layerColors[table.layer].badge}`}>
                   {table.layer}
                 </span>
-                <span className="text-sm text-gray-500">{table.category}</span>
+                <span className="text-xs text-gray-400">{table.category}</span>
               </div>
             </div>
 
             {/* Fields */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
-                <FileText className="w-4 h-4" />
-                <span>Fields ({table.fields.length})</span>
-              </h4>
-              <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="w-3.5 h-3.5 text-gray-400" />
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Fields ({table.fields.length})
+                </h4>
+              </div>
+              <div className="space-y-1">
                 {table.fields.map((field, idx) => (
                   <div
                     key={idx}
-                    className="bg-gray-50 rounded p-3 border border-gray-200"
+                    className="bg-gray-50 rounded-lg p-2.5 border border-gray-100 hover:border-gray-200 transition-colors"
                   >
-                    <div className="flex items-center space-x-2 mb-1">
-                      {field.isPK && <Key className="w-4 h-4 text-amber-500" />}
-                      {field.isFK && <Link2 className="w-4 h-4 text-blue-600" />}
-                      <span className="font-mono font-semibold text-gray-900">{field.name}</span>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      {field.isPK && <Key className="w-3 h-3 text-amber-500 flex-shrink-0" />}
+                      {field.isFK && <Link2 className="w-3 h-3 text-blue-600 flex-shrink-0" />}
+                      <span className="font-mono font-semibold text-xs text-gray-900 truncate">{field.name}</span>
                       {field.dataType && (
-                        <span className="text-xs text-gray-500">({field.dataType})</span>
+                        <span className="text-[9px] text-gray-400 ml-auto flex-shrink-0 px-1 py-0.5 bg-gray-200/60 rounded font-medium">{field.dataType}</span>
                       )}
                     </div>
                     {field.description && (
-                      <p className="text-sm text-gray-600 mt-1">{field.description}</p>
+                      <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">{field.description}</p>
                     )}
                     {field.whyRequired && (
-                      <p className="text-xs text-gray-500 mt-1">Why: {field.whyRequired}</p>
+                      <p className="text-[10px] text-gray-400 mt-1 italic">Why: {field.whyRequired}</p>
                     )}
                     {field.simplificationNote && (
-                      <p className="text-xs text-amber-600 mt-1">Note: {field.simplificationNote}</p>
+                      <p className="text-[10px] text-amber-600 mt-1">Note: {field.simplificationNote}</p>
                     )}
                     {field.fkTarget && (
-                      <p className="text-xs text-blue-600 mt-1">
+                      <p className="text-[10px] text-blue-600 mt-1 font-medium">
                         → {field.fkTarget.layer}.{field.fkTarget.table}.{field.fkTarget.field}
                       </p>
                     )}
                     {field.formula && (
-                      <div className="mt-2 p-2 bg-gray-100 rounded">
-                        <p className="text-xs text-gray-500 mb-1">Formula:</p>
-                        <code className="text-xs text-emerald-700">{field.formula}</code>
+                      <div className="mt-1.5 p-1.5 bg-gray-100 rounded">
+                        <code className="text-[10px] text-emerald-700">{field.formula}</code>
                       </div>
                     )}
                     {field.sourceTables && field.sourceTables.length > 0 && (
-                      <div className="mt-2">
-                        <p className="text-xs text-gray-500 mb-1">Source Tables:</p>
-                        <div className="flex flex-wrap gap-1">
+                      <div className="mt-1.5">
+                        <div className="flex flex-wrap gap-0.5">
                           {field.sourceTables.map((src, i) => (
-                            <span key={i} className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                            <span key={i} className="text-[9px] bg-gray-200/80 text-gray-600 px-1.5 py-0.5 rounded font-medium">
                               {src.layer}.{src.table}
                             </span>
                           ))}
@@ -292,36 +319,39 @@ export default function DetailPanel() {
                       </div>
                     )}
                     {field.dashboardUsage && (
-                      <p className="text-xs text-violet-600 mt-1">Used in: {field.dashboardUsage}</p>
+                      <p className="text-[10px] text-violet-600 mt-1">Used in: {field.dashboardUsage}</p>
                     )}
                     {field.grain && (
-                      <p className="text-xs text-gray-500 mt-1">Grain: {field.grain}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">Grain: {field.grain}</p>
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Sample data (when table is selected) */}
+            {/* Sample data */}
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <Table2 className="w-4 h-4" />
-                Sample data
-              </h4>
+              <div className="flex items-center gap-2 mb-2">
+                <Table2 className="w-3.5 h-3.5 text-gray-400" />
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sample data</h4>
+              </div>
               {sampleDataLoading && (
-                <p className="text-sm text-gray-500">Loading…</p>
+                <div className="flex items-center gap-2 text-xs text-gray-400 py-2">
+                  <div className="w-3 h-3 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                  Loading…
+                </div>
               )}
               {sampleDataError && !sampleDataLoading && (
-                <p className="text-sm text-amber-600">{sampleDataError}</p>
+                <p className="text-xs text-amber-600 py-1">{sampleDataError}</p>
               )}
               {!sampleDataLoading && !sampleDataError && sampleData && sampleData.rows.length > 0 && (
-                <div className="rounded border border-gray-200 overflow-hidden">
-                  <div className="overflow-x-auto max-h-64 overflow-y-auto">
-                    <table className="w-full text-sm border-collapse">
-                      <thead className="bg-gray-100 sticky top-0">
+                <div className="rounded-lg border border-gray-100 overflow-hidden">
+                  <div className="overflow-x-auto max-h-48 overflow-y-auto scrollbar-thin">
+                    <table className="w-full text-[11px] border-collapse" aria-label={`Sample data for ${table.name}`}>
+                      <thead className="bg-gray-50 sticky top-0">
                         <tr>
                           {sampleData.columns.map((col) => (
-                            <th key={col} className="text-left px-3 py-2 text-gray-700 font-medium border-b border-gray-200 whitespace-nowrap">
+                            <th key={col} className="text-left px-2 py-1.5 text-gray-500 font-semibold border-b border-gray-100 whitespace-nowrap uppercase text-[9px] tracking-wider">
                               {col}
                             </th>
                           ))}
@@ -329,10 +359,10 @@ export default function DetailPanel() {
                       </thead>
                       <tbody>
                         {sampleData.rows.map((row, rIdx) => (
-                          <tr key={rIdx} className="border-b border-gray-100 hover:bg-gray-50">
+                          <tr key={rIdx} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors">
                             {sampleData.columns.map((col, cIdx) => (
-                              <td key={col} className="px-3 py-2 text-gray-600 whitespace-nowrap max-w-[160px] truncate" title={String(row[cIdx] ?? '')}>
-                                {row[cIdx] != null ? String(row[cIdx]) : '—'}
+                              <td key={col} className="px-2 py-1.5 text-gray-600 whitespace-nowrap max-w-[120px] truncate" title={String(row[cIdx] ?? '')}>
+                                {row[cIdx] != null ? String(row[cIdx]) : <span className="text-gray-300">—</span>}
                               </td>
                             ))}
                           </tr>
@@ -340,21 +370,28 @@ export default function DetailPanel() {
                       </tbody>
                     </table>
                   </div>
-                  <div className="px-3 py-2 bg-gray-100 text-sm text-gray-500 border-t border-gray-200">
-                    {sampleData.rows.length} row{sampleData.rows.length !== 1 ? 's' : ''} · {sampleData.source === 'database' ? 'Live DB' : 'Generated sample'}
+                  <div className="px-2 py-1.5 bg-gray-50 text-[10px] text-gray-400 border-t border-gray-100 font-medium">
+                    {sampleData.rows.length} row{sampleData.rows.length !== 1 ? 's' : ''} · {sampleData.source === 'uploaded' ? 'Uploaded' : sampleData.source === 'database' ? 'Live DB' : 'Generated'}
                   </div>
                 </div>
               )}
               {!sampleDataLoading && !sampleDataError && (!sampleData || sampleData.rows.length === 0) && selectedTable && (
-                <p className="text-sm text-gray-500">No sample data for this table. For L1 run: npx tsx scripts/l1/generate.ts. For L2 run: npx tsx scripts/l2/generate.ts</p>
+                <p className="text-[11px] text-gray-400 py-1 leading-relaxed">
+                  No sample data available. Use the toolbar Import button to upload Excel data.
+                </p>
               )}
             </div>
           </div>
         )}
 
+        {/* Empty state - nothing selected */}
         {!table && !relationship && !selectedField && (
-          <div className="text-center text-gray-500 mt-8">
-            <p>Click a table, then a column to see field details and relationships for banking data</p>
+          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+            <div className="w-12 h-12 mb-3 bg-gray-100 rounded-xl flex items-center justify-center">
+              <MousePointerClick className="w-6 h-6 text-gray-300" />
+            </div>
+            <p className="text-sm text-gray-500 font-medium mb-1">Nothing selected</p>
+            <p className="text-xs text-gray-400 max-w-[200px] leading-relaxed">Click a table on the canvas, then click a field to see its details and relationships.</p>
           </div>
         )}
       </div>

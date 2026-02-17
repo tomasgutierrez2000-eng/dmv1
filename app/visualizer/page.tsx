@@ -9,24 +9,23 @@ import Sidebar from '../../components/visualizer/Sidebar';
 import DetailPanel from '../../components/visualizer/DetailPanel';
 import Toolbar from '../../components/visualizer/Toolbar';
 import Minimap from '../../components/visualizer/Minimap';
-import { Loader, AlertCircle } from 'lucide-react';
+import KeyboardShortcutsPanel from '../../components/visualizer/KeyboardShortcutsPanel';
+import { Loader, AlertCircle, Database, ArrowRight } from 'lucide-react';
+import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
 
 export default function VisualizerPage() {
   const { model, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers } = useModelStore();
   const { parseExcel, loading, result } = useExcelParser();
+  const { toast } = useToast();
   const [initialLoad, setInitialLoad] = useState(true);
 
-  // Try to load from data dictionary on mount
   useEffect(() => {
     const loadFromDictionary = async () => {
       try {
         const response = await fetch('/api/data-dictionary');
         if (response.ok) {
-          const dataDict = await response.json();
-          // Convert data dictionary to DataModel format
-          // This is a simplified conversion - you may need to adjust based on your data dictionary structure
-          // For now, we'll just try to parse from Excel if dictionary exists
+          // Placeholder for data dictionary loading
         }
       } catch (error) {
         // No data dictionary found, that's okay
@@ -39,7 +38,6 @@ export default function VisualizerPage() {
   useEffect(() => {
     if (result?.model) {
       setModel(result.model);
-      // Apply initial layout only if positions don't exist
       const { calculateLayout } = require('../../utils/layoutEngine');
       const existingPositions = tablePositions;
       const positions = calculateLayout(result.model, layoutMode, existingPositions, undefined, tableSize, visibleLayers);
@@ -77,16 +75,17 @@ export default function VisualizerPage() {
           setTablePositions(key, pos as any);
         }
       });
+      toast({ type: 'success', title: 'Demo loaded', description: `${Object.keys(model.tables).length} tables loaded.` });
     } catch (e) {
       console.error('Load L1 demo failed:', e);
-      alert(e instanceof Error ? e.message : 'Failed to load L1 demo');
+      toast({ type: 'error', title: 'Failed to load demo', description: e instanceof Error ? e.message : 'Unknown error.' });
     } finally {
       setDemoLoading(false);
     }
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 text-gray-900 overflow-hidden">
+    <div className="h-screen flex flex-col bg-gray-50 text-gray-900 overflow-hidden">
       {/* Toolbar */}
       <Toolbar />
 
@@ -98,42 +97,75 @@ export default function VisualizerPage() {
         {/* Canvas Area */}
         <div className="flex-1 relative">
           {!model && !loading && (
-            <div className="absolute inset-0 flex items-center justify-center p-6">
-              <div className="max-w-2xl w-full">
-                <div className="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow-md">
-                  <p className="text-lg text-gray-700 mb-4">View L1 banking data schema and sample data (no upload required):</p>
-                  <button
-                    type="button"
-                    onClick={loadL1Demo}
-                    disabled={demoLoading}
-                    className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-base"
-                  >
-                    {demoLoading ? 'Loading…' : 'Load L1 bank data demo (78 tables)'}
-                  </button>
+            <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="max-w-lg w-full">
+                {/* Hero empty state - Apple/Google clean design */}
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl flex items-center justify-center shadow-sm">
+                    <Database className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">Get started</h2>
+                  <p className="text-sm text-gray-500 max-w-sm mx-auto">
+                    Load a demo dataset to explore the banking data model, or upload your own data dictionary.
+                  </p>
                 </div>
+
+                {/* Primary CTA - Load demo */}
+                <button
+                  type="button"
+                  onClick={loadL1Demo}
+                  disabled={demoLoading}
+                  className="w-full mb-4 py-3.5 px-6 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
+                >
+                  {demoLoading ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      <span>Loading demo data…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Load L1 bank data demo (78 tables)</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+
+                {/* Secondary: File upload */}
+                <div className="relative">
+                  <div className="absolute inset-x-0 -top-px h-px bg-gray-200" />
+                  <p className="text-center text-xs text-gray-400 my-4 uppercase tracking-wider font-medium">or upload your own</p>
+                </div>
+
                 <FileUpload
                   onFileSelect={handleFileSelect}
                   currentFile={null}
                 />
+
+                {/* Inline feedback */}
                 {result?.error && (
-                  <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-5">
-                    <div className="flex items-start space-x-4">
-                      <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="font-semibold text-red-800 mb-1 text-base">Parse Error</h3>
-                        <p className="text-base text-red-700">{result.error}</p>
-                      </div>
+                  <div className="mt-5 bg-red-50 border border-red-100 rounded-xl p-4 flex items-start gap-3" role="alert">
+                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-red-800 text-sm">Parse error</p>
+                      <p className="text-sm text-red-600 mt-0.5">{result.error}</p>
                     </div>
                   </div>
                 )}
                 {result?.statistics && (
-                  <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-green-800 mb-3 text-base">Parse successful</h3>
-                    <div className="grid grid-cols-2 gap-3 text-base text-gray-700">
-                      <div><span className="text-gray-500">Tables:</span> <span className="font-bold">{result.statistics.tables}</span></div>
-                      <div><span className="text-gray-500">Fields:</span> <span className="font-bold">{result.statistics.fields}</span></div>
-                      <div><span className="text-gray-500">Relationships:</span> <span className="font-bold">{result.statistics.relationships}</span></div>
-                      <div><span className="text-gray-500">Categories:</span> <span className="font-bold">{result.statistics.categories}</span></div>
+                  <div className="mt-5 bg-emerald-50 border border-emerald-100 rounded-xl p-4" role="status">
+                    <p className="font-medium text-emerald-800 text-sm mb-2">Parsed successfully</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { label: 'Tables', value: result.statistics.tables },
+                        { label: 'Fields', value: result.statistics.fields },
+                        { label: 'Relationships', value: result.statistics.relationships },
+                        { label: 'Categories', value: result.statistics.categories },
+                      ].map((s) => (
+                        <div key={s.label} className="flex items-center justify-between text-sm">
+                          <span className="text-emerald-600">{s.label}</span>
+                          <span className="font-semibold text-emerald-800">{s.value}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -141,11 +173,13 @@ export default function VisualizerPage() {
             </div>
           )}
 
+          {/* Loading overlay with skeleton feel */}
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/90">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm" role="status" aria-live="polite">
               <div className="text-center">
-                <Loader className="w-12 h-12 animate-spin mx-auto mb-5 text-blue-600" />
-                <p className="text-lg text-gray-600 font-medium">Parsing Excel file…</p>
+                <Loader className="w-10 h-10 animate-spin mx-auto mb-4 text-gray-400" />
+                <p className="text-sm text-gray-600 font-medium">Parsing Excel file…</p>
+                <p className="text-xs text-gray-400 mt-1">This may take a moment for large files</p>
               </div>
             </div>
           )}
@@ -157,6 +191,9 @@ export default function VisualizerPage() {
         {/* Detail Panel */}
         <DetailPanel />
       </div>
+
+      {/* Keyboard shortcuts panel - toggled with ? key */}
+      <KeyboardShortcutsPanel />
     </div>
   );
 }

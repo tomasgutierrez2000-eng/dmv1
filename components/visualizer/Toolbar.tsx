@@ -12,15 +12,14 @@ import {
   Moon,
   Sun,
   Eye,
-  Grid3x3,
-  Layers,
-  List,
   FileText,
   Minimize2,
   Maximize,
   GitBranch,
   GitMerge,
   EyeOff,
+  Keyboard,
+  ChevronDown,
 } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
 import { modelToSchemaExport } from '../../utils/schemaExport';
@@ -31,8 +30,56 @@ import { computeModelDiff } from '../../utils/modelDiff';
 import type { DataModel } from '../../types/model';
 import type { SchemaExport } from '../../types/schemaExport';
 import SchemaImportModal from './SchemaImportModal';
+import { useToast } from '../ui/Toast';
 
 type ExportFormat = 'png' | 'svg' | 'sql' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2';
+
+function ToolbarTooltip({ children, label }: { children: React.ReactNode; label: string }) {
+  return (
+    <div className="relative group/tip">
+      {children}
+      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 px-2.5 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover/tip:opacity-100 transition-opacity z-50 shadow-lg">
+        {label}
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45" />
+      </div>
+    </div>
+  );
+}
+
+function ToolbarDivider() {
+  return <div className="w-px h-7 bg-gray-200 mx-1.5 flex-shrink-0" />;
+}
+
+function ToolbarIconButton({
+  onClick,
+  active,
+  label,
+  children,
+  ariaPressed,
+}: {
+  onClick: () => void;
+  active?: boolean;
+  label: string;
+  children: React.ReactNode;
+  ariaPressed?: boolean;
+}) {
+  return (
+    <ToolbarTooltip label={label}>
+      <button
+        onClick={onClick}
+        className={`p-2 rounded-lg transition-all duration-150 ${
+          active
+            ? 'bg-blue-100 text-blue-700 shadow-inner'
+            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+        }`}
+        aria-label={label}
+        aria-pressed={ariaPressed}
+      >
+        {children}
+      </button>
+    </ToolbarTooltip>
+  );
+}
 
 export default function Toolbar() {
   const {
@@ -63,15 +110,19 @@ export default function Toolbar() {
     setShowSecondaryRelationships,
   } = useModelStore();
 
+  const { toast } = useToast();
   const schemaFileRef = useRef<HTMLInputElement>(null);
   const sampleFileRef = useRef<HTMLInputElement>(null);
   const [importModal, setImportModal] = useState<{ diff: ReturnType<typeof computeModelDiff>; importedModel: DataModel } | null>(null);
   const [sampleImportLayer, setSampleImportLayer] = useState<'L1' | 'L2'>('L1');
+  const [exportOpen, setExportOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const handleExport = async (format: ExportFormat) => {
+    setExportOpen(false);
     if (format === 'schema-json' || format === 'schema-excel') {
       if (!model) {
-        alert('Load a data model first.');
+        toast({ type: 'warning', title: 'No model loaded', description: 'Load a data model first before exporting.' });
         return;
       }
       const exported = modelToSchemaExport(model);
@@ -82,6 +133,7 @@ export default function Toolbar() {
         a.download = `data-model-schema-${new Date().toISOString().slice(0, 10)}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
+        toast({ type: 'success', title: 'Schema exported', description: 'JSON file downloaded.' });
       } else {
         const XLSX = await import('xlsx');
         const wb = XLSX.utils.book_new();
@@ -98,6 +150,7 @@ export default function Toolbar() {
         a.download = `data-model-schema-${new Date().toISOString().slice(0, 10)}.xlsx`;
         a.click();
         URL.revokeObjectURL(a.href);
+        toast({ type: 'success', title: 'Schema exported', description: 'Excel file downloaded.' });
       }
       return;
     }
@@ -116,7 +169,7 @@ export default function Toolbar() {
           if (key.startsWith(prefix)) merged[key] = data;
         }
         if (Object.keys(merged).length === 0) {
-          alert('No sample data for this layer.');
+          toast({ type: 'warning', title: 'No sample data', description: `No sample data found for ${layer}.` });
           return;
         }
         const XLSX = await import('xlsx');
@@ -134,13 +187,13 @@ export default function Toolbar() {
         a.download = `sample-data-${layer}-${new Date().toISOString().slice(0, 10)}.xlsx`;
         a.click();
         URL.revokeObjectURL(a.href);
+        toast({ type: 'success', title: `${layer} sample data exported`, description: `${Object.keys(merged).length} tables exported.` });
       } catch (e) {
         console.error(e);
-        alert(e instanceof Error ? e.message : 'Export failed. Ensure sample data exists for this layer.');
+        toast({ type: 'error', title: 'Export failed', description: e instanceof Error ? e.message : 'Ensure sample data exists for this layer.' });
       }
       return;
     }
-    // TODO: png, svg, sql, mermaid, dbml
     console.log(`Export as ${format}`);
   };
 
@@ -173,7 +226,7 @@ export default function Toolbar() {
       const diff = computeModelDiff(model, importedModel);
       setImportModal({ diff, importedModel });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to parse schema file.');
+      toast({ type: 'error', title: 'Schema import failed', description: err instanceof Error ? err.message : 'Failed to parse schema file.' });
     }
   };
 
@@ -198,11 +251,18 @@ export default function Toolbar() {
         bulk[tableKey] = { columns, rows };
       }
       setUploadedSampleDataBulk({ ...uploadedSampleData, ...bulk });
-      alert(`Imported sample data for ${Object.keys(bulk).length} table(s) in ${layer}.`);
+      toast({ type: 'success', title: `${layer} sample data imported`, description: `${Object.keys(bulk).length} table(s) loaded.` });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to parse Excel file.');
+      toast({ type: 'error', title: 'Import failed', description: err instanceof Error ? err.message : 'Failed to parse Excel file.' });
     }
   };
+
+  const presets = [
+    { key: 'overview' as const, label: 'Overview', icon: Eye, match: viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' },
+    { key: 'detailed' as const, label: 'Detailed', icon: FileText, match: viewMode === 'detailed' && tableSize === 'large' && fieldDisplayMode === 'full' },
+    { key: 'compact' as const, label: 'Compact', icon: Minimize2, match: viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' && zoom === 1 },
+    { key: 'focus' as const, label: 'Focus', icon: Maximize, match: viewMode === 'standard' && tableSize === 'medium' && fieldDisplayMode === 'standard' },
+  ];
 
   return (
     <>
@@ -212,6 +272,7 @@ export default function Toolbar() {
         accept=".json,.xlsx,.xls,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         className="hidden"
         onChange={onSchemaFileChange}
+        aria-hidden="true"
       />
       <input
         ref={sampleFileRef}
@@ -219,6 +280,7 @@ export default function Toolbar() {
         accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         className="hidden"
         onChange={onSampleFileChange}
+        aria-hidden="true"
       />
       {importModal && (
         <SchemaImportModal
@@ -226,286 +288,262 @@ export default function Toolbar() {
           onApply={() => {
             setModel(importModal.importedModel);
             setImportModal(null);
+            toast({ type: 'success', title: 'Schema applied', description: 'Data model updated from import.' });
           }}
           onClose={() => setImportModal(null)}
         />
       )}
-      <div className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 shadow-sm">
-      <div className="flex items-center space-x-2">
-        {/* Zoom Controls */}
-        <button
-          onClick={() => setZoom(zoom * 0.9)}
-          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title="Zoom Out"
-        >
-          <ZoomOut className="w-4 h-4" />
-        </button>
-        <span className="text-sm text-gray-600 min-w-[60px] text-center">
-          {Math.round(zoom * 100)}%
-        </span>
-        <button
-          onClick={() => setZoom(zoom * 1.1)}
-          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title="Zoom In"
-        >
-          <ZoomIn className="w-4 h-4" />
-        </button>
-        <button
-          onClick={resetView}
-          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title="Reset Zoom"
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setRequestFitToView()}
-          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title="Fit to View (fits visible tables and zooms in when filtered)"
-        >
-          <Maximize2 className="w-4 h-4" />
-        </button>
-
-        <div className="w-px h-6 bg-gray-200 mx-2" />
-
-        {/* View Presets - Quick Access with Active State */}
-        <div className="flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5">
-          <button
-            onClick={() => applyViewPreset('overview')}
-            className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-              viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-            }`}
-            title="Overview - See everything at once (Compact + Small + Minimal)"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Overview</span>
-          </button>
-          <button
-            onClick={() => applyViewPreset('detailed')}
-            className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-              viewMode === 'detailed' && tableSize === 'large' && fieldDisplayMode === 'full'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-            }`}
-            title="Detailed - Full information (Detailed + Large + Full)"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Detailed</span>
-          </button>
-          <button
-            onClick={() => applyViewPreset('compact')}
-            className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-              viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' && zoom === 1
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-            }`}
-            title="Compact - Minimal view (Compact + Small + Minimal)"
-          >
-            <Minimize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Compact</span>
-          </button>
-          <button
-            onClick={() => applyViewPreset('focus')}
-            className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-              viewMode === 'standard' && tableSize === 'medium' && fieldDisplayMode === 'standard'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-            }`}
-            title="Focus - Standard view (Standard + Medium + Standard)"
-          >
-            <Maximize className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Focus</span>
-          </button>
-        </div>
-
-        <div className="w-px h-6 bg-gray-200 mx-2" />
-
-        {/* View Mode */}
-        <div className="relative">
-          <select
-            value={viewMode}
-            onChange={(e) => setViewMode(e.target.value as any)}
-            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
-            title="View detail level"
-          >
-            <option value="compact">Compact View</option>
-            <option value="standard">Standard View</option>
-            <option value="detailed">Detailed View</option>
-          </select>
-          <Eye className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        </div>
-
-        <div className="w-px h-6 bg-gray-200 mx-2" />
-
-        {/* Table Size */}
-        <div className="relative">
-          <select
-            value={tableSize}
-            onChange={(e) => setTableSize(e.target.value as any)}
-            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
-            title="Table card size"
-          >
-            <option value="small">Small Tables</option>
-            <option value="medium">Medium Tables</option>
-            <option value="large">Large Tables</option>
-          </select>
-          <Grid3x3 className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        </div>
-
-        <div className="w-px h-6 bg-gray-200 mx-2" />
-
-        {/* Field Display Mode */}
-        <div className="relative">
-          <select
-            value={fieldDisplayMode}
-            onChange={(e) => setFieldDisplayMode(e.target.value as any)}
-            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
-            title="Field information level"
-          >
-            <option value="minimal">Minimal Fields</option>
-            <option value="standard">Standard Fields</option>
-            <option value="full">Full Fields</option>
-          </select>
-          <List className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        </div>
-
-        <div className="w-px h-6 bg-pwc-gray mx-2" />
-
-        {/* Relationship Visibility Controls */}
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
-          <button
-            onClick={() => setShowRelationships(!showRelationships)}
-            className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-              showRelationships
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-            }`}
-            title="Toggle all relationships"
-          >
-            {showRelationships ? <GitBranch className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">Relationships</span>
-          </button>
-          {showRelationships && (
-            <>
-              <div className="w-px h-4 bg-gray-200 mx-0.5" />
-              <button
-                onClick={() => setShowPrimaryRelationships(!showPrimaryRelationships)}
-                className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-                  showPrimaryRelationships
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                }`}
-                title="Toggle primary relationships (direct FK->PK)"
-              >
-                <GitBranch className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Primary</span>
-              </button>
-              <button
-                onClick={() => setShowSecondaryRelationships(!showSecondaryRelationships)}
-                className={`px-2 py-1 text-xs font-medium rounded transition-all flex items-center gap-1.5 ${
-                  showSecondaryRelationships
-                    ? 'bg-violet-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                }`}
-                title="Toggle secondary relationships (derived/complex)"
-              >
-                <GitMerge className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Secondary</span>
-              </button>
-            </>
-          )}
-        </div>
-
-        <div className="w-px h-6 bg-gray-200 mx-2" />
-
-        {/* Export */}
-        <div className="relative">
-          <select
-            onChange={(e) => {
-              if (e.target.value) {
-                handleExport(e.target.value as ExportFormat);
-                e.target.value = '';
-              }
-            }}
-            className="px-3 py-1.5 bg-white text-gray-800 rounded border border-gray-300 focus:border-blue-500 focus:outline-none text-sm appearance-none pr-8"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Export...
-            </option>
-            <option value="schema-json">Data model (JSON)</option>
-            <option value="schema-excel">Data model (Excel)</option>
-            <option value="sample-L1">Sample data L1 (Excel)</option>
-            <option value="sample-L2">Sample data L2 (Excel)</option>
-            <option value="png">PNG Image</option>
-            <option value="svg">SVG Image</option>
-            <option value="sql">SQL DDL</option>
-            <option value="mermaid">Mermaid</option>
-            <option value="dbml">dbdiagram.io</option>
-          </select>
-          <Download className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        </div>
-
-        {/* Import */}
+      <div
+        className="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-3 shadow-sm flex-shrink-0"
+        role="toolbar"
+        aria-label="Visualizer toolbar"
+      >
+        {/* Left: Navigation + View controls */}
         <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => schemaFileRef.current?.click()}
-            className="px-2 py-1.5 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-            title="Import data model (JSON). See changes for SQL and visualization."
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-0.5" role="group" aria-label="Zoom controls">
+            <ToolbarIconButton onClick={() => setZoom(zoom * 0.9)} label="Zoom out (-)">
+              <ZoomOut className="w-4 h-4" />
+            </ToolbarIconButton>
+            <div
+              className="text-xs font-medium text-gray-600 min-w-[48px] text-center tabular-nums select-none cursor-default"
+              aria-label={`Zoom level: ${Math.round(zoom * 100)}%`}
+              aria-live="polite"
+            >
+              {Math.round(zoom * 100)}%
+            </div>
+            <ToolbarIconButton onClick={() => setZoom(zoom * 1.1)} label="Zoom in (+)">
+              <ZoomIn className="w-4 h-4" />
+            </ToolbarIconButton>
+            <ToolbarIconButton onClick={resetView} label="Reset zoom">
+              <RotateCcw className="w-4 h-4" />
+            </ToolbarIconButton>
+            <ToolbarIconButton onClick={() => setRequestFitToView()} label="Fit to view (0)">
+              <Maximize2 className="w-4 h-4" />
+            </ToolbarIconButton>
+          </div>
+
+          <ToolbarDivider />
+
+          {/* View Presets - Segmented control (Apple pattern) */}
+          <div
+            className="flex items-center bg-gray-100 rounded-lg p-0.5"
+            role="group"
+            aria-label="View presets"
           >
-            Import schema
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSampleImportLayer('L1');
-              sampleFileRef.current?.click();
-            }}
-            className="px-2 py-1.5 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-            title="Import sample data Excel for L1 (one sheet per table)"
+            {presets.map((p) => {
+              const Icon = p.icon;
+              return (
+                <ToolbarTooltip key={p.key} label={`${p.label} preset`}>
+                  <button
+                    onClick={() => applyViewPreset(p.key)}
+                    className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1.5 ${
+                      p.match
+                        ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                    aria-label={`${p.label} view preset`}
+                    aria-pressed={p.match}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span className="hidden lg:inline">{p.label}</span>
+                  </button>
+                </ToolbarTooltip>
+              );
+            })}
+          </div>
+
+          <ToolbarDivider />
+
+          {/* Compact dropdowns for view settings */}
+          <div className="flex items-center gap-1" role="group" aria-label="Display settings">
+            <ToolbarTooltip label="View detail level">
+              <select
+                value={viewMode}
+                onChange={(e) => setViewMode(e.target.value as typeof viewMode)}
+                className="h-8 px-2 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
+                aria-label="View detail level"
+                style={{ paddingRight: '1.75rem' }}
+              >
+                <option value="compact">Compact</option>
+                <option value="standard">Standard</option>
+                <option value="detailed">Detailed</option>
+              </select>
+            </ToolbarTooltip>
+            <ToolbarTooltip label="Table card size">
+              <select
+                value={tableSize}
+                onChange={(e) => setTableSize(e.target.value as typeof tableSize)}
+                className="h-8 px-2 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
+                aria-label="Table card size"
+                style={{ paddingRight: '1.75rem' }}
+              >
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </ToolbarTooltip>
+            <ToolbarTooltip label="Field display mode">
+              <select
+                value={fieldDisplayMode}
+                onChange={(e) => setFieldDisplayMode(e.target.value as typeof fieldDisplayMode)}
+                className="h-8 px-2 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
+                aria-label="Field display mode"
+                style={{ paddingRight: '1.75rem' }}
+              >
+                <option value="minimal">Minimal</option>
+                <option value="standard">Standard</option>
+                <option value="full">Full</option>
+              </select>
+            </ToolbarTooltip>
+          </div>
+
+          <ToolbarDivider />
+
+          {/* Relationship Controls - Segmented (Apple toggle pattern) */}
+          <div
+            className="flex items-center bg-gray-100 rounded-lg p-0.5"
+            role="group"
+            aria-label="Relationship visibility"
           >
-            Import sample L1
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSampleImportLayer('L2');
-              sampleFileRef.current?.click();
-            }}
-            className="px-2 py-1.5 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-            title="Import sample data Excel for L2 (one sheet per table)"
-          >
-            Import sample L2
-          </button>
+            <ToolbarTooltip label={showRelationships ? 'Hide relationships' : 'Show relationships'}>
+              <button
+                onClick={() => setShowRelationships(!showRelationships)}
+                className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1.5 ${
+                  showRelationships
+                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+                aria-label="Toggle relationships"
+                aria-pressed={showRelationships}
+              >
+                {showRelationships ? <GitBranch className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                <span className="hidden lg:inline">Rels</span>
+              </button>
+            </ToolbarTooltip>
+            {showRelationships && (
+              <>
+                <div className="w-px h-5 bg-gray-200 mx-0.5" />
+                <ToolbarTooltip label="Primary relationships (FK → PK)">
+                  <button
+                    onClick={() => setShowPrimaryRelationships(!showPrimaryRelationships)}
+                    className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1 ${
+                      showPrimaryRelationships
+                        ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                    aria-label="Toggle primary relationships"
+                    aria-pressed={showPrimaryRelationships}
+                  >
+                    <GitBranch className="w-3.5 h-3.5" />
+                    <span className="hidden xl:inline">Primary</span>
+                  </button>
+                </ToolbarTooltip>
+                <ToolbarTooltip label="Secondary relationships (derived)">
+                  <button
+                    onClick={() => setShowSecondaryRelationships(!showSecondaryRelationships)}
+                    className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1 ${
+                      showSecondaryRelationships
+                        ? 'bg-violet-50 text-violet-700 ring-1 ring-violet-200'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                    aria-label="Toggle secondary relationships"
+                    aria-pressed={showSecondaryRelationships}
+                  >
+                    <GitMerge className="w-3.5 h-3.5" />
+                    <span className="hidden xl:inline">Secondary</span>
+                  </button>
+                </ToolbarTooltip>
+              </>
+            )}
+          </div>
+
+          <ToolbarDivider />
+
+          {/* Export & Import - Dropdown menus (Google Docs pattern) */}
+          <div className="flex items-center gap-1" role="group" aria-label="Export and import">
+            {/* Export dropdown */}
+            <div className="relative">
+              <ToolbarTooltip label="Export data model or sample data">
+                <button
+                  onClick={() => { setExportOpen(!exportOpen); setImportOpen(false); }}
+                  className="h-8 px-2.5 text-xs font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+                  aria-haspopup="true"
+                  aria-expanded={exportOpen}
+                  aria-label="Export"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Export</span>
+                  <ChevronDown className="w-3 h-3 opacity-50" />
+                </button>
+              </ToolbarTooltip>
+              {exportOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setExportOpen(false)} />
+                  <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden" role="menu">
+                    <div className="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Schema</div>
+                    <button onClick={() => handleExport('schema-json')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Data model (JSON)</button>
+                    <button onClick={() => handleExport('schema-excel')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Data model (Excel)</button>
+                    <div className="h-px bg-gray-100 my-1" />
+                    <div className="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sample Data</div>
+                    <button onClick={() => handleExport('sample-L1')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L1 sample data (Excel)</button>
+                    <button onClick={() => handleExport('sample-L2')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L2 sample data (Excel)</button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Import dropdown */}
+            <div className="relative">
+              <ToolbarTooltip label="Import schema or sample data">
+                <button
+                  onClick={() => { setImportOpen(!importOpen); setExportOpen(false); }}
+                  className="h-8 px-2.5 text-xs font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+                  aria-haspopup="true"
+                  aria-expanded={importOpen}
+                  aria-label="Import"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Import</span>
+                  <ChevronDown className="w-3 h-3 opacity-50" />
+                </button>
+              </ToolbarTooltip>
+              {importOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setImportOpen(false)} />
+                  <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden" role="menu">
+                    <button onClick={() => { setImportOpen(false); schemaFileRef.current?.click(); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Import schema (JSON/Excel)</button>
+                    <div className="h-px bg-gray-100 my-1" />
+                    <button onClick={() => { setImportOpen(false); setSampleImportLayer('L1'); sampleFileRef.current?.click(); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Import L1 sample data</button>
+                    <button onClick={() => { setImportOpen(false); setSampleImportLayer('L2'); sampleFileRef.current?.click(); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Import L2 sample data</button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Utility controls */}
+        <div className="flex items-center gap-0.5">
+          <ToolbarIconButton onClick={() => setShowMinimap(!showMinimap)} active={showMinimap} label="Toggle minimap" ariaPressed={showMinimap}>
+            <Map className="w-4 h-4" />
+          </ToolbarIconButton>
+          <ToolbarIconButton onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </ToolbarIconButton>
+          <ToolbarTooltip label="Keyboard shortcuts (?)">
+            <button
+              onClick={() => {
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' }));
+              }}
+              className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              aria-label="Show keyboard shortcuts"
+            >
+              <Keyboard className="w-4 h-4" />
+            </button>
+          </ToolbarTooltip>
         </div>
       </div>
-
-      <div className="flex items-center space-x-2">
-        {/* Minimap Toggle */}
-        <button
-          onClick={() => setShowMinimap(!showMinimap)}
-          className={`p-2 rounded transition-colors ${
-            showMinimap
-              ? 'text-blue-600 bg-blue-100'
-              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-          }`}
-          title="Toggle Minimap"
-        >
-          <Map className="w-4 h-4" />
-        </button>
-
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-          title="Toggle Theme"
-        >
-          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
-      </div>
-    </div>
     </>
   );
 }

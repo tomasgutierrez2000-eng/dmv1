@@ -214,14 +214,14 @@ export default function OverviewContent() {
               </div>
             </div>
 
-            <div className="bg-pwc-gray/30 border border-pwc-gray/50 rounded-xl p-6 opacity-60">
+            <div className="bg-pwc-gray/30 border border-pwc-gray/50 rounded-xl p-6 opacity-50 cursor-default" aria-disabled="true">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-12 h-12 rounded-lg bg-pwc-gray/60 flex items-center justify-center flex-shrink-0">
                   <Eye className="w-6 h-6 text-pwc-gray-light" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-bold text-lg mb-1 text-pwc-gray-light">Lineage Flow</h4>
-                  <p className="text-sm text-pwc-gray-light">Coming soon</p>
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-pwc-gray-light bg-pwc-gray/60 px-2 py-0.5 rounded">Coming soon</span>
                 </div>
               </div>
               <p className="text-sm text-pwc-gray-light mb-4">
@@ -229,14 +229,14 @@ export default function OverviewContent() {
               </p>
             </div>
 
-            <div className="bg-pwc-gray/30 border border-pwc-gray/50 rounded-xl p-6 opacity-60">
+            <div className="bg-pwc-gray/30 border border-pwc-gray/50 rounded-xl p-6 opacity-50 cursor-default" aria-disabled="true">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-12 h-12 rounded-lg bg-pwc-gray/60 flex items-center justify-center flex-shrink-0">
                   <Network className="w-6 h-6 text-pwc-gray-light" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-bold text-lg mb-1 text-pwc-gray-light">Impact Analysis</h4>
-                  <p className="text-sm text-pwc-gray-light">Coming soon</p>
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-pwc-gray-light bg-pwc-gray/60 px-2 py-0.5 rounded">Coming soon</span>
                 </div>
               </div>
               <p className="text-sm text-pwc-gray-light mb-4">

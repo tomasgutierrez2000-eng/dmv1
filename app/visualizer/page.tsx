@@ -15,7 +15,7 @@ import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
 
 export default function VisualizerPage() {
-  const { model, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers, viewMode } = useModelStore();
+  const { model, setModel, setTablePositions, setTablePositionsBulk, layoutMode, tablePositions, tableSize, visibleLayers, viewMode } = useModelStore();
   const { parseExcel, loading, result } = useExcelParser();
   const { toast } = useToast();
   const [initialLoad, setInitialLoad] = useState(true);
@@ -40,15 +40,16 @@ export default function VisualizerPage() {
       setModel(result.model);
       const { calculateLayout } = require('../../utils/layoutEngine');
       const existingPositions = tablePositions;
-      const compactOverview = layoutMode === 'domain-overview' && viewMode === 'compact';
+      const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
       const positions = calculateLayout(result.model, layoutMode, existingPositions, undefined, tableSize, visibleLayers, compactOverview);
+      const toSet: Record<string, { x: number; y: number }> = {};
       Object.entries(positions).forEach(([key, pos]) => {
-        if (!existingPositions[key]) {
-          setTablePositions(key, pos as any);
-        }
+        const p = pos as { x: number; y: number };
+        if (!existingPositions[key]) toSet[key] = p;
       });
+      if (Object.keys(toSet).length > 0) setTablePositionsBulk(toSet);
     }
-  }, [result, setModel, setTablePositions, layoutMode, tablePositions, tableSize, visibleLayers, viewMode]);
+  }, [result, setModel, setTablePositions, setTablePositionsBulk, layoutMode, tablePositions, tableSize, visibleLayers, viewMode]);
 
   const handleFileSelect = async (file: File | null) => {
     if (file) {
@@ -70,13 +71,14 @@ export default function VisualizerPage() {
       const model = (await res.json()) as DataModel;
       setModel(model);
       const { calculateLayout } = require('../../utils/layoutEngine');
-      const compactOverview = layoutMode === 'domain-overview' && viewMode === 'compact';
+      const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
       const positions = calculateLayout(model, layoutMode, tablePositions, undefined, tableSize, visibleLayers, compactOverview);
+      const toSet: Record<string, { x: number; y: number }> = {};
       Object.entries(positions).forEach(([key, pos]) => {
-        if (!tablePositions[key]) {
-          setTablePositions(key, pos as any);
-        }
+        const p = pos as { x: number; y: number };
+        if (!tablePositions[key]) toSet[key] = p;
       });
+      if (Object.keys(toSet).length > 0) setTablePositionsBulk(toSet);
       toast({ type: 'success', title: 'Demo loaded', description: `${Object.keys(model.tables).length} tables loaded.` });
     } catch (e) {
       console.error('Load L1 demo failed:', e);

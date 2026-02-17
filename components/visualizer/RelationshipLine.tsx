@@ -44,7 +44,7 @@ export default function RelationshipLine({
   onHover,
 }: RelationshipLineProps) {
   const { tableSize, viewMode, zoom, model, expandedTables, layoutMode } = useModelStore();
-  const isOverviewMode = layoutMode === 'domain-overview';
+  const isOverviewMode = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
   const overviewDims = isOverviewMode
     ? (viewMode === 'compact' ? getCompactOverviewTableDimensions() : getOverviewTableDimensions(tableSize))
     : null;

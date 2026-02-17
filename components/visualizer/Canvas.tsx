@@ -53,6 +53,8 @@ export default function Canvas() {
     setZoom,
     setPan,
     setTablePosition,
+    setTablePositionsBulk,
+    setRequestFitToView,
     setSelectedTable,
     setSelectedRelationship,
     setSelectedField,
@@ -103,10 +105,11 @@ export default function Canvas() {
       };
       const overviewDims = getOverviewTableDimensions(tableSize);
       const compactDims = getCompactOverviewTableDimensions();
-      const tableWidth = layoutMode === 'domain-overview'
+      const useOverviewDims = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+      const tableWidth = useOverviewDims
         ? (viewMode === 'compact' ? compactDims.width : overviewDims.width)
         : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
-      const tableHeight = layoutMode === 'domain-overview'
+      const tableHeight = useOverviewDims
         ? (viewMode === 'compact' ? compactDims.height : overviewDims.height)
         : (viewMode === 'compact' ? 84 : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height);
 
@@ -122,37 +125,32 @@ export default function Canvas() {
 
       const viewportWidth = containerRef.current?.clientWidth || 1200;
       const viewportHeight = containerRef.current?.clientHeight || 800;
-      const padding = 72;
+      const padding = 80;
       const zoomX = (viewportWidth - padding * 2) / width;
       const zoomY = (viewportHeight - padding * 2) / height;
-      const aspectRatio = width / height;
-      const viewportAspectRatio = viewportWidth / viewportHeight;
 
       let newZoom: number;
-      if (layoutMode === 'domain-overview') {
-        newZoom = Math.min(zoomX * 0.85, 0.75);
-      } else if (layoutMode === 'domain') {
-        newZoom = Math.min(zoomX * 0.88, 0.8);
-      } else if (aspectRatio > viewportAspectRatio * 1.2) {
-        newZoom = Math.min(zoomX, 0.95);
-      } else {
-        newZoom = Math.min(zoomX, zoomY, 1.05);
-      }
-      // When few tables are visible (e.g. after filter), zoom in so boxes take more screen
+      // Fit to both axes so diagram is fully visible and aspect ratio is preserved (no distortion)
+      newZoom = Math.min(zoomX, zoomY);
+      const cap = layoutMode === 'domain-overview' || layoutMode === 'snowflake' ? 0.78 : 1.05;
+      newZoom = Math.min(newZoom, cap);
+      // When few tables visible, zoom in so content is readable
       if (visibleCount <= 6) {
-        newZoom = Math.max(0.95, Math.min(newZoom, 1.4));
+        newZoom = Math.max(0.9, Math.min(newZoom, 1.35));
       } else if (visibleCount <= 15) {
-        newZoom = Math.max(0.88, Math.min(newZoom, 1.2));
+        newZoom = Math.max(0.8, Math.min(newZoom, 1.15));
       } else if (visibleCount <= 30) {
-        newZoom = Math.max(0.75, newZoom);
+        newZoom = Math.max(0.7, newZoom);
       }
 
       const safeZoom = Number.isFinite(newZoom) ? Math.max(0.05, Math.min(4, newZoom)) : 1;
       const panX = -(centerX * safeZoom - viewportWidth / 2);
       const panY = -(centerY * safeZoom - viewportHeight / 2);
       const minPanX = -(minX * safeZoom - padding);
+      const minPanY = -(minY * safeZoom - padding);
       const finalPanX = Math.max(panX, minPanX);
-      setPan({ x: Number.isFinite(finalPanX) ? finalPanX : 0, y: Number.isFinite(panY) ? panY : 0 });
+      const finalPanY = Math.max(panY, minPanY);
+      setPan({ x: Number.isFinite(finalPanX) ? finalPanX : 0, y: Number.isFinite(finalPanY) ? finalPanY : 0 });
       setZoom(safeZoom);
     },
     [layoutMode, tableSize, viewMode, setPan, setZoom]
@@ -174,22 +172,29 @@ export default function Canvas() {
     [runFitToView]
   );
 
-  // Apply layout when model, layout mode, table size, visible layers, or compact view change
+  // Apply layout when model, layout mode, table size, visible layers, or compact view change.
+  // Use bulk set to avoid N re-renders and lag; defer fit so it runs after positions commit.
   useEffect(() => {
     if (!model) return;
-    const compactOverview = layoutMode === 'domain-overview' && viewMode === 'compact';
+    const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
     const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers, compactOverview);
-    Object.entries(newPositions).forEach(([key, pos]) => {
-      setTablePosition(key, pos);
-    });
+    setTablePositionsBulk(newPositions);
+    const isOverviewLayout = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+    if (isOverviewLayout) {
+      // Defer fit so React has committed new positions; zoom directly to diagram so user doesn't need to scroll
+      const t = setTimeout(() => setRequestFitToView(), 120);
+      return () => clearTimeout(t);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
-  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition]);
+  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setRequestFitToView]);
 
   // Fit to visible tables when layout or full-view state change. Skipped when focus-compact
   // or when search/filter is active (delayed effect below handles those for one consistent fit).
+  // Skip for snowflake/domain-overview: layout effect will request fit on next frame with committed positions.
   useEffect(() => {
     if (!model || visibleTables.length === 0 || savedPositionsRef.current) return;
     if (searchQuery.trim() || filtersNarrowing) return;
+    if (layoutMode === 'snowflake' || layoutMode === 'domain-overview') return;
     fitToTablesNow(visibleTables);
   }, [model, visibleTables, layoutMode, tableSize, searchQuery, filtersNarrowing, fitToTablesNow]);
 
@@ -238,7 +243,7 @@ export default function Canvas() {
       medium: { w: 1.0, h: 1.0 },
       large: { w: 1.35, h: 1.25 },
     };
-    const isOverview = layoutMode === 'domain-overview';
+    const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
     const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
     const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
     const hGap = Math.round(tw * (isOverview ? 0.24 : 0.16));
@@ -424,7 +429,7 @@ export default function Canvas() {
       medium: { w: 1.0, h: 1.0 },
       large: { w: 1.35, h: 1.25 },
     };
-    const isOverview = layoutMode === 'domain-overview';
+    const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
     const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
     const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
 
@@ -731,7 +736,7 @@ export default function Canvas() {
         >
           {/* Domain Containers - In domain and domain-overview layout modes.
               Hidden during focus-compact because tables are repositioned outside their domains. */}
-          {(layoutMode === 'domain' || layoutMode === 'domain-overview') && model && !savedPositionsRef.current && (() => {
+          {layoutMode === 'domain-overview' && model && !savedPositionsRef.current && (() => {
             const domains = new Set(visibleTables.map(t => t.category));
             const domainPositions = new Map<string, { x: number; y: number; width: number; height: number }>();
             
@@ -746,40 +751,27 @@ export default function Canvas() {
             
             let tableWidth: number;
             let tableHeight: number;
-            if (layoutMode === 'domain-overview') {
-              if (viewMode === 'compact') {
-                const compactDims = getCompactOverviewTableDimensions();
-                tableWidth = compactDims.width;
-                tableHeight = compactDims.height;
-              } else {
-                const dims = getOverviewTableDimensions(tableSize);
-                tableWidth = dims.width;
-                tableHeight = dims.height;
-              }
+            if (viewMode === 'compact') {
+              const compactDims = getCompactOverviewTableDimensions();
+              tableWidth = compactDims.width;
+              tableHeight = compactDims.height;
             } else {
-              const multiplier = SIZE_MULTIPLIERS[tableSize];
-              tableWidth = BASE_TABLE_WIDTH * multiplier.width;
-              tableHeight = viewMode === 'compact' ? 84 : (BASE_TABLE_HEIGHT * multiplier.height);
+              const dims = getOverviewTableDimensions(tableSize);
+              tableWidth = dims.width;
+              tableHeight = dims.height;
             }
-            
-            // Domain bounds from actual table positions so category boxes resize to content and sit closer
+
             let domainPadding: number;
             let headerOffset: number;
             let footerOffset: number;
-            if (layoutMode === 'domain-overview') {
-              if (viewMode === 'compact') {
-                domainPadding = 6;
-                headerOffset = 28;
-                footerOffset = 8;
-              } else {
-                domainPadding = 10;
-                headerOffset = 45; // match DomainContainer overview header height when !compactFrame
-                footerOffset = 10;
-              }
+            if (viewMode === 'compact') {
+              domainPadding = 6;
+              headerOffset = 28;
+              footerOffset = 8;
             } else {
-              domainPadding = 25;
-              headerOffset = 105;
-              footerOffset = 25;
+              domainPadding = 10;
+              headerOffset = 45;
+              footerOffset = 10;
             }
 
             Array.from(domains).forEach((domain) => {
@@ -823,7 +815,7 @@ export default function Canvas() {
                     height={pos.height}
                     isExpanded={expandedDomains.has(domain)}
                     onToggle={() => toggleExpandedDomain(domain)}
-                    compactFrame={layoutMode === 'domain-overview' && viewMode === 'compact'}
+                    compactFrame={viewMode === 'compact'}
                   />
                 </g>
               );
@@ -875,14 +867,8 @@ export default function Canvas() {
             );
           })}
 
-          {/* Table Nodes - Show all in domain-overview, only expanded in domain mode */}
-          {visibleTables
-            .filter((table) => {
-              if (layoutMode === 'domain-overview') return true; // Show all in overview
-              if (layoutMode !== 'domain') return true;
-              return expandedDomains.has(table.category);
-            })
-            .map((table) => {
+          {/* Table Nodes */}
+          {visibleTables.map((table) => {
             const position = tablePositions[table.key] || { x: 0, y: 0 };
             // Calculate relationship counts for this table
             const relationshipCounts = model ? {

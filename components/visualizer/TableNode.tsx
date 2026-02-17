@@ -58,8 +58,8 @@ export default function TableNode({
     outgoing: model.relationships.filter(r => r.source.tableKey === table.key).length,
   } : { incoming: 0, outgoing: 0 });
   
-  // OVERVIEW MODE: Use fixed small size for all tables
-  const isOverviewMode = layoutMode === 'domain-overview';
+  // OVERVIEW MODE: Use fixed small size for all tables (domain-overview and snowflake)
+  const isOverviewMode = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
   
   // Keep geometry stable; canvas already scales with zoom.
   // Zoom only controls semantic detail levels (what content is shown), not card size.

@@ -37,7 +37,7 @@ interface ModelStore {
   showSecondaryRelationships: boolean; // Show secondary relationships
   
   // Layout
-  layoutMode: 'grid' | 'force' | 'hierarchical' | 'domain' | 'domain-overview';
+  layoutMode: 'domain-overview' | 'snowflake';
   viewMode: 'compact' | 'standard' | 'detailed';
   tableSize: 'small' | 'medium' | 'large';
   fieldDisplayMode: 'minimal' | 'standard' | 'full';
@@ -51,6 +51,7 @@ interface ModelStore {
   setPan: (pan: { x: number; y: number }) => void;
   setTablePosition: (tableKey: string, position: TablePosition) => void;
   setTablePositions: (tableKey: string, position: TablePosition) => void;
+  setTablePositionsBulk: (positions: Record<string, TablePosition>) => void;
   setSelectedTable: (tableKey: string | null) => void;
   setSelectedRelationship: (relId: string | null) => void;
   setSelectedField: (field: { tableKey: string; fieldName: string } | null) => void;
@@ -67,7 +68,7 @@ interface ModelStore {
   setSidebarOpen: (open: boolean) => void;
   setDetailPanelOpen: (open: boolean) => void;
   toggleExpandedDomain: (domain: string) => void;
-  setLayoutMode: (mode: 'grid' | 'force' | 'hierarchical' | 'domain' | 'domain-overview') => void;
+  setLayoutMode: (mode: 'domain-overview' | 'snowflake') => void;
   setViewMode: (mode: 'compact' | 'standard' | 'detailed') => void;
   setTableSize: (size: 'small' | 'medium' | 'large') => void;
   setFieldDisplayMode: (mode: 'minimal' | 'standard' | 'full') => void;
@@ -133,6 +134,10 @@ export const useModelStore = create<ModelStore>((set) => ({
   setTablePositions: (tableKey, position) =>
     set((state) => ({
       tablePositions: { ...state.tablePositions, [tableKey]: position },
+    })),
+  setTablePositionsBulk: (positions) =>
+    set((state) => ({
+      tablePositions: { ...state.tablePositions, ...positions },
     })),
   setSelectedTable: (tableKey) => set({ 
     selectedTable: tableKey, 

@@ -91,6 +91,8 @@ export default function Toolbar() {
     setZoom,
     resetView,
     setRequestFitToView,
+    layoutMode,
+    setLayoutMode,
     viewMode,
     setViewMode,
     tableSize,
@@ -354,6 +356,19 @@ export default function Toolbar() {
           </div>
 
           <ToolbarDivider />
+
+          {/* Layout mode */}
+          <ToolbarTooltip label="Diagram layout">
+            <select
+              value={layoutMode}
+              onChange={(e) => setLayoutMode(e.target.value as typeof layoutMode)}
+              className="h-8 pl-2 pr-7 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors min-w-[8rem]"
+              aria-label="Diagram layout"
+            >
+              <option value="domain-overview">Domain overview</option>
+              <option value="snowflake">Snowflake</option>
+            </select>
+          </ToolbarTooltip>
 
           {/* Compact dropdowns for view settings */}
           <div className="flex items-center gap-1" role="group" aria-label="Display settings">

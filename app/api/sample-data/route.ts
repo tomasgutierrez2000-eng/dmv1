@@ -5,6 +5,7 @@ import { tableKeyToDbTable } from '@/lib/db-table-mapping';
 
 const L1_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
 const L2_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l2/output/sample-data.json');
+const L3_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l3/output/l3-sample-data.json');
 
 export async function GET(request: NextRequest) {
   const tableKey = request.nextUrl.searchParams.get('tableKey');
@@ -14,6 +15,29 @@ export async function GET(request: NextRequest) {
 
   if (!tableKeyToDbTable(tableKey)) {
     return NextResponse.json({ error: 'Invalid tableKey' }, { status: 400 });
+  }
+
+  if (tableKey.startsWith('L3.')) {
+    if (!fs.existsSync(L3_SAMPLE_DATA_PATH)) {
+      return NextResponse.json(
+        { error: 'L3 sample data not found. See scripts/l3/output/l3-sample-data.json' },
+        { status: 404 }
+      );
+    }
+    const data = JSON.parse(fs.readFileSync(L3_SAMPLE_DATA_PATH, 'utf-8'));
+    const entry = data[tableKey];
+    if (!entry) {
+      return NextResponse.json(
+        { error: `No sample data for table ${tableKey}` },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({
+      tableKey,
+      columns: entry.columns ?? [],
+      rows: entry.rows ?? [],
+      source: 'file',
+    });
   }
 
   const isL2 = tableKey.startsWith('L2.');

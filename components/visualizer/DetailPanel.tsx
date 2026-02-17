@@ -307,6 +307,11 @@ export default function DetailPanel() {
                         <code className="text-[10px] text-emerald-700">{field.formula}</code>
                       </div>
                     )}
+                    {field.sourceFields && (
+                      <p className="text-[10px] text-blue-600 mt-1 font-medium">
+                        Source: <code className="font-mono">{field.sourceFields}</code>
+                      </p>
+                    )}
                     {field.sourceTables && field.sourceTables.length > 0 && (
                       <div className="mt-1.5">
                         <div className="flex flex-wrap gap-0.5">
@@ -317,6 +322,9 @@ export default function DetailPanel() {
                           ))}
                         </div>
                       </div>
+                    )}
+                    {field.derivationLogic && (
+                      <p className="text-[10px] text-gray-500 mt-1 italic">{field.derivationLogic}</p>
                     )}
                     {field.dashboardUsage && (
                       <p className="text-[10px] text-violet-600 mt-1">Used in: {field.dashboardUsage}</p>

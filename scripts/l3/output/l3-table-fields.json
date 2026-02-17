@@ -1,0 +1,5013 @@
+{
+  "exposure_metric_cube": {
+    "category": "Exposure & Risk Metrics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "org_unit_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "org_unit_dim",
+          "field": "org_unit_id"
+        },
+        "sourceFields": "L1.org_unit_dim.org_unit_id"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id"
+        },
+        "sourceFields": "L1.portfolio_dim.portfolio_id"
+      },
+      {
+        "name": "product_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "product_hierarchy",
+          "field": "product_node_id"
+        },
+        "sourceFields": "L1.product_hierarchy.product_node_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "instrument_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "instrument_master",
+          "field": "instrument_id"
+        },
+        "sourceFields": "L1.instrument_master.instrument_id"
+      },
+      {
+        "name": "netting_set_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "netting_set",
+          "field": "netting_set_id"
+        },
+        "sourceFields": "L1.netting_set.netting_set_id"
+      },
+      {
+        "name": "country_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "country_dim",
+          "field": "country_code"
+        },
+        "sourceFields": "L1.country_dim.country_code"
+      },
+      {
+        "name": "currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "exposure_type_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "drawn_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "undrawn_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "ead_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "secured_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "unsecured_residual_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "attribution_pct",
+        "dataType": "NUMERIC"
+      }
+    ]
+  },
+  "risk_metric_cube": {
+    "category": "Exposure & Risk Metrics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id"
+        },
+        "sourceFields": "L1.portfolio_dim.portfolio_id"
+      },
+      {
+        "name": "product_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "product_hierarchy",
+          "field": "product_node_id"
+        },
+        "sourceFields": "L1.product_hierarchy.product_node_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "instrument_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "instrument_master",
+          "field": "instrument_id"
+        },
+        "sourceFields": "L1.instrument_master.instrument_id"
+      },
+      {
+        "name": "currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "model_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "model_registry_dim",
+          "field": "model_id"
+        },
+        "sourceFields": "L1.model_registry_dim.model_id"
+      },
+      {
+        "name": "rating_grade_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rating_grade_dim",
+          "field": "rating_grade_id"
+        },
+        "sourceFields": "L1.rating_grade_dim.rating_grade_id"
+      },
+      {
+        "name": "pd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "ead_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "risk_weight_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "rwa_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "capital_req_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      }
+    ]
+  },
+  "counterparty_exposure_summary": {
+    "category": "Exposure & Risk Metrics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "sccl_group_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "sccl_counterparty_group",
+          "field": "sccl_group_id"
+        },
+        "sourceFields": "L1.sccl_counterparty_group.sccl_group_id"
+      },
+      {
+        "name": "country_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "country_dim",
+          "field": "country_code"
+        },
+        "sourceFields": "L1.country_dim.country_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "total_gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_net_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_ead_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "secured_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "unsecured_residual_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "has_cross_entity_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "cross_entity_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "cross_entity_entity_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "is_parent_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "total_committed_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_outstanding_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "exposure_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_pd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "credit_limit_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "headroom_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "risk_tier_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "limit_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "region_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "region_dim",
+          "field": "region_code"
+        },
+        "sourceFields": "L1.region_dim.region_code"
+      },
+      {
+        "name": "industry_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "industry_dim",
+          "field": "industry_code"
+        },
+        "sourceFields": "L1.industry_dim.industry_code"
+      }
+    ]
+  },
+  "facility_exposure_summary": {
+    "category": "Exposure & Risk Metrics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id"
+        },
+        "sourceFields": "L1.portfolio_dim.portfolio_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "outstanding_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "undrawn_commitment_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "ead_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "secured_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "unsecured_residual_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "attribution_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "is_syndicated_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "has_amendment_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "amendment_type_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "amendment_status_code",
+        "dataType": "VARCHAR"
+      }
+    ]
+  },
+  "portfolio_summary": {
+    "category": "Exposure & Risk Metrics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id"
+        },
+        "sourceFields": "L1.portfolio_dim.portfolio_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "total_gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_ead_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_pd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_rwa_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      }
+    ]
+  },
+  "crm_allocation_summary": {
+    "category": "Credit Risk Mitigation (CRM",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "crm_type_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "allocation_target_level",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "netting_set_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "netting_set",
+          "field": "netting_set_id"
+        },
+        "sourceFields": "L1.netting_set.netting_set_id"
+      },
+      {
+        "name": "crm_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "collateral_asset_master",
+          "field": "collateral_asset_id"
+        },
+        "sourceFields": "L1.collateral_asset_master.collateral_asset_id"
+      },
+      {
+        "name": "currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "crm_market_value_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "haircut_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "crm_recognized_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "allocated_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "allocation_method_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "risk_mitigant_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "risk_mitigant_master",
+          "field": "risk_mitigant_id"
+        },
+        "sourceFields": "L1.risk_mitigant_master.risk_mitigant_id"
+      },
+      {
+        "name": "risk_mitigant_subtype_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "risk_mitigant_type_dim",
+          "field": "risk_mitigant_subtype_code"
+        },
+        "sourceFields": "L1.risk_mitigant_type_dim.risk_mitigant_subtype_code"
+      },
+      {
+        "name": "parent_group_code",
+        "dataType": "VARCHAR"
+      }
+    ]
+  },
+  "collateral_portfolio_valuation": {
+    "category": "Credit Risk Mitigation (CRM",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id"
+        },
+        "sourceFields": "L1.portfolio_dim.portfolio_id"
+      },
+      {
+        "name": "collateral_type_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "collateral_type",
+          "field": "collateral_type_id"
+        },
+        "sourceFields": "L1.collateral_type.collateral_type_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "collateral_market_value_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "collateral_recognized_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "asset_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "parent_group_code",
+        "dataType": "VARCHAR"
+      }
+    ]
+  },
+  "limit_current_state": {
+    "category": "Limits & Appetite",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "limit_definition_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "limit_definition",
+          "field": "limit_definition_id"
+        },
+        "sourceFields": "L1.limit_definition.limit_definition_id"
+      },
+      {
+        "name": "limit_assignment_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "limit_assignment",
+          "field": "limit_assignment_id"
+        },
+        "sourceFields": "L1.limit_assignment.limit_assignment_id"
+      },
+      {
+        "name": "limit_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "limit_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilized_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "available_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "last_breach_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "last_status_change_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "status_last_changed_event_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "limit_real_time_event_log",
+          "field": "event_id"
+        },
+        "sourceFields": "L3.limit_real_time_event_log.event_id"
+      },
+      {
+        "name": "classification_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "velocity_30d_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "velocity_90d_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "utilization_tier_code",
+        "dataType": "VARCHAR"
+      }
+    ]
+  },
+  "limit_utilization_timeseries": {
+    "category": "Limits & Appetite",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "limit_assignment_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "limit_assignment",
+          "field": "limit_assignment_id"
+        },
+        "sourceFields": "L1.limit_assignment.limit_assignment_id"
+      },
+      {
+        "name": "limit_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "utilized_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "available_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      }
+    ]
+  },
+  "limit_attribution_summary": {
+    "category": "Limits & Appetite",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "limit_assignment_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "limit_assignment",
+          "field": "limit_assignment_id"
+        },
+        "sourceFields": "L1.limit_assignment.limit_assignment_id"
+      },
+      {
+        "name": "contributor_level",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id"
+        },
+        "sourceFields": "L1.portfolio_dim.portfolio_id"
+      },
+      {
+        "name": "product_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "product_hierarchy",
+          "field": "product_node_id"
+        },
+        "sourceFields": "L1.product_hierarchy.product_node_id"
+      },
+      {
+        "name": "org_unit_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "org_unit_dim",
+          "field": "org_unit_id"
+        },
+        "sourceFields": "L1.org_unit_dim.org_unit_id"
+      },
+      {
+        "name": "contribution_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "contribution_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      }
+    ]
+  },
+  "limit_breach_fact": {
+    "category": "Limits & Appetite",
+    "fields": [
+      {
+        "name": "breach_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "limit_assignment_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "limit_assignment",
+          "field": "limit_assignment_id"
+        },
+        "sourceFields": "L1.limit_assignment.limit_assignment_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "breach_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "severity_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "breach_amount",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "resolved_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      }
+    ]
+  },
+  "credit_event_summary": {
+    "category": "Credit Events & Performance",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "credit_event_type_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "credit_event_type_dim",
+          "field": "credit_event_type_id"
+        },
+        "sourceFields": "L1.credit_event_type_dim.credit_event_type_id"
+      },
+      {
+        "name": "event_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "default_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "charge_off_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "recovery_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "impacted_facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "event_summary_text",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "event_short_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "event_risk_rating",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "estimated_exposure_impact_amt",
+        "dataType": "NUMERIC"
+      }
+    ]
+  },
+  "rating_migration_summary": {
+    "category": "Credit Events & Performance",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "rating_source_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rating_source",
+          "field": "rating_source_id"
+        },
+        "sourceFields": "L1.rating_source.rating_source_id"
+      },
+      {
+        "name": "from_rating_grade_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rating_grade_dim",
+          "field": "rating_grade_id"
+        },
+        "sourceFields": "L1.rating_grade_dim.rating_grade_id"
+      },
+      {
+        "name": "to_rating_grade_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rating_grade_dim",
+          "field": "rating_grade_id"
+        },
+        "sourceFields": "L1.rating_grade_dim.rating_grade_id"
+      },
+      {
+        "name": "migration_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "exposure_at_migration_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      }
+    ]
+  },
+  "default_loss_recovery_summary": {
+    "category": "Credit Events & Performance",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "default_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "charge_off_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "recovery_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "realized_lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      }
+    ]
+  },
+  "report_run": {
+    "category": "Regulatory Reporting Output",
+    "fields": [
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "report_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "report_registry",
+          "field": "report_code"
+        },
+        "sourceFields": "L1.report_registry.report_code"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "started_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "completed_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "produced_by_system_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "source_system_registry",
+          "field": "source_system_id"
+        },
+        "sourceFields": "L1.source_system_registry.source_system_id"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "report_cell_value": {
+    "category": "Regulatory Reporting Output",
+    "fields": [
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "report_run",
+          "field": "report_run_id"
+        },
+        "sourceFields": "L3.report_run.report_run_id"
+      },
+      {
+        "name": "cell_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "report_cell_definition",
+          "field": "cell_id"
+        },
+        "sourceFields": "L1.report_cell_definition.cell_id"
+      },
+      {
+        "name": "value_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "unit_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "value_precision",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "calculation_rule_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rule_registry",
+          "field": "rule_id"
+        },
+        "sourceFields": "L1.rule_registry.rule_id"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "report_cell_contribution_fact": {
+    "category": "Regulatory Reporting Output",
+    "fields": [
+      {
+        "name": "contribution_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "report_run",
+          "field": "report_run_id"
+        },
+        "sourceFields": "L3.report_run.report_run_id"
+      },
+      {
+        "name": "cell_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "report_cell_definition",
+          "field": "cell_id"
+        },
+        "sourceFields": "L1.report_cell_definition.cell_id"
+      },
+      {
+        "name": "source_record_type_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "source_record_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "contribution_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "rule_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rule_registry",
+          "field": "rule_id"
+        },
+        "sourceFields": "L1.rule_registry.rule_id"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      }
+    ]
+  },
+  "report_cell_rule_execution": {
+    "category": "Regulatory Reporting Output",
+    "fields": [
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "report_run",
+          "field": "report_run_id"
+        },
+        "sourceFields": "L3.report_run.report_run_id"
+      },
+      {
+        "name": "cell_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "report_cell_definition",
+          "field": "cell_id"
+        },
+        "sourceFields": "L1.report_cell_definition.cell_id"
+      },
+      {
+        "name": "rule_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "rule_registry",
+          "field": "rule_id"
+        },
+        "sourceFields": "L1.rule_registry.rule_id"
+      },
+      {
+        "name": "rule_version",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "started_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "ended_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "input_record_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "output_value_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "error_message",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "report_validation_result": {
+    "category": "Regulatory Reporting Output",
+    "fields": [
+      {
+        "name": "validation_result_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "report_run",
+          "field": "report_run_id"
+        },
+        "sourceFields": "L3.report_run.report_run_id"
+      },
+      {
+        "name": "validation_check_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "validation_check_registry",
+          "field": "validation_check_id"
+        },
+        "sourceFields": "L1.validation_check_registry.validation_check_id"
+      },
+      {
+        "name": "cell_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "report_cell_definition",
+          "field": "cell_id"
+        },
+        "sourceFields": "L1.report_cell_definition.cell_id"
+      },
+      {
+        "name": "severity_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "result_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "threshold_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "observed_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "message",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "fr2590_position_snapshot": {
+    "category": "FR 2590 Helper Artifacts",
+    "fields": [
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "report_run",
+          "field": "report_run_id"
+        },
+        "sourceFields": "L3.report_run.report_run_id"
+      },
+      {
+        "name": "position_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L2",
+          "table": "position",
+          "field": "position_id"
+        },
+        "sourceFields": "L2.position.position_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "instrument_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "instrument_master",
+          "field": "instrument_id"
+        },
+        "sourceFields": "L1.instrument_master.instrument_id"
+      },
+      {
+        "name": "product_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "product_hierarchy",
+          "field": "product_node_id"
+        },
+        "sourceFields": "L1.product_hierarchy.product_node_id"
+      },
+      {
+        "name": "country_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "country_dim",
+          "field": "country_code"
+        },
+        "sourceFields": "L1.country_dim.country_code"
+      },
+      {
+        "name": "currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "mdrm_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "regulatory_mapping",
+          "field": "mdrm_id"
+        },
+        "sourceFields": "L1.regulatory_mapping.mdrm_id"
+      },
+      {
+        "name": "mapped_schedule_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "mapped_line_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "mapped_column_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "amount_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "fr2590_category_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "fr2590_category_dim",
+          "field": "fr2590_category_code"
+        },
+        "sourceFields": "L1.fr2590_category_dim.fr2590_category_code"
+      }
+    ]
+  },
+  "fr2590_counterparty_aggregate": {
+    "category": "FR 2590 Helper Artifacts",
+    "fields": [
+      {
+        "name": "report_run_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L3",
+          "table": "report_run",
+          "field": "report_run_id"
+        },
+        "sourceFields": "L3.report_run.report_run_id"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "product_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "product_hierarchy",
+          "field": "product_node_id"
+        },
+        "sourceFields": "L1.product_hierarchy.product_node_id"
+      },
+      {
+        "name": "country_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "country_dim",
+          "field": "country_code"
+        },
+        "sourceFields": "L1.country_dim.country_code"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "total_amount_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "rank_within_entity",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "is_top_counterparty_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "fr2590_category_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "fr2590_category_dim",
+          "field": "fr2590_category_code"
+        },
+        "sourceFields": "L1.fr2590_category_dim.fr2590_category_code"
+      }
+    ]
+  },
+  "lob_exposure_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "counterparty_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "drawn_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "undrawn_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "ead_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "rwa_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_pd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "limit_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "breach_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "npl_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "npl_ratio_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "exposure_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "result_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "scenario_scope_desc",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "coverage_ratio_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_crm_amt",
+        "dataType": "NUMERIC"
+      }
+    ]
+  },
+  "lob_profitability_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "period_start_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "period_end_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "periodicity_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "total_revenue_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_income_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_interest_income_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_earning_assets_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_total_assets_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "allocated_equity_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "nim_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "roa_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "roe_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_total_revenue_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "revenue_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_net_income_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_income_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "updated_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_pricing_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "avg_spread_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_base_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_all_in_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "internal_spread_threshold_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "spread_vs_threshold_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "below_threshold_facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "documented_exception_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "prior_period_avg_spread_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_spread_change_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "updated_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_delinquency_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "total_overdue_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "delinquent_facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "delinquent_counterparty_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "total_outstanding_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "delinquency_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_total_overdue_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "overdue_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_delinquency_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "delinquency_rate_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "updated_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_profitability_allocation_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "allocation_dim_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "allocation_dim_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "region_dim",
+          "field": "region_code"
+        },
+        "sourceFields": "L1.region_dim.region_code"
+      },
+      {
+        "name": "allocation_dim_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "allocation_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_revenue_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_income_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "roe_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "roa_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "nim_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "updated_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "deal_pipeline_stage_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "pipeline_stage_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "pipeline_stage_dim",
+          "field": "pipeline_stage_code"
+        },
+        "sourceFields": "L1.pipeline_stage_dim.pipeline_stage_code"
+      },
+      {
+        "name": "deal_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "expected_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_collateral_value_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_expected_spread_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_expected_coverage_ratio",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "updated_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_credit_quality_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "avg_internal_risk_rating",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "prior_period_avg_internal_risk_rating",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "avg_internal_risk_rating_change",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "dscr_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "dcsr_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "rwa_density_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "rating_downgrade_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "updated_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "external_downgrade_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "internal_downgrade_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "criticized_portfolio_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "deteriorated_deal_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "doi_pct",
+        "dataType": "NUMERIC"
+      }
+    ]
+  },
+  "kpi_period_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "kpi_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "metric_definition_dim",
+          "field": "metric_code"
+        },
+        "sourceFields": "L1.metric_definition_dim.metric_code"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "prior_as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "current_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "change_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "unit_of_measure",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "risk_appetite_metric_state": {
+    "category": "Executive Dashboard",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "metric_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "metric_definition_dim",
+          "field": "metric_code"
+        },
+        "sourceFields": "L1.metric_definition_dim.metric_code"
+      },
+      {
+        "name": "metric_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "metric_description",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "metric_classification",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "limit_type_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "current_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "limit_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "inner_threshold_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "outer_threshold_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "velocity_30d_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "velocity_90d_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "immediate_action_text",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "report_frequency_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "report_deadline_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "metric_owner",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "first_lod_sponsor",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "second_lod_sponsor",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "last_metric_updated_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "last_threshold_updated_ts",
+        "dataType": "TIMESTAMP"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "executive_highlight_summary": {
+    "category": "Executive Dashboard",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "highlight_seq",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "highlight_category",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "highlight_text",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "driver_text",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "action_required_text",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "icon_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "severity_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "source_metric_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "metric_definition_dim",
+          "field": "metric_code"
+        },
+        "sourceFields": "L1.metric_definition_dim.metric_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "counterparty_detail_snapshot": {
+    "category": "Counterparty Analytics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "counterparty_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "is_parent_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "parent_counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "parent_counterparty_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "country_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "country_dim",
+          "field": "country_code"
+        },
+        "sourceFields": "L1.country_dim.country_code"
+      },
+      {
+        "name": "region_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "region_dim",
+          "field": "region_code"
+        },
+        "sourceFields": "L1.region_dim.region_code"
+      },
+      {
+        "name": "industry_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "industry_dim",
+          "field": "industry_code"
+        },
+        "sourceFields": "L1.industry_dim.industry_code"
+      },
+      {
+        "name": "industry_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "internal_risk_rating",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "external_risk_rating",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "total_gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_net_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_committed_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_outstanding_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "pd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "credit_limit_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilized_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "headroom_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "risk_tier_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "limit_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "crm_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "prior_period_gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "exposure_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "limit_tier_status_matrix": {
+    "category": "Limits & Appetite",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "risk_tier_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "limit_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "prior_period_counterparty_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "counterparty_count_change",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "total_utilized_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_headroom_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "risk_score",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "limit_counterparty_movement": {
+    "category": "Limits & Appetite",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "risk_tier_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "limit_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "movement_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "prior_limit_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "data_quality_score_summary": {
+    "category": "Data Quality",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "dimension_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "dimension_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "dimension_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "data_quality_score_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "prior_period_dq_score_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "dq_score_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_dq_issues",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "reconciliation_break_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "prior_period_recon_break_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "leading_issue_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "legal_entity_risk_profile": {
+    "category": "Legal Entity Analytics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "legal_entity_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "le_classification",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "gross_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "net_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "has_cross_entity_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "cross_entity_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "liquidity_ratio_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_pd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "avg_lgd_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "data_quality_attribute_score": {
+    "category": "Data Quality",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "attribute_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "data_quality_score_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "dq_issue_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "impact_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "impacted_reports",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "rank_order",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "data_quality_trend": {
+    "category": "Data Quality",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "legal_entity_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "legal_entity",
+          "field": "legal_entity_id"
+        },
+        "sourceFields": "L1.legal_entity.legal_entity_id"
+      },
+      {
+        "name": "data_quality_score_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "reconciliation_break_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "total_dq_issues",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "stress_test_result_summary": {
+    "category": "Stress Testing",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "scenario_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "scenario_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "scenario_description",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "scope_description",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "total_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "capital_impact_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "total_breach_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "critical_breach_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "high_breach_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "moderate_breach_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "low_breach_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "result_status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "last_tested_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "stress_test_breach_detail": {
+    "category": "Stress Testing",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "scenario_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "scenario_dim",
+          "field": "scenario_id"
+        },
+        "sourceFields": "L1.scenario_dim.scenario_id"
+      },
+      {
+        "name": "breach_seq",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "lob_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "breach_severity",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "control_description",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "control_owner_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "exception_description",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "expected_loss_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "regulatory_compliance_state": {
+    "category": "Regulatory Reporting Output",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "metric_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "metric_definition_dim",
+          "field": "metric_code"
+        },
+        "sourceFields": "L1.metric_definition_dim.metric_code"
+      },
+      {
+        "name": "metric_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "current_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "regulatory_threshold",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "variance_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "compliance_status",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "prior_period_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "facility_timeline_summary": {
+    "category": "Facility Analytics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "timeline_month",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "timeline_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "total_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "cumulative_exposure_change_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "amendment_summary": {
+    "category": "Amendment Analytics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "amendment_type_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "amendment_type_dim",
+          "field": "amendment_type_code"
+        },
+        "sourceFields": "L1.amendment_type_dim.amendment_type_code"
+      },
+      {
+        "name": "amendment_type_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "amendment_status_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "amendment_status_dim",
+          "field": "amendment_status_code"
+        },
+        "sourceFields": "L1.amendment_status_dim.amendment_status_code"
+      },
+      {
+        "name": "amendment_status_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "credit_agreement_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "total_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "amendment_detail": {
+    "category": "Amendment Analytics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "amendment_event_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L2",
+          "table": "amendment_event",
+          "field": "amendment_event_id"
+        },
+        "sourceFields": "L2.amendment_event.amendment_event_id"
+      },
+      {
+        "name": "credit_agreement_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "credit_agreement_master",
+          "field": "credit_agreement_id"
+        },
+        "sourceFields": "L1.credit_agreement_master.credit_agreement_id"
+      },
+      {
+        "name": "obligor_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "amendment_type_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "amendment_type_dim",
+          "field": "amendment_type_code"
+        },
+        "sourceFields": "L1.amendment_type_dim.amendment_type_code"
+      },
+      {
+        "name": "amendment_description",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "original_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "amended_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "amendment_start_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "amendment_status_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "amendment_status_dim",
+          "field": "amendment_status_code"
+        },
+        "sourceFields": "L1.amendment_status_dim.amendment_status_code"
+      },
+      {
+        "name": "amendment_aging_days",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "facility_detail_snapshot": {
+    "category": "Facility Analytics",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_id"
+        },
+        "sourceFields": "L1.facility_master.facility_id"
+      },
+      {
+        "name": "facility_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_purpose_desc",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "lob_l1_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "lob_l2_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "portfolio_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "product_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "region_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "counterparty_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "committed_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilized_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "coverage_ratio_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "effective_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "maturity_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "days_remaining",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_duration_days",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "status_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "is_syndicated_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "interest_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "rate_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "all_in_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "interest_rate_spread_bps",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "interest_rate_index",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "rate_cap_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "payment_frequency",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "prepayment_penalty_desc",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "has_amendment_flag",
+        "dataType": "BOOLEAN"
+      },
+      {
+        "name": "amendment_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_risk_ratio_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "dscr_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "fccr_value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "ltv_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "lcr_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "capital_adequacy_ratio_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "tangible_net_worth_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "cash_interest_expense_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "exception_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_deterioration_summary": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "deteriorated_deal_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "deteriorated_deal_exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "deteriorated_deal_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "criticized_portfolio_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "doi_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "internal_downgrade_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "external_downgrade_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "total_rating_change_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "prior_period_deteriorated_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "deterioration_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "base_currency_code",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "currency_dim",
+          "field": "currency_code"
+        },
+        "sourceFields": "L1.currency_dim.currency_code"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_rating_distribution": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "rating_bucket_code",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "rating_bucket_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "bucket_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "lob_top_contributors": {
+    "category": "LoB Summary",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "run_control",
+          "field": "run_version_id"
+        },
+        "sourceFields": "L1.run_control.run_version_id"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "calendar_date"
+        },
+        "sourceFields": "L1.date_dim.calendar_date"
+      },
+      {
+        "name": "hierarchy_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_hierarchy_config",
+          "field": "hierarchy_id"
+        },
+        "sourceFields": "L1.lob_hierarchy_config.hierarchy_id"
+      },
+      {
+        "name": "lob_node_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "lob_node",
+          "field": "lob_node_id"
+        },
+        "sourceFields": "L1.lob_node.lob_node_id"
+      },
+      {
+        "name": "rank_order",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "contributor_type",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR",
+        "fkTarget": {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "counterparty_id"
+        },
+        "sourceFields": "L1.counterparty.counterparty_id"
+      },
+      {
+        "name": "counterparty_name",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "exposure_amt",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "utilization_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "contribution_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  }
+}

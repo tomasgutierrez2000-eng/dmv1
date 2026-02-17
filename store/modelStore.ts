@@ -23,6 +23,8 @@ interface ModelStore {
   searchQuery: string;
   visibleLayers: { L1: boolean; L2: boolean; L3: boolean };
   filterCategories: Set<string>; // Set of selected category names (empty = all)
+  /** L3 only: categories to hide. Empty = show all L3 categories. */
+  l3CategoryExcluded: Set<string>;
   
   // UI
   theme: 'dark' | 'light';
@@ -58,6 +60,8 @@ interface ModelStore {
   setVisibleLayer: (layer: 'L1' | 'L2' | 'L3', visible: boolean) => void;
   setFilterCategories: (categories: Set<string>) => void;
   toggleFilterCategory: (category: string) => void;
+  toggleL3Category: (category: string) => void; // When L3 visible: show/hide this L3 category
+  setL3CategoryExcluded: (categories: Set<string>) => void;
   setTheme: (theme: 'dark' | 'light') => void;
   setShowMinimap: (show: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
@@ -91,6 +95,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   searchQuery: '',
   visibleLayers: { L1: true, L2: true, L3: true },
   filterCategories: new Set<string>(), // Empty set = show all categories
+  l3CategoryExcluded: new Set<string>(), // Empty = show all L3 categories
   theme: 'dark',
   showMinimap: true,
   sidebarOpen: true,
@@ -181,6 +186,14 @@ export const useModelStore = create<ModelStore>((set) => ({
       }
       return { filterCategories: newCategories };
     }),
+  toggleL3Category: (category) =>
+    set((state) => {
+      const next = new Set(state.l3CategoryExcluded);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      return { l3CategoryExcluded: next };
+    }),
+  setL3CategoryExcluded: (categories) => set({ l3CategoryExcluded: categories }),
   setTheme: (theme) => set({ theme }),
   setShowMinimap: (show) => set({ showMinimap: show }),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),

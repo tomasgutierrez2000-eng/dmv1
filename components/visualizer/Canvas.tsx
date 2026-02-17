@@ -41,6 +41,7 @@ export default function Canvas() {
     searchQuery,
     visibleLayers,
     filterCategories,
+    l3CategoryExcluded,
     layoutMode,
     tableSize,
     showRelationships,
@@ -64,6 +65,7 @@ export default function Canvas() {
     if (!model) return [];
     return Object.values(model.tables).filter((table) => {
       if (!visibleLayers[table.layer]) return false;
+      if (table.layer === 'L3' && l3CategoryExcluded.has(table.category)) return false;
       if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -73,7 +75,7 @@ export default function Canvas() {
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, searchQuery]);
+  }, [model, visibleLayers, filterCategories, l3CategoryExcluded, searchQuery]);
 
   // Fit view to a set of positions; when visible count is low, zoom in so boxes fill the screen
   const runFitToView = useCallback(

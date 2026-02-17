@@ -1,18 +1,36 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
-import type { DataModel, Relationship } from '@/types/model';
+import type { DataModel, Relationship, TableDef, Field } from '@/types/model';
 import { getL1Category, L1_CATEGORY_ORDER } from '@/lib/l1-table-categories';
 import { getL2Category, L2_CATEGORY_ORDER } from '@/lib/l2-table-categories';
+import { L3_TABLES } from '@/data/l3-tables';
 
 const L1_OUTPUT_DIR = path.join(process.cwd(), 'scripts/l1/output');
 const L2_OUTPUT_DIR = path.join(process.cwd(), 'scripts/l2/output');
+const L3_OUTPUT_DIR = path.join(process.cwd(), 'scripts/l3/output');
 const L1_SAMPLE_DATA_PATH = path.join(L1_OUTPUT_DIR, 'sample-data.json');
 const L1_RELATIONSHIPS_PATH = path.join(L1_OUTPUT_DIR, 'relationships.json');
 const L1_METADATA_PATH = path.join(L1_OUTPUT_DIR, 'table-metadata.json');
 const L2_SAMPLE_DATA_PATH = path.join(L2_OUTPUT_DIR, 'sample-data.json');
 const L2_RELATIONSHIPS_PATH = path.join(L2_OUTPUT_DIR, 'relationships.json');
 const L2_METADATA_PATH = path.join(L2_OUTPUT_DIR, 'table-metadata.json');
+const L3_TABLE_FIELDS_PATH = path.join(L3_OUTPUT_DIR, 'l3-table-fields.json');
+
+/** Formulas for key L3 derived fields (from population scripts) */
+const L3_FIELD_FORMULAS: Record<string, Record<string, { formula?: string; derivationLogic?: string }>> = {
+  limit_current_state: {
+    utilized_amt: { formula: 'SUM(L2.limit_contribution_snapshot.contribution_amt)', derivationLogic: 'Sum of contributions to this limit' },
+    available_amt: { formula: 'limit_amt - utilized_amt', derivationLogic: 'Headroom' },
+    utilization_pct: { formula: 'utilized_amt / limit_amt * 100', derivationLogic: 'Percent of limit used' },
+    status_code: { formula: "CASE WHEN utilized > limit THEN 'BREACH' WHEN utilized/limit >= 0.9 THEN 'WARN' ELSE 'OK'", derivationLogic: 'From utilization vs threshold' },
+    classification_code: { formula: "RED if >=100%, AMBER if >=75%, GREEN else", derivationLogic: 'Tier from utilization %' },
+    utilization_tier_code: { formula: "'<50%' | '50-75%' | '75-90%' | '>90%'", derivationLogic: 'From utilization_pct' },
+  },
+  limit_utilization_timeseries: {
+    utilization_pct: { formula: 'utilized_amt / (utilized_amt + available_amt) * 100', derivationLogic: 'Snapshot utilization %' },
+  },
+};
 
 type ColumnMeta = { type: string; pk: boolean; fk: string | null; nullable: boolean };
 type TableMetadata = Record<string, Record<string, ColumnMeta>>;
@@ -68,6 +86,69 @@ function buildTablesFromData(
     };
   }
   return tables;
+}
+
+type L3FieldSpec = { name: string; dataType?: string; fkTarget?: { layer: string; table: string; field: string }; sourceFields?: string };
+type L3TableFieldsJson = Record<string, { category: string; fields: L3FieldSpec[] }>;
+
+function buildL3TablesAndRelationships(
+  l3FieldsByTable: L3TableFieldsJson,
+  existingTableKeys: Set<string>
+): { tables: DataModel['tables']; relationships: Relationship[]; categories: string[] } {
+  const tables: DataModel['tables'] = {};
+  const relationships: Relationship[] = [];
+  const categorySet = new Set<string>();
+
+  for (const l3Table of L3_TABLES) {
+    const tableName = l3Table.name;
+    const key = `L3.${tableName}`;
+    const spec = l3FieldsByTable[tableName];
+    const category = spec?.category ?? l3Table.category;
+    categorySet.add(category);
+
+    const rawFields: L3FieldSpec[] = spec?.fields ?? [{ name: 'id', dataType: 'VARCHAR' }];
+    const fields: Field[] = rawFields.map((f, i) => {
+      const formulas = L3_FIELD_FORMULAS[tableName]?.[f.name];
+      const isPK = i === 0;
+      const isFK = !!f.fkTarget;
+      return {
+        name: f.name,
+        description: '',
+        isPK,
+        isFK,
+        dataType: f.dataType ?? '',
+        ...(f.fkTarget && { fkTarget: f.fkTarget }),
+        ...(f.sourceFields && { sourceFields: f.sourceFields }),
+        ...(formulas?.formula && { formula: formulas.formula }),
+        ...(formulas?.derivationLogic && { derivationLogic: formulas.derivationLogic }),
+      };
+    });
+
+    tables[key] = {
+      key,
+      name: tableName,
+      layer: 'L3',
+      category,
+      fields,
+    };
+
+    for (const f of rawFields) {
+      if (!f.fkTarget) continue;
+      const { layer, table: srcTable, field: srcField } = f.fkTarget;
+      const sourceTableKey = `${layer}.${srcTable}`;
+      if (!existingTableKeys.has(sourceTableKey)) continue;
+      const relId = `deriv-${sourceTableKey}-${srcField}-${key}-${f.name}`;
+      relationships.push({
+        id: relId,
+        source: { layer, table: srcTable, field: srcField, tableKey: sourceTableKey },
+        target: { layer: 'L3', table: tableName, field: f.name, tableKey: key },
+        isCrossLayer: true,
+        relationshipType: 'secondary',
+      });
+    }
+  }
+
+  return { tables, relationships, categories: Array.from(categorySet).sort() };
 }
 
 export async function GET() {
@@ -148,13 +229,25 @@ export async function GET() {
   const remaining = Array.from(categorySet).filter(
     (c) => !l1Categories.includes(c) && !l2Categories.includes(c)
   ).sort();
-  const categories = [...l1Categories, ...l2Categories, ...remaining];
+  let categories = [...l1Categories, ...l2Categories, ...remaining];
+  let layers: string[] = hasL2 ? ['L1', 'L2'] : ['L1'];
+
+  const existingTableKeys = new Set(Object.keys(tables));
+  const l3FieldsByTable = loadJsonIfExists<L3TableFieldsJson>(L3_TABLE_FIELDS_PATH, {});
+  if (Object.keys(l3FieldsByTable).length > 0) {
+    const l3Result = buildL3TablesAndRelationships(l3FieldsByTable, existingTableKeys);
+    Object.assign(tables, l3Result.tables);
+    relationships.push(...l3Result.relationships);
+    const l3Cats = l3Result.categories.filter((c) => !categories.includes(c));
+    categories = [...categories, ...l3Cats];
+    layers = [...layers, 'L3'];
+  }
 
   const model: DataModel = {
     tables,
     relationships,
     categories,
-    layers: hasL2 ? ['L1', 'L2'] : ['L1'],
+    layers,
   };
 
   return NextResponse.json(model);

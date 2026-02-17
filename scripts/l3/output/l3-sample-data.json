@@ -1,0 +1,32 @@
+{
+  "L3.limit_current_state": {
+    "columns": ["run_version_id", "as_of_ts", "legal_entity_id", "limit_assignment_id", "limit_currency_code", "limit_amt", "utilized_amt", "available_amt", "utilization_pct", "status_code", "classification_code", "utilization_tier_code"],
+    "rows": [
+      ["run-v-001", "2024-12-15 00:00:00", "LE-001", "LA-FAC-2024-00847", "USD", 5000000000, 4200000000, 800000000, 84.0, "WARN", "AMBER", "75-90%"]
+    ]
+  },
+  "L3.limit_utilization_timeseries": {
+    "columns": ["run_version_id", "as_of_ts", "legal_entity_id", "limit_assignment_id", "limit_currency_code", "utilized_amt", "available_amt", "utilization_pct"],
+    "rows": [
+      ["run-v-001", "2024-12-15 00:00:00", "LE-001", "LA-FAC-2024-00847", "USD", 4200000000, 800000000, 84.0]
+    ]
+  },
+  "L3.exposure_metric_cube": {
+    "columns": ["run_version_id", "as_of_date", "scenario_id", "legal_entity_id", "facility_id", "counterparty_id", "currency_code", "gross_exposure_amt", "net_exposure_amt", "ead_amt"],
+    "rows": [
+      ["run-v-001", "2024-12-15", "base", "LE-001", "FAC-2024-00847", "CP-001", "USD", 4200000000, 4200000000, 4200000000]
+    ]
+  },
+  "L3.facility_exposure_summary": {
+    "columns": ["run_version_id", "as_of_date", "scenario_id", "legal_entity_id", "facility_id", "counterparty_id", "base_currency_code", "outstanding_amt", "ead_amt"],
+    "rows": [
+      ["run-v-001", "2024-12-15", "base", "LE-001", "FAC-2024-00847", "CP-001", "USD", 4200000000, 4200000000]
+    ]
+  },
+  "L3.portfolio_summary": {
+    "columns": ["run_version_id", "as_of_date", "scenario_id", "legal_entity_id", "portfolio_id", "base_currency_code", "total_gross_exposure_amt", "total_ead_amt", "avg_pd_pct"],
+    "rows": [
+      ["run-v-001", "2024-12-15", "base", "LE-001", "PORT-001", "USD", 5000000000, 5000000000, 2.5]
+    ]
+  }
+}

@@ -5,6 +5,7 @@ import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTrian
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
 import { debugRelationships } from '../../utils/relationshipDebug';
+import { getL3Categories } from '@/data/l3-tables';
 
 export default function Sidebar() {
   const {
@@ -12,9 +13,11 @@ export default function Sidebar() {
     searchQuery,
     visibleLayers,
     filterCategories,
+    l3CategoryExcluded,
     setSearchQuery,
     setVisibleLayer,
     toggleFilterCategory,
+    toggleL3Category,
     setSelectedTable,
     sidebarOpen,
     setSidebarOpen,
@@ -34,6 +37,7 @@ export default function Sidebar() {
     if (!model) return [];
     return Object.values(model.tables).filter((table) => {
       if (!visibleLayers[table.layer]) return false;
+      if (table.layer === 'L3' && l3CategoryExcluded.has(table.category)) return false;
       if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -43,7 +47,7 @@ export default function Sidebar() {
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, searchQuery]);
+  }, [model, visibleLayers, filterCategories, l3CategoryExcluded, searchQuery]);
 
   const tablesByCategory = useMemo(() => {
     const grouped = new Map<string, typeof filteredTables>();
@@ -174,6 +178,34 @@ export default function Sidebar() {
             );
           })}
         </div>
+        {/* L3 category toggles - only when L3 layer is visible */}
+        {visibleLayers.L3 && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">L3 categories</div>
+            <div className="space-y-1 max-h-36 overflow-y-auto scrollbar-thin">
+              {getL3Categories().map((cat) => {
+                const excluded = l3CategoryExcluded.has(cat);
+                const count = model ? Object.values(model.tables).filter((t) => t.layer === 'L3' && t.category === cat).length : 0;
+                return (
+                  <label
+                    key={cat}
+                    className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-1.5 -mx-1.5"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!excluded}
+                      onChange={() => toggleL3Category(cat)}
+                      className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                      aria-label={`${excluded ? 'Show' : 'Hide'} L3 category ${cat}`}
+                    />
+                    <span className="text-xs text-gray-700 truncate flex-1">{cat}</span>
+                    {count > 0 && <span className="text-[10px] text-gray-400 tabular-nums">{count}</span>}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Search - Apple-style search bar */}

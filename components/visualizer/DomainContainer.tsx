@@ -50,7 +50,12 @@ export default function DomainContainer({
   const headerHeight = isOverview ? 45 : 80;
 
   return (
-    <g transform={`translate(${position.x}, ${position.y})`}>
+    <g
+      transform={`translate(${position.x}, ${position.y})`}
+      style={{
+        transition: 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1)',
+      }}
+    >
       {/* Domain Container Background - in overview let clicks pass through to tables */}
       <rect
         x="0"
@@ -68,11 +73,22 @@ export default function DomainContainer({
             ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
             : 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4))',
           strokeOpacity: 0.8,
+          transition:
+            'width 260ms cubic-bezier(0.22, 1, 0.36, 1), height 260ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms ease, stroke-opacity 220ms ease',
         }}
       />
 
       {/* Domain Header - keep pointer-events so header click still toggles */}
-      <foreignObject x="0" y="0" width={width} height={headerHeight} style={{ pointerEvents: 'auto' }}>
+      <foreignObject
+        x="0"
+        y="0"
+        width={width}
+        height={headerHeight}
+        style={{
+          pointerEvents: 'auto',
+          transition: 'width 260ms cubic-bezier(0.22, 1, 0.36, 1)',
+        }}
+      >
         <div
           className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-white/10`}
           onClick={onToggle}
@@ -152,7 +168,16 @@ export default function DomainContainer({
       
       {/* Collapsed state indicator */}
       {!isExpanded && !isOverview && (
-        <foreignObject x="0" y={headerHeight} width={width} height={height - headerHeight}>
+        <foreignObject
+          x="0"
+          y={headerHeight}
+          width={width}
+          height={height - headerHeight}
+          style={{
+            transition:
+              'width 260ms cubic-bezier(0.22, 1, 0.36, 1), height 260ms cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
+        >
           <div className="h-full flex items-center justify-center text-white/50 text-sm font-medium">
             Click to expand and view tables
           </div>

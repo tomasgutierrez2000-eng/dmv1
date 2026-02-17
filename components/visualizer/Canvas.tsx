@@ -667,6 +667,8 @@ export default function Canvas() {
     : isDraggingTable
       ? 'move'
       : 'grab';
+  const hasActiveSearch = searchQuery.trim().length > 0;
+  const hasNarrowedView = hasActiveSearch || filtersNarrowing;
 
   return (
     <div
@@ -755,7 +757,7 @@ export default function Canvas() {
               DOMAINS_PER_ROW: 5,
             };
 
-            if (layoutMode === 'domain-overview') {
+            if (layoutMode === 'domain-overview' && !hasNarrowedView) {
               const viewportW = typeof window !== 'undefined' ? window.innerWidth : 2400;
               const availableWidth = Math.max(viewportW - 12, 3200);
               const domainWidth = Math.floor(
@@ -802,13 +804,21 @@ export default function Canvas() {
                 colIndex++;
               });
             } else {
-              // Domain (non-overview): position/size from table bounds
+              // Domain bounds from actual visible table positions.
+              // In domain-overview we switch to this path while narrowed (search/filter)
+              // so frames track temporary compacted/reduced table positions.
               let domainPadding: number;
               let headerOffset: number;
               let footerOffset: number;
-              domainPadding = 25;
-              headerOffset = 105;
-              footerOffset = 25;
+              if (layoutMode === 'domain-overview') {
+                domainPadding = DOMAIN_OVERVIEW.DOMAIN_PADDING;
+                headerOffset = DOMAIN_OVERVIEW.headerOffset;
+                footerOffset = DOMAIN_OVERVIEW.footerOffset;
+              } else {
+                domainPadding = 25;
+                headerOffset = 105;
+                footerOffset = 25;
+              }
 
               Array.from(domains).forEach((domain) => {
                 const domainTables = visibleTables.filter(t => t.category === domain);

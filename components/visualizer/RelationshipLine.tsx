@@ -3,7 +3,7 @@
 import type { Relationship } from '../../types/model';
 import type { TablePosition } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
 
 interface RelationshipLineProps {
   relationship: Relationship;
@@ -67,11 +67,12 @@ export default function RelationshipLine({
   const EXPANDED_HEIGHT = isOverviewMode && overviewDims
     ? overviewDims.height
     : Math.max(200, Math.round(baseExpandedHeight));
-  const HEADER_HEIGHT = isOverviewMode && overviewDims
-    ? Math.max(20, Math.round(overviewDims.height * 0.28))
+  // Overview mode uses fixed geometry matching the pure-SVG cards
+  const HEADER_HEIGHT = isOverviewMode
+    ? OVERVIEW_CARD.HEADER_H
     : Math.max(32, Math.round(baseHeaderHeight));
-  const FOOTER_HEIGHT = isOverviewMode && overviewDims
-    ? Math.max(12, Math.round(overviewDims.height * 0.16))
+  const FOOTER_HEIGHT = isOverviewMode
+    ? OVERVIEW_CARD.FOOTER_H
     : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
 
   const sourceTable = model?.tables[relationship.source.tableKey];
@@ -86,11 +87,12 @@ export default function RelationshipLine({
   const isCompact = isOverviewMode || viewMode === 'compact' || zoomLevel < ZOOM_THRESHOLDS.MEDIUM;
   const isDetailed = !isOverviewMode && viewMode === 'detailed' && zoomLevel >= ZOOM_THRESHOLDS.HIGH;
 
-  const contentPaddingTop = isCompact ? 4 : isDetailed ? 12 : 8;
-  const fieldSpacing = isCompact ? 2 : isDetailed ? 6 : 4;
-  const fieldPaddingY = isCompact ? 4 : isDetailed ? 8 : 6;
-  const textLineHeight = isCompact ? 14 : isDetailed ? 16 : 14;
-  const fieldHeight = fieldPaddingY + textLineHeight + fieldPaddingY;
+  // Overview mode: match the pure-SVG card field layout exactly
+  const contentPaddingTop = isOverviewMode ? OVERVIEW_CARD.PAD_Y : isCompact ? 4 : isDetailed ? 12 : 8;
+  const fieldSpacing = isOverviewMode ? 0 : isCompact ? 2 : isDetailed ? 6 : 4;
+  const fieldPaddingY = isOverviewMode ? 0 : isCompact ? 4 : isDetailed ? 8 : 6;
+  const textLineHeight = isOverviewMode ? OVERVIEW_CARD.LINE_H : isCompact ? 14 : isDetailed ? 16 : 14;
+  const fieldHeight = isOverviewMode ? OVERVIEW_CARD.LINE_H : fieldPaddingY + textLineHeight + fieldPaddingY;
   
   // Calculate Y position for specific field - PRECISE calculation
   const getFieldY = (

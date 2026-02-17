@@ -9,12 +9,23 @@ export type VisibleLayers = { L1: boolean; L2: boolean; L3: boolean };
 /** Overview table dimensions by size (used by layout, Canvas, and TableNode) - larger for readability */
 export function getOverviewTableDimensions(tableSize: TableSize): { width: number; height: number } {
   switch (tableSize) {
-    case 'small': return { width: 150, height: 82 };
-    case 'medium': return { width: 180, height: 96 };
-    case 'large': return { width: 200, height: 108 };
-    default: return { width: 180, height: 96 };
+    case 'small': return { width: 200, height: 160 };
+    case 'medium': return { width: 240, height: 190 };
+    case 'large': return { width: 280, height: 220 };
+    default: return { width: 240, height: 190 };
   }
 }
+
+/** Pure-SVG overview card geometry constants (shared by TableNode and RelationshipLine) */
+export const OVERVIEW_CARD = {
+  HEADER_H: 32,
+  FOOTER_H: 20,
+  LINE_H: 15,
+  PAD_X: 10,
+  PAD_Y: 6,
+  RADIUS: 8,
+  FIELD_OFFSET: 11, // baseline offset from content-area top to first field text
+} as const;
 
 // Base dimensions - will be adjusted by view mode
 // Note: Actual table dimensions are now dynamic based on tableSize setting

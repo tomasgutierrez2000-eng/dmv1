@@ -101,7 +101,7 @@ export default function Canvas() {
 
       let newZoom: number;
       if (layoutMode === 'domain-overview') {
-        newZoom = Math.min(zoomX * 0.72, 0.55);
+        newZoom = Math.min(zoomX * 0.85, 0.75);
       } else if (layoutMode === 'domain') {
         newZoom = Math.min(zoomX * 0.88, 0.8);
       } else if (aspectRatio > viewportAspectRatio * 1.2) {

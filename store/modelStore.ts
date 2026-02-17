@@ -4,7 +4,9 @@ import type { DataModel, TablePosition } from '../types/model';
 interface ModelStore {
   // Data
   model: DataModel | null;
-  
+  /** Uploaded sample data (tableKey -> { columns, rows }). Overrides API sample data when set. */
+  uploadedSampleData: Record<string, { columns: string[]; rows: unknown[][] }>;
+
   // View state
   zoom: number;
   pan: { x: number; y: number };
@@ -40,6 +42,9 @@ interface ModelStore {
   
   // Actions
   setModel: (model: DataModel | null) => void;
+  setUploadedSampleData: (tableKey: string, data: { columns: string[]; rows: unknown[][] } | null) => void;
+  setUploadedSampleDataBulk: (data: Record<string, { columns: string[]; rows: unknown[][] }>) => void;
+  clearUploadedSampleData: () => void;
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
   setTablePosition: (tableKey: string, position: TablePosition) => void;
@@ -74,6 +79,7 @@ interface ModelStore {
 export const useModelStore = create<ModelStore>((set) => ({
   // Initial state
   model: null,
+  uploadedSampleData: {},
   zoom: 1,
   pan: { x: 0, y: 0 },
   tablePositions: {},
@@ -101,6 +107,18 @@ export const useModelStore = create<ModelStore>((set) => ({
   
   // Actions
   setModel: (model) => set({ model }),
+  setUploadedSampleData: (tableKey, data) =>
+    set((state) => ({
+      uploadedSampleData: data
+        ? { ...state.uploadedSampleData, [tableKey]: data }
+        : (() => {
+            const next = { ...state.uploadedSampleData };
+            delete next[tableKey];
+            return next;
+          })(),
+    })),
+  setUploadedSampleDataBulk: (data) => set({ uploadedSampleData: data }),
+  clearUploadedSampleData: () => set({ uploadedSampleData: {} }),
   setZoom: (zoom) => set({ zoom: Math.max(0.1, Math.min(3, zoom)) }),
   setPan: (pan) => set({ pan }),
   setTablePosition: (tableKey, position) =>

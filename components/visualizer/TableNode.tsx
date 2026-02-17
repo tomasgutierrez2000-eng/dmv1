@@ -5,7 +5,7 @@ import type { TableDef } from '../../types/model';
 import { layerColors } from '../../utils/colors';
 import { getCategoryColor } from '../../utils/colors';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
 
 interface TableNodeProps {
   table: TableDef;
@@ -165,6 +165,184 @@ export default function TableNode({
 
   // All fields are now always visible and scrollable
 
+  // ─── OVERVIEW MODE: Pure SVG rendering (no foreignObject) ───
+  // This eliminates all foreignObject rendering artifacts in production
+  if (isOverviewMode) {
+    const OV = OVERVIEW_CARD;
+    const contentH = TABLE_HEIGHT - OV.HEADER_H - OV.FOOTER_H;
+    const maxFields = Math.floor((contentH - OV.PAD_Y) / OV.LINE_H);
+    const hasMore = table.fields.length > maxFields;
+    const fieldsToShow = hasMore ? table.fields.slice(0, maxFields - 1) : table.fields;
+    const remaining = table.fields.length - fieldsToShow.length;
+    const safeId = table.key.replace(/[^a-zA-Z0-9]/g, '_');
+    const maxNameChars = Math.floor((TABLE_WIDTH - OV.PAD_X * 2 - 36) / 7);
+    const maxFieldChars = Math.floor((TABLE_WIDTH - OV.PAD_X * 2) / 6.2);
+
+    return (
+      <g
+        transform={`translate(${position.x}, ${position.y})`}
+        onMouseDown={handleMouseDown}
+        style={{ cursor: 'grab' }}
+      >
+        <defs>
+          <clipPath id={`ov-card-${safeId}`}>
+            <rect width={TABLE_WIDTH} height={TABLE_HEIGHT} rx={OV.RADIUS} ry={OV.RADIUS} />
+          </clipPath>
+          <clipPath id={`ov-fields-${safeId}`}>
+            <rect x="0" y={OV.HEADER_H} width={TABLE_WIDTH} height={contentH} />
+          </clipPath>
+        </defs>
+
+        {/* Selection glow ring */}
+        {isSelected && (
+          <rect
+            x="-3" y="-3"
+            width={TABLE_WIDTH + 6} height={TABLE_HEIGHT + 6}
+            rx={OV.RADIUS + 2} ry={OV.RADIUS + 2}
+            fill="none" stroke="#fbbf24" strokeWidth="2" opacity="0.6"
+          />
+        )}
+
+        {/* Card content clipped to rounded rect */}
+        <g clipPath={`url(#ov-card-${safeId})`}>
+          {/* White background */}
+          <rect width={TABLE_WIDTH} height={TABLE_HEIGHT} fill="white" />
+
+          {/* Header with gradient */}
+          <rect width={TABLE_WIDTH} height={OV.HEADER_H} fill={colors.border} />
+          {/* Semi-transparent gradient overlay for depth */}
+          <rect
+            width={TABLE_WIDTH} height={OV.HEADER_H}
+            fill={colors.primary} opacity="0.35"
+          />
+
+          {/* Category indicator dot */}
+          <circle
+            cx={OV.PAD_X + 5} cy={OV.HEADER_H / 2}
+            r="4" fill={categoryColor.color} opacity="0.9"
+          />
+
+          {/* Table name */}
+          <text
+            x={OV.PAD_X + 14} y={OV.HEADER_H / 2 + 4}
+            fill="white" fontSize="12" fontWeight="bold"
+            fontFamily="system-ui, -apple-system, sans-serif"
+          >
+            {table.name.length > maxNameChars
+              ? table.name.slice(0, maxNameChars - 1) + '\u2026'
+              : table.name}
+          </text>
+
+          {/* Layer badge */}
+          <rect
+            x={TABLE_WIDTH - OV.PAD_X - 28} y={(OV.HEADER_H - 16) / 2}
+            width="28" height="16" rx="3" fill="rgba(255,255,255,0.25)"
+          />
+          <text
+            x={TABLE_WIDTH - OV.PAD_X - 14} y={OV.HEADER_H / 2 + 4}
+            fill="white" fontSize="10" fontWeight="bold" textAnchor="middle"
+            fontFamily="system-ui, -apple-system, sans-serif"
+          >
+            {table.layer}
+          </text>
+
+          {/* Fields (clipped to content area) */}
+          <g clipPath={`url(#ov-fields-${safeId})`}>
+            {table.fields.length > 0 ? (
+              <>
+                {fieldsToShow.map((field, i) => {
+                  const y = OV.HEADER_H + OV.PAD_Y + OV.FIELD_OFFSET + i * OV.LINE_H;
+                  const isPK = field.isPK;
+                  const isFK = field.isFK;
+                  const prefix = isPK ? 'PK ' : isFK ? 'FK ' : '';
+                  const name = field.name;
+                  const maxChars = maxFieldChars - prefix.length;
+                  const displayText = prefix + (name.length > maxChars
+                    ? name.slice(0, maxChars - 1) + '\u2026'
+                    : name);
+
+                  return (
+                    <text
+                      key={i}
+                      x={OV.PAD_X} y={y}
+                      fill={isPK ? '#92400e' : isFK ? '#1e40af' : '#374151'}
+                      fontSize="10"
+                      fontWeight={isPK ? 'bold' : isFK ? '600' : 'normal'}
+                      fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace"
+                    >
+                      {displayText}
+                    </text>
+                  );
+                })}
+                {remaining > 0 && (
+                  <text
+                    x={OV.PAD_X}
+                    y={OV.HEADER_H + OV.PAD_Y + OV.FIELD_OFFSET + fieldsToShow.length * OV.LINE_H}
+                    fill="#9ca3af" fontSize="9" fontStyle="italic"
+                    fontFamily="system-ui, -apple-system, sans-serif"
+                  >
+                    +{remaining} more\u2026
+                  </text>
+                )}
+              </>
+            ) : (
+              <text
+                x={TABLE_WIDTH / 2} y={OV.HEADER_H + contentH / 2}
+                fill="#9ca3af" fontSize="10" fontStyle="italic" textAnchor="middle"
+                fontFamily="system-ui, -apple-system, sans-serif"
+              >
+                No fields
+              </text>
+            )}
+          </g>
+
+          {/* Footer separator */}
+          <line
+            x1="0" y1={TABLE_HEIGHT - OV.FOOTER_H}
+            x2={TABLE_WIDTH} y2={TABLE_HEIGHT - OV.FOOTER_H}
+            stroke="#e5e7eb" strokeWidth="0.5"
+          />
+
+          {/* Footer: field counts */}
+          <text
+            x={OV.PAD_X} y={TABLE_HEIGHT - OV.FOOTER_H / 2 + 3}
+            fill="#6b7280" fontSize="9"
+            fontFamily="system-ui, -apple-system, sans-serif"
+          >
+            {pkFields.length > 0 ? `${pkFields.length} PK` : ''}
+            {pkFields.length > 0 && fkFields.length > 0 ? ' \u00b7 ' : ''}
+            {fkFields.length > 0 ? `${fkFields.length} FK` : ''}
+            {(pkFields.length > 0 || fkFields.length > 0) ? ' \u00b7 ' : ''}
+            {table.fields.length} fields
+          </text>
+
+          {/* Footer: relationship indicators */}
+          {(relCounts.incoming > 0 || relCounts.outgoing > 0) && (
+            <text
+              x={TABLE_WIDTH - OV.PAD_X} y={TABLE_HEIGHT - OV.FOOTER_H / 2 + 3}
+              fill="#9ca3af" fontSize="8" textAnchor="end"
+              fontFamily="system-ui, -apple-system, sans-serif"
+            >
+              {relCounts.incoming > 0 ? `\u2190${relCounts.incoming}` : ''}
+              {relCounts.incoming > 0 && relCounts.outgoing > 0 ? ' ' : ''}
+              {relCounts.outgoing > 0 ? `\u2192${relCounts.outgoing}` : ''}
+            </text>
+          )}
+        </g>
+
+        {/* Card border */}
+        <rect
+          width={TABLE_WIDTH} height={TABLE_HEIGHT}
+          rx={OV.RADIUS} ry={OV.RADIUS}
+          fill="none"
+          stroke={isSelected ? '#fbbf24' : colors.border}
+          strokeWidth={isSelected ? 2.5 : 1.5}
+        />
+      </g>
+    );
+  }
+
+  // ─── NON-OVERVIEW MODES: Full HTML rendering via foreignObject ───
   return (
     <g
       transform={`translate(${position.x}, ${position.y})`}

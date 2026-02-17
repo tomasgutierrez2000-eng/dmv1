@@ -20,13 +20,13 @@ interface RelationshipLineProps {
   onHover: (hovered: boolean) => void;
 }
 
-// Base dimensions - will be adjusted by table size
-const BASE_TABLE_WIDTH = 480;
-const BASE_TABLE_HEIGHT = 280;
+// Base dimensions - must match TableNode geometry
+const BASE_TABLE_WIDTH = 560;
+const BASE_TABLE_HEIGHT = 320;
 const SIZE_MULTIPLIERS = {
-  small: { width: 0.75, height: 0.85 },
+  small: { width: 0.8, height: 0.9 },
   medium: { width: 1.0, height: 1.0 },
-  large: { width: 1.3, height: 1.2 },
+  large: { width: 1.35, height: 1.25 },
 };
 
 export default function RelationshipLine({
@@ -49,11 +49,10 @@ export default function RelationshipLine({
 
   // CRITICAL: Use EXACT same calculations as TableNode (and overview dimensions when in domain-overview)
   const sizeMultiplier = SIZE_MULTIPLIERS[tableSize];
-  const BASE_COLLAPSED_HEIGHT = 280;
-  const BASE_EXPANDED_HEIGHT = 520;
-  const BASE_HEADER_HEIGHT = 52;
-  const BASE_FOOTER_HEIGHT = 44;
-  const zoomMultiplier = Math.max(0.4, Math.min(1.5, zoom));
+  const BASE_COLLAPSED_HEIGHT = 320;
+  const BASE_EXPANDED_HEIGHT = 600;
+  const BASE_HEADER_HEIGHT = 56;
+  const BASE_FOOTER_HEIGHT = 48;
   const baseWidth = BASE_TABLE_WIDTH * sizeMultiplier.width;
   const baseCollapsedHeight = BASE_COLLAPSED_HEIGHT * sizeMultiplier.height;
   const baseExpandedHeight = BASE_EXPANDED_HEIGHT * sizeMultiplier.height;
@@ -61,19 +60,19 @@ export default function RelationshipLine({
 
   const TABLE_WIDTH = isOverviewMode && overviewDims
     ? overviewDims.width
-    : Math.max(200, Math.round(baseWidth * zoomMultiplier));
+    : Math.max(200, Math.round(baseWidth));
   const COLLAPSED_HEIGHT = isOverviewMode && overviewDims
     ? overviewDims.height
-    : Math.max(120, Math.round(baseCollapsedHeight * zoomMultiplier));
+    : Math.max(120, Math.round(baseCollapsedHeight));
   const EXPANDED_HEIGHT = isOverviewMode && overviewDims
     ? overviewDims.height
-    : Math.max(200, Math.round(baseExpandedHeight * zoomMultiplier));
+    : Math.max(200, Math.round(baseExpandedHeight));
   const HEADER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(20, Math.round(overviewDims.height * 0.28))
-    : Math.max(32, Math.round(baseHeaderHeight * zoomMultiplier));
+    : Math.max(32, Math.round(baseHeaderHeight));
   const FOOTER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(12, Math.round(overviewDims.height * 0.16))
-    : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height * zoomMultiplier));
+    : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
 
   const sourceTable = model?.tables[relationship.source.tableKey];
   const targetTable = model?.tables[relationship.target.tableKey];

@@ -137,6 +137,7 @@ export default function TableNode({
   const pkFields = table.fields.filter((f) => f.isPK);
   const fkFields = table.fields.filter((f) => f.isFK);
   const regularFields = table.fields.filter((f) => !f.isPK && !f.isFK);
+  const previewFields = table.fields.slice(0, 2);
 
   const highlightMatch = (text: string) => {
     if (!searchQuery) return text;
@@ -228,7 +229,36 @@ export default function TableNode({
 
           {/* Content */}
           <div className="flex flex-col bg-gradient-to-b from-gray-50 to-white overflow-hidden" style={{ height: TABLE_HEIGHT - HEADER_HEIGHT }}>
-            {showFields ? (
+            {isOverviewMode ? (
+              <div className="flex-1 px-2 py-1 overflow-hidden">
+                <div className="space-y-1">
+                  {previewFields.length > 0 ? (
+                    previewFields.map((field, idx) => (
+                      <div
+                        key={idx}
+                        className={`text-[10px] rounded border px-1.5 py-0.5 truncate ${
+                          field.isPK
+                            ? 'bg-yellow-50 border-yellow-300 text-yellow-900'
+                            : field.isFK
+                            ? 'bg-blue-50 border-blue-300 text-blue-800'
+                            : 'bg-gray-50 border-gray-300 text-gray-700'
+                        }`}
+                        title={field.name}
+                      >
+                        {field.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-[10px] text-gray-400 italic px-1">No fields</div>
+                  )}
+                  {table.fields.length > previewFields.length && (
+                    <div className="text-[9px] text-gray-500 px-1">
+                      +{table.fields.length - previewFields.length} more
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : showFields ? (
               <div 
                 className={`flex-1 overflow-y-auto ${isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-3' : 'px-3 py-2'} scrollbar-thin`}
                 style={{ 

@@ -9,13 +9,11 @@ import fs from 'fs';
 import XLSX from 'xlsx';
 import { writeCustomMetrics } from '../lib/metrics-store';
 import { writeModelGaps } from '../lib/model-gaps-store';
-import { L3_METRICS } from '../data/l3-metrics';
 import type { L3Metric, DashboardPage, MetricType, DimensionUsage, SourceField } from '../data/l3-metrics';
 
 const PAGES: DashboardPage[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
 const METRIC_TYPES: MetricType[] = ['Aggregate', 'Ratio', 'Count', 'Derived', 'Status', 'Trend', 'Table', 'Categorical'];
 const INTERACTIONS = ['FILTER', 'GROUP_BY', 'AVAILABLE', 'TOGGLE'] as const;
-const BUILTIN_IDS = new Set(L3_METRICS.map(m => m.id));
 
 function parseDimensions(str: string): DimensionUsage[] {
   if (!str || typeof str !== 'string') return [];
@@ -117,10 +115,6 @@ for (const row of metricsRows) {
   const sourceFields = sourceByMetric.get(id) ?? [];
   if (sourceFields.length === 0) {
     errors.push({ row: rowNum, sheet: 'Metrics', message: 'at least one source field required' });
-    continue;
-  }
-  if (BUILTIN_IDS.has(id)) {
-    errors.push({ row: rowNum, sheet: 'Metrics', message: `id "${id}" is reserved` });
     continue;
   }
   const page = String(row['page'] ?? 'P1').trim();

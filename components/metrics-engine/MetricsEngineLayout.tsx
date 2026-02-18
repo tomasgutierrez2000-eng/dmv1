@@ -202,7 +202,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                         className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
                       >
                         <span className="text-[10px] font-mono text-gray-500 w-8 flex-shrink-0">{m.id}</span>
-                        {m.source === 'custom' && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" title="Custom" />}
                         <span className="flex-1 truncate text-xs font-medium">{m.name}</span>
                         {hasLineage && <span className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0" title="Has lineage" />}
                         <ChevronRight className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
@@ -317,7 +316,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="text-[10px] font-mono text-gray-500">{m.id}</span>
-                                {(m as MetricWithSource).source === 'custom' && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Custom</span>}
                                 {hasLineage && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Has lineage" />}
                               </div>
                               <div className="text-sm font-medium text-white truncate mt-0.5">{m.name}</div>

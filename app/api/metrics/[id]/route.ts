@@ -44,7 +44,7 @@ function validateMetric(m: Partial<L3Metric>): { ok: boolean; error?: string } {
   return { ok: true };
 }
 
-/** GET one metric (merged: custom overrides built-in) */
+/** GET one metric */
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -53,12 +53,10 @@ export async function GET(
   const merged = getMergedMetrics();
   const metric = merged.find(m => m.id === id);
   if (!metric) return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
-  const customIds = new Set(readCustomMetrics().map(m => m.id));
-  const source = customIds.has(id) ? 'custom' : 'builtin';
-  return NextResponse.json({ ...metric, source });
+  return NextResponse.json({ ...metric, source: 'custom' });
 }
 
-/** PUT: update a custom metric */
+/** PUT: update a metric */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -89,7 +87,7 @@ export async function PUT(
   return NextResponse.json({ ...metric, source: 'custom' });
 }
 
-/** DELETE: remove a custom metric */
+/** DELETE: remove a metric */
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -98,7 +96,7 @@ export async function DELETE(
   const custom = readCustomMetrics();
   const filtered = custom.filter(m => m.id !== id);
   if (filtered.length === custom.length) {
-    return NextResponse.json({ error: 'Metric not found or is built-in (only custom metrics can be deleted)' }, { status: 404 });
+    return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
   }
   writeCustomMetrics(filtered);
   return new NextResponse(null, { status: 204 });

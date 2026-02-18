@@ -70,19 +70,14 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
             onClick={onDuplicate}
             type="button"
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 text-sm font-medium"
-            title={source === 'builtin' ? 'Create an editable copy as a custom metric' : 'Create a copy with a new ID'}
+            title="Create a copy with a new ID"
           >
             <Copy className="w-3.5 h-3.5" />
-            {source === 'builtin' ? 'Copy as custom' : 'Duplicate'}
+            Duplicate
           </button>
         </div>
       </div>
 
-      {source === 'builtin' && (
-        <p className="mb-4 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm">
-          Edits are saved as your custom version (overriding the built-in). To revert to the original, delete this metric from the list.
-        </p>
-      )}
       <header className="border-b border-white/10 pb-6 mb-6">
         <div className="flex items-start gap-4">
           <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 text-gray-400" aria-hidden>
@@ -93,11 +88,6 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
               <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
                 {metric.id}
               </span>
-              {source === 'custom' && (
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">
-                  Custom
-                </span>
-              )}
               {pageInfo && (
                 <span className="text-[10px] text-gray-500" style={{ color: pageInfo.color }}>
                   {pageInfo.shortName} · {metric.section}

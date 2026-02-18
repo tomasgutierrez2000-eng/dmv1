@@ -181,12 +181,17 @@ function LineageFlow({ metric }: { metric: L3Metric }) {
               onMouseEnter={() => setHovered(pos.id)}
               onMouseLeave={() => setHovered(null)}
             >
-              <div className="px-2.5 py-1.5 h-full flex flex-col justify-center">
+              <div className="px-2.5 py-1.5 h-full flex flex-col justify-center min-w-0">
                 <div className="flex items-center gap-1 mb-0.5">
-                  <span className={`text-[8px] font-bold uppercase tracking-wider px-1 py-px rounded ${s.badge}`}>{s.label}</span>
+                  <span className={`text-[8px] font-bold uppercase tracking-wider px-1 py-px rounded flex-shrink-0 ${s.badge}`}>{s.label}</span>
                   {node.table && <span className="text-[9px] text-gray-500 truncate">{node.table}</span>}
+                  {node.fields && node.fields.length > 1 && (
+                    <span className="text-[8px] text-gray-500 flex-shrink-0">({node.fields.length})</span>
+                  )}
                 </div>
-                <div className={`text-xs font-semibold ${s.text} truncate`}>{node.field}</div>
+                <div className={`text-xs font-semibold ${s.text} truncate`} title={node.fields?.join(', ')}>
+                  {node.fields && node.fields.length > 1 ? node.fields.join(', ') : node.field}
+                </div>
                 <div className="text-[10px] text-gray-400 font-mono truncate mt-px">
                   {node.formula ? <span className="text-purple-300">{node.formula}</span> : node.sampleValue}
                 </div>
@@ -227,7 +232,9 @@ function EquationBreakdown({ metric }: { metric: L3Metric }) {
             {i > 0 && <span className="text-lg font-bold text-gray-500">{edge.label || '→'}</span>}
             <div className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border ${s.border} ${s.bg}`}>
               <span className="text-sm font-bold font-mono text-white">{node.sampleValue}</span>
-              <span className={`text-[10px] font-medium ${s.text}`}>{node.field}</span>
+              <span className={`text-[10px] font-medium ${s.text}`}>
+                {node.fields && node.fields.length > 1 ? node.fields.join(', ') : node.field}
+              </span>
             </div>
           </React.Fragment>
         );

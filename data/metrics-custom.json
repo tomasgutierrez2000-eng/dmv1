@@ -215,8 +215,15 @@
           "layer": "L1",
           "table": "limit_threshold",
           "field": "threshold_upper_pct",
-          "description": "Upper bound of band",
+          "description": "WARNING band upper bound",
           "sampleValue": "75.0"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_threshold",
+          "field": "threshold_lower_pct",
+          "description": "BREACH band lower bound",
+          "sampleValue": "100.0"
         }
       ],
       "dimensions": [
@@ -237,7 +244,7 @@
         "counterparty",
         "lob"
       ],
-      "notes": "Derived from limit_utilization_event + limit_rule + limit_threshold."
+      "notes": "Derived from limit_utilization_event + limit_rule + limit_threshold (WARNING and BREACH bands)."
     },
     {
       "id": "C005",
@@ -246,7 +253,7 @@
       "section": "Limit Data",
       "metricType": "Aggregate",
       "formula": "SUM(limit_amount_usd)",
-      "formulaSQL": "SELECT SUM(lr.limit_amount_usd)\nFROM L1.limit_rule lr\nWHERE lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lr.as_of_date = :as_of_date",
+      "formulaSQL": "SELECT SUM(lr.limit_amount_usd)\nFROM L1.limit_rule lr\nWHERE lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL",
       "description": "Total approved limit amount (USD) across active, non-waived limits.",
       "displayFormat": "$#,##0.0M",
       "sampleValue": "$200.0M",
@@ -451,8 +458,15 @@
           "layer": "L1",
           "table": "limit_threshold",
           "field": "threshold_type",
-          "description": "Band type",
+          "description": "Band type (WARNING/BREACH)",
           "sampleValue": "WARNING"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_threshold",
+          "field": "threshold_lower_pct",
+          "description": "BREACH band lower bound",
+          "sampleValue": "100.0"
         },
         {
           "layer": "L1",
@@ -763,7 +777,7 @@
       "section": "Counterparty",
       "metricType": "Aggregate",
       "formula": "SUM(limit_amount_usd) WHERE limit_scope = COUNTERPARTY",
-      "formulaSQL": "SELECT SUM(lr.limit_amount_usd)\nFROM L1.limit_rule lr\nWHERE lr.limit_scope = 'COUNTERPARTY' AND lr.counterparty_id = :counterparty_id\nAND lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lr.as_of_date = :as_of_date",
+      "formulaSQL": "SELECT SUM(lr.limit_amount_usd)\nFROM L1.limit_rule lr\nWHERE lr.limit_scope = 'COUNTERPARTY' AND lr.counterparty_id = :counterparty_id\nAND lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL",
       "description": "Total approved credit limit for a specific counterparty.",
       "displayFormat": "$#,##0.0M",
       "sampleValue": "$250.0M",

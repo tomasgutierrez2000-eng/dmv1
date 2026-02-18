@@ -24,12 +24,12 @@ function assert(condition: boolean, message: string): void {
 function main() {
   console.log('Metrics engine tests\n');
 
-  // 1) getMergedMetrics: without custom file, returns built-in only (or built-in + custom from file if it exists)
+  // 1) getMergedMetrics: single source from file (may be empty)
   const merged = getMergedMetrics();
   assert(Array.isArray(merged), 'getMergedMetrics returns an array');
-  assert(merged.length >= 1, 'getMergedMetrics returns at least one metric (built-in catalog)');
-  const firstId = merged[0].id;
-  assert(!!firstId && !!merged[0].name && !!merged[0].formula, 'each merged metric has id, name, formula');
+  if (merged.length >= 1) {
+    assert(!!merged[0].id && !!merged[0].name && !!merged[0].formula, 'each metric has id, name, formula');
+  }
 
   // 2) metricWithLineage: generates nodes/edges from sourceFields when metric has no nodes
   const metricWithoutLineage: L3Metric = {

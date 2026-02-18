@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { L3_METRICS } from '@/data/l3-metrics';
 import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
 import type { L3Metric, DashboardPage, MetricType } from '@/data/l3-metrics';
 
@@ -51,14 +50,10 @@ function validateMetric(m: Partial<L3Metric>): { ok: boolean; error?: string } {
   return { ok: true };
 }
 
-/** GET: merged list of built-in + custom metrics. Query: ?page=P1 | ?id=M007 */
+/** GET: all metrics (single source). Query: ?page=P1 | ?id=M007 */
 export async function GET(request: NextRequest) {
   const merged = getMergedMetrics();
-  const customIds = new Set(readCustomMetrics().map(m => m.id));
-  const withSource: MetricWithSource[] = merged.map(m => ({
-    ...m,
-    source: (customIds.has(m.id) ? 'custom' : 'builtin') as MetricSource,
-  }));
+  const withSource: MetricWithSource[] = merged.map(m => ({ ...m, source: 'custom' as MetricSource }));
 
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page');
@@ -96,5 +91,5 @@ export async function POST(request: NextRequest) {
   const metric = normalizeMetric(body, id);
   custom.push(metric);
   writeCustomMetrics(custom);
-  return NextResponse.json({ ...metric, source: 'custom' as MetricSource });
+  return NextResponse.json({ ...metric, source: 'custom' });
 }

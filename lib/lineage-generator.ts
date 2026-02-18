@@ -2,7 +2,8 @@ import type { L3Metric, LineageNode, LineageEdge, SourceField } from '@/data/l3-
 
 /**
  * Generate nodes and edges for a metric that doesn't have pre-defined lineage.
- * One node per source field (L1/L2), one transform node (formula), one L3 output node.
+ * Groups source fields by (layer, table) so that joins between tables are visually clear:
+ * one node per table (with all its fields), then transform, then L3 output.
  */
 export function generateLineage(metric: L3Metric): { nodes: LineageNode[]; edges: LineageEdge[] } {
   const sourceFields = metric.sourceFields ?? [];
@@ -13,17 +14,29 @@ export function generateLineage(metric: L3Metric): { nodes: LineageNode[]; edges
   const nodes: LineageNode[] = [];
   const edges: LineageEdge[] = [];
 
-  sourceFields.forEach((sf: SourceField, i: number) => {
-    const id = `src-${i}-${sf.layer}-${sf.table}-${sf.field}`.replace(/\s/g, '-');
+  // Group by (layer, table) so we show one node per table — tells the "two tables" story
+  const byTable = new Map<string, SourceField[]>();
+  for (const sf of sourceFields) {
+    const key = `${sf.layer}:${sf.table}`;
+    if (!byTable.has(key)) byTable.set(key, []);
+    byTable.get(key)!.push(sf);
+  }
+
+  byTable.forEach((fields, key) => {
+    const [layer, table] = key.split(':') as [string, string];
+    const fieldNames = fields.map(f => f.field);
+    const id = `table-${layer}-${table}`.replace(/\s/g, '-');
+    const first = fields[0];
     nodes.push({
       id,
-      layer: sf.layer,
-      table: sf.table,
-      field: sf.field,
-      description: sf.description,
-      sampleValue: sf.sampleValue,
+      layer: layer as 'L1' | 'L2',
+      table,
+      field: fieldNames.length === 1 ? fieldNames[0] : fieldNames.join(', '),
+      fields: fieldNames.length > 1 ? fieldNames : undefined,
+      description: fieldNames.length === 1 ? first.description : `Fields: ${fieldNames.join(', ')}`,
+      sampleValue: first.sampleValue,
     });
-    edges.push({ from: id, to: 'transform-formula', label: '→' });
+    edges.push({ from: id, to: 'transform-formula', label: fieldNames.length > 1 ? `${fieldNames.length} fields` : '→' });
   });
 
   nodes.push({

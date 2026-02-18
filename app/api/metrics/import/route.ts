@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
 import { writeModelGaps } from '@/lib/model-gaps-store';
-import { L3_METRICS } from '@/data/l3-metrics';
 import type { L3Metric, DashboardPage, MetricType, DimensionUsage, SourceField } from '@/data/l3-metrics';
 
 const PAGES: DashboardPage[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
 const METRIC_TYPES: MetricType[] = ['Aggregate', 'Ratio', 'Count', 'Derived', 'Status', 'Trend', 'Table', 'Categorical'];
 const INTERACTIONS = ['FILTER', 'GROUP_BY', 'AVAILABLE', 'TOGGLE'] as const;
-const BUILTIN_IDS = new Set(L3_METRICS.map(m => m.id));
 
 function parseDimensions(str: string): DimensionUsage[] {
   if (!str || typeof str !== 'string') return [];
@@ -151,10 +149,6 @@ export async function POST(request: NextRequest) {
         errors.push({ row: rowNum, sheet: 'Metrics', message: 'at least one source field required in SourceFields sheet with this metric_id' });
         continue;
       }
-      if (BUILTIN_IDS.has(id)) {
-        errors.push({ row: rowNum, sheet: 'Metrics', message: `id "${id}" is reserved for built-in metrics` });
-        continue;
-      }
       const finalId = id;
       const page = String(row['page'] ?? 'P1').trim();
       const metricType = String(row['metricType'] ?? 'Derived').trim();
@@ -222,10 +216,6 @@ export async function POST(request: NextRequest) {
         result.updated.push(metric.id);
       }
     } else {
-      if (BUILTIN_IDS.has(metric.id)) {
-        result.errors.push({ message: `Skipped reserved id "${metric.id}"` });
-        continue;
-      }
       custom.push(metric);
       existingIds.add(metric.id);
       result.created.push(metric.id);

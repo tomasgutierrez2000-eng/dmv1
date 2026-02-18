@@ -22,6 +22,8 @@ export default function Canvas() {
   const [marqueeCurrent, setMarqueeCurrent] = useState<{ x: number; y: number } | null>(null);
   const DRAG_THRESHOLD_PX = 6;
   const MARQUEE_MIN_SIZE_PX = 10;
+  const DOUBLE_CLICK_ZOOM_IN_DELAY_MS = 300;
+  const TRIPLE_CLICK_ZOOM_OUT = 0.15;
   const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
   const isInteractingRef = useRef(false);
   const doubleClickZoomInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -779,7 +781,7 @@ export default function Canvas() {
   }, [setZoom, setPan]);
 
   // Double-click: zoom in toward the click point (keeps that point under the cursor).
-  // If user clicks again within 300ms (triple-click), we zoom out to 15% instead (handled in handleCanvasClick).
+  // If user clicks again within DOUBLE_CLICK_ZOOM_IN_DELAY_MS (triple-click), zoom out to TRIPLE_CLICK_ZOOM_OUT (handled in handleCanvasClick).
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       if (!model || visibleTables.length === 0) return;
@@ -805,7 +807,7 @@ export default function Canvas() {
         setTimeout(() => setIsAnimating(false), 280);
       };
       if (doubleClickZoomInTimeoutRef.current) clearTimeout(doubleClickZoomInTimeoutRef.current);
-      doubleClickZoomInTimeoutRef.current = setTimeout(runZoomIn, 300);
+      doubleClickZoomInTimeoutRef.current = setTimeout(runZoomIn, DOUBLE_CLICK_ZOOM_IN_DELAY_MS);
     },
     [model, visibleTables.length, setPan, setZoom]
   );
@@ -827,7 +829,7 @@ export default function Canvas() {
           clearTimeout(doubleClickZoomInTimeoutRef.current);
           doubleClickZoomInTimeoutRef.current = null;
           setIsAnimating(true);
-          setZoom(0.15);
+          setZoom(TRIPLE_CLICK_ZOOM_OUT);
           setTimeout(() => setIsAnimating(false), 280);
         }
         setSelectedField(null);

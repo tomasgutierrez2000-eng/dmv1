@@ -56,14 +56,14 @@ export default function KeyboardShortcutsPanel() {
           </button>
         </div>
         <div className="px-5 py-3 space-y-1">
-          {shortcuts.map((s, i) => (
-            <div key={i} className="flex items-center justify-between py-2">
+          {shortcuts.map((s) => (
+            <div key={`${s.keys.join('-')}-${s.desc.slice(0, 20)}`} className="flex items-center justify-between py-2">
               <span className="text-sm text-gray-600">{s.desc}</span>
               <div className="flex items-center gap-1">
                 {s.keys.map((k) => (
                   <kbd
                     key={k}
-                    className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-md shadow-sm"
+                    className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-md shadow-sm"
                   >
                     {k}
                   </kbd>
@@ -73,8 +73,8 @@ export default function KeyboardShortcutsPanel() {
           ))}
         </div>
         <div className="px-5 py-3 border-t border-gray-100 bg-gray-50">
-          <p className="text-xs text-gray-500 text-center">
-            Press <kbd className="px-1.5 py-0.5 bg-white border border-gray-200 rounded text-xs font-medium">?</kbd> to toggle this panel
+          <p className="text-sm text-gray-500 text-center">
+            Press <kbd className="px-1.5 py-0.5 bg-white border border-gray-200 rounded text-sm font-medium">?</kbd> to toggle this panel
           </p>
         </div>
       </div>

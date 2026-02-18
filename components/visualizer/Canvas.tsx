@@ -805,7 +805,7 @@ export default function Canvas() {
       {/* Navigation hint – auto-fades with better visual (Google Maps style) */}
       {showHint && (
         <div
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 px-5 py-2.5 bg-gray-900/80 text-white text-xs font-medium rounded-xl backdrop-blur-md pointer-events-none shadow-lg transition-opacity duration-700"
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 px-5 py-2.5 bg-gray-900/80 text-white text-sm font-medium rounded-xl backdrop-blur-md pointer-events-none shadow-lg transition-opacity duration-700"
           role="status"
           aria-live="polite"
         >
@@ -814,7 +814,7 @@ export default function Canvas() {
             <span className="w-px h-3 bg-white/30" />
             <span>Drag to pan</span>
             <span className="w-px h-3 bg-white/30" />
-            <span>Press <kbd className="px-1.5 py-0.5 bg-white/15 rounded text-[10px] font-bold">?</kbd> for shortcuts</span>
+            <span>Press <kbd className="px-1.5 py-0.5 bg-white/15 rounded text-[11px] font-bold">?</kbd> for shortcuts</span>
           </div>
         </div>
       )}

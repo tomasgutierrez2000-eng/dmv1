@@ -11,10 +11,8 @@ import {
   Map,
   Moon,
   Sun,
-  Eye,
   FileText,
   Minimize2,
-  Maximize,
   GitBranch,
   GitMerge,
   EyeOff,
@@ -38,7 +36,7 @@ function ToolbarTooltip({ children, label }: { children: React.ReactNode; label:
   return (
     <div className="relative group/tip">
       {children}
-      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 px-2.5 py-1 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover/tip:opacity-100 transition-opacity z-50 shadow-lg">
+      <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 px-2.5 py-1 bg-gray-900 text-white text-sm rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover/tip:opacity-100 transition-opacity z-50 shadow-lg">
         {label}
         <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45" />
       </div>
@@ -94,11 +92,8 @@ export default function Toolbar() {
     layoutMode,
     setLayoutMode,
     viewMode,
-    setViewMode,
     tableSize,
-    setTableSize,
     fieldDisplayMode,
-    setFieldDisplayMode,
     applyViewPreset,
     showMinimap,
     setShowMinimap,
@@ -260,10 +255,8 @@ export default function Toolbar() {
   };
 
   const presets = [
-    { key: 'overview' as const, label: 'Overview', icon: Eye, match: viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' },
+    { key: 'compact' as const, label: 'Compact', icon: Minimize2, match: viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' },
     { key: 'detailed' as const, label: 'Detailed', icon: FileText, match: viewMode === 'detailed' && tableSize === 'large' && fieldDisplayMode === 'full' },
-    { key: 'compact' as const, label: 'Compact', icon: Minimize2, match: viewMode === 'compact' && tableSize === 'small' && fieldDisplayMode === 'minimal' && zoom === 1 },
-    { key: 'focus' as const, label: 'Focus', icon: Maximize, match: viewMode === 'standard' && tableSize === 'medium' && fieldDisplayMode === 'standard' },
   ];
 
   return (
@@ -308,7 +301,7 @@ export default function Toolbar() {
               <ZoomOut className="w-4 h-4" />
             </ToolbarIconButton>
             <div
-              className="text-xs font-medium text-gray-600 min-w-[48px] text-center tabular-nums select-none cursor-default"
+              className="text-sm font-medium text-gray-600 min-w-[48px] text-center tabular-nums select-none cursor-default"
               aria-label={`Zoom level: ${Math.round(zoom * 100)}%`}
               aria-live="polite"
             >
@@ -332,6 +325,7 @@ export default function Toolbar() {
             className="flex items-center bg-gray-100 rounded-lg p-0.5"
             role="group"
             aria-label="View presets"
+            data-tour="view-presets"
           >
             {presets.map((p) => {
               const Icon = p.icon;
@@ -339,7 +333,7 @@ export default function Toolbar() {
                 <ToolbarTooltip key={p.key} label={`${p.label} preset`}>
                   <button
                     onClick={() => applyViewPreset(p.key)}
-                    className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1.5 ${
+                    className={`px-2.5 py-1.5 text-sm font-medium rounded-md transition-all duration-150 flex items-center gap-1.5 ${
                       p.match
                         ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -362,56 +356,14 @@ export default function Toolbar() {
             <select
               value={layoutMode}
               onChange={(e) => setLayoutMode(e.target.value as typeof layoutMode)}
-              className="h-8 pl-2 pr-7 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors min-w-[8rem]"
+              className="h-8 pl-2 pr-7 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-sm font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors min-w-[8rem]"
               aria-label="Diagram layout"
+              data-tour="layout-mode"
             >
               <option value="domain-overview">Domain overview</option>
               <option value="snowflake">Snowflake</option>
             </select>
           </ToolbarTooltip>
-
-          {/* Compact dropdowns for view settings */}
-          <div className="flex items-center gap-1" role="group" aria-label="Display settings">
-            <ToolbarTooltip label="View detail level">
-              <select
-                value={viewMode}
-                onChange={(e) => setViewMode(e.target.value as typeof viewMode)}
-                className="h-8 px-2 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
-                aria-label="View detail level"
-                style={{ paddingRight: '1.75rem' }}
-              >
-                <option value="compact">Compact</option>
-                <option value="standard">Standard</option>
-                <option value="detailed">Detailed</option>
-              </select>
-            </ToolbarTooltip>
-            <ToolbarTooltip label="Table card size">
-              <select
-                value={tableSize}
-                onChange={(e) => setTableSize(e.target.value as typeof tableSize)}
-                className="h-8 px-2 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
-                aria-label="Table card size"
-                style={{ paddingRight: '1.75rem' }}
-              >
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-              </select>
-            </ToolbarTooltip>
-            <ToolbarTooltip label="Field display mode">
-              <select
-                value={fieldDisplayMode}
-                onChange={(e) => setFieldDisplayMode(e.target.value as typeof fieldDisplayMode)}
-                className="h-8 px-2 bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs font-medium appearance-none cursor-pointer hover:bg-gray-100 transition-colors"
-                aria-label="Field display mode"
-                style={{ paddingRight: '1.75rem' }}
-              >
-                <option value="minimal">Minimal</option>
-                <option value="standard">Standard</option>
-                <option value="full">Full</option>
-              </select>
-            </ToolbarTooltip>
-          </div>
 
           <ToolbarDivider />
 
@@ -420,11 +372,12 @@ export default function Toolbar() {
             className="flex items-center bg-gray-100 rounded-lg p-0.5"
             role="group"
             aria-label="Relationship visibility"
+            data-tour="relationships"
           >
             <ToolbarTooltip label={showRelationships ? 'Hide relationships' : 'Show relationships'}>
               <button
                 onClick={() => setShowRelationships(!showRelationships)}
-                className={`px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1.5 ${
+                className={`px-2.5 py-1.5 text-sm font-medium rounded-md transition-all duration-150 flex items-center gap-1.5 ${
                   showRelationships
                     ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -442,7 +395,7 @@ export default function Toolbar() {
                 <ToolbarTooltip label="Primary relationships (FK → PK)">
                   <button
                     onClick={() => setShowPrimaryRelationships(!showPrimaryRelationships)}
-                    className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1 ${
+                    className={`px-2 py-1.5 text-sm font-medium rounded-md transition-all duration-150 flex items-center gap-1 ${
                       showPrimaryRelationships
                         ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -457,7 +410,7 @@ export default function Toolbar() {
                 <ToolbarTooltip label="Secondary relationships (derived)">
                   <button
                     onClick={() => setShowSecondaryRelationships(!showSecondaryRelationships)}
-                    className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all duration-150 flex items-center gap-1 ${
+                    className={`px-2 py-1.5 text-sm font-medium rounded-md transition-all duration-150 flex items-center gap-1 ${
                       showSecondaryRelationships
                         ? 'bg-violet-50 text-violet-700 ring-1 ring-violet-200'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -482,7 +435,7 @@ export default function Toolbar() {
               <ToolbarTooltip label="Export data model or sample data">
                 <button
                   onClick={() => { setExportOpen(!exportOpen); setImportOpen(false); }}
-                  className="h-8 px-2.5 text-xs font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+                  className="h-8 px-2.5 text-sm font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
                   aria-haspopup="true"
                   aria-expanded={exportOpen}
                   aria-label="Export"
@@ -496,11 +449,11 @@ export default function Toolbar() {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setExportOpen(false)} />
                   <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1 overflow-hidden" role="menu">
-                    <div className="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Schema</div>
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Schema</div>
                     <button onClick={() => handleExport('schema-json')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Data model (JSON)</button>
                     <button onClick={() => handleExport('schema-excel')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Data model (Excel)</button>
                     <div className="h-px bg-gray-100 my-1" />
-                    <div className="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sample Data</div>
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Sample Data</div>
                     <button onClick={() => handleExport('sample-L1')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L1 sample data (Excel)</button>
                     <button onClick={() => handleExport('sample-L2')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L2 sample data (Excel)</button>
                   </div>
@@ -513,7 +466,7 @@ export default function Toolbar() {
               <ToolbarTooltip label="Import schema or sample data">
                 <button
                   onClick={() => { setImportOpen(!importOpen); setExportOpen(false); }}
-                  className="h-8 px-2.5 text-xs font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+                  className="h-8 px-2.5 text-sm font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
                   aria-haspopup="true"
                   aria-expanded={importOpen}
                   aria-label="Import"

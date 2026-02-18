@@ -237,28 +237,6 @@ export default function OverviewContent() {
               </div>
             </Link>
 
-            <Link
-              href="/lineage"
-              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
-                  <Eye className="w-6 h-6 text-slate-300" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1 text-white">L3 Metric Lineage</h4>
-                  <p className="text-sm text-slate-400">Read-only lineage explorer</p>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 mb-4 leading-relaxed">
-                Browse metrics by dashboard page with formula and source field details.
-              </p>
-              <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
-                <ArrowRight className="w-4 h-4" />
-                <span>Explore Lineage</span>
-              </div>
-            </Link>
-
             <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 opacity-60 cursor-default" aria-disabled="true">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-12 h-12 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">

@@ -124,7 +124,7 @@ export default function Sidebar() {
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-base font-bold text-gray-900 tabular-nums">{s.value}</div>
-                <div className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">{s.label}</div>
+                <div className="text-[12px] text-gray-400 uppercase tracking-wider font-medium">{s.label}</div>
               </div>
             ))}
           </div>
@@ -134,7 +134,7 @@ export default function Sidebar() {
             const debug = debugRelationships(model);
             if (debug.invalid.length > 0 || debug.missingTables.length > 0) {
               return (
-                <div className="mt-2 flex items-center gap-1.5 text-xs text-amber-600">
+                <div className="mt-2 flex items-center gap-1.5 text-sm text-amber-600">
                   <AlertTriangle className="w-3 h-3 flex-shrink-0" />
                   <span>{debug.invalid.length} invalid, {debug.missingTables.length} missing refs</span>
                 </div>
@@ -146,10 +146,10 @@ export default function Sidebar() {
       )}
 
       {/* Layer Toggles - horizontal pill group */}
-      <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
+      <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0" data-tour="layers">
         <div className="flex items-center gap-1.5 mb-2">
           <Layers className="w-3.5 h-3.5 text-gray-400" />
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Layers</span>
+          <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Layers</span>
         </div>
         <div className="flex items-center gap-1.5">
           {(['L1', 'L2', 'L3'] as const).map((layer) => {
@@ -159,7 +159,7 @@ export default function Sidebar() {
               <button
                 key={layer}
                 onClick={() => setVisibleLayer(layer, !active)}
-                className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 border ${
+                className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-150 border ${
                   active
                     ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
                     : 'bg-white text-gray-400 border-gray-200 hover:text-gray-600 hover:border-gray-300'
@@ -180,8 +180,8 @@ export default function Sidebar() {
         </div>
         {/* L3 category toggles - only when L3 layer is visible */}
         {visibleLayers.L3 && (
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">L3 categories</div>
+          <div className="mt-3 pt-3 border-t border-gray-200" data-tour="l3-categories">
+            <div className="text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">L3 categories</div>
             <div className="space-y-1 max-h-36 overflow-y-auto scrollbar-thin">
               {getL3Categories().map((cat) => {
                 const excluded = l3CategoryExcluded.has(cat);
@@ -198,8 +198,8 @@ export default function Sidebar() {
                       className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       aria-label={`${excluded ? 'Show' : 'Hide'} L3 category ${cat}`}
                     />
-                    <span className="text-xs text-gray-700 truncate flex-1">{cat}</span>
-                    {count > 0 && <span className="text-[10px] text-gray-400 tabular-nums">{count}</span>}
+                    <span className="text-sm text-gray-700 truncate flex-1">{cat}</span>
+                    {count > 0 && <span className="text-[12px] text-gray-400 tabular-nums">{count}</span>}
                   </label>
                 );
               })}
@@ -209,7 +209,7 @@ export default function Sidebar() {
       </div>
 
       {/* Search - Apple-style search bar */}
-      <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
+      <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0" data-tour="search">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           <input
@@ -232,7 +232,7 @@ export default function Sidebar() {
           )}
         </div>
         {searchQuery && (
-          <p className="text-[10px] text-gray-400 mt-1.5 px-0.5">
+          <p className="text-[12px] text-gray-400 mt-1.5 px-0.5">
             {filteredTables.length} result{filteredTables.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
           </p>
         )}
@@ -240,16 +240,16 @@ export default function Sidebar() {
 
       {/* Category Filter */}
       {model && (
-        <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
+        <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0" data-tour="categories">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
               <Filter className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Categories</span>
+              <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Categories</span>
             </div>
             {filterCategories.size > 0 && (
               <button
                 onClick={() => toggleFilterCategory('')}
-                className="text-[10px] font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                className="text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors"
                 aria-label="Clear all category filters"
               >
                 Clear ({filterCategories.size})
@@ -274,8 +274,8 @@ export default function Sidebar() {
                     className="w-3.5 h-3.5 text-blue-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-blue-200 focus:ring-offset-0 transition-colors"
                     aria-label={`Filter by ${cat}`}
                   />
-                  <span className="text-xs text-gray-700 flex-1 truncate">{cat}</span>
-                  <span className="text-[10px] text-gray-400 tabular-nums font-medium">{count}</span>
+                  <span className="text-sm text-gray-700 flex-1 truncate">{cat}</span>
+                  <span className="text-[12px] text-gray-400 tabular-nums font-medium">{count}</span>
                 </label>
               );
             })}
@@ -284,10 +284,10 @@ export default function Sidebar() {
       )}
 
       {/* Table Tree */}
-      <div className="flex-1 overflow-y-auto px-3 py-2 scrollbar-thin" role="tree" aria-label="Tables by category">
+      <div className="flex-1 overflow-y-auto px-3 py-2 scrollbar-thin" role="tree" aria-label="Tables by category" data-tour="tables-list">
         <div className="flex items-center gap-1.5 mb-2 px-1">
           <Database className="w-3.5 h-3.5 text-gray-400" />
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tables</span>
+          <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Tables</span>
         </div>
         <div className="space-y-0.5">
           {Array.from(tablesByCategory.entries()).map(([category, tables]) => {
@@ -304,7 +304,7 @@ export default function Sidebar() {
                     }
                     setExpandedCategories(newExpanded);
                   }}
-                  className="w-full px-2 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-1.5 transition-colors group"
+                  className="w-full px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-lg flex items-center gap-1.5 transition-colors group"
                   aria-label={`${category} (${tables.length} tables)`}
                 >
                   {isExpanded ? (
@@ -313,7 +313,7 @@ export default function Sidebar() {
                     <ChevronRight className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors flex-shrink-0" />
                   )}
                   <span className="font-semibold truncate">{category}</span>
-                  <span className="text-[10px] text-gray-400 tabular-nums ml-auto flex-shrink-0">{tables.length}</span>
+                  <span className="text-[12px] text-gray-400 tabular-nums ml-auto flex-shrink-0">{tables.length}</span>
                 </button>
                 {isExpanded && (
                   <div className="ml-3 mt-0.5 space-y-px border-l border-gray-100 pl-2" role="group">
@@ -323,15 +323,15 @@ export default function Sidebar() {
                         <button
                           key={table.key}
                           onClick={() => setSelectedTable(table.key)}
-                          className="w-full px-2 py-1.5 text-left text-xs text-gray-600 hover:bg-gray-50 rounded-lg flex items-center gap-2 transition-all duration-150 hover:text-gray-900 group/table"
+                          className="w-full px-2 py-1.5 text-left text-sm text-gray-600 hover:bg-gray-50 rounded-lg flex items-center gap-2 transition-all duration-150 hover:text-gray-900 group/table"
                           aria-label={`${table.name} (${table.layer})`}
                         >
                           <div
                             className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                             style={{ backgroundColor: colors.primary }}
                           />
-                          <span className="font-mono truncate text-[11px] group-hover/table:font-medium transition-all">{table.name}</span>
-                          <span className={`ml-auto px-1 py-0.5 rounded text-[9px] font-bold flex-shrink-0 ${colors.badge}`}>
+                          <span className="font-mono truncate text-[12px] group-hover/table:font-medium transition-all">{table.name}</span>
+                          <span className={`ml-auto px-1 py-0.5 rounded text-[12px] font-bold flex-shrink-0 ${colors.badge}`}>
                             {table.layer}
                           </span>
                         </button>
@@ -348,14 +348,14 @@ export default function Sidebar() {
         {filteredTables.length === 0 && model && (
           <div className="text-center py-8 px-4">
             <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-            <p className="text-xs text-gray-500 font-medium">No tables match your filters</p>
-            <p className="text-[10px] text-gray-400 mt-1 mb-4">Try adjusting layers, categories, or search</p>
+            <p className="text-sm text-gray-500 font-medium">No tables match your filters</p>
+            <p className="text-[12px] text-gray-400 mt-1 mb-4">Try adjusting layers, categories, or search</p>
             <button
               onClick={() => {
                 toggleFilterCategory('');
                 setSearchQuery('');
               }}
-              className="text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors"
+              className="text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors"
               aria-label="Clear all filters"
             >
               Clear all filters

@@ -126,12 +126,12 @@ export default function TableNode({
   // Dynamic sizing based on view mode
   const headerPadding = isCompact ? 'px-2.5 py-1.5' : isDetailed ? 'px-4 py-3' : 'px-3.5 py-2.5';
   const headerIconSize = isCompact ? 'w-3 h-3' : isDetailed ? 'w-5 h-5' : 'w-4 h-4';
-  const headerTextSize = isCompact ? 'text-xs' : isDetailed ? 'text-lg' : 'text-base';
+  const headerTextSize = isCompact ? 'text-sm' : isDetailed ? 'text-lg' : 'text-base';
   const fieldPadding = isCompact ? 'px-1.5 py-1' : isDetailed ? 'px-3 py-2' : 'px-2.5 py-1.5';
-  const fieldTextSize = isCompact ? 'text-[10px]' : isDetailed ? 'text-sm' : 'text-xs';
+  const fieldTextSize = isCompact ? 'text-[11px]' : isDetailed ? 'text-sm' : 'text-xs';
   const fieldIconSize = isCompact ? 'w-2.5 h-2.5' : isDetailed ? 'w-4 h-4' : 'w-3.5 h-3.5';
   const footerPadding = isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-2' : 'px-3 py-1.5';
-  const footerTextSize = isCompact ? 'text-[9px]' : isDetailed ? 'text-xs' : 'text-[11px]';
+  const footerTextSize = isCompact ? 'text-[11px]' : isDetailed ? 'text-sm' : 'text-[12px]';
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -280,11 +280,11 @@ export default function TableNode({
                           key={`pk-${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
-                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
+                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[11px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
                           title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
                           <span className="truncate">PK {highlightMatch(fieldName)}</span>
-                          {field.dataType && <span className="flex-shrink-0 text-[8px] text-amber-700/80 font-normal">{field.dataType}</span>}
+                          {field.dataType && <span className="flex-shrink-0 text-[10px] text-amber-700/80 font-normal">{field.dataType}</span>}
                         </div>
                       );
                     })}
@@ -296,11 +296,11 @@ export default function TableNode({
                           key={`fk-${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
-                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
+                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[11px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
                           title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
                           <span className="truncate">FK {highlightMatch(fieldName)}</span>
-                          {field.dataType && <span className="flex-shrink-0 text-[8px] text-blue-700/80 font-normal">{field.dataType}</span>}
+                          {field.dataType && <span className="flex-shrink-0 text-[10px] text-blue-700/80 font-normal">{field.dataType}</span>}
                         </div>
                       );
                     })}
@@ -352,7 +352,7 @@ export default function TableNode({
                           title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
                           <span className="truncate">{prefix}{highlightMatch(fieldName)}</span>
-                          {field.dataType && <span className="flex-shrink-0 text-[8px] text-gray-500 font-normal">{field.dataType}</span>}
+                          {field.dataType && <span className="flex-shrink-0 text-[10px] text-gray-500 font-normal">{field.dataType}</span>}
                         </div>
                       );
                     })}
@@ -360,7 +360,7 @@ export default function TableNode({
                 </div>
               ) : (
                 <div
-                  className="flex items-center justify-center text-gray-400 text-xs italic"
+                  className="flex items-center justify-center text-gray-400 text-sm italic"
                   style={{ height: contentH }}
                 >
                   {pkFields.length === 0 && fkFields.length === 0 ? 'No PK/FK' : 'No fields'}
@@ -453,7 +453,7 @@ export default function TableNode({
               <Database className={`${headerIconSize} flex-shrink-0`} />
               <h3 className={`font-bold ${headerTextSize} truncate tracking-tight`}>{highlightMatch(table.name)}</h3>
               {!isCompact && (
-                <span className={`${isDetailed ? 'text-xs' : 'text-[10px]'} opacity-90`}>({table.fields.length})</span>
+                <span className={`${isDetailed ? 'text-xs' : 'text-[11px]'} opacity-90`}>({table.fields.length})</span>
               )}
             </div>
             <div className={`flex items-center ${isCompact ? 'space-x-1' : 'space-x-2'} flex-shrink-0`}>
@@ -462,19 +462,19 @@ export default function TableNode({
                 style={{ backgroundColor: categoryColor.color }}
                 title={table.category}
               />
-              <span className={`${isCompact ? 'px-1 py-0.5 text-[9px]' : isDetailed ? 'px-2 py-1 text-xs' : 'px-1.5 py-0.5 text-[10px]'} rounded font-bold bg-white/25 backdrop-blur-sm`}>
+              <span className={`${isCompact ? 'px-1 py-0.5 text-[11px]' : isDetailed ? 'px-2 py-1 text-xs' : 'px-1.5 py-0.5 text-[11px]'} rounded font-bold bg-white/25 backdrop-blur-sm`}>
                 {table.layer}
               </span>
               {/* Relationship indicators */}
               {(relCounts.incoming > 0 || relCounts.outgoing > 0) && !isCompact && (
                 <div className={`flex items-center ${isCompact ? 'gap-0.5' : 'gap-1'} ml-1`} title={`${relCounts.incoming} incoming, ${relCounts.outgoing} outgoing relationships`}>
                   {relCounts.incoming > 0 && (
-                    <span className={`${isDetailed ? 'text-[10px]' : 'text-[9px]'} text-amber-200 font-semibold`} title={`${relCounts.incoming} incoming`}>
+                    <span className={`${isDetailed ? 'text-[11px]' : 'text-[11px]'} text-amber-200 font-semibold`} title={`${relCounts.incoming} incoming`}>
                       ←{relCounts.incoming}
                     </span>
                   )}
                   {relCounts.outgoing > 0 && (
-                    <span className={`${isDetailed ? 'text-[10px]' : 'text-[9px]'} text-emerald-200 font-semibold`} title={`${relCounts.outgoing} outgoing`}>
+                    <span className={`${isDetailed ? 'text-[11px]' : 'text-[11px]'} text-emerald-200 font-semibold`} title={`${relCounts.outgoing} outgoing`}>
                       →{relCounts.outgoing}
                     </span>
                   )}
@@ -558,7 +558,7 @@ export default function TableNode({
                         
                         {/* Data Type - Show based on zoom level and field display mode */}
                         {showDataTypes && field.dataType && (
-                          <span className={`text-gray-600 ${isCompact ? 'text-[9px] px-1 py-0.5' : isDetailed ? 'text-[10px] px-2 py-1' : 'text-[9px] px-1.5 py-0.5'} font-medium bg-gray-200/80 rounded border border-gray-300/50 flex-shrink-0`}>
+                          <span className={`text-gray-600 ${isCompact ? 'text-[11px] px-1 py-0.5' : isDetailed ? 'text-[11px] px-2 py-1' : 'text-[11px] px-1.5 py-0.5'} font-medium bg-gray-200/80 rounded border border-gray-300/50 flex-shrink-0`}>
                             {field.dataType}
                           </span>
                         )}
@@ -566,14 +566,14 @@ export default function TableNode({
                       
                       {/* Description - Based on view mode with better styling */}
                       {showFieldDescriptions && field.description && (
-                        <div className={`text-gray-700 ${isCompact ? 'text-[9px]' : isDetailed ? 'text-[10px]' : 'text-[9px]'} mt-1.5 ${isCompact ? 'ml-5' : 'ml-7'} ${showFullInfo ? 'leading-relaxed' : 'line-clamp-2'} bg-gray-50/50 rounded px-1.5 py-0.5 border-l-2 ${isPK ? 'border-l-yellow-400' : isFK ? 'border-l-blue-500' : 'border-l-gray-300'}`}>
+                        <div className={`text-gray-700 ${isCompact ? 'text-[11px]' : isDetailed ? 'text-[11px]' : 'text-[11px]'} mt-1.5 ${isCompact ? 'ml-5' : 'ml-7'} ${showFullInfo ? 'leading-relaxed' : 'line-clamp-2'} bg-gray-50/50 rounded px-1.5 py-0.5 border-l-2 ${isPK ? 'border-l-yellow-400' : isFK ? 'border-l-blue-500' : 'border-l-gray-300'}`}>
                           {field.description}
                         </div>
                       )}
                       
                       {/* FK Target indicator - Always show for FK fields */}
                       {isFK && field.fkTarget && !isCompact && (
-                        <div className={`text-blue-600 ${isDetailed ? 'text-[9px]' : 'text-[8px]'} mt-0.5 ${isCompact ? 'ml-5' : 'ml-7'} font-medium flex items-center gap-1`}>
+                        <div className={`text-blue-600 ${isDetailed ? 'text-[11px]' : 'text-[10px]'} mt-0.5 ${isCompact ? 'ml-5' : 'ml-7'} font-medium flex items-center gap-1`}>
                           <Link2 className="w-2.5 h-2.5" />
                           <span>→ {field.fkTarget.layer}.{field.fkTarget.table}.{field.fkTarget.field}</span>
                         </div>
@@ -581,7 +581,7 @@ export default function TableNode({
                       
                       {/* Additional info for full mode */}
                       {showFullInfo && field.whyRequired && (
-                        <div className={`text-gray-600 ${isCompact ? 'text-[8px]' : 'text-[9px]'} mt-1 ${isCompact ? 'ml-5' : 'ml-7'} italic bg-amber-50/50 rounded px-1.5 py-0.5 border-l-2 border-amber-300`}>
+                        <div className={`text-gray-600 ${isCompact ? 'text-[10px]' : 'text-[11px]'} mt-1 ${isCompact ? 'ml-5' : 'ml-7'} italic bg-amber-50/50 rounded px-1.5 py-0.5 border-l-2 border-amber-300`}>
                           <span className="font-semibold">Why:</span> {field.whyRequired}
                         </div>
                       )}
@@ -591,13 +591,13 @@ export default function TableNode({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400 text-xs flex-col gap-1">
+              <div className="flex items-center justify-center h-full text-gray-400 text-sm flex-col gap-1">
                 {showOnlyPkFkInCompact ? (
                   <div>No PK/FK</div>
                 ) : (
                   <>
                     <div>Zoom in to see fields</div>
-                    <div className="text-[10px] opacity-75">Current zoom: {Math.round(zoom * 100)}%</div>
+                    <div className="text-[11px] opacity-75">Current zoom: {Math.round(zoom * 100)}%</div>
                   </>
                 )}
               </div>
@@ -630,7 +630,7 @@ export default function TableNode({
                     e.stopPropagation();
                     onToggleExpand();
                   }}
-                  className={`${isCompact ? 'px-1.5 py-0.5 text-[9px]' : isDetailed ? 'px-2.5 py-1 text-[11px]' : 'px-2 py-0.5 text-[10px]'} font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors flex items-center ${isCompact ? 'gap-0.5' : 'gap-1'}`}
+                  className={`${isCompact ? 'px-1.5 py-0.5 text-[11px]' : isDetailed ? 'px-2.5 py-1 text-[11px]' : 'px-2 py-0.5 text-[11px]'} font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors flex items-center ${isCompact ? 'gap-0.5' : 'gap-1'}`}
                   title={isExpanded ? "Collapse" : "Expand for descriptions"}
                 >
                   {isExpanded ? (

@@ -133,7 +133,7 @@ export default function DomainContainer({
                   </div>
                 )}
                 {isOverview && (
-                  <div className="flex items-center space-x-2 text-xs text-white/60 font-medium">
+                  <div className="flex items-center space-x-2 text-sm text-white/60 font-medium">
                     <span>{stats.tableCount} tables</span>
                     <span className="text-white/40">|</span>
                     <span>{stats.totalFields} fields</span>
@@ -145,17 +145,17 @@ export default function DomainContainer({
               <div className="flex items-center space-x-3 flex-shrink-0">
                 <div className="flex items-center space-x-1.5">
                   {stats.byLayer.L1 > 0 && (
-                    <span className="px-2 py-1 bg-pwc-orange/25 text-pwc-orange-light text-xs rounded-md font-semibold border border-pwc-orange/40">
+                    <span className="px-2 py-1 bg-pwc-orange/25 text-pwc-orange-light text-sm rounded-md font-semibold border border-pwc-orange/40">
                       L1:{stats.byLayer.L1}
                     </span>
                   )}
                   {stats.byLayer.L2 > 0 && (
-                    <span className="px-2 py-1 bg-pwc-orange/15 text-white/80 text-xs rounded-md font-semibold border border-pwc-orange/30">
+                    <span className="px-2 py-1 bg-pwc-orange/15 text-white/80 text-sm rounded-md font-semibold border border-pwc-orange/30">
                       L2:{stats.byLayer.L2}
                     </span>
                   )}
                   {stats.byLayer.L3 > 0 && (
-                    <span className="px-2 py-1 bg-white/10 text-white/70 text-xs rounded-md font-semibold border border-white/20">
+                    <span className="px-2 py-1 bg-white/10 text-white/70 text-sm rounded-md font-semibold border border-white/20">
                       L3:{stats.byLayer.L3}
                     </span>
                   )}

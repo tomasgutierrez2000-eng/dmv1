@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useModelStore } from '../../store/modelStore';
 import { useExcelParser } from '../../hooks/useExcelParser';
 import FileUpload from '../../components/visualizer/FileUpload';
@@ -11,12 +11,17 @@ import Toolbar from '../../components/visualizer/Toolbar';
 import Minimap from '../../components/visualizer/Minimap';
 import KeyboardShortcutsPanel from '../../components/visualizer/KeyboardShortcutsPanel';
 import L3SampleDataStrip from '../../components/visualizer/L3SampleDataStrip';
+import VisualizerTour from '../../components/visualizer/VisualizerTour';
+import { getTourCompleted } from '../../components/visualizer/VisualizerTour';
 import { Loader, AlertCircle, Database, ArrowRight } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
 
 export default function VisualizerPage() {
-  const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
+  const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, setSidebarOpen, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
+  const [, forceUpdate] = useState(0);
+  const tourClosed = useCallback(() => forceUpdate((n) => n + 1), []);
+  const tourOpenSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
   const { parseExcel, loading, result } = useExcelParser();
   const { toast } = useToast();
 
@@ -181,6 +186,13 @@ export default function VisualizerPage() {
 
       {/* Keyboard shortcuts panel - toggled with ? key */}
       <KeyboardShortcutsPanel />
+
+      {/* First-time tour - only when model is loaded and tour not completed */}
+      <VisualizerTour
+        active={Boolean(model) && !getTourCompleted()}
+        onClose={tourClosed}
+        onStart={tourOpenSidebar}
+      />
     </div>
   );
 }

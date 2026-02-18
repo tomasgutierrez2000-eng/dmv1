@@ -79,7 +79,7 @@ interface ModelStore {
   setShowRelationships: (show: boolean) => void;
   setShowPrimaryRelationships: (show: boolean) => void;
   setShowSecondaryRelationships: (show: boolean) => void;
-  applyViewPreset: (preset: 'overview' | 'detailed' | 'compact' | 'focus') => void;
+  applyViewPreset: (preset: 'detailed' | 'compact') => void;
   resetView: () => void;
   requestFitToView: number;
   setRequestFitToView: () => void;
@@ -91,7 +91,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   // Initial state
   model: null,
   uploadedSampleData: {},
-  zoom: 1,
+  zoom: 0.6,
   pan: { x: 0, y: 0 },
   tablePositions: {},
   selectedTable: null,
@@ -110,9 +110,9 @@ export const useModelStore = create<ModelStore>((set) => ({
   detailPanelOpen: false,
   layoutMode: 'domain-overview',
   expandedDomains: new Set<string>(), // All domains expanded by default
-  viewMode: 'standard',
-  tableSize: 'large',
-  fieldDisplayMode: 'standard',
+  viewMode: 'compact',
+  tableSize: 'small',
+  fieldDisplayMode: 'minimal',
   requestFitToView: 0,
   requestFitToDomain: null,
   showRelationships: false, // Off by default; user can toggle on
@@ -240,16 +240,6 @@ export const useModelStore = create<ModelStore>((set) => ({
   setShowSecondaryRelationships: (show) => set({ showSecondaryRelationships: show }),
   applyViewPreset: (preset) => {
     switch (preset) {
-      case 'overview':
-        set({
-          viewMode: 'compact',
-          tableSize: 'small',
-          fieldDisplayMode: 'minimal',
-          zoom: 0.6,
-          pan: { x: 0, y: 0 },
-          expandedTables: new Set(),
-        });
-        break;
       case 'detailed':
         set({
           viewMode: 'detailed',
@@ -265,16 +255,6 @@ export const useModelStore = create<ModelStore>((set) => ({
           viewMode: 'compact',
           tableSize: 'small',
           fieldDisplayMode: 'minimal',
-          zoom: 1.0,
-          pan: { x: 0, y: 0 },
-          expandedTables: new Set(),
-        });
-        break;
-      case 'focus':
-        set({
-          viewMode: 'standard',
-          tableSize: 'medium',
-          fieldDisplayMode: 'standard',
           zoom: 1.0,
           pan: { x: 0, y: 0 },
           expandedTables: new Set(),

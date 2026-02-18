@@ -56,7 +56,7 @@ export default function SchemaImportModal({
                     : 'Update your database to match the imported schema. Summary below shows what to run in SQL and what will change in the visualization.'}
               </p>
               {sqlActionCount > 0 && (
-                <ul className="mt-2 text-xs text-pwc-gray-light space-y-0.5">
+                <ul className="mt-2 text-sm text-pwc-gray-light space-y-0.5">
                   {s.tablesAdded > 0 && <li>• CREATE TABLE: {s.tablesAdded} table(s)</li>}
                   {s.tablesRemoved > 0 && <li>• DROP TABLE: {s.tablesRemoved} table(s)</li>}
                   {s.tablesModified > 0 && <li>• ALTER TABLE: {s.tablesModified} table(s) (add/remove/change columns)</li>}
@@ -99,7 +99,7 @@ export default function SchemaImportModal({
                 ))}
               </ul>
               {(diff.fieldsAdded.length > 0 || diff.fieldsRemoved.length > 0 || diff.fieldsModified.length > 0) && (
-                <div className="mt-2 text-xs text-pwc-gray-light">
+                <div className="mt-2 text-sm text-pwc-gray-light">
                   Fields added: {diff.fieldsAdded.length} · removed: {diff.fieldsRemoved.length} · modified: {diff.fieldsModified.length}
                 </div>
               )}

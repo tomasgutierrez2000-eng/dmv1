@@ -269,7 +269,7 @@ export default function RelationshipLine({
       {(isSelected || involvesSelectedField) && (
         <g transform={`translate(${(sourceX + 3 * cp1x + 3 * cp2x + targetX) / 8}, ${(sourceY + 3 * cp1y + 3 * cp2y + targetY) / 8})`}>
           <rect x="-60" y="-10" width="120" height="20" rx="4" fill="rgba(15,23,42,0.95)" stroke={strokeColor} strokeWidth="1.5" className="pointer-events-none" />
-          <text textAnchor="middle" dominantBaseline="middle" className="text-[10px] font-mono fill-white pointer-events-none" style={{ pointerEvents: 'none' }}>
+          <text textAnchor="middle" dominantBaseline="middle" className="text-[11px] font-mono fill-white pointer-events-none" style={{ pointerEvents: 'none' }}>
             {relationship.source.field} → {relationship.target.field}
           </text>
         </g>

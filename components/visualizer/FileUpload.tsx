@@ -57,7 +57,7 @@ export default function FileUpload({ onFileSelect, currentFile }: FileUploadProp
           <FileSpreadsheet className="w-6 h-6 text-emerald-500" />
           <div className="text-left">
             <p className="text-sm font-medium text-gray-800">{currentFile.name}</p>
-            <p className="text-xs text-gray-400">{(currentFile.size / 1024).toFixed(1)} KB</p>
+            <p className="text-sm text-gray-400">{(currentFile.size / 1024).toFixed(1)} KB</p>
           </div>
           <button
             onClick={(e) => {
@@ -80,7 +80,7 @@ export default function FileUpload({ onFileSelect, currentFile }: FileUploadProp
           <p className="text-sm text-gray-600 mb-1">
             {isDragOver ? 'Drop file here' : 'Drop data dictionary here or click to browse'}
           </p>
-          <p className="text-xs text-gray-400">.xlsx or .xls format</p>
+          <p className="text-sm text-gray-400">.xlsx or .xls format</p>
         </>
       )}
     </div>

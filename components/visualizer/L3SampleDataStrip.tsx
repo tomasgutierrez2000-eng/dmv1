@@ -84,23 +84,23 @@ export default function L3SampleDataStrip() {
     >
       <div className="px-3 py-2 flex items-center gap-2 border-b border-gray-100">
         <Table2 className="w-4 h-4 text-violet-500" aria-hidden />
-        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+        <span className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
           L3 sample data
         </span>
-        <span className="text-xs text-gray-500 font-normal">— {table?.name}</span>
+        <span className="text-sm text-gray-500 font-normal">— {table?.name}</span>
       </div>
       <div className="px-3 py-2 overflow-x-auto max-h-40 overflow-y-auto">
         {loading && (
-          <div className="flex items-center gap-2 text-xs text-gray-400 py-4">
+          <div className="flex items-center gap-2 text-sm text-gray-400 py-4">
             <div className="w-3 h-3 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" aria-hidden />
             Loading…
           </div>
         )}
         {error && !loading && (
-          <p className="text-xs text-amber-600 py-2">{error}</p>
+          <p className="text-sm text-amber-600 py-2">{error}</p>
         )}
         {!loading && !error && data && data.rows.length > 0 && (
-          <table className="w-full text-[11px] border-collapse" role="grid" aria-label={`Sample data for ${table?.name}`}>
+          <table className="w-full text-[12px] border-collapse" role="grid" aria-label={`Sample data for ${table?.name}`}>
             <thead className="bg-gray-50 sticky top-0">
               <tr>
                 {displayColumns.map((col) => {
@@ -109,7 +109,7 @@ export default function L3SampleDataStrip() {
                     <th
                       key={col}
                       scope="col"
-                      className={`text-left px-2 py-1.5 font-semibold border-b border-gray-100 whitespace-nowrap uppercase text-[9px] tracking-wider cursor-pointer transition-colors ${
+                      className={`text-left px-2 py-1.5 font-semibold border-b border-gray-100 whitespace-nowrap uppercase text-[12px] tracking-wider cursor-pointer transition-colors ${
                         isSelected ? 'bg-violet-100 text-violet-800' : 'text-gray-500 hover:bg-gray-100'
                       }`}
                       onClick={() =>
@@ -178,11 +178,11 @@ export default function L3SampleDataStrip() {
           </table>
         )}
         {!loading && !error && (!data || data.rows.length === 0) && (
-          <p className="text-xs text-gray-400 py-2">No sample data for this table.</p>
+          <p className="text-sm text-gray-400 py-2">No sample data for this table.</p>
         )}
       </div>
       {data && data.rows.length > 0 && (
-        <div className="px-3 py-1.5 bg-gray-50 text-[10px] text-gray-400 border-t border-gray-100">
+        <div className="px-3 py-1.5 bg-gray-50 text-[12px] text-gray-400 border-t border-gray-100">
           {data.rows.length} row{data.rows.length !== 1 ? 's' : ''} · Click a cell to see formula &amp; inputs in the detail panel
         </div>
       )}

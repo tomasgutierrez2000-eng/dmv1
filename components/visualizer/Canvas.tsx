@@ -396,7 +396,7 @@ export default function Canvas() {
     setTimeout(() => setIsAnimating(false), 350);
   }, [requestFitToView, model, visibleTables, tablePositions, runFitToView, focusVisibleTableKeys]);
 
-  // Fit to category when user clicks a category header (domain-overview): zoom to show whole category
+  // Fit to category when user clicks a category header: zoom in to show whole category (from any zoom level)
   const requestFitToDomain = useModelStore((s) => s.requestFitToDomain);
   useEffect(() => {
     if (!requestFitToDomain || !model) return;
@@ -405,38 +405,48 @@ export default function Canvas() {
     const positions = domainTables
       .map((t) => tablePositions[t.key])
       .filter((p): p is TablePosition => !!p && Number.isFinite(p.x) && Number.isFinite(p.y));
-    if (positions.length === 0) {
-      setRequestFitToDomain(null);
-      return;
-    }
+    if (positions.length === 0) return; // wait for positions (effect re-runs when tablePositions updates)
+    setRequestFitToDomain(null);
     setIsAnimating(true);
     runFitToView(positions, domainTables.length);
-    setRequestFitToDomain(null);
     const duration = prefersReducedMotion ? 0 : 320;
     const t = setTimeout(() => setIsAnimating(false), duration);
     return () => clearTimeout(t);
   }, [requestFitToDomain, model, visibleTables, tablePositions, runFitToView, setRequestFitToDomain, prefersReducedMotion]);
 
-  // When user selects a table: zoom to that table and show details in sidebar (smooth, no lag)
+  // When user selects a table: latch to it — zoom to that table and show details (works from any zoom level)
   const prevSelectedTableRef = useRef<string | null>(null);
+  const fitToTable = useCallback(
+    (tableKey: string) => {
+      const pos = useModelStore.getState().tablePositions[tableKey];
+      if (!pos || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return false;
+      prevSelectedTableRef.current = tableKey;
+      setIsAnimating(true);
+      runFitToView([pos], 1);
+      const duration = prefersReducedMotion ? 0 : 280;
+      setTimeout(() => setIsAnimating(false), duration);
+      return true;
+    },
+    [runFitToView, prefersReducedMotion]
+  );
   useEffect(() => {
     if (!selectedTable || !layoutMode) return;
     setShowHint(false);
     if (layoutMode !== 'domain-overview' && layoutMode !== 'snowflake') return;
     if (savedPositionsRef.current) return; // don't override focus-compact
-    const pos = tablePositions[selectedTable];
-    if (!pos || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return;
-    // Avoid re-running for same table (e.g. panel re-open)
     if (prevSelectedTableRef.current === selectedTable) return;
-    prevSelectedTableRef.current = selectedTable;
-    setIsAnimating(true);
-    runFitToView([pos], 1);
-    const duration = prefersReducedMotion ? 0 : 280;
-    const t = setTimeout(() => {
-      setIsAnimating(false);
-    }, duration);
-    return () => clearTimeout(t);
-  }, [selectedTable, layoutMode, tablePositions, runFitToView, prefersReducedMotion]);
+    const pos = tablePositions[selectedTable];
+    if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
+      fitToTable(selectedTable);
+      return;
+    }
+    // Position may not be committed yet (e.g. when very zoomed out or right after load): retry once
+    const id = setTimeout(() => {
+      if (prevSelectedTableRef.current === selectedTable) return;
+      fitToTable(selectedTable);
+    }, 80);
+    return () => clearTimeout(id);
+  }, [selectedTable, layoutMode, tablePositions, fitToTable]);
 
   useEffect(() => {
     if (!selectedTable) prevSelectedTableRef.current = null;
@@ -668,7 +678,7 @@ export default function Canvas() {
     setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, runFitToView]);
 
-  // Click on empty canvas: clear selections and exit focus mode.
+  // Click on empty canvas: clear selections, exit focus mode, and fit view to show all tables (smooth unzoom).
   // Clicks on "empty" space often hit the transform <g> (first child of SVG), not the SVG itself.
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
     const target = e.target as Node | null;
@@ -685,8 +695,10 @@ export default function Canvas() {
       setSelectedTable(null);
       setSelectedRelationship(null);
       setFocusMode(false);
+      // Defer fit-to-view so selection state has committed; then zoom out to show full diagram (no blank/crazy view)
+      setTimeout(() => setRequestFitToView(), 50);
     }
-  }, [setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode]);
+  }, [setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode, setRequestFitToView]);
 
   // Keyboard shortcuts
   useEffect(() => {

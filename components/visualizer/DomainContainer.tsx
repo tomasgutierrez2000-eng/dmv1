@@ -94,7 +94,7 @@ export default function DomainContainer({
       >
         <div
           className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all duration-150 hover:bg-white/10 active:bg-white/15 active:scale-[0.995]`}
-          onClick={onToggle}
+          onClick={(e) => { e.stopPropagation(); onToggle(); }}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}

@@ -238,7 +238,7 @@ export default function RelationshipLine({
         fill="none"
         markerEnd={`url(#arrow-${relationship.id})`}
         className="cursor-pointer transition-all duration-200"
-        onClick={onSelect}
+        onClick={(e) => { e.stopPropagation(); onSelect(); }}
         onMouseEnter={() => onHover(true)}
         onMouseLeave={() => onHover(false)}
         opacity={opacity}
@@ -260,7 +260,7 @@ export default function RelationshipLine({
         strokeWidth="25"
         fill="none"
         className="cursor-pointer"
-        onClick={onSelect}
+        onClick={(e) => { e.stopPropagation(); onSelect(); }}
         onMouseEnter={() => onHover(true)}
         onMouseLeave={() => onHover(false)}
       />

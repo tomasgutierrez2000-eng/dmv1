@@ -256,6 +256,7 @@ export default function TableNode({
                 minWidth: 0,
                 minHeight: 0,
               }}
+              onClick={(e) => e.stopPropagation()}
             >
               {showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0) ? (
                 <div
@@ -435,6 +436,7 @@ export default function TableNode({
             maxHeight: TABLE_HEIGHT,
             overflow: 'hidden',
           }}
+          onClick={(e) => e.stopPropagation()}
         >
           {/* Header - Dynamic sizing based on view mode */}
           <div

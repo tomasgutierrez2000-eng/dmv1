@@ -126,7 +126,7 @@ export default function TableNode({
   // Dynamic sizing based on view mode
   const headerPadding = isCompact ? 'px-2.5 py-1.5' : isDetailed ? 'px-4 py-3' : 'px-3.5 py-2.5';
   const headerIconSize = isCompact ? 'w-3 h-3' : isDetailed ? 'w-5 h-5' : 'w-4 h-4';
-  const headerTextSize = isCompact ? 'text-sm' : isDetailed ? 'text-lg' : 'text-base';
+  const headerTextSize = isDetailed ? 'text-lg' : 'text-base';
   const fieldPadding = isCompact ? 'px-1.5 py-1' : isDetailed ? 'px-3 py-2' : 'px-2.5 py-1.5';
   const fieldTextSize = isCompact ? 'text-[11px]' : isDetailed ? 'text-sm' : 'text-xs';
   const fieldIconSize = isCompact ? 'w-2.5 h-2.5' : isDetailed ? 'w-4 h-4' : 'w-3.5 h-3.5';
@@ -219,7 +219,7 @@ export default function TableNode({
           />
           <text
             x={OV.PAD_X + 14} y={OV.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
-            fill="white" fontSize={showOnlyPkFkInCompact ? 10 : 12} fontWeight="bold"
+            fill="white" fontSize={12} fontWeight="bold"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
             {table.name.length > maxNameChars
@@ -232,7 +232,7 @@ export default function TableNode({
           />
           <text
             x={TABLE_WIDTH - OV.PAD_X - 14} y={OV.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
-            fill="white" fontSize="10" fontWeight="bold" textAnchor="middle"
+            fill="white" fontSize={11} fontWeight="bold" textAnchor="middle"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
             {table.layer}

@@ -440,10 +440,10 @@ export default function Toolbar() {
                   className="h-8 px-2.5 text-sm font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
                   aria-haspopup="true"
                   aria-expanded={exportOpen}
-                  aria-label="Export"
+                  aria-label="Export data model or sample data"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Export</span>
+                  <span>Export</span>
                   <ChevronDown className="w-3 h-3 opacity-50" />
                 </button>
               </ToolbarTooltip>
@@ -471,10 +471,10 @@ export default function Toolbar() {
                   className="h-8 px-2.5 text-sm font-medium rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1.5"
                   aria-haspopup="true"
                   aria-expanded={importOpen}
-                  aria-label="Import"
+                  aria-label="Import schema or sample data"
                 >
                   <Upload className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Import</span>
+                  <span>Import</span>
                   <ChevronDown className="w-3 h-3 opacity-50" />
                 </button>
               </ToolbarTooltip>

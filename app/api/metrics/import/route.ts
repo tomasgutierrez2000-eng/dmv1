@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
+import { writeModelGaps } from '@/lib/model-gaps-store';
 import { L3_METRICS } from '@/data/l3-metrics';
 import type { L3Metric, DashboardPage, MetricType, DimensionUsage, SourceField } from '@/data/l3-metrics';
 
@@ -51,12 +52,15 @@ export interface ImportResult {
   created: string[];
   updated: string[];
   errors: { row?: number; sheet?: string; message: string }[];
+  replaced?: boolean;
+  count?: number;
 }
 
-/** POST: import metrics from Excel or JSON file */
+/** POST: import metrics from Excel or JSON file. Form field replace=true replaces all custom metrics with file contents. */
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get('file') as File | null;
+  const replace = String(formData.get('replace') ?? '').toLowerCase() === 'true';
   if (!file) {
     return NextResponse.json({ error: 'No file provided. Use form field "file".' }, { status: 400 });
   }
@@ -173,8 +177,37 @@ export async function POST(request: NextRequest) {
         notes: String(row['notes'] ?? '').trim() || undefined,
       }, finalId));
     }
+
+    // Parse ModelGaps sheet if present and persist to data/model-gaps.json
+    const modelGapsSheet = wb.Sheets['ModelGaps'];
+    if (modelGapsSheet) {
+      const gapRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(modelGapsSheet, { defval: '' });
+      const gaps = gapRows
+        .map(row => ({
+          gapItem: String(row['Gap Item'] ?? row['gapItem'] ?? '').trim(),
+          targetTable: String(row['Target Table / Scope'] ?? row['Target Table / Scope'] ?? row['targetTable'] ?? '').trim(),
+          fieldsRequired: String(row['Fields Required'] ?? row['fieldsRequired'] ?? '').trim(),
+          rationale: String(row['Rationale'] ?? row['rationale'] ?? '').trim(),
+          impactedMetrics: String(row['Impacted Metrics'] ?? row['impactedMetrics'] ?? '').trim(),
+        }))
+        .filter(g => g.gapItem || g.targetTable);
+      if (gaps.length > 0) {
+        writeModelGaps(gaps);
+      }
+    }
   } else {
     return NextResponse.json({ error: 'Unsupported file type. Use .json or .xlsx' }, { status: 400 });
+  }
+
+  if (replace) {
+    writeCustomMetrics(toImport);
+    return NextResponse.json({
+      created: [],
+      updated: [],
+      errors: [...errors],
+      replaced: true,
+      count: toImport.length,
+    } satisfies ImportResult);
   }
 
   const custom = readCustomMetrics();

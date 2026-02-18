@@ -1,0 +1,3572 @@
+{
+  "version": 1,
+  "metrics": [
+    {
+      "id": "C001",
+      "name": "impactedFacilityIds",
+      "page": "P1",
+      "section": "Credit Events",
+      "metricType": "Table",
+      "formula": "LISTAGG(DISTINCT facility_id)",
+      "formulaSQL": "SELECT LISTAGG(DISTINCT cefl.facility_id, ',') WITHIN GROUP (ORDER BY cefl.facility_id)\nFROM L2.credit_event_facility_link cefl\nJOIN L2.credit_event ce ON ce.credit_event_id = cefl.credit_event_id\nWHERE ce.event_status = 'open' AND ce.as_of_date = :as_of_date",
+      "description": "Comma-separated list of facility IDs impacted by in-scope credit events for a given counterparty and time period.",
+      "displayFormat": "Text",
+      "sampleValue": "10234, 10567, 10890",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "credit_event_facility_link",
+          "field": "facility_id",
+          "description": "FK to impacted facility",
+          "sampleValue": "10234"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "credit_event_id",
+          "description": "Credit event identifier",
+          "sampleValue": "5001"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "event_status",
+          "description": "Event status filter (open)",
+          "sampleValue": "open"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "counterparty_id",
+          "description": "Impacted counterparty",
+          "sampleValue": "7890"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "as_of_date",
+          "description": "Snapshot date",
+          "sampleValue": "2026-01-31"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "credit_event"
+      ]
+    },
+    {
+      "id": "C002",
+      "name": "impactedFacilityCount",
+      "page": "P1",
+      "section": "Credit Events",
+      "metricType": "Count",
+      "formula": "COUNT(DISTINCT facility_id)",
+      "formulaSQL": "SELECT COUNT(DISTINCT cefl.facility_id)\nFROM L2.credit_event_facility_link cefl\nJOIN L2.credit_event ce ON ce.credit_event_id = cefl.credit_event_id\nWHERE ce.event_status = 'open' AND ce.as_of_date = :as_of_date",
+      "description": "Number of distinct facilities impacted by in-scope credit events. Represents relationship size of impacted exposures.",
+      "displayFormat": "#,##0",
+      "sampleValue": "12",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "credit_event_facility_link",
+          "field": "facility_id",
+          "description": "FK to impacted facility",
+          "sampleValue": "10234"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "credit_event_id",
+          "description": "Credit event identifier",
+          "sampleValue": "5001"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "event_status",
+          "description": "Event status filter",
+          "sampleValue": "open"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "as_of_date",
+          "description": "Snapshot date",
+          "sampleValue": "2026-01-31"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "credit_event"
+      ],
+      "notes": "Derived from credit_event_facility_link. Not stored directly."
+    },
+    {
+      "id": "C003",
+      "name": "estimatedExposureImpact",
+      "page": "P1",
+      "section": "Credit Events",
+      "metricType": "Aggregate",
+      "formula": "SUM(gross_exposure_usd) for impacted facilities",
+      "formulaSQL": "SELECT SUM(fes.gross_exposure_usd)\nFROM L2.credit_event_facility_link cefl\nJOIN L2.credit_event ce ON ce.credit_event_id = cefl.credit_event_id\nJOIN L2.facility_exposure_snapshot fes ON fes.facility_id = cefl.facility_id AND fes.as_of_date = ce.as_of_date\nJOIN L1.facility_master fm ON fm.facility_id = cefl.facility_id AND fm.facility_status = 'Active'\nWHERE ce.event_status = 'open' AND ce.as_of_date = :as_of_date",
+      "description": "Total gross exposure (USD) across facilities linked to in-scope credit events. Uses facility_exposure_snapshot for current exposure.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$45.2M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "credit_event_facility_link",
+          "field": "facility_id",
+          "description": "Impacted facility link",
+          "sampleValue": "10234"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure for impacted facility",
+          "sampleValue": "$45,200,000"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_status",
+          "description": "Active filter",
+          "sampleValue": "Active"
+        },
+        {
+          "layer": "L2",
+          "table": "credit_event",
+          "field": "as_of_date",
+          "description": "Snapshot date",
+          "sampleValue": "2026-01-31"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "credit_event"
+      ],
+      "notes": "Derivable. Joins credit_event_facility_link → facility_exposure_snapshot for active facilities."
+    },
+    {
+      "id": "C004",
+      "name": "tier",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Categorical",
+      "formula": "CASE WHEN utilization_pct < inner_threshold_pct THEN 'No Breach' WHEN utilization_pct < outer_threshold_pct THEN 'Warning' ELSE 'Breach' END",
+      "formulaSQL": "SELECT CASE\n  WHEN (lue.utilized_amount_usd / NULLIF(lr.limit_amount_usd,0))*100 < lt_warn.threshold_upper_pct THEN 'No Breach'\n  WHEN (lue.utilized_amount_usd / NULLIF(lr.limit_amount_usd,0))*100 < lt_breach.threshold_lower_pct THEN 'Warning'\n  ELSE 'Breach' END AS tier\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nJOIN L1.limit_threshold lt_warn ON lt_warn.limit_rule_id = lr.limit_rule_id AND lt_warn.threshold_type = 'WARNING' AND lt_warn.active_flag = 'Y'\nJOIN L1.limit_threshold lt_breach ON lt_breach.limit_rule_id = lr.limit_rule_id AND lt_breach.threshold_type = 'BREACH' AND lt_breach.active_flag = 'Y'\nWHERE lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Limit breach tier: No Breach / Warning / Breach based on utilization vs threshold bands from limit_threshold.",
+      "displayFormat": "Text",
+      "sampleValue": "Warning",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Current utilized amount",
+          "sampleValue": "$120,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Approved limit amount",
+          "sampleValue": "$200,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_threshold",
+          "field": "threshold_type",
+          "description": "Band type (WARNING/BREACH)",
+          "sampleValue": "WARNING"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_threshold",
+          "field": "threshold_upper_pct",
+          "description": "Upper bound of band",
+          "sampleValue": "75.0"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        },
+        {
+          "dimension": "limit_rule_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ],
+      "notes": "Derived from limit_utilization_event + limit_rule + limit_threshold."
+    },
+    {
+      "id": "C005",
+      "name": "limitAmount",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Aggregate",
+      "formula": "SUM(limit_amount_usd)",
+      "formulaSQL": "SELECT SUM(lr.limit_amount_usd)\nFROM L1.limit_rule lr\nWHERE lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lr.as_of_date = :as_of_date",
+      "description": "Total approved limit amount (USD) across active, non-waived limits.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$200.0M",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Approved limit amount",
+          "sampleValue": "$200,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_scope",
+          "description": "Limit scope (COUNTERPARTY/LOB)",
+          "sampleValue": "COUNTERPARTY"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "effective_to_date",
+          "description": "NULL = currently active"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ]
+    },
+    {
+      "id": "C006",
+      "name": "utilizedExposure",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Aggregate",
+      "formula": "SUM(utilized_amount_usd)",
+      "formulaSQL": "SELECT SUM(lue.utilized_amount_usd)\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nWHERE lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Total utilized exposure (USD) against active limits.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$150.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Utilized amount",
+          "sampleValue": "$150,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "limit_rule_id",
+          "description": "FK to limit rule",
+          "sampleValue": "1001"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Limit > 0 filter",
+          "sampleValue": "$200,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ]
+    },
+    {
+      "id": "C007",
+      "name": "headroom",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Derived",
+      "formula": "SUM(limit_amount_usd) - SUM(utilized_amount_usd)",
+      "formulaSQL": "SELECT SUM(lr.limit_amount_usd) - SUM(lue.utilized_amount_usd)\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nWHERE lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Available headroom: limit minus utilized. Positive = capacity remaining.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$50.0M",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Approved limit",
+          "sampleValue": "$200,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Utilized amount",
+          "sampleValue": "$150,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ],
+      "notes": "Derived: C005 - C006."
+    },
+    {
+      "id": "C008",
+      "name": "utilizationPct",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Ratio",
+      "formula": "(SUM(utilized_amount_usd) / SUM(limit_amount_usd)) * 100",
+      "formulaSQL": "SELECT (SUM(lue.utilized_amount_usd) / NULLIF(SUM(lr.limit_amount_usd), 0)) * 100\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nWHERE lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Limit utilization percentage.",
+      "displayFormat": "0.0%",
+      "sampleValue": "75.0%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Utilized amount",
+          "sampleValue": "$150,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Approved limit",
+          "sampleValue": "$200,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ]
+    },
+    {
+      "id": "C009",
+      "name": "priorMonthLimitStatus",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Categorical",
+      "formula": "tier logic applied to prior month-end snapshot",
+      "formulaSQL": "SELECT CASE\n  WHEN (lue_prior.utilized_amount_usd / NULLIF(lr.limit_amount_usd,0))*100 < lt_warn.threshold_upper_pct THEN 'No Breach'\n  WHEN (lue_prior.utilized_amount_usd / NULLIF(lr.limit_amount_usd,0))*100 < lt_breach.threshold_lower_pct THEN 'Warning'\n  ELSE 'Breach' END\nFROM L2.limit_utilization_event lue_prior\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue_prior.limit_rule_id\nJOIN L1.limit_threshold lt_warn ON lt_warn.limit_rule_id = lr.limit_rule_id AND lt_warn.threshold_type = 'WARNING' AND lt_warn.active_flag = 'Y'\nJOIN L1.limit_threshold lt_breach ON lt_breach.limit_rule_id = lr.limit_rule_id AND lt_breach.threshold_type = 'BREACH' AND lt_breach.active_flag = 'Y'\nWHERE lue_prior.as_of_date = (SELECT MAX(dd.calendar_date) FROM L1.date_dim dd WHERE dd.calendar_date < :as_of_date AND dd.is_month_end = 'Y')",
+      "description": "Limit breach status as of prior month-end. For month-over-month comparison.",
+      "displayFormat": "Text",
+      "sampleValue": "No Breach",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Prior month utilized",
+          "sampleValue": "$140,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Limit amount",
+          "sampleValue": "$200,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_threshold",
+          "field": "threshold_type",
+          "description": "Band type",
+          "sampleValue": "WARNING"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Month-end filter",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ],
+      "notes": "Derived: same tier logic as C004 but filtered to prior month-end via date_dim."
+    },
+    {
+      "id": "C010",
+      "name": "lastStatusChangeDate",
+      "page": "P2",
+      "section": "Limit Data",
+      "metricType": "Aggregate",
+      "formula": "MAX(reporting_ts)",
+      "formulaSQL": "SELECT MAX(lue.reporting_ts) FROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nWHERE lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Most recent timestamp of limit utilization update.",
+      "displayFormat": "YYYY-MM-DD",
+      "sampleValue": "2026-01-15",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "reporting_ts",
+          "description": "Utilization report timestamp",
+          "sampleValue": "2026-01-15 14:30:00"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "lob"
+      ]
+    },
+    {
+      "id": "C011",
+      "name": "stressExposure",
+      "page": "P3",
+      "section": "Stress Test Results",
+      "metricType": "Aggregate",
+      "formula": "SUM(total_exposure_usd)",
+      "formulaSQL": "SELECT SUM(str.total_exposure_usd) FROM L2.stress_test_result str WHERE str.as_of_date = :as_of_date",
+      "description": "Total gross exposure (USD) under in-scope stress test scenarios.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$1.2B",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "stress_test_result",
+          "field": "total_exposure_usd",
+          "description": "Total exposure under scenario",
+          "sampleValue": "$1,200,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "stress_test_result",
+          "field": "scenario_id",
+          "description": "FK to scenario",
+          "sampleValue": "3001"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "scenario_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "C012",
+      "name": "expectedLoss",
+      "page": "P3",
+      "section": "Stress Test Results",
+      "metricType": "Aggregate",
+      "formula": "SUM(expected_loss_usd)",
+      "formulaSQL": "SELECT SUM(str.expected_loss_usd) FROM L2.stress_test_result str WHERE str.as_of_date = :as_of_date",
+      "description": "Total expected loss (USD) under stress scenarios.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$85.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "stress_test_result",
+          "field": "expected_loss_usd",
+          "description": "Expected loss",
+          "sampleValue": "$85,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "scenario_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "scenario"
+      ]
+    },
+    {
+      "id": "C013",
+      "name": "capitalImpact",
+      "page": "P3",
+      "section": "Stress Test Results",
+      "metricType": "Ratio",
+      "formula": "capital_impact_pct (pre-calculated)",
+      "formulaSQL": "SELECT str.capital_impact_pct FROM L2.stress_test_result str WHERE str.as_of_date = :as_of_date",
+      "description": "Capital impact as % of Tier 1 capital. Pre-calculated in stress_test_result by risk engine.",
+      "displayFormat": "0.0%",
+      "sampleValue": "3.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "stress_test_result",
+          "field": "capital_impact_pct",
+          "description": "Capital impact % of Tier 1",
+          "sampleValue": "3.5"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "scenario_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "scenario"
+      ],
+      "notes": "Pre-calculated field. Capital base assumed as input to stress engine, not stored separately."
+    },
+    {
+      "id": "C014",
+      "name": "isParent",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Categorical",
+      "formula": "is_parent_flag from counterparty",
+      "formulaSQL": "SELECT c.is_parent_flag FROM L1.counterparty c WHERE c.counterparty_id = :counterparty_id",
+      "description": "Flag: is the counterparty a parent entity in the hierarchy.",
+      "displayFormat": "Y/N",
+      "sampleValue": "Y",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "is_parent_flag",
+          "description": "Parent flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ],
+      "notes": "Direct field on L1.counterparty."
+    },
+    {
+      "id": "C015",
+      "name": "probabilityOfDefault",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "Counterparty-level: pd_annual; Aggregated: SUM(pd_estimate * EAD) / SUM(EAD)",
+      "formulaSQL": "-- Counterparty-level (single obligor):\nSELECT c.pd_annual FROM L1.counterparty c WHERE c.counterparty_id = :counterparty_id\n-- Portfolio/aggregated-level (exposure-weighted):\nSELECT SUM(CAST(p.pd_estimate AS DECIMAL) * fes.gross_exposure_usd) / NULLIF(SUM(fes.gross_exposure_usd), 0)\nFROM L2.position p\nJOIN L2.facility_exposure_snapshot fes ON fes.facility_id = p.facility_id AND fes.as_of_date = p.as_of_date\nWHERE p.pd_estimate IS NOT NULL AND fes.gross_exposure_usd > 0 AND p.as_of_date = :as_of_date",
+      "description": "Probability of default. Single counterparty: obligor-level pd_annual. Aggregated views: exposure-weighted PD per Basel IRB standard (Σ PD×EAD / Σ EAD).",
+      "displayFormat": "0.00%",
+      "sampleValue": "1.25%",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "pd_annual",
+          "description": "Obligor-level annual PD",
+          "sampleValue": "0.012"
+        },
+        {
+          "layer": "L2",
+          "table": "position",
+          "field": "pd_estimate",
+          "description": "Position-level PD for weighting",
+          "sampleValue": "0.0125"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "EAD weight",
+          "sampleValue": "$50,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "portfolio",
+        "lob"
+      ],
+      "notes": "Industry standard: obligor PD at counterparty level, exposure-weighted PD at aggregated levels. Toggle controls which view."
+    },
+    {
+      "id": "C016",
+      "name": "lossGivenDefault",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "Counterparty-level: lgd_unsecured; Aggregated: SUM(lgd_estimate * EAD) / SUM(EAD)",
+      "formulaSQL": "-- Counterparty-level:\nSELECT c.lgd_unsecured FROM L1.counterparty c WHERE c.counterparty_id = :counterparty_id\n-- Aggregated (exposure-weighted):\nSELECT SUM(CAST(p.lgd_estimate AS DECIMAL) * fes.gross_exposure_usd) / NULLIF(SUM(fes.gross_exposure_usd), 0)\nFROM L2.position p\nJOIN L2.facility_exposure_snapshot fes ON fes.facility_id = p.facility_id AND fes.as_of_date = p.as_of_date\nWHERE p.lgd_estimate IS NOT NULL AND fes.gross_exposure_usd > 0 AND p.as_of_date = :as_of_date",
+      "description": "Loss given default. Single counterparty: unsecured LGD. Aggregated: exposure-weighted per Basel IRB.",
+      "displayFormat": "0.0%",
+      "sampleValue": "42.5%",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "counterparty",
+          "field": "lgd_unsecured",
+          "description": "Unsecured LGD",
+          "sampleValue": "0.45"
+        },
+        {
+          "layer": "L2",
+          "table": "position",
+          "field": "lgd_estimate",
+          "description": "Position-level LGD",
+          "sampleValue": "0.425"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "EAD weight",
+          "sampleValue": "$50,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "portfolio",
+        "lob"
+      ],
+      "notes": "Same toggle pattern as PD: obligor at counterparty, exposure-weighted at aggregate."
+    },
+    {
+      "id": "C017",
+      "name": "creditLimit",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "SUM(limit_amount_usd) WHERE limit_scope = COUNTERPARTY",
+      "formulaSQL": "SELECT SUM(lr.limit_amount_usd)\nFROM L1.limit_rule lr\nWHERE lr.limit_scope = 'COUNTERPARTY' AND lr.counterparty_id = :counterparty_id\nAND lr.limit_amount_usd > 0 AND lr.effective_to_date IS NULL AND lr.as_of_date = :as_of_date",
+      "description": "Total approved credit limit for a specific counterparty.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$250.0M",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Approved limit",
+          "sampleValue": "$250,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_scope",
+          "description": "Scope = COUNTERPARTY",
+          "sampleValue": "COUNTERPARTY"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "counterparty_id",
+          "description": "FK to counterparty",
+          "sampleValue": "7890"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C018",
+      "name": "hasCrossEntityExposure",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Status",
+      "formula": "cross_entity_flag (proposed new field) OR CASE WHEN COUNT(DISTINCT legal_entity_id) > 1 THEN 1 ELSE 0 END",
+      "formulaSQL": "-- Current derivation (until cross_entity_flag is added):\nSELECT CASE WHEN COUNT(DISTINCT fes.legal_entity_id) > 1 THEN 1 ELSE 0 END\nFROM L2.facility_exposure_snapshot fes\nWHERE fes.counterparty_id = :counterparty_id AND fes.gross_exposure_usd > 0 AND fes.as_of_date = :as_of_date",
+      "description": "Flag: does this counterparty have exposure booked across multiple legal entities. MODEL GAP: recommend adding cross_entity_flag to facility_exposure_snapshot.",
+      "displayFormat": "1/0",
+      "sampleValue": "1",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "legal_entity_id",
+          "description": "Booking legal entity",
+          "sampleValue": "2001"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "counterparty_id",
+          "description": "Counterparty FK",
+          "sampleValue": "7890"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure > 0 filter",
+          "sampleValue": "$50,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "facility"
+      ],
+      "notes": "MODEL GAP: cross_entity_flag should be pre-calculated on facility_exposure_snapshot. Current derivation via COUNT(DISTINCT legal_entity_id) > 1 is correct but expensive."
+    },
+    {
+      "id": "C019",
+      "name": "crossEntityExposureAmount",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "SUM(gross_exposure_usd) WHERE cross_entity_flag = Y",
+      "formulaSQL": "SELECT SUM(fes.gross_exposure_usd)\nFROM L2.facility_exposure_snapshot fes\nWHERE fes.counterparty_id = :counterparty_id AND fes.gross_exposure_usd > 0 AND fes.as_of_date = :as_of_date\nAND (SELECT COUNT(DISTINCT fes2.legal_entity_id) FROM L2.facility_exposure_snapshot fes2\n     WHERE fes2.counterparty_id = fes.counterparty_id AND fes2.as_of_date = fes.as_of_date) > 1",
+      "description": "Total exposure for counterparties with cross-entity presence. Filtered to cross_entity_flag = Y once added.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$320.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure",
+          "sampleValue": "$320,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "legal_entity_id",
+          "description": "Legal entity for cross-check",
+          "sampleValue": "2001"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "facility"
+      ],
+      "notes": "Depends on cross_entity_flag (MODEL GAP)."
+    },
+    {
+      "id": "C020",
+      "name": "utilizationPct_cpty",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Ratio",
+      "formula": "(SUM(utilized_amount_usd) / SUM(limit_amount_usd)) * 100",
+      "formulaSQL": "SELECT (SUM(lue.utilized_amount_usd) / NULLIF(SUM(lr.limit_amount_usd), 0)) * 100\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nWHERE lr.counterparty_id = :counterparty_id AND lr.limit_amount_usd > 0\nAND lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Limit utilization percentage at counterparty level.",
+      "displayFormat": "0.0%",
+      "sampleValue": "72.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Utilized amount",
+          "sampleValue": "$145,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Limit amount",
+          "sampleValue": "$200,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C021",
+      "name": "exposure_mom_change_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Trend",
+      "formula": "((current - prior_month) / prior_month) * 100",
+      "formulaSQL": "SELECT ((curr.t - prior.t) / NULLIF(prior.t, 0)) * 100\nFROM (SELECT SUM(gross_exposure_usd) t FROM L2.facility_exposure_snapshot WHERE counterparty_id = :cpty AND as_of_date = :as_of_date) curr,\n(SELECT SUM(gross_exposure_usd) t FROM L2.facility_exposure_snapshot WHERE counterparty_id = :cpty\n AND as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')) prior",
+      "description": "Month-over-month change in gross exposure at counterparty level.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+5.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure current/prior",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Month-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C022",
+      "name": "exposure_qoq_change_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Trend",
+      "formula": "((current - prior_quarter) / prior_quarter) * 100",
+      "formulaSQL": "SELECT ((curr.t - prior.t) / NULLIF(prior.t, 0)) * 100\nFROM (SELECT SUM(gross_exposure_usd) t FROM L2.facility_exposure_snapshot WHERE counterparty_id = :cpty AND as_of_date = :as_of_date) curr,\n(SELECT SUM(gross_exposure_usd) t FROM L2.facility_exposure_snapshot WHERE counterparty_id = :cpty\n AND as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_quarter_end = 'Y')) prior",
+      "description": "Quarter-over-quarter change in gross exposure at counterparty level.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+5.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure current/prior",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_quarter_end",
+          "description": "Quarter-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C023",
+      "name": "exposure_yoy_change_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Trend",
+      "formula": "((current - prior_year) / prior_year) * 100",
+      "formulaSQL": "SELECT ((curr.t - prior.t) / NULLIF(prior.t, 0)) * 100\nFROM (SELECT SUM(gross_exposure_usd) t FROM L2.facility_exposure_snapshot WHERE counterparty_id = :cpty AND as_of_date = :as_of_date) curr,\n(SELECT SUM(gross_exposure_usd) t FROM L2.facility_exposure_snapshot WHERE counterparty_id = :cpty\n AND as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_year_end = 'Y')) prior",
+      "description": "Year-over-year change in gross exposure at counterparty level.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+5.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure current/prior",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_year_end",
+          "description": "Year-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C024",
+      "name": "internal_rating_change",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Trend",
+      "formula": "rating_value - prior_rating_value",
+      "formulaSQL": "SELECT cro.rating_value - cro.prior_rating_value AS rating_change\nFROM L2.counterparty_rating_observation cro\nWHERE cro.counterparty_id = :counterparty_id AND cro.rating_type = 'INTERNAL' AND cro.as_of_date = :as_of_date",
+      "description": "Numeric change in internal rating. Positive = downgrade (higher notch = worse).",
+      "displayFormat": "+/- #",
+      "sampleValue": "-1",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_value",
+          "description": "Current rating",
+          "sampleValue": "3"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "prior_rating_value",
+          "description": "Prior rating",
+          "sampleValue": "4"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_type",
+          "description": "INTERNAL filter",
+          "sampleValue": "INTERNAL"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C025",
+      "name": "avg_spread_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "AVG(spread_bps) / 100",
+      "formulaSQL": "SELECT AVG(fps.spread_bps) / 100.0\nFROM L2.facility_pricing_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nWHERE fm.counterparty_id = :counterparty_id AND fps.as_of_date = :as_of_date",
+      "description": "Average credit spread (%) across facilities. Converted from bps.",
+      "displayFormat": "0.00%",
+      "sampleValue": "2.50%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread in bps",
+          "sampleValue": "250"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "counterparty_id",
+          "description": "FK to counterparty",
+          "sampleValue": "7890"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "portfolio",
+        "lob",
+        "desk"
+      ],
+      "notes": "Same formula at all dimensions — join path changes by dimension (counterparty_id, portfolio_id, lob_segment_id, org_unit_id)."
+    },
+    {
+      "id": "C026",
+      "name": "avg_base_rate_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "AVG(base_rate_pct)",
+      "formulaSQL": "SELECT AVG(fps.base_rate_pct)\nFROM L2.facility_pricing_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nWHERE fm.counterparty_id = :counterparty_id AND fps.as_of_date = :as_of_date",
+      "description": "Average base/reference rate (%) across facilities.",
+      "displayFormat": "0.00%",
+      "sampleValue": "5.25%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate %",
+          "sampleValue": "5.25"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "interest_rate_reference",
+          "description": "Base rate ref (L1 alternative)",
+          "sampleValue": "5.25"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "portfolio",
+        "lob",
+        "desk"
+      ],
+      "notes": "Same formula at all dimensions — join path changes by dimension."
+    },
+    {
+      "id": "C027",
+      "name": "all_in_rate_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Derived",
+      "formula": "AVG(base_rate_pct + spread_bps/100) OR all_in_rate_pct from facility_master",
+      "formulaSQL": "SELECT AVG(fps.base_rate_pct + fps.spread_bps / 100.0)\nFROM L2.facility_pricing_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nWHERE fm.counterparty_id = :counterparty_id AND fps.as_of_date = :as_of_date",
+      "description": "All-in rate: base + spread. Also pre-calculated as all_in_rate_pct on facility_master.",
+      "displayFormat": "0.00%",
+      "sampleValue": "7.75%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.25"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread bps",
+          "sampleValue": "250"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "all_in_rate_pct",
+          "description": "Pre-calculated all-in",
+          "sampleValue": "7.75"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "facility"
+      ],
+      "notes": "Derivable. facility_master.all_in_rate_pct is static; pricing snapshot is point-in-time."
+    },
+    {
+      "id": "C028",
+      "name": "probability_of_default_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "metric_value from financial_metric_observation WHERE metric_code = PD",
+      "formulaSQL": "SELECT fmo.metric_value FROM L2.financial_metric_observation fmo\nWHERE fmo.metric_code = 'PD' AND fmo.counterparty_id = :counterparty_id AND fmo.as_of_date = :as_of_date",
+      "description": "PD from risk metric observation. Alternative to C015 — this reads the pre-calculated value from the metrics store.",
+      "displayFormat": "0.00%",
+      "sampleValue": "1.25%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "PD value",
+          "sampleValue": "0.0125"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_code",
+          "description": "PD filter",
+          "sampleValue": "PD"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C029",
+      "name": "loss_given_default_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "metric_value from financial_metric_observation WHERE metric_code = LGD",
+      "formulaSQL": "SELECT fmo.metric_value FROM L2.financial_metric_observation fmo\nWHERE fmo.metric_code = 'LGD' AND fmo.counterparty_id = :counterparty_id AND fmo.as_of_date = :as_of_date",
+      "description": "LGD from risk metric observation.",
+      "displayFormat": "0.0%",
+      "sampleValue": "42.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "LGD value",
+          "sampleValue": "0.425"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_code",
+          "description": "LGD filter",
+          "sampleValue": "LGD"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C030",
+      "name": "expected_loss_m",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Derived",
+      "formula": "PD × LGD × Utilized Exposure",
+      "formulaSQL": "SELECT fmo.metric_value_usd FROM L2.financial_metric_observation fmo\nWHERE fmo.metric_code = 'EL' AND fmo.counterparty_id = :counterparty_id AND fmo.as_of_date = :as_of_date",
+      "description": "Expected loss: PD × LGD × EAD. Pre-calculated in financial_metric_observation.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$2.4M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value_usd",
+          "description": "Expected loss",
+          "sampleValue": "$2,400,000"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_code",
+          "description": "EL filter",
+          "sampleValue": "EL"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C031",
+      "name": "delinquent_amount_m",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "SUM(overdue_principal_amt + overdue_interest_amt)",
+      "formulaSQL": "SELECT SUM(fds.overdue_principal_amt + fds.overdue_interest_amt)\nFROM L2.facility_delinquency_snapshot fds\nWHERE fds.counterparty_id = :counterparty_id AND fds.as_of_date = :as_of_date",
+      "description": "Total delinquent amount (principal + interest overdue) at counterparty level.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$1.2M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_delinquency_snapshot",
+          "field": "overdue_principal_amt",
+          "description": "Overdue principal",
+          "sampleValue": "$800,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_delinquency_snapshot",
+          "field": "overdue_interest_amt",
+          "description": "Overdue interest",
+          "sampleValue": "$400,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ],
+      "notes": "Derivable from facility_delinquency_snapshot."
+    },
+    {
+      "id": "C032",
+      "name": "days_overdue",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "MAX(days_past_due)",
+      "formulaSQL": "SELECT MAX(fds.days_past_due_max)\nFROM L2.facility_delinquency_snapshot fds\nWHERE fds.counterparty_id = :counterparty_id AND fds.as_of_date = :as_of_date",
+      "description": "Maximum days past due across all facilities for a counterparty.",
+      "displayFormat": "#,##0",
+      "sampleValue": "45",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_delinquency_snapshot",
+          "field": "days_past_due_max",
+          "description": "Max DPD per facility",
+          "sampleValue": "45"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C033",
+      "name": "ROE_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Ratio",
+      "formula": "((interest_income + fee_income - interest_expense) / allocated_equity) * 100",
+      "formulaSQL": "SELECT ((SUM(fps.interest_income_amt + fps.fee_income_amt - fps.interest_expense_amt)) / NULLIF(SUM(fps.allocated_equity_amt), 0)) * 100\nFROM L2.facility_profitability_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nWHERE fm.counterparty_id = :counterparty_id AND fps.as_of_date = :as_of_date",
+      "description": "Return on equity proxy. APPROXIMATION: uses profitability snapshot income/equity. MODEL GAP: true ROE needs provision_for_credit_losses, non_interest_expense, tax on facility_profitability_snapshot.",
+      "displayFormat": "0.0%",
+      "sampleValue": "12.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_income_amt",
+          "description": "Interest income",
+          "sampleValue": "$5,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "fee_income_amt",
+          "description": "Fee income",
+          "sampleValue": "$500,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_expense_amt",
+          "description": "Interest expense",
+          "sampleValue": "$3,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "allocated_equity_amt",
+          "description": "Allocated equity",
+          "sampleValue": "$20,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "facility",
+        "portfolio",
+        "lob",
+        "desk"
+      ],
+      "notes": "MODEL GAP: Add provision_for_credit_losses_amt, non_interest_expense_amt, tax_allocation_amt to facility_profitability_snapshot for true net income."
+    },
+    {
+      "id": "C034",
+      "name": "ROA_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Ratio",
+      "formula": "((interest_income + fee_income - interest_expense) / avg_earning_assets) * 100",
+      "formulaSQL": "SELECT ((SUM(fps.interest_income_amt + fps.fee_income_amt - fps.interest_expense_amt)) / NULLIF(SUM(fps.avg_earning_assets_amt), 0)) * 100\nFROM L2.facility_profitability_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nWHERE fm.counterparty_id = :counterparty_id AND fps.as_of_date = :as_of_date",
+      "description": "Return on assets proxy. Same MODEL GAP as ROE.",
+      "displayFormat": "0.0%",
+      "sampleValue": "1.8%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_income_amt",
+          "description": "Interest income",
+          "sampleValue": "$5,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "fee_income_amt",
+          "description": "Fee income",
+          "sampleValue": "$500,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_expense_amt",
+          "description": "Interest expense",
+          "sampleValue": "$3,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "avg_earning_assets_amt",
+          "description": "Avg earning assets",
+          "sampleValue": "$138,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "facility",
+        "portfolio",
+        "lob",
+        "desk"
+      ],
+      "notes": "MODEL GAP: Same as C033."
+    },
+    {
+      "id": "C035",
+      "name": "NIM_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Ratio",
+      "formula": "((interest_income - interest_expense) / avg_earning_assets) * 100",
+      "formulaSQL": "SELECT ((SUM(fps.interest_income_amt) - SUM(fps.interest_expense_amt)) / NULLIF(SUM(fps.avg_earning_assets_amt), 0)) * 100\nFROM L2.facility_profitability_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nWHERE fm.counterparty_id = :counterparty_id AND fps.as_of_date = :as_of_date",
+      "description": "Net interest margin. This metric uses existing fields and does not require MODEL GAP additions.",
+      "displayFormat": "0.0%",
+      "sampleValue": "3.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_income_amt",
+          "description": "Interest income",
+          "sampleValue": "$5,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_expense_amt",
+          "description": "Interest expense",
+          "sampleValue": "$3,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "avg_earning_assets_amt",
+          "description": "Avg earning assets",
+          "sampleValue": "$138,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty",
+        "facility",
+        "portfolio",
+        "lob",
+        "desk"
+      ]
+    },
+    {
+      "id": "C036",
+      "name": "avg_tenor_years",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Aggregate",
+      "formula": "AVG(DATEDIFF(maturity_date, origination_date) / 365.25)",
+      "formulaSQL": "SELECT AVG(DATEDIFF(fm.maturity_date, fm.origination_date) / 365.25)\nFROM L1.facility_master fm WHERE fm.counterparty_id = :counterparty_id AND fm.facility_status = 'Active'",
+      "description": "Average tenor (years) across active facilities.",
+      "displayFormat": "0.0",
+      "sampleValue": "3.5",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "maturity_date",
+          "description": "Maturity date",
+          "sampleValue": "2029-06-30"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "origination_date",
+          "description": "Origination date",
+          "sampleValue": "2025-01-15"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C037",
+      "name": "LTV_pct",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Ratio",
+      "formula": "(SUM(gross_exposure_usd) / SUM(current_valuation_usd)) * 100",
+      "formulaSQL": "SELECT (SUM(fes.gross_exposure_usd) / NULLIF(SUM(cs.current_valuation_usd), 0)) * 100\nFROM L2.facility_exposure_snapshot fes\nLEFT JOIN L2.collateral_snapshot cs ON cs.facility_id = fes.facility_id AND cs.as_of_date = fes.as_of_date\nWHERE fes.counterparty_id = :counterparty_id AND fes.as_of_date = :as_of_date",
+      "description": "Loan-to-value: exposure / collateral valuation.",
+      "displayFormat": "0.0%",
+      "sampleValue": "78.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "current_valuation_usd",
+          "description": "Collateral valuation",
+          "sampleValue": "$197,500,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C038",
+      "name": "risk_rating_status_internal",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Categorical",
+      "formula": "CASE WHEN rating_value > prior_rating_value THEN 'Downgrade' WHEN < THEN 'Upgrade' ELSE 'Stable' END",
+      "formulaSQL": "SELECT CASE WHEN cro.rating_value > cro.prior_rating_value THEN 'Downgrade'\nWHEN cro.rating_value < cro.prior_rating_value THEN 'Upgrade' ELSE 'Stable' END\nFROM L2.counterparty_rating_observation cro\nWHERE cro.counterparty_id = :counterparty_id AND cro.rating_type = 'INTERNAL' AND cro.as_of_date = :as_of_date",
+      "description": "Internal rating direction: Downgrade / Upgrade / Stable.",
+      "displayFormat": "Text",
+      "sampleValue": "Stable",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_value",
+          "description": "Current rating",
+          "sampleValue": "3"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "prior_rating_value",
+          "description": "Prior rating",
+          "sampleValue": "3"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_type",
+          "description": "INTERNAL",
+          "sampleValue": "INTERNAL"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ],
+      "notes": "Higher rating_value = worse. rating_value > prior = Downgrade."
+    },
+    {
+      "id": "C039",
+      "name": "risk_rating_status_external",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Categorical",
+      "formula": "CASE WHEN rating_value > prior THEN 'Downgrade' WHEN < THEN 'Upgrade' ELSE 'Stable' END",
+      "formulaSQL": "SELECT CASE WHEN cro.rating_value > cro.prior_rating_value THEN 'Downgrade'\nWHEN cro.rating_value < cro.prior_rating_value THEN 'Upgrade' ELSE 'Stable' END\nFROM L2.counterparty_rating_observation cro\nWHERE cro.counterparty_id = :counterparty_id AND cro.rating_type = 'EXTERNAL' AND cro.as_of_date = :as_of_date",
+      "description": "External rating direction: Downgrade / Upgrade / Stable.",
+      "displayFormat": "Text",
+      "sampleValue": "Downgrade",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_value",
+          "description": "Current external",
+          "sampleValue": "4"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "prior_rating_value",
+          "description": "Prior external",
+          "sampleValue": "3"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_type",
+          "description": "EXTERNAL",
+          "sampleValue": "EXTERNAL"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C040",
+      "name": "risk_rating_external_steps",
+      "page": "P4",
+      "section": "Counterparty",
+      "metricType": "Derived",
+      "formula": "prior_rating_notch - current_rating_notch",
+      "formulaSQL": "SELECT rsd_prior.rating_notch - rsd_curr.rating_notch AS steps\nFROM L2.counterparty_rating_observation cro\nJOIN L1.rating_scale_dim rsd_curr ON rsd_curr.rating_grade_id = cro.rating_grade_id\nLEFT JOIN L1.rating_scale_dim rsd_prior ON rsd_prior.rating_value = cro.prior_rating_value AND rsd_prior.scale_type = rsd_curr.scale_type\nWHERE cro.counterparty_id = :counterparty_id AND cro.rating_type = 'EXTERNAL' AND cro.as_of_date = :as_of_date",
+      "description": "External rating change in notch steps (negative = downgrade, e.g. AAA → A = -2).",
+      "displayFormat": "+/- #",
+      "sampleValue": "-2",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_grade_id",
+          "description": "FK to rating_scale_dim",
+          "sampleValue": "15"
+        },
+        {
+          "layer": "L1",
+          "table": "rating_scale_dim",
+          "field": "rating_notch",
+          "description": "Standardized notch",
+          "sampleValue": "5"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "counterparty_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C041",
+      "name": "riskMitigantAmount",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Aggregate",
+      "formula": "SUM(allocated_amount_usd)",
+      "formulaSQL": "SELECT SUM(cs.allocated_amount_usd)\nFROM L2.collateral_snapshot cs\nWHERE cs.facility_id = :facility_id AND cs.allocated_amount_usd IS NOT NULL AND cs.as_of_date = :as_of_date",
+      "description": "Total risk mitigant value allocated to a facility.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$25.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "allocated_amount_usd",
+          "description": "Allocated CRM amount",
+          "sampleValue": "$25,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C042",
+      "name": "riskMitigantType",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Categorical",
+      "formula": "ARGMAX(mitigant_subtype, SUM(allocated_amount_usd))",
+      "formulaSQL": "SELECT cs.mitigant_subtype FROM L2.collateral_snapshot cs\nWHERE cs.facility_id = :facility_id AND cs.as_of_date = :as_of_date\nGROUP BY cs.mitigant_subtype ORDER BY SUM(cs.allocated_amount_usd) DESC LIMIT 1",
+      "description": "Dominant risk mitigant type by value (Cash, Sovereign Debt, Guarantees, etc.).",
+      "displayFormat": "Text",
+      "sampleValue": "Cash",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "mitigant_subtype",
+          "description": "Mitigant type",
+          "sampleValue": "Cash"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "allocated_amount_usd",
+          "description": "Amount for ranking",
+          "sampleValue": "$15,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C043",
+      "name": "riskMitigantSubType",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Categorical",
+      "formula": "ARGMAX(mitigant_group_code, SUM(allocated_amount_usd))",
+      "formulaSQL": "SELECT cs.mitigant_group_code FROM L2.collateral_snapshot cs\nWHERE cs.facility_id = :facility_id AND cs.as_of_date = :as_of_date\nGROUP BY cs.mitigant_group_code ORDER BY SUM(cs.allocated_amount_usd) DESC LIMIT 1",
+      "description": "Dominant mitigant group (M1 = Eligible Collateral, M2 = Other CRM) by value.",
+      "displayFormat": "Text",
+      "sampleValue": "M1",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "mitigant_group_code",
+          "description": "Parent group",
+          "sampleValue": "M1"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "allocated_amount_usd",
+          "description": "Amount for ranking",
+          "sampleValue": "$15,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C044",
+      "name": "participatingCounterpartyIds",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Table",
+      "formula": "LISTAGG(DISTINCT counterparty_id)",
+      "formulaSQL": "SELECT LISTAGG(DISTINCT fcp.counterparty_id, ',') WITHIN GROUP (ORDER BY fcp.counterparty_id)\nFROM L1.facility_counterparty_participation fcp WHERE fcp.facility_id = :facility_id",
+      "description": "List of counterparty IDs participating in a syndicated facility.",
+      "displayFormat": "Text",
+      "sampleValue": "7890, 7891",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "facility_counterparty_participation",
+          "field": "counterparty_id",
+          "description": "Participating counterparty",
+          "sampleValue": "7890"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ],
+      "notes": "Derivable from facility_counterparty_participation."
+    },
+    {
+      "id": "C045",
+      "name": "isSyndicated",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Status",
+      "formula": "CASE WHEN COUNT(DISTINCT counterparty_id) > 1 THEN 1 ELSE 0 END",
+      "formulaSQL": "SELECT CASE WHEN COUNT(DISTINCT fcp.counterparty_id) > 1 THEN 1 ELSE 0 END\nFROM L1.facility_counterparty_participation fcp WHERE fcp.facility_id = :facility_id",
+      "description": "Syndication flag: >1 participating counterparty.",
+      "displayFormat": "1/0",
+      "sampleValue": "1",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "facility_counterparty_participation",
+          "field": "counterparty_id",
+          "description": "Participating counterparties",
+          "sampleValue": "7890"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ]
+    },
+    {
+      "id": "C046",
+      "name": "outstandingExposure",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Aggregate",
+      "formula": "gross_exposure_usd from facility_exposure_snapshot",
+      "formulaSQL": "SELECT fes.gross_exposure_usd\nFROM L2.facility_exposure_snapshot fes\nWHERE fes.facility_id = :facility_id AND fes.as_of_date = :as_of_date",
+      "description": "Outstanding gross exposure for the facility. Direct read from facility_exposure_snapshot.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$45.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure",
+          "sampleValue": "$45,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ],
+      "notes": "Simplified: use gross_exposure_usd directly rather than committed - contribution."
+    },
+    {
+      "id": "C047",
+      "name": "isActive",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Status",
+      "formula": "CASE WHEN facility_status = 'Active' THEN 1 ELSE 0 END",
+      "formulaSQL": "SELECT CASE WHEN fm.facility_status = 'Active' THEN 1 ELSE 0 END FROM L1.facility_master fm WHERE fm.facility_id = :facility_id",
+      "description": "Active facility flag.",
+      "displayFormat": "1/0",
+      "sampleValue": "1",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "facility_status",
+          "description": "Facility status",
+          "sampleValue": "Active"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ]
+    },
+    {
+      "id": "C048",
+      "name": "hasAmendment",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Status",
+      "formula": "CASE WHEN EXISTS amendment_event THEN 1 ELSE 0 END",
+      "formulaSQL": "SELECT CASE WHEN EXISTS (SELECT 1 FROM L2.amendment_event ae\nWHERE ae.facility_id = :facility_id AND ae.amendment_status NOT IN ('Rejected','Complete') AND ae.as_of_date = :as_of_date)\nTHEN 1 ELSE 0 END",
+      "description": "Flag: facility has an active/pending amendment.",
+      "displayFormat": "1/0",
+      "sampleValue": "1",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "amendment_event",
+          "field": "facility_id",
+          "description": "Facility FK",
+          "sampleValue": "10234"
+        },
+        {
+          "layer": "L2",
+          "table": "amendment_event",
+          "field": "amendment_status",
+          "description": "Status filter",
+          "sampleValue": "Under Credit Review"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ],
+      "notes": "Derivable from amendment_event."
+    },
+    {
+      "id": "C049",
+      "name": "spread_pct_fac",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Aggregate",
+      "formula": "spread_bps / 100",
+      "formulaSQL": "SELECT fps.spread_bps / 100.0 FROM L2.facility_pricing_snapshot fps\nWHERE fps.facility_id = :facility_id AND fps.as_of_date = :as_of_date",
+      "description": "Credit spread (%) for the facility.",
+      "displayFormat": "0.00%",
+      "sampleValue": "2.50%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread bps",
+          "sampleValue": "250"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ]
+    },
+    {
+      "id": "C050",
+      "name": "base_rate_pct_fac",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Aggregate",
+      "formula": "base_rate_pct",
+      "formulaSQL": "SELECT fps.base_rate_pct FROM L2.facility_pricing_snapshot fps WHERE fps.facility_id = :facility_id AND fps.as_of_date = :as_of_date",
+      "description": "Base/reference rate (%) for the facility.",
+      "displayFormat": "0.00%",
+      "sampleValue": "5.25%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate %",
+          "sampleValue": "5.25"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ]
+    },
+    {
+      "id": "C051",
+      "name": "fee_rate_pct_fac",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Derived",
+      "formula": "(fee_income_amt / avg_earning_assets_amt) * 100",
+      "formulaSQL": "SELECT (fps.fee_income_amt / NULLIF(fps.avg_earning_assets_amt, 0)) * 100\nFROM L2.facility_profitability_snapshot fps WHERE fps.facility_id = :facility_id AND fps.as_of_date = :as_of_date",
+      "description": "Fee rate as % of average earning assets.",
+      "displayFormat": "0.00%",
+      "sampleValue": "0.35%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "fee_income_amt",
+          "description": "Fee income",
+          "sampleValue": "$350,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "avg_earning_assets_amt",
+          "description": "Avg earning assets",
+          "sampleValue": "$100,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ],
+      "notes": "Derivable from profitability snapshot."
+    },
+    {
+      "id": "C052",
+      "name": "tenor_years_fac",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Derived",
+      "formula": "(maturity_date - origination_date) / 365.25",
+      "formulaSQL": "SELECT DATEDIFF(fm.maturity_date, fm.origination_date) / 365.25 FROM L1.facility_master fm WHERE fm.facility_id = :facility_id",
+      "description": "Tenor in years from origination to maturity.",
+      "displayFormat": "0.0",
+      "sampleValue": "5.0",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "maturity_date",
+          "description": "Maturity",
+          "sampleValue": "2031-01-15"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "origination_date",
+          "description": "Origination",
+          "sampleValue": "2026-01-15"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ]
+    },
+    {
+      "id": "C053",
+      "name": "days_until_maturity",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Derived",
+      "formula": "maturity_date - CURRENT_DATE",
+      "formulaSQL": "SELECT DATEDIFF(fm.maturity_date, CURRENT_DATE) FROM L1.facility_master fm WHERE fm.facility_id = :facility_id",
+      "description": "Days remaining until facility maturity.",
+      "displayFormat": "#,##0",
+      "sampleValue": "1825",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "maturity_date",
+          "description": "Maturity",
+          "sampleValue": "2031-01-15"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ],
+      "notes": "Derivable."
+    },
+    {
+      "id": "C054",
+      "name": "num_loans",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Count",
+      "formula": "COUNT(position_id)",
+      "formulaSQL": "SELECT COUNT(p.position_id) FROM L2.position p\nWHERE p.facility_id = :facility_id AND p.as_of_date = :as_of_date",
+      "description": "Count of loan positions under a facility.",
+      "displayFormat": "#,##0",
+      "sampleValue": "3",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "position",
+          "field": "position_id",
+          "description": "Position PK",
+          "sampleValue": "50001"
+        },
+        {
+          "layer": "L2",
+          "table": "position",
+          "field": "facility_id",
+          "description": "Facility FK",
+          "sampleValue": "10234"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility",
+        "counterparty",
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C055",
+      "name": "exposure_utilized_fac",
+      "page": "P5",
+      "section": "Facility",
+      "metricType": "Aggregate",
+      "formula": "contribution_amount_usd from limit_contribution_snapshot",
+      "formulaSQL": "SELECT SUM(lcs.contribution_amount_usd) FROM L2.limit_contribution_snapshot lcs\nWHERE lcs.facility_id = :facility_id AND lcs.as_of_date = :as_of_date",
+      "description": "Utilized exposure at facility level from limit contribution.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$45.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_contribution_snapshot",
+          "field": "contribution_amount_usd",
+          "description": "Facility contribution",
+          "sampleValue": "$45,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "facility_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "facility"
+      ]
+    },
+    {
+      "id": "C058",
+      "name": "num_portfolios",
+      "page": "P6",
+      "section": "Department Summary",
+      "metricType": "Count",
+      "formula": "COUNT(DISTINCT portfolio_id)",
+      "formulaSQL": "SELECT COUNT(DISTINCT pd.portfolio_id) FROM L1.portfolio_dim pd\nWHERE pd.lob_segment_id = :lob_segment_id AND pd.active_flag = 'Y'",
+      "description": "Number of active portfolios in the department/LoB.",
+      "displayFormat": "#,##0",
+      "sampleValue": "8",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "portfolio_id",
+          "description": "Portfolio ID",
+          "sampleValue": "3001"
+        },
+        {
+          "layer": "L1",
+          "table": "portfolio_dim",
+          "field": "lob_segment_id",
+          "description": "FK to LoB",
+          "sampleValue": "1001"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "lob_segment_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "department",
+        "lob"
+      ]
+    },
+    {
+      "id": "C059",
+      "name": "num_desks",
+      "page": "P6",
+      "section": "Department Summary",
+      "metricType": "Count",
+      "formula": "COUNT(DISTINCT org_unit_id) WHERE type = 'DESK'",
+      "formulaSQL": "SELECT COUNT(DISTINCT oud.org_unit_id) FROM L1.org_unit_dim oud\nWHERE oud.lob_segment_id = :lob_segment_id AND oud.org_unit_type = 'DESK' AND oud.is_current = 'Y'",
+      "description": "Number of desks in the department/LoB.",
+      "displayFormat": "#,##0",
+      "sampleValue": "4",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "org_unit_dim",
+          "field": "org_unit_id",
+          "description": "Org unit ID",
+          "sampleValue": "5001"
+        },
+        {
+          "layer": "L1",
+          "table": "org_unit_dim",
+          "field": "org_unit_type",
+          "description": "DESK filter",
+          "sampleValue": "DESK"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "lob_segment_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "department",
+        "lob"
+      ]
+    },
+    {
+      "id": "C060",
+      "name": "exposure_limit_m",
+      "page": "P6",
+      "section": "Department Summary",
+      "metricType": "Aggregate",
+      "formula": "SUM(limit_amount_usd) WHERE limit_scope = LOB",
+      "formulaSQL": "SELECT SUM(lr.limit_amount_usd) FROM L1.limit_rule lr\nWHERE lr.limit_scope = 'LOB' AND lr.lob_segment_id = :lob_segment_id AND lr.effective_to_date IS NULL",
+      "description": "Total approved exposure limit for the department/LoB.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$500.0M",
+      "sourceFields": [
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Limit amount",
+          "sampleValue": "$500,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_scope",
+          "description": "LOB scope",
+          "sampleValue": "LOB"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "lob_segment_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "department",
+        "lob"
+      ]
+    },
+    {
+      "id": "C061",
+      "name": "utilizationPct_portfolio",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Ratio",
+      "formula": "(SUM(utilized_exposure) / SUM(limit_amount)) * 100",
+      "formulaSQL": "SELECT (SUM(lue.utilized_amount_usd) / NULLIF(SUM(lr.limit_amount_usd), 0)) * 100\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nJOIN L1.facility_master fm ON fm.counterparty_id = lr.counterparty_id\nWHERE fm.portfolio_id = :portfolio_id AND lr.effective_to_date IS NULL AND lue.as_of_date = :as_of_date",
+      "description": "Utilization % at portfolio level.",
+      "displayFormat": "0.0%",
+      "sampleValue": "71.0%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Utilized",
+          "sampleValue": "$355,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Limit",
+          "sampleValue": "$500,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "portfolio_id",
+          "description": "Portfolio FK",
+          "sampleValue": "3001"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "department",
+        "lob"
+      ]
+    },
+    {
+      "id": "C062",
+      "name": "limit_status",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Categorical",
+      "formula": "Worst-case tier across counterparties in portfolio",
+      "formulaSQL": "SELECT CASE\n  WHEN MAX(CASE WHEN (lue.utilized_amount_usd / lr.limit_amount_usd)*100 >= lr.outer_threshold_pct THEN 1 ELSE 0 END) = 1 THEN 'Breach'\n  WHEN MAX(CASE WHEN (lue.utilized_amount_usd / lr.limit_amount_usd)*100 >= lr.inner_threshold_pct THEN 1 ELSE 0 END) = 1 THEN 'Warning'\n  ELSE 'No Breach' END\nFROM L2.limit_utilization_event lue\nJOIN L1.limit_rule lr ON lr.limit_rule_id = lue.limit_rule_id\nJOIN L1.facility_master fm ON fm.counterparty_id = lr.counterparty_id\nWHERE fm.portfolio_id = :portfolio_id AND lue.as_of_date = :as_of_date",
+      "description": "Worst-case limit status across all counterparties in the portfolio.",
+      "displayFormat": "Text",
+      "sampleValue": "Warning",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "limit_utilization_event",
+          "field": "utilized_amount_usd",
+          "description": "Utilized",
+          "sampleValue": "$355,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "limit_amount_usd",
+          "description": "Limit",
+          "sampleValue": "$500,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "inner_threshold_pct",
+          "description": "Warning threshold",
+          "sampleValue": "75.0"
+        },
+        {
+          "layer": "L1",
+          "table": "limit_rule",
+          "field": "outer_threshold_pct",
+          "description": "Breach threshold",
+          "sampleValue": "100.0"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C063",
+      "name": "exposure_mom_change_pct_portfolio",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current - prior_month) / prior_month) * 100",
+      "formulaSQL": "SELECT ((curr.t - prior.t) / NULLIF(prior.t, 0)) * 100\nFROM (SELECT SUM(fes.gross_exposure_usd) t FROM L2.facility_exposure_snapshot fes JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fm.portfolio_id = :pid AND fes.as_of_date = :as_of_date) curr,\n(SELECT SUM(fes.gross_exposure_usd) t FROM L2.facility_exposure_snapshot fes JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fm.portfolio_id = :pid AND fes.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')) prior",
+      "description": "Month-over-month exposure change at portfolio level.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+6.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Month-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C064",
+      "name": "exposure_qoq_change_pct_portfolio",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current - prior_quarter) / prior_quarter) * 100",
+      "formulaSQL": "SELECT ((curr.t - prior.t) / NULLIF(prior.t, 0)) * 100\nFROM (SELECT SUM(fes.gross_exposure_usd) t FROM L2.facility_exposure_snapshot fes JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fm.portfolio_id = :pid AND fes.as_of_date = :as_of_date) curr,\n(SELECT SUM(fes.gross_exposure_usd) t FROM L2.facility_exposure_snapshot fes JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fm.portfolio_id = :pid AND fes.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_quarter_end = 'Y')) prior",
+      "description": "Quarter-over-quarter exposure change at portfolio level.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+6.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_quarter_end",
+          "description": "Quarter-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C065",
+      "name": "exposure_yoy_change_pct_portfolio",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current - prior_year) / prior_year) * 100",
+      "formulaSQL": "SELECT ((curr.t - prior.t) / NULLIF(prior.t, 0)) * 100\nFROM (SELECT SUM(fes.gross_exposure_usd) t FROM L2.facility_exposure_snapshot fes JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fm.portfolio_id = :pid AND fes.as_of_date = :as_of_date) curr,\n(SELECT SUM(fes.gross_exposure_usd) t FROM L2.facility_exposure_snapshot fes JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fm.portfolio_id = :pid AND fes.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_year_end = 'Y')) prior",
+      "description": "Year-over-year exposure change at portfolio level.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+6.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure",
+          "sampleValue": "$155,000,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_year_end",
+          "description": "Year-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C066",
+      "name": "spread_mom_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_avg_spread - prior_avg_spread) / prior_avg_spread) * 100",
+      "formulaSQL": "SELECT ((curr.s - prior.s) / NULLIF(prior.s, 0)) * 100\nFROM (SELECT AVG(fps.spread_bps) s FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = :as_of_date) curr,\n(SELECT AVG(fps.spread_bps) s FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')) prior",
+      "description": "Month-over-month spread change.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+3.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread bps",
+          "sampleValue": "235"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Month-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C067",
+      "name": "spread_qoq_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_avg_spread - prior_avg_spread) / prior_avg_spread) * 100",
+      "formulaSQL": "SELECT ((curr.s - prior.s) / NULLIF(prior.s, 0)) * 100\nFROM (SELECT AVG(fps.spread_bps) s FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = :as_of_date) curr,\n(SELECT AVG(fps.spread_bps) s FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_quarter_end = 'Y')) prior",
+      "description": "Quarter-over-quarter spread change.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+3.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread bps",
+          "sampleValue": "235"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_quarter_end",
+          "description": "Quarter-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C068",
+      "name": "spread_yoy_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_avg_spread - prior_avg_spread) / prior_avg_spread) * 100",
+      "formulaSQL": "SELECT ((curr.s - prior.s) / NULLIF(prior.s, 0)) * 100\nFROM (SELECT AVG(fps.spread_bps) s FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = :as_of_date) curr,\n(SELECT AVG(fps.spread_bps) s FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_year_end = 'Y')) prior",
+      "description": "Year-over-year spread change.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+3.2%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread bps",
+          "sampleValue": "235"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_year_end",
+          "description": "Year-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C069",
+      "name": "base_rate_mom_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_avg_base - prior_avg_base) / prior_avg_base) * 100",
+      "formulaSQL": "SELECT ((curr.r - prior.r) / NULLIF(prior.r, 0)) * 100\nFROM (SELECT AVG(fps.base_rate_pct) r FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = :as_of_date) curr,\n(SELECT AVG(fps.base_rate_pct) r FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')) prior",
+      "description": "Month-over-month base rate change.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "-1.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.20"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Month-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C070",
+      "name": "base_rate_qoq_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_avg_base - prior_avg_base) / prior_avg_base) * 100",
+      "formulaSQL": "SELECT ((curr.r - prior.r) / NULLIF(prior.r, 0)) * 100\nFROM (SELECT AVG(fps.base_rate_pct) r FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = :as_of_date) curr,\n(SELECT AVG(fps.base_rate_pct) r FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_quarter_end = 'Y')) prior",
+      "description": "Quarter-over-quarter base rate change.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "-1.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.20"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_quarter_end",
+          "description": "Quarter-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C071",
+      "name": "base_rate_yoy_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_avg_base - prior_avg_base) / prior_avg_base) * 100",
+      "formulaSQL": "SELECT ((curr.r - prior.r) / NULLIF(prior.r, 0)) * 100\nFROM (SELECT AVG(fps.base_rate_pct) r FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = :as_of_date) curr,\n(SELECT AVG(fps.base_rate_pct) r FROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id WHERE fm.portfolio_id = :pid AND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_year_end = 'Y')) prior",
+      "description": "Year-over-year base rate change.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "-1.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.20"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_year_end",
+          "description": "Year-end flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ]
+    },
+    {
+      "id": "C072",
+      "name": "delinquency_rate_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Ratio",
+      "formula": "SUM(delinquent_exposure) / SUM(total_exposure) * 100",
+      "formulaSQL": "SELECT (SUM(CASE WHEN fds.delinquency_status_code != 'CURRENT' THEN fes.gross_exposure_usd ELSE 0 END) / NULLIF(SUM(fes.gross_exposure_usd), 0)) * 100\nFROM L2.facility_exposure_snapshot fes\nJOIN L2.facility_delinquency_snapshot fds ON fds.facility_id = fes.facility_id AND fds.as_of_date = fes.as_of_date\nJOIN L1.facility_master fm ON fm.facility_id = fes.facility_id\nWHERE fm.portfolio_id = :portfolio_id AND fes.as_of_date = :as_of_date",
+      "description": "Delinquency rate: delinquent exposure / total exposure.",
+      "displayFormat": "0.0%",
+      "sampleValue": "2.3%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_delinquency_snapshot",
+          "field": "delinquency_status_code",
+          "description": "Status",
+          "sampleValue": "DELINQUENT"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Exposure weight",
+          "sampleValue": "$155,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "counterparty"
+      ],
+      "notes": "MODEL GAP NOTE: Would benefit from delinquent_exposure_amt on facility_delinquency_snapshot to avoid join."
+    },
+    {
+      "id": "C073",
+      "name": "downgrades_mom_change_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Trend",
+      "formula": "((current_downgrades - prior_month_downgrades) / prior_month_downgrades) * 100",
+      "formulaSQL": "SELECT ((curr.cnt - prior.cnt) / NULLIF(prior.cnt, 0)) * 100\nFROM (SELECT COUNT(*) cnt FROM L2.counterparty_rating_observation cro JOIN L1.facility_master fm ON fm.counterparty_id = cro.counterparty_id\nWHERE fm.portfolio_id = :pid AND cro.rating_type = 'INTERNAL' AND cro.rating_value > cro.prior_rating_value AND cro.as_of_date = :as_of_date) curr,\n(SELECT COUNT(*) cnt FROM L2.counterparty_rating_observation cro JOIN L1.facility_master fm ON fm.counterparty_id = cro.counterparty_id\nWHERE fm.portfolio_id = :pid AND cro.rating_type = 'INTERNAL' AND cro.rating_value > cro.prior_rating_value\nAND cro.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')) prior",
+      "description": "MoM change in count of internal rating downgrades.",
+      "displayFormat": "+0.0%",
+      "sampleValue": "+15.0%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "rating_value",
+          "description": "Current rating",
+          "sampleValue": "4"
+        },
+        {
+          "layer": "L2",
+          "table": "counterparty_rating_observation",
+          "field": "prior_rating_value",
+          "description": "Prior rating",
+          "sampleValue": "3"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C074",
+      "name": "rwa_density_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Ratio",
+      "formula": "(SUM(rwa_amount) / SUM(exposure)) * 100",
+      "formulaSQL": "SELECT (SUM(fmo.metric_value_usd) / NULLIF(SUM(fes.gross_exposure_usd), 0)) * 100\nFROM L2.financial_metric_observation fmo\nJOIN L2.facility_exposure_snapshot fes ON fes.counterparty_id = fmo.counterparty_id AND fes.as_of_date = fmo.as_of_date\nJOIN L1.facility_master fm ON fm.facility_id = fes.facility_id\nWHERE fmo.metric_code = 'RWA' AND fm.portfolio_id = :portfolio_id AND fmo.as_of_date = :as_of_date",
+      "description": "RWA density: risk-weighted assets / exposure. RWA is pre-calculated by risk engine and stored in financial_metric_observation (metric_code = RWA). MODEL GAP: for position-level drill-down, add risk_weight_pct and rwa_amount_usd to L2.position.",
+      "displayFormat": "0.0%",
+      "sampleValue": "52.0%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value_usd",
+          "description": "Pre-calculated RWA",
+          "sampleValue": "$78,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_code",
+          "description": "RWA filter",
+          "sampleValue": "RWA"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Total exposure",
+          "sampleValue": "$150,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio",
+        "department",
+        "lob"
+      ],
+      "notes": "RWA is CALCULATED (EAD × Risk Weight under SA, or EAD × K × 12.5 under IRB). Pre-calculated values stored in financial_metric_observation. MODEL GAP: position-level risk_weight_pct for drill-down."
+    },
+    {
+      "id": "C075",
+      "name": "prior_month_rwa_density_pct",
+      "page": "P6",
+      "section": "Portfolio Summary",
+      "metricType": "Ratio",
+      "formula": "Prior month: (SUM(rwa) / SUM(exposure)) * 100",
+      "formulaSQL": "SELECT (SUM(fmo.metric_value_usd) / NULLIF(SUM(fes.gross_exposure_usd), 0)) * 100\nFROM L2.financial_metric_observation fmo\nJOIN L2.facility_exposure_snapshot fes ON fes.counterparty_id = fmo.counterparty_id AND fes.as_of_date = fmo.as_of_date\nJOIN L1.facility_master fm ON fm.facility_id = fes.facility_id\nWHERE fmo.metric_code = 'RWA' AND fm.portfolio_id = :portfolio_id\nAND fmo.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')",
+      "description": "RWA density for prior month-end.",
+      "displayFormat": "0.0%",
+      "sampleValue": "50.5%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value_usd",
+          "description": "Prior month RWA",
+          "sampleValue": "$75,750,000"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Month-end filter",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "portfolio_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "portfolio"
+      ]
+    },
+    {
+      "id": "C076",
+      "name": "prior_month_spread_pct_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "AVG(spread_bps) / 100 for Prior Month",
+      "formulaSQL": "SELECT AVG(fps.spread_bps) / 100.0\nFROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')",
+      "description": "Average spread at desk level for prior month.",
+      "displayFormat": "0.00%",
+      "sampleValue": "2.30%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread",
+          "sampleValue": "230"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Prior Month flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C077",
+      "name": "prior_quarter_spread_pct_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "AVG(spread_bps) / 100 for Prior Quarter",
+      "formulaSQL": "SELECT AVG(fps.spread_bps) / 100.0\nFROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_quarter_end = 'Y')",
+      "description": "Average spread at desk level for prior quarter.",
+      "displayFormat": "0.00%",
+      "sampleValue": "2.30%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread",
+          "sampleValue": "230"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_quarter_end",
+          "description": "Prior Quarter flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C078",
+      "name": "prior_year_spread_pct_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "AVG(spread_bps) / 100 for Prior Year",
+      "formulaSQL": "SELECT AVG(fps.spread_bps) / 100.0\nFROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_year_end = 'Y')",
+      "description": "Average spread at desk level for prior year.",
+      "displayFormat": "0.00%",
+      "sampleValue": "2.30%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "spread_bps",
+          "description": "Spread",
+          "sampleValue": "230"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_year_end",
+          "description": "Prior Year flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C079",
+      "name": "prior_month_base_rate_pct_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "AVG(base_rate_pct) for Prior Month",
+      "formulaSQL": "SELECT AVG(fps.base_rate_pct)\nFROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')",
+      "description": "Average base rate at desk level for prior month.",
+      "displayFormat": "0.00%",
+      "sampleValue": "5.15%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.15"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Prior Month flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C080",
+      "name": "prior_quarter_base_rate_pct_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "AVG(base_rate_pct) for Prior Quarter",
+      "formulaSQL": "SELECT AVG(fps.base_rate_pct)\nFROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_quarter_end = 'Y')",
+      "description": "Average base rate at desk level for prior quarter.",
+      "displayFormat": "0.00%",
+      "sampleValue": "5.15%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.15"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_quarter_end",
+          "description": "Prior Quarter flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C081",
+      "name": "prior_year_base_rate_pct_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "AVG(base_rate_pct) for Prior Year",
+      "formulaSQL": "SELECT AVG(fps.base_rate_pct)\nFROM L2.facility_pricing_snapshot fps JOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_year_end = 'Y')",
+      "description": "Average base rate at desk level for prior year.",
+      "displayFormat": "0.00%",
+      "sampleValue": "5.15%",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_pricing_snapshot",
+          "field": "base_rate_pct",
+          "description": "Base rate",
+          "sampleValue": "5.15"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_year_end",
+          "description": "Prior Year flag",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C082",
+      "name": "assets_count_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Count",
+      "formula": "COUNT(DISTINCT collateral_asset_id)",
+      "formulaSQL": "SELECT COUNT(DISTINCT cs.collateral_asset_id)\nFROM L2.collateral_snapshot cs\nJOIN L1.facility_master fm ON fm.facility_id = cs.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id AND cs.as_of_date = :as_of_date",
+      "description": "Count of distinct collateral assets at desk level.",
+      "displayFormat": "#,##0",
+      "sampleValue": "42",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "collateral_asset_id",
+          "description": "Collateral asset",
+          "sampleValue": "8001"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C083",
+      "name": "prior_month_assets_count_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Count",
+      "formula": "COUNT(DISTINCT collateral_asset_id) for prior month",
+      "formulaSQL": "SELECT COUNT(DISTINCT cs.collateral_asset_id)\nFROM L2.collateral_snapshot cs\nJOIN L1.facility_master fm ON fm.facility_id = cs.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND cs.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')",
+      "description": "Prior month collateral asset count at desk level.",
+      "displayFormat": "#,##0",
+      "sampleValue": "40",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "collateral_asset_id",
+          "description": "Asset",
+          "sampleValue": "8001"
+        },
+        {
+          "layer": "L1",
+          "table": "date_dim",
+          "field": "is_month_end",
+          "description": "Prior month",
+          "sampleValue": "Y"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ]
+    },
+    {
+      "id": "C084",
+      "name": "prior_month_net_income_m_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Derived",
+      "formula": "(interest_income + fee_income - interest_expense) for prior month",
+      "formulaSQL": "SELECT SUM(fps.interest_income_amt + fps.fee_income_amt - fps.interest_expense_amt)\nFROM L2.facility_profitability_snapshot fps\nJOIN L1.facility_master fm ON fm.facility_id = fps.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE oud.org_unit_id = :org_unit_id\nAND fps.as_of_date = (SELECT MAX(calendar_date) FROM L1.date_dim WHERE calendar_date < :as_of_date AND is_month_end = 'Y')",
+      "description": "Prior month net income proxy at desk level.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$2.5M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_income_amt",
+          "description": "Income",
+          "sampleValue": "$5,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "fee_income_amt",
+          "description": "Fee income",
+          "sampleValue": "$500,000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_profitability_snapshot",
+          "field": "interest_expense_amt",
+          "description": "Expense",
+          "sampleValue": "$3,000,000"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ],
+      "notes": "Approximation. True net income requires MODEL GAP additions to profitability snapshot."
+    },
+    {
+      "id": "C085",
+      "name": "total_capital_m_desk",
+      "page": "P6",
+      "section": "Desk Data",
+      "metricType": "Aggregate",
+      "formula": "SUM(metric_value_usd) WHERE metric_code = CAPITAL_REQ",
+      "formulaSQL": "SELECT SUM(fmo.metric_value_usd)\nFROM L2.financial_metric_observation fmo\nJOIN L1.facility_master fm ON fm.facility_id = fmo.facility_id\nJOIN L1.org_unit_dim oud ON oud.lob_segment_id = fm.lob_segment_id AND oud.org_unit_type = 'DESK'\nWHERE fmo.metric_code = 'CAPITAL_REQ' AND oud.org_unit_id = :org_unit_id AND fmo.as_of_date = :as_of_date",
+      "description": "Total capital requirement at desk level.",
+      "displayFormat": "$#,##0.0M",
+      "sampleValue": "$15.0M",
+      "sourceFields": [
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value_usd",
+          "description": "Capital req",
+          "sampleValue": "$15,000,000"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_code",
+          "description": "CAPITAL_REQ",
+          "sampleValue": "CAPITAL_REQ"
+        }
+      ],
+      "dimensions": [
+        {
+          "dimension": "as_of_date",
+          "interaction": "FILTER"
+        },
+        {
+          "dimension": "org_unit_id",
+          "interaction": "GROUP_BY"
+        }
+      ],
+      "toggles": [
+        "desk"
+      ],
+      "notes": "Pre-calculated by risk engine. Stored in financial_metric_observation."
+    }
+  ]
+}

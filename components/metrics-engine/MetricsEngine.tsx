@@ -17,6 +17,8 @@ export default function MetricsEngine() {
   const [duplicateMetric, setDuplicateMetric] = useState<L3Metric | null>(null);
   const importFileRef = useRef<HTMLInputElement>(null);
   const [importResult, setImportResult] = useState<ImportResultState | null>(null);
+  const [replaceAllCustom, setReplaceAllCustom] = useState(false);
+  const [showModelGaps, setShowModelGaps] = useState(false);
 
   const fetchMetrics = () => {
     setLoading(true);
@@ -87,6 +89,7 @@ export default function MetricsEngine() {
     if (!file) return;
     const form = new FormData();
     form.append('file', file);
+    if (replaceAllCustom) form.append('replace', 'true');
     fetch('/api/metrics/import', { method: 'POST', body: form })
       .then(res => res.json())
       .then(data => { setImportResult(data); fetchMetrics(); })
@@ -116,6 +119,10 @@ export default function MetricsEngine() {
       handleFilterPageChange={handleFilterPageChange}
       handleExport={handleExport}
       handleImport={handleImport}
+      replaceAllCustom={replaceAllCustom}
+      setReplaceAllCustom={setReplaceAllCustom}
+      showModelGaps={showModelGaps}
+      setShowModelGaps={setShowModelGaps}
       handleSaveCreate={handleSaveCreate}
       handleSaveEdit={handleSaveEdit}
       duplicateMetric={duplicateMetric}

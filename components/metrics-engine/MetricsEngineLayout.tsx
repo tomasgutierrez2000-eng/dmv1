@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Search, Plus, Download, Upload, FileSpreadsheet, FileJson, FileCode,
-  ChevronRight, Layers, Hash, TrendingUp, Zap,
+  ChevronRight, Layers, Hash, TrendingUp, Zap, AlertCircle, X,
 } from 'lucide-react';
 import { DASHBOARD_PAGES } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
@@ -20,6 +20,8 @@ export interface ImportResultState {
   created: string[];
   updated: string[];
   errors: { message: string; row?: number; sheet?: string }[];
+  replaced?: boolean;
+  count?: number;
 }
 
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
@@ -31,6 +33,73 @@ function getMetricTypeIcon(type: string): React.ReactNode {
     case 'Derived': return <Zap className="w-3.5 h-3.5" />;
     default: return <Hash className="w-3.5 h-3.5" />;
   }
+}
+
+interface ModelGapRow {
+  gapItem: string;
+  targetTable: string;
+  fieldsRequired: string;
+  rationale: string;
+  impactedMetrics: string;
+}
+
+function ModelGapsModal({ onClose }: { onClose: () => void }) {
+  const [gaps, setGaps] = React.useState<ModelGapRow[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    fetch('/api/model-gaps')
+      .then(res => res.json())
+      .then((data: { gaps: ModelGapRow[] }) => setGaps(Array.isArray(data.gaps) ? data.gaps : []))
+      .catch(() => setGaps([]))
+      .finally(() => setLoading(false));
+  }, []);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
+      <div className="bg-[#0a0e1a] border border-white/10 rounded-xl shadow-xl max-w-4xl w-full max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-amber-400" />
+            Model Gaps
+          </h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto px-6 py-4">
+          {loading ? (
+            <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>
+          ) : gaps.length === 0 ? (
+            <div className="text-sm text-gray-500 py-8 text-center">No model gaps stored. Import an Excel file with a ModelGaps sheet to populate.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500 border-b border-white/[0.06]">
+                    <th className="pb-2 pr-4 font-semibold">Gap Item</th>
+                    <th className="pb-2 pr-4 font-semibold">Target Table / Scope</th>
+                    <th className="pb-2 pr-4 font-semibold">Fields Required</th>
+                    <th className="pb-2 pr-4 font-semibold">Rationale</th>
+                    <th className="pb-2 font-semibold">Impacted Metrics</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gaps.map((g, i) => (
+                    <tr key={i} className="border-b border-white/[0.04]">
+                      <td className="py-3 pr-4 text-white font-medium align-top">{g.gapItem}</td>
+                      <td className="py-3 pr-4 text-gray-300 align-top font-mono text-xs">{g.targetTable}</td>
+                      <td className="py-3 pr-4 text-gray-400 align-top text-xs max-w-[200px]">{g.fieldsRequired}</td>
+                      <td className="py-3 pr-4 text-gray-400 align-top text-xs max-w-[220px]">{g.rationale}</td>
+                      <td className="py-3 text-gray-400 align-top text-xs">{g.impactedMetrics}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export interface MetricsEngineLayoutProps {
@@ -54,6 +123,10 @@ export interface MetricsEngineLayoutProps {
   handleFilterPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleExport: (format: 'json' | 'xlsx' | 'template') => void;
   handleImport: (e: InputChangeEvent) => void;
+  replaceAllCustom: boolean;
+  setReplaceAllCustom: (v: boolean) => void;
+  showModelGaps: boolean;
+  setShowModelGaps: (v: boolean) => void;
   handleSaveCreate: (payload: MetricPayload) => Promise<void>;
   handleSaveEdit: (payload: MetricPayload) => Promise<void>;
   duplicateMetric: L3Metric | null;
@@ -67,7 +140,9 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
     metrics, loading, filterPage, setFilterPage, search, setSearch,
     selectedId, setSelectedId, view, setView, importFileRef, importResult, setImportResult,
     sections, filtered, selectedMetric, selectedSource,
-    handleFilterPageChange, handleExport, handleImport, handleSaveCreate, handleSaveEdit,
+    handleFilterPageChange, handleExport, handleImport,
+    replaceAllCustom, setReplaceAllCustom, showModelGaps, setShowModelGaps,
+    handleSaveCreate, handleSaveEdit,
     duplicateMetric, onDuplicate, onStartCreate, onCancelCreate,
   } = props;
 
@@ -160,23 +235,40 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               </button>
             </div>
           </div>
+          <label className="flex items-center gap-2 px-2 py-1.5 text-xs text-gray-400 cursor-pointer hover:text-gray-300">
+            <input
+              type="checkbox"
+              checked={replaceAllCustom}
+              onChange={e => setReplaceAllCustom(e.target.checked)}
+              className="rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500/40"
+            />
+            Replace all custom
+          </label>
           <div>
             <input ref={importFileRef} type="file" accept=".json,.xlsx,.xls" className="hidden" onChange={handleImport} />
             <button type="button" onClick={() => importFileRef.current?.click()} className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-gray-400 text-xs">
               <Upload className="w-3.5 h-3.5" /> Import
             </button>
           </div>
+          <button type="button" onClick={() => setShowModelGaps(true)} className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-gray-400 text-xs">
+            <AlertCircle className="w-3.5 h-3.5" /> Model Gaps
+          </button>
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto">
         {importResult && (
           <div className="sticky top-0 z-20 px-6 py-3 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between">
             <span className="text-sm text-amber-200">
-              Import: {importResult.created.length} created, {importResult.updated.length} updated
-              {(importResult.errors.length > 0) && `; ${importResult.errors.length} error(s)`}
+              {importResult.replaced
+                ? `Replaced ${importResult.count ?? 0} custom metrics`
+                : `Import: ${importResult.created.length} created, ${importResult.updated.length} updated`}
+              {(importResult.errors?.length > 0) && `; ${importResult.errors.length} error(s)`}
             </span>
             <button onClick={() => setImportResult(null)} className="text-amber-300 hover:text-white text-sm">Dismiss</button>
           </div>
+        )}
+        {showModelGaps && (
+          <ModelGapsModal onClose={() => setShowModelGaps(false)} />
         )}
         <div className="px-6 py-6">
           {view === 'detail' && selectedMetric && (

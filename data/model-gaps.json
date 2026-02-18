@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "gaps": [
+    {
+      "gapItem": "NEW TABLE: Counterparty Financial Statement",
+      "targetTable": "L2.counterparty_financial_snapshot",
+      "fieldsRequired": "counterparty_id (FK), as_of_date, revenue_amt, operating_expense_amt, net_income_amt, interest_expense_amt, tax_expense_amt, depreciation_amt, amortization_amt, total_assets_amt, total_liabilities_amt, shareholders_equity_amt, ebitda_amt (derived), noi_amt (derived), reporting_period, currency_code",
+      "rationale": "Borrower-level financial statement data needed for credit analysis metrics (EBITDA, NOI, LTV numerator context). Sourced from annual/quarterly financial filings or credit memo data.",
+      "impactedMetrics": "ebitda_m, noi_m, LTV context, borrower ROE/ROA"
+    },
+    {
+      "gapItem": "ENHANCE: facility_profitability_snapshot",
+      "targetTable": "L2.facility_profitability_snapshot",
+      "fieldsRequired": "provision_for_credit_losses_amt, non_interest_expense_amt, tax_allocation_amt",
+      "rationale": "Current table has interest income/expense, fee income, avg assets, allocated equity. Missing provision, opex, and tax for true net income and ROE/ROA. Without these, ROE/ROA are approximations only.",
+      "impactedMetrics": "ROE, ROA, NIM (all dimensions)"
+    },
+    {
+      "gapItem": "NEW FIELD: cross_entity_exposure_flag",
+      "targetTable": "L2.facility_exposure_snapshot",
+      "fieldsRequired": "cross_entity_flag CHAR(1) — Y if counterparty has exposure across >1 legal_entity_id for the same as_of_date",
+      "rationale": "Currently derivable via COUNT(DISTINCT legal_entity_id) > 1, but expensive at query time. Pre-calculating as a flag on the snapshot table avoids repeated subqueries and makes filtering performant.",
+      "impactedMetrics": "hasCrossEntityExposure, crossEntityExposureAmount (all dimensions)"
+    },
+    {
+      "gapItem": "NEW FIELD: position-level risk weight",
+      "targetTable": "L2.position or new L2.position_risk_metric",
+      "fieldsRequired": "risk_weight_pct DECIMAL(10,4), rwa_amount_usd DECIMAL(18,2), capital_requirement_pct DECIMAL(10,4), regulatory_approach VARCHAR(20)",
+      "rationale": "Enables RWA drill-down to position level. Currently RWA only available as pre-aggregated metric in financial_metric_observation. For RWA density waterfall and driver analysis, position-level RWA is needed.",
+      "impactedMetrics": "rwa_density_pct (all dimensions), capital metrics"
+    },
+    {
+      "gapItem": "NEW FIELD: delinquent_exposure_amt",
+      "targetTable": "L2.facility_delinquency_snapshot",
+      "fieldsRequired": "delinquent_exposure_amt DECIMAL(18,2) — total exposure amount in delinquent status",
+      "rationale": "Current table has overdue_principal/interest amounts but not the total exposure flagged as delinquent. Delinquency rate calculation needs delinquent exposure / total exposure, which currently requires a join to facility_exposure_snapshot.",
+      "impactedMetrics": "delinquency_rate_pct"
+    },
+    {
+      "gapItem": "CONFIRM: financial_metric_observation metric codes",
+      "targetTable": "L2.financial_metric_observation",
+      "fieldsRequired": "Standardize metric_code values: RWA, CAPITAL_REQ, PD, LGD, EL, EAD",
+      "rationale": "financial_metric_observation is the catch-all for pre-calculated risk metrics. Need to confirm and standardize the metric_code enum to ensure consistent filtering.",
+      "impactedMetrics": "rwa_density, total_capital, expected_loss, PD, LGD"
+    }
+  ]
+}

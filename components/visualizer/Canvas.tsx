@@ -56,6 +56,7 @@ export default function Canvas() {
     setTablePositionsBulk,
     setTablePositionsReplace,
     setRequestFitToView,
+    setRequestFitToDomain,
     setSelectedTable,
     setSelectedRelationship,
     setSelectedField,
@@ -133,10 +134,15 @@ export default function Canvas() {
       let newZoom: number;
       // Fit to both axes so diagram is fully visible and aspect ratio is preserved (no distortion)
       newZoom = Math.min(zoomX, zoomY);
-      const cap = layoutMode === 'domain-overview' || layoutMode === 'snowflake' ? 0.78 : 1.05;
+      const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+      const cap = isOverview
+        ? (visibleCount <= 1 ? 1.25 : 0.78)
+        : 1.05;
       newZoom = Math.min(newZoom, cap);
-      // When few tables visible, zoom in so content is readable
-      if (visibleCount <= 6) {
+      // When few tables visible, zoom in so content is readable; single table gets prominent zoom
+      if (visibleCount <= 1) {
+        newZoom = Math.max(1, Math.min(newZoom, 1.25));
+      } else if (visibleCount <= 6) {
         newZoom = Math.max(0.9, Math.min(newZoom, 1.35));
       } else if (visibleCount <= 15) {
         newZoom = Math.max(0.8, Math.min(newZoom, 1.15));
@@ -186,8 +192,10 @@ export default function Canvas() {
       setTablePositionsBulk(newPositions);
     }
     if (isOverviewLayout) {
-      // Defer fit so React has committed new positions; zoom directly to diagram so user doesn't need to scroll
-      const t = setTimeout(() => setRequestFitToView(), 120);
+      // Defer fit so React has committed new positions; skip if user already selected a table (don't override zoom-to-table)
+      const t = setTimeout(() => {
+        if (!useModelStore.getState().selectedTable) setRequestFitToView();
+      }, 120);
       return () => clearTimeout(t);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
@@ -361,6 +369,10 @@ export default function Canvas() {
     return keys.size > 0 ? keys : null;
   }, [focusMode, model, selectedField, selectedTable, selectedRelationship, visibleRelationships]);
 
+  const prefersReducedMotion = typeof window !== 'undefined'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+
   // Fit to view when user clicks toolbar "Fit to View" (animated).
   // During focus-compact, fit only the focused tables instead of all visible tables.
   useEffect(() => {
@@ -383,6 +395,52 @@ export default function Canvas() {
     runFitToView(positionsForFit, count);
     setTimeout(() => setIsAnimating(false), 350);
   }, [requestFitToView, model, visibleTables, tablePositions, runFitToView, focusVisibleTableKeys]);
+
+  // Fit to category when user clicks a category header (domain-overview): zoom to show whole category
+  const requestFitToDomain = useModelStore((s) => s.requestFitToDomain);
+  useEffect(() => {
+    if (!requestFitToDomain || !model) return;
+    setShowHint(false);
+    const domainTables = visibleTables.filter((t) => t.category === requestFitToDomain);
+    const positions = domainTables
+      .map((t) => tablePositions[t.key])
+      .filter((p): p is TablePosition => !!p && Number.isFinite(p.x) && Number.isFinite(p.y));
+    if (positions.length === 0) {
+      setRequestFitToDomain(null);
+      return;
+    }
+    setIsAnimating(true);
+    runFitToView(positions, domainTables.length);
+    setRequestFitToDomain(null);
+    const duration = prefersReducedMotion ? 0 : 320;
+    const t = setTimeout(() => setIsAnimating(false), duration);
+    return () => clearTimeout(t);
+  }, [requestFitToDomain, model, visibleTables, tablePositions, runFitToView, setRequestFitToDomain, prefersReducedMotion]);
+
+  // When user selects a table: zoom to that table and show details in sidebar (smooth, no lag)
+  const prevSelectedTableRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedTable || !layoutMode) return;
+    setShowHint(false);
+    if (layoutMode !== 'domain-overview' && layoutMode !== 'snowflake') return;
+    if (savedPositionsRef.current) return; // don't override focus-compact
+    const pos = tablePositions[selectedTable];
+    if (!pos || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return;
+    // Avoid re-running for same table (e.g. panel re-open)
+    if (prevSelectedTableRef.current === selectedTable) return;
+    prevSelectedTableRef.current = selectedTable;
+    setIsAnimating(true);
+    runFitToView([pos], 1);
+    const duration = prefersReducedMotion ? 0 : 280;
+    const t = setTimeout(() => {
+      setIsAnimating(false);
+    }, duration);
+    return () => clearTimeout(t);
+  }, [selectedTable, layoutMode, tablePositions, runFitToView, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (!selectedTable) prevSelectedTableRef.current = null;
+  }, [selectedTable]);
 
   // ── Focus-compact: bring related tables closer when a field is selected ──
   useEffect(() => {
@@ -512,6 +570,7 @@ export default function Canvas() {
         e.target === canvas ||
         (canvas?.firstElementChild != null && e.target === canvas.firstElementChild);
       if (e.button === 0 && hitEmptyCanvas) {
+        setShowHint(false);
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
         setSelectedTable(null);
@@ -621,6 +680,7 @@ export default function Canvas() {
       target === canvas ||
       (canvas?.firstElementChild != null && target === canvas.firstElementChild);
     if (hitCanvas) {
+      setShowHint(false);
       setSelectedField(null);
       setSelectedTable(null);
       setSelectedRelationship(null);
@@ -662,11 +722,6 @@ export default function Canvas() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode]);
-
-  // Respect prefers-reduced-motion
-  const prefersReducedMotion = typeof window !== 'undefined'
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
 
   // Auto-hide navigation hint after first interaction or 8 seconds
   useEffect(() => {
@@ -737,7 +792,13 @@ export default function Canvas() {
       >
         <g
           transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}
-          style={isAnimating && !prefersReducedMotion ? { transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' } : undefined}
+          style={
+            isAnimating
+              ? prefersReducedMotion
+                ? undefined
+                : { transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)', willChange: 'transform' }
+              : undefined
+          }
         >
           {/* Domain Containers - In domain and domain-overview layout modes.
               Hidden during focus-compact because tables are repositioned outside their domains. */}
@@ -819,7 +880,10 @@ export default function Canvas() {
                     width={pos.width}
                     height={pos.height}
                     isExpanded={expandedDomains.has(domain)}
-                    onToggle={() => toggleExpandedDomain(domain)}
+                    onToggle={() => {
+                      toggleExpandedDomain(domain);
+                      setRequestFitToDomain(domain);
+                    }}
                     compactFrame={viewMode === 'compact'}
                   />
                 </g>

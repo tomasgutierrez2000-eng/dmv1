@@ -349,7 +349,17 @@ export default function Sidebar() {
           <div className="text-center py-8 px-4">
             <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
             <p className="text-xs text-gray-500 font-medium">No tables match your filters</p>
-            <p className="text-[10px] text-gray-400 mt-1">Try adjusting layers, categories, or search</p>
+            <p className="text-[10px] text-gray-400 mt-1 mb-4">Try adjusting layers, categories, or search</p>
+            <button
+              onClick={() => {
+                toggleFilterCategory('');
+                setSearchQuery('');
+              }}
+              className="text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors"
+              aria-label="Clear all filters"
+            >
+              Clear all filters
+            </button>
           </div>
         )}
       </div>

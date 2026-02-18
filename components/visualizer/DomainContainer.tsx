@@ -93,8 +93,12 @@ export default function DomainContainer({
         }}
       >
         <div
-          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all hover:bg-white/10`}
+          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all duration-150 hover:bg-white/10 active:bg-white/15 active:scale-[0.995]`}
           onClick={onToggle}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
+          aria-label={`Focus on ${domain} category`}
           style={{
             background: `linear-gradient(135deg, ${categoryColor.color}20 0%, ${categoryColor.color}10 100%)`,
             borderBottom: `${isOverview ? 2 : 3}px solid ${categoryColor.color}60`,

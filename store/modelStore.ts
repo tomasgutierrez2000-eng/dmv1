@@ -80,6 +80,8 @@ interface ModelStore {
   resetView: () => void;
   requestFitToView: number;
   setRequestFitToView: () => void;
+  requestFitToDomain: string | null;
+  setRequestFitToDomain: (domain: string | null) => void;
 }
 
 export const useModelStore = create<ModelStore>((set) => ({
@@ -108,6 +110,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   tableSize: 'large',
   fieldDisplayMode: 'standard',
   requestFitToView: 0,
+  requestFitToDomain: null,
   showRelationships: false, // Off by default; user can toggle on
   showPrimaryRelationships: true, // Active when relationships toggled on
   showSecondaryRelationships: true, // Active when relationships toggled on
@@ -281,4 +284,5 @@ export const useModelStore = create<ModelStore>((set) => ({
       focusMode: false,
     }),
   setRequestFitToView: () => set({ requestFitToView: Date.now() }),
+  setRequestFitToDomain: (domain) => set({ requestFitToDomain: domain }),
 }));

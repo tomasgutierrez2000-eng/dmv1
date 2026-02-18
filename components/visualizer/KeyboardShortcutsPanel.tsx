@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { X, Keyboard } from 'lucide-react';
 
 const shortcuts = [
+  { keys: ['Click category'], desc: 'Zoom to category' },
+  { keys: ['Click table'], desc: 'Zoom to table & open details' },
   { keys: ['Scroll'], desc: 'Zoom in/out' },
   { keys: ['Drag'], desc: 'Pan canvas' },
   { keys: ['+', '-'], desc: 'Zoom in / out' },
   { keys: ['0'], desc: 'Fit to view' },
-  { keys: ['Esc'], desc: 'Deselect / close panel' },
+  { keys: ['Esc'], desc: 'Deselect & close panel' },
   { keys: ['Double-click'], desc: 'Fit canvas to view' },
-  { keys: ['Middle-click'], desc: 'Pan (anywhere)' },
   { keys: ['?'], desc: 'Toggle this panel' },
 ];
 

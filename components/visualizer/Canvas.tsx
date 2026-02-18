@@ -94,10 +94,10 @@ export default function Canvas() {
     [filterCategories, visibleLayers, l3CategoryExcluded]
   );
 
-  // Fit view to a set of positions; when visible count is low, zoom in so boxes fill the screen
-  const runFitToView = useCallback(
-    (positionsToFit: Array<{ x: number; y: number }>, visibleCount: number) => {
-      if (positionsToFit.length === 0) return;
+  // Compute zoom/pan to fit a set of positions (same math as runFitToView). Returns null if invalid.
+  const computeFitView = useCallback(
+    (positionsToFit: Array<{ x: number; y: number }>, visibleCount: number): { zoom: number; pan: { x: number; y: number }; centerX: number; centerY: number } | null => {
+      if (positionsToFit.length === 0) return null;
       const BASE_TABLE_WIDTH = 560;
       const BASE_TABLE_HEIGHT = 320;
       const SIZE_MULTIPLIERS = {
@@ -123,7 +123,7 @@ export default function Canvas() {
       const centerY = (minY + maxY) / 2;
       const width = maxX - minX;
       const height = maxY - minY;
-      if (width <= 0 || height <= 0 || !Number.isFinite(width) || !Number.isFinite(height)) return;
+      if (width <= 0 || height <= 0 || !Number.isFinite(width) || !Number.isFinite(height)) return null;
 
       const viewportWidth = containerRef.current?.clientWidth || 1200;
       const viewportHeight = containerRef.current?.clientHeight || 800;
@@ -132,14 +132,10 @@ export default function Canvas() {
       const zoomY = (viewportHeight - padding * 2) / height;
 
       let newZoom: number;
-      // Fit to both axes so diagram is fully visible and aspect ratio is preserved (no distortion)
       newZoom = Math.min(zoomX, zoomY);
       const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
-      const cap = isOverview
-        ? (visibleCount <= 1 ? 1.25 : 0.78)
-        : 1.05;
+      const cap = isOverview ? (visibleCount <= 1 ? 1.25 : 0.78) : 1.05;
       newZoom = Math.min(newZoom, cap);
-      // When few tables visible, zoom in so content is readable; single table gets prominent zoom
       if (visibleCount <= 1) {
         newZoom = Math.max(1, Math.min(newZoom, 1.25));
       } else if (visibleCount <= 6) {
@@ -157,10 +153,25 @@ export default function Canvas() {
       const minPanY = -(minY * safeZoom - padding);
       const finalPanX = Math.max(panX, minPanX);
       const finalPanY = Math.max(panY, minPanY);
-      setPan({ x: Number.isFinite(finalPanX) ? finalPanX : 0, y: Number.isFinite(finalPanY) ? finalPanY : 0 });
-      setZoom(safeZoom);
+      return {
+        zoom: safeZoom,
+        pan: { x: Number.isFinite(finalPanX) ? finalPanX : 0, y: Number.isFinite(finalPanY) ? finalPanY : 0 },
+        centerX,
+        centerY,
+      };
     },
-    [layoutMode, tableSize, viewMode, setPan, setZoom]
+    [layoutMode, tableSize, viewMode]
+  );
+
+  // Fit view to a set of positions; when visible count is low, zoom in so boxes fill the screen
+  const runFitToView = useCallback(
+    (positionsToFit: Array<{ x: number; y: number }>, visibleCount: number) => {
+      const result = computeFitView(positionsToFit, visibleCount);
+      if (!result) return;
+      setPan(result.pan);
+      setZoom(result.zoom);
+    },
+    [computeFitView, setPan, setZoom]
   );
 
   // Single helper: fit camera to a set of tables (reads latest positions from store).
@@ -373,14 +384,16 @@ export default function Canvas() {
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false;
 
-  // Fit to view when user clicks toolbar "Fit to View" (animated).
-  // During focus-compact, fit only the focused tables instead of all visible tables.
+  // Fit to view when user clicks toolbar "Fit to View" or empty space.
+  // Full diagram: apply "base" view = 30% more zoomed in than fit-all (user can zoom out from there).
+  // Focus mode: fit the focused tables as before.
   useEffect(() => {
     if (!model || !requestFitToView) return;
+    const isFocusFit = Boolean(savedPositionsRef.current && focusVisibleTableKeys);
     let positionsForFit: TablePosition[];
     let count: number;
-    if (savedPositionsRef.current && focusVisibleTableKeys) {
-      positionsForFit = Array.from(focusVisibleTableKeys)
+    if (isFocusFit) {
+      positionsForFit = Array.from(focusVisibleTableKeys!)
         .map((k) => tablePositions[k])
         .filter((p): p is TablePosition => !!p);
       count = positionsForFit.length;
@@ -392,9 +405,27 @@ export default function Canvas() {
     }
     if (positionsForFit.length === 0) return;
     setIsAnimating(true);
-    runFitToView(positionsForFit, count);
+    if (isFocusFit) {
+      runFitToView(positionsForFit, count);
+    } else {
+      // Full diagram: base view = 30% more zoomed in than fit-all (revert-to view on empty click)
+      const result = computeFitView(positionsForFit, count);
+      if (result) {
+        const viewportWidth = containerRef.current?.clientWidth || 1200;
+        const viewportHeight = containerRef.current?.clientHeight || 800;
+        const baseZoom = Math.min(4, Math.max(0.05, result.zoom * 1.3));
+        const basePan = {
+          x: -(result.centerX * baseZoom - viewportWidth / 2),
+          y: -(result.centerY * baseZoom - viewportHeight / 2),
+        };
+        setPan(basePan);
+        setZoom(baseZoom);
+      } else {
+        runFitToView(positionsForFit, count);
+      }
+    }
     setTimeout(() => setIsAnimating(false), 350);
-  }, [requestFitToView, model, visibleTables, tablePositions, runFitToView, focusVisibleTableKeys]);
+  }, [requestFitToView, model, visibleTables, tablePositions, runFitToView, computeFitView, focusVisibleTableKeys, setPan, setZoom]);
 
   // Fit to category when user clicks a category header: zoom in to show whole category (from any zoom level)
   const requestFitToDomain = useModelStore((s) => s.requestFitToDomain);

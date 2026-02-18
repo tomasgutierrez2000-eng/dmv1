@@ -204,15 +204,9 @@ export default function Canvas() {
     } else {
       setTablePositionsBulk(newPositions);
     }
-    if (isOverviewLayout) {
-      // Defer fit so React has committed new positions; skip if user already selected a table (don't override zoom-to-table)
-      const t = setTimeout(() => {
-        if (!useModelStore.getState().selectedTable) setRequestFitToView();
-      }, 120);
-      return () => clearTimeout(t);
-    }
+    // Do NOT auto fit-to-view on layout change. Zoom/fit only on: double-click empty, toolbar "Fit to view", or key "0".
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
-  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setTablePositionsReplace, setRequestFitToView]);
+  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setTablePositionsReplace]);
 
   // Fit to visible tables when layout or full-view state change. Skipped when focus-compact
   // or when search/filter is active (delayed effect below handles those for one consistent fit).
@@ -711,8 +705,8 @@ export default function Canvas() {
     setTimeout(() => setIsAnimating(false), 350);
   }, [model, visibleTables, tablePositions, runFitToView]);
 
-  // Click on empty canvas: clear selections, exit focus mode, and fit view to show all tables (smooth unzoom).
-  // Clicks on "empty" space often hit the transform <g> (first child of SVG), not the SVG itself.
+  // Single click on empty canvas: clear selections and exit focus mode only. Do NOT change zoom.
+  // Zoom out / fit-to-view only on double-click (handleDoubleClick).
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
     const target = e.target as Node | null;
     if (!target) return;
@@ -727,11 +721,10 @@ export default function Canvas() {
       setSelectedField(null);
       setSelectedTable(null);
       setSelectedRelationship(null);
+      setSelectedSampleDataCell(null);
       setFocusMode(false);
-      // Defer fit-to-view so selection state has committed; then zoom out to show full diagram (no blank/crazy view)
-      setTimeout(() => setRequestFitToView(), 50);
     }
-  }, [setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode, setRequestFitToView]);
+  }, [setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode]);
 
   // Keyboard shortcuts
   useEffect(() => {

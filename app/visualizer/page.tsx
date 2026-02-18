@@ -10,6 +10,7 @@ import DetailPanel from '../../components/visualizer/DetailPanel';
 import Toolbar from '../../components/visualizer/Toolbar';
 import Minimap from '../../components/visualizer/Minimap';
 import KeyboardShortcutsPanel from '../../components/visualizer/KeyboardShortcutsPanel';
+import L3SampleDataStrip from '../../components/visualizer/L3SampleDataStrip';
 import { Loader, AlertCircle, Database, ArrowRight } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
@@ -91,8 +92,8 @@ export default function VisualizerPage() {
         {/* Sidebar */}
         <Sidebar />
 
-        {/* Canvas Area */}
-        <div className="flex-1 relative">
+        {/* Canvas Area: main diagram + L3 sample data strip when an L3 table is selected */}
+        <div className="flex-1 flex flex-col relative min-h-0">
           {!model && !loading && (
             <div className="absolute inset-0 flex items-center justify-center p-8">
               <div className="max-w-lg w-full">
@@ -181,8 +182,11 @@ export default function VisualizerPage() {
             </div>
           )}
 
-          {model && <Canvas />}
-          <Minimap />
+          <div className="flex-1 relative min-h-0">
+            {model && <Canvas />}
+            <Minimap />
+          </div>
+          {model && <L3SampleDataStrip />}
         </div>
 
         {/* Detail Panel */}

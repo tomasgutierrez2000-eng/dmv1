@@ -12,6 +12,51 @@ type SampleDataState = {
   source: string;
 } | null;
 
+/** Format a number for display in calculated examples (commas, reasonable decimals) */
+function formatExampleValue(val: unknown): string {
+  if (val == null) return '—';
+  if (typeof val === 'number') {
+    if (Number.isInteger(val) && Math.abs(val) >= 1000) return val.toLocaleString('en-US');
+    if (!Number.isInteger(val)) return String(Number((val as number).toFixed(4)));
+    return String(val);
+  }
+  return String(val);
+}
+
+/**
+ * Build a "calculated example" string from a formula and sample row values.
+ * Replaces same-table field names in the formula with values from the row; appends result.
+ * Returns null if formula references other layers (e.g. L2.) or we can't substitute meaningfully.
+ */
+function buildCalculatedExample(
+  formula: string,
+  tableFieldNames: string[],
+  rowValueByColumn: Record<string, unknown>,
+  resultValue: unknown
+): string | null {
+  const trimmed = formula.trim();
+  if (!trimmed) return null;
+  // If formula clearly references other tables/layers, we still show a simple "with sample data" line
+  if (/\bL[12]\./i.test(trimmed)) {
+    return `Result in this sample row: ${formatExampleValue(resultValue)} (inputs from L1/L2)`;
+  }
+  // Find which table fields appear in the formula (sort by length desc to replace longest first)
+  const namesInFormula = tableFieldNames.filter((name) => trimmed.includes(name)).sort((a, b) => b.length - a.length);
+  if (namesInFormula.length === 0) return null;
+  const missing = namesInFormula.some((name) => rowValueByColumn[name] === undefined || rowValueByColumn[name] === null);
+  if (missing) return null;
+  let displayExpr = trimmed;
+  for (const name of namesInFormula) {
+    const val = rowValueByColumn[name];
+    const replacement = formatExampleValue(val);
+    // Replace whole-word occurrences only (avoid "limit_amt" matching inside another name)
+    displayExpr = displayExpr.replace(new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'), replacement);
+  }
+  // Display operators nicely
+  displayExpr = displayExpr.replace(/\s*\*\s*/g, ' × ').replace(/\s*\/\s*/g, ' ÷ ');
+  return `${displayExpr} = ${formatExampleValue(resultValue)}`;
+}
+
 export default function DetailPanel() {
   const {
     model,
@@ -144,6 +189,26 @@ export default function DetailPanel() {
           (r) => r.target.tableKey === selectedTable && r.target.field === selectedSampleDataCell!.columnName
         )
       : [];
+
+  // Build row value map and calculated example for the selected L3 cell (for "Example with sample data")
+  const calculatedExample = useMemo(() => {
+    if (!selectedCellField?.formula || !table || !sampleData?.rows?.length || selectedSampleDataCell == null) return null;
+    const rowIndex = selectedSampleDataCell.rowIndex;
+    if (rowIndex < 0 || rowIndex >= sampleData.rows.length) return null;
+    const row = sampleData.rows[rowIndex] as unknown[];
+    const rowValueByColumn: Record<string, unknown> = {};
+    sampleData.columns.forEach((col, i) => {
+      rowValueByColumn[col] = row[i];
+    });
+    const colIdx = sampleData.columns.indexOf(selectedSampleDataCell.columnName);
+    const resultValue = colIdx >= 0 ? row[colIdx] : undefined;
+    return buildCalculatedExample(
+      selectedCellField.formula,
+      table.fields.map((f) => f.name),
+      rowValueByColumn,
+      resultValue
+    );
+  }, [selectedCellField?.formula, table, sampleData, selectedSampleDataCell]);
 
   if (!detailPanelOpen) return null;
 
@@ -316,6 +381,51 @@ export default function DetailPanel() {
               </div>
             </div>
 
+            {/* L3: Formulas with worked examples (using first sample row) */}
+            {table.layer === 'L3' && table.fields.some((f) => f.formula) && (
+              <div className="rounded-lg border border-violet-200 bg-violet-50/60 overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-violet-200/80 bg-violet-100/60">
+                  <Calculator className="w-3.5 h-3.5 text-violet-700" aria-hidden />
+                  <h4 className="text-xs font-semibold text-violet-800 uppercase tracking-wider">
+                    Formulas & examples
+                  </h4>
+                </div>
+                <div className="p-3 space-y-3 max-h-56 overflow-y-auto">
+                  {table.fields
+                    .filter((f) => f.formula)
+                    .map((field) => {
+                      const rowValueByColumn: Record<string, unknown> = {};
+                      if (sampleData?.rows?.[0] && sampleData.columns) {
+                        sampleData.columns.forEach((col, i) => {
+                          rowValueByColumn[col] = (sampleData.rows[0] as unknown[])[i];
+                        });
+                      }
+                      const colIdx = sampleData?.columns?.indexOf(field.name) ?? -1;
+                      const resultValue = sampleData?.rows?.[0] && colIdx >= 0 ? (sampleData.rows[0] as unknown[])[colIdx] : undefined;
+                      const example = buildCalculatedExample(
+                        field.formula!,
+                        table.fields.map((f) => f.name),
+                        rowValueByColumn,
+                        resultValue
+                      );
+                      return (
+                        <div key={field.name} className="bg-white/80 rounded p-2.5 border border-violet-100">
+                          <div className="font-mono text-[11px] font-semibold text-violet-900 mb-1">{field.name}</div>
+                          <pre className="text-[10px] font-mono text-gray-700 whitespace-pre-wrap break-all mb-1.5">
+                            {field.formula}
+                          </pre>
+                          {example && (
+                            <p className="text-[10px] font-mono text-emerald-700 bg-emerald-50/80 rounded px-1.5 py-1 border border-emerald-100">
+                              Example: {example}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
             {/* Fields */}
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -434,6 +544,14 @@ export default function DetailPanel() {
                           <pre className="text-[11px] font-mono text-gray-800 bg-white/80 rounded p-2 border border-emerald-100 overflow-x-auto overflow-y-auto max-h-32 whitespace-pre-wrap break-all">
                             {selectedCellField.formula}
                           </pre>
+                        </div>
+                      )}
+                      {calculatedExample && (
+                        <div>
+                          <div className="text-[10px] font-medium text-emerald-700 uppercase tracking-wider mb-1">Example with sample data</div>
+                          <p className="text-[11px] font-mono text-gray-800 bg-white/80 rounded p-2 border border-emerald-100 break-all">
+                            {calculatedExample}
+                          </p>
                         </div>
                       )}
                       {(selectedCellField.sourceFields || selectedCellField.sourceTables?.length) ? (

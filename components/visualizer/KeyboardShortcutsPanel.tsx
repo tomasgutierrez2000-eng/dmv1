@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { X, Keyboard } from 'lucide-react';
 
 const shortcuts = [
+  { keys: ['Click empty'], desc: 'Clear selection (no zoom change)' },
   { keys: ['Click category'], desc: 'Zoom to category' },
   { keys: ['Click table'], desc: 'Zoom to table & open details' },
   { keys: ['Scroll'], desc: 'Zoom in/out' },
@@ -11,7 +12,7 @@ const shortcuts = [
   { keys: ['+', '-'], desc: 'Zoom in / out' },
   { keys: ['0'], desc: 'Fit to view' },
   { keys: ['Esc'], desc: 'Deselect & close panel' },
-  { keys: ['Double-click'], desc: 'Fit canvas to view' },
+  { keys: ['Double-click empty'], desc: 'Fit canvas to view (zoom out)' },
   { keys: ['?'], desc: 'Toggle this panel' },
 ];
 

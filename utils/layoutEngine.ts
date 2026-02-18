@@ -95,7 +95,7 @@ function calculateDomainOverviewLayout(
   const TABLE_SPACING = compactView ? 4 : 6;
   const DOMAIN_SPACING = compactView ? 8 : 12;
   const DOMAIN_PADDING = compactView ? 8 : 12;
-  const DOMAIN_HEADER_HEIGHT = compactView ? 26 : 36;
+  const DOMAIN_HEADER_HEIGHT = 36;
   const LAYER_GAP = compactView ? 6 : 10;
 
   // Group tables by domain

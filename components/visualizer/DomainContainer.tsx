@@ -50,7 +50,7 @@ export default function DomainContainer({
   }, [tables, visibleLayers, model]);
 
   const isOverview = layoutMode === 'domain-overview';
-  const headerHeight = isOverview ? (compactFrame ? 28 : 45) : 80;
+  const headerHeight = isOverview ? (compactFrame ? 36 : 45) : 80;
 
   return (
     <g
@@ -93,7 +93,7 @@ export default function DomainContainer({
         }}
       >
         <div
-          className={`h-full ${isOverview ? 'px-2 py-1' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all duration-150 hover:bg-white/10 active:bg-white/15 active:scale-[0.995]`}
+          className={`h-full ${isOverview ? 'px-3 py-2' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all duration-150 hover:bg-white/10 active:bg-white/15 active:scale-[0.995]`}
           onClick={(e) => { e.stopPropagation(); onToggle(); }}
           role="button"
           tabIndex={0}

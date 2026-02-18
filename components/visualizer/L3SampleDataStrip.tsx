@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { Table2 } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
 
@@ -15,6 +15,7 @@ export default function L3SampleDataStrip() {
   const [data, setData] = useState<SampleData>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchKeyRef = useRef<string | null>(null);
 
   const table = selectedTable && model ? model.tables[selectedTable] : null;
   const isL3 = table?.layer === 'L3';
@@ -25,18 +26,22 @@ export default function L3SampleDataStrip() {
       setError(null);
       return;
     }
+    const ac = new AbortController();
+    const key = selectedTable;
+    fetchKeyRef.current = key;
     setLoading(true);
     setError(null);
-    fetch(`/api/sample-data?tableKey=${encodeURIComponent(selectedTable)}`)
+    fetch(`/api/sample-data?tableKey=${encodeURIComponent(selectedTable)}`, { signal: ac.signal })
       .then((res) => {
         if (!res.ok) {
-          if (res.status === 404) return null;
-          throw new Error(res.statusText);
+          if (res.status === 404) throw new Error('No sample data for this table.');
+          throw new Error(res.status === 400 ? 'Invalid table' : res.statusText);
         }
         return res.json();
       })
       .then((body) => {
-        if (body?.columns && Array.isArray(body.rows)) {
+        if (fetchKeyRef.current !== key) return;
+        if (body && body.columns && Array.isArray(body.rows)) {
           setData({
             columns: body.columns,
             rows: body.rows,
@@ -47,10 +52,18 @@ export default function L3SampleDataStrip() {
         }
       })
       .catch((err) => {
+        if (err.name === 'AbortError') return;
+        if (fetchKeyRef.current !== key) return;
         setData(null);
         setError(err.message || 'Failed to load sample data');
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (fetchKeyRef.current === key) setLoading(false);
+      });
+    return () => {
+      fetchKeyRef.current = null;
+      ac.abort();
+    };
   }, [selectedTable, isL3]);
 
   const displayColumns = useMemo(() => {

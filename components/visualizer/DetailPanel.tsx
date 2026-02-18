@@ -79,6 +79,7 @@ export default function DetailPanel() {
   const fieldRelationshipsRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const derivationPanelRef = useRef<HTMLDivElement>(null);
+  const sampleDataFetchRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (selectedField && fieldRelationshipsRef.current) {
@@ -119,17 +120,21 @@ export default function DetailPanel() {
       });
       return;
     }
+    const ac = new AbortController();
+    const key = selectedTable;
+    sampleDataFetchRef.current = key;
     setSampleDataLoading(true);
     setSampleDataError(null);
-    fetch(`/api/sample-data?tableKey=${encodeURIComponent(selectedTable)}`)
+    fetch(`/api/sample-data?tableKey=${encodeURIComponent(selectedTable)}`, { signal: ac.signal })
       .then((res) => {
         if (!res.ok) {
-          if (res.status === 404) return null;
-          throw new Error(res.statusText);
+          if (res.status === 404) throw new Error('No sample data for this table.');
+          throw new Error(res.status === 400 ? 'Invalid table' : res.statusText);
         }
         return res.json();
       })
       .then((body) => {
+        if (sampleDataFetchRef.current !== key) return;
         if (body && body.columns && Array.isArray(body.rows)) {
           setSampleData({
             columns: body.columns,
@@ -141,10 +146,18 @@ export default function DetailPanel() {
         }
       })
       .catch((err) => {
+        if (err.name === 'AbortError') return;
+        if (sampleDataFetchRef.current !== key) return;
         setSampleData(null);
         setSampleDataError(err.message || 'Failed to load sample data');
       })
-      .finally(() => setSampleDataLoading(false));
+      .finally(() => {
+        if (sampleDataFetchRef.current === key) setSampleDataLoading(false);
+      });
+    return () => {
+      sampleDataFetchRef.current = null;
+      ac.abort();
+    };
   }, [selectedTable, uploadedSampleData]);
 
   const table = selectedTable && model ? model.tables[selectedTable] : null;

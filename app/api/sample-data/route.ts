@@ -24,20 +24,29 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
-    const data = JSON.parse(fs.readFileSync(L3_SAMPLE_DATA_PATH, 'utf-8'));
-    const entry = data[tableKey];
-    if (!entry) {
+    try {
+      const raw = fs.readFileSync(L3_SAMPLE_DATA_PATH, 'utf-8');
+      const data = JSON.parse(raw) as Record<string, { columns?: string[]; rows?: unknown[][] }>;
+      const entry = data[tableKey];
+      if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {
+        return NextResponse.json(
+          { error: `No sample data for table ${tableKey}` },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({
+        tableKey,
+        columns: entry.columns,
+        rows: entry.rows,
+        source: 'file',
+      });
+    } catch (err) {
+      console.error('L3 sample data read error:', err);
       return NextResponse.json(
-        { error: `No sample data for table ${tableKey}` },
-        { status: 404 }
+        { error: 'Sample data unavailable' },
+        { status: 500 }
       );
     }
-    return NextResponse.json({
-      tableKey,
-      columns: entry.columns ?? [],
-      rows: entry.rows ?? [],
-      source: 'file',
-    });
   }
 
   const isL2 = tableKey.startsWith('L2.');
@@ -51,19 +60,27 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const data = JSON.parse(fs.readFileSync(samplePath, 'utf-8'));
-  const entry = data[tableKey];
-  if (!entry) {
+  try {
+    const raw = fs.readFileSync(samplePath, 'utf-8');
+    const data = JSON.parse(raw) as Record<string, { columns?: string[]; rows?: unknown[][] }>;
+    const entry = data[tableKey];
+    if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {
+      return NextResponse.json(
+        { error: `No sample data for table ${tableKey}` },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({
+      tableKey,
+      columns: entry.columns,
+      rows: entry.rows,
+      source: 'file',
+    });
+  } catch (err) {
+    console.error('Sample data read error:', err);
     return NextResponse.json(
-      { error: `No sample data for table ${tableKey}` },
-      { status: 404 }
+      { error: 'Sample data unavailable' },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({
-    tableKey,
-    columns: entry.columns ?? [],
-    rows: entry.rows ?? [],
-    source: 'file',
-  });
 }

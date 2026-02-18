@@ -16,25 +16,9 @@ import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
 
 export default function VisualizerPage() {
-  const { model, setModel, setTablePositions, setTablePositionsBulk, setTablePositionsReplace, layoutMode, tablePositions, tableSize, visibleLayers, viewMode } = useModelStore();
+  const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
   const { parseExcel, loading, result } = useExcelParser();
   const { toast } = useToast();
-  const [initialLoad, setInitialLoad] = useState(true);
-
-  useEffect(() => {
-    const loadFromDictionary = async () => {
-      try {
-        const response = await fetch('/api/data-dictionary');
-        if (response.ok) {
-          // Placeholder for data dictionary loading
-        }
-      } catch (error) {
-        // No data dictionary found, that's okay
-      }
-      setInitialLoad(false);
-    };
-    loadFromDictionary();
-  }, []);
 
   useEffect(() => {
     if (result?.model) {
@@ -95,7 +79,7 @@ export default function VisualizerPage() {
         {/* Canvas Area: main diagram + L3 sample data strip when an L3 table is selected */}
         <div className="flex-1 flex flex-col relative min-h-0">
           {!model && !loading && (
-            <div className="absolute inset-0 flex items-center justify-center p-8">
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-8">
               <div className="max-w-lg w-full">
                 {/* Hero empty state - Apple/Google clean design */}
                 <div className="text-center mb-8">
@@ -113,6 +97,8 @@ export default function VisualizerPage() {
                   type="button"
                   onClick={loadL1Demo}
                   disabled={demoLoading}
+                  aria-busy={demoLoading}
+                  aria-label={demoLoading ? 'Loading demo data' : 'Load L1 bank data demo (78 tables)'}
                   className="w-full mb-4 py-3.5 px-6 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
                 >
                   {demoLoading ? (
@@ -173,7 +159,7 @@ export default function VisualizerPage() {
 
           {/* Loading overlay with skeleton feel */}
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm" role="status" aria-live="polite">
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/95 backdrop-blur-sm" role="status" aria-live="polite">
               <div className="text-center">
                 <Loader className="w-10 h-10 animate-spin mx-auto mb-4 text-gray-400" />
                 <p className="text-sm text-gray-600 font-medium">Parsing Excel file…</p>

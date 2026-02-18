@@ -16,6 +16,8 @@ interface ModelStore {
   selectedTable: string | null;
   selectedRelationship: string | null;
   selectedField: { tableKey: string; fieldName: string } | null; // Selected field for relationship highlighting
+  /** When user clicks a cell in the detail panel sample data table: column name and row index (for L3 formula/lineage) */
+  selectedSampleDataCell: { columnName: string; rowIndex: number } | null;
   focusMode: boolean; // When true, only show selected relationship/table relationships
   expandedTables: Set<string>;
   
@@ -56,6 +58,7 @@ interface ModelStore {
   setSelectedTable: (tableKey: string | null) => void;
   setSelectedRelationship: (relId: string | null) => void;
   setSelectedField: (field: { tableKey: string; fieldName: string } | null) => void;
+  setSelectedSampleDataCell: (cell: { columnName: string; rowIndex: number } | null) => void;
   setFocusMode: (focus: boolean) => void;
   toggleExpandedTable: (tableKey: string) => void;
   setSearchQuery: (query: string) => void;
@@ -94,6 +97,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   selectedTable: null,
   selectedRelationship: null,
   selectedField: null,
+  selectedSampleDataCell: null,
   focusMode: false,
   expandedTables: new Set(),
   searchQuery: '',
@@ -149,23 +153,27 @@ export const useModelStore = create<ModelStore>((set) => ({
     selectedTable: tableKey, 
     detailPanelOpen: tableKey !== null, 
     selectedField: null,
-    selectedRelationship: null, // Clear relationship selection when table is selected
-    focusMode: tableKey !== null, // Enable focus mode when table is selected
+    selectedRelationship: null,
+    selectedSampleDataCell: null, // Clear when table changes or panel closes
+    focusMode: tableKey !== null,
   }),
   setSelectedRelationship: (relId) => set({ 
     selectedRelationship: relId, 
     detailPanelOpen: relId !== null,
-    selectedTable: null, // Clear table selection when relationship is selected
-    selectedField: null, // Clear field selection when relationship is selected
-    focusMode: relId !== null, // Enable focus mode when relationship is selected
+    selectedTable: null,
+    selectedField: null,
+    selectedSampleDataCell: null,
+    focusMode: relId !== null,
   }),
   setSelectedField: (field) => set({ 
     selectedField: field, 
-    selectedTable: field ? field.tableKey : null, // Keep in sync with the field's parent table
+    selectedTable: field ? field.tableKey : null,
     selectedRelationship: null,
+    selectedSampleDataCell: null,
     focusMode: field !== null,
     detailPanelOpen: field !== null,
   }),
+  setSelectedSampleDataCell: (cell) => set({ selectedSampleDataCell: cell }),
   setFocusMode: (focus) => set({ focusMode: focus }),
   toggleExpandedTable: (tableKey) =>
     set((state) => {
@@ -281,6 +289,7 @@ export const useModelStore = create<ModelStore>((set) => ({
       selectedTable: null,
       selectedRelationship: null,
       selectedField: null,
+      selectedSampleDataCell: null,
       focusMode: false,
     }),
   setRequestFitToView: () => set({ requestFitToView: Date.now() }),

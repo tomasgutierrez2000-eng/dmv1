@@ -36,6 +36,7 @@ export default function Canvas() {
     selectedTable,
     selectedRelationship,
     selectedField,
+    selectedSampleDataCell,
     focusMode,
     expandedTables,
     expandedDomains,
@@ -60,6 +61,7 @@ export default function Canvas() {
     setSelectedTable,
     setSelectedRelationship,
     setSelectedField,
+    setSelectedSampleDataCell,
     setFocusMode,
     toggleExpandedTable,
     resetView,
@@ -756,15 +758,21 @@ export default function Canvas() {
         }
         setTimeout(() => setIsAnimating(false), 350);
       } else if (e.key === 'Escape') {
-        setSelectedField(null);
-        setSelectedTable(null);
-        setSelectedRelationship(null);
-        setFocusMode(false);
+        // First Escape: clear sample data cell selection (derivation panel). Second Escape: clear table/field/relationship.
+        if (selectedSampleDataCell) {
+          setSelectedSampleDataCell(null);
+          e.preventDefault();
+        } else {
+          setSelectedField(null);
+          setSelectedTable(null);
+          setSelectedRelationship(null);
+          setFocusMode(false);
+        }
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setFocusMode]);
+  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode, selectedSampleDataCell]);
 
   // Auto-hide navigation hint after first interaction or 8 seconds
   useEffect(() => {

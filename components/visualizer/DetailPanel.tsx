@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { X, Key, Link2, Database, FileText, Table2, ChevronRight, MousePointerClick } from 'lucide-react';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { X, Key, Link2, Database, FileText, Table2, ChevronRight, MousePointerClick, Calculator, XCircle } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
+import type { Field } from '../../types/model';
 
 type SampleDataState = {
   columns: string[];
@@ -17,11 +18,13 @@ export default function DetailPanel() {
     selectedTable,
     selectedRelationship,
     selectedField,
+    selectedSampleDataCell,
     detailPanelOpen,
     setDetailPanelOpen,
     setSelectedTable,
     setSelectedRelationship,
     setSelectedField,
+    setSelectedSampleDataCell,
     uploadedSampleData,
   } = useModelStore();
 
@@ -30,12 +33,22 @@ export default function DetailPanel() {
   const [sampleDataError, setSampleDataError] = useState<string | null>(null);
   const fieldRelationshipsRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const derivationPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (selectedField && fieldRelationshipsRef.current) {
       fieldRelationshipsRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [selectedField]);
+
+  // When user selects a sample data cell (L3), scroll derivation panel into view so it's visible
+  useEffect(() => {
+    if (!selectedSampleDataCell || !selectedTable || !model) return;
+    const t = model.tables[selectedTable];
+    if (t?.layer === 'L3' && derivationPanelRef.current) {
+      derivationPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [selectedSampleDataCell, selectedTable, model]);
 
   // When panel opens, move focus to close button so keyboard users can dismiss with Escape or Tab
   useEffect(() => {
@@ -89,8 +102,6 @@ export default function DetailPanel() {
       .finally(() => setSampleDataLoading(false));
   }, [selectedTable, uploadedSampleData]);
 
-  if (!detailPanelOpen) return null;
-
   const table = selectedTable && model ? model.tables[selectedTable] : null;
   const relationship = selectedRelationship && model
     ? model.relationships.find((r) => r.id === selectedRelationship)
@@ -106,6 +117,35 @@ export default function DetailPanel() {
           (r.target.tableKey === selectedField.tableKey && r.target.field === selectedField.fieldName)
       )
     : [];
+
+  // For L3 tables: order sample data columns by model field order so they align with the data model
+  const displayColumns = useMemo(() => {
+    if (!sampleData?.columns?.length) return sampleData?.columns ?? [];
+    if (!table || table.layer !== 'L3' || !model?.tables[selectedTable!]) return sampleData.columns;
+    const fieldNames = new Set(table.fields.map((f) => f.name));
+    const ordered = table.fields.filter((f) => sampleData.columns.includes(f.name)).map((f) => f.name);
+    const rest = sampleData.columns.filter((c) => !fieldNames.has(c));
+    return ordered.length ? [...ordered, ...rest] : sampleData.columns;
+  }, [sampleData?.columns, table, selectedTable, model]);
+
+  // Selected L3 column's field definition (for derivation panel)
+  const selectedCellField: Field | null =
+    selectedTable && table?.layer === 'L3' && selectedSampleDataCell && table
+      ? table.fields.find((f) => f.name === selectedSampleDataCell.columnName) ?? null
+      : null;
+
+  const isDerivedField = (f: Field) =>
+    !!(f.formula || f.sourceFields || (f.sourceTables && f.sourceTables.length) || f.derivationLogic || f.fkTarget);
+
+  // L3 field inputs from model relationships (source → this field)
+  const inputsFromRelationships =
+    selectedTable && selectedSampleDataCell && model
+      ? model.relationships.filter(
+          (r) => r.target.tableKey === selectedTable && r.target.field === selectedSampleDataCell!.columnName
+        )
+      : [];
+
+  if (!detailPanelOpen) return null;
 
   return (
     <div
@@ -123,6 +163,7 @@ export default function DetailPanel() {
             setSelectedTable(null);
             setSelectedRelationship(null);
             setSelectedField(null);
+            setSelectedSampleDataCell(null);
           }}
           className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
           aria-label="Close detail panel (Esc)"
@@ -346,15 +387,147 @@ export default function DetailPanel() {
               </div>
             </div>
 
+            {/* L3: Derivation panel when user clicks a column value */}
+            {table.layer === 'L3' && selectedSampleDataCell && (
+              <div
+                ref={derivationPanelRef}
+                className="rounded-lg border border-emerald-200 bg-emerald-50/80 overflow-hidden"
+                role="region"
+                aria-label={`Derivation for ${selectedSampleDataCell.columnName}`}
+              >
+                <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-emerald-200/80 bg-emerald-100/60">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Calculator className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" aria-hidden />
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider truncate">
+                        Derivation: {selectedSampleDataCell.columnName}
+                      </h4>
+                      {sampleData?.rows?.[selectedSampleDataCell.rowIndex] != null && (() => {
+                        const colIdx = sampleData.columns.indexOf(selectedSampleDataCell.columnName);
+                        const val = colIdx >= 0 ? sampleData.rows[selectedSampleDataCell.rowIndex][colIdx] : undefined;
+                        return val != null ? (
+                          <p className="text-[10px] text-emerald-700 mt-0.5 truncate" title={String(val)}>
+                            Sample value: <span className="font-mono font-medium">{String(val)}</span>
+                          </p>
+                        ) : null;
+                      })()}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSampleDataCell(null)}
+                    className="flex-shrink-0 p-1.5 rounded-md text-emerald-600 hover:text-emerald-800 hover:bg-emerald-200/60 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
+                    aria-label="Clear selection"
+                    title="Clear selection"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-3 space-y-3 max-h-64 overflow-y-auto">
+                  {!selectedCellField ? (
+                    <p className="text-[11px] text-gray-500 italic">No field metadata for this column in the model.</p>
+                  ) : isDerivedField(selectedCellField) ? (
+                    <>
+                      {selectedCellField.formula && (
+                        <div>
+                          <div className="text-[10px] font-medium text-emerald-700 uppercase tracking-wider mb-1">Formula</div>
+                          <pre className="text-[11px] font-mono text-gray-800 bg-white/80 rounded p-2 border border-emerald-100 overflow-x-auto overflow-y-auto max-h-32 whitespace-pre-wrap break-all">
+                            {selectedCellField.formula}
+                          </pre>
+                        </div>
+                      )}
+                      {(selectedCellField.sourceFields || selectedCellField.sourceTables?.length) ? (
+                        <div>
+                          <div className="text-[10px] font-medium text-emerald-700 uppercase tracking-wider mb-1">Inputs from L1 / L2</div>
+                          <ul className="space-y-1 text-[11px]">
+                            {selectedCellField.sourceFields && (
+                              <li className="text-gray-700">
+                                <span className="text-gray-500">Fields: </span>
+                                <code className="font-mono bg-white/80 px-1 rounded">{selectedCellField.sourceFields}</code>
+                              </li>
+                            )}
+                            {selectedCellField.sourceTables && selectedCellField.sourceTables.length > 0 && (
+                              <li className="flex flex-wrap gap-1 items-center">
+                                <span className="text-gray-500">Tables: </span>
+                                {selectedCellField.sourceTables.map((src, i) => (
+                                  <span
+                                    key={i}
+                                    className="text-[10px] bg-white/80 text-gray-700 px-1.5 py-0.5 rounded border border-emerald-100 font-medium"
+                                  >
+                                    {src.layer}.{src.table}
+                                  </span>
+                                ))}
+                              </li>
+                            )}
+                            {selectedCellField.fkTarget && (
+                              <li className="text-gray-700">
+                                <span className="text-gray-500">FK → </span>
+                                <code className="font-mono bg-white/80 px-1 rounded">
+                                  {selectedCellField.fkTarget.layer}.{selectedCellField.fkTarget.table}.{selectedCellField.fkTarget.field}
+                                </code>
+                              </li>
+                            )}
+                            {inputsFromRelationships.length > 0 && (
+                              <li className="flex flex-wrap gap-1 items-center pt-1 border-t border-emerald-200/60">
+                                <span className="text-gray-500 w-full text-[10px] mb-0.5">Lineage: </span>
+                                {inputsFromRelationships.map((rel) => (
+                                  <span
+                                    key={rel.id}
+                                    className="text-[10px] bg-white/80 text-gray-700 px-1.5 py-0.5 rounded border border-emerald-100 font-mono"
+                                  >
+                                    {rel.source.layer}.{rel.source.table}.{rel.source.field} → {selectedSampleDataCell.columnName}
+                                  </span>
+                                ))}
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      ) : (selectedCellField.fkTarget || inputsFromRelationships.length > 0) && !selectedCellField.sourceFields && !selectedCellField.sourceTables?.length && (
+                        <div>
+                          <div className="text-[10px] font-medium text-emerald-700 uppercase tracking-wider mb-1">Inputs from L1 / L2</div>
+                          <ul className="space-y-1 text-[11px]">
+                            {selectedCellField.fkTarget && (
+                              <li>
+                                <code className="font-mono bg-white/80 px-1 rounded">
+                                  {selectedCellField.fkTarget.layer}.{selectedCellField.fkTarget.table}.{selectedCellField.fkTarget.field}
+                                </code>
+                              </li>
+                            )}
+                            {inputsFromRelationships.map((rel) => (
+                              <li key={rel.id} className="font-mono text-gray-700">
+                                {rel.source.layer}.{rel.source.table}.{rel.source.field}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {selectedCellField.derivationLogic && (
+                        <p className="text-[11px] text-gray-600 italic border-t border-emerald-200/80 pt-2">
+                          {selectedCellField.derivationLogic}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-[11px] text-gray-500 italic">This column is not a derived field. Select a column with a formula or source inputs.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Sample data */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Table2 className="w-3.5 h-3.5 text-gray-400" />
+                <Table2 className="w-3.5 h-3.5 text-gray-400" aria-hidden />
                 <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sample data</h4>
               </div>
+              {table.layer === 'L3' && (
+                <p className="text-[10px] text-gray-500 mb-2">
+                  Click a column header or cell to see formula and inputs from L1/L2.
+                </p>
+              )}
               {sampleDataLoading && (
                 <div className="flex items-center gap-2 text-xs text-gray-400 py-2">
-                  <div className="w-3 h-3 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                  <div className="w-3 h-3 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" aria-hidden />
                   Loading…
                 </div>
               )}
@@ -364,24 +537,86 @@ export default function DetailPanel() {
               {!sampleDataLoading && !sampleDataError && sampleData && sampleData.rows.length > 0 && (
                 <div className="rounded-lg border border-gray-100 overflow-hidden">
                   <div className="overflow-x-auto max-h-48 overflow-y-auto scrollbar-thin">
-                    <table className="w-full text-[11px] border-collapse" aria-label={`Sample data for ${table.name}`}>
+                    <table
+                      className="w-full text-[11px] border-collapse"
+                      role="grid"
+                      aria-label={`Sample data for ${table.name}. Click a cell to see derivation for L3 columns.`}
+                    >
                       <thead className="bg-gray-50 sticky top-0">
                         <tr>
-                          {sampleData.columns.map((col) => (
-                            <th key={col} className="text-left px-2 py-1.5 text-gray-500 font-semibold border-b border-gray-100 whitespace-nowrap uppercase text-[9px] tracking-wider">
-                              {col}
-                            </th>
-                          ))}
+                          {displayColumns.map((col) => {
+                            const isSelected = selectedSampleDataCell?.columnName === col;
+                            return (
+                              <th
+                                key={col}
+                                scope="col"
+                                className={`text-left px-2 py-1.5 font-semibold border-b border-gray-100 whitespace-nowrap uppercase text-[9px] tracking-wider cursor-pointer transition-colors ${
+                                  isSelected ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200' : 'text-gray-500 hover:bg-gray-100'
+                                }`}
+                                onClick={() => {
+                                  setSelectedSampleDataCell(
+                                    selectedSampleDataCell?.columnName === col ? null : { columnName: col, rowIndex: 0 }
+                                  );
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setSelectedSampleDataCell(
+                                      selectedSampleDataCell?.columnName === col ? null : { columnName: col, rowIndex: 0 }
+                                    );
+                                  }
+                                }}
+                                tabIndex={0}
+                                role="columnheader"
+                                aria-selected={isSelected}
+                                aria-label={`Column ${col}${isSelected ? ', selected' : ''}`}
+                              >
+                                {col}
+                              </th>
+                            );
+                          })}
                         </tr>
                       </thead>
                       <tbody>
                         {sampleData.rows.map((row, rIdx) => (
                           <tr key={rIdx} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors">
-                            {sampleData.columns.map((col, cIdx) => (
-                              <td key={col} className="px-2 py-1.5 text-gray-600 whitespace-nowrap max-w-[120px] truncate" title={String(row[cIdx] ?? '')}>
-                                {row[cIdx] != null ? String(row[cIdx]) : <span className="text-gray-300">—</span>}
-                              </td>
-                            ))}
+                            {displayColumns.map((col) => {
+                              const colIdx = sampleData.columns.indexOf(col);
+                              const value = colIdx >= 0 ? row[colIdx] : undefined;
+                              const isSelected =
+                                selectedSampleDataCell?.columnName === col && selectedSampleDataCell?.rowIndex === rIdx;
+                              const isSelectedCol = selectedSampleDataCell?.columnName === col;
+                              return (
+                                <td
+                                  key={col}
+                                  className={`px-2 py-1.5 whitespace-nowrap max-w-[120px] truncate cursor-pointer transition-colors ${
+                                    isSelected
+                                      ? 'bg-emerald-200 text-emerald-900 font-medium ring-1 ring-emerald-300'
+                                      : isSelectedCol
+                                        ? 'bg-emerald-50/80 text-gray-700'
+                                        : 'text-gray-600 hover:bg-blue-50/50'
+                                  }`}
+                                  title={String(value ?? '')}
+                                  onClick={() => {
+                                    const same = selectedSampleDataCell?.columnName === col && selectedSampleDataCell?.rowIndex === rIdx;
+                                    setSelectedSampleDataCell(same ? null : { columnName: col, rowIndex: rIdx });
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      const same = selectedSampleDataCell?.columnName === col && selectedSampleDataCell?.rowIndex === rIdx;
+                                      setSelectedSampleDataCell(same ? null : { columnName: col, rowIndex: rIdx });
+                                    }
+                                  }}
+                                  tabIndex={0}
+                                  role="gridcell"
+                                  aria-selected={isSelected}
+                                  aria-label={`${col}: ${value != null ? String(value) : 'empty'}`}
+                                >
+                                  {value != null ? String(value) : <span className="text-gray-300">—</span>}
+                                </td>
+                              );
+                            })}
                           </tr>
                         ))}
                       </tbody>

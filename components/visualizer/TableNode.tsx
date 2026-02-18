@@ -280,10 +280,11 @@ export default function TableNode({
                           key={`pk-${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
-                          className={`truncate rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
-                          title={fieldName}
+                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
+                          title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
-                          PK {highlightMatch(fieldName)}
+                          <span className="truncate">PK {highlightMatch(fieldName)}</span>
+                          {field.dataType && <span className="flex-shrink-0 text-[8px] text-amber-700/80 font-normal">{field.dataType}</span>}
                         </div>
                       );
                     })}
@@ -295,10 +296,11 @@ export default function TableNode({
                           key={`fk-${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
-                          className={`truncate rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
-                          title={fieldName}
+                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[9px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
+                          title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
-                          FK {highlightMatch(fieldName)}
+                          <span className="truncate">FK {highlightMatch(fieldName)}</span>
+                          {field.dataType && <span className="flex-shrink-0 text-[8px] text-blue-700/80 font-normal">{field.dataType}</span>}
                         </div>
                       );
                     })}
@@ -334,7 +336,7 @@ export default function TableNode({
                             e.stopPropagation();
                             if (onFieldSelect) onFieldSelect(table.key, fieldName);
                           }}
-                          className={`truncate rounded px-1 py-0.5 cursor-pointer font-mono ${
+                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono ${
                             isThisFieldSelected
                               ? isPK
                                 ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900'
@@ -347,9 +349,10 @@ export default function TableNode({
                                   ? 'text-blue-800 font-semibold hover:bg-blue-50'
                                   : 'text-gray-700 hover:bg-gray-50'
                           }`}
-                          title={fieldName}
+                          title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
-                          {prefix}{highlightMatch(fieldName)}
+                          <span className="truncate">{prefix}{highlightMatch(fieldName)}</span>
+                          {field.dataType && <span className="flex-shrink-0 text-[8px] text-gray-500 font-normal">{field.dataType}</span>}
                         </div>
                       );
                     })}

@@ -9,10 +9,12 @@ const shortcuts = [
   { keys: ['Click table'], desc: 'Zoom to table & open details' },
   { keys: ['Scroll'], desc: 'Zoom in/out' },
   { keys: ['Drag'], desc: 'Pan canvas' },
+  { keys: ['Shift', 'Drag'], desc: 'Zoom to region (marquee)' },
   { keys: ['+', '-'], desc: 'Zoom in / out' },
   { keys: ['0'], desc: 'Fit to view' },
   { keys: ['Esc'], desc: 'Deselect & close panel' },
-  { keys: ['Double-click empty'], desc: 'Fit canvas to view (zoom out)' },
+  { keys: ['Double-click empty'], desc: 'Zoom in toward click' },
+  { keys: ['Triple-click empty'], desc: 'Zoom out to 15%' },
   { keys: ['?'], desc: 'Toggle this panel' },
 ];
 

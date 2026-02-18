@@ -91,7 +91,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   // Initial state
   model: null,
   uploadedSampleData: {},
-  zoom: 0.6,
+  zoom: 0.4,
   pan: { x: 0, y: 0 },
   tablePositions: {},
   selectedTable: null,
@@ -110,9 +110,9 @@ export const useModelStore = create<ModelStore>((set) => ({
   detailPanelOpen: false,
   layoutMode: 'domain-overview',
   expandedDomains: new Set<string>(), // All domains expanded by default
-  viewMode: 'compact',
-  tableSize: 'small',
-  fieldDisplayMode: 'minimal',
+  viewMode: 'detailed',
+  tableSize: 'large',
+  fieldDisplayMode: 'full',
   requestFitToView: 0,
   requestFitToDomain: null,
   showRelationships: false, // Off by default; user can toggle on
@@ -245,7 +245,7 @@ export const useModelStore = create<ModelStore>((set) => ({
           viewMode: 'detailed',
           tableSize: 'large',
           fieldDisplayMode: 'full',
-          zoom: 1.1,
+          zoom: 0.4,
           pan: { x: 0, y: 0 },
         });
         break;

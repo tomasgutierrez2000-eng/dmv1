@@ -18,9 +18,23 @@ export default function Canvas() {
   const [hoveredRelationship, setHoveredRelationship] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showHint, setShowHint] = useState(true);
+  const [marqueeStart, setMarqueeStart] = useState<{ x: number; y: number } | null>(null);
+  const [marqueeCurrent, setMarqueeCurrent] = useState<{ x: number; y: number } | null>(null);
   const DRAG_THRESHOLD_PX = 6;
+  const MARQUEE_MIN_SIZE_PX = 10;
   const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
   const isInteractingRef = useRef(false);
+  const doubleClickZoomInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear pending double-click zoom on unmount to avoid setState after unmount
+  useEffect(() => {
+    return () => {
+      if (doubleClickZoomInTimeoutRef.current) {
+        clearTimeout(doubleClickZoomInTimeoutRef.current);
+        doubleClickZoomInTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   // Focus-compact: when a field is selected, we bring related tables closer together.
   // These refs persist across renders without causing dependency cascades.
@@ -590,11 +604,23 @@ export default function Canvas() {
     savedSearchPositionsRef.current = null;
   }, [model, layoutMode, tableSize, visibleLayers]);
 
-  // Canvas panning (left-click on empty area or middle-click anywhere)
+  // Canvas panning (left-click on empty area or middle-click anywhere). Shift+drag = marquee zoom.
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       setShowHint(false);
       isInteractingRef.current = true;
+      // Shift + left-drag: marquee zoom to region (over canvas or content)
+      if (e.button === 0 && e.shiftKey) {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          setMarqueeStart({ x, y });
+          setMarqueeCurrent({ x, y });
+        }
+        e.preventDefault();
+        return;
+      }
       // Middle mouse button: always pan
       if (e.button === 1) {
         e.preventDefault();
@@ -619,6 +645,13 @@ export default function Canvas() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      if (marqueeStart !== null) {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          setMarqueeCurrent({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+        }
+        return;
+      }
       const pending = pendingDragRef.current;
       if (pending) {
         const dx = e.clientX - pending.startX;
@@ -647,15 +680,67 @@ export default function Canvas() {
         }
       }
     },
-    [isPanning, isDraggingTable, panStart, dragStart, zoom, tablePositions, setPan, setTablePosition]
+    [marqueeStart, isPanning, isDraggingTable, panStart, dragStart, zoom, tablePositions, setPan, setTablePosition]
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseLeave = useCallback(() => {
+    if (marqueeStart !== null) {
+      setMarqueeStart(null);
+      setMarqueeCurrent(null);
+    }
     setIsPanning(false);
     setIsDraggingTable(null);
     pendingDragRef.current = null;
     isInteractingRef.current = false;
-  }, []);
+  }, [marqueeStart]);
+
+  const handleMouseUp = useCallback(() => {
+    if (marqueeStart !== null && marqueeCurrent !== null) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const sx0 = Math.min(marqueeStart.x, marqueeCurrent.x);
+        const sy0 = Math.min(marqueeStart.y, marqueeCurrent.y);
+        const sx1 = Math.max(marqueeStart.x, marqueeCurrent.x);
+        const sy1 = Math.max(marqueeStart.y, marqueeCurrent.y);
+        const w = sx1 - sx0;
+        const h = sy1 - sy0;
+        const diagonal = Math.sqrt(w * w + h * h);
+        if (diagonal >= MARQUEE_MIN_SIZE_PX) {
+          const { zoom: z, pan: p } = useModelStore.getState();
+          const worldLeft = (sx0 - p.x) / z;
+          const worldTop = (sy0 - p.y) / z;
+          const worldRight = (sx1 - p.x) / z;
+          const worldBottom = (sy1 - p.y) / z;
+          const worldWidth = worldRight - worldLeft;
+          const worldHeight = worldBottom - worldTop;
+          if (worldWidth > 0 && worldHeight > 0) {
+            const PAD = 40;
+            const vpW = rect.width;
+            const vpH = rect.height;
+            const zoomX = (vpW - 2 * PAD) / worldWidth;
+            const zoomY = (vpH - 2 * PAD) / worldHeight;
+            const newZoom = Math.max(0.05, Math.min(4, Math.min(zoomX, zoomY)));
+            const worldCx = (worldLeft + worldRight) / 2;
+            const worldCy = (worldTop + worldBottom) / 2;
+            const newPan = {
+              x: -worldCx * newZoom + vpW / 2,
+              y: -worldCy * newZoom + vpH / 2,
+            };
+            setIsAnimating(true);
+            setZoom(newZoom);
+            setPan(newPan);
+            setTimeout(() => setIsAnimating(false), prefersReducedMotion ? 0 : 300);
+          }
+        }
+      }
+      setMarqueeStart(null);
+      setMarqueeCurrent(null);
+    }
+    setIsPanning(false);
+    setIsDraggingTable(null);
+    pendingDragRef.current = null;
+    isInteractingRef.current = false;
+  }, [marqueeStart, marqueeCurrent, setZoom, setPan, prefersReducedMotion]);
 
   // Smooth zoom toward cursor. Use native listener with { passive: false } so preventDefault works
   // (React's onWheel is passive by default, which causes "Unable to preventDefault" console errors).
@@ -693,38 +778,67 @@ export default function Canvas() {
     return () => el.removeEventListener('wheel', onWheel);
   }, [setZoom, setPan]);
 
-  // Double-click: fit to view with smooth animation.
-  // During focus-compact the canvas click will exit focus, so skip the redundant fit here.
-  const handleDoubleClick = useCallback(() => {
-    if (!model || visibleTables.length === 0) return;
-    if (savedPositionsRef.current) return; // focus-compact handles its own camera
-    setIsAnimating(true);
-    const positions = visibleTables.map((t) => tablePositions[t.key]).filter(Boolean) as TablePosition[];
-    if (positions.length === 0) return;
-    runFitToView(positions, visibleTables.length);
-    setTimeout(() => setIsAnimating(false), 350);
-  }, [model, visibleTables, tablePositions, runFitToView]);
+  // Double-click: zoom in toward the click point (keeps that point under the cursor).
+  // If user clicks again within 300ms (triple-click), we zoom out to 15% instead (handled in handleCanvasClick).
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!model || visibleTables.length === 0) return;
+      if (savedPositionsRef.current) return; // focus-compact handles its own camera
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      const { zoom: z, pan: p } = useModelStore.getState();
+      const newZoom = Math.min(4, z * 1.5);
+      const worldX = (sx - p.x) / z;
+      const worldY = (sy - p.y) / z;
+      const newPan = {
+        x: sx - worldX * newZoom,
+        y: sy - worldY * newZoom,
+      };
+      const runZoomIn = () => {
+        doubleClickZoomInTimeoutRef.current = null;
+        setIsAnimating(true);
+        setPan(newPan);
+        setZoom(newZoom);
+        setTimeout(() => setIsAnimating(false), 280);
+      };
+      if (doubleClickZoomInTimeoutRef.current) clearTimeout(doubleClickZoomInTimeoutRef.current);
+      doubleClickZoomInTimeoutRef.current = setTimeout(runZoomIn, 300);
+    },
+    [model, visibleTables.length, setPan, setZoom]
+  );
 
-  // Single click on empty canvas: clear selections and exit focus mode only. Do NOT change zoom.
-  // Zoom out / fit-to-view only on double-click (handleDoubleClick).
-  const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    const target = e.target as Node | null;
-    if (!target) return;
-    const container = containerRef.current;
-    const canvas = canvasRef.current;
-    const hitCanvas =
-      target === container ||
-      target === canvas ||
-      (canvas?.firstElementChild != null && target === canvas.firstElementChild);
-    if (hitCanvas) {
-      setShowHint(false);
-      setSelectedField(null);
-      setSelectedTable(null);
-      setSelectedRelationship(null);
-      setSelectedSampleDataCell(null);
-      setFocusMode(false);
-    }
-  }, [setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode]);
+  // Single click on empty canvas: clear selections and exit focus mode. If a double-click zoom-in was pending, treat as triple-click and zoom out to 15%.
+  const handleCanvasClick = useCallback(
+    (e: React.MouseEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+      const container = containerRef.current;
+      const canvas = canvasRef.current;
+      const hitCanvas =
+        target === container ||
+        target === canvas ||
+        (canvas?.firstElementChild != null && target === canvas.firstElementChild);
+      if (hitCanvas) {
+        setShowHint(false);
+        if (doubleClickZoomInTimeoutRef.current) {
+          clearTimeout(doubleClickZoomInTimeoutRef.current);
+          doubleClickZoomInTimeoutRef.current = null;
+          setIsAnimating(true);
+          setZoom(0.15);
+          setTimeout(() => setIsAnimating(false), 280);
+        }
+        setSelectedField(null);
+        setSelectedTable(null);
+        setSelectedRelationship(null);
+        setSelectedSampleDataCell(null);
+        setFocusMode(false);
+      }
+    },
+    [setZoom, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode]
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -751,6 +865,12 @@ export default function Canvas() {
         }
         setTimeout(() => setIsAnimating(false), 350);
       } else if (e.key === 'Escape') {
+        if (marqueeStart !== null) {
+          setMarqueeStart(null);
+          setMarqueeCurrent(null);
+          e.preventDefault();
+          return;
+        }
         // First Escape: clear sample data cell selection (derivation panel). Second Escape: clear table/field/relationship.
         if (selectedSampleDataCell) {
           setSelectedSampleDataCell(null);
@@ -765,7 +885,7 @@ export default function Canvas() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode, selectedSampleDataCell]);
+  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode, selectedSampleDataCell, marqueeStart]);
 
   // Auto-hide navigation hint after first interaction or 8 seconds
   useEffect(() => {
@@ -781,11 +901,13 @@ export default function Canvas() {
     );
   }
 
-  const cursorStyle = isPanning
-    ? 'grabbing'
-    : isDraggingTable
-      ? 'move'
-      : 'grab';
+  const cursorStyle = marqueeStart !== null
+    ? 'crosshair'
+    : isPanning
+      ? 'grabbing'
+      : isDraggingTable
+        ? 'move'
+        : 'grab';
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasNarrowedView = hasActiveSearch || filtersNarrowing;
 
@@ -796,7 +918,7 @@ export default function Canvas() {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
       onDoubleClick={handleDoubleClick}
       onClick={handleCanvasClick}
       onContextMenu={(e) => e.preventDefault()}
@@ -814,10 +936,32 @@ export default function Canvas() {
             <span className="w-px h-3 bg-white/30" />
             <span>Drag to pan</span>
             <span className="w-px h-3 bg-white/30" />
+            <span>Shift+drag to zoom to region</span>
+            <span className="w-px h-3 bg-white/30" />
             <span>Press <kbd className="px-1.5 py-0.5 bg-white/15 rounded text-[11px] font-bold">?</kbd> for shortcuts</span>
           </div>
         </div>
       )}
+      {/* Marquee zoom overlay (Option A: div in screen space) */}
+      {marqueeStart !== null && marqueeCurrent !== null && (() => {
+        const left = Math.min(marqueeStart.x, marqueeCurrent.x);
+        const top = Math.min(marqueeStart.y, marqueeCurrent.y);
+        const width = Math.abs(marqueeCurrent.x - marqueeStart.x);
+        const height = Math.abs(marqueeCurrent.y - marqueeStart.y);
+        if (width < 1 && height < 1) return null;
+        return (
+          <div
+            className="absolute pointer-events-none z-30 rounded-md border-2 border-blue-500 bg-blue-500/15"
+            style={{
+              left,
+              top,
+              width,
+              height,
+            }}
+            aria-hidden="true"
+          />
+        );
+      })()}
       <svg
         ref={canvasRef}
         width="100%"

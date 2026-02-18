@@ -171,8 +171,10 @@ export default function Toolbar() {
         }
         const XLSX = await import('xlsx');
         const wb = XLSX.utils.book_new();
+        const sanitizeSheetName = (s: string) =>
+          s.replace(/[:\\/?*[\]]/g, '_').slice(0, 31) || 'Sheet';
         for (const [tableKey, { columns, rows }] of Object.entries(merged)) {
-          const sheetName = tableKey.replace(`${layer}.`, '').slice(0, 31);
+          const sheetName = sanitizeSheetName(tableKey.replace(`${layer}.`, ''));
           const wsData = [columns, ...rows];
           const ws = XLSX.utils.aoa_to_sheet(wsData);
           XLSX.utils.book_append_sheet(wb, ws, sheetName);

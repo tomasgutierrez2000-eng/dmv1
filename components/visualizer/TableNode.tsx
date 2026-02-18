@@ -174,8 +174,8 @@ export default function TableNode({
   // ─── OVERVIEW MODE: SVG header/footer + scrollable foreignObject for fields ───
   if (isOverviewMode) {
     const OV = OVERVIEW_CARD;
-    const compactOv = showOnlyPkFkInCompact ? { HEADER_H: 22, FOOTER_H: 10 } : OV;
-    const contentH = TABLE_HEIGHT - compactOv.HEADER_H - compactOv.FOOTER_H;
+    // Use same header/footer size as detailed view for consistent spacing
+    const contentH = TABLE_HEIGHT - OV.HEADER_H - OV.FOOTER_H;
     const safeId = table.key.replace(/[^a-zA-Z0-9]/g, '_');
     const maxNameChars = Math.floor((TABLE_WIDTH - OV.PAD_X * 2 - 36) / 7);
 
@@ -208,17 +208,17 @@ export default function TableNode({
           <rect width={TABLE_WIDTH} height={TABLE_HEIGHT} fill="white" />
 
           {/* Header with gradient */}
-          <rect width={TABLE_WIDTH} height={compactOv.HEADER_H} fill={colors.border} />
+          <rect width={TABLE_WIDTH} height={OV.HEADER_H} fill={colors.border} />
           <rect
-            width={TABLE_WIDTH} height={compactOv.HEADER_H}
+            width={TABLE_WIDTH} height={OV.HEADER_H}
             fill={colors.primary} opacity="0.35"
           />
           <circle
-            cx={OV.PAD_X + 5} cy={compactOv.HEADER_H / 2}
+            cx={OV.PAD_X + 5} cy={OV.HEADER_H / 2}
             r={showOnlyPkFkInCompact ? 3 : 4} fill={categoryColor.color} opacity="0.9"
           />
           <text
-            x={OV.PAD_X + 14} y={compactOv.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
+            x={OV.PAD_X + 14} y={OV.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
             fill="white" fontSize={showOnlyPkFkInCompact ? 10 : 12} fontWeight="bold"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
@@ -227,11 +227,11 @@ export default function TableNode({
               : table.name}
           </text>
           <rect
-            x={TABLE_WIDTH - OV.PAD_X - 28} y={(compactOv.HEADER_H - 16) / 2}
+            x={TABLE_WIDTH - OV.PAD_X - 28} y={(OV.HEADER_H - 16) / 2}
             width="28" height="16" rx="3" fill="rgba(255,255,255,0.25)"
           />
           <text
-            x={TABLE_WIDTH - OV.PAD_X - 14} y={compactOv.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
+            x={TABLE_WIDTH - OV.PAD_X - 14} y={OV.HEADER_H / 2 + (showOnlyPkFkInCompact ? 3 : 4)}
             fill="white" fontSize="10" fontWeight="bold" textAnchor="middle"
             fontFamily="system-ui, -apple-system, sans-serif"
           >
@@ -241,7 +241,7 @@ export default function TableNode({
           {/* Scrollable field list (foreignObject so we can use overflow-y) */}
           <foreignObject
             x={0}
-            y={compactOv.HEADER_H}
+            y={OV.HEADER_H}
             width={TABLE_WIDTH}
             height={contentH}
             requiredExtensions="http://www.w3.org/1999/xhtml"
@@ -371,12 +371,12 @@ export default function TableNode({
 
           {/* Footer separator */}
           <line
-            x1="0" y1={TABLE_HEIGHT - compactOv.FOOTER_H}
-            x2={TABLE_WIDTH} y2={TABLE_HEIGHT - compactOv.FOOTER_H}
+            x1="0" y1={TABLE_HEIGHT - OV.FOOTER_H}
+            x2={TABLE_WIDTH} y2={TABLE_HEIGHT - OV.FOOTER_H}
             stroke="#e5e7eb" strokeWidth="0.5"
           />
           <text
-            x={OV.PAD_X} y={TABLE_HEIGHT - compactOv.FOOTER_H / 2 + 3}
+            x={OV.PAD_X} y={TABLE_HEIGHT - OV.FOOTER_H / 2 + 3}
             fill="#6b7280" fontSize={showOnlyPkFkInCompact ? 8 : 9}
             fontFamily="system-ui, -apple-system, sans-serif"
           >
@@ -388,7 +388,7 @@ export default function TableNode({
           </text>
           {(relCounts.incoming > 0 || relCounts.outgoing > 0) && (
             <text
-              x={TABLE_WIDTH - OV.PAD_X} y={TABLE_HEIGHT - compactOv.FOOTER_H / 2 + 3}
+              x={TABLE_WIDTH - OV.PAD_X} y={TABLE_HEIGHT - OV.FOOTER_H / 2 + 3}
               fill="#9ca3af" fontSize="8" textAnchor="end"
               fontFamily="system-ui, -apple-system, sans-serif"
             >

@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowLeft, Info, Layers, Plus, Trash2, X } from 'lucide-react';
 import { DASHBOARD_PAGES } from '@/data/l3-metrics';
-import type { L3Metric, DashboardPage, MetricType, SourceField } from '@/data/l3-metrics';
+import type { L3Metric, DashboardPage, MetricType, SourceField, CalculationDimension } from '@/data/l3-metrics';
+import { CALCULATION_DIMENSIONS, CALCULATION_DIMENSION_LABELS } from '@/data/l3-metrics';
 import { deriveDimensionsFromSourceFields, suggestTogglesFromSourceFields } from '@/lib/metric-derivation';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
@@ -47,6 +48,9 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
   const [sampleValue, setSampleValue] = useState(metric?.sampleValue ?? '');
   const [sourceFields, setSourceFields] = useState<SourceField[]>(
     metric?.sourceFields?.length ? [...metric.sourceFields] : [{ layer: 'L2', table: '', field: '' }]
+  );
+  const [allowedDimensions, setAllowedDimensions] = useState<CalculationDimension[] | undefined>(
+    metric?.allowedDimensions?.length ? [...metric.allowedDimensions] : undefined
   );
   const [schema, setSchema] = useState<DataModel | null>(null);
   const [saving, setSaving] = useState(false);
@@ -170,6 +174,7 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
         sampleValue: sampleValue.trim(),
         sourceFields: fields,
         dimensions,
+        allowedDimensions: allowedDimensions?.length ? allowedDimensions : undefined,
         toggles,
         notes: metric?.notes,
       });
@@ -485,6 +490,42 @@ export default function MetricForm({ metric, isCreate, onSave, onCancel }: Metri
             />
           </div>
         </div>
+
+        <section className="space-y-3 p-4 rounded-lg bg-white/[0.02] border border-white/10" aria-labelledby="calc-dim-heading">
+          <h2 id="calc-dim-heading" className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Calculation dimensions
+          </h2>
+          <p className="text-[11px] text-gray-500">
+            Check the levels where this metric applies. Leave all checked for all levels (Counterparty, Facility, L1, L2, L3). Uncheck any level where the metric does not apply.
+          </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {CALCULATION_DIMENSIONS.map((dim) => {
+              const checked = allowedDimensions === undefined || allowedDimensions.includes(dim);
+              return (
+                <label key={dim} className="flex items-center gap-2.5 cursor-pointer py-2 min-h-[44px]">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => {
+                      if (checked) {
+                        const current = allowedDimensions ?? [...CALCULATION_DIMENSIONS];
+                        const next = current.filter((d) => d !== dim);
+                        setAllowedDimensions(next.length === 0 ? undefined : next);
+                      } else {
+                        const current = allowedDimensions ?? [];
+                        const next = [...current, dim].sort((a, b) => CALCULATION_DIMENSIONS.indexOf(a) - CALCULATION_DIMENSIONS.indexOf(b));
+                        setAllowedDimensions(next.length === CALCULATION_DIMENSIONS.length ? undefined : next);
+                      }
+                    }}
+                    className="rounded border-white/20 bg-white/5 text-purple-500 focus:ring-2 focus:ring-purple-500/40 w-4 h-4 shrink-0"
+                    aria-describedby={dim === CALCULATION_DIMENSIONS[0] ? 'calc-dim-heading' : undefined}
+                  />
+                  <span className="text-sm text-gray-300 select-none">{CALCULATION_DIMENSION_LABELS[dim]}</span>
+                </label>
+              );
+            })}
+          </div>
+        </section>
 
         {draftMetricWithLineage?.nodes && draftMetricWithLineage.nodes.length > 0 && (
           <section className="rounded-lg border border-white/10 bg-black/10 p-4" aria-labelledby="lineage-preview-heading">

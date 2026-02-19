@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
 import { writeModelGaps } from '@/lib/model-gaps-store';
-import type { L3Metric, DashboardPage, MetricType, DimensionUsage, SourceField } from '@/data/l3-metrics';
+import type { L3Metric, DashboardPage, MetricType, DimensionUsage, SourceField, CalculationDimension } from '@/data/l3-metrics';
+import { CALCULATION_DIMENSIONS } from '@/data/l3-metrics';
 
 const PAGES: DashboardPage[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
 const METRIC_TYPES: MetricType[] = ['Aggregate', 'Ratio', 'Count', 'Derived', 'Status', 'Trend', 'Table', 'Categorical'];
@@ -27,6 +28,25 @@ function parseToggles(str: string): string[] {
   return str.split(';').map(s => s.trim()).filter(Boolean);
 }
 
+const VALID_CALC_DIMENSIONS = new Set<string>(CALCULATION_DIMENSIONS);
+function parseAllowedDimensions(str: string): CalculationDimension[] | undefined {
+  if (!str || typeof str !== 'string') return undefined;
+  const parts = str.split(';').map(s => s.trim()).filter(Boolean);
+  if (parts.length === 0) return undefined;
+  const out = parts.filter((p): p is CalculationDimension => VALID_CALC_DIMENSIONS.has(p));
+  return out.length === 0 ? undefined : out.length === CALCULATION_DIMENSIONS.length ? undefined : out;
+}
+
+function parseFormulasByDimension(row: Record<string, unknown>): L3Metric['formulasByDimension'] | undefined {
+  const out: Partial<Record<CalculationDimension, { formula: string; formulaSQL?: string }>> = {};
+  for (const dim of CALCULATION_DIMENSIONS) {
+    const formula = String(row[`formula_${dim}`] ?? '').trim();
+    if (!formula) continue;
+    out[dim] = { formula };
+  }
+  return Object.keys(out).length === 0 ? undefined : out;
+}
+
 function normalizeMetric(m: Partial<L3Metric>, id: string): L3Metric {
   return {
     id,
@@ -41,6 +61,8 @@ function normalizeMetric(m: Partial<L3Metric>, id: string): L3Metric {
     sampleValue: m.sampleValue ?? '',
     sourceFields: Array.isArray(m.sourceFields) ? m.sourceFields : [],
     dimensions: Array.isArray(m.dimensions) ? m.dimensions : [],
+    allowedDimensions: Array.isArray(m.allowedDimensions) ? m.allowedDimensions : undefined,
+    formulasByDimension: m.formulasByDimension && Object.keys(m.formulasByDimension).length > 0 ? m.formulasByDimension : undefined,
     toggles: m.toggles,
     notes: m.notes,
   };
@@ -153,6 +175,8 @@ export async function POST(request: NextRequest) {
       const page = String(row['page'] ?? 'P1').trim();
       const metricType = String(row['metricType'] ?? 'Derived').trim();
       const dimensions = parseDimensions(String(row['dimensions'] ?? ''));
+      const allowedDimensions = parseAllowedDimensions(String(row['allowedDimensions'] ?? ''));
+      const formulasByDimension = parseFormulasByDimension(row as Record<string, unknown>);
       const toggles = parseToggles(String(row['toggles'] ?? ''));
       toImport.push(normalizeMetric({
         id: finalId,
@@ -167,6 +191,8 @@ export async function POST(request: NextRequest) {
         sampleValue: String(row['sampleValue'] ?? '').trim(),
         sourceFields,
         dimensions,
+        allowedDimensions,
+        formulasByDimension,
         toggles: toggles.length ? toggles : undefined,
         notes: String(row['notes'] ?? '').trim() || undefined,
       }, finalId));

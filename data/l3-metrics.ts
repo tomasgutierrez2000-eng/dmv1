@@ -26,6 +26,19 @@ export type MetricType = 'Aggregate' | 'Ratio' | 'Count' | 'Derived' | 'Status' 
 
 export type DimensionInteraction = 'FILTER' | 'GROUP_BY' | 'AVAILABLE' | 'TOGGLE';
 
+/** Dimension at which the metric is calculated (grain): counterparty, facility, or layer (L1/L2/L3). */
+export type CalculationDimension = 'counterparty' | 'facility' | 'L1' | 'L2' | 'L3';
+
+export const CALCULATION_DIMENSIONS: CalculationDimension[] = ['counterparty', 'facility', 'L1', 'L2', 'L3'];
+
+export const CALCULATION_DIMENSION_LABELS: Record<CalculationDimension, string> = {
+  counterparty: 'Counterparty',
+  facility: 'Facility',
+  L1: 'L1 (Reference)',
+  L2: 'L2 (Snapshot)',
+  L3: 'L3 (Derived)',
+};
+
 export interface DimensionUsage {
   dimension: string;
   interaction: DimensionInteraction;
@@ -71,6 +84,10 @@ export interface L3Metric {
   sampleValue: string;
   sourceFields: SourceField[];
   dimensions: DimensionUsage[];
+  /** Dimensions at which this metric can be calculated (grain). If omitted, all are allowed. */
+  allowedDimensions?: CalculationDimension[];
+  /** Formula (and optional formulaSQL) per calculation dimension. Overrides metrics_dimensions_filled when set. */
+  formulasByDimension?: Partial<Record<CalculationDimension, { formula: string; formulaSQL?: string }>>;
   toggles?: string[];
   notes?: string;
   // Detailed lineage — only populated for key metrics with visual DAGs

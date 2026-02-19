@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMergedMetrics } from '@/lib/metrics-store';
 import type { L3Metric } from '@/data/l3-metrics';
+import { CALCULATION_DIMENSIONS } from '@/data/l3-metrics';
 
 const PAGES = 'P1, P2, P3, P4, P5, P6, P7';
 const METRIC_TYPES = 'Aggregate, Ratio, Count, Derived, Status, Trend, Table, Categorical';
 const DIM_INTERACTIONS = 'FILTER, GROUP_BY, AVAILABLE, TOGGLE';
+
+/** Column names for formula per calculation dimension (aligned with data/metrics_dimensions_filled.xlsx). */
+const FORMULA_DIMENSION_COLS = CALCULATION_DIMENSIONS.map((d) => `formula_${d}` as const);
+
+function getFormulaByDimensionRow(m: L3Metric): string[] {
+  return CALCULATION_DIMENSIONS.map((dim) => {
+    const entry = m.formulasByDimension?.[dim];
+    return entry?.formula ?? '';
+  });
+}
 
 async function buildWorkbook(metrics: L3Metric[]) {
   const XLSX = await import('xlsx');
@@ -17,7 +28,16 @@ async function buildWorkbook(metrics: L3Metric[]) {
     ['2. Metrics: one row per metric. Use id like C001 for new custom metrics, or leave id blank to auto-generate.'],
     ['3. SourceFields: one row per source field; metric_id must match an id in the Metrics sheet. ord = 1, 2, 3...'],
     ['4. dimensions: semicolon-separated, e.g. as_of_date:GROUP_BY;counterparty_id:FILTER'],
-    ['5. toggles: semicolon-separated toggle ids, e.g. exposure_calc'],
+    ['5. allowedDimensions: semicolon-separated, e.g. counterparty;facility;L1;L2;L3 (or leave blank for all).'],
+    ['6. Formula per dimension: formula_facility, formula_counterparty, formula_L1, formula_L2, formula_L3 — one formula per grain (aligns with data/metrics_dimensions_filled.xlsx).'],
+    ['7. toggles: semicolon-separated toggle ids, e.g. exposure_calc'],
+    [],
+    ['Calculation dimensions (formula_* columns)'],
+    ['formula_facility', 'Facility'],
+    ['formula_counterparty', 'Counterparty'],
+    ['formula_L1', 'L1 (Reference / Department/LoB)'],
+    ['formula_L2', 'L2 (Snapshot / Portfolio)'],
+    ['formula_L3', 'L3 (Derived / Desk)'],
     [],
     ['Valid values'],
     ['page', PAGES],
@@ -25,8 +45,13 @@ async function buildWorkbook(metrics: L3Metric[]) {
     ['dimension interaction', DIM_INTERACTIONS],
   ];
 
-  const metricsHeaders = ['id', 'name', 'page', 'section', 'metricType', 'formula', 'formulaSQL', 'description', 'displayFormat', 'sampleValue', 'dimensions', 'toggles', 'notes'];
-  const metricsRows = metrics.map(m => [
+  const metricsHeaders = [
+    'id', 'name', 'page', 'section', 'metricType', 'formula', 'formulaSQL', 'description', 'displayFormat', 'sampleValue',
+    'dimensions', 'allowedDimensions',
+    ...FORMULA_DIMENSION_COLS,
+    'toggles', 'notes',
+  ];
+  const metricsRows = metrics.map((m) => [
     m.id,
     m.name,
     m.page,
@@ -37,7 +62,9 @@ async function buildWorkbook(metrics: L3Metric[]) {
     m.description ?? '',
     m.displayFormat ?? '',
     m.sampleValue ?? '',
-    m.dimensions?.map(d => `${d.dimension}:${d.interaction}`).join(';') ?? '',
+    m.dimensions?.map((d) => `${d.dimension}:${d.interaction}`).join(';') ?? '',
+    m.allowedDimensions?.join(';') ?? '',
+    ...getFormulaByDimensionRow(m),
     m.toggles?.join(';') ?? '',
     m.notes ?? '',
   ]);

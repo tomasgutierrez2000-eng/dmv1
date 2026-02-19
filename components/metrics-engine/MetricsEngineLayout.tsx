@@ -199,7 +199,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                       <button
                         key={m.id}
                         onClick={() => { setSelectedId(m.id); setView('detail'); }}
-                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
+                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
                       >
                         <span className="text-[10px] font-mono text-gray-500 w-8 flex-shrink-0">{m.id}</span>
                         <span className="flex-1 truncate text-xs font-medium">{m.name}</span>
@@ -295,7 +295,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               <header className="mb-6">
                 <h2 className="text-lg font-bold text-white">All metrics</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}{filterPage !== 'all' && ` on ${filterPage}`} — click one to see how it is calculated
+                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}{filterPage !== 'all' && ` on ${filterPage}`}. Click a metric to see formula and lineage; use the dimension dropdown to view by level (Counterparty, Facility, L1, L2, L3).
                 </p>
               </header>
               <div className="space-y-4">
@@ -310,7 +310,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                           <button
                             key={m.id}
                             onClick={() => { setSelectedId(m.id); setView('detail'); }}
-                            className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04] text-left transition-all"
+                            className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04] text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:border-purple-500/30"
                           >
                             <span className="text-gray-500 flex-shrink-0 mt-0.5">{getMetricTypeIcon(m.metricType)}</span>
                             <div className="flex-1 min-w-0">

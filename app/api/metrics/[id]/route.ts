@@ -19,6 +19,8 @@ function normalizeMetric(m: Partial<L3Metric>, id: string): L3Metric {
     sampleValue: m.sampleValue ?? '',
     sourceFields: Array.isArray(m.sourceFields) ? m.sourceFields : [],
     dimensions: Array.isArray(m.dimensions) ? m.dimensions : [],
+    allowedDimensions: Array.isArray(m.allowedDimensions) ? m.allowedDimensions : undefined,
+    formulasByDimension: m.formulasByDimension && Object.keys(m.formulasByDimension).length > 0 ? m.formulasByDimension : undefined,
     toggles: m.toggles,
     notes: m.notes,
     nodes: m.nodes,

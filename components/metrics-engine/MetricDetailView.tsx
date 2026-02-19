@@ -1,10 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Copy, Edit, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag } from 'lucide-react';
-import { DASHBOARD_PAGES, DIMENSION_LABELS } from '@/data/l3-metrics';
+import {
+  DASHBOARD_PAGES,
+  DIMENSION_LABELS,
+  CALCULATION_DIMENSIONS,
+  CALCULATION_DIMENSION_LABELS,
+  type CalculationDimension,
+} from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
+import { getFormulaForDimension, type MetricDimensionFormulaRow } from '@/data/metrics_dimensions_filled';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
 import type { L3Metric, MetricType, DimensionInteraction } from '@/data/l3-metrics';
 
@@ -41,9 +48,48 @@ interface MetricDetailViewProps {
   onDuplicate: () => void;
 }
 
+/** Dimensions at which this metric can be calculated. Defaults to all if not specified. */
+function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
+  if (metric.allowedDimensions && metric.allowedDimensions.length > 0) {
+    return metric.allowedDimensions;
+  }
+  return [...CALCULATION_DIMENSIONS];
+}
+
 export default function MetricDetailView({ metric, source, onEdit, onBack, onDuplicate }: MetricDetailViewProps) {
-  const withLineage = metricWithLineage(metric);
+  const allowedDimensions = getAllowedDimensions(metric);
+  const [selectedDimension, setSelectedDimension] = useState<CalculationDimension>(allowedDimensions[0]);
+
+  // Keep selected dimension in sync when metric changes or when it's no longer allowed
+  useEffect(() => {
+    if (allowedDimensions.includes(selectedDimension)) return;
+    setSelectedDimension(allowedDimensions[0]);
+  }, [metric.id, allowedDimensions, selectedDimension]);
+
+  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaRow[] | null>(null);
+  useEffect(() => {
+    fetch('/api/metrics-dimensions-filled')
+      .then((res) => res.json())
+      .then((data: { formulas?: MetricDimensionFormulaRow[] }) => setFormulasFromApi(data.formulas ?? null))
+      .catch(() => setFormulasFromApi(null));
+  }, []);
+
+  const withLineage = metricWithLineage(metric, selectedDimension);
   const pageInfo = DASHBOARD_PAGES.find(p => p.id === metric.page);
+  // Formula for selected dimension: metric.formulasByDimension (template/import) > API (data/metrics_dimensions_filled.xlsx) > static
+  const dimensionFormulaFromMetric = metric.formulasByDimension?.[selectedDimension];
+  const matchKeys = [metric.id, metric.name].filter(Boolean);
+  const dimensionFormulaFromApi = formulasFromApi
+    ? formulasFromApi.find(
+        (r) =>
+          r.dimension === selectedDimension &&
+          matchKeys.some((k) => k && String(k).trim() === String(r.metricId).trim())
+      )
+    : null;
+  const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, selectedDimension);
+  const dimensionFormula = dimensionFormulaFromMetric ?? dimensionFormulaFromApi ?? dimensionFormulaFromStatic;
+  const displayFormula = dimensionFormula?.formula ?? metric.formula;
+  const displayFormulaSQL = dimensionFormula?.formulaSQL ?? metric.formulaSQL;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -51,7 +97,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:rounded"
           aria-label="Back to metrics list"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -61,7 +107,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           <button
             type="button"
             onClick={onEdit}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e1a]"
           >
             <Edit className="w-3.5 h-3.5" />
             Edit
@@ -69,7 +115,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           <button
             onClick={onDuplicate}
             type="button"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 text-sm font-medium"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/20 bg-white/5 text-gray-300 hover:bg-white/10 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e1a]"
             title="Create a copy with a new ID"
           >
             <Copy className="w-3.5 h-3.5" />
@@ -97,6 +143,36 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
             <h1 className="text-xl font-bold text-white mt-1">{metric.name}</h1>
             {metric.description && (
               <p className="text-sm text-gray-400 mt-2 leading-relaxed">{metric.description}</p>
+            )}
+            {/* Dimension selector: formula and lineage update when changed */}
+            {allowedDimensions.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg bg-white/[0.04] border border-white/10" role="group" aria-labelledby="dimension-label">
+                <p id="dimension-label" className="text-xs font-medium text-gray-400 mb-2">
+                  View formula at
+                </p>
+                {allowedDimensions.length === 1 ? (
+                  <span className="inline-flex items-center px-3 py-2 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white">
+                    {CALCULATION_DIMENSION_LABELS[allowedDimensions[0]]}
+                  </span>
+                ) : (
+                  <select
+                    value={selectedDimension}
+                    onChange={(e) => setSelectedDimension(e.target.value as CalculationDimension)}
+                    className="min-h-[44px] w-full max-w-xs px-3 py-2.5 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/40 appearance-none bg-no-repeat bg-[length:14px] bg-[right_12px_center] pr-10 cursor-pointer"
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239ca3af\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")' }}
+                    aria-label="Choose dimension to see formula and lineage for that level"
+                  >
+                    {allowedDimensions.map((dim) => (
+                      <option key={dim} value={dim}>
+                        {CALCULATION_DIMENSION_LABELS[dim]}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="text-[11px] text-gray-500 mt-1.5">
+                  Formula and lineage below update for the selected level.
+                </p>
+              </div>
             )}
           </div>
           <div className="text-right flex-shrink-0">
@@ -136,18 +212,28 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
         </div>
       </section>
 
-      {/* Step 2: Formula */}
-      <section className="mb-8">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
-          <span className="w-6 h-0.5 bg-gray-600 rounded" />
+      {/* Step 2: Formula (for selected dimension) */}
+      <section className="mb-8" aria-labelledby="formula-heading" role="region">
+        <h2 id="formula-heading" className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2 flex-wrap">
+          <span className="w-6 h-0.5 bg-gray-600 rounded" aria-hidden />
           Formula
+          {allowedDimensions.length > 0 && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/20 text-purple-300 normal-case">
+              {CALCULATION_DIMENSION_LABELS[selectedDimension]}
+            </span>
+          )}
         </h2>
         <div className="bg-black/20 rounded-lg px-4 py-3 border border-white/5">
-          <div className="text-sm font-mono text-purple-300">{metric.formula}</div>
-          {metric.formulaSQL && (
-            <div className="text-xs font-mono text-gray-500 mt-2 pt-2 border-t border-white/5">
-              SQL: {metric.formulaSQL}
+          <div className="text-sm font-mono text-purple-300 break-words">{displayFormula}</div>
+          {displayFormulaSQL && (
+            <div className="text-xs font-mono text-gray-500 mt-2 pt-2 border-t border-white/5 break-all">
+              SQL: {displayFormulaSQL}
             </div>
+          )}
+          {allowedDimensions.length > 1 && (
+            <p className="text-[11px] text-gray-500 mt-2 pt-2 border-t border-white/5">
+              Use the dimension selector above to see the formula for another level.
+            </p>
           )}
         </div>
       </section>

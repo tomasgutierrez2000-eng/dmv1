@@ -161,7 +161,8 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     displayFormat: '0.00%',
     sampleValue: '—',
     sourceFields: [
-      { layer: 'L2', table: 'financial_metric_observation', field: 'metric_value' },
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount' },
+      { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd' },
       { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd' },
     ],
     dimensions: [
@@ -171,9 +172,9 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     ],
     allowedDimensions: ALL_DIMS,
     formulasByDimension: buildGroupedFormula(
-      'SUM(ltv_pct * outstanding_exposure) / NULLIF(SUM(outstanding_exposure), 0)',
-      'SUM(CAST(fmo.metric_value AS REAL) * fes.gross_exposure_usd) / NULLIF(SUM(fes.gross_exposure_usd), 0)',
-      "FROM L2.facility_exposure_snapshot fes JOIN L2.financial_metric_observation fmo ON fmo.facility_id = fes.facility_id AND fmo.as_of_date = fes.as_of_date AND fmo.metric_code = 'LTV' LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
+      'SUM((drawn_amount / NULLIF(collateral_value, 0)) * outstanding_exposure) / NULLIF(SUM(CASE WHEN collateral_value > 0 THEN outstanding_exposure ELSE 0 END), 0)',
+      'SUM((fes.drawn_amount / NULLIF(cs.collateral_value_usd, 0)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN cs.collateral_value_usd > 0 THEN fes.gross_exposure_usd ELSE 0 END), 0)',
+      "FROM L2.facility_exposure_snapshot fes LEFT JOIN (SELECT facility_id, as_of_date, SUM(current_valuation_usd) AS collateral_value_usd FROM L2.collateral_snapshot GROUP BY facility_id, as_of_date) cs ON cs.facility_id = fes.facility_id AND cs.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
@@ -248,7 +249,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     displayFormat: '$#,##0.0M',
     sampleValue: '—',
     sourceFields: [
-      { layer: 'L2', table: 'financial_metric_observation', field: 'metric_value_usd' },
+      { layer: 'L2', table: 'financial_metric_observation', field: 'metric_value' },
       { layer: 'L2', table: 'financial_metric_observation', field: 'metric_code' },
       { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd' },
       { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
@@ -262,8 +263,8 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     allowedDimensions: ALL_DIMS,
     formulasByDimension: buildGroupedFormula(
       'SUM(expected_loss_usd)',
-      'SUM(CAST(fmo.metric_value_usd AS REAL))',
-      "FROM L2.facility_exposure_snapshot fes JOIN L2.financial_metric_observation fmo ON fmo.facility_id = fes.facility_id AND fmo.as_of_date = fes.as_of_date AND fmo.metric_code = 'EL' LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
+      'SUM((COALESCE(CAST(pd.metric_value AS REAL), 0) / 100.0) * (COALESCE(CAST(lgd.metric_value AS REAL), 0) / 100.0) * fes.gross_exposure_usd)',
+      "FROM L2.facility_exposure_snapshot fes LEFT JOIN L2.financial_metric_observation pd ON pd.facility_id = fes.facility_id AND pd.as_of_date = fes.as_of_date AND pd.metric_code = 'PD' LEFT JOIN L2.financial_metric_observation lgd ON lgd.facility_id = fes.facility_id AND lgd.as_of_date = fes.as_of_date AND lgd.metric_code = 'LGD' LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),

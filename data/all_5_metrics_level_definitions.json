@@ -694,24 +694,26 @@
     {
       "metricId": "C104",
       "dimension": "facility",
-      "definition": "The loan-to-value ratio for this individual secured facility, calculated as the outstanding loan amount divided by the appraised collateral value. Only populated for collateralized facilities (primarily CRE loans). For unsecured facilities, LTV is null  —  it is never imputed. Reported per OCC Supervisory LTV guidelines: 65% for raw land, 75% for land development, 80% for commercial/multifamily. At facility level this is a raw sourced value from appraisal or financial metric observation.",
-      "laymanFormula": "The LTV is the raw value from the financial metric observation table where metric_code = 'LTV'. For unsecured facilities, this field is null.",
-      "formula": "ltv_pct = financial_metric_observation.metric_value WHERE metric_code = 'LTV' AND facility_id = X",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  Description: LTV ratio from appraisal data, filtered by metric_code='LTV'  →  Join: facility_id, as_of_date | [OUTPUT] Facility LTV (%)",
+      "definition": "The loan-to-value ratio for this individual secured facility, calculated directly as outstanding loan amount divided by collateral valuation at the same as-of date. For unsecured facilities (or missing collateral valuation), LTV is null and excluded from weighted aggregates.",
+      "laymanFormula": "For each facility, LTV = drawn_amount / collateral_value. Here collateral_value is summed from collateral snapshot current_valuation_usd at the same facility and as_of_date. If collateral_value is zero or missing, LTV is null.",
+      "formula": "ltv_pct = drawn_amount / collateral_value WHERE facility_id = X",
+      "formulaSQL": "SELECT fes.facility_id AS dimension_value, SUM((fes.drawn_amount / NULLIF(cs.collateral_value_usd, 0)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN cs.collateral_value_usd > 0 THEN fes.gross_exposure_usd ELSE 0 END), 0) AS metric_value FROM L2.facility_exposure_snapshot fes LEFT JOIN (SELECT facility_id, as_of_date, SUM(current_valuation_usd) AS collateral_value_usd FROM L2.collateral_snapshot GROUP BY facility_id, as_of_date) cs ON cs.facility_id = fes.facility_id AND cs.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fes.as_of_date = :as_of_date GROUP BY fes.facility_id",
+      "lineageNarrative": "[SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding drawn balance  →  Join: facility_id, as_of_date | [SOURCE] L2.collateral_snapshot.current_valuation_usd  →  Summed collateral valuation per facility/date  →  Join: facility_id, as_of_date | [TRANSFORM] Facility LTV calculation  →  Formula: drawn_amount / collateral_value (null when collateral_value <= 0) | [OUTPUT] Facility LTV (%)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "LTV ratio (metric_code=LTV)",
-          "sampleValue": "0.65"
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "drawn_amount",
+          "description": "Outstanding drawn balance",
+          "sampleValue": "120000000"
         },
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_code",
-          "description": "Filter for LTV metric type",
-          "sampleValue": "LTV"
+          "table": "collateral_snapshot",
+          "field": "current_valuation_usd",
+          "description": "Collateral valuation in USD (summed by facility/date)",
+          "sampleValue": "50000000"
         }
       ],
       "dashboardDisplayName": "Facility LTV (%)"
@@ -1238,29 +1240,30 @@
       "metricId": "C107",
       "dimension": "facility",
       "definition": "The expected loss for this individual facility, calculated as PD * LGD * EAD. This is the fundamental building block of all credit loss estimation. PD comes from the counterparty rating model, LGD from the facility-level collateral/seniority model, and EAD from the exposure calculation (outstanding + CCF * undrawn). The result represents the dollar amount of loss expected from this facility over a one-year horizon under normal conditions. A reconciliation check validates that expected_loss_amt = (pd_pct/100) * (lgd_pct/100) * ead_amt within $1.00 tolerance.",
-      "laymanFormula": "Multiply the facility PD (as a decimal) by the facility LGD (as a decimal) by the facility EAD. The result is stored in risk_metric_cube.expected_loss_amt. This is a pure multiplicative calculation  —  three raw inputs produce one derived output.",
+      "laymanFormula": "Multiply facility PD by facility LGD (both converted from percent to decimal), then multiply by facility gross exposure. In short: EL = (PD/100) * (LGD/100) * gross_exposure_usd.",
       "formula": "expected_loss_amt = (pd_pct / 100.0) * (lgd_pct / 100.0) * ead_amt",
-      "lineageNarrative": "[SOURCE] L2.risk_metric_cube.pd_pct  →  Description: Probability of default from counterparty rating model | [SOURCE] L2.risk_metric_cube.lgd_pct  →  Description: Loss given default from facility collateral/seniority model | [SOURCE] L2.risk_metric_cube.ead_amt  →  Description: Exposure at default (outstanding + CCF * undrawn) | [TRANSFORM] (pd_pct / 100) * (lgd_pct / 100) * ead_amt  →  Multiplicative calculation producing dollar EL | [OUTPUT] Facility Expected Loss ($)",
+      "formulaSQL": "SELECT fes.facility_id AS dimension_value, SUM((COALESCE(CAST(pd.metric_value AS REAL), 0) / 100.0) * (COALESCE(CAST(lgd.metric_value AS REAL), 0) / 100.0) * fes.gross_exposure_usd) AS metric_value FROM L2.facility_exposure_snapshot fes LEFT JOIN L2.financial_metric_observation pd ON pd.facility_id = fes.facility_id AND pd.as_of_date = fes.as_of_date AND pd.metric_code = 'PD' LEFT JOIN L2.financial_metric_observation lgd ON lgd.facility_id = fes.facility_id AND lgd.as_of_date = fes.as_of_date AND lgd.metric_code = 'LGD' LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id WHERE fes.as_of_date = :as_of_date GROUP BY fes.facility_id",
+      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value (metric_code='PD')  →  PD percent by facility/date | [SOURCE] L2.financial_metric_observation.metric_value (metric_code='LGD')  →  LGD percent by facility/date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Facility exposure amount | [TRANSFORM] EL = (PD/100) * (LGD/100) * gross_exposure_usd | [OUTPUT] Facility Expected Loss ($)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "pd_pct",
-          "description": "Probability of default (0–100%)",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "PD percent (metric_code='PD')",
           "sampleValue": "1.24"
         },
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "lgd_pct",
-          "description": "Loss given default (0–100%)",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "LGD percent (metric_code='LGD')",
           "sampleValue": "38.5"
         },
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "ead_amt",
-          "description": "Exposure at default ($)",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Facility gross exposure in USD",
           "sampleValue": "125000000"
         }
       ],

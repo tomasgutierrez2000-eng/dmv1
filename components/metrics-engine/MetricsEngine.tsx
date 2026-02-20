@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import MetricsEngineLayout, { type MetricWithSource, type ImportResultState } from './MetricsEngineLayout';
-import type { L3Metric, DashboardPage } from '@/data/l3-metrics';
+import type { L3Metric } from '@/data/l3-metrics';
 import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
@@ -11,7 +11,6 @@ type MetricPayload = Partial<L3Metric>;
 export default function MetricsEngine() {
   const [metrics, setMetrics] = useState<MetricWithSource[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterPage, setFilterPage] = useState<DashboardPage | 'all'>('all');
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [view, setView] = useState<'list' | 'detail' | 'edit' | 'create'>('list');
@@ -19,7 +18,6 @@ export default function MetricsEngine() {
   const importFileRef = useRef<HTMLInputElement>(null);
   const [importResult, setImportResult] = useState<ImportResultState | null>(null);
   const [replaceAllCustom, setReplaceAllCustom] = useState(false);
-  const [showModelGaps, setShowModelGaps] = useState(false);
 
   const fetchMetrics = () => {
     setLoading(true);
@@ -39,7 +37,6 @@ export default function MetricsEngine() {
 
   const filtered = useMemo(() => {
     let list = deepDiveMetrics;
-    if (filterPage !== 'all') list = list.filter(m => m.page === filterPage);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(m =>
@@ -50,7 +47,7 @@ export default function MetricsEngine() {
       );
     }
     return list;
-  }, [deepDiveMetrics, filterPage, search]);
+  }, [deepDiveMetrics, search]);
 
   const sections = useMemo(() => {
     const map = new Map<string, MetricWithSource[]>();
@@ -63,7 +60,6 @@ export default function MetricsEngine() {
   }, [filtered]);
 
   const selectedMetric = selectedId ? deepDiveMetrics.find(m => m.id === selectedId) ?? null : null;
-  const selectedSource = selectedMetric ? (selectedMetric as MetricWithSource).source : null;
 
   useEffect(() => {
     if (!selectedId) return;
@@ -101,10 +97,6 @@ export default function MetricsEngine() {
     window.open(`/api/metrics/export?format=${format === 'template' ? 'template' : format}`, '_blank');
   };
 
-  const handleFilterPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterPage(e.target.value as DashboardPage | 'all');
-  };
-
   const handleImport = (e: InputChangeEvent) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -120,10 +112,7 @@ export default function MetricsEngine() {
 
   return (
     <MetricsEngineLayout
-      metrics={deepDiveMetrics}
       loading={loading}
-      filterPage={filterPage}
-      setFilterPage={setFilterPage}
       search={search}
       setSearch={setSearch}
       selectedId={selectedId}
@@ -136,18 +125,13 @@ export default function MetricsEngine() {
       sections={sections}
       filtered={filtered}
       selectedMetric={selectedMetric}
-      selectedSource={selectedSource}
-      handleFilterPageChange={handleFilterPageChange}
       handleExport={handleExport}
       handleImport={handleImport}
       replaceAllCustom={replaceAllCustom}
       setReplaceAllCustom={setReplaceAllCustom}
-      showModelGaps={showModelGaps}
-      setShowModelGaps={setShowModelGaps}
       handleSaveCreate={handleSaveCreate}
       handleSaveEdit={handleSaveEdit}
       duplicateMetric={duplicateMetric}
-      onDuplicate={(metric) => { setDuplicateMetric(metric); setView('create'); }}
       onStartCreate={() => { setDuplicateMetric(null); setSelectedId(null); setView('create'); }}
       onCancelCreate={() => { setDuplicateMetric(null); setView('list'); }}
     />

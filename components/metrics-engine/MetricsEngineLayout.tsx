@@ -4,13 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Search, Plus, Download, Upload, FileSpreadsheet, FileJson, FileCode,
-  ChevronRight, Layers, Hash, TrendingUp, Zap, AlertCircle, X,
+  ChevronRight, Layers, Hash, TrendingUp, Zap,
 } from 'lucide-react';
-import { DASHBOARD_PAGES } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import MetricDetailView from './MetricDetailView';
 import MetricForm from './MetricForm';
-import type { L3Metric, DashboardPage } from '@/data/l3-metrics';
+import type { L3Metric } from '@/data/l3-metrics';
 
 export interface MetricWithSource extends L3Metric {
   source: 'builtin' | 'custom';
@@ -35,78 +34,8 @@ function getMetricTypeIcon(type: string): React.ReactNode {
   }
 }
 
-interface ModelGapRow {
-  gapItem: string;
-  targetTable: string;
-  fieldsRequired: string;
-  rationale: string;
-  impactedMetrics: string;
-}
-
-function ModelGapsModal({ onClose }: { onClose: () => void }) {
-  const [gaps, setGaps] = React.useState<ModelGapRow[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  React.useEffect(() => {
-    fetch('/api/model-gaps')
-      .then(res => res.json())
-      .then((data: { gaps: ModelGapRow[] }) => setGaps(Array.isArray(data.gaps) ? data.gaps : []))
-      .catch(() => setGaps([]))
-      .finally(() => setLoading(false));
-  }, []);
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
-      <div className="bg-[#0a0e1a] border border-white/10 rounded-xl shadow-xl max-w-4xl w-full max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-amber-400" />
-            Model Gaps
-          </h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="flex-1 overflow-auto px-6 py-4">
-          {loading ? (
-            <div className="text-sm text-gray-500 py-8 text-center">Loading...</div>
-          ) : gaps.length === 0 ? (
-            <div className="text-sm text-gray-500 py-8 text-center">No model gaps stored. Import an Excel file with a ModelGaps sheet to populate.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500 border-b border-white/[0.06]">
-                    <th className="pb-2 pr-4 font-semibold">Gap Item</th>
-                    <th className="pb-2 pr-4 font-semibold">Target Table / Scope</th>
-                    <th className="pb-2 pr-4 font-semibold">Fields Required</th>
-                    <th className="pb-2 pr-4 font-semibold">Rationale</th>
-                    <th className="pb-2 font-semibold">Impacted Metrics</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {gaps.map((g, i) => (
-                    <tr key={i} className="border-b border-white/[0.04]">
-                      <td className="py-3 pr-4 text-white font-medium align-top">{g.gapItem}</td>
-                      <td className="py-3 pr-4 text-gray-300 align-top font-mono text-xs">{g.targetTable}</td>
-                      <td className="py-3 pr-4 text-gray-400 align-top text-xs max-w-[200px]">{g.fieldsRequired}</td>
-                      <td className="py-3 pr-4 text-gray-400 align-top text-xs max-w-[220px]">{g.rationale}</td>
-                      <td className="py-3 text-gray-400 align-top text-xs">{g.impactedMetrics}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export interface MetricsEngineLayoutProps {
-  metrics: MetricWithSource[];
   loading: boolean;
-  filterPage: DashboardPage | 'all';
-  setFilterPage: (v: DashboardPage | 'all') => void;
   search: string;
   setSearch: (v: string) => void;
   selectedId: string | null;
@@ -119,31 +48,26 @@ export interface MetricsEngineLayoutProps {
   sections: Map<string, MetricWithSource[]>;
   filtered: MetricWithSource[];
   selectedMetric: MetricWithSource | null;
-  selectedSource: 'builtin' | 'custom' | null;
-  handleFilterPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleExport: (format: 'json' | 'xlsx' | 'template') => void;
   handleImport: (e: InputChangeEvent) => void;
   replaceAllCustom: boolean;
   setReplaceAllCustom: (v: boolean) => void;
-  showModelGaps: boolean;
-  setShowModelGaps: (v: boolean) => void;
   handleSaveCreate: (payload: MetricPayload) => Promise<void>;
   handleSaveEdit: (payload: MetricPayload) => Promise<void>;
   duplicateMetric: L3Metric | null;
-  onDuplicate: (metric: L3Metric) => void;
   onStartCreate: () => void;
   onCancelCreate: () => void;
 }
 
 export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
   const {
-    metrics, loading, filterPage, setFilterPage, search, setSearch,
+    loading, search, setSearch,
     selectedId, setSelectedId, view, setView, importFileRef, importResult, setImportResult,
-    sections, filtered, selectedMetric, selectedSource,
-    handleFilterPageChange, handleExport, handleImport,
-    replaceAllCustom, setReplaceAllCustom, showModelGaps, setShowModelGaps,
+    sections, filtered, selectedMetric,
+    handleExport, handleImport,
+    replaceAllCustom, setReplaceAllCustom,
     handleSaveCreate, handleSaveEdit,
-    duplicateMetric, onDuplicate, onStartCreate, onCancelCreate,
+    duplicateMetric, onStartCreate, onCancelCreate,
   } = props;
 
   return (
@@ -159,19 +83,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
             Metric Deep Dive
           </h1>
           <p className="text-[11px] text-gray-500 mt-1">8 deep-dive metrics</p>
-        </div>
-        <div className="p-3 border-b border-white/[0.04]">
-          <select
-            value={filterPage}
-            onChange={handleFilterPageChange}
-            aria-label="Filter deep-dive metrics by page"
-            className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500/40"
-          >
-            <option value="all">All pages</option>
-            {DASHBOARD_PAGES.map(p => (
-              <option key={p.id} value={p.id}>{p.id}: {p.shortName}</option>
-            ))}
-          </select>
         </div>
         <div className="p-3 border-b border-white/[0.04]">
           <div className="relative">
@@ -254,9 +165,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               <Upload className="w-3.5 h-3.5" /> Import
             </button>
           </div>
-          <button type="button" onClick={() => setShowModelGaps(true)} className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-gray-400 text-xs">
-            <AlertCircle className="w-3.5 h-3.5" /> Model Gaps
-          </button>
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto">
@@ -271,17 +179,11 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
             <button onClick={() => setImportResult(null)} className="text-amber-300 hover:text-white text-sm">Dismiss</button>
           </div>
         )}
-        {showModelGaps && (
-          <ModelGapsModal onClose={() => setShowModelGaps(false)} />
-        )}
         <div className="px-6 py-6">
           {view === 'detail' && selectedMetric && (
             <MetricDetailView
               metric={selectedMetric}
-              source={selectedSource ?? 'builtin'}
-              onEdit={() => setView('edit')}
               onBack={() => setView('list')}
-              onDuplicate={() => onDuplicate(selectedMetric)}
             />
           )}
           {view === 'edit' && selectedMetric && (
@@ -300,7 +202,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               <header className="mb-6">
                 <h2 className="text-lg font-bold text-white">Deep-dive metrics</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}{filterPage !== 'all' && ` on ${filterPage}`}. Click a metric to validate calculations with sample data across Facility, Counterparty, L3 Desk, L2 Portfolio, and L1 Department.
+                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}. Click a metric to validate calculations across Facility, Counterparty, L3 Desk, L2 Portfolio, and L1 Department.
                 </p>
               </header>
               <div className="space-y-4">
@@ -327,7 +229,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                               <div className="text-sm font-medium text-white truncate mt-0.5">{m.name}</div>
                               <div className="text-[11px] text-gray-500 font-mono truncate mt-0.5">{m.formula}</div>
                             </div>
-                            <div className="text-sm font-mono font-semibold text-emerald-400 flex-shrink-0">{m.sampleValue || '—'}</div>
                           </button>
                         );
                       })}

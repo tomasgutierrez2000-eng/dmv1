@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { ArrowLeft, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag } from 'lucide-react';
 import {
-  DASHBOARD_PAGES,
   DIMENSION_LABELS,
   CALCULATION_DIMENSIONS,
   type CalculationDimension,
@@ -50,10 +48,7 @@ const DIMENSION_BAR_LABELS: Record<CalculationDimension, string> = {
 
 interface MetricDetailViewProps {
   metric: L3Metric;
-  source: 'builtin' | 'custom';
-  onEdit: () => void;
   onBack: () => void;
-  onDuplicate: () => void;
 }
 
 interface MetricDimensionFormulaApiRow {
@@ -68,18 +63,6 @@ interface MetricDimensionFormulaApiRow {
   sourceFields?: SourceField[];
 }
 
-type RunResult =
-  | {
-      ok: true;
-      inputRowCounts: Record<string, number>;
-      sqlExecuted: string;
-      result:
-        | { type: 'scalar'; value: number | null }
-        | { type: 'grouped'; rows: { dimension_value: string | number; metric_value: number }[] };
-      asOfDateUsed: string | null;
-    }
-  | { ok: false; error: string; hint?: string; sqlExecuted?: string; inputRowCounts?: Record<string, number> };
-
 function normalizeMatchKey(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
 }
@@ -92,11 +75,9 @@ function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
   return [...CALCULATION_DIMENSIONS];
 }
 
-export default function MetricDetailView({ metric, source, onEdit, onBack, onDuplicate }: MetricDetailViewProps) {
+export default function MetricDetailView({ metric, onBack }: MetricDetailViewProps) {
   const allowedDimensions = getAllowedDimensions(metric);
   const [selectedDimension, setSelectedDimension] = useState<CalculationDimension>(allowedDimensions[0]);
-  const [sampleRun, setSampleRun] = useState<RunResult | null>(null);
-  const [sampleLoading, setSampleLoading] = useState(false);
 
   // Keep selected dimension in sync when metric changes or when it's no longer allowed
   useEffect(() => {
@@ -112,7 +93,6 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
       .catch(() => setFormulasFromApi(null));
   }, []);
 
-  const pageInfo = DASHBOARD_PAGES.find(p => p.id === metric.page);
   const dimensionFormulaFromMetric = metric.formulasByDimension?.[selectedDimension];
   const matchKeys = [metric.id, metric.name].filter(Boolean).map(normalizeMatchKey);
   const dimensionFormulaFromApi = formulasFromApi
@@ -143,36 +123,6 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
     },
     selectedDimension
   );
-  const displaySampleValue = (() => {
-    if (!sampleRun || !sampleRun.ok) return metric.sampleValue || '—';
-    if (sampleRun.result.type === 'scalar') {
-      const val = sampleRun.result.value;
-      return val == null ? '—' : String(val);
-    }
-    const first = sampleRun.result.rows[0];
-    return first ? String(first.metric_value) : metric.sampleValue || '—';
-  })();
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setSampleLoading(true);
-    fetch('/api/metrics/deep-dive/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ metricId: metric.id, dimension: selectedDimension }),
-      signal: controller.signal,
-    })
-      .then((res) => res.json())
-      .then((data: RunResult) => setSampleRun(data))
-      .catch((e) => {
-        if ((e as Error).name !== 'AbortError') {
-          setSampleRun(null);
-        }
-      })
-      .finally(() => setSampleLoading(false));
-
-    return () => controller.abort();
-  }, [metric.id, selectedDimension]);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -198,11 +148,6 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
               <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
                 {metric.id}
               </span>
-              {pageInfo && (
-                <span className="text-[10px] text-gray-500" style={{ color: pageInfo.color }}>
-                  {pageInfo.shortName} · {metric.section}
-                </span>
-              )}
             </div>
             <h1 className="text-xl font-bold text-white mt-1">{displayName}</h1>
             {displayDescription && (
@@ -237,10 +182,6 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
                 </p>
               </div>
             )}
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-2xl font-bold font-mono text-emerald-400">{displaySampleValue}</div>
-            <div className="text-[10px] text-gray-500">{metric.displayFormat || 'Value'}</div>
           </div>
         </div>
       </header>
@@ -306,24 +247,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
         </div>
       </section>
 
-      {/* Step 3: Result */}
-      <section className="mb-8">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
-          <span className="w-6 h-0.5 bg-gray-600 rounded" />
-          Result
-        </h2>
-        <div className="flex items-center gap-3">
-          <span className="text-lg font-mono font-semibold text-emerald-400">
-            {sampleLoading ? 'Calculating…' : displaySampleValue}
-          </span>
-          <span className="text-xs text-gray-500">({metric.displayFormat || 'display format'})</span>
-        </div>
-        {sampleRun && !sampleRun.ok && (
-          <p className="text-xs text-amber-300 mt-2">{sampleRun.error}</p>
-        )}
-      </section>
-
-      {/* Step 4: Lineage */}
+      {/* Step 3: Lineage */}
       {withLineage.nodes && withLineage.nodes.length > 0 && (
         <section className="mb-8">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
@@ -334,9 +258,14 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
             <LineageFlowView metric={withLineage} />
           </div>
           {displayLineageNarrative && (
-            <p className="text-xs text-gray-400 mt-3 leading-relaxed whitespace-pre-wrap">
-              {displayLineageNarrative}
-            </p>
+            <details className="mt-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
+              <summary className="cursor-pointer select-none text-xs text-gray-400 hover:text-gray-300">
+                Show lineage notes
+              </summary>
+              <p className="text-xs text-gray-400 mt-2 leading-relaxed whitespace-pre-wrap">
+                {displayLineageNarrative}
+              </p>
+            </details>
           )}
         </section>
       )}
@@ -344,7 +273,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
       {/* Dimensions */}
       {metric.dimensions && metric.dimensions.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Dimensions</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Dimensions in Dashboard</h2>
           <div className="flex flex-wrap gap-1.5">
             {metric.dimensions.map((d, i) => (
               <span

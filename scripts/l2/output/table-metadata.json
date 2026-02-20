@@ -837,6 +837,86 @@
       "nullable": true
     }
   },
+  "L2.facility_financial_snapshot": {
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "noi_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "total_debt_service_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "revenue_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "operating_expense_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ebitda_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_expense_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "principal_payment_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "reporting_period": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "financial_snapshot_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
   "L2.facility_delinquency_snapshot": {
     "facility_id": {
       "type": "BIGINT",

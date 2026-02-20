@@ -85,8 +85,8 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     displayFormat: '0.00x',
     sampleValue: '—',
     sourceFields: [
-      { layer: 'L2', table: 'financial_metric_observation', field: 'metric_value' },
-      { layer: 'L2', table: 'financial_metric_observation', field: 'metric_code' },
+      { layer: 'L2', table: 'facility_financial_snapshot', field: 'noi_amt' },
+      { layer: 'L2', table: 'facility_financial_snapshot', field: 'total_debt_service_amt' },
       { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd' },
     ],
     dimensions: [
@@ -96,9 +96,9 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     ],
     allowedDimensions: ALL_DIMS,
     formulasByDimension: buildGroupedFormula(
-      'SUM(dscr * exposure) / NULLIF(SUM(exposure), 0)',
-      'SUM(CAST(fmo.metric_value AS REAL) * fes.gross_exposure_usd) / NULLIF(SUM(fes.gross_exposure_usd), 0)',
-      "FROM L2.facility_exposure_snapshot fes JOIN L2.financial_metric_observation fmo ON fmo.facility_id = fes.facility_id AND fmo.as_of_date = fes.as_of_date AND fmo.metric_code = 'DSCR' LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
+      'SUM((noi_amt / NULLIF(total_debt_service_amt, 0)) * gross_exposure_usd) / NULLIF(SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END), 0)',
+      'SUM((ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN ffs.total_debt_service_amt > 0 THEN fes.gross_exposure_usd ELSE 0 END), 0)',
+      "FROM L2.facility_exposure_snapshot fes LEFT JOIN L2.facility_financial_snapshot ffs ON ffs.facility_id = fes.facility_id AND ffs.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),

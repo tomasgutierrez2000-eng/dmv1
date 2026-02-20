@@ -111,6 +111,21 @@ export function getL2SeedValue(
       if (columnName === 'currency_code') return 'USD';
       break;
 
+    case 'facility_financial_snapshot':
+      if (columnName === 'facility_id') return (idx % 10) + 1;
+      if (columnName === 'as_of_date') return AS_OF_DATES[idx];
+      if (columnName === 'noi_amt') return [8_500_000, 12_200_000, 22_000_000, 0, 6_800_000, 35_000_000, 0, 4_200_000, 15_600_000, 52_000_000, 9_100_000, 0][idx];
+      if (columnName === 'total_debt_service_amt') return [5_800_000, 7_200_000, 14_500_000, 0, 5_400_000, 21_000_000, 0, 3_200_000, 9_800_000, 38_000_000, 7_500_000, 0][idx];
+      if (columnName === 'revenue_amt') return [14_000_000, 20_000_000, 38_000_000, 0, 12_000_000, 58_000_000, 0, 7_500_000, 26_000_000, 85_000_000, 15_000_000, 0][idx];
+      if (columnName === 'operating_expense_amt') return [5_500_000, 7_800_000, 16_000_000, 0, 5_200_000, 23_000_000, 0, 3_300_000, 10_400_000, 33_000_000, 5_900_000, 0][idx];
+      if (columnName === 'ebitda_amt') return [10_200_000, 15_000_000, 27_500_000, 0, 8_500_000, 42_000_000, 0, 5_100_000, 19_200_000, 62_000_000, 11_200_000, 0][idx];
+      if (columnName === 'interest_expense_amt') return [3_800_000, 5_200_000, 10_500_000, 0, 3_900_000, 15_000_000, 0, 2_100_000, 7_200_000, 28_000_000, 5_500_000, 0][idx];
+      if (columnName === 'principal_payment_amt') return [2_000_000, 2_000_000, 4_000_000, 0, 1_500_000, 6_000_000, 0, 1_100_000, 2_600_000, 10_000_000, 2_000_000, 0][idx];
+      if (columnName === 'counterparty_id') return (idx % 10) + 1;
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'reporting_period') return ['Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024', 'Q4-2024'][idx];
+      break;
+
     case 'facility_delinquency_snapshot':
       if (columnName === 'facility_id') return (idx % 10) + 1;
       if (columnName === 'as_of_date') return AS_OF_DATES[idx];

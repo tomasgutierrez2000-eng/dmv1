@@ -72,6 +72,7 @@ interface ModelStore {
   setSidebarOpen: (open: boolean) => void;
   setDetailPanelOpen: (open: boolean) => void;
   toggleExpandedDomain: (domain: string) => void;
+  setExpandedDomains: (domains: Set<string>) => void;
   setLayoutMode: (mode: 'domain-overview' | 'snowflake') => void;
   setViewMode: (mode: 'compact' | 'standard' | 'detailed') => void;
   setTableSize: (size: 'small' | 'medium' | 'large') => void;
@@ -232,6 +233,7 @@ export const useModelStore = create<ModelStore>((set) => ({
       }
       return { expandedDomains: newExpanded };
     }),
+  setExpandedDomains: (domains) => set({ expandedDomains: domains }),
   setViewMode: (mode) => set({ viewMode: mode }),
   setTableSize: (size) => set({ tableSize: size }),
   setFieldDisplayMode: (mode) => set({ fieldDisplayMode: mode }),

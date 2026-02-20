@@ -67,6 +67,7 @@ export default function Canvas() {
     showPrimaryRelationships,
     showSecondaryRelationships,
     toggleExpandedDomain,
+    setExpandedDomains,
     setZoom,
     setPan,
     setTablePosition,
@@ -100,6 +101,24 @@ export default function Canvas() {
       return true;
     });
   }, [model, visibleLayers, filterCategories, l3CategoryExcluded, searchQuery]);
+
+  // When model loads, reset domain collapse state so all categories start expanded
+  const prevModelRef = useRef<typeof model>(null);
+  useEffect(() => {
+    if (!model) return;
+    if (prevModelRef.current !== model) {
+      prevModelRef.current = model;
+      setExpandedDomains(new Set());
+    }
+  }, [model, setExpandedDomains]);
+
+  // In domain-overview: empty expandedDomains means "all expanded"; otherwise use user's toggles
+  const effectiveExpandedDomains = useMemo(() => {
+    if (expandedDomains.size === 0 && visibleTables.length > 0) {
+      return new Set(visibleTables.map((t) => t.category));
+    }
+    return expandedDomains;
+  }, [expandedDomains, visibleTables]);
 
   // True when user has applied filters that narrow the visible set (category, layer, or L3 exclusion).
   const filtersNarrowing = useMemo(
@@ -1030,6 +1049,7 @@ export default function Canvas() {
               footerOffset = 10;
             }
 
+            const collapsedHeaderHeight = viewMode === 'compact' ? 36 : 45;
             Array.from(domains).forEach((domain) => {
               const domainTables = visibleTables.filter(t => t.category === domain);
               if (domainTables.length === 0) return;
@@ -1042,7 +1062,9 @@ export default function Canvas() {
               const minY = Math.min(...positions.map(p => p.y));
               const maxY = Math.max(...positions.map(p => p.y + tableHeight));
               const width = maxX - minX + domainPadding * 2;
-              const height = maxY - minY + headerOffset + footerOffset;
+              const expandedHeight = maxY - minY + headerOffset + footerOffset;
+              const isDomainExpanded = effectiveExpandedDomains.has(domain);
+              const height = isDomainExpanded ? expandedHeight : collapsedHeaderHeight;
               if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return;
               domainPositions.set(domain, {
                 x: minX - domainPadding,
@@ -1069,7 +1091,7 @@ export default function Canvas() {
                     position={pos}
                     width={pos.width}
                     height={pos.height}
-                    isExpanded={expandedDomains.has(domain)}
+                    isExpanded={effectiveExpandedDomains.has(domain)}
                     onToggle={() => {
                       toggleExpandedDomain(domain);
                       setRequestFitToDomain(domain);
@@ -1083,6 +1105,17 @@ export default function Canvas() {
           
           {/* Relationship Lines - Render behind tables */}
           {visibleRelationships.map((rel) => {
+            // In domain-overview, hide lines for tables in collapsed categories
+            if (layoutMode === 'domain-overview') {
+              const sourceTable = model?.tables[rel.source.tableKey];
+              const targetTable = model?.tables[rel.target.tableKey];
+              if (
+                (sourceTable && !effectiveExpandedDomains.has(sourceTable.category)) ||
+                (targetTable && !effectiveExpandedDomains.has(targetTable.category))
+              ) {
+                return null;
+              }
+            }
             const sourcePos = tablePositions[rel.source.tableKey];
             const targetPos = tablePositions[rel.target.tableKey];
             
@@ -1126,8 +1159,11 @@ export default function Canvas() {
             );
           })}
 
-          {/* Table Nodes */}
+          {/* Table Nodes - in domain-overview hide tables whose category is collapsed */}
           {visibleTables.map((table) => {
+            if (layoutMode === 'domain-overview' && !effectiveExpandedDomains.has(table.category)) {
+              return null;
+            }
             const position = tablePositions[table.key] || { x: 0, y: 0 };
             // Calculate relationship counts for this table
             const relationshipCounts = model ? {

@@ -191,6 +191,26 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'position_id', type: 'BIGINT', nullable: true },
     ],
   },
+  // ----- Facility financial snapshots -----
+  {
+    tableName: 'facility_financial_snapshot',
+    scd: 'Snapshot',
+    columns: [
+      { name: 'facility_id', type: 'BIGINT', nullable: false, pk: true, fk: 'l1.facility_master(facility_id)' },
+      { name: 'as_of_date', type: 'DATE', nullable: false, pk: true },
+      { name: 'noi_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'total_debt_service_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'revenue_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'operating_expense_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'ebitda_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'interest_expense_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'principal_payment_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'counterparty_id', type: 'BIGINT', nullable: true },
+      { name: 'currency_code', type: 'VARCHAR(20)', nullable: true },
+      { name: 'reporting_period', type: 'VARCHAR(20)', nullable: true },
+      { name: 'financial_snapshot_id', type: 'BIGINT', nullable: true },
+    ],
+  },
   // ----- Facility snapshots -----
   {
     tableName: 'facility_delinquency_snapshot',

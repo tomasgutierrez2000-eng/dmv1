@@ -200,24 +200,25 @@
     {
       "metricId": "C101",
       "dimension": "facility",
-      "definition": "The debt service coverage ratio for this individual facility, calculated as Net Operating Income (NOI) divided by Total Debt Service. For CRE loans, this is the property-level DSCR from the most recent operating statement or appraisal. For C&I loans, this is the borrower-level DSCR from the most recent financial statements. FR Y-14Q Schedule H.2 Field 39 requires this for CRE facilities with balance > $250K. At facility level this is a raw sourced value from financial metric observation.",
-      "laymanFormula": "The DSCR is the raw value from the financial metric observation table where metric_code = 'DSCR'. No calculation needed at facility level.",
-      "formula": "dscr = financial_metric_observation.metric_value WHERE metric_code = 'DSCR' AND facility_id = X",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  Description: DSCR ratio from financial statements or appraisal, filtered by metric_code='DSCR'  →  Join: facility_id, as_of_date | [OUTPUT] Facility DSCR (x)",
+      "definition": "The debt service coverage ratio for this individual facility, calculated as Net Operating Income (NOI) divided by Total Debt Service. NOI and total debt service are sourced from facility_financial_snapshot, which captures property-level or borrower-level financial data. FR Y-14Q Schedule H.2 Field 39 requires this for CRE facilities with balance > $250K.",
+      "laymanFormula": "DSCR = noi_amt / total_debt_service_amt from the facility_financial_snapshot table. If total_debt_service_amt is zero or missing, DSCR is null.",
+      "formula": "dscr = noi_amt / total_debt_service_amt WHERE facility_id = X",
+      "formulaSQL": "SELECT ffs.facility_id AS dimension_value, ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value FROM L2.facility_financial_snapshot ffs LEFT JOIN L1.facility_master fm ON fm.facility_id = ffs.facility_id WHERE ffs.as_of_date = :as_of_date GROUP BY ffs.facility_id",
+      "lineageNarrative": "[SOURCE] L2.facility_financial_snapshot.noi_amt  →  Net Operating Income from financial statements  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_financial_snapshot.total_debt_service_amt  →  Total Debt Service (interest + principal)  →  Join: facility_id, as_of_date | [TRANSFORM] DSCR = noi_amt / total_debt_service_amt (null when debt service is zero) | [OUTPUT] Facility DSCR (x)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "DSCR ratio (metric_code=DSCR)",
-          "sampleValue": "1.45"
+          "table": "facility_financial_snapshot",
+          "field": "noi_amt",
+          "description": "Net Operating Income from financial statements",
+          "sampleValue": "8500000"
         },
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_code",
-          "description": "Filter for DSCR metric type",
-          "sampleValue": "DSCR"
+          "table": "facility_financial_snapshot",
+          "field": "total_debt_service_amt",
+          "description": "Total Debt Service (interest + principal payments)",
+          "sampleValue": "5800000"
         }
       ],
       "dashboardDisplayName": "Facility DSCR (x)"
@@ -226,23 +227,30 @@
       "metricId": "C101",
       "dimension": "counterparty",
       "definition": "The exposure-weighted average DSCR across all facilities for a single counterparty that have a non-null DSCR value. Facilities without DSCR (e.g., revolving credit lines, unfunded commitments) are excluded from the weighted average. This gives relationship managers a single view of the borrower's overall debt service capacity, weighted by how much exposure each facility represents.",
-      "laymanFormula": "For each facility under this counterparty that has a DSCR value: multiply its DSCR by its outstanding balance. Sum those products, divide by the total outstanding balance of facilities with DSCR values. Facilities with null DSCR are excluded entirely.",
-      "formula": "wavg_dscr = SUM(facility.dscr * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE counterparty_id = X AND dscr IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  DSCR per facility (metric_code=DSCR)  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.counterparty_id  →  FK to counterparty for grouping  →  Join: facility_id | [TRANSFORM] Exposure-weighted average  →  Formula: SUM(dscr * drawn_amount) / SUM(drawn_amount)  →  Grouping: counterparty_id  →  Null guard: exclude facilities without DSCR | [OUTPUT] Counterparty WAvg DSCR (x)",
+      "laymanFormula": "For each facility under this counterparty: compute DSCR = noi_amt / total_debt_service_amt from facility_financial_snapshot. Weight each facility DSCR by its gross_exposure_usd. Divide by total exposure of facilities with valid debt service. Facilities without financial data are excluded.",
+      "formula": "wavg_dscr = SUM((noi_amt / total_debt_service_amt) * gross_exposure_usd) / SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE counterparty_id = X",
+      "lineageNarrative": "[SOURCE] L2.facility_financial_snapshot.noi_amt  →  NOI per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_financial_snapshot.total_debt_service_amt  →  Total Debt Service per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.counterparty_id  →  FK to counterparty for grouping  →  Join: facility_id | [TRANSFORM] Exposure-weighted average  →  Formula: SUM((noi / debt_service) * gross_exposure) / SUM(CASE WHEN debt_service > 0 THEN gross_exposure ELSE 0 END)  →  Grouping: counterparty_id | [OUTPUT] Counterparty WAvg DSCR (x)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "DSCR per facility (metric_code=DSCR)",
-          "sampleValue": "1.45"
+          "table": "facility_financial_snapshot",
+          "field": "noi_amt",
+          "description": "Net Operating Income per facility",
+          "sampleValue": "8500000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_financial_snapshot",
+          "field": "total_debt_service_amt",
+          "description": "Total Debt Service per facility",
+          "sampleValue": "5800000"
         },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
-          "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
-          "sampleValue": "50000000"
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -258,23 +266,30 @@
       "metricId": "C101",
       "dimension": "L3",
       "definition": "The exposure-weighted average DSCR across all facilities with non-null DSCR assigned to a specific L3 desk. Only facilities with DSCR values are included. Desk heads use this to monitor the overall debt-service health of their book. A desk-level DSCR trending toward 1.0x signals growing stress in the underlying portfolio and may trigger enhanced monitoring or origination restrictions.",
-      "laymanFormula": "Same weighted average as counterparty, but grouping all facilities with DSCR that belong to this desk. Resolve desk via LoB hierarchy (leaf node = L3).",
-      "formula": "wavg_dscr = SUM(facility.dscr * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE lob_l3_name = X AND dscr IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  DSCR per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Resolve leaf segment_name as lob_l3_name  →  Join: lob_segment_id = managed_segment_id | [TRANSFORM] Exposure-weighted average grouped by L3 desk  →  Null guard: exclude facilities without DSCR | [OUTPUT] Desk WAvg DSCR (x)",
+      "laymanFormula": "Same weighted average as counterparty, but grouping all facilities with financial data that belong to this desk. DSCR computed as noi_amt / total_debt_service_amt from atomic sources.",
+      "formula": "wavg_dscr = SUM((noi_amt / total_debt_service_amt) * gross_exposure_usd) / SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE lob_l3_name = X",
+      "lineageNarrative": "[SOURCE] L2.facility_financial_snapshot.noi_amt  →  NOI per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_financial_snapshot.total_debt_service_amt  →  Total Debt Service per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Resolve leaf as lob_l3_name  →  Join: lob_segment_id = managed_segment_id | [TRANSFORM] Exposure-weighted average grouped by L3 desk  →  Null guard: exclude facilities without financial data | [OUTPUT] Desk WAvg DSCR (x)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "DSCR per facility",
-          "sampleValue": "1.45"
+          "table": "facility_financial_snapshot",
+          "field": "noi_amt",
+          "description": "Net Operating Income per facility",
+          "sampleValue": "8500000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_financial_snapshot",
+          "field": "total_debt_service_amt",
+          "description": "Total Debt Service per facility",
+          "sampleValue": "5800000"
         },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
-          "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
-          "sampleValue": "50000000"
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -297,23 +312,30 @@
       "metricId": "C101",
       "dimension": "L2",
       "definition": "The exposure-weighted average DSCR across all facilities with non-null DSCR within an L2 portfolio. Used in ALCO reporting for portfolio-level credit quality monitoring, stress testing scenarios (e.g., what if NOI drops 20%?), and peer comparison across portfolios.",
-      "laymanFormula": "Same weighted average, grouping all facilities with DSCR in the L2 portfolio. Traverse LoB hierarchy one level up from leaf to L2 parent.",
-      "formula": "wavg_dscr = SUM(facility.dscr * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE lob_l2_name = X AND dscr IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  DSCR per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Entry point for hierarchy traversal  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse one level up to L2 parent  →  Resolve: segment_name as lob_l2_name | [TRANSFORM] Exposure-weighted average grouped by L2 portfolio  →  Null guard: exclude facilities without DSCR | [OUTPUT] Portfolio WAvg DSCR (x)",
+      "laymanFormula": "Same weighted average, grouping all facilities with financial data in the L2 portfolio. DSCR computed as noi_amt / total_debt_service_amt from atomic sources.",
+      "formula": "wavg_dscr = SUM((noi_amt / total_debt_service_amt) * gross_exposure_usd) / SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE lob_l2_name = X",
+      "lineageNarrative": "[SOURCE] L2.facility_financial_snapshot.noi_amt  →  NOI per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_financial_snapshot.total_debt_service_amt  →  Total Debt Service per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  LoB hierarchy entry point  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse one level up to L2 parent | [TRANSFORM] Exposure-weighted average grouped by L2 portfolio | [OUTPUT] Portfolio WAvg DSCR (x)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "DSCR per facility",
-          "sampleValue": "1.45"
+          "table": "facility_financial_snapshot",
+          "field": "noi_amt",
+          "description": "Net Operating Income per facility",
+          "sampleValue": "8500000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_financial_snapshot",
+          "field": "total_debt_service_amt",
+          "description": "Total Debt Service per facility",
+          "sampleValue": "5800000"
         },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
-          "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
-          "sampleValue": "50000000"
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -343,23 +365,30 @@
       "metricId": "C101",
       "dimension": "L1",
       "definition": "The exposure-weighted average DSCR across all facilities with non-null DSCR within an L1 department/line of business. Board-level metric for credit quality by business line. Enables CRO to compare debt-service health across CRE vs Corporate Banking vs Specialty Lending. Used in enterprise risk appetite monitoring and regulatory stress testing.",
-      "laymanFormula": "Same weighted average at the highest organizational level. Traverse LoB hierarchy to root node (parent_segment_id IS NULL).",
-      "formula": "wavg_dscr = SUM(facility.dscr * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE lob_l1_name = X AND dscr IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  DSCR per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Entry point for hierarchy traversal  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse to root node (parent_segment_id IS NULL)  →  Resolve: segment_name as lob_l1_name | [TRANSFORM] Exposure-weighted average grouped by L1 department  →  Null guard: exclude facilities without DSCR | [OUTPUT] Department WAvg DSCR (x)",
+      "laymanFormula": "Same weighted average at the highest organizational level. DSCR computed as noi_amt / total_debt_service_amt from atomic sources. Traverse LoB hierarchy to root node.",
+      "formula": "wavg_dscr = SUM((noi_amt / total_debt_service_amt) * gross_exposure_usd) / SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE lob_l1_name = X",
+      "lineageNarrative": "[SOURCE] L2.facility_financial_snapshot.noi_amt  →  NOI per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_financial_snapshot.total_debt_service_amt  →  Total Debt Service per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  LoB hierarchy entry point  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse to root (parent IS NULL) | [TRANSFORM] Exposure-weighted average grouped by L1 department | [OUTPUT] Department WAvg DSCR (x)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "DSCR per facility",
-          "sampleValue": "1.45"
+          "table": "facility_financial_snapshot",
+          "field": "noi_amt",
+          "description": "Net Operating Income per facility",
+          "sampleValue": "8500000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_financial_snapshot",
+          "field": "total_debt_service_amt",
+          "description": "Total Debt Service per facility",
+          "sampleValue": "5800000"
         },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
-          "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
-          "sampleValue": "50000000"
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -702,7 +731,6 @@
       "sourceFields": [
         {
           "layer": "L2",
-          "layer": "L2",
           "table": "facility_exposure_snapshot",
           "field": "drawn_amount",
           "description": "Outstanding drawn balance",
@@ -722,23 +750,30 @@
       "metricId": "C104",
       "dimension": "counterparty",
       "definition": "The exposure-weighted average LTV across all secured facilities for a single counterparty. Only facilities with non-null LTV values (i.e., secured/collateralized facilities) are included. For CRE borrowers with multiple properties, this blends the individual property LTVs weighted by exposure. Enables assessment of overall collateral adequacy for the lending relationship. Should be paired with secured_exposure_pct to contextualize (e.g., avg_ltv=65% but only 40% of exposure is secured).",
-      "laymanFormula": "For each facility under this counterparty that has an LTV value: multiply its LTV by its outstanding balance. Sum those products, divide by the total outstanding balance of facilities with LTV values. Unsecured facilities (null LTV) are excluded entirely.",
-      "formula": "wavg_ltv = SUM(facility.ltv * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE counterparty_id = X AND ltv IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  LTV per facility (metric_code=LTV)  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.counterparty_id  →  FK to counterparty for grouping  →  Join: facility_id | [TRANSFORM] Exposure-weighted average  →  Formula: SUM(ltv * drawn_amount) / SUM(drawn_amount)  →  Grouping: counterparty_id  →  Null guard: exclude unsecured (null LTV) | [OUTPUT] Counterparty WAvg LTV (%)",
+      "laymanFormula": "For each facility under this counterparty: compute LTV = drawn_amount / collateral_value (from collateral_snapshot). Weight each facility LTV by its gross_exposure_usd. Divide by total exposure of facilities with valid collateral. Unsecured facilities (null collateral) are excluded.",
+      "formula": "wavg_ltv = SUM((drawn_amount / collateral_value) * gross_exposure_usd) / SUM(CASE WHEN collateral_value > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE counterparty_id = X",
+      "lineageNarrative": "[SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding drawn balance  →  Join: facility_id, as_of_date | [SOURCE] L2.collateral_snapshot.current_valuation_usd  →  Summed collateral valuation per facility/date  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.counterparty_id  →  FK to counterparty for grouping  →  Join: facility_id | [TRANSFORM] Exposure-weighted average  →  Formula: SUM((drawn_amount / collateral_value) * gross_exposure_usd) / SUM(CASE WHEN collateral_value > 0 THEN gross_exposure_usd ELSE 0 END)  →  Grouping: counterparty_id  →  Null guard: exclude unsecured (null collateral) | [OUTPUT] Counterparty WAvg LTV (%)",
       "sourceFields": [
-        {
-          "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "LTV per facility (metric_code=LTV)",
-          "sampleValue": "0.65"
-        },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
           "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
+          "description": "Outstanding drawn balance",
+          "sampleValue": "120000000"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "current_valuation_usd",
+          "description": "Collateral valuation in USD (summed by facility/date)",
           "sampleValue": "50000000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -754,23 +789,30 @@
       "metricId": "C104",
       "dimension": "L3",
       "definition": "The exposure-weighted average LTV across all secured facilities assigned to a specific L3 desk. Only facilities with non-null LTV are included. Primarily relevant for CRE desks. Desk heads monitor this for concentration in high-LTV loans and stress testing  —  a 20% property value decline would push an 80% LTV desk into negative equity territory.",
-      "laymanFormula": "Same weighted average as counterparty, but grouping all secured facilities that belong to this desk.",
-      "formula": "wavg_ltv = SUM(facility.ltv * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE lob_l3_name = X AND ltv IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  LTV per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Resolve leaf as lob_l3_name  →  Join: lob_segment_id = managed_segment_id | [TRANSFORM] Exposure-weighted average grouped by L3 desk  →  Null guard: exclude unsecured | [OUTPUT] Desk WAvg LTV (%)",
+      "laymanFormula": "Same weighted average as counterparty, but grouping all secured facilities that belong to this desk. LTV computed as drawn_amount / collateral_value from atomic sources.",
+      "formula": "wavg_ltv = SUM((drawn_amount / collateral_value) * gross_exposure_usd) / SUM(CASE WHEN collateral_value > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE lob_l3_name = X",
+      "lineageNarrative": "[SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding drawn balance  →  Join: facility_id, as_of_date | [SOURCE] L2.collateral_snapshot.current_valuation_usd  →  Summed collateral valuation per facility/date  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Resolve leaf as lob_l3_name  →  Join: lob_segment_id = managed_segment_id | [TRANSFORM] Exposure-weighted average grouped by L3 desk  →  Null guard: exclude unsecured | [OUTPUT] Desk WAvg LTV (%)",
       "sourceFields": [
-        {
-          "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "LTV per facility",
-          "sampleValue": "0.65"
-        },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
           "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
+          "description": "Outstanding drawn balance",
+          "sampleValue": "120000000"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "current_valuation_usd",
+          "description": "Collateral valuation in USD",
           "sampleValue": "50000000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -793,23 +835,30 @@
       "metricId": "C104",
       "dimension": "L2",
       "definition": "The exposure-weighted average LTV across all secured facilities within an L2 portfolio. Used in ALCO reporting for collateral adequacy monitoring and stress testing loss projections under property value decline scenarios.",
-      "laymanFormula": "Same weighted average, grouping all secured facilities in the L2 portfolio.",
-      "formula": "wavg_ltv = SUM(facility.ltv * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE lob_l2_name = X AND ltv IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  LTV per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Entry point  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse one level up to L2 parent | [TRANSFORM] Exposure-weighted average grouped by L2 portfolio  →  Null guard: exclude unsecured | [OUTPUT] Portfolio WAvg LTV (%)",
+      "laymanFormula": "Same weighted average, grouping all secured facilities in the L2 portfolio. LTV computed as drawn_amount / collateral_value from atomic sources.",
+      "formula": "wavg_ltv = SUM((drawn_amount / collateral_value) * gross_exposure_usd) / SUM(CASE WHEN collateral_value > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE lob_l2_name = X",
+      "lineageNarrative": "[SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding drawn balance  →  Join: facility_id, as_of_date | [SOURCE] L2.collateral_snapshot.current_valuation_usd  →  Summed collateral valuation per facility/date  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  LoB hierarchy entry point  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse one level up to L2 parent | [TRANSFORM] Exposure-weighted average grouped by L2 portfolio  →  Null guard: exclude unsecured | [OUTPUT] Portfolio WAvg LTV (%)",
       "sourceFields": [
-        {
-          "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "LTV per facility",
-          "sampleValue": "0.65"
-        },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
           "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
+          "description": "Outstanding drawn balance",
+          "sampleValue": "120000000"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "current_valuation_usd",
+          "description": "Collateral valuation in USD",
           "sampleValue": "50000000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -839,23 +888,30 @@
       "metricId": "C104",
       "dimension": "L1",
       "definition": "The exposure-weighted average LTV across all secured facilities within an L1 department. Board-level metric for collateral coverage adequacy by business line (e.g., CRE dept avg LTV 65% vs Corporate Banking avg LTV null because unsecured). Supports enterprise-wide risk appetite monitoring.",
-      "laymanFormula": "Same weighted average at the highest organizational level. Only secured facilities included.",
-      "formula": "wavg_ltv = SUM(facility.ltv * facility.outstanding_balance) / SUM(facility.outstanding_balance) FOR ALL facilities WHERE lob_l1_name = X AND ltv IS NOT NULL",
-      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value  →  LTV per facility  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding balance used as weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Entry point  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse to root (parent IS NULL) | [TRANSFORM] Exposure-weighted average grouped by L1 department  →  Null guard: exclude unsecured | [OUTPUT] Department WAvg LTV (%)",
+      "laymanFormula": "Same weighted average at the highest organizational level. Only secured facilities included. LTV computed as drawn_amount / collateral_value from atomic sources.",
+      "formula": "wavg_ltv = SUM((drawn_amount / collateral_value) * gross_exposure_usd) / SUM(CASE WHEN collateral_value > 0 THEN gross_exposure_usd ELSE 0 END) FOR ALL facilities WHERE lob_l1_name = X",
+      "lineageNarrative": "[SOURCE] L2.facility_exposure_snapshot.drawn_amount  →  Outstanding drawn balance  →  Join: facility_id, as_of_date | [SOURCE] L2.collateral_snapshot.current_valuation_usd  →  Summed collateral valuation per facility/date  →  Join: facility_id, as_of_date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Exposure weight  →  Join: facility_id, as_of_date | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy  →  Join: facility_id | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  LoB hierarchy entry point  →  Join: lob_segment_id = managed_segment_id | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse to root (parent IS NULL) | [TRANSFORM] Exposure-weighted average grouped by L1 department  →  Null guard: exclude unsecured | [OUTPUT] Department WAvg LTV (%)",
       "sourceFields": [
-        {
-          "layer": "L2",
-          "table": "financial_metric_observation",
-          "field": "metric_value",
-          "description": "LTV per facility",
-          "sampleValue": "0.65"
-        },
         {
           "layer": "L2",
           "table": "facility_exposure_snapshot",
           "field": "drawn_amount",
-          "description": "Outstanding balance in USD (exposure weight)",
+          "description": "Outstanding drawn balance",
+          "sampleValue": "120000000"
+        },
+        {
+          "layer": "L2",
+          "table": "collateral_snapshot",
+          "field": "current_valuation_usd",
+          "description": "Collateral valuation in USD",
           "sampleValue": "50000000"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Gross exposure in USD (weight)",
+          "sampleValue": "150000000"
         },
         {
           "layer": "L1",
@@ -1273,23 +1329,37 @@
       "metricId": "C107",
       "dimension": "counterparty",
       "definition": "The total expected loss across all facilities for this counterparty, computed as a simple sum of facility-level EL values. Unlike PD and LGD (which aggregate as EAD-weighted averages), EL is additive because it represents actual dollar amounts. This gives relationship managers and credit approvers the total dollar loss exposure for the counterparty relationship. Pre-computed in counterparty_exposure_summary.expected_loss_amt.",
-      "laymanFormula": "Sum all facility-level expected_loss_amt values for this counterparty. EL is additive  —  no weighting needed because each facility EL already incorporates its own PD, LGD, and EAD. The sum represents total expected dollar loss for the relationship.",
-      "formula": "counterparty_el = SUM(expected_loss_amt) WHERE counterparty_id = X",
-      "lineageNarrative": "[SOURCE] L2.risk_metric_cube.expected_loss_amt  →  Per-facility expected loss (PD * LGD * EAD) | [TRANSFORM] SUM(expected_loss_amt)  →  Simple additive aggregation across counterparty facilities | [OUTPUT] Counterparty Total Expected Loss ($)",
+      "laymanFormula": "Sum all facility-level EL calculations for this counterparty. Each facility EL = (PD/100) * (LGD/100) * gross_exposure_usd. PD and LGD from financial_metric_observation, exposure from facility_exposure_snapshot. EL is additive  —  no weighting needed.",
+      "formula": "counterparty_el = SUM((pd_pct / 100.0) * (lgd_pct / 100.0) * gross_exposure_usd) WHERE counterparty_id = X",
+      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value (metric_code='PD')  →  PD percent by facility/date | [SOURCE] L2.financial_metric_observation.metric_value (metric_code='LGD')  →  LGD percent by facility/date | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Facility exposure amount | [SOURCE] L1.facility_master.counterparty_id  →  FK to counterparty for grouping | [TRANSFORM] SUM((PD/100) * (LGD/100) * gross_exposure_usd) grouped by counterparty_id | [OUTPUT] Counterparty Total Expected Loss ($)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "expected_loss_amt",
-          "description": "Per-facility expected loss ($)",
-          "sampleValue": "596250"
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "PD percent (metric_code='PD')",
+          "sampleValue": "1.24"
         },
         {
           "layer": "L2",
-          "table": "counterparty_exposure_summary",
-          "field": "expected_loss_amt",
-          "description": "Pre-computed counterparty total EL",
-          "sampleValue": "2850000"
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "LGD percent (metric_code='LGD')",
+          "sampleValue": "38.5"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Facility gross exposure in USD",
+          "sampleValue": "125000000"
+        },
+        {
+          "layer": "L1",
+          "table": "facility_master",
+          "field": "counterparty_id",
+          "description": "FK to counterparty for grouping",
+          "sampleValue": "7890"
         }
       ],
       "dashboardDisplayName": "Counterparty Total EL ($)"
@@ -1298,23 +1368,44 @@
       "metricId": "C107",
       "dimension": "L3",
       "definition": "The total expected loss across all facilities assigned to this L3 desk, computed as a simple sum. This gives the desk head a direct dollar view of the credit loss budget for their portfolio segment. Desks with higher total EL relative to their revenue contribution may warrant closer scrutiny from the CRO.",
-      "laymanFormula": "Sum all facility-level expected_loss_amt for facilities assigned to this L3 desk. As with the counterparty level, EL is purely additive  —  each facility already has its complete EL calculation baked in.",
-      "formula": "desk_el = SUM(expected_loss_amt) WHERE l3_desk_id = X",
-      "lineageNarrative": "[SOURCE] L2.risk_metric_cube.expected_loss_amt  →  Per-facility expected loss | [SOURCE] L1.facility_master.l3_desk_id  →  Desk assignment | [TRANSFORM] SUM(expected_loss_amt) grouped by l3_desk_id  →  Additive aggregation | [OUTPUT] L3 Desk Total Expected Loss ($)",
+      "laymanFormula": "Sum all facility-level EL calculations for facilities in this L3 desk. Each facility EL = (PD/100) * (LGD/100) * gross_exposure_usd. EL is additive at all levels.",
+      "formula": "desk_el = SUM((pd_pct / 100.0) * (lgd_pct / 100.0) * gross_exposure_usd) WHERE l3_desk_id = X",
+      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value (metric_code='PD')  →  PD percent | [SOURCE] L2.financial_metric_observation.metric_value (metric_code='LGD')  →  LGD percent | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Facility exposure | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  Desk assignment | [TRANSFORM] SUM((PD/100) * (LGD/100) * gross_exposure_usd) grouped by l3_desk  →  Additive aggregation | [OUTPUT] L3 Desk Total Expected Loss ($)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "expected_loss_amt",
-          "description": "Per-facility expected loss ($)",
-          "sampleValue": "596250"
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "PD percent (metric_code='PD')",
+          "sampleValue": "1.24"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "LGD percent (metric_code='LGD')",
+          "sampleValue": "38.5"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Facility gross exposure in USD",
+          "sampleValue": "125000000"
         },
         {
           "layer": "L1",
           "table": "facility_master",
-          "field": "l3_desk_id",
-          "description": "L3 desk assignment for grouping",
-          "sampleValue": "DSK-042"
+          "field": "lob_segment_id",
+          "description": "FK to LoB taxonomy",
+          "sampleValue": "301"
+        },
+        {
+          "layer": "L1",
+          "table": "enterprise_business_taxonomy",
+          "field": "managed_segment_id",
+          "description": "Resolve leaf as lob_l3_name",
+          "sampleValue": "301"
         }
       ],
       "dashboardDisplayName": "L3 Desk Total EL ($)"
@@ -1323,30 +1414,51 @@
       "metricId": "C107",
       "dimension": "L2",
       "definition": "The total expected loss across the L2 portfolio, computed as a simple sum of all facility-level EL values. This feeds into portfolio-level CECL/ASC 326 allowance estimation and is a primary input for the quarterly allowance adequacy assessment. Pre-computed in portfolio_summary for efficient reporting. Trends in portfolio EL drive management action on risk appetite limits.",
-      "laymanFormula": "Sum all facility-level expected_loss_amt for facilities in this L2 portfolio. The portfolio_summary table stores this pre-computed for dashboard display. EL is additive at every level above facility.",
-      "formula": "portfolio_el = SUM(expected_loss_amt) WHERE l2_portfolio_id = X",
-      "lineageNarrative": "[SOURCE] L2.risk_metric_cube.expected_loss_amt  →  Per-facility expected loss | [SOURCE] L1.facility_master.l2_portfolio_id  →  Portfolio assignment | [TRANSFORM] SUM(expected_loss_amt) grouped by l2_portfolio_id  →  Additive aggregation | [OUTPUT] L2 Portfolio Total Expected Loss ($)",
+      "laymanFormula": "Sum all facility-level EL calculations for facilities in this L2 portfolio. Each facility EL = (PD/100) * (LGD/100) * gross_exposure_usd. EL is additive at all levels.",
+      "formula": "portfolio_el = SUM((pd_pct / 100.0) * (lgd_pct / 100.0) * gross_exposure_usd) WHERE l2_portfolio_id = X",
+      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value (metric_code='PD')  →  PD percent | [SOURCE] L2.financial_metric_observation.metric_value (metric_code='LGD')  →  LGD percent | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Facility exposure | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  LoB hierarchy entry point | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse one level up to L2 parent | [TRANSFORM] SUM((PD/100) * (LGD/100) * gross_exposure_usd) grouped by l2_portfolio  →  Additive aggregation | [OUTPUT] L2 Portfolio Total Expected Loss ($)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "expected_loss_amt",
-          "description": "Per-facility expected loss ($)",
-          "sampleValue": "596250"
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "PD percent (metric_code='PD')",
+          "sampleValue": "1.24"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "LGD percent (metric_code='LGD')",
+          "sampleValue": "38.5"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Facility gross exposure in USD",
+          "sampleValue": "125000000"
         },
         {
           "layer": "L1",
           "table": "facility_master",
-          "field": "l2_portfolio_id",
-          "description": "L2 portfolio assignment",
-          "sampleValue": "PORT-007"
+          "field": "lob_segment_id",
+          "description": "FK to LoB taxonomy",
+          "sampleValue": "301"
         },
         {
-          "layer": "L2",
-          "table": "portfolio_summary",
-          "field": "total_expected_loss_amt",
-          "description": "Pre-computed portfolio total EL",
-          "sampleValue": "47200000"
+          "layer": "L1",
+          "table": "enterprise_business_taxonomy",
+          "field": "managed_segment_id",
+          "description": "LoB hierarchy entry point",
+          "sampleValue": "301"
+        },
+        {
+          "layer": "L1",
+          "table": "enterprise_business_taxonomy",
+          "field": "parent_segment_id",
+          "description": "Traverse one level up to L2 parent",
+          "sampleValue": "30"
         }
       ],
       "dashboardDisplayName": "L2 Portfolio Total EL ($)"
@@ -1355,30 +1467,51 @@
       "metricId": "C107",
       "dimension": "L1",
       "definition": "The total expected loss for the entire L1 department  —  the broadest aggregation of credit loss expectation. This is a headline number reported to the Board Risk Committee and feeds directly into enterprise-level CCAR/DFAST stress projections, economic capital allocation, and the CFO allowance adequacy assessment. Pre-computed in lob_exposure_summary.expected_loss_amt. Department-level EL relative to total exposure is a key risk appetite metric.",
-      "laymanFormula": "Sum all facility-level expected_loss_amt across the entire department. This is the simple additive total  —  the grand sum of all individual facility EL calculations. The lob_exposure_summary.expected_loss_amt is the authoritative pre-computed value.",
-      "formula": "dept_el = SUM(expected_loss_amt) WHERE l1_department_id = X",
-      "lineageNarrative": "[SOURCE] L2.risk_metric_cube.expected_loss_amt  →  Per-facility expected loss | [SOURCE] L1.facility_master.l1_department_id  →  Department assignment | [TRANSFORM] SUM(expected_loss_amt) grouped by l1_department_id  →  Additive aggregation | [OUTPUT] L1 Dept Total Expected Loss ($)",
+      "laymanFormula": "Sum all facility-level EL calculations across the entire department. Each facility EL = (PD/100) * (LGD/100) * gross_exposure_usd. EL is additive  —  the grand sum of all individual facility EL calculations.",
+      "formula": "dept_el = SUM((pd_pct / 100.0) * (lgd_pct / 100.0) * gross_exposure_usd) WHERE l1_department_id = X",
+      "lineageNarrative": "[SOURCE] L2.financial_metric_observation.metric_value (metric_code='PD')  →  PD percent | [SOURCE] L2.financial_metric_observation.metric_value (metric_code='LGD')  →  LGD percent | [SOURCE] L2.facility_exposure_snapshot.gross_exposure_usd  →  Facility exposure | [SOURCE] L1.facility_master.lob_segment_id  →  FK to LoB taxonomy | [SOURCE] L1.enterprise_business_taxonomy.managed_segment_id  →  LoB hierarchy entry point | [SOURCE] L1.enterprise_business_taxonomy.parent_segment_id  →  Traverse to root (parent IS NULL) | [TRANSFORM] SUM((PD/100) * (LGD/100) * gross_exposure_usd) grouped by l1_department  →  Additive aggregation | [OUTPUT] L1 Dept Total Expected Loss ($)",
       "sourceFields": [
         {
           "layer": "L2",
-          "table": "risk_metric_cube",
-          "field": "expected_loss_amt",
-          "description": "Per-facility expected loss ($)",
-          "sampleValue": "596250"
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "PD percent (metric_code='PD')",
+          "sampleValue": "1.24"
+        },
+        {
+          "layer": "L2",
+          "table": "financial_metric_observation",
+          "field": "metric_value",
+          "description": "LGD percent (metric_code='LGD')",
+          "sampleValue": "38.5"
+        },
+        {
+          "layer": "L2",
+          "table": "facility_exposure_snapshot",
+          "field": "gross_exposure_usd",
+          "description": "Facility gross exposure in USD",
+          "sampleValue": "125000000"
         },
         {
           "layer": "L1",
           "table": "facility_master",
-          "field": "l1_department_id",
-          "description": "L1 department assignment",
-          "sampleValue": "DEPT-01"
+          "field": "lob_segment_id",
+          "description": "FK to LoB taxonomy",
+          "sampleValue": "301"
         },
         {
-          "layer": "L2",
-          "table": "lob_exposure_summary",
-          "field": "expected_loss_amt",
-          "description": "Pre-computed LOB total expected loss",
-          "sampleValue": "185400000"
+          "layer": "L1",
+          "table": "enterprise_business_taxonomy",
+          "field": "managed_segment_id",
+          "description": "LoB hierarchy entry point",
+          "sampleValue": "301"
+        },
+        {
+          "layer": "L1",
+          "table": "enterprise_business_taxonomy",
+          "field": "parent_segment_id",
+          "description": "Traverse to root (parent IS NULL)",
+          "sampleValue": "NULL"
         }
       ],
       "dashboardDisplayName": "L1 Dept Total EL ($)"

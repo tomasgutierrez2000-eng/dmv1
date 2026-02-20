@@ -133,13 +133,27 @@ export default function DomainContainer({
                   </div>
                 )}
                 {isOverview && (
-                  <div className="flex items-center space-x-2 text-sm text-white/60 font-medium">
+                  <div className="flex items-center space-x-2 text-sm text-white/60 font-medium flex-1 min-w-0">
                     <span>{stats.tableCount} tables</span>
                     <span className="text-white/40">|</span>
                     <span>{stats.totalFields} fields</span>
                   </div>
                 )}
               </div>
+            </div>
+            {/* Collapse/expand arrow - show in both overview and focused domain */}
+            <div className="flex items-center flex-shrink-0">
+              <span
+                className="text-white/60 hover:text-white transition-colors p-1 hover:bg-white/20 rounded inline-flex items-center justify-center"
+                title={isExpanded ? 'Collapse tables' : 'Expand tables'}
+                aria-label={isExpanded ? 'Collapse tables in this category' : 'Expand tables in this category'}
+              >
+                {isExpanded ? (
+                  <ChevronDown className={isOverview ? 'w-4 h-4' : 'w-6 h-6'} />
+                ) : (
+                  <ChevronRight className={isOverview ? 'w-4 h-4' : 'w-6 h-6'} />
+                )}
+              </span>
             </div>
             {!isOverview && (
               <div className="flex items-center space-x-3 flex-shrink-0">
@@ -160,13 +174,6 @@ export default function DomainContainer({
                     </span>
                   )}
                 </div>
-                <button className="text-white/60 hover:text-white transition-colors p-1 hover:bg-white/20 rounded">
-                  {isExpanded ? (
-                    <ChevronDown className="w-6 h-6" />
-                  ) : (
-                    <ChevronRight className="w-6 h-6" />
-                  )}
-                </button>
               </div>
             )}
           </div>

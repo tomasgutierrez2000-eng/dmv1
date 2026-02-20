@@ -323,6 +323,23 @@
     "relationshipType": "primary"
   },
   {
+    "id": "L2.facility_financial_snapshot.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L2",
+      "table": "facility_financial_snapshot",
+      "field": "facility_id",
+      "tableKey": "L2.facility_financial_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
     "id": "L2.facility_delinquency_snapshot.facility_id->L1.facility_master.facility_id",
     "source": {
       "layer": "L2",

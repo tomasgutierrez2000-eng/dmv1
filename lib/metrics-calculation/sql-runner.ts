@@ -8,6 +8,47 @@ const RUN_TIMEOUT_MS = 10_000;
 
 export type SampleDataByTable = Record<string, { columns: string[]; rows: unknown[][] }>;
 
+const SQLJS_DIST_DIR = path.join(process.cwd(), 'node_modules', 'sql.js', 'dist');
+
+async function initSqlJsEngine() {
+  const locateFile = (file: string) => path.join(SQLJS_DIST_DIR, file);
+
+  try {
+    const mod = await import('sql.js/dist/sql-wasm.js');
+    const initSqlJs = (mod as { default?: unknown }).default ?? mod;
+    if (typeof initSqlJs === 'function') {
+      return await (initSqlJs as (opts: { locateFile: (file: string) => string }) => Promise<{ Database: new () => any }> )({
+        locateFile,
+      });
+    }
+  } catch {
+    // fall through
+  }
+
+  try {
+    const { createRequire } = await import('module');
+    const require = createRequire(import.meta.url);
+    const mod = require('sql.js') as { default?: unknown };
+    const initSqlJs = mod.default ?? mod;
+    if (typeof initSqlJs === 'function') {
+      return await (initSqlJs as (opts: { locateFile: (file: string) => string }) => Promise<{ Database: new () => any }> )({
+        locateFile,
+      });
+    }
+  } catch {
+    // fall through
+  }
+
+  const mod = await import('sql.js');
+  const initSqlJs = (mod as { default?: unknown }).default ?? mod;
+  if (typeof initSqlJs !== 'function') {
+    throw new Error('Unable to initialize sql.js runtime');
+  }
+  return await (initSqlJs as (opts: { locateFile: (file: string) => string }) => Promise<{ Database: new () => any }> )({
+    locateFile,
+  });
+}
+
 function tableKeyToSqliteName(tableKey: string): string {
   return tableKey.replace('.', '_').toLowerCase();
 }
@@ -104,8 +145,7 @@ export async function runSqlMetric(input: {
   }
 
   try {
-    const initSqlJs = (await import('sql.js')).default;
-    const SQL = await initSqlJs({});
+    const SQL = await initSqlJsEngine();
     const db = new SQL.Database();
 
     try {

@@ -12,7 +12,7 @@ import {
 } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
-import { getFormulaForDimension, type MetricDimensionFormulaRow } from '@/data/metrics_dimensions_filled';
+import { getFormulaForDimension } from '@/data/metrics_dimensions_filled';
 import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
 import type { L3Metric, MetricType, DimensionInteraction } from '@/data/l3-metrics';
@@ -58,6 +58,16 @@ interface MetricDetailViewProps {
   onDuplicate: () => void;
 }
 
+interface MetricDimensionFormulaApiRow {
+  metricId: string;
+  dimension: CalculationDimension;
+  formula: string;
+  formulaSQL?: string;
+  definition?: string;
+  dashboardDisplayName?: string;
+  laymanFormula?: string;
+}
+
 /** Dimensions at which this metric can be calculated. Defaults to all if not specified. */
 function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
   if (metric.allowedDimensions && metric.allowedDimensions.length > 0) {
@@ -78,11 +88,11 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
     setSelectedDimension(allowedDimensions[0]);
   }, [metric.id, allowedDimensions, selectedDimension]);
 
-  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaRow[] | null>(null);
+  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaApiRow[] | null>(null);
   useEffect(() => {
     fetch('/api/metrics-dimensions-filled')
       .then((res) => res.json())
-      .then((data: { formulas?: MetricDimensionFormulaRow[] }) => setFormulasFromApi(data.formulas ?? null))
+      .then((data: { formulas?: MetricDimensionFormulaApiRow[] }) => setFormulasFromApi(data.formulas ?? null))
       .catch(() => setFormulasFromApi(null));
   }, []);
 
@@ -98,12 +108,14 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
     : null;
   const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, selectedDimension);
   const resolvedFormula = resolveFormulaForDimension(metric, selectedDimension, { allowLegacyFallback: true });
-  const dimensionFormula = dimensionFormulaFromMetric ?? dimensionFormulaFromApi ?? dimensionFormulaFromStatic ?? resolvedFormula;
+  const dimensionFormula = dimensionFormulaFromApi ?? dimensionFormulaFromMetric ?? dimensionFormulaFromStatic ?? resolvedFormula;
   const displayFormula = dimensionFormula?.formula ?? metric.formula;
   const displayFormulaSQL = dimensionFormula?.formulaSQL ?? metric.formulaSQL;
-  const displayName = metric.displayNameByDimension?.[selectedDimension] ?? metric.name;
+  const displayLaymanFormula = dimensionFormulaFromApi?.laymanFormula;
+  const displayName = metric.displayNameByDimension?.[selectedDimension] ?? dimensionFormulaFromApi?.dashboardDisplayName ?? metric.name;
+  const displayDescription = dimensionFormulaFromApi?.definition ?? metric.description;
   const withLineage = metricWithLineage(
-    { ...metric, formula: displayFormula, formulaSQL: displayFormulaSQL },
+    { ...metric, name: displayName, description: displayDescription, formula: displayFormula, formulaSQL: displayFormulaSQL },
     selectedDimension
   );
 
@@ -168,8 +180,8 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
               )}
             </div>
             <h1 className="text-xl font-bold text-white mt-1">{displayName}</h1>
-            {metric.description && (
-              <p className="text-sm text-gray-400 mt-2 leading-relaxed">{metric.description}</p>
+            {displayDescription && (
+              <p className="text-sm text-gray-400 mt-2 leading-relaxed">{displayDescription}</p>
             )}
             {/* Dimension selector: formula and lineage update when changed */}
             {allowedDimensions.length > 0 && (
@@ -251,6 +263,11 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
         </h2>
         <div className="bg-black/20 rounded-lg px-4 py-3 border border-white/5">
           <div className="text-sm font-mono text-purple-300 break-words">{displayFormula}</div>
+          {displayLaymanFormula && (
+            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+              In plain English: {displayLaymanFormula}
+            </p>
+          )}
           {displayFormulaSQL && (
             <div className="text-xs font-mono text-gray-500 mt-2 pt-2 border-t border-white/5 break-all">
               SQL: {displayFormulaSQL}

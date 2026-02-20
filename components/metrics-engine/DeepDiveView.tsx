@@ -9,7 +9,7 @@ import {
   type CalculationDimension,
 } from '@/data/l3-metrics';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
-import { getFormulaForDimension, type MetricDimensionFormulaRow } from '@/data/metrics_dimensions_filled';
+import { getFormulaForDimension } from '@/data/metrics_dimensions_filled';
 import type { L3Metric } from '@/data/l3-metrics';
 
 type RunResult =
@@ -30,6 +30,16 @@ function formatValue(value: number | null, displayFormat: string): string {
 interface DeepDiveViewProps {
   metric: L3Metric;
   onBack: () => void;
+}
+
+interface MetricDimensionFormulaApiRow {
+  metricId: string;
+  dimension: CalculationDimension;
+  formula: string;
+  formulaSQL?: string;
+  definition?: string;
+  dashboardDisplayName?: string;
+  laymanFormula?: string;
 }
 
 const DEEP_DIVE_LEVEL_LABELS: Record<CalculationDimension, string> = {
@@ -56,7 +66,7 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showSql, setShowSql] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaRow[] | null>(null);
+  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaApiRow[] | null>(null);
   const cacheRef = useRef<Map<string, RunResult>>(new Map());
   const abortRef = useRef<AbortController | null>(null);
   const latestResultRef = useRef<RunResult | null>(null);
@@ -64,7 +74,7 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
   useEffect(() => {
     fetch('/api/metrics-dimensions-filled')
       .then((res) => res.json())
-      .then((data: { formulas?: MetricDimensionFormulaRow[] }) => setFormulasFromApi(data.formulas ?? null))
+      .then((data: { formulas?: MetricDimensionFormulaApiRow[] }) => setFormulasFromApi(data.formulas ?? null))
       .catch(() => setFormulasFromApi(null));
   }, []);
 
@@ -79,10 +89,12 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
     : null;
   const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, dimension);
   const resolvedFormula = resolveFormulaForDimension(metric, dimension, { allowLegacyFallback: true });
-  const dimensionFormula = dimensionFormulaFromMetric ?? dimensionFormulaFromApi ?? dimensionFormulaFromStatic ?? resolvedFormula;
+  const dimensionFormula = dimensionFormulaFromApi ?? dimensionFormulaFromMetric ?? dimensionFormulaFromStatic ?? resolvedFormula;
   const displayFormula = dimensionFormula?.formula ?? metric.formula;
   const displayFormulaSQL = dimensionFormula?.formulaSQL ?? metric.formulaSQL;
-  const displayName = metric.displayNameByDimension?.[dimension] ?? metric.name;
+  const displayLaymanFormula = dimensionFormulaFromApi?.laymanFormula;
+  const displayName = metric.displayNameByDimension?.[dimension] ?? dimensionFormulaFromApi?.dashboardDisplayName ?? metric.name;
+  const displayDescription = dimensionFormulaFromApi?.definition ?? metric.description;
   const needsAsOfDate = Boolean(displayFormulaSQL?.includes(':as_of_date'));
 
   const cacheKey = `${metric.id}\t${dimension}\t${asOfDate ?? ''}`;
@@ -196,8 +208,8 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
           )}
         </div>
         <h1 className="text-xl font-bold text-white">{displayName}</h1>
-        {metric.description && (
-          <p className="text-sm text-gray-400 mt-2 leading-relaxed">{metric.description}</p>
+        {displayDescription && (
+          <p className="text-sm text-gray-400 mt-2 leading-relaxed">{displayDescription}</p>
         )}
       </header>
 
@@ -253,6 +265,11 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
         </h2>
         <div className="bg-black/20 rounded-lg px-4 py-3 border border-white/5">
           <p className="text-sm font-mono text-purple-300">{displayFormula}</p>
+          {displayLaymanFormula && (
+            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+              In plain English: {displayLaymanFormula}
+            </p>
+          )}
         </div>
       </section>
 

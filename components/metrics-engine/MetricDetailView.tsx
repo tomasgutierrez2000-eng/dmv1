@@ -8,7 +8,6 @@ import {
   DASHBOARD_PAGES,
   DIMENSION_LABELS,
   CALCULATION_DIMENSIONS,
-  CALCULATION_DIMENSION_LABELS,
   type CalculationDimension,
 } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
@@ -41,6 +40,14 @@ const METRIC_TYPE_ICON: Record<MetricType, React.ReactNode> = {
   Trend: <TrendingUp className="w-4 h-4" />,
   Table: <Table2 className="w-4 h-4" />,
   Categorical: <Tag className="w-4 h-4" />,
+};
+
+const DIMENSION_BAR_LABELS: Record<CalculationDimension, string> = {
+  facility: 'Facility',
+  counterparty: 'Counterparty',
+  L3: 'L3-Desk',
+  L2: 'L2-Portfolio',
+  L1: 'L1-LoB',
 };
 
 interface MetricDetailViewProps {
@@ -170,25 +177,24 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
                 <p id="dimension-label" className="text-xs font-medium text-gray-400 mb-2">
                   View formula at
                 </p>
-                {allowedDimensions.length === 1 ? (
-                  <span className="inline-flex items-center px-3 py-2 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white">
-                    {CALCULATION_DIMENSION_LABELS[allowedDimensions[0]]}
-                  </span>
-                ) : (
-                  <select
-                    value={selectedDimension}
-                    onChange={(e) => setSelectedDimension(e.target.value as CalculationDimension)}
-                    className="min-h-[44px] w-full max-w-xs px-3 py-2.5 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/40 appearance-none bg-no-repeat bg-[length:14px] bg-[right_12px_center] pr-10 cursor-pointer"
-                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239ca3af\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")' }}
-                    aria-label="Choose dimension to see formula and lineage for that level"
-                  >
-                    {allowedDimensions.map((dim) => (
-                      <option key={dim} value={dim}>
-                        {CALCULATION_DIMENSION_LABELS[dim]}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                  {allowedDimensions.map((dim) => (
+                    <button
+                      key={dim}
+                      type="button"
+                      onClick={() => setSelectedDimension(dim)}
+                      aria-pressed={selectedDimension === dim}
+                      aria-label={`Show formula at ${DIMENSION_BAR_LABELS[dim]} level`}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
+                        selectedDimension === dim
+                          ? 'bg-purple-500/30 text-purple-200 border border-purple-500/50'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
+                      }`}
+                    >
+                      {DIMENSION_BAR_LABELS[dim]}
+                    </button>
+                  ))}
+                </div>
                 <p className="text-[11px] text-gray-500 mt-1.5">
                   Formula and lineage below update for the selected level.
                 </p>
@@ -239,7 +245,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           Formula
           {allowedDimensions.length > 0 && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/20 text-purple-300 normal-case">
-              {CALCULATION_DIMENSION_LABELS[selectedDimension]}
+              {DIMENSION_BAR_LABELS[selectedDimension]}
             </span>
           )}
         </h2>

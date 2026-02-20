@@ -35,9 +35,9 @@ interface DeepDiveViewProps {
 const DEEP_DIVE_LEVEL_LABELS: Record<CalculationDimension, string> = {
   facility: 'Facility',
   counterparty: 'Counterparty',
-  L3: 'L3 Desk',
-  L2: 'L2 Portfolio',
-  L1: 'L1 Department',
+  L3: 'L3-Desk',
+  L2: 'L2-Portfolio',
+  L1: 'L1-LoB',
 };
 
 function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {

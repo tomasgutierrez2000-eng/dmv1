@@ -9,50 +9,15 @@ import fs from 'fs';
 import XLSX from 'xlsx';
 import { writeCustomMetrics } from '../lib/metrics-store';
 import { writeModelGaps } from '../lib/model-gaps-store';
-import type { L3Metric, DashboardPage, MetricType, DimensionUsage, SourceField } from '../data/l3-metrics';
-
-const PAGES: DashboardPage[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
-const METRIC_TYPES: MetricType[] = ['Aggregate', 'Ratio', 'Count', 'Derived', 'Status', 'Trend', 'Table', 'Categorical'];
-const INTERACTIONS = ['FILTER', 'GROUP_BY', 'AVAILABLE', 'TOGGLE'] as const;
-
-function parseDimensions(str: string): DimensionUsage[] {
-  if (!str || typeof str !== 'string') return [];
-  return str
-    .split(';')
-    .map(s => s.trim())
-    .filter(Boolean)
-    .map(part => {
-      const [dim, inter] = part.split(':').map(x => x?.trim());
-      if (!dim) return null;
-      const interaction = inter && INTERACTIONS.includes(inter as DimensionUsage['interaction']) ? inter : 'FILTER';
-      return { dimension: dim, interaction: interaction as DimensionUsage['interaction'] };
-    })
-    .filter((d): d is DimensionUsage => d !== null);
-}
-
-function parseToggles(str: string): string[] {
-  if (!str || typeof str !== 'string') return [];
-  return str.split(';').map(s => s.trim()).filter(Boolean);
-}
-
-function normalizeMetric(m: Partial<L3Metric>, id: string): L3Metric {
-  return {
-    id,
-    name: m.name ?? '',
-    page: PAGES.includes(m.page!) ? m.page! : 'P1',
-    section: m.section ?? '',
-    metricType: METRIC_TYPES.includes(m.metricType!) ? m.metricType! : 'Derived',
-    formula: m.formula ?? '',
-    formulaSQL: m.formulaSQL,
-    description: m.description ?? '',
-    displayFormat: m.displayFormat ?? '',
-    sampleValue: m.sampleValue ?? '',
-    sourceFields: Array.isArray(m.sourceFields) ? m.sourceFields : [],
-    dimensions: Array.isArray(m.dimensions) ? m.dimensions : [],
-    toggles: m.toggles,
-    notes: m.notes,
-  };
-}
+import type { L3Metric, SourceField } from '../data/l3-metrics';
+import {
+  METRIC_TYPES,
+  PAGES,
+  normalizeMetric,
+  parseDimensions,
+  parseToggles,
+  validateMetric,
+} from '../lib/metrics-calculation';
 
 const excelPath = process.argv[2] || path.join(process.cwd(), 'metrics_import_FINAL_2026-02-17.xlsx');
 
@@ -121,12 +86,12 @@ for (const row of metricsRows) {
   const metricType = String(row['metricType'] ?? 'Derived').trim();
   const dimensions = parseDimensions(String(row['dimensions'] ?? ''));
   const toggles = parseToggles(String(row['toggles'] ?? ''));
-  toImport.push(normalizeMetric({
+  const normalized = normalizeMetric({
     id,
     name,
-    page: PAGES.includes(page as DashboardPage) ? page as DashboardPage : 'P1',
+    page: PAGES.includes(page as L3Metric['page']) ? (page as L3Metric['page']) : 'P1',
     section: String(row['section'] ?? '').trim(),
-    metricType: METRIC_TYPES.includes(metricType as MetricType) ? metricType as MetricType : 'Derived',
+    metricType: METRIC_TYPES.includes(metricType as L3Metric['metricType']) ? (metricType as L3Metric['metricType']) : 'Derived',
     formula,
     formulaSQL: String(row['formulaSQL'] ?? '').trim() || undefined,
     description: String(row['description'] ?? '').trim(),
@@ -136,7 +101,13 @@ for (const row of metricsRows) {
     dimensions,
     toggles: toggles.length ? toggles : undefined,
     notes: String(row['notes'] ?? '').trim() || undefined,
-  }, id));
+  }, id);
+  const validation = validateMetric(normalized);
+  if (!validation.ok) {
+    errors.push({ row: rowNum, sheet: 'Metrics', message: validation.error ?? 'invalid metric' });
+    continue;
+  }
+  toImport.push(normalized);
 }
 
 if (modelGapsSheet) {

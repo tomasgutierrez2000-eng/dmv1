@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Copy, Edit, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag } from 'lucide-react';
+import { ArrowLeft, Copy, Edit, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag, Calculator } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {
   DASHBOARD_PAGES,
   DIMENSION_LABELS,
@@ -11,7 +12,8 @@ import {
   type CalculationDimension,
 } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
-import { getFormulaForDimension, type MetricDimensionFormulaRow } from '@/data/metrics_dimensions_filled';
+import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
+import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
 import type { L3Metric, MetricType, DimensionInteraction } from '@/data/l3-metrics';
 
@@ -57,6 +59,8 @@ function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
 }
 
 export default function MetricDetailView({ metric, source, onEdit, onBack, onDuplicate }: MetricDetailViewProps) {
+  const router = useRouter();
+  const deepDiveEnabled = isDeepDiveMetric(metric.id);
   const allowedDimensions = getAllowedDimensions(metric);
   const [selectedDimension, setSelectedDimension] = useState<CalculationDimension>(allowedDimensions[0]);
 
@@ -66,30 +70,13 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
     setSelectedDimension(allowedDimensions[0]);
   }, [metric.id, allowedDimensions, selectedDimension]);
 
-  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaRow[] | null>(null);
-  useEffect(() => {
-    fetch('/api/metrics-dimensions-filled')
-      .then((res) => res.json())
-      .then((data: { formulas?: MetricDimensionFormulaRow[] }) => setFormulasFromApi(data.formulas ?? null))
-      .catch(() => setFormulasFromApi(null));
-  }, []);
-
   const withLineage = metricWithLineage(metric, selectedDimension);
   const pageInfo = DASHBOARD_PAGES.find(p => p.id === metric.page);
-  // Formula for selected dimension: metric.formulasByDimension (template/import) > API (data/metrics_dimensions_filled.xlsx) > static
-  const dimensionFormulaFromMetric = metric.formulasByDimension?.[selectedDimension];
-  const matchKeys = [metric.id, metric.name].filter(Boolean);
-  const dimensionFormulaFromApi = formulasFromApi
-    ? formulasFromApi.find(
-        (r) =>
-          r.dimension === selectedDimension &&
-          matchKeys.some((k) => k && String(k).trim() === String(r.metricId).trim())
-      )
-    : null;
-  const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, selectedDimension);
-  const dimensionFormula = dimensionFormulaFromMetric ?? dimensionFormulaFromApi ?? dimensionFormulaFromStatic;
-  const displayFormula = dimensionFormula?.formula ?? metric.formula;
-  const displayFormulaSQL = dimensionFormula?.formulaSQL ?? metric.formulaSQL;
+  // Keep formula display aligned with backend calculation engine precedence.
+  const resolvedFormula = resolveFormulaForDimension(metric, selectedDimension, { allowLegacyFallback: true });
+  const displayFormula = resolvedFormula?.formula ?? metric.formula;
+  const displayFormulaSQL = resolvedFormula?.formulaSQL ?? metric.formulaSQL;
+  const displayName = metric.displayNameByDimension?.[selectedDimension] ?? metric.name;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -104,6 +91,17 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           Back to list
         </button>
         <div className="ml-auto flex items-center gap-2">
+          {deepDiveEnabled && (
+            <button
+              type="button"
+              onClick={() => router.push(`/metrics/deep-dive/${metric.id}`)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e1a]"
+              title="See how this metric is calculated with live sample data"
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Deep dive
+            </button>
+          )}
           <button
             type="button"
             onClick={onEdit}
@@ -140,7 +138,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
                 </span>
               )}
             </div>
-            <h1 className="text-xl font-bold text-white mt-1">{metric.name}</h1>
+            <h1 className="text-xl font-bold text-white mt-1">{displayName}</h1>
             {metric.description && (
               <p className="text-sm text-gray-400 mt-2 leading-relaxed">{metric.description}</p>
             )}

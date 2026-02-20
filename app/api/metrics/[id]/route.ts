@@ -1,50 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMergedMetrics, readCustomMetrics, writeCustomMetrics } from '@/lib/metrics-store';
-import type { L3Metric, DashboardPage, MetricType } from '@/data/l3-metrics';
-
-const PAGES: DashboardPage[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
-const METRIC_TYPES: MetricType[] = ['Aggregate', 'Ratio', 'Count', 'Derived', 'Status', 'Trend', 'Table', 'Categorical'];
-
-function normalizeMetric(m: Partial<L3Metric>, id: string): L3Metric {
-  return {
-    id,
-    name: m.name ?? '',
-    page: PAGES.includes(m.page!) ? m.page! : 'P1',
-    section: m.section ?? '',
-    metricType: METRIC_TYPES.includes(m.metricType!) ? m.metricType! : 'Derived',
-    formula: m.formula ?? '',
-    formulaSQL: m.formulaSQL,
-    description: m.description ?? '',
-    displayFormat: m.displayFormat ?? '',
-    sampleValue: m.sampleValue ?? '',
-    sourceFields: Array.isArray(m.sourceFields) ? m.sourceFields : [],
-    dimensions: Array.isArray(m.dimensions) ? m.dimensions : [],
-    allowedDimensions: Array.isArray(m.allowedDimensions) ? m.allowedDimensions : undefined,
-    formulasByDimension: m.formulasByDimension && Object.keys(m.formulasByDimension).length > 0 ? m.formulasByDimension : undefined,
-    toggles: m.toggles,
-    notes: m.notes,
-    nodes: m.nodes,
-    edges: m.edges,
-  };
-}
-
-function validateMetric(m: Partial<L3Metric>): { ok: boolean; error?: string } {
-  if (!m.name?.trim()) return { ok: false, error: 'name is required' };
-  if (!m.formula?.trim()) return { ok: false, error: 'formula is required' };
-  if (!Array.isArray(m.sourceFields) || m.sourceFields.length === 0)
-    return { ok: false, error: 'at least one source field is required' };
-  for (const sf of m.sourceFields) {
-    if (!sf.layer || !sf.table?.trim() || !sf.field?.trim())
-      return { ok: false, error: 'each source field must have layer, table, and field' };
-    if (sf.layer !== 'L1' && sf.layer !== 'L2')
-      return { ok: false, error: 'source field layer must be L1 or L2' };
-  }
-  if (m.page && !PAGES.includes(m.page as DashboardPage))
-    return { ok: false, error: `page must be one of: ${PAGES.join(', ')}` };
-  if (m.metricType && !METRIC_TYPES.includes(m.metricType as MetricType))
-    return { ok: false, error: `metricType must be one of: ${METRIC_TYPES.join(', ')}` };
-  return { ok: true };
-}
+import type { L3Metric } from '@/data/l3-metrics';
+import { normalizeMetric, validateMetric } from '@/lib/metrics-calculation';
 
 /** GET one metric */
 export async function GET(

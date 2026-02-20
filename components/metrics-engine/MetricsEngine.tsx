@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import MetricsEngineLayout, { type MetricWithSource, type ImportResultState } from './MetricsEngineLayout';
 import type { L3Metric, DashboardPage } from '@/data/l3-metrics';
+import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type MetricPayload = Partial<L3Metric>;
@@ -31,8 +32,13 @@ export default function MetricsEngine() {
 
   useEffect(() => { fetchMetrics(); }, []);
 
+  const deepDiveMetrics = useMemo(
+    () => metrics.filter((m) => isDeepDiveMetric(m.id)),
+    [metrics]
+  );
+
   const filtered = useMemo(() => {
-    let list = metrics;
+    let list = deepDiveMetrics;
     if (filterPage !== 'all') list = list.filter(m => m.page === filterPage);
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -44,7 +50,7 @@ export default function MetricsEngine() {
       );
     }
     return list;
-  }, [metrics, filterPage, search]);
+  }, [deepDiveMetrics, filterPage, search]);
 
   const sections = useMemo(() => {
     const map = new Map<string, MetricWithSource[]>();
@@ -56,8 +62,23 @@ export default function MetricsEngine() {
     return map;
   }, [filtered]);
 
-  const selectedMetric = selectedId ? metrics.find(m => m.id === selectedId) ?? null : null;
+  const selectedMetric = selectedId ? deepDiveMetrics.find(m => m.id === selectedId) ?? null : null;
   const selectedSource = selectedMetric ? (selectedMetric as MetricWithSource).source : null;
+
+  useEffect(() => {
+    if (!selectedId) return;
+    if (!deepDiveMetrics.some((m) => m.id === selectedId)) {
+      setSelectedId(null);
+      setView('list');
+    }
+  }, [selectedId, deepDiveMetrics]);
+
+  // Keep navigation predictable when switching views on long pages.
+  useEffect(() => {
+    if (view === 'detail' || view === 'edit' || view === 'create') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [view, selectedId]);
 
   const handleSaveCreate = async (payload: MetricPayload) => {
     const res = await fetch('/api/metrics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -99,7 +120,7 @@ export default function MetricsEngine() {
 
   return (
     <MetricsEngineLayout
-      metrics={metrics}
+      metrics={deepDiveMetrics}
       loading={loading}
       filterPage={filterPage}
       setFilterPage={setFilterPage}

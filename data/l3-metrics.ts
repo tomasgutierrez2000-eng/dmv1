@@ -88,6 +88,8 @@ export interface L3Metric {
   allowedDimensions?: CalculationDimension[];
   /** Formula (and optional formulaSQL) per calculation dimension. Overrides metrics_dimensions_filled when set. */
   formulasByDimension?: Partial<Record<CalculationDimension, { formula: string; formulaSQL?: string }>>;
+  /** Display name when viewing the metric at each dimension (e.g. "Counterparty # Loans"). */
+  displayNameByDimension?: Partial<Record<CalculationDimension, string>>;
   toggles?: string[];
   notes?: string;
   // Detailed lineage — only populated for key metrics with visual DAGs

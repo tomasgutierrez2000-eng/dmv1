@@ -1,11 +1,13 @@
 /**
- * Single source of truth for metrics: all metrics are stored in data/metrics-custom.json.
- * No separate "built-in" vs "custom" — one merged list.
+ * Metrics source: when data/metrics_dimensions_filled.xlsx exists, it is the source of truth (replaces list).
+ * Otherwise metrics are read from data/metrics-custom.json.
  */
 
 import fs from 'fs';
 import path from 'path';
 import type { L3Metric } from '@/data/l3-metrics';
+import { loadMetricsFromExcel } from './metrics-from-excel';
+import { DEEP_DIVE_SEED_METRICS } from './deep-dive/seed-metrics';
 
 const METRICS_PATH = path.join(process.cwd(), 'data', 'metrics-custom.json');
 
@@ -50,7 +52,14 @@ export function nextCustomMetricId(existing: L3Metric[]): string {
   return `C${String(max + 1).padStart(3, '0')}`;
 }
 
-/** All metrics (single source: JSON file). */
+/** All metrics: from Excel if data/metrics_dimensions_filled.xlsx exists, else from JSON. */
 export function getMergedMetrics(): L3Metric[] {
-  return readCustomMetrics();
+  const fromExcel = loadMetricsFromExcel();
+  const base = fromExcel && fromExcel.length > 0 ? fromExcel : readCustomMetrics();
+
+  // Ensure deep-dive seed metrics (C100..C107) are always available.
+  const byId = new Map<string, L3Metric>();
+  for (const m of base) byId.set(m.id, m);
+  for (const m of DEEP_DIVE_SEED_METRICS) byId.set(m.id, m);
+  return Array.from(byId.values());
 }

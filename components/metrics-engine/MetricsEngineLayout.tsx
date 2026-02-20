@@ -156,13 +156,15 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
           </Link>
           <h1 className="text-sm font-bold flex items-center gap-2">
             <Layers className="w-4 h-4 text-purple-400" />
-            Metrics Engine
+            Metric Deep Dive
           </h1>
+          <p className="text-[11px] text-gray-500 mt-1">8 deep-dive metrics</p>
         </div>
         <div className="p-3 border-b border-white/[0.04]">
           <select
             value={filterPage}
             onChange={handleFilterPageChange}
+            aria-label="Filter deep-dive metrics by page"
             className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500/40"
           >
             <option value="all">All pages</option>
@@ -179,11 +181,12 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search metrics..."
+              aria-label="Search deep-dive metrics"
               className="w-full pl-8 pr-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-500/40"
             />
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto py-2">
+        <div className="flex-1 overflow-y-auto overscroll-contain py-2">
           {loading ? (
             <div className="px-4 py-6 text-center text-gray-500 text-sm">Loading...</div>
           ) : (
@@ -199,6 +202,8 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                       <button
                         key={m.id}
                         onClick={() => { setSelectedId(m.id); setView('detail'); }}
+                        aria-current={isSelected ? 'page' : undefined}
+                        aria-label={`Open ${m.id} ${m.name}`}
                         className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
                       >
                         <span className="text-[10px] font-mono text-gray-500 w-8 flex-shrink-0">{m.id}</span>
@@ -210,7 +215,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                   })}
                 </div>
               ))}
-              {filtered.length === 0 && !loading && <div className="px-4 py-6 text-center text-gray-500 text-sm">No metrics match</div>}
+              {filtered.length === 0 && !loading && <div className="px-4 py-6 text-center text-gray-500 text-sm">No deep-dive metrics match</div>}
             </div>
           )}
         </div>
@@ -293,9 +298,9 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
           {view === 'list' && (
             <>
               <header className="mb-6">
-                <h2 className="text-lg font-bold text-white">All metrics</h2>
+                <h2 className="text-lg font-bold text-white">Deep-dive metrics</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}{filterPage !== 'all' && ` on ${filterPage}`}. Click a metric to see formula and lineage; use the dimension dropdown to view by level (Counterparty, Facility, L1, L2, L3).
+                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}{filterPage !== 'all' && ` on ${filterPage}`}. Click a metric to validate calculations with sample data across Facility, Counterparty, L3 Desk, L2 Portfolio, and L1 Department.
                 </p>
               </header>
               <div className="space-y-4">
@@ -310,6 +315,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                           <button
                             key={m.id}
                             onClick={() => { setSelectedId(m.id); setView('detail'); }}
+                            aria-label={`Open deep-dive metric ${m.id} ${m.name}`}
                             className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04] text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:border-purple-500/30"
                           >
                             <span className="text-gray-500 flex-shrink-0 mt-0.5">{getMetricTypeIcon(m.metricType)}</span>

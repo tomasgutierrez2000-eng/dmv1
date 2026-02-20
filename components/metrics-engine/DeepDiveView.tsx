@@ -9,6 +9,7 @@ import {
   type CalculationDimension,
 } from '@/data/l3-metrics';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
+import { getFormulaForDimension, type MetricDimensionFormulaRow } from '@/data/metrics_dimensions_filled';
 import type { L3Metric } from '@/data/l3-metrics';
 
 type RunResult =
@@ -55,13 +56,33 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showSql, setShowSql] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaRow[] | null>(null);
   const cacheRef = useRef<Map<string, RunResult>>(new Map());
   const abortRef = useRef<AbortController | null>(null);
   const latestResultRef = useRef<RunResult | null>(null);
 
+  useEffect(() => {
+    fetch('/api/metrics-dimensions-filled')
+      .then((res) => res.json())
+      .then((data: { formulas?: MetricDimensionFormulaRow[] }) => setFormulasFromApi(data.formulas ?? null))
+      .catch(() => setFormulasFromApi(null));
+  }, []);
+
+  const dimensionFormulaFromMetric = metric.formulasByDimension?.[dimension];
+  const matchKeys = [metric.id, metric.name].filter(Boolean);
+  const dimensionFormulaFromApi = formulasFromApi
+    ? formulasFromApi.find(
+        (r) =>
+          r.dimension === dimension &&
+          matchKeys.some((k) => k && String(k).trim() === String(r.metricId).trim())
+      )
+    : null;
+  const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, dimension);
   const resolvedFormula = resolveFormulaForDimension(metric, dimension, { allowLegacyFallback: true });
-  const displayFormula = resolvedFormula?.formula ?? metric.formula;
-  const displayFormulaSQL = resolvedFormula?.formulaSQL ?? metric.formulaSQL;
+  const dimensionFormula = dimensionFormulaFromMetric ?? dimensionFormulaFromApi ?? dimensionFormulaFromStatic ?? resolvedFormula;
+  const displayFormula = dimensionFormula?.formula ?? metric.formula;
+  const displayFormulaSQL = dimensionFormula?.formulaSQL ?? metric.formulaSQL;
+  const displayName = metric.displayNameByDimension?.[dimension] ?? metric.name;
   const needsAsOfDate = Boolean(displayFormulaSQL?.includes(':as_of_date'));
 
   const cacheKey = `${metric.id}\t${dimension}\t${asOfDate ?? ''}`;
@@ -174,7 +195,7 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
             </span>
           )}
         </div>
-        <h1 className="text-xl font-bold text-white">{metric.name}</h1>
+        <h1 className="text-xl font-bold text-white">{displayName}</h1>
         {metric.description && (
           <p className="text-sm text-gray-400 mt-2 leading-relaxed">{metric.description}</p>
         )}

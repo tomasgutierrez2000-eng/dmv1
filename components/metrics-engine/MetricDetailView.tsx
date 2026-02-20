@@ -13,6 +13,7 @@ import {
 } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
+import { getFormulaForDimension, type MetricDimensionFormulaRow } from '@/data/metrics_dimensions_filled';
 import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
 import type { L3Metric, MetricType, DimensionInteraction } from '@/data/l3-metrics';
@@ -70,13 +71,34 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
     setSelectedDimension(allowedDimensions[0]);
   }, [metric.id, allowedDimensions, selectedDimension]);
 
-  const withLineage = metricWithLineage(metric, selectedDimension);
+  const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaRow[] | null>(null);
+  useEffect(() => {
+    fetch('/api/metrics-dimensions-filled')
+      .then((res) => res.json())
+      .then((data: { formulas?: MetricDimensionFormulaRow[] }) => setFormulasFromApi(data.formulas ?? null))
+      .catch(() => setFormulasFromApi(null));
+  }, []);
+
   const pageInfo = DASHBOARD_PAGES.find(p => p.id === metric.page);
-  // Keep formula display aligned with backend calculation engine precedence.
+  const dimensionFormulaFromMetric = metric.formulasByDimension?.[selectedDimension];
+  const matchKeys = [metric.id, metric.name].filter(Boolean);
+  const dimensionFormulaFromApi = formulasFromApi
+    ? formulasFromApi.find(
+        (r) =>
+          r.dimension === selectedDimension &&
+          matchKeys.some((k) => k && String(k).trim() === String(r.metricId).trim())
+      )
+    : null;
+  const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, selectedDimension);
   const resolvedFormula = resolveFormulaForDimension(metric, selectedDimension, { allowLegacyFallback: true });
-  const displayFormula = resolvedFormula?.formula ?? metric.formula;
-  const displayFormulaSQL = resolvedFormula?.formulaSQL ?? metric.formulaSQL;
+  const dimensionFormula = dimensionFormulaFromMetric ?? dimensionFormulaFromApi ?? dimensionFormulaFromStatic ?? resolvedFormula;
+  const displayFormula = dimensionFormula?.formula ?? metric.formula;
+  const displayFormulaSQL = dimensionFormula?.formulaSQL ?? metric.formulaSQL;
   const displayName = metric.displayNameByDimension?.[selectedDimension] ?? metric.name;
+  const withLineage = metricWithLineage(
+    { ...metric, formula: displayFormula, formulaSQL: displayFormulaSQL },
+    selectedDimension
+  );
 
   return (
     <div className="max-w-4xl mx-auto">

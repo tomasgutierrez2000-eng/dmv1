@@ -20,14 +20,6 @@ export function resolveFormulaForDimension(
     };
   }
 
-  if (metric.formula?.trim() || metric.formulaSQL?.trim()) {
-    return {
-      formula: metric.formula,
-      formulaSQL: metric.formulaSQL,
-      source: 'metric-base',
-    };
-  }
-
   if (options?.allowLegacyFallback) {
     const legacy = getFormulaForDimension(metric.id, dimension);
     if (legacy?.formula?.trim() || legacy?.formulaSQL?.trim()) {
@@ -37,6 +29,14 @@ export function resolveFormulaForDimension(
         source: 'legacy-fallback',
       };
     }
+  }
+
+  if (metric.formula?.trim() || metric.formulaSQL?.trim()) {
+    return {
+      formula: metric.formula,
+      formulaSQL: metric.formulaSQL,
+      source: 'metric-base',
+    };
   }
 
   return null;

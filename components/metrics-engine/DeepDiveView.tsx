@@ -42,6 +42,10 @@ interface MetricDimensionFormulaApiRow {
   laymanFormula?: string;
 }
 
+function normalizeMatchKey(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
 const DEEP_DIVE_LEVEL_LABELS: Record<CalculationDimension, string> = {
   facility: 'Facility',
   counterparty: 'Counterparty',
@@ -72,19 +76,19 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
   const latestResultRef = useRef<RunResult | null>(null);
 
   useEffect(() => {
-    fetch('/api/metrics-dimensions-filled')
+    fetch('/api/metrics-dimensions-filled', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data: { formulas?: MetricDimensionFormulaApiRow[] }) => setFormulasFromApi(data.formulas ?? null))
       .catch(() => setFormulasFromApi(null));
   }, []);
 
   const dimensionFormulaFromMetric = metric.formulasByDimension?.[dimension];
-  const matchKeys = [metric.id, metric.name].filter(Boolean);
+  const matchKeys = [metric.id, metric.name].filter(Boolean).map(normalizeMatchKey);
   const dimensionFormulaFromApi = formulasFromApi
     ? formulasFromApi.find(
         (r) =>
           r.dimension === dimension &&
-          matchKeys.some((k) => k && String(k).trim() === String(r.metricId).trim())
+          matchKeys.some((k) => k === normalizeMatchKey(String(r.metricId)))
       )
     : null;
   const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, dimension);

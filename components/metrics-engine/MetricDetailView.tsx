@@ -68,6 +68,10 @@ interface MetricDimensionFormulaApiRow {
   laymanFormula?: string;
 }
 
+function normalizeMatchKey(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
 /** Dimensions at which this metric can be calculated. Defaults to all if not specified. */
 function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
   if (metric.allowedDimensions && metric.allowedDimensions.length > 0) {
@@ -90,7 +94,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
 
   const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaApiRow[] | null>(null);
   useEffect(() => {
-    fetch('/api/metrics-dimensions-filled')
+    fetch('/api/metrics-dimensions-filled', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data: { formulas?: MetricDimensionFormulaApiRow[] }) => setFormulasFromApi(data.formulas ?? null))
       .catch(() => setFormulasFromApi(null));
@@ -98,12 +102,12 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
 
   const pageInfo = DASHBOARD_PAGES.find(p => p.id === metric.page);
   const dimensionFormulaFromMetric = metric.formulasByDimension?.[selectedDimension];
-  const matchKeys = [metric.id, metric.name].filter(Boolean);
+  const matchKeys = [metric.id, metric.name].filter(Boolean).map(normalizeMatchKey);
   const dimensionFormulaFromApi = formulasFromApi
     ? formulasFromApi.find(
         (r) =>
           r.dimension === selectedDimension &&
-          matchKeys.some((k) => k && String(k).trim() === String(r.metricId).trim())
+          matchKeys.some((k) => k === normalizeMatchKey(String(r.metricId)))
       )
     : null;
   const dimensionFormulaFromStatic = getFormulaForDimension(metric.id, selectedDimension);

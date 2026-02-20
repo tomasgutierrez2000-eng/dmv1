@@ -4,6 +4,8 @@ import fs from 'fs';
 import type { CalculationDimension } from '@/data/l3-metrics';
 import { METRICS_DIMENSIONS_FILLED } from '@/data/metrics_dimensions_filled';
 
+export const dynamic = 'force-dynamic';
+
 export interface MetricDimensionFormulaRow {
   metricId: string;
   dimension: CalculationDimension;

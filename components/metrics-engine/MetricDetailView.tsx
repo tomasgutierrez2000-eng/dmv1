@@ -15,7 +15,7 @@ import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-re
 import { getFormulaForDimension } from '@/data/metrics_dimensions_filled';
 import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
-import type { L3Metric, MetricType, DimensionInteraction } from '@/data/l3-metrics';
+import type { L3Metric, MetricType, DimensionInteraction, SourceField } from '@/data/l3-metrics';
 
 const LAYER_STYLE: Record<string, { bg: string; border: string; text: string }> = {
   L1:        { bg: 'bg-blue-950/60',    border: 'border-blue-500/40',    text: 'text-blue-300' },
@@ -66,6 +66,8 @@ interface MetricDimensionFormulaApiRow {
   definition?: string;
   dashboardDisplayName?: string;
   laymanFormula?: string;
+  lineageNarrative?: string;
+  sourceFields?: SourceField[];
 }
 
 function normalizeMatchKey(value: string): string {
@@ -118,8 +120,17 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
   const displayLaymanFormula = dimensionFormulaFromApi?.laymanFormula;
   const displayName = metric.displayNameByDimension?.[selectedDimension] ?? dimensionFormulaFromApi?.dashboardDisplayName ?? metric.name;
   const displayDescription = dimensionFormulaFromApi?.definition ?? metric.description;
+  const displaySourceFields = dimensionFormulaFromApi?.sourceFields?.length ? dimensionFormulaFromApi.sourceFields : metric.sourceFields;
+  const displayLineageNarrative = dimensionFormulaFromApi?.lineageNarrative;
   const withLineage = metricWithLineage(
-    { ...metric, name: displayName, description: displayDescription, formula: displayFormula, formulaSQL: displayFormulaSQL },
+    {
+      ...metric,
+      name: displayName,
+      description: displayDescription,
+      formula: displayFormula,
+      formulaSQL: displayFormulaSQL,
+      sourceFields: displaySourceFields,
+    },
     selectedDimension
   );
 
@@ -231,7 +242,7 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           Inputs (source fields)
         </h2>
         <div className="flex flex-wrap gap-2">
-          {metric.sourceFields.map((sf, i) => {
+          {displaySourceFields.map((sf, i) => {
             const s = LAYER_STYLE[sf.layer];
             return (
               <div
@@ -307,6 +318,11 @@ export default function MetricDetailView({ metric, source, onEdit, onBack, onDup
           <div className="bg-black/10 rounded-lg p-4 border border-white/5">
             <LineageFlowView metric={withLineage} />
           </div>
+          {displayLineageNarrative && (
+            <p className="text-xs text-gray-400 mt-3 leading-relaxed whitespace-pre-wrap">
+              {displayLineageNarrative}
+            </p>
+          )}
         </section>
       )}
 

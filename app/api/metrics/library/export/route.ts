@@ -94,6 +94,11 @@ export async function GET() {
     'source_variant_identifier',
     'source_payload_spec',
     'source_setup_validation_notes',
+    'atomic_sourcing_level',
+    'reconciliation_anchor_levels',
+    'sourcing_level_rationale',
+    'sourcing_do_not_source',
+    'sourcing_category',
     'data_format',
     'data_lag',
   ];
@@ -137,6 +142,11 @@ export async function GET() {
     v.source_variant_identifier ?? '',
     Array.isArray(v.source_payload_spec) ? JSON.stringify(v.source_payload_spec) : '',
     v.source_setup_validation_notes ?? '',
+    v.atomic_sourcing_level ?? '',
+    Array.isArray(v.reconciliation_anchor_levels) ? v.reconciliation_anchor_levels.join(', ') : '',
+    v.sourcing_level_rationale ?? '',
+    v.sourcing_do_not_source ?? '',
+    v.sourcing_category ?? '',
     v.data_format ?? '',
     v.data_lag ?? '',
   ]);

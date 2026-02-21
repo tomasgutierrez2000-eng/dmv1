@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, type ComponentType } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Pencil, Check, X, Lock, RefreshCw, Settings } from 'lucide-react';
+import { ExternalLink, Pencil, Check, X, Lock, RefreshCw, Settings, Copy, LayoutDashboard } from 'lucide-react';
 import type { MetricVariant } from '@/lib/metric-library/types';
 import { ROLLUP_HIERARCHY_LEVELS, ROLLUP_LEVEL_LABELS } from '@/lib/metric-library/types';
 import {
@@ -85,6 +85,18 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [editForm, setEditForm] = useState<Partial<MetricVariant>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyToClipboard = useCallback((text: string, id: string) => {
+    if (!text.trim()) return;
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+      },
+      () => {}
+    );
+  }, []);
 
   const fetchData = useCallback(() => {
     setError(null);
@@ -389,7 +401,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                               calculation_authority_tier: (e.target.value || undefined) as MetricVariant['calculation_authority_tier'],
                             }))
                           }
-                          className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                           aria-describedby="calc-tier-current-desc"
                         >
                           <option value="">Not set</option>
@@ -412,7 +424,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                               calculation_authority_tier_future: (e.target.value || undefined) as MetricVariant['calculation_authority_tier_future'],
                             }))
                           }
-                          className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         >
                           <option value="">Not set</option>
                           <option value="T1">T1</option>
@@ -456,7 +468,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                           setEditForm((f) => ({ ...f, expected_gsib_data_source: e.target.value || undefined }))
                         }
                         placeholder="e.g. Basel Engine, Risk DW, Spreading system"
-                        className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         aria-describedby="expected-gsib-desc"
                       />
                     ) : (
@@ -475,7 +487,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                             setEditForm((f) => ({ ...f, calculation_authority_rationale: e.target.value || undefined }))
                           }
                           rows={3}
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         />
                       ) : (
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">
@@ -490,7 +502,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                             setEditForm((f) => ({ ...f, calculation_authority_components: e.target.value || undefined }))
                           }
                           rows={2}
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         />
                       ) : (
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">
@@ -507,7 +519,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                             setEditForm((f) => ({ ...f, calculation_authority_future_evolution: e.target.value || undefined }))
                           }
                           rows={3}
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         />
                       ) : (
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">
@@ -523,7 +535,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                             setEditForm((f) => ({ ...f, calculation_authority_migration_path: e.target.value || undefined }))
                           }
                           placeholder="e.g. T1 → T2 when CDS data is ingested"
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         />
                       ) : (
                         <p className="text-sm font-medium" style={v.calculation_authority_migration_path && tierConfig ? { color: tierConfig.color } : undefined}>
@@ -553,10 +565,31 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             aria-labelledby="variant-tab-sourceIngestion-btn"
             className="space-y-6"
           >
+            {!editing && !v.expected_gsib_data_source && !v.source_system && !v.source_endpoint_or_feed && (
+              <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/50 p-6 text-center">
+                <p className="text-sm font-medium text-blue-900 mb-2">Connect this metric to a source system</p>
+                <p className="text-xs text-blue-700 mb-4 max-w-md mx-auto">
+                  Set the source name, delivery (Push or Pull), endpoint, and connection instructions so your team can plug in the feed.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { setEditing(true); setEditForm({ ...v }); setSaveError(null); }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
+                  aria-label="Connect source — open edit mode to set source, delivery, endpoint, and instructions"
+                >
+                  <Pencil className="w-4 h-4" aria-hidden />
+                  Connect source
+                </button>
+              </div>
+            )}
+
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Link to source</h2>
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-gray-500 mb-1">
                 Where this metric comes from and how to connect. Push = source sends to us; Pull = we request from source.
+              </p>
+              <p className="text-xs text-gray-400 mb-4">
+                To connect: set Source → Delivery → Endpoint → paste Instructions below.
               </p>
 
               <div className="space-y-4">
@@ -617,7 +650,26 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                       className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                     />
                   ) : (
-                    <p className="text-sm font-mono text-gray-700">{v.source_endpoint_or_feed ?? '—'}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-mono text-gray-700 flex-1 min-w-0 truncate" title={v.source_endpoint_or_feed ?? undefined}>
+                        {v.source_endpoint_or_feed ?? '—'}
+                      </p>
+                      {v.source_endpoint_or_feed && (
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(v.source_endpoint_or_feed!, 'endpoint')}
+                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          aria-label="Copy endpoint"
+                          title="Copy endpoint"
+                        >
+                          {copiedId === 'endpoint' ? (
+                            <span className="text-xs text-emerald-600 font-medium">Copied!</span>
+                          ) : (
+                            <Copy className="w-4 h-4" aria-hidden />
+                          )}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -635,9 +687,26 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                       className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                     />
                   ) : (
-                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded-lg p-3 border border-gray-100">
-                      {v.source_setup_validation_notes ?? '—'}
-                    </pre>
+                    <div className="relative">
+                      <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded-lg p-3 border border-gray-100 pr-12">
+                        {v.source_setup_validation_notes ?? '—'}
+                      </pre>
+                      {v.source_setup_validation_notes && (
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(v.source_setup_validation_notes!, 'instructions')}
+                          className="absolute top-2 right-2 p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          aria-label="Copy instructions and code"
+                          title="Copy instructions"
+                        >
+                          {copiedId === 'instructions' ? (
+                            <span className="text-xs text-emerald-600 font-medium">Copied!</span>
+                          ) : (
+                            <Copy className="w-4 h-4" aria-hidden />
+                          )}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -657,7 +726,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                             setEditForm((f) => ({ ...f, source_variant_identifier: e.target.value || undefined }))
                           }
                           placeholder="e.g. product_type=CRE"
-                          className="block w-full rounded border border-gray-300 px-2 py-1 text-sm font-mono"
+                          className="block w-full rounded border border-gray-300 px-2 py-1 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                         />
                       ) : (
                         v.source_variant_identifier ?? '—'
@@ -695,11 +764,6 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               </div>
             </div>
 
-            {!editing && !v.source_integration_pattern && !v.expected_gsib_data_source && !v.source_system && (
-              <p className="text-gray-500 text-sm">
-                No source linked. Click Edit to add source, delivery (Push/Pull), and instructions.
-              </p>
-            )}
           </section>
         )}
 
@@ -753,25 +817,121 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             id="variant-tab-usage"
             role="tabpanel"
             aria-labelledby="variant-tab-usage-btn"
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="space-y-6"
           >
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Dashboards & Reports</h2>
-              {(v.used_by_dashboards?.length ?? v.used_by_reports?.length ?? 0) > 0 ? (
-                <ul className="divide-y divide-gray-100">
-                  {[...(v.used_by_dashboards ?? []), ...(v.used_by_reports ?? [])].map((u, i) => (
-                    <li key={i} className="flex items-center gap-2 py-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" aria-hidden />
-                      <span className="text-sm text-gray-700">{u}</span>
-                    </li>
-                  ))}
-                </ul>
+              <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Use in dashboard</h2>
+              <p className="text-xs text-gray-500 mb-3">
+                Add this metric to a dashboard by using its ID when configuring the dashboard or data source.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <code className="text-sm font-mono bg-gray-100 text-gray-800 px-3 py-1.5 rounded border border-gray-200">
+                  {v.variant_id}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(v.variant_id, 'variant-id')}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  aria-label={copiedId === 'variant-id' ? 'Copied to clipboard' : 'Copy metric ID to clipboard'}
+                >
+                  {copiedId === 'variant-id' ? (
+                    <span className="text-emerald-600">Copied!</span>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" aria-hidden />
+                      Copy metric ID
+                    </>
+                  )}
+                </button>
+                <Link
+                  href="/overview"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  aria-label="Open overview and dashboards"
+                >
+                  <LayoutDashboard className="w-4 h-4" aria-hidden />
+                  Open overview
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Used in</h2>
+              <p className="text-xs text-gray-500 mb-3">
+                Record which dashboards and reports use this metric (optional).
+              </p>
+              {editing ? (
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="used-by-dashboards" className="block text-xs font-medium text-gray-600 mb-1">Dashboards</label>
+                    <input
+                      id="used-by-dashboards"
+                      type="text"
+                      value={(editForm.used_by_dashboards ?? v.used_by_dashboards ?? []).join(', ')}
+                      onChange={(e) =>
+                        setEditForm((f) => ({
+                          ...f,
+                          used_by_dashboards: e.target.value ? e.target.value.split(',').map((s) => s.trim()).filter(Boolean) : [],
+                        }))
+                      }
+                      placeholder="e.g. CRO Dashboard, Risk Appetite"
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="used-by-reports" className="block text-xs font-medium text-gray-600 mb-1">Reports</label>
+                    <input
+                      id="used-by-reports"
+                      type="text"
+                      value={(editForm.used_by_reports ?? v.used_by_reports ?? []).join(', ')}
+                      onChange={(e) =>
+                        setEditForm((f) => ({
+                          ...f,
+                          used_by_reports: e.target.value ? e.target.value.split(',').map((s) => s.trim()).filter(Boolean) : [],
+                        }))
+                      }
+                      placeholder="e.g. FR Y-14Q, Pillar 3"
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
+                    />
+                  </div>
+                </div>
               ) : (
-                <p className="text-sm text-gray-500">—</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-500 mb-2">Dashboards</h3>
+                    {(v.used_by_dashboards?.length ?? 0) > 0 ? (
+                      <ul className="space-y-1">
+                        {v.used_by_dashboards!.map((u, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" aria-hidden />
+                            {u}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-gray-500">—</p>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-500 mb-2">Reports</h3>
+                    {(v.used_by_reports?.length ?? 0) > 0 ? (
+                      <ul className="space-y-1">
+                        {v.used_by_reports!.map((r, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" aria-hidden />
+                            {r}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-gray-500">—</p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
+
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Regulatory References</h2>
+              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Regulatory references</h2>
               {(v.regulatory_references?.length ?? 0) > 0 ? (
                 <ul className="divide-y divide-gray-100">
                   {v.regulatory_references!.map((r, i) => (

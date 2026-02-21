@@ -105,6 +105,12 @@ CREATE TABLE IF NOT EXISTS metric_library.metric_variants (
     source_payload_spec                JSONB DEFAULT '[]',
     source_setup_validation_notes     TEXT,
 
+    atomic_sourcing_level             VARCHAR(32) CHECK (atomic_sourcing_level IN ('facility','counterparty','desk','portfolio','lob')),
+    reconciliation_anchor_levels      JSONB DEFAULT '[]',
+    sourcing_level_rationale          TEXT,
+    sourcing_do_not_source            TEXT,
+    sourcing_category                 VARCHAR(32) CHECK (sourcing_category IN ('obligor','facility','facility_with_exceptions','dual_level','flexible_level','configuration')),
+
     version_history         JSONB DEFAULT '[]',
     created_at              TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at              TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -115,4 +121,9 @@ CREATE INDEX IF NOT EXISTS idx_metric_variants_status ON metric_library.metric_v
 CREATE INDEX IF NOT EXISTS idx_metric_variants_executable ON metric_library.metric_variants(executable_metric_id) WHERE executable_metric_id IS NOT NULL;
 
 COMMENT ON COLUMN metric_library.metric_variants.expected_gsib_data_source IS 'GSIB system/database/feed from which this metric is sourced; drives integration design.';
+COMMENT ON COLUMN metric_library.metric_variants.atomic_sourcing_level IS 'Dimension at which the bank provides this metric (facility, counterparty, desk, portfolio, lob); drives feed grain and join key.';
+COMMENT ON COLUMN metric_library.metric_variants.reconciliation_anchor_levels IS 'Levels where we also source an aggregate from the bank for reconciliation (e.g. portfolio total).';
+COMMENT ON COLUMN metric_library.metric_variants.sourcing_level_rationale IS 'Why we source at this level (e.g. PD is obligor-level; one per counterparty).';
+COMMENT ON COLUMN metric_library.metric_variants.sourcing_do_not_source IS 'What NOT to source (e.g. do not source desk-level WAvg PD; we compute it).';
+COMMENT ON COLUMN metric_library.metric_variants.sourcing_category IS 'Sourcing category for display and filtering: obligor, facility, facility_with_exceptions, dual_level, flexible_level, configuration.';
 COMMENT ON SCHEMA metric_library IS 'GSIB Metric Library: governed definitions, variants, rollup, and lineage';

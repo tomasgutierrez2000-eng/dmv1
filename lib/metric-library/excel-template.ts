@@ -78,6 +78,11 @@ export const COLUMN_ALIASES: Record<string, string[][]> = {
   source_variant_identifier: [['source_variant_identifier', 'source variant identifier', 'variant identifier']],
   source_payload_spec: [['source_payload_spec', 'source payload spec', 'payload spec']],
   source_setup_validation_notes: [['source_setup_validation_notes', 'source setup validation notes', 'setup validation notes']],
+  atomic_sourcing_level: [['atomic_sourcing_level', 'atomic sourcing level', 'sourcing level']],
+  reconciliation_anchor_levels: [['reconciliation_anchor_levels', 'reconciliation anchor levels', 'anchor levels']],
+  sourcing_level_rationale: [['sourcing_level_rationale', 'sourcing level rationale', 'sourcing rationale']],
+  sourcing_do_not_source: [['sourcing_do_not_source', 'sourcing do not source', 'do not source']],
+  sourcing_category: [['sourcing_category', 'sourcing category', 'sourcing category']],
   data_format: [['data_format', 'data format']],
   data_lag: [['data_lag', 'data lag']],
 };

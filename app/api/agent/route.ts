@@ -160,7 +160,7 @@ async function runClaudeAgent(params: {
 /** Request body for POST /api/agent. */
 interface AgentRequestBody {
   message?: string;
-  messages?: Array<{ role: string; content: string }>;
+  messages?: Array<{ role: 'user' | 'model'; content: string }>;
 }
 
 /**
@@ -194,10 +194,19 @@ export async function POST(request: NextRequest) {
   }
 
   const message = body.message;
-  const messages = body.messages;
-
+  const rawMessages = body.messages;
+  let validatedMessages: Array<{ role: 'user' | 'model'; content: string }> | undefined;
+  if (Array.isArray(rawMessages) && rawMessages.length > 0) {
+    validatedMessages = rawMessages
+      .filter((m): m is { role: 'user' | 'model'; content: string } =>
+        m != null && typeof m === 'object' && typeof (m as { content?: unknown }).content === 'string')
+      .map((m) => ({
+        role: (m as { role?: string }).role === 'model' ? ('model' as const) : ('user' as const),
+        content: String((m as { content: string }).content),
+      }));
+  }
   const hasMessage = message && typeof message === 'string';
-  const hasMessages = Array.isArray(messages) && messages.length > 0;
+  const hasMessages = Array.isArray(validatedMessages) && validatedMessages.length > 0;
   if (!hasMessage && !hasMessages) {
     return NextResponse.json(
       { error: 'Provide "message" (string) or "messages" (array of { role, content })' },
@@ -212,7 +221,7 @@ export async function POST(request: NextRequest) {
 
     const timeoutMs = getAgentTimeoutMs();
     if (anthropicKey) {
-      return await runClaudeAgent({ anthropicKey, message, messages, systemPrompt, bundle, timeoutMs });
+      return await runClaudeAgent({ anthropicKey, message, messages: validatedMessages, systemPrompt, bundle, timeoutMs });
     }
     if (!apiKey) {
       return NextResponse.json(
@@ -223,7 +232,7 @@ export async function POST(request: NextRequest) {
 
     const contents: Content[] = hasMessage
       ? [createUserContent(message!)]
-      : messages!.map((m) =>
+      : validatedMessages!.map((m) =>
           m.role === 'model'
             ? { role: 'model' as const, parts: [{ text: m.content }] }
             : createUserContent(m.content)

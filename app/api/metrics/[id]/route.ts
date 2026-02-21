@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMergedMetrics, readCustomMetrics, writeCustomMetrics } from '@/lib/metrics-store';
+import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, isReadOnlyFsError } from '@/lib/metrics-store';
 import type { L3Metric } from '@/data/l3-metrics';
 import { normalizeMetric, validateMetric } from '@/lib/metrics-calculation';
 
@@ -42,7 +42,14 @@ export async function PUT(
   } else {
     custom.push(metric);
   }
-  writeCustomMetrics(custom);
+  try {
+    writeCustomMetrics(custom);
+  } catch (err) {
+    return NextResponse.json(
+      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
+      { status: 503 }
+    );
+  }
   return NextResponse.json({ ...metric, source: 'custom' });
 }
 
@@ -57,6 +64,13 @@ export async function DELETE(
   if (filtered.length === custom.length) {
     return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
   }
-  writeCustomMetrics(filtered);
+  try {
+    writeCustomMetrics(filtered);
+  } catch (err) {
+    return NextResponse.json(
+      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
+      { status: 503 }
+    );
+  }
   return new NextResponse(null, { status: 204 });
 }

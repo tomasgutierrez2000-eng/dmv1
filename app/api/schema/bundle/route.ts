@@ -22,8 +22,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(bundle);
   } catch (error) {
     console.error('[schema/bundle]', error);
+    const details = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Failed to build schema bundle' },
+      {
+        error: 'Failed to build schema bundle',
+        ...(process.env.NODE_ENV === 'development' && { details }),
+      },
       { status: 500 }
     );
   }

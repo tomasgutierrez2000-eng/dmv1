@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
+import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId, isReadOnlyFsError } from '@/lib/metrics-store';
 import { writeModelGaps } from '@/lib/model-gaps-store';
 import type { L3Metric, SourceField } from '@/data/l3-metrics';
 import {
@@ -177,7 +177,14 @@ export async function POST(request: NextRequest) {
   }
 
   if (replace) {
-    writeCustomMetrics(toImport);
+    try {
+      writeCustomMetrics(toImport);
+    } catch (err) {
+      return NextResponse.json(
+        { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
+        { status: 503 }
+      );
+    }
     return NextResponse.json({
       created: [],
       updated: [],
@@ -205,6 +212,13 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  writeCustomMetrics(custom);
+  try {
+    writeCustomMetrics(custom);
+  } catch (err) {
+    return NextResponse.json(
+      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
+      { status: 503 }
+    );
+  }
   return NextResponse.json(result);
 }

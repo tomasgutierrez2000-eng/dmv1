@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { EXCEL_TEMPLATE_COLUMN_MAPPING } from '../../../EXCEL_TEMPLATE_CONFIG';
+import { EXCEL_TEMPLATE_COLUMN_MAPPING } from '@/EXCEL_TEMPLATE_CONFIG';
 import { findColumnIndex, getDetectedColumns } from './column-mapping';
 
 interface FieldDefinition {
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
         errors.push('L1 sheet has no data rows');
       } else {
         // First row is headers - map to column indices
-        const headers = (jsonData[0] as any[]).map((h: any) => String(h || '').trim());
+        const headers = (jsonData[0] as unknown[]).map((h: unknown) => String(h ?? '').trim());
         const detectedColumns = getDetectedColumns(headers);
         
         try {
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
           const tableMap = new Map<string, { fields: FieldDefinition[]; category: string }>();
 
           for (let i = 1; i < jsonData.length; i++) {
-            const row = jsonData[i] as any[];
+            const row = jsonData[i] as unknown[];
             const tableName = row[tableNameIdx] ? String(row[tableNameIdx]).trim() : null;
             const fieldName = row[dataElementIdx] ? String(row[dataElementIdx]).trim() : null;
 
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
       if (jsonData.length < 2) {
         errors.push('L2 sheet has no data rows');
       } else {
-        const headers = (jsonData[0] as any[]).map((h: any) => String(h || '').trim());
+        const headers = (jsonData[0] as unknown[]).map((h: unknown) => String(h ?? '').trim());
         const detectedColumns = getDetectedColumns(headers);
         
         try {
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
           const tableMap = new Map<string, { fields: FieldDefinition[]; category: string }>();
 
           for (let i = 1; i < jsonData.length; i++) {
-            const row = jsonData[i] as any[];
+            const row = jsonData[i] as unknown[];
             const tableName = row[tableNameIdx] ? String(row[tableNameIdx]).trim() : null;
             const fieldName = row[dataElementIdx] ? String(row[dataElementIdx]).trim() : null;
 
@@ -358,7 +358,7 @@ export async function POST(request: NextRequest) {
       if (jsonData.length < 2) {
         errors.push('L3 sheet has no data rows');
       } else {
-        const headers = (jsonData[0] as any[]).map((h: any) => String(h || '').trim());
+        const headers = (jsonData[0] as unknown[]).map((h: unknown) => String(h ?? '').trim());
         const detectedColumns = getDetectedColumns(headers);
         
         try {
@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
           const tableMap = new Map<string, { fields: FieldDefinition[]; category: string }>();
 
           for (let i = 1; i < jsonData.length; i++) {
-            const row = jsonData[i] as any[];
+            const row = jsonData[i] as unknown[];
             const tableName = row[tableNameIdx] ? String(row[tableNameIdx]).trim() : null;
             const fieldName = row[fieldIdx] ? String(row[fieldIdx]).trim() : null;
 

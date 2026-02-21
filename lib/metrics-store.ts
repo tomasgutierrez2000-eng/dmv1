@@ -31,9 +31,18 @@ export function readCustomMetrics(): L3Metric[] {
     const raw = fs.readFileSync(METRICS_PATH, 'utf-8');
     const data = JSON.parse(raw) as CustomMetricsFile;
     return Array.isArray(data.metrics) ? data.metrics : [];
-  } catch {
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[metrics-store] readCustomMetrics parse failed:', err instanceof Error ? err.message : err);
+    }
     return [];
   }
+}
+
+/** True if the error indicates a read-only filesystem (e.g. Vercel). */
+export function isReadOnlyFsError(err: unknown): boolean {
+  const code = err instanceof Error ? (err as NodeJS.ErrnoException).code : undefined;
+  return code === 'EROFS' || code === 'EACCES';
 }
 
 export function writeCustomMetrics(metrics: L3Metric[]): void {
@@ -52,14 +61,15 @@ export function nextCustomMetricId(existing: L3Metric[]): string {
   return `C${String(max + 1).padStart(3, '0')}`;
 }
 
-/** All metrics: from Excel if data/metrics_dimensions_filled.xlsx exists, else from JSON. */
+/** All metrics: Excel (if present) + custom JSON merged by id. Custom metrics always appear. */
 export function getMergedMetrics(): L3Metric[] {
   const fromExcel = loadMetricsFromExcel();
-  const base = fromExcel && fromExcel.length > 0 ? fromExcel : readCustomMetrics();
+  const base = fromExcel && fromExcel.length > 0 ? fromExcel : [];
+  const custom = readCustomMetrics();
 
-  // Ensure deep-dive seed metrics (C100..C107) are always available.
   const byId = new Map<string, L3Metric>();
   for (const m of base) byId.set(m.id, m);
+  for (const m of custom) byId.set(m.id, m);
   for (const m of DEEP_DIVE_SEED_METRICS) byId.set(m.id, m);
   return Array.from(byId.values());
 }

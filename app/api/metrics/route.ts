@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
+import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, nextCustomMetricId, isReadOnlyFsError } from '@/lib/metrics-store';
 import type { L3Metric, DashboardPage } from '@/data/l3-metrics';
 import { normalizeMetric, PAGES, validateMetric } from '@/lib/metrics-calculation';
 
@@ -49,6 +49,13 @@ export async function POST(request: NextRequest) {
 
   const metric = normalizeMetric(body, id);
   custom.push(metric);
-  writeCustomMetrics(custom);
+  try {
+    writeCustomMetrics(custom);
+  } catch (err) {
+    return NextResponse.json(
+      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem). Use a local build or import/export to persist.' : 'Failed to write metrics.' },
+      { status: 503 }
+    );
+  }
   return NextResponse.json({ ...metric, source: 'custom' });
 }

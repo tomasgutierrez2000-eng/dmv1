@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export default function TestAPIPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState<string>('');
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<unknown>(null);
 
   useEffect(() => {
     fetch('/api/facility-summary')
@@ -53,14 +53,14 @@ export default function TestAPIPage() {
           </div>
         </div>
 
-        {data && Array.isArray(data) && (
+        {data && Array.isArray(data) ? (
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold mb-2">Sample Data (first item)</h2>
             <pre className="bg-gray-50 p-4 rounded overflow-auto text-xs">
-              {JSON.stringify(data[0], null, 2)}
+              {JSON.stringify((data as unknown[])[0], null, 2)}
             </pre>
           </div>
-        )}
+        ) : null}
 
         {status === 'error' && (
           <div className="bg-white rounded-lg shadow p-6">

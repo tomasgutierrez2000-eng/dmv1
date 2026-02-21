@@ -11,6 +11,7 @@ import { TOOL_DECLARATIONS, runTool } from '@/lib/agent/tools';
 import { CLAUDE_TOOLS } from '@/lib/agent/claude-tools';
 import { getEnvVar } from '@/lib/env';
 import Anthropic from '@anthropic-ai/sdk';
+import type { MessageParam } from '@anthropic-ai/sdk/resources/messages';
 
 // Next.js requires a static literal for maxDuration (no ternary). Use 60 so Vercel Hobby works; locally timeout is getAgentTimeoutMs() (180s).
 export const maxDuration = 60;
@@ -91,17 +92,20 @@ async function runClaudeAgent(params: {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const response = await anthropic.messages.create({
-        model: CLAUDE_MODEL,
-        max_tokens: CLAUDE_MAX_TOKENS,
-        system: systemPrompt,
-        messages: currentMessages,
-        tools: CLAUDE_TOOLS,
-        abortSignal: controller.signal,
-      });
+      const response = await anthropic.messages.create(
+        {
+          model: CLAUDE_MODEL,
+          max_tokens: CLAUDE_MAX_TOKENS,
+          system: systemPrompt,
+          messages: currentMessages as MessageParam[],
+          tools: CLAUDE_TOOLS,
+        },
+        { signal: controller.signal }
+      );
 
       const content = response.content ?? [];
-      const toolUseBlocks = content.filter((b: { type: string }) => b.type === 'tool_use');
+      type ToolUseLike = { type: string; id?: string; name?: string; input?: Record<string, unknown> };
+      const toolUseBlocks = content.filter((b: { type: string }) => b.type === 'tool_use') as ToolUseLike[];
 
       if (toolUseBlocks.length === 0 || rounds >= MAX_TOOL_ROUNDS) {
         clearTimeout(timeoutId);
@@ -120,7 +124,7 @@ async function runClaudeAgent(params: {
       for (const block of toolUseBlocks) {
         const id = block.id ?? '';
         const name = block.name ?? 'unknown';
-        const input = (block.input ?? {}) as Record<string, unknown>;
+        const input = block.input ?? {};
         toolCallsMade.push({ name, args: input });
         const result = runTool(name, input, bundle);
         toolResults.push({ type: 'tool_result', tool_use_id: id, content: JSON.stringify(result) });

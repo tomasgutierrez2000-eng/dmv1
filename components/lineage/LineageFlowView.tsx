@@ -46,8 +46,8 @@ function computeLayout(nodes: LineageNode[], edges: LineageEdge[]): { positions:
 }
 
 export default function LineageFlowView({ metric }: { metric: L3Metric }) {
-  const nodes = metric.nodes || [];
-  const edges = metric.edges || [];
+  const nodes = useMemo(() => metric.nodes || [], [metric.nodes]);
+  const edges = useMemo(() => metric.edges || [], [metric.edges]);
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [ready, setReady] = useState(false);

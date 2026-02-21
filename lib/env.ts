@@ -10,7 +10,7 @@ export function getEnvVar(name: string): string | undefined {
   let key = process.env[name];
   if (key && key.trim()) return key.trim();
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // Optional dotenv fallback when Next.js hasn't loaded .env (e.g. serverless)
     require('dotenv').config({ path: path.join(process.cwd(), '.env') });
     key = process.env[name];
     if (key && key.trim()) return key.trim();

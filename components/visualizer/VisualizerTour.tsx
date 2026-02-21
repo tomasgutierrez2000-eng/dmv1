@@ -80,7 +80,7 @@ export default function VisualizerTour({ active, onClose, onStart }: VisualizerT
       measure();
     });
     return () => cancelAnimationFrame(t);
-  }, [active, step?.id, onStart, measure]);
+  }, [active, step, onStart, measure]);
 
   useEffect(() => {
     if (!active) return;

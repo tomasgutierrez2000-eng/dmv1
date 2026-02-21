@@ -37,7 +37,7 @@ const LAYER_STYLE: Record<string, { bg: string; border: string; text: string; ba
   transform: { bg: 'bg-purple-950/60',  border: 'border-purple-500/40',  text: 'text-purple-300',  badge: 'bg-purple-500/20 text-purple-300',  svgColor: '#a855f7', label: 'Transform' },
 };
 
-const PAGE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const PAGE_ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   BarChart3,
   Wallet,
   Target,

@@ -1,257 +1,1558 @@
 [
   {
     "metric_id": "PD",
-    "metric_name": "Probability of Default (PD)",
-    "definition": "The likelihood that a borrower will default on obligations within a specified time horizon. The most fundamental credit risk parameter — feeds EL, capital, pricing, and provisioning.",
-    "generic_formula": "Model Output → Rating → Master Scale → PD",
+    "metric_name": "Probability of Default",
+    "definition": "Model-estimated probability that the counterparty defaults within a defined horizon. Core credit risk input supporting capital modeling, expected loss estimation, stress testing, and risk appetite alignment.",
+    "generic_formula": "PD model output per obligor",
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
     "risk_appetite_relevant": true,
-    "rollup_philosophy": "Weighted Average by EAD + Distribution by rating grade.",
-    "rollup_description": "PD is an OBLIGOR-level attribute inherited by all facilities. At desk/portfolio/LoB we report EAD-weighted average and rating distribution.",
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by EAD at each aggregation level",
     "domain_ids": [
-      "CQ",
-      "LP"
+      "CR"
     ],
     "regulatory_references": [
-      "Basel IRB (BCBS 128)",
-      "SR 11-7",
-      "FR Y-14Q"
-    ],
-    "variant_count": 4
-  },
-  {
-    "metric_id": "DSCR",
-    "metric_name": "Debt Service Coverage Ratio (DSCR)",
-    "definition": "Measures a borrower's ability to service debt from operating cash flow. The most fundamental credit quality metric for income-producing lending.",
-    "generic_formula": "Cash Flow / Debt Service",
-    "metric_class": "CALCULATED",
-    "unit_type": "RATIO",
-    "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": true,
-    "rollup_philosophy": "Exposure-Weighted Average + Distribution (% < 1.0x, 1.0–1.2x, 1.2–1.5x, >1.5x).",
-    "rollup_description": "At facility: calculated per facility. At counterparty and above: exposure-weighted average plus distribution buckets for risk appetite.",
-    "domain_ids": [
-      "CQ"
-    ],
-    "regulatory_references": [
-      "Interagency CRE Guidance",
-      "FR Y-14Q",
-      "SNC",
-      "SR 13-3"
+      "FR2590",
+      "Basel III IRB",
+      "CCAR"
     ],
     "variant_count": 5
   },
   {
-    "metric_id": "LTV",
-    "metric_name": "Loan to Value (LTV)",
-    "definition": "Measures the relationship between the bank's exposure and the collateral value. The primary collateral coverage metric.",
-    "generic_formula": "Exposure / Collateral Value",
-    "metric_class": "CALCULATED",
-    "unit_type": "PERCENTAGE",
-    "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
-    "rollup_philosophy": "Exposure-Weighted Average + Distribution by LTV bucket aligned with supervisory limits.",
-    "rollup_description": "Per facility at facility level; EAD-weighted average and distribution at counterparty, desk, portfolio, LoB.",
-    "domain_ids": [
-      "CQ"
-    ],
-    "regulatory_references": [
-      "Interagency CRE Guidance",
-      "FDIC LTV limits",
-      "FR Y-14Q"
-    ],
-    "variant_count": 2
-  },
-  {
     "metric_id": "LGD",
-    "metric_name": "Loss Given Default (LGD)",
-    "definition": "Expected percentage of EAD lost upon default after recovery. Drives EL, RWA, and CECL allowance.",
-    "generic_formula": "1 − Recovery Rate",
+    "metric_name": "Loss Given Default",
+    "definition": "Estimated percentage of exposure expected to be lost in event of default. Key risk severity parameter informing capital allocation and recovery expectations.",
+    "generic_formula": "1 - Recovery Rate",
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
     "risk_appetite_relevant": true,
-    "rollup_philosophy": "EAD-weighted average; recovery model or historical by segment.",
-    "rollup_description": "Obligor/collateral-level attribute; rolled up by EAD weight.",
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by EAD at each aggregation level",
     "domain_ids": [
-      "CQ",
-      "LP"
+      "CR"
     ],
     "regulatory_references": [
-      "Basel IRB",
-      "SR 11-7",
-      "FR Y-14Q"
+      "FR2590",
+      "Basel III IRB",
+      "CCAR"
     ],
-    "variant_count": 2
+    "variant_count": 5
   },
   {
-    "metric_id": "ALL_IN_RATE",
-    "metric_name": "All-In Rate",
-    "definition": "Total effective interest rate (base + spread + fees) earned on exposure. Core profitability and pricing metric.",
-    "generic_formula": "Σ(Interest + Fees) / Average Exposure",
-    "metric_class": "CALCULATED",
-    "unit_type": "PERCENTAGE",
-    "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
-    "rollup_philosophy": "Exposure-weighted average at all levels.",
-    "rollup_description": "Calculated at facility; exposure-weighted average at counterparty, desk, portfolio, LoB.",
-    "domain_ids": [
-      "PR",
-      "PC"
-    ],
-    "regulatory_references": [
-      "Pillar 3",
-      "SR 13-3"
-    ],
-    "variant_count": 2
-  },
-  {
-    "metric_id": "ROE",
-    "metric_name": "Return on Equity (ROE)",
-    "definition": "Net income attributable to segment as a percentage of allocated equity. Key performance metric for capital allocation.",
-    "generic_formula": "Net Income / Allocated Equity",
-    "metric_class": "CALCULATED",
-    "unit_type": "PERCENTAGE",
-    "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
-    "rollup_philosophy": "Sum income; equity allocated by methodology; ratio at each level.",
-    "rollup_description": "Income and equity rolled by allocation rules; ratio computed at desk, portfolio, LoB.",
-    "domain_ids": [
-      "PR"
-    ],
-    "regulatory_references": [
-      "Pillar 3",
-      "SEC"
-    ],
-    "variant_count": 1
-  },
-  {
-    "metric_id": "EXPECTED_LOSS",
-    "metric_name": "Expected Loss (EL)",
-    "definition": "Probability-weighted credit loss (PD × LGD × EAD). Core risk and provisioning metric.",
-    "generic_formula": "PD × LGD × EAD",
+    "metric_id": "EAD",
+    "metric_name": "Exposure at Default",
+    "definition": "Total expected exposure outstanding at time of default. Regulatory capital modeling input reflecting forward-looking credit risk position.",
+    "generic_formula": "Outstanding + CCF \u00d7 Undrawn",
     "metric_class": "HYBRID",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
     "risk_appetite_relevant": true,
-    "rollup_philosophy": "Sum at facility/counterparty; sum or model at higher levels.",
-    "rollup_description": "EL dollars sum from facility up; EL rate as EL/EAD at each level.",
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
     "domain_ids": [
-      "LP",
-      "CQ"
+      "CR",
+      "EL"
     ],
     "regulatory_references": [
-      "Basel IRB",
-      "ASC 326",
-      "FR Y-14Q"
-    ],
-    "variant_count": 2
-  },
-  {
-    "metric_id": "UTILIZATION",
-    "metric_name": "Utilization Rate",
-    "definition": "Drawn exposure as a percentage of committed exposure. Key early warning and liquidity metric.",
-    "generic_formula": "Drawn / Committed",
-    "metric_class": "CALCULATED",
-    "unit_type": "PERCENTAGE",
-    "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
-    "rollup_philosophy": "Exposure-weighted average or sum(drawn)/sum(committed).",
-    "rollup_description": "Facility-level ratio; at higher levels either WAvg or ratio of sums.",
-    "domain_ids": [
-      "EX",
-      "EW"
-    ],
-    "regulatory_references": [
-      "FR Y-14Q",
-      "Liquidity monitoring"
-    ],
-    "variant_count": 2
-  },
-  {
-    "metric_id": "EAD",
-    "metric_name": "Exposure at Default (EAD)",
-    "definition": "Expected exposure at time of default. Drives RWA and EL; on- and off-balance-sheet.",
-    "generic_formula": "Drawn + CCF × Undrawn (or model)",
-    "metric_class": "CALCULATED",
-    "unit_type": "CURRENCY",
-    "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
-    "rollup_philosophy": "Sum at all levels.",
-    "rollup_description": "EAD sums from facility to LoB.",
-    "domain_ids": [
-      "EX",
-      "LP"
-    ],
-    "regulatory_references": [
-      "Basel IRB",
-      "FR Y-14Q"
-    ],
-    "variant_count": 2
-  },
-  {
-    "metric_id": "RWA",
-    "metric_name": "Risk-Weighted Assets (RWA)",
-    "definition": "Exposure weighted by regulatory risk weights. Basis for capital requirements.",
-    "generic_formula": "Σ(EAD × Risk Weight)",
-    "metric_class": "CALCULATED",
-    "unit_type": "CURRENCY",
-    "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
-    "rollup_philosophy": "Sum at all levels.",
-    "rollup_description": "RWA sums from facility to legal entity/LoB.",
-    "domain_ids": [
-      "CA"
-    ],
-    "regulatory_references": [
+      "FR2590",
       "Basel III",
-      "FR Y-14Q",
-      "CCAR"
+      "FR Y-14Q"
     ],
-    "variant_count": 2
+    "variant_count": 5
   },
   {
-    "metric_id": "CONCENTRATION",
-    "metric_name": "Concentration",
-    "definition": "Exposure concentration by counterparty, industry, geography, or product. Single-name and sector limits.",
-    "generic_formula": "Exposure / Portfolio or Limit",
+    "metric_id": "EL",
+    "metric_name": "Expected Loss",
+    "definition": "PD \u00d7 LGD \u00d7 EAD. Calculated forward-looking credit loss estimate supporting provisioning, capital allocation, and portfolio risk prioritization.",
+    "generic_formula": "PD \u00d7 LGD \u00d7 EAD",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive; sum of facility-level EL",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III",
+      "CCAR",
+      "CECL"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "EL_RATE",
+    "metric_name": "Expected Loss Rate",
+    "definition": "Expected Loss divided by Exposure. Derived KPI measuring loss intensity relative to exposure size enabling comparative risk ranking.",
+    "generic_formula": "Expected Loss / Exposure",
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
     "risk_appetite_relevant": true,
-    "rollup_philosophy": "Distribution and top-N at portfolio/LoB.",
-    "rollup_description": "Concentration ratios and top exposures at desk, portfolio, LoB.",
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated at each level as \u03a3 EL / \u03a3 Exposure",
     "domain_ids": [
-      "PO",
-      "CQ"
+      "CR"
     ],
     "regulatory_references": [
-      "FR Y-14Q",
-      "Large exposure limits"
+      "CCAR",
+      "Internal risk appetite"
     ],
-    "variant_count": 2
+    "variant_count": 5
   },
   {
-    "metric_id": "RATING_MIGRATION",
-    "metric_name": "Rating Migration",
-    "definition": "Movement of obligors across rating grades over time. Early warning and portfolio drift metric.",
-    "generic_formula": "Count or % by from-rating → to-rating",
+    "metric_id": "IRR",
+    "metric_name": "Internal Risk Rating",
+    "definition": "Bank-assigned internal credit risk rating reflecting modeled risk assessment and expert judgment. Used for credit segmentation and capital allocation.",
+    "generic_formula": "Rating model output",
+    "metric_class": "SOURCED",
+    "unit_type": "ORDINAL",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Numeric mapping weighted by exposure for aggregation",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "OCC guidelines",
+      "SR 11-7"
+    ],
+    "variant_count": 8
+  },
+  {
+    "metric_id": "EXT_RATING",
+    "metric_name": "External Rating",
+    "definition": "Current external credit agency rating assigned to the obligor. Used for benchmarking, regulatory reporting, and external credit risk validation.",
+    "generic_formula": "Agency rating (Moody's/S&P/Fitch)",
+    "metric_class": "SOURCED",
+    "unit_type": "ORDINAL",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Distribution / mode",
+    "rollup_description": "Report distribution across rating buckets at aggregated levels",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III SA",
+      "Pillar 3"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "DELINQ_RATE",
+    "metric_name": "Delinquency Rate",
+    "definition": "Percentage of exposure that is delinquent. Calculated KPI measuring portfolio credit stress intensity and early deterioration signals.",
+    "generic_formula": "Count(Delinquent) / Total Count \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Recalculate at level",
+    "rollup_description": "Recalculated at each aggregation level",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14M",
+      "CCAR",
+      "OCC guidelines"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CRITICIZED",
+    "metric_name": "Criticized Indicator",
+    "definition": "Flag identifying exposures requiring heightened monitoring due to elevated credit risk. Supports governance, reserve consideration, and management reporting.",
+    "generic_formula": "Classified per OCC guidelines",
+    "metric_class": "SOURCED",
+    "unit_type": "COUNT",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Count / percentage",
+    "rollup_description": "Count criticized; % criticized = count/total",
+    "domain_ids": [
+      "CR",
+      "GO"
+    ],
+    "regulatory_references": [
+      "OCC Shared National Credits",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "DETERIORATED",
+    "metric_name": "Deteriorated Indicator",
+    "definition": "Derived indicator that internal credit rating has worsened during reporting period. Provides automated early warning signal of credit migration.",
+    "generic_formula": "CASE WHEN Current_Rating > Prior_Rating THEN 1 ELSE 0",
+    "metric_class": "CALCULATED",
+    "unit_type": "COUNT",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Count / percentage",
+    "rollup_description": "Count deteriorated; % at each level",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "Internal risk appetite",
+      "OCC guidelines"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "DAYS_OVERDUE",
+    "metric_name": "Days Overdue",
+    "definition": "Number of calendar days payment remains unpaid beyond due date. Supports staging classification and regulatory default identification.",
+    "generic_formula": "Date difference from due date",
+    "metric_class": "SOURCED",
+    "unit_type": "DAYS",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Maximum / weighted average",
+    "rollup_description": "Max for worst-case; exposure-weighted avg for portfolio",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14M",
+      "CECL",
+      "IFRS 9"
+    ],
+    "variant_count": 1
+  },
+  {
+    "metric_id": "EXPOSURE",
+    "metric_name": "Exposure Outstanding",
+    "definition": "Current funded credit exposure in millions USD. Core balance sheet risk metric representing on-balance-sheet credit risk.",
+    "generic_formula": "Sum of outstanding balances",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "FR Y-14Q",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "COMMITTED",
+    "metric_name": "Committed Amount",
+    "definition": "Total approved committed credit amount in millions USD representing maximum contractual lending capacity.",
+    "generic_formula": "Sum of committed facility amounts",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "FR Y-14Q",
+      "FR Y-14M"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "UNDRAWN",
+    "metric_name": "Undrawn Exposure",
+    "definition": "Committed but not yet utilized portion of credit facility. Reflects contingent liquidity risk and future funding obligations.",
+    "generic_formula": "Committed Amount - Utilized Amount",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III CCF",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "UTILIZED",
+    "metric_name": "Utilized Exposure",
+    "definition": "Portion of committed exposure currently drawn. Used to assess funding deployment and credit capacity usage.",
+    "generic_formula": "Sum of drawn amounts",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "UTIL_PCT",
+    "metric_name": "Utilization Rate",
+    "definition": "Exposure divided by Committed Amount. Provides insight into liquidity usage, limit management, and concentration risk build-up.",
+    "generic_formula": "Exposure / Committed Amount \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Recalculate at level",
+    "rollup_description": "Recalculated as \u03a3 Exposure / \u03a3 Committed at each level",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Internal limits framework"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "LIMIT",
+    "metric_name": "Exposure Limit",
+    "definition": "Maximum approved credit exposure authorized for the counterparty. Represents formal risk appetite allocation and governance control threshold.",
+    "generic_formula": "Approved limit per counterparty",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive; sum of counterparty limits",
+    "domain_ids": [
+      "EL",
+      "GO"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "OCC Heightened Standards"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "CROSS_ENTITY_EXP",
+    "metric_name": "Cross-Entity Exposure",
+    "definition": "Total exposure amount allocated across legal entities. Supports intra-group concentration transparency.",
+    "generic_formula": "SUM(exposure) WHERE cross_entity_flag = 1",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across entities",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III large exposures"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "GROSS_EXP",
+    "metric_name": "Gross Exposure",
+    "definition": "Total exposure before credit risk mitigation.",
+    "generic_formula": "Sum of pre-CRM exposure",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "NET_EXP",
+    "metric_name": "Net Exposure",
+    "definition": "Total exposure after credit risk mitigation.",
+    "generic_formula": "Gross Exposure - CRM Amount",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "DSCR",
+    "metric_name": "Debt Service Coverage Ratio",
+    "definition": "Cashflow divided by Total Debt Service. Measures borrower's ability to meet debt obligations from operating cash flow.",
+    "generic_formula": "Cashflow / Total Debt Service",
+    "metric_class": "CALCULATED",
+    "unit_type": "RATIO",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each aggregation level",
+    "domain_ids": [
+      "FP",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CRE underwriting",
+      "CCAR",
+      "FR Y-14Q"
+    ],
+    "variant_count": 6
+  },
+  {
+    "metric_id": "LTV",
+    "metric_name": "Loan-to-Value Ratio",
+    "definition": "Exposure divided by Collateral Value. Leverage KPI providing insight into collateral coverage and downside protection.",
+    "generic_formula": "Exposure / Collateral Value \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each aggregation level",
+    "domain_ids": [
+      "FP",
+      "CM"
+    ],
+    "regulatory_references": [
+      "CRE underwriting",
+      "FR Y-14Q",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "ROE",
+    "metric_name": "Return on Equity",
+    "definition": "Net Income divided by Equity. Profitability KPI measuring return on shareholder capital.",
+    "generic_formula": "Net Income / Equity \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by capital allocated at each level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR revenue projection"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "ROA",
+    "metric_name": "Return on Assets",
+    "definition": "Net Income divided by Total Assets. Efficiency KPI measuring asset productivity.",
+    "generic_formula": "Net Income / Total Assets \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR revenue projection"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "NIM",
+    "metric_name": "Net Interest Margin",
+    "definition": "Net Interest Income divided by earning assets. Margin KPI assessing lending profitability.",
+    "generic_formula": "Net Interest Income / Earning Assets \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "NII stress testing"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "ALL_IN_RATE",
+    "metric_name": "All-in Rate",
+    "definition": "Total effective interest rate including base rate and spread. Total yield KPI.",
+    "generic_formula": "Base Rate + Spread",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "Internal pricing",
+      "CCAR NII"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "SPREAD",
+    "metric_name": "Credit Spread",
+    "definition": "Credit spread over reference base rate on exposure. Represents risk premium in pricing.",
+    "generic_formula": "Contractual spread",
+    "metric_class": "SOURCED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "Internal pricing framework"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "BASE_RATE",
+    "metric_name": "Base Rate",
+    "definition": "Reference benchmark interest rate (e.g., SOFR, Prime). Base component of facility pricing.",
+    "generic_formula": "SOFR / Prime / fixed rate",
+    "metric_class": "SOURCED",
+    "unit_type": "PERCENTAGE",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "CCAR NII",
+      "ALM"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "REVENUE",
+    "metric_name": "Revenue",
+    "definition": "Total income generated by the borrower or attributed to the facility.",
+    "generic_formula": "Gross revenue",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "NET_INCOME",
+    "metric_name": "Net Income",
+    "definition": "Net income reflecting borrower profitability and sustainability.",
+    "generic_formula": "Revenue - Expenses - Taxes",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CASHFLOW",
+    "metric_name": "Operating Cashflow",
+    "definition": "Operating cash flow generated by borrower. Primary repayment capacity and covenant strength indicator.",
+    "generic_formula": "Cash from operations",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CRE underwriting",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "TDS",
+    "metric_name": "Total Debt Service",
+    "definition": "Total principal and interest obligations due within reporting period.",
+    "generic_formula": "Principal + Interest payments",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CRE underwriting",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "FEE_RATE",
+    "metric_name": "Fee Rate",
+    "definition": "Fee percentage applied to committed or undrawn exposure. Pricing adequacy KPI.",
+    "generic_formula": "Annual fee / Committed Amount",
+    "metric_class": "SOURCED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by committed amount",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "Internal pricing framework"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "COST_OF_FUNDS",
+    "metric_name": "Cost of Funds",
+    "definition": "Funding expense allocated to exposure. Supports net profitability and RAROC.",
+    "generic_formula": "Transfer pricing allocation",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "ALM/FTP"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CAP_ALLOC",
+    "metric_name": "Capital Allocated",
+    "definition": "Economic or regulatory capital assigned to exposure. Used in RAROC and capital efficiency.",
+    "generic_formula": "RWA \u00d7 Capital Ratio",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "Basel III",
+      "CCAR",
+      "Internal RAROC"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "OP_COST",
+    "metric_name": "Operating Cost",
+    "definition": "Operating cost allocated to facility or portfolio. Supports profitability analysis.",
+    "generic_formula": "Allocated operating expense",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "Internal P&L",
+      "FR Y-9C"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "COLLATERAL",
+    "metric_name": "Collateral Value",
+    "definition": "Value of pledged collateral securing exposure. Supports recovery and secured lending analysis.",
+    "generic_formula": "Appraised or mark-to-market value",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "CM"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Basel III CRM",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CRM_AMOUNT",
+    "metric_name": "Risk Mitigant Amount",
+    "definition": "Total eligible credit risk mitigation value.",
+    "generic_formula": "SUM(eligible_mitigant_value)",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across facilities",
+    "domain_ids": [
+      "CM"
+    ],
+    "regulatory_references": [
+      "Basel III CRM",
+      "FR2590"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CRM_TYPE",
+    "metric_name": "Risk Mitigant Type",
+    "definition": "Dominant type of credit risk mitigation applied to the exposure.",
+    "generic_formula": "ARGMAX(mitigant_type, SUM(mitigant_value))",
+    "metric_class": "SOURCED",
+    "unit_type": "INDEX",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Distribution",
+    "rollup_description": "Report distribution of types at aggregated levels",
+    "domain_ids": [
+      "CM"
+    ],
+    "regulatory_references": [
+      "Basel III CRM",
+      "FR2590"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "COLLATERAL_COV",
+    "metric_name": "Collateral Coverage Ratio",
+    "definition": "Collateral Value divided by Exposure. Measures security protection level.",
+    "generic_formula": "(Collateral Value / Exposure) \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated as \u03a3 Collateral / \u03a3 Exposure at each level",
+    "domain_ids": [
+      "CM"
+    ],
+    "regulatory_references": [
+      "CRE underwriting",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "AVG_SPREAD",
+    "metric_name": "Weighted Average Spread",
+    "definition": "Exposure-weighted average credit spread. Insight into portfolio pricing and yield profile.",
+    "generic_formula": "\u03a3(Spread \u00d7 Exposure) / Total Exposure",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated at each aggregation level",
+    "domain_ids": [
+      "PA",
+      "FP"
+    ],
+    "regulatory_references": [
+      "Internal pricing",
+      "CCAR NII"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "AVG_TENOR",
+    "metric_name": "Weighted Average Tenor",
+    "definition": "Exposure-weighted average remaining maturity. Portfolio duration and refinancing risk metric.",
+    "generic_formula": "\u03a3(Tenor \u00d7 Exposure) / Total Exposure",
+    "metric_class": "CALCULATED",
+    "unit_type": "DAYS",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated at each aggregation level",
+    "domain_ids": [
+      "PA"
+    ],
+    "regulatory_references": [
+      "ALM",
+      "CCAR",
+      "Pillar 3"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "DAYS_DELINQ",
+    "metric_name": "Days Delinquent",
+    "definition": "Days contractual payment is past due. Supports staging (30/60/90+), impairment, and regulatory reporting.",
+    "generic_formula": "Date difference from due date",
+    "metric_class": "SOURCED",
+    "unit_type": "DAYS",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Maximum / average",
+    "rollup_description": "Max for worst-case; EAD-weighted avg for portfolio",
+    "domain_ids": [
+      "PA",
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14M",
+      "CECL",
+      "IFRS 9"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "DELINQ_AMT",
+    "metric_name": "Delinquent Amount",
+    "definition": "Total outstanding exposure contractually past due. Direct measurement of impaired balances.",
+    "generic_formula": "Sum of past-due amounts",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "PA",
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14M",
+      "CECL",
+      "FR2590"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "DAYS_TO_MAT",
+    "metric_name": "Days Until Maturity",
+    "definition": "Calendar days remaining until contractual maturity. Rollover risk and duration metric.",
+    "generic_formula": "Maturity Date - Reporting Date",
+    "metric_class": "CALCULATED",
+    "unit_type": "DAYS",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "PA"
+    ],
+    "regulatory_references": [
+      "ALM",
+      "Liquidity risk",
+      "FR Y-14Q"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CPTY_ALLOC",
+    "metric_name": "Counterparty Concentration",
+    "definition": "Counterparty exposure as % of total. Concentration KPI measuring obligor dependency risk.",
+    "generic_formula": "(Counterparty Exposure / Total Exposure) \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "N/A at cpty; recalc at portfolio",
+    "rollup_description": "Meaningful only at portfolio/desk/LOB level",
+    "domain_ids": [
+      "PA"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "Large Exposure Framework",
+      "Basel III"
+    ],
+    "variant_count": 3
+  },
+  {
+    "metric_id": "RATING_MIG_INT",
+    "metric_name": "Internal Rating Migration",
+    "definition": "Directional indicator (Upgrade/Downgrade/Stable) of internal rating movement between periods.",
+    "generic_formula": "Compare Current vs Prior Period Rating",
+    "metric_class": "CALCULATED",
+    "unit_type": "INDEX",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Distribution / count",
+    "rollup_description": "Count upgrades/downgrades/stable at each level",
+    "domain_ids": [
+      "PA",
+      "CR"
+    ],
+    "regulatory_references": [
+      "Internal risk appetite",
+      "OCC guidelines"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "RATING_MIG_EXT",
+    "metric_name": "External Rating Migration",
+    "definition": "Directional indicator of external rating movement between periods.",
+    "generic_formula": "Compare Current vs Prior External Rating",
+    "metric_class": "CALCULATED",
+    "unit_type": "INDEX",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Distribution / count",
+    "rollup_description": "Count upgrades/downgrades/stable at each level",
+    "domain_ids": [
+      "PA",
+      "CR"
+    ],
+    "regulatory_references": [
+      "Pillar 3",
+      "Investor reporting"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "EXT_RATING_CHG_STEPS",
+    "metric_name": "External Rating Change Steps",
+    "definition": "Numerical notch change in external rating between periods. Migration magnitude metric.",
+    "generic_formula": "Current Notch - Prior Notch",
+    "metric_class": "CALCULATED",
+    "unit_type": "COUNT",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure for severity",
+    "domain_ids": [
+      "PA",
+      "CR"
+    ],
+    "regulatory_references": [
+      "Pillar 3",
+      "Investor reporting"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "LOAN_COUNT",
+    "metric_name": "Loan Count",
+    "definition": "Count of individual facilities within grouping. Exposure granularity metric.",
+    "generic_formula": "COUNT(facility_id)",
+    "metric_class": "CALCULATED",
+    "unit_type": "COUNT",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive count at each level",
+    "domain_ids": [
+      "PA"
+    ],
+    "regulatory_references": [
+      "Internal reporting"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "INT_RATING_CHG",
+    "metric_name": "Internal Rating Change (Notches)",
+    "definition": "Month-over-month notch movement in internal credit rating. Quantifies credit migration magnitude.",
+    "generic_formula": "Current Numeric Rating - Prior Numeric Rating",
     "metric_class": "CALCULATED",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
     "risk_appetite_relevant": true,
-    "rollup_philosophy": "Migration matrix at portfolio/LoB; drill to desk/counterparty.",
-    "rollup_description": "Aggregate migration matrices and deterioration rates.",
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure for severity assessment",
     "domain_ids": [
-      "EW",
-      "CQ"
+      "PA",
+      "CR"
     ],
     "regulatory_references": [
-      "SR 11-7",
-      "OCC Handbook"
+      "Internal risk appetite",
+      "OCC guidelines"
     ],
-    "variant_count": 1
+    "variant_count": 4
+  },
+  {
+    "metric_id": "PRICING_EXCEPTION",
+    "metric_name": "Pricing Exception Status",
+    "definition": "Indicator identifying exposures priced outside standard policy. Governance and pricing compliance metric.",
+    "generic_formula": "Policy exception flag",
+    "metric_class": "SOURCED",
+    "unit_type": "INDEX",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Count / percentage",
+    "rollup_description": "Count exceptions; % at each level",
+    "domain_ids": [
+      "GO"
+    ],
+    "regulatory_references": [
+      "OCC Heightened Standards",
+      "Internal policy"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "LIMIT_STATUS",
+    "metric_name": "Limit Status",
+    "definition": "Status of credit limit (Active, Breached, Suspended). Risk appetite breach and governance compliance metric.",
+    "generic_formula": "Utilization vs limit threshold",
+    "metric_class": "SOURCED",
+    "unit_type": "INDEX",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Count / percentage",
+    "rollup_description": "Count by status category at each level",
+    "domain_ids": [
+      "GO"
+    ],
+    "regulatory_references": [
+      "FR2590",
+      "OCC Heightened Standards"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "EXCEPTION_RATE",
+    "metric_name": "Exception Rate",
+    "definition": "Percentage of exposures with pricing/policy exceptions. Governance KPI measuring policy discipline.",
+    "generic_formula": "Count(Exceptions) / Total Count \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Recalculate at level",
+    "rollup_description": "Recalculated at each aggregation level",
+    "domain_ids": [
+      "GO"
+    ],
+    "regulatory_references": [
+      "OCC Heightened Standards",
+      "Internal policy"
+    ],
+    "variant_count": 3
+  },
+  {
+    "metric_id": "FAC_UTIL_STATUS",
+    "metric_name": "Facility Utilization Status",
+    "definition": "Categorical utilization classification (Sufficient/Approaching/Fully Utilized). Early warning of limit pressure.",
+    "generic_formula": "CASE WHEN util < 75% THEN 'Sufficient' ...",
+    "metric_class": "CALCULATED",
+    "unit_type": "INDEX",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Count / percentage",
+    "rollup_description": "Count by category at each level",
+    "domain_ids": [
+      "GO",
+      "EL"
+    ],
+    "regulatory_references": [
+      "Internal limits framework"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "STRESSED_PD",
+    "metric_name": "Stressed Probability of Default",
+    "definition": "PD under macroeconomic stress scenario. Core CCAR/DFAST input for loss projection under adverse conditions.",
+    "generic_formula": "PD_Baseline \u00d7 Scenario_Multiplier or PD_Model(stressed_macro)",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by stressed EAD at each level",
+    "domain_ids": [
+      "ST",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST",
+      "FR Y-14A Schedule A"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESSED_LGD",
+    "metric_name": "Stressed Loss Given Default",
+    "definition": "LGD under stress scenario incorporating stressed collateral values and recovery assumptions.",
+    "generic_formula": "LGD_Baseline \u00d7 Stress_Factor or LGD_Model(stressed_collateral)",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by stressed EAD at each level",
+    "domain_ids": [
+      "ST",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST",
+      "FR Y-14A Schedule A"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESSED_EL",
+    "metric_name": "Stressed Expected Loss",
+    "definition": "Expected loss under stress scenario. Primary CCAR/DFAST loss projection metric.",
+    "generic_formula": "Stressed_PD \u00d7 Stressed_LGD \u00d7 Stressed_EAD",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "ST",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST",
+      "FR Y-14A"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESSED_EL_RATE",
+    "metric_name": "Stressed Expected Loss Rate",
+    "definition": "Stressed EL as percentage of stressed exposure. Loss severity under stress.",
+    "generic_formula": "Stressed_EL / Stressed_Exposure \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated as \u03a3 Stressed EL / \u03a3 Stressed Exp at each level",
+    "domain_ids": [
+      "ST",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESS_CAP_IMPACT",
+    "metric_name": "Stress Capital Impact",
+    "definition": "Change in required capital under stress scenario vs baseline. Capital adequacy test metric.",
+    "generic_formula": "(Stressed_EL - Baseline_EL) / Capital_Base \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Recalculate at level",
+    "rollup_description": "Recalculated using aggregated EL and capital at each level",
+    "domain_ids": [
+      "ST",
+      "RC"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST",
+      "FR Y-14A"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESS_LOSS_DELTA",
+    "metric_name": "Stress Loss Delta",
+    "definition": "Incremental expected loss under stress vs baseline in millions USD.",
+    "generic_formula": "Stressed_EL - Baseline_EL",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "ST"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST",
+      "Internal stress testing"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESSED_DSCR",
+    "metric_name": "Stressed DSCR",
+    "definition": "DSCR under stressed revenue/cashflow assumptions. Covenant breach risk under adverse conditions.",
+    "generic_formula": "Stressed_Cashflow / Stressed_TDS",
+    "metric_class": "CALCULATED",
+    "unit_type": "RATIO",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "ST",
+      "FP"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "CRE stress",
+      "FR Y-14Q"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "STRESSED_LTV",
+    "metric_name": "Stressed LTV",
+    "definition": "LTV under stressed collateral valuations. Downside collateral coverage metric.",
+    "generic_formula": "Exposure / Stressed_Collateral_Value \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Weighted by exposure at each level",
+    "domain_ids": [
+      "ST",
+      "CM"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "CRE stress",
+      "FR Y-14Q"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "PROVISION_RATE",
+    "metric_name": "Provision Rate",
+    "definition": "Provision expense as percentage of exposure under given scenario. CECL/IFRS 9 provisioning metric.",
+    "generic_formula": "Provision / Exposure \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated at each level",
+    "domain_ids": [
+      "ST"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "CECL",
+      "IFRS 9"
+    ],
+    "variant_count": 15
+  },
+  {
+    "metric_id": "PPNR",
+    "metric_name": "Pre-Provision Net Revenue",
+    "definition": "Net revenue before provision for credit losses. Key CCAR revenue projection metric.",
+    "generic_formula": "NII + Non-Interest Income - Non-Interest Expense",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "ST",
+      "FP"
+    ],
+    "regulatory_references": [
+      "CCAR",
+      "DFAST",
+      "FR Y-14A"
+    ],
+    "variant_count": 9
+  },
+  {
+    "metric_id": "RWA",
+    "metric_name": "Risk-Weighted Assets",
+    "definition": "Exposure weighted by risk for capital adequacy calculation. Core Basel III/IV metric.",
+    "generic_formula": "EAD \u00d7 Risk_Weight",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "RC"
+    ],
+    "regulatory_references": [
+      "Basel III",
+      "FR Y-9C",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "RWA_DENSITY",
+    "metric_name": "RWA Density",
+    "definition": "RWA as percentage of total exposure. Capital intensity metric.",
+    "generic_formula": "RWA / Exposure \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated as \u03a3 RWA / \u03a3 Exposure at each level",
+    "domain_ids": [
+      "RC"
+    ],
+    "regulatory_references": [
+      "Basel III",
+      "Pillar 3"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "CET1_CONSUMPTION",
+    "metric_name": "CET1 Capital Consumption",
+    "definition": "CET1 capital consumed by exposure. Capital allocation and efficiency metric.",
+    "generic_formula": "RWA \u00d7 CET1_Ratio",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "RC"
+    ],
+    "regulatory_references": [
+      "Basel III",
+      "CCAR",
+      "FR Y-9C"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "LEVERAGE_EXP",
+    "metric_name": "Leverage Ratio Exposure",
+    "definition": "Exposure measure for supplementary leverage ratio calculation.",
+    "generic_formula": "On-balance + Off-balance adjustments",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "RC"
+    ],
+    "regulatory_references": [
+      "Basel III SLR",
+      "FR Y-9C"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "RAROC",
+    "metric_name": "Risk-Adjusted Return on Capital",
+    "definition": "Net income after expected loss divided by allocated capital. Risk-adjusted profitability metric.",
+    "generic_formula": "(Net Income - EL) / Capital Allocated \u00d7 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "PERCENTAGE",
+    "direction": "HIGHER_BETTER",
+    "risk_appetite_relevant": true,
+    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_description": "Recalculated at each level",
+    "domain_ids": [
+      "RC",
+      "FP"
+    ],
+    "regulatory_references": [
+      "Internal RAROC framework",
+      "CCAR"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "SA_RWA",
+    "metric_name": "Standardized Approach RWA",
+    "definition": "RWA calculated under Basel III Standardized Approach. Used for capital floor comparison.",
+    "generic_formula": "EAD \u00d7 SA_Risk_Weight",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "RC"
+    ],
+    "regulatory_references": [
+      "Basel III SA",
+      "FR Y-9C",
+      "Capital floor"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "IRB_RWA",
+    "metric_name": "IRB Approach RWA",
+    "definition": "RWA calculated under Internal Ratings-Based approach using bank PD/LGD models.",
+    "generic_formula": "EAD \u00d7 IRB_Risk_Weight(PD,LGD,M)",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "RC"
+    ],
+    "regulatory_references": [
+      "Basel III IRB",
+      "FR Y-9C",
+      "FR 2590"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "FR2590_EXP",
+    "metric_name": "FR 2590 Reportable Exposure",
+    "definition": "Exposure meeting FR 2590 large exposure reporting threshold for GSIB.",
+    "generic_formula": "SUM(exposure) WHERE counterparty meets 2590 threshold",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum per counterparty",
+    "rollup_description": "Aggregated at counterparty level; filtered by threshold",
+    "domain_ids": [
+      "RC",
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR 2590"
+    ],
+    "variant_count": 4
+  },
+  {
+    "metric_id": "Y14Q_EXP",
+    "metric_name": "FR Y-14Q Schedule H.1 Exposure",
+    "definition": "Wholesale credit exposure reported under FR Y-14Q Schedule H.1 for CCAR.",
+    "generic_formula": "Exposure per Y-14Q field definitions",
+    "metric_class": "HYBRID",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive; mapped to Y-14Q schedule fields",
+    "domain_ids": [
+      "RC",
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q Schedule H.1"
+    ],
+    "variant_count": 5
+  },
+  {
+    "metric_id": "Y14M_EXP",
+    "metric_name": "FR Y-14M Monthly Exposure",
+    "definition": "Monthly granular facility-level exposure reported under FR Y-14M.",
+    "generic_formula": "Monthly exposure snapshot",
+    "metric_class": "SOURCED",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "risk_appetite_relevant": false,
+    "rollup_philosophy": "Sum",
+    "rollup_description": "Additive across all levels",
+    "domain_ids": [
+      "RC",
+      "EL"
+    ],
+    "regulatory_references": [
+      "FR Y-14M"
+    ],
+    "variant_count": 5
   }
 ]

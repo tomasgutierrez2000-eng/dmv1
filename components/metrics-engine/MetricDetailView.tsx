@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag } from 'lucide-react';
+import { ArrowLeft, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag, BarChart3, Copy, Check, ExternalLink } from 'lucide-react';
 import {
   DIMENSION_LABELS,
   CALCULATION_DIMENSIONS,
+  CALCULATION_DIMENSION_LABELS,
   type CalculationDimension,
 } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
 import { getFormulaForDimension } from '@/data/metrics_dimensions_filled';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
+import MetricValuesWidget from '@/components/dashboard/MetricValuesWidget';
+import ConsumeApiIntegrationGuide from './ConsumeApiIntegrationGuide';
 import type { L3Metric, MetricType, DimensionInteraction, SourceField } from '@/data/l3-metrics';
 
 const LAYER_STYLE: Record<string, { bg: string; border: string; text: string }> = {
@@ -38,14 +41,6 @@ const METRIC_TYPE_ICON: Record<MetricType, React.ReactNode> = {
   Categorical: <Tag className="w-4 h-4" />,
 };
 
-const DIMENSION_BAR_LABELS: Record<CalculationDimension, string> = {
-  facility: 'Facility',
-  counterparty: 'Counterparty',
-  L3: 'L3-Desk',
-  L2: 'L2-Portfolio',
-  L1: 'L1-LoB',
-};
-
 interface MetricDetailViewProps {
   metric: L3Metric;
   onBack: () => void;
@@ -63,6 +58,16 @@ interface MetricDimensionFormulaApiRow {
   sourceFields?: SourceField[];
 }
 
+interface ConsumableDetail {
+  id: string;
+  name: string;
+  description: string;
+  allowedLevels: { dimension: CalculationDimension; label: string; level: string }[];
+  exampleUrls: Record<string, string>;
+  rollupSummary: string;
+  displayFormat?: string;
+}
+
 function normalizeMatchKey(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
 }
@@ -77,12 +82,14 @@ function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
 
 export default function MetricDetailView({ metric, onBack }: MetricDetailViewProps) {
   const allowedDimensions = getAllowedDimensions(metric);
-  const [selectedDimension, setSelectedDimension] = useState<CalculationDimension>(allowedDimensions[0]);
+  const [selectedDimension, setSelectedDimension] = useState<CalculationDimension>(
+    allowedDimensions[0] ?? CALCULATION_DIMENSIONS[0]
+  );
 
   // Keep selected dimension in sync when metric changes or when it's no longer allowed
   useEffect(() => {
     if (allowedDimensions.includes(selectedDimension)) return;
-    setSelectedDimension(allowedDimensions[0]);
+    setSelectedDimension(allowedDimensions[0] ?? CALCULATION_DIMENSIONS[0]);
   }, [metric.id, allowedDimensions, selectedDimension]);
 
   const [formulasFromApi, setFormulasFromApi] = useState<MetricDimensionFormulaApiRow[] | null>(null);
@@ -92,6 +99,56 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
       .then((data: { formulas?: MetricDimensionFormulaApiRow[] }) => setFormulasFromApi(data.formulas ?? null))
       .catch(() => setFormulasFromApi(null));
   }, []);
+
+  const [showConsume, setShowConsume] = useState(false);
+  const [consumableDetail, setConsumableDetail] = useState<ConsumableDetail | null>(null);
+  const [selectedLevels, setSelectedLevels] = useState<Set<string>>(new Set());
+  const [copySuccess, setCopySuccess] = useState<string | null>(null);
+  useEffect(() => {
+    if (!showConsume || !metric.id) return;
+    fetch(`/api/metrics/${encodeURIComponent(metric.id)}/consumable`, { cache: 'no-store' })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data: ConsumableDetail | null) => {
+        setConsumableDetail(data ?? null);
+        if (data?.allowedLevels?.length) {
+          setSelectedLevels(new Set(data.allowedLevels.map((l) => l.level)));
+        }
+      })
+      .catch(() => setConsumableDetail(null));
+  }, [showConsume, metric.id]);
+
+  const toggleLevel = (level: string) => {
+    setSelectedLevels((prev) => {
+      const next = new Set(prev);
+      if (next.has(level)) next.delete(level);
+      else next.add(level);
+      return next;
+    });
+  };
+  const exampleUrl = (() => {
+    if (!consumableDetail?.exampleUrls || selectedLevels.size === 0) return '';
+    const first = consumableDetail.allowedLevels.find((l) => selectedLevels.has(l.level));
+    return first ? consumableDetail.exampleUrls[first.level] ?? '' : consumableDetail.exampleUrls[consumableDetail.allowedLevels[0]!.level] ?? '';
+  })();
+  const copySnippet = () => {
+    const url = exampleUrl || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/metrics/values?metricId=${encodeURIComponent(metric.id)}&level=facility&asOfDate=`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopySuccess('url');
+      setTimeout(() => setCopySuccess(null), 2000);
+    }).catch(() => { setCopySuccess(null); });
+  };
+  const widgetConfig = {
+    metricId: metric.id,
+    variantId: undefined as string | undefined,
+    level: Array.from(selectedLevels)[0] || 'facility',
+    displayFormat: metric.displayFormat,
+  };
+  const copyWidgetConfig = () => {
+    navigator.clipboard.writeText(JSON.stringify(widgetConfig, null, 2)).then(() => {
+      setCopySuccess('widget');
+      setTimeout(() => setCopySuccess(null), 2000);
+    }).catch(() => { setCopySuccess(null); });
+  };
 
   const dimensionFormulaFromMetric = metric.formulasByDimension?.[selectedDimension];
   const matchKeys = [metric.id, metric.name].filter(Boolean).map(normalizeMatchKey);
@@ -126,7 +183,7 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
         <button
           type="button"
           onClick={onBack}
@@ -135,6 +192,15 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
         >
           <ArrowLeft className="w-4 h-4" />
           Back to list
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowConsume((v) => !v)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+          aria-expanded={showConsume}
+        >
+          <BarChart3 className="w-4 h-4" />
+          {showConsume ? 'Hide' : 'Consume API'}
         </button>
       </div>
 
@@ -166,14 +232,14 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
                       type="button"
                       onClick={() => setSelectedDimension(dim)}
                       aria-pressed={selectedDimension === dim}
-                      aria-label={`Show formula at ${DIMENSION_BAR_LABELS[dim]} level`}
+                      aria-label={`Show formula at ${CALCULATION_DIMENSION_LABELS[dim]} level`}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
                         selectedDimension === dim
                           ? 'bg-purple-500/30 text-purple-200 border border-purple-500/50'
                           : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
                       }`}
                     >
-                      {DIMENSION_BAR_LABELS[dim]}
+                      {CALCULATION_DIMENSION_LABELS[dim]}
                     </button>
                   ))}
                 </div>
@@ -223,7 +289,7 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
           Formula
           {allowedDimensions.length > 0 && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/20 text-purple-300 normal-case">
-              {DIMENSION_BAR_LABELS[selectedDimension]}
+              {CALCULATION_DIMENSION_LABELS[selectedDimension]}
             </span>
           )}
         </h2>
@@ -288,7 +354,7 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
       )}
 
       {metric.toggles && metric.toggles.length > 0 && (
-        <section>
+        <section className="mb-8">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Toggles</h2>
           <div className="flex flex-wrap gap-1.5">
             {metric.toggles.map(t => (
@@ -297,6 +363,120 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
               </span>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Consume this metric: variant + levels + API snippet */}
+      {showConsume && (
+        <section className="mb-8 p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20" aria-labelledby="consume-api-heading">
+          <h2 id="consume-api-heading" className="text-xs font-semibold uppercase tracking-wider text-emerald-400/90 mb-3 flex items-center gap-2">
+            <BarChart3 className="w-3.5 h-3.5" />
+            Consume API
+          </h2>
+          <p className="text-sm text-gray-400 mb-4">
+            Choose a dimension and copy the API URL to consume this metric in your dashboard.
+          </p>
+          {consumableDetail && (
+            <>
+              <div className="mb-4">
+                <p className="text-xs font-medium text-gray-500 mb-2">Levels (select at least one)</p>
+                <div className="flex flex-wrap gap-2">
+                  {consumableDetail.allowedLevels.map(({ level, label }) => (
+                    <label key={level} className="inline-flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedLevels.has(level)}
+                        onChange={() => toggleLevel(level)}
+                        className="rounded border-gray-500 bg-white/5 text-emerald-500 focus:ring-emerald-500/50"
+                      />
+                      <span className="text-sm text-gray-300">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4 p-3 rounded-lg bg-black/20 border border-white/5">
+                <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">Rollup</p>
+                <p className="text-xs text-gray-400 leading-relaxed">{consumableDetail.rollupSummary}</p>
+              </div>
+              <div className="flex flex-wrap gap-2 items-center">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold uppercase text-gray-500 mb-1">API URL</p>
+                  <code className="text-xs font-mono text-emerald-300/90 break-all block pr-2">
+                    {exampleUrl || 'Select a level above'}
+                  </code>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={copySnippet}
+                    disabled={!exampleUrl}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-emerald-500/30 hover:bg-emerald-500/40 text-emerald-200 border border-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  >
+                    {copySuccess === 'url' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copySuccess === 'url' ? 'Copied' : 'Consume API'}
+                  </button>
+                  {exampleUrl && (
+                    <a
+                      href={exampleUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-gray-400 hover:text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                      title="Open URL in new tab to see JSON response"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Try it
+                    </a>
+                  )}
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1.5">
+                Optional: add <code className="px-1 rounded bg-white/10">asOfDate=YYYY-MM-DD</code> or filter params (<code>facilityId</code>, <code>counterpartyId</code>, etc.) to the URL.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2 items-center">
+                <p className="text-[10px] font-semibold uppercase text-gray-500">Widget config</p>
+                <button
+                  type="button"
+                  onClick={copyWidgetConfig}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/15 border border-white/10"
+                >
+                  {copySuccess === 'widget' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copySuccess === 'widget' ? 'Copied' : 'Copy config JSON'}
+                </button>
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <p className="text-[10px] font-semibold uppercase text-gray-500 mb-2">Live preview (from API)</p>
+                <MetricValuesWidget
+                  config={
+                    selectedLevels.size > 0
+                      ? {
+                          metricId: metric.id,
+                          level: Array.from(selectedLevels)[0] as 'facility' | 'counterparty' | 'desk' | 'portfolio' | 'lob',
+                        }
+                      : null
+                  }
+                  maxRows={5}
+                />
+              </div>
+              <details className="mt-4 pt-4 border-t border-white/10 group">
+                <summary className="cursor-pointer list-none flex items-center gap-2 text-xs font-medium text-gray-400 hover:text-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 rounded py-1">
+                  <span className="inline-block transition-transform group-open:rotate-90" aria-hidden>▶</span>
+                  Dashboard integration guide (copy-paste snippets)
+                </summary>
+                <div className="mt-3 pl-4 border-l-2 border-emerald-500/20">
+                  <ConsumeApiIntegrationGuide
+                    valuesApiBaseUrl={typeof window !== 'undefined' ? `${window.location.origin}/api/metrics/values` : ''}
+                    singleMetricExample={{
+                      metricId: metric.id,
+                      level: Array.from(selectedLevels)[0] || 'facility',
+                    }}
+                  />
+                </div>
+              </details>
+            </>
+          )}
+          {showConsume && !consumableDetail && (
+            <p className="text-sm text-gray-500">Loading consumable options…</p>
+          )}
         </section>
       )}
     </div>

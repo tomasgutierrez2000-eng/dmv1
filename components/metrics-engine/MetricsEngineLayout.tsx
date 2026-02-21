@@ -1,15 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Search, Plus, Download, Upload, FileSpreadsheet, FileJson, FileCode,
-  ChevronRight, Layers, Hash, TrendingUp, Zap, Calculator,
+  ChevronRight, Layers, Hash, TrendingUp, Zap, Calculator, BarChart3, Copy, Check, ExternalLink,
 } from 'lucide-react';
+import { CALCULATION_DIMENSION_LABELS } from '@/data/l3-metrics';
+import { CONSUMPTION_LEVELS, DIMENSION_TO_CONSUMPTION_LEVEL } from '@/data/l3-metrics';
+import type { CalculationDimension } from '@/data/l3-metrics';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import MetricDetailView from './MetricDetailView';
 import MetricForm from './MetricForm';
 import DSCREngine from './engines/DSCREngine';
+import ConsumeApiIntegrationGuide from './ConsumeApiIntegrationGuide';
 import type { L3Metric } from '@/data/l3-metrics';
 
 const CALCULATION_ENGINES = [
@@ -67,6 +71,14 @@ export interface MetricsEngineLayoutProps {
   onCancelCreate: () => void;
 }
 
+const CONSUME_LEVEL_OPTIONS: { value: CalculationDimension; label: string; level: string }[] = [
+  { value: 'facility', label: CALCULATION_DIMENSION_LABELS.facility, level: DIMENSION_TO_CONSUMPTION_LEVEL.facility },
+  { value: 'counterparty', label: CALCULATION_DIMENSION_LABELS.counterparty, level: DIMENSION_TO_CONSUMPTION_LEVEL.counterparty },
+  { value: 'L3', label: CALCULATION_DIMENSION_LABELS.L3, level: DIMENSION_TO_CONSUMPTION_LEVEL.L3 },
+  { value: 'L2', label: CALCULATION_DIMENSION_LABELS.L2, level: DIMENSION_TO_CONSUMPTION_LEVEL.L2 },
+  { value: 'L1', label: CALCULATION_DIMENSION_LABELS.L1, level: DIMENSION_TO_CONSUMPTION_LEVEL.L1 },
+];
+
 export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
   const {
     loading, search, setSearch,
@@ -78,6 +90,44 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
     handleSaveCreateFromEngine,
     duplicateMetric, onStartCreate, onCancelCreate,
   } = props;
+
+  const [consumeLevel, setConsumeLevel] = useState<string>(CONSUMPTION_LEVELS[0]);
+  const [copyConsumeSuccess, setCopyConsumeSuccess] = useState<'all' | 'consumable' | 'allDims' | null>(null);
+  const [showApiRef, setShowApiRef] = useState(false);
+
+  const consumeAllUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/api/metrics/values?level=${encodeURIComponent(consumeLevel)}&asOfDate=`
+      : '';
+  const consumableListUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/api/metrics/consumable`
+      : '';
+  const valuesApiBaseUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/metrics/values` : '';
+
+  const copyConsumeAll = () => {
+    navigator.clipboard.writeText(consumeAllUrl).then(() => {
+      setCopyConsumeSuccess('all');
+      setTimeout(() => setCopyConsumeSuccess(null), 2000);
+    }).catch(() => setCopyConsumeSuccess(null));
+  };
+  const copyConsumableList = () => {
+    navigator.clipboard.writeText(consumableListUrl).then(() => {
+      setCopyConsumeSuccess('consumable');
+      setTimeout(() => setCopyConsumeSuccess(null), 2000);
+    }).catch(() => setCopyConsumeSuccess(null));
+  };
+  const copyAllDimensionsUrls = () => {
+    const base = valuesApiBaseUrl || '';
+    const block = CONSUMPTION_LEVELS.map(
+      (lev) => `${lev}: ${base}?level=${lev}&asOfDate=`
+    ).join('\n');
+    const toCopy = `// URLs for each dimension — use one per dashboard section\n${block}`;
+    navigator.clipboard.writeText(toCopy).then(() => {
+      setCopyConsumeSuccess('allDims');
+      setTimeout(() => setCopyConsumeSuccess(null), 2000);
+    }).catch(() => setCopyConsumeSuccess(null));
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white flex">
@@ -240,9 +290,124 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               <header className="mb-6">
                 <h2 className="text-lg font-bold text-white">Deep-dive metrics</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}. Click a metric to validate calculations across Facility, Counterparty, L3 Desk, L2 Portfolio, and L1 Department.
+                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}. Click a metric to validate calculations across Facility, Counterparty, Desk, Portfolio, and LOB.
                 </p>
               </header>
+
+              <section
+                className="mb-8 p-5 rounded-xl border border-emerald-500/30 bg-emerald-950/20"
+                aria-labelledby="consume-api-section-heading"
+              >
+                <h2 id="consume-api-section-heading" className="text-sm font-semibold text-emerald-300 flex items-center gap-2 mb-1">
+                  <BarChart3 className="w-4 h-4" aria-hidden />
+                  Consume API
+                </h2>
+                <p className="text-xs text-gray-400 mb-2">
+                  Get all metrics at a specific dimension for your dashboard. Copy the API URL and call it with optional <code className="px-1 py-0.5 rounded bg-white/10 text-[10px]">asOfDate=</code>.
+                </p>
+                <div className="mb-4 p-3 rounded-lg bg-white/[0.04] border border-white/10" role="status">
+                  <p className="text-[11px] text-gray-300 leading-relaxed">
+                    <strong className="text-emerald-400/90">Dashboard with many dimensions?</strong> Use the same API with <code className="px-1 rounded bg-white/10">level=facility</code>, <code className="px-1 rounded bg-white/10">level=counterparty</code>, <code className="px-1 rounded bg-white/10">level=desk</code>, <code className="px-1 rounded bg-white/10">level=portfolio</code>, or <code className="px-1 rounded bg-white/10">level=lob</code> for each section. One call per dimension — no calculations in your app.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-end gap-4 mb-4">
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider" id="consume-dimension-label">Dimension</span>
+                    <select
+                      value={consumeLevel}
+                      onChange={(e) => setConsumeLevel(e.target.value)}
+                      aria-labelledby="consume-dimension-label"
+                      className="rounded-lg bg-white/10 border border-white/20 text-sm text-white px-3 py-2 min-w-[140px] focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-[#0a0e1a]"
+                    >
+                      {CONSUME_LEVEL_OPTIONS.map((opt) => (
+                        <option key={opt.level} value={opt.level} className="bg-gray-900 text-white">
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={copyConsumeAll}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/30 hover:bg-emerald-500/40 text-emerald-200 text-sm font-medium border border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    >
+                      {copyConsumeSuccess === 'all' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copyConsumeSuccess === 'all' ? 'Copied' : 'Consume API'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={copyConsumableList}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-gray-300 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    >
+                      {copyConsumeSuccess === 'consumable' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      Copy consumable list URL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={copyAllDimensionsUrls}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-gray-300 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                      title="Copy one URL per dimension (facility, counterparty, desk, portfolio, lob) for multi-section dashboards"
+                    >
+                      {copyConsumeSuccess === 'allDims' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copyConsumeSuccess === 'allDims' ? 'Copied' : 'Copy all dimensions'}
+                    </button>
+                  </div>
+                </div>
+                <div className="rounded-lg bg-black/20 border border-white/10 px-3 py-2">
+                  <p className="text-[10px] text-gray-500 mb-1">All metrics at this dimension (GET)</p>
+                  <code className="text-xs font-mono text-emerald-300/90 break-all">
+                    {consumeAllUrl}
+                  </code>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <a
+                    href={consumeAllUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e1a] rounded px-1 py-0.5"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" aria-hidden />
+                    Try it (open JSON in new tab)
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setShowApiRef((v) => !v)}
+                    aria-expanded={showApiRef}
+                    className="text-xs text-gray-500 hover:text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e1a] rounded px-1 py-0.5"
+                  >
+                    {showApiRef ? 'Hide' : 'Show'} API reference
+                  </button>
+                </div>
+                {showApiRef && (
+                  <details open className="mt-3 rounded-lg bg-black/30 border border-white/10 overflow-hidden">
+                    <summary className="px-3 py-2 text-xs font-medium text-gray-400 cursor-pointer list-none">
+                      Query params & response
+                    </summary>
+                    <div className="px-3 py-2 pt-0 text-[11px] text-gray-400 space-y-2 border-t border-white/10">
+                      <p><strong className="text-gray-300">Params:</strong> <code>level</code> (required), <code>asOfDate</code> (optional, e.g. 2025-01-15), <code>runVersion</code>, <code>facilityId</code>, <code>counterpartyId</code>, <code>portfolioId</code>, <code>deskId</code>, <code>lobId</code> (optional filters).</p>
+                      <p><strong className="text-gray-300">All metrics response:</strong> <code>{`{ level, asOfDate, runVersion, metrics: [ { metric: { id, name, displayFormat }, rows: [ { facility_id?, counterparty_id?, ..., value } ] } ], errors? }`}</code></p>
+                      <p><strong className="text-gray-300">Single metric</strong> (add <code>metricId=ID</code>): <code>{`{ metric, level, asOfDate, runVersion, rows }`}</code></p>
+                    </div>
+                  </details>
+                )}
+                <p className="text-[11px] text-gray-500 mt-2">
+                  Omit <code className="px-1 rounded bg-white/10">metricId</code> to receive every metric at the selected level. For a single metric, open the metric and use &quot;Consume API&quot; there. &quot;Consumable list&quot; returns metadata only (metric list and allowed levels); use the URL above for values.
+                </p>
+                <details className="mt-4 group">
+                  <summary className="cursor-pointer list-none flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e1a] rounded py-1 pr-2">
+                    <span className="inline-block transition-transform group-open:rotate-90">▶</span>
+                    Dashboard integration guide (copy-paste snippets)
+                  </summary>
+                  <div className="mt-3 pl-4 border-l-2 border-emerald-500/30">
+                    <ConsumeApiIntegrationGuide
+                      valuesApiBaseUrl={valuesApiBaseUrl}
+                      singleMetricExample={{ metricId: 'C101', level: consumeLevel }}
+                    />
+                  </div>
+                </details>
+              </section>
+
               <div className="space-y-4">
                 {Array.from(sections.entries()).map(([section, list]) => (
                   <div key={section}>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Copy, ChevronDown, ChevronUp, Code, Zap } from 'lucide-react';
 import {
   CALCULATION_DIMENSIONS,
+  CALCULATION_DIMENSION_LABELS,
   type CalculationDimension,
 } from '@/data/l3-metrics';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
@@ -29,14 +30,6 @@ interface MetricDimensionFormulaApiRow {
 function normalizeMatchKey(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
 }
-
-const DEEP_DIVE_LEVEL_LABELS: Record<CalculationDimension, string> = {
-  facility: 'Facility',
-  counterparty: 'Counterparty',
-  L3: 'L3-Desk',
-  L2: 'L2-Portfolio',
-  L1: 'L1-LoB',
-};
 
 function getAllowedDimensions(metric: L3Metric): CalculationDimension[] {
   if (metric.allowedDimensions?.length) return metric.allowedDimensions;
@@ -129,14 +122,14 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
               type="button"
               onClick={() => setDimension(dim)}
               aria-pressed={dimension === dim}
-              aria-label={`Calculate metric at ${DEEP_DIVE_LEVEL_LABELS[dim]} level`}
+              aria-label={`Calculate metric at ${CALCULATION_DIMENSION_LABELS[dim]} level`}
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
                 dimension === dim
                   ? 'bg-purple-500/30 text-purple-200 border border-purple-500/50'
                   : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
               }`}
             >
-              {DEEP_DIVE_LEVEL_LABELS[dim]}
+              {CALCULATION_DIMENSION_LABELS[dim]}
             </button>
           ))}
         </div>

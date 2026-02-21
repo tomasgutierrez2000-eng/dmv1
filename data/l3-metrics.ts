@@ -31,12 +31,36 @@ export type CalculationDimension = 'counterparty' | 'facility' | 'L1' | 'L2' | '
 
 export const CALCULATION_DIMENSIONS: CalculationDimension[] = ['counterparty', 'facility', 'L1', 'L2', 'L3'];
 
+/** Business-facing labels for aggregation levels (Facility, Counterparty, Desk, Portfolio, LOB). */
 export const CALCULATION_DIMENSION_LABELS: Record<CalculationDimension, string> = {
   counterparty: 'Counterparty',
   facility: 'Facility',
-  L1: 'L1 (Reference)',
-  L2: 'L2 (Snapshot)',
-  L3: 'L3 (Derived)',
+  L1: 'LOB',
+  L2: 'Portfolio',
+  L3: 'Desk',
+};
+
+/** API level param for consumption API: facility | counterparty | desk | portfolio | lob */
+export type ConsumptionLevel = 'facility' | 'counterparty' | 'desk' | 'portfolio' | 'lob';
+
+export const CONSUMPTION_LEVELS: ConsumptionLevel[] = ['facility', 'counterparty', 'desk', 'portfolio', 'lob'];
+
+/** Map CalculationDimension to ConsumptionLevel for the values/consumable API. */
+export const DIMENSION_TO_CONSUMPTION_LEVEL: Record<CalculationDimension, ConsumptionLevel> = {
+  facility: 'facility',
+  counterparty: 'counterparty',
+  L3: 'desk',
+  L2: 'portfolio',
+  L1: 'lob',
+};
+
+/** Map ConsumptionLevel (API param) back to CalculationDimension. */
+export const CONSUMPTION_LEVEL_TO_DIMENSION: Record<ConsumptionLevel, CalculationDimension> = {
+  facility: 'facility',
+  counterparty: 'counterparty',
+  desk: 'L3',
+  portfolio: 'L2',
+  lob: 'L1',
 };
 
 export interface DimensionUsage {

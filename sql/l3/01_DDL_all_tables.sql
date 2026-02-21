@@ -1305,3 +1305,23 @@ CREATE TABLE IF NOT EXISTS l3.lob_top_contributors (
     -- FK: lob_node_id → L1.lob_node.lob_node_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
 
+-- T50: metric_value_fact (Dashboard consumption — pre-calculated metric values by level)
+CREATE TABLE IF NOT EXISTS l3.metric_value_fact (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    metric_id                                     VARCHAR(64) NOT NULL,
+    variant_id                                    VARCHAR(64),
+    aggregation_level                             VARCHAR(30) NOT NULL,
+    facility_id                                   VARCHAR(64),
+    counterparty_id                               VARCHAR(64),
+    desk_id                                       VARCHAR(64),
+    portfolio_id                                  VARCHAR(64),
+    lob_id                                        VARCHAR(64),
+    value                                         NUMERIC(20,6),
+    unit                                          VARCHAR(30),
+    display_format                                VARCHAR(64),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_metric_value_fact ON l3.metric_value_fact (run_version_id, as_of_date, metric_id, COALESCE(variant_id, ''), aggregation_level, COALESCE(facility_id, ''), COALESCE(counterparty_id, ''), COALESCE(desk_id, ''), COALESCE(portfolio_id, ''), COALESCE(lob_id, ''));
+CREATE INDEX IF NOT EXISTS ix_metric_value_fact_lookup ON l3.metric_value_fact (metric_id, aggregation_level, as_of_date, run_version_id);
+

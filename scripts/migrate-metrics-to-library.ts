@@ -15,6 +15,15 @@ import type { ParentMetric, MetricVariant } from '../lib/metric-library/types';
 
 const DEFAULT_DOMAIN_ID = 'PR';
 
+/** Default rollup_logic so every variant is in the full dictionary format (Facility → Counterparty → Desk → Portfolio → LoB). */
+const DEFAULT_ROLLUP_LOGIC: MetricVariant['rollup_logic'] = {
+  facility: 'Calculated per facility (native grain).',
+  counterparty: 'Aggregated from facility to counterparty.',
+  desk: 'Rolled up to desk (e.g. weighted average or sum by L3 segment).',
+  portfolio: 'Rolled up to portfolio (L2 segment).',
+  lob: 'Rolled up to line of business (L1 segment).',
+};
+
 function main() {
   const metrics = getMergedMetrics();
   let parentsCreated = 0;
@@ -54,6 +63,7 @@ function main() {
       formula_specification: m.formulaSQL,
       executable_metric_id: metricId,
       detailed_description: m.description,
+      rollup_logic: DEFAULT_ROLLUP_LOGIC,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };

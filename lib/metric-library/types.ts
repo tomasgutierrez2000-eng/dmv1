@@ -80,10 +80,18 @@ export interface RiskAppetiteThreshold {
   escalation_action?: string;
 }
 
+/** Data tier for lineage: L1 = reference/atomic, L2 = snapshot/attribution, L3 = derived metric, EXTERNAL = outside bank data. */
+export type LineageDataTier = 'L1' | 'L2' | 'L3' | 'EXTERNAL';
+
 export interface LineageNodeRef {
   node_id: string;
   node_name: string;
   node_type?: 'FIELD' | 'METRIC_VARIANT' | 'EXTERNAL_SYSTEM' | 'REFERENCE_DATA';
+  /** When set, drives layout: L1/L2 shown as atomic inputs, L3 as derived, EXTERNAL as source system. */
+  data_tier?: LineageDataTier;
+  /** Optional table.field for FIELD nodes (e.g. "position.balance_amount", "facility_master.committed_amt"). */
+  table?: string;
+  field?: string;
   description?: string;
 }
 

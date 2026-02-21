@@ -402,7 +402,7 @@ export default function LibraryMainView() {
                 <Link
                   key={m.metric_id}
                   href={`/metrics/library/${encodeURIComponent(m.metric_id)}`}
-                  className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">

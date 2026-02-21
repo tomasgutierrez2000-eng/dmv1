@@ -12,7 +12,10 @@ export async function GET(
     return NextResponse.json({ error: 'Variant not found' }, { status: 404 });
   }
   const parent = variant.parent_metric_id ? getParentMetric(variant.parent_metric_id) : null;
-  return NextResponse.json({ ...variant, parent });
+  return NextResponse.json({
+    variant,
+    parent: parent ? { metric_id: parent.metric_id, metric_name: parent.metric_name } : null,
+  });
 }
 
 export async function PUT(

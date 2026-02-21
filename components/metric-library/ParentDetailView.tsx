@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import type { MetricDomain } from '@/lib/metric-library/types';
 import { TypeBadge, StatusBadge } from './badges';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
@@ -32,6 +33,8 @@ interface VariantSummary {
   source_system?: string;
   refresh_frequency?: string;
   executable_metric_id?: string | null;
+  used_by_dashboards?: string[];
+  used_by_reports?: string[];
 }
 
 const TABS = [
@@ -178,12 +181,15 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
             aria-labelledby="parent-tab-variants-btn"
             className="space-y-3"
           >
+            <p className="text-sm text-gray-500 mb-2">
+              Click any variant to see its full definition, formula, rollup logic, data lineage, validation rules, usage, and governance.
+            </p>
             {(m.variants ?? []).length > 0 ? (
               (m.variants ?? []).map((v) => (
                 <Link
                   key={v.variant_id}
                   href={`/metrics/library/${encodeURIComponent(parentId)}/${encodeURIComponent(v.variant_id)}`}
-                  className="bg-white rounded-2xl border border-gray-200 p-4 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  className="bg-white rounded-2xl border border-gray-200 p-4 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -201,12 +207,15 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                         {v.refresh_frequency && (
                           <span>Refresh: <span className="font-medium text-gray-700">{v.refresh_frequency}</span></span>
                         )}
+                        {((v.used_by_dashboards?.length ?? 0) + (v.used_by_reports?.length ?? 0)) > 0 && (
+                          <span>Used by: <span className="font-medium text-gray-700">{(v.used_by_dashboards?.length ?? 0) + (v.used_by_reports?.length ?? 0)} dashboards/reports</span></span>
+                        )}
                         {v.executable_metric_id && (
                           <span className="font-medium text-green-600">Runnable in Engine</span>
                         )}
                       </div>
                     </div>
-                    <span className="text-blue-400 flex-shrink-0" aria-hidden>→</span>
+                    <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" aria-hidden />
                   </div>
                 </Link>
               ))

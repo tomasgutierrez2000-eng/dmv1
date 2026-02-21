@@ -6,6 +6,7 @@ import { ExternalLink } from 'lucide-react';
 import type { MetricVariant } from '@/lib/metric-library/types';
 import { ROLLUP_HIERARCHY_LEVELS, ROLLUP_LEVEL_LABELS } from '@/lib/metric-library/types';
 import { TypeBadge, StatusBadge } from './badges';
+import MetricLibraryLineageView from './MetricLibraryLineageView';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 
 interface VariantDetailResponse {
@@ -101,12 +102,6 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
   const v = data.variant;
   const parent = data.parent;
 
-  const upstream = Array.isArray(v.upstream_inputs)
-    ? v.upstream_inputs.map((x) => (typeof x === 'string' ? x : (x as { node_name: string }).node_name))
-    : [];
-  const downstream = Array.isArray(v.downstream_consumers)
-    ? v.downstream_consumers.map((x) => (typeof x === 'string' ? x : (x as { node_name: string }).node_name))
-    : [];
   const rollupLogic = v.rollup_logic as Record<string, string> | undefined;
   const levels = rollupLogic ? [...ROLLUP_HIERARCHY_LEVELS] : [];
 
@@ -196,6 +191,12 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             aria-labelledby="variant-tab-definition-btn"
             className="space-y-6"
           >
+            {v.detailed_description && (
+              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Description</h2>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{v.detailed_description}</p>
+              </div>
+            )}
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Formula</h2>
               <div className="bg-gray-900 rounded-xl p-4 font-mono text-sm text-green-400 whitespace-pre-wrap overflow-x-auto">
@@ -205,12 +206,16 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             {(v.companion_fields?.length ?? 0) > 0 && (
               <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
                 <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Companion Metadata Fields</h2>
+                <p className="text-xs text-gray-500 mb-3">These fields must be ingested alongside the primary value for full context.</p>
                 <div className="flex flex-wrap gap-2">
-                  {v.companion_fields!.map((f) => (
-                    <span key={f} className="bg-gray-100 text-gray-700 text-xs font-mono px-2.5 py-1 rounded border border-gray-200">
-                      {f}
-                    </span>
-                  ))}
+                  {v.companion_fields!.map((f, i) => {
+                    const label = typeof f === 'string' ? f : (f as { field_name?: string; display_name?: string }).field_name ?? (f as { display_name?: string }).display_name ?? String(f);
+                    return (
+                      <span key={typeof f === 'string' ? f : `f-${i}`} className="bg-gray-100 text-gray-700 text-xs font-mono px-2.5 py-1 rounded border border-gray-200">
+                        {label}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -262,45 +267,9 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             aria-labelledby="variant-tab-lineage-btn"
             className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
           >
-            <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Data Lineage</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <div className="text-xs font-bold text-gray-500 uppercase mb-2">Upstream Inputs</div>
-                {upstream.length > 0 ? (
-                  <ul className="space-y-2">
-                    {upstream.map((u, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" aria-hidden />
-                        <span className="text-sm text-gray-700">{u}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-gray-500">—</p>
-                )}
-              </div>
-              <div className="flex items-center justify-center">
-                <div className="bg-blue-600 text-white rounded-lg px-4 py-3 text-center shadow-sm">
-                  <div className="text-xs font-bold uppercase opacity-80">This Metric</div>
-                  <div className="text-sm font-bold mt-1">{v.variant_name}</div>
-                </div>
-              </div>
-              <div>
-                <div className="text-xs font-bold text-gray-500 uppercase mb-2">Downstream Consumers</div>
-                {downstream.length > 0 ? (
-                  <ul className="space-y-2">
-                    {downstream.map((d, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" aria-hidden />
-                        <span className="text-sm text-gray-700">{d}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-gray-500">—</p>
-                )}
-              </div>
-            </div>
+            <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Data Lineage</h2>
+            <p className="text-xs text-gray-500 mb-4">How this metric is built from L1/L2 atomic data and where it is consumed.</p>
+            <MetricLibraryLineageView variant={v} />
           </section>
         )}
 

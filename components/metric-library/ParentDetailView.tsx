@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import type { MetricDomain } from '@/lib/metric-library/types';
+import { TypeBadge, StatusBadge } from './badges';
+import { LibraryPageLoading, LibraryError } from './LibraryStates';
 
 interface ParentDetail {
   metric_id: string;
@@ -32,61 +34,78 @@ interface VariantSummary {
   executable_metric_id?: string | null;
 }
 
-const TypeBadge = ({ type }: { type: string }) => {
-  const colors: Record<string, string> = {
-    SOURCED: 'bg-sky-100 text-sky-800 border border-sky-300',
-    CALCULATED: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
-    HYBRID: 'bg-amber-100 text-amber-800 border border-amber-300',
-  };
-  return <span className={`text-xs font-bold px-2 py-0.5 rounded ${colors[type] ?? ''}`}>{type}</span>;
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const colors: Record<string, string> = {
-    ACTIVE: 'bg-emerald-100 text-emerald-800',
-    DRAFT: 'bg-amber-100 text-amber-800',
-    DEPRECATED: 'bg-gray-200 text-gray-500',
-    INACTIVE: 'bg-gray-200 text-gray-500',
-    PROPOSED: 'bg-blue-100 text-blue-700',
-  };
-  return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${colors[status] ?? colors.DRAFT}`}>{status}</span>;
-};
+const TABS = [
+  { id: 'variants' as const, label: 'Variants' },
+  { id: 'rollup' as const, label: 'Rollup Philosophy' },
+  { id: 'domains' as const, label: 'Domains' },
+];
 
 export default function ParentDetailView({ parentId }: { parentId: string }) {
   const [data, setData] = useState<ParentDetail | null>(null);
   const [domains, setDomains] = useState<MetricDomain[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'variants' | 'rollup' | 'domains'>('variants');
+  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('variants');
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
+    setError(null);
+    setLoading(true);
     Promise.all([
-      fetch(`/api/metrics/library/parents/${encodeURIComponent(parentId)}`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`/api/metrics/library/parents/${encodeURIComponent(parentId)}`).then((r) => {
+        if (!r.ok) throw new Error(r.status === 404 ? 'Parent metric not found' : 'Failed to load');
+        return r.json();
+      }),
       fetch('/api/metrics/library/domains').then((r) => r.json()),
-    ]).then(([detail, d]) => {
-      setData(detail ?? null);
-      setDomains(Array.isArray(d) ? d : []);
-      setLoading(false);
-    });
+    ])
+      .then(([detail, d]) => {
+        setData(detail);
+        setDomains(Array.isArray(d) ? d : []);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
+      .finally(() => setLoading(false));
   }, [parentId]);
 
-  if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
-  if (!data) return <div className="min-h-screen bg-gray-50 p-6">Parent metric not found.</div>;
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) return <LibraryPageLoading />;
+  if (error || !data) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+        <LibraryError
+          message={error ?? 'Parent metric not found.'}
+          onRetry={fetchData}
+          backHref="/metrics/library"
+          backLabel="Back to Library"
+        />
+      </div>
+    );
+  }
 
   const m = data;
+  const variantCount = m.variants?.length ?? m.variant_count ?? 0;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-3">
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Link href="/metrics/library" className="hover:text-blue-600">Metric Library</Link>
-          <span>/</span>
-          <span className="text-gray-900 font-medium">{m.metric_name}</span>
-        </div>
-      </div>
+      <nav className="bg-white border-b border-gray-200 px-6 py-3" aria-label="Breadcrumb">
+        <ol className="flex items-center gap-2 text-sm text-gray-500">
+          <li>
+            <Link href="/metrics/library" className="hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded">
+              Metric Library
+            </Link>
+          </li>
+          <li aria-hidden>/</li>
+          <li className="text-gray-900 font-medium" aria-current="page">
+            {m.metric_name}
+          </li>
+        </ol>
+      </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-6">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
+      <main className="max-w-6xl mx-auto px-6 py-6">
+        <div className="flex items-start justify-between gap-6 mb-6">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-2xl font-bold text-gray-900">{m.metric_name}</h1>
               <TypeBadge type={m.metric_class} />
               <span
@@ -99,105 +118,145 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
             </div>
             <p className="text-gray-600 text-sm max-w-3xl">{m.definition}</p>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-gray-900">{m.variants?.length ?? m.variant_count ?? 0}</div>
+          <div className="text-right flex-shrink-0">
+            <div className="text-3xl font-bold text-gray-900 tabular-nums">{variantCount}</div>
             <div className="text-xs text-gray-500">Variants</div>
           </div>
         </div>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-gray-500 mb-6">
           One parent metric, multiple variants. Each variant defines how it rolls up across Facility → Counterparty → Desk → Portfolio → LoB.
         </p>
 
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="text-xs text-gray-500 uppercase font-bold mb-1">Generic Formula</div>
-            <div className="font-mono text-sm text-gray-900">{m.generic_formula}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Generic Formula</div>
+            <div className="font-mono text-sm text-gray-900 break-words">{m.generic_formula}</div>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="text-xs text-gray-500 uppercase font-bold mb-1">Unit</div>
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Unit</div>
             <div className="text-lg font-bold text-gray-900">{m.unit_type}</div>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="text-xs text-gray-500 uppercase font-bold mb-1">Rollup Philosophy</div>
-            <div className="text-sm text-gray-700">{(m.rollup_philosophy ?? m.rollup_description ?? '').split('.')[0]}</div>
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Rollup Philosophy</div>
+            <div className="text-sm text-gray-700">{(m.rollup_philosophy ?? m.rollup_description ?? '').split('.')[0] || '—'}</div>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="text-xs text-gray-500 uppercase font-bold mb-1">Risk Appetite</div>
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+            <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Risk Appetite</div>
             <div className={`text-sm font-bold ${m.risk_appetite_relevant ? 'text-green-600' : 'text-gray-400'}`}>
               {m.risk_appetite_relevant ? 'Yes — Linked' : 'No'}
             </div>
           </div>
         </div>
 
-        <div className="flex gap-1 border-b border-gray-200 mb-4">
-          {(['variants', 'rollup', 'domains'] as const).map((t) => (
+        <div
+          role="tablist"
+          aria-label="Parent metric sections"
+          className="flex gap-1 border-b border-gray-200 mb-4 -mb-px"
+        >
+          {TABS.map((t) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-                tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              aria-controls={`parent-tab-${t.id}`}
+              id={`parent-tab-${t.id}-btn`}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                tab === t.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              {t === 'variants' ? `Variants (${m.variants?.length ?? 0})` : t === 'rollup' ? 'Rollup Philosophy' : 'Domains'}
+              {t.id === 'variants' ? `Variants (${variantCount})` : t.label}
             </button>
           ))}
         </div>
 
         {tab === 'variants' && (
-          <div className="space-y-3">
-            {(m.variants ?? []).map((v) => (
-              <Link
-                key={v.variant_id}
-                href={`/metrics/library/${encodeURIComponent(parentId)}/${encodeURIComponent(v.variant_id)}`}
-                className="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md cursor-pointer transition-all block"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-gray-900">{v.variant_name}</span>
-                      <TypeBadge type={v.variant_type} />
-                      <StatusBadge status={v.status} />
+          <section
+            id="parent-tab-variants"
+            role="tabpanel"
+            aria-labelledby="parent-tab-variants-btn"
+            className="space-y-3"
+          >
+            {(m.variants ?? []).length > 0 ? (
+              (m.variants ?? []).map((v) => (
+                <Link
+                  key={v.variant_id}
+                  href={`/metrics/library/${encodeURIComponent(parentId)}/${encodeURIComponent(v.variant_id)}`}
+                  className="bg-white rounded-2xl border border-gray-200 p-4 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-bold text-gray-900">{v.variant_name}</span>
+                        <TypeBadge type={v.variant_type} />
+                        <StatusBadge status={v.status} />
+                      </div>
+                      <code className="text-xs text-gray-400 font-mono">{v.variant_id}</code>
+                      <p className="text-sm text-gray-600 mt-1.5 line-clamp-2">{v.detailed_description ?? v.formula_display ?? '—'}</p>
+                      <div className="flex gap-4 mt-2 text-xs text-gray-500 flex-wrap">
+                        {v.source_system && (
+                          <span>Source: <span className="font-medium text-gray-700">{v.source_system}</span></span>
+                        )}
+                        {v.refresh_frequency && (
+                          <span>Refresh: <span className="font-medium text-gray-700">{v.refresh_frequency}</span></span>
+                        )}
+                        {v.executable_metric_id && (
+                          <span className="font-medium text-green-600">Runnable in Engine</span>
+                        )}
+                      </div>
                     </div>
-                    <code className="text-xs text-gray-400 font-mono">{v.variant_id}</code>
-                    <p className="text-sm text-gray-600 mt-1.5 line-clamp-2">{v.detailed_description ?? v.formula_display}</p>
-                    <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                      {v.source_system && <span>Source: <span className="font-medium text-gray-700">{v.source_system}</span></span>}
-                      {v.refresh_frequency && <span>Refresh: <span className="font-medium text-gray-700">{v.refresh_frequency}</span></span>}
-                      {v.executable_metric_id && <span className="font-medium text-green-600">Runnable in Engine</span>}
-                    </div>
+                    <span className="text-blue-400 flex-shrink-0" aria-hidden>→</span>
                   </div>
-                  <span className="text-gray-400">→</span>
-                </div>
-              </Link>
-            ))}
-            {(!m.variants || m.variants.length === 0) && (
-              <div className="bg-white rounded-lg border border-gray-200 p-6 text-center text-gray-500">No variants yet.</div>
+                </Link>
+              ))
+            ) : (
+              <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center text-gray-500 shadow-sm">
+                No variants yet.
+              </div>
             )}
-          </div>
+          </section>
         )}
 
         {tab === 'rollup' && (
-          <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Rollup Philosophy</h3>
+          <section
+            id="parent-tab-rollup"
+            role="tabpanel"
+            aria-labelledby="parent-tab-rollup-btn"
+            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+          >
+            <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Rollup Philosophy</h2>
             <p className="text-sm text-gray-700">{m.rollup_description || m.rollup_philosophy || 'Not specified.'}</p>
-          </div>
+          </section>
         )}
 
         {tab === 'domains' && (
-          <div className="flex flex-wrap gap-3">
-            {(m.domain_ids ?? []).map((dId) => {
-              const domain = domains.find((d) => d.domain_id === dId);
-              return domain ? (
-                <div key={dId} className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-2">
-                  <span className="text-xl">{domain.icon}</span>
-                  <span className="font-medium text-gray-900">{domain.domain_name}</span>
-                </div>
-              ) : null;
-            })}
-            {(m.domain_ids ?? []).length === 0 && <p className="text-gray-500">No domains assigned.</p>}
-          </div>
+          <section
+            id="parent-tab-domains"
+            role="tabpanel"
+            aria-labelledby="parent-tab-domains-btn"
+            className="flex flex-wrap gap-3"
+          >
+            {(m.domain_ids ?? []).length > 0 ? (
+              (m.domain_ids ?? []).map((dId) => {
+                const domain = domains.find((d) => d.domain_id === dId);
+                return domain ? (
+                  <div
+                    key={dId}
+                    className="bg-white border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm transition-shadow hover:shadow-md"
+                    style={{ borderLeftWidth: 4, borderLeftColor: domain.color }}
+                  >
+                    <span className="text-xl" aria-hidden>{domain.icon}</span>
+                    <span className="font-medium text-gray-900">{domain.domain_name}</span>
+                  </div>
+                ) : null;
+              })
+            ) : (
+              <p className="text-gray-500">No domains assigned.</p>
+            )}
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }

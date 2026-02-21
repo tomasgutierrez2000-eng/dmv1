@@ -16,6 +16,73 @@ function isValidLayer(layer: string): layer is Layer {
   return layer === 'L1' || layer === 'L2' || layer === 'L3';
 }
 
+/** PATCH: update table (category). Updates data dictionary and regenerates DDL. */
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ layer: string; tableName: string }> }
+) {
+  try {
+    const { layer, tableName: rawTableName } = await context.params;
+    const tableName = decodeURIComponent(rawTableName || '');
+    if (!isValidLayer(layer)) {
+      return NextResponse.json({ error: 'Invalid layer. Use L1, L2, or L3.' }, { status: 400 });
+    }
+
+    const body = await request.json().catch(() => ({})) as { category?: string };
+    const category = typeof body.category === 'string' ? body.category.trim() : undefined;
+    if (category === undefined) {
+      return NextResponse.json(
+        { error: 'Body must include "category" to update.' },
+        { status: 400 }
+      );
+    }
+
+    const dd = readDataDictionary();
+    if (!dd) {
+      return NextResponse.json(
+        { error: 'Data dictionary not found. Load or create a model first.' },
+        { status: 404 }
+      );
+    }
+
+    const table = findTable(dd, layer, tableName);
+    if (!table) {
+      return NextResponse.json(
+        { error: `Table "${tableName}" not found in ${layer}.` },
+        { status: 404 }
+      );
+    }
+
+    const updatedTables = dd[layer].map((t) =>
+      t.name === tableName ? { ...t, category: category || t.category } : t
+    );
+    const updated: DataDictionary = {
+      ...dd,
+      [layer]: updatedTables,
+    };
+    writeDataDictionary(updated);
+
+    const sqlDir = path.join(process.cwd(), 'sql', layerToSchema(layer));
+    const ddlPath = path.join(sqlDir, '01_DDL_all_tables.sql');
+    if (fs.existsSync(sqlDir)) {
+      const ddlContent =
+        layer === 'L3' ? generateL3Ddl(updated) : generateLayerDdl(updated, layer);
+      fs.writeFileSync(ddlPath, ddlContent, 'utf-8');
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Table "${tableName}" updated.`,
+    });
+  } catch (error) {
+    console.error('Update table error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to update table.' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   _request: NextRequest,
   context: { params: Promise<{ layer: string; tableName: string }> }

@@ -46,6 +46,8 @@ export default function VisualizerPage() {
   };
 
   const [demoLoading, setDemoLoading] = useState(false);
+  const [dictLoading, setDictLoading] = useState(false);
+
   const loadL1Demo = async () => {
     setDemoLoading(true);
     try {
@@ -68,6 +70,31 @@ export default function VisualizerPage() {
       toast({ type: 'error', title: 'Failed to load demo', description: e instanceof Error ? e.message : 'Unknown error.' });
     } finally {
       setDemoLoading(false);
+    }
+  };
+
+  const loadFromDataDictionary = async () => {
+    setDictLoading(true);
+    try {
+      const res = await fetch('/api/data-model/model');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || res.statusText);
+      }
+      const model = (await res.json()) as DataModel;
+      setModel(model);
+      const { calculateLayout } = require('../../utils/layoutEngine');
+      const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
+      const positions = calculateLayout(model, layoutMode, {}, undefined, tableSize, visibleLayers, compactOverview);
+      const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+      if (isOverview) setTablePositionsReplace(positions);
+      else setTablePositionsBulk(positions);
+      toast({ type: 'success', title: 'Model loaded', description: `Data dictionary: ${Object.keys(model.tables).length} tables (edits from Data Model page).` });
+    } catch (e) {
+      console.error('Load from data dictionary failed:', e);
+      toast({ type: 'error', title: 'Failed to load', description: e instanceof Error ? e.message : 'Unknown error.' });
+    } finally {
+      setDictLoading(false);
     }
   };
 
@@ -116,6 +143,24 @@ export default function VisualizerPage() {
                       <span>Load L1 bank data demo (78 tables)</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
+                  )}
+                </button>
+
+                {/* Load from data dictionary (reflects Data Model page add/edit/remove + SQL/DDL) */}
+                <button
+                  type="button"
+                  onClick={loadFromDataDictionary}
+                  disabled={dictLoading}
+                  aria-busy={dictLoading}
+                  className="w-full mb-4 py-3 px-6 rounded-xl border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 font-medium text-sm flex items-center justify-center gap-2"
+                >
+                  {dictLoading ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      <span>Loading…</span>
+                    </>
+                  ) : (
+                    <span>Load from Data Model (current tables &amp; fields)</span>
                   )}
                 </button>
 

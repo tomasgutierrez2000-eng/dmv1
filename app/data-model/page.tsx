@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Database, Key, Link2, ChevronRight, ChevronDown, Layers, Search, RefreshCw, AlertCircle, Plus, Trash2, FileCode, Loader2 } from 'lucide-react';
+import { Database, Key, Link2, ChevronRight, ChevronDown, Layers, Search, RefreshCw, AlertCircle, Plus, Trash2, FileCode, Loader2, Pencil } from 'lucide-react';
 import Link from 'next/link';
 
 interface FieldDefinition {
@@ -166,6 +166,11 @@ export default function DataModelPage() {
 
   const [addFieldForm, setAddFieldForm] = useState<{ name: string; data_type: string; is_pk: boolean }>({ name: '', data_type: 'VARCHAR(64)', is_pk: false });
 
+  const [editTableOpen, setEditTableOpen] = useState(false);
+  const [editTableForm, setEditTableForm] = useState<{ layer: 'L1' | 'L2' | 'L3'; tableName: string; category: string } | null>(null);
+  const [editFieldOpen, setEditFieldOpen] = useState(false);
+  const [editFieldForm, setEditFieldForm] = useState<{ layer: 'L1' | 'L2' | 'L3'; tableName: string; fieldName: string; name: string; data_type: string; is_pk: boolean } | null>(null);
+
   const loadDataDictionary = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -267,6 +272,55 @@ export default function DataModelPage() {
         return;
       }
       setRemoveConfirm(null);
+      await loadDataDictionary();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateTable = async (layer: 'L1' | 'L2' | 'L3', tableName: string, payload: { category: string }) => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/data-model/tables/${layer}/${encodeURIComponent(tableName)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setActionError(data.error || res.statusText);
+        return;
+      }
+      setEditTableOpen(false);
+      setEditTableForm(null);
+      await loadDataDictionary();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdateField = async (
+    layer: 'L1' | 'L2' | 'L3',
+    tableName: string,
+    fieldName: string,
+    payload: { name: string; data_type?: string; pk_fk?: { is_pk: boolean } }
+  ) => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/data-model/tables/${layer}/${encodeURIComponent(tableName)}/fields/${encodeURIComponent(fieldName)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setActionError(data.error || res.statusText);
+        return;
+      }
+      setEditFieldOpen(false);
+      setEditFieldForm(null);
       await loadDataDictionary();
     } finally {
       setActionLoading(false);
@@ -810,12 +864,28 @@ export default function DataModelPage() {
           <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">{selectedTableData.name}</h2>
-              <button
-                onClick={() => setSelectedTable(null)}
-                className="text-pwc-gray-light hover:text-gray-600 text-2xl"
-              >
-                ×
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const raw = getTableFromDict(dataDictionary, selectedTableData.id);
+                    if (raw) {
+                      setEditTableForm({ layer: raw.layer, tableName: raw.name, category: raw.category || '' });
+                      setEditTableOpen(true);
+                    }
+                  }}
+                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-600"
+                  title="Edit table (category)"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setSelectedTable(null)}
+                  className="text-pwc-gray-light hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
             </div>
 
             <div className={`inline-block px-3 py-1 rounded text-sm mb-4 ${layerColors[selectedTableData.layer].badge}`}>
@@ -933,15 +1003,36 @@ export default function DataModelPage() {
                   return raw.fields.map((f) => (
                     <div key={f.name} className="text-xs font-mono bg-gray-50 p-2 rounded border border-gray-200 flex items-center justify-between gap-2">
                       <span>{f.name}{f.pk_fk?.is_pk ? ' (PK)' : ''}{f.pk_fk?.fk_target ? ' (FK)' : ''}</span>
-                      <button
-                        type="button"
-                        onClick={() => setRemoveConfirm({ type: 'field', tableId: raw.name, layer: raw.layer, fieldName: f.name })}
-                        className="text-red-600 hover:text-red-800 p-0.5"
-                        title="Remove field"
-                        aria-label={`Remove ${f.name}`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditFieldForm({
+                              layer: raw.layer,
+                              tableName: raw.name,
+                              fieldName: f.name,
+                              name: f.name,
+                              data_type: f.data_type || 'VARCHAR(64)',
+                              is_pk: !!f.pk_fk?.is_pk,
+                            });
+                            setEditFieldOpen(true);
+                          }}
+                          className="p-0.5 text-gray-500 hover:text-pwc-orange"
+                          title="Edit field"
+                          aria-label={`Edit ${f.name}`}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRemoveConfirm({ type: 'field', tableId: raw.name, layer: raw.layer, fieldName: f.name })}
+                          className="text-red-600 hover:text-red-800 p-0.5"
+                          title="Remove field"
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ));
                 })()}
@@ -993,6 +1084,101 @@ export default function DataModelPage() {
                 {actionLoading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : 'Remove'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {editTableOpen && editTableForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => !actionLoading && (setEditTableOpen(false), setEditTableForm(null))}>
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-gray-900 mb-2">Edit table</h3>
+            <p className="text-sm text-gray-500 mb-3">{editTableForm.tableName}</p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateTable(editTableForm.layer, editTableForm.tableName, { category: editTableForm.category.trim() || 'Uncategorized' });
+              }}
+              className="space-y-3"
+            >
+              <label className="block text-sm font-medium text-gray-700">Category</label>
+              <input
+                type="text"
+                value={editTableForm.category}
+                onChange={(e) => setEditTableForm((f) => f ? { ...f, category: e.target.value } : null)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Uncategorized"
+              />
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => { setEditTableOpen(false); setEditTableForm(null); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                  Cancel
+                </button>
+                <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-60" disabled={actionLoading}>
+                  {actionLoading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editFieldOpen && editFieldForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => !actionLoading && (setEditFieldOpen(false), setEditFieldForm(null))}>
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-gray-900 mb-2">Edit field</h3>
+            <p className="text-sm text-gray-500 mb-3">{editFieldForm.tableName}.{editFieldForm.fieldName}</p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!editFieldForm.name.trim()) { setActionError('Field name required'); return; }
+                handleUpdateField(editFieldForm.layer, editFieldForm.tableName, editFieldForm.fieldName, {
+                  name: editFieldForm.name.trim(),
+                  data_type: editFieldForm.data_type || undefined,
+                  pk_fk: { is_pk: editFieldForm.is_pk },
+                });
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={editFieldForm.name}
+                  onChange={(e) => setEditFieldForm((f) => f ? { ...f, name: e.target.value } : null)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data type</label>
+                <select
+                  value={editFieldForm.data_type}
+                  onChange={(e) => setEditFieldForm((f) => f ? { ...f, data_type: e.target.value } : null)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="VARCHAR(64)">VARCHAR(64)</option>
+                  <option value="NUMERIC(20,4)">NUMERIC(20,4)</option>
+                  <option value="DATE">DATE</option>
+                  <option value="TIMESTAMP">TIMESTAMP</option>
+                  <option value="INTEGER">INTEGER</option>
+                </select>
+              </div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={editFieldForm.is_pk}
+                  onChange={(e) => setEditFieldForm((f) => f ? { ...f, is_pk: e.target.checked } : null)}
+                />
+                <span className="text-sm">Primary key</span>
+              </label>
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => { setEditFieldOpen(false); setEditFieldForm(null); }} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                  Cancel
+                </button>
+                <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-60" disabled={actionLoading}>
+                  {actionLoading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : 'Save'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

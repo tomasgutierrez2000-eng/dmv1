@@ -1,90 +1,34 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import MetricsEngineLayout, { ENGINE_PREFIX, type MetricWithSource, type ImportResultState } from './MetricsEngineLayout';
 import type { L3Metric } from '@/data/l3-metrics';
-import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type MetricPayload = Partial<L3Metric>;
 
+/** Only the DSCR calculator lives in the engine. All metrics are browsed in the Metric Library. */
+const DSCR_ENGINE_ID = `${ENGINE_PREFIX}dscr`;
+
 export default function MetricsEngine() {
-  const [metrics, setMetrics] = useState<MetricWithSource[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [view, setView] = useState<'list' | 'detail' | 'edit' | 'create'>('list');
+  const [selectedId, setSelectedId] = useState<string | null>(DSCR_ENGINE_ID);
+  const [view, setView] = useState<'list' | 'detail' | 'edit' | 'create'>('detail');
   const [duplicateMetric, setDuplicateMetric] = useState<L3Metric | null>(null);
   const importFileRef = useRef<HTMLInputElement>(null);
   const [importResult, setImportResult] = useState<ImportResultState | null>(null);
   const [replaceAllCustom, setReplaceAllCustom] = useState(false);
 
   const fetchMetrics = () => {
-    setLoading(true);
-    Promise.all([
-      fetch('/api/metrics').then((r) => r.json()).then((d: MetricWithSource[]) => Array.isArray(d) ? d : []),
-      fetch('/api/metrics/library/variants?executable_only=true').then((r) => r.json()).then((d: { executable_metric_id?: string }[]) => Array.isArray(d) ? d : []),
-    ])
-      .then(([allMetrics, libraryVariants]) => {
-        setMetrics(allMetrics);
-        setLibraryExecutableIds(new Set((libraryVariants as { executable_metric_id?: string }[]).map((v) => v.executable_metric_id).filter(Boolean) as string[]));
-      })
-      .catch(() => { setMetrics([]); setLibraryExecutableIds(new Set()); })
-      .finally(() => setLoading(false));
+    // No-op: engine no longer lists metrics; library is the source of truth.
   };
 
-  const [libraryExecutableIds, setLibraryExecutableIds] = useState<Set<string>>(new Set());
+  const sections = new Map<string, MetricWithSource[]>();
+  const filtered: MetricWithSource[] = [];
+  const selectedMetric: MetricWithSource | null = null;
+  const loading = false;
+  const search = '';
+  const setSearch = () => {};
 
-  useEffect(() => { fetchMetrics(); }, []);
-
-  const deepDiveMetrics = useMemo(() => {
-    const fromMetrics = metrics.filter((m) => isDeepDiveMetric(m.id));
-    if (libraryExecutableIds.size === 0) return fromMetrics;
-    const libraryList = fromMetrics.filter((m) => libraryExecutableIds.has(m.id));
-    return libraryList.length > 0 ? libraryList : fromMetrics;
-  }, [metrics, libraryExecutableIds]);
-
-  const filtered = useMemo(() => {
-    let list = deepDiveMetrics;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(m =>
-        m.name.toLowerCase().includes(q) ||
-        m.id.toLowerCase().includes(q) ||
-        m.formula.toLowerCase().includes(q) ||
-        (m.description || '').toLowerCase().includes(q)
-      );
-    }
-    return list;
-  }, [deepDiveMetrics, search]);
-
-  const sections = useMemo(() => {
-    const map = new Map<string, MetricWithSource[]>();
-    for (const m of filtered) {
-      const sec = m.section || 'Other';
-      if (!map.has(sec)) map.set(sec, []);
-      map.get(sec)!.push(m);
-    }
-    return map;
-  }, [filtered]);
-
-  const selectedMetric = selectedId ? deepDiveMetrics.find(m => m.id === selectedId) ?? null : null;
-
-  useEffect(() => {
-    if (!selectedId) return;
-    if (selectedId.startsWith(ENGINE_PREFIX)) return;
-    if (!deepDiveMetrics.some((m) => m.id === selectedId)) {
-      setSelectedId(null);
-      setView('list');
-    }
-  }, [selectedId, deepDiveMetrics]);
-
-  // Keep navigation predictable when switching views on long pages.
-  useEffect(() => {
-    if (view === 'detail' || view === 'edit' || view === 'create') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [view, selectedId]);
 
   const handleSaveCreate = async (payload: MetricPayload) => {
     const res = await fetch('/api/metrics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });

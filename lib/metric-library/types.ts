@@ -14,6 +14,15 @@
 export const ROLLUP_HIERARCHY_LEVELS = ['facility', 'counterparty', 'desk', 'portfolio', 'lob'] as const;
 export type RollupLevelKey = (typeof ROLLUP_HIERARCHY_LEVELS)[number];
 
+/** Display labels for rollup levels. */
+export const ROLLUP_LEVEL_LABELS: Record<RollupLevelKey, string> = {
+  facility: 'Facility',
+  counterparty: 'Counterparty',
+  desk: 'Desk',
+  portfolio: 'Portfolio',
+  lob: 'Line of Business',
+};
+
 export type MetricClass = 'SOURCED' | 'CALCULATED' | 'HYBRID';
 export type UnitType = 'RATIO' | 'PERCENTAGE' | 'CURRENCY' | 'COUNT' | 'RATE' | 'ORDINAL' | 'DAYS' | 'INDEX';
 export type Direction = 'HIGHER_BETTER' | 'LOWER_BETTER' | 'NEUTRAL';

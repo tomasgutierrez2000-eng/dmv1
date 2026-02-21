@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  ArrowLeft, Search, Plus, Download, Upload, FileSpreadsheet, FileJson, FileCode,
-  ChevronRight, Layers, Hash, TrendingUp, Zap, Calculator, BarChart3, Copy, Check, ExternalLink,
+  ArrowLeft, Plus, Download, Upload, FileSpreadsheet, FileJson, FileCode,
+  ChevronRight, Layers, Calculator, BarChart3, Copy, Check, ExternalLink,
 } from 'lucide-react';
 import { CALCULATION_DIMENSION_LABELS } from '@/data/l3-metrics';
 import { CONSUMPTION_LEVELS, DIMENSION_TO_CONSUMPTION_LEVEL } from '@/data/l3-metrics';
 import type { CalculationDimension } from '@/data/l3-metrics';
-import { metricWithLineage } from '@/lib/lineage-generator';
 import MetricDetailView from './MetricDetailView';
 import MetricForm from './MetricForm';
 import DSCREngine from './engines/DSCREngine';
@@ -35,14 +34,6 @@ export interface ImportResultState {
 
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type MetricPayload = Partial<L3Metric>;
-
-function getMetricTypeIcon(type: string): React.ReactNode {
-  switch (type) {
-    case 'Ratio': case 'Trend': return <TrendingUp className="w-3.5 h-3.5" />;
-    case 'Derived': return <Zap className="w-3.5 h-3.5" />;
-    default: return <Hash className="w-3.5 h-3.5" />;
-  }
-}
 
 export interface MetricsEngineLayoutProps {
   loading: boolean;
@@ -147,74 +138,33 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
             Metric Library →
           </Link>
         </div>
-        <div className="p-3 border-b border-white/[0.04]">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search metrics..."
-              aria-label="Search deep-dive metrics"
-              className="w-full pl-8 pr-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-purple-500/40"
-            />
-          </div>
-        </div>
         <div className="flex-1 overflow-y-auto overscroll-contain py-2">
-          {loading ? (
-            <div className="px-4 py-6 text-center text-gray-500 text-sm">Loading...</div>
-          ) : (
-            <div className="space-y-0.5 px-2">
-              <div className="mb-3">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 px-2 mb-1">
-                  Calculator engine
-                </div>
-                {CALCULATION_ENGINES.map((eng) => {
-                  const engineId = `${ENGINE_PREFIX}${eng.id}`;
-                  const isSelected = selectedId === engineId;
-                  return (
-                    <button
-                      key={eng.id}
-                      onClick={() => { setSelectedId(engineId); setView('detail'); }}
-                      aria-current={isSelected ? 'page' : undefined}
-                      aria-label={`Open ${eng.name} ${eng.description}`}
-                      title={`${eng.name} — ${eng.description}`}
-                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
-                    >
-                      <Calculator className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" aria-hidden />
-                      <span className="flex-1 truncate text-xs font-medium">{eng.name}</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" aria-hidden />
-                    </button>
-                  );
-                })}
-              </div>
-              {Array.from(sections.entries()).map(([section, list]) => (
-                <div key={section} className="mb-3">
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 px-2 mb-1">{section}</div>
-                  {list.map(m => {
-                    const withLineage = metricWithLineage(m);
-                    const hasLineage = withLineage.nodes && withLineage.nodes.length > 0;
-                    const isSelected = selectedId === m.id;
-                    return (
-                      <button
-                        key={m.id}
-                        onClick={() => { setSelectedId(m.id); setView('detail'); }}
-                        aria-current={isSelected ? 'page' : undefined}
-                        aria-label={`Open ${m.id} ${m.name}`}
-                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
-                      >
-                        <span className="text-[10px] font-mono text-gray-500 w-8 flex-shrink-0">{m.id}</span>
-                        <span className="flex-1 truncate text-xs font-medium">{m.name}</span>
-                        {hasLineage && <span className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0" title="Has lineage" />}
-                        <ChevronRight className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-                      </button>
-                    );
-                  })}
-                </div>
-              ))}
-              {filtered.length === 0 && !loading && <div className="px-4 py-6 text-center text-gray-500 text-sm">No deep-dive metrics match</div>}
+          <div className="px-2">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 px-2 mb-1">
+              Calculator
             </div>
-          )}
+            {CALCULATION_ENGINES.map((eng) => {
+              const engineId = `${ENGINE_PREFIX}${eng.id}`;
+              const isSelected = selectedId === engineId;
+              return (
+                <button
+                  key={eng.id}
+                  onClick={() => { setSelectedId(engineId); setView('detail'); }}
+                  aria-current={isSelected ? 'page' : undefined}
+                  aria-label={`Open ${eng.name} ${eng.description}`}
+                  title={`${eng.name} — ${eng.description}`}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
+                >
+                  <Calculator className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" aria-hidden />
+                  <span className="flex-1 truncate text-xs font-medium">{eng.name}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" aria-hidden />
+                </button>
+              );
+            })}
+            <p className="px-2 mt-3 text-[11px] text-gray-500">
+              All metrics live in the <Link href="/metrics/library" className="text-purple-400 hover:text-purple-300">Metric Library</Link>.
+            </p>
+          </div>
         </div>
         <div className="p-3 border-t border-white/[0.04] space-y-2">
           <button onClick={onStartCreate} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-sm font-medium">
@@ -292,9 +242,9 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
           {view === 'list' && (
             <>
               <header className="mb-6">
-                <h2 className="text-lg font-bold text-white">Deep-dive metrics</h2>
+                <h2 className="text-lg font-bold text-white">Calculator engine</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {filtered.length} metric{filtered.length !== 1 ? 's' : ''}. Click a metric to validate calculations across Facility, Counterparty, Desk, Portfolio, and LOB.
+                  Use <strong className="text-purple-300">DSCR</strong> in the sidebar to build variants, or browse all metrics in the <Link href="/metrics/library" className="text-purple-400 hover:text-purple-300">Metric Library</Link>.
                 </p>
               </header>
 
@@ -411,38 +361,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                   </div>
                 </details>
               </section>
-
-              <div className="space-y-4">
-                {Array.from(sections.entries()).map(([section, list]) => (
-                  <div key={section}>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">{section}</h3>
-                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                      {list.map(m => {
-                        const withLineage = metricWithLineage(m);
-                        const hasLineage = withLineage.nodes && withLineage.nodes.length > 0;
-                        return (
-                          <button
-                            key={m.id}
-                            onClick={() => { setSelectedId(m.id); setView('detail'); }}
-                            aria-label={`Open deep-dive metric ${m.id} ${m.name}`}
-                            className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04] text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:border-purple-500/30"
-                          >
-                            <span className="text-gray-500 flex-shrink-0 mt-0.5">{getMetricTypeIcon(m.metricType)}</span>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] font-mono text-gray-500">{m.id}</span>
-                                {hasLineage && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Has lineage" />}
-                              </div>
-                              <div className="text-sm font-medium text-white truncate mt-0.5">{m.name}</div>
-                              <div className="text-[11px] text-gray-500 font-mono truncate mt-0.5">{m.formula}</div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
             </>
           )}
         </div>

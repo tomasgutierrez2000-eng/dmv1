@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import MetricsEngineLayout, { type MetricWithSource, type ImportResultState } from './MetricsEngineLayout';
+import MetricsEngineLayout, { ENGINE_PREFIX, type MetricWithSource, type ImportResultState } from './MetricsEngineLayout';
 import type { L3Metric } from '@/data/l3-metrics';
 import { isDeepDiveMetric } from '@/lib/deep-dive/scope';
 
@@ -63,6 +63,7 @@ export default function MetricsEngine() {
 
   useEffect(() => {
     if (!selectedId) return;
+    if (selectedId.startsWith(ENGINE_PREFIX)) return;
     if (!deepDiveMetrics.some((m) => m.id === selectedId)) {
       setSelectedId(null);
       setView('list');
@@ -83,6 +84,13 @@ export default function MetricsEngine() {
     const created = await res.json();
     setSelectedId(created.id);
     setView('detail');
+  };
+
+  /** Save from calculator engine: persist metric and refetch, but stay on engine (no navigation). */
+  const handleSaveCreateFromEngine = async (payload: MetricPayload) => {
+    const res = await fetch('/api/metrics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Failed to create');
+    fetchMetrics();
   };
 
   const handleSaveEdit = async (payload: MetricPayload) => {
@@ -131,6 +139,7 @@ export default function MetricsEngine() {
       setReplaceAllCustom={setReplaceAllCustom}
       handleSaveCreate={handleSaveCreate}
       handleSaveEdit={handleSaveEdit}
+      handleSaveCreateFromEngine={handleSaveCreateFromEngine}
       duplicateMetric={duplicateMetric}
       onStartCreate={() => { setDuplicateMetric(null); setSelectedId(null); setView('create'); }}
       onCancelCreate={() => { setDuplicateMetric(null); setView('list'); }}

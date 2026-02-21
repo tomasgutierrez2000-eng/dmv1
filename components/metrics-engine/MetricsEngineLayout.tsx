@@ -4,12 +4,18 @@ import React from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Search, Plus, Download, Upload, FileSpreadsheet, FileJson, FileCode,
-  ChevronRight, Layers, Hash, TrendingUp, Zap,
+  ChevronRight, Layers, Hash, TrendingUp, Zap, Calculator,
 } from 'lucide-react';
 import { metricWithLineage } from '@/lib/lineage-generator';
 import MetricDetailView from './MetricDetailView';
 import MetricForm from './MetricForm';
+import DSCREngine from './engines/DSCREngine';
 import type { L3Metric } from '@/data/l3-metrics';
+
+const CALCULATION_ENGINES = [
+  { id: 'dscr', name: 'DSCR', description: 'Variant builder' },
+] as const;
+export const ENGINE_PREFIX = 'engine:';
 
 export interface MetricWithSource extends L3Metric {
   source: 'builtin' | 'custom';
@@ -54,6 +60,8 @@ export interface MetricsEngineLayoutProps {
   setReplaceAllCustom: (v: boolean) => void;
   handleSaveCreate: (payload: MetricPayload) => Promise<void>;
   handleSaveEdit: (payload: MetricPayload) => Promise<void>;
+  /** When saving from a calculator engine, persist without navigating away. */
+  handleSaveCreateFromEngine?: (payload: MetricPayload) => Promise<void>;
   duplicateMetric: L3Metric | null;
   onStartCreate: () => void;
   onCancelCreate: () => void;
@@ -67,6 +75,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
     handleExport, handleImport,
     replaceAllCustom, setReplaceAllCustom,
     handleSaveCreate, handleSaveEdit,
+    handleSaveCreateFromEngine,
     duplicateMetric, onStartCreate, onCancelCreate,
   } = props;
 
@@ -102,6 +111,29 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
             <div className="px-4 py-6 text-center text-gray-500 text-sm">Loading...</div>
           ) : (
             <div className="space-y-0.5 px-2">
+              <div className="mb-3">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 px-2 mb-1">
+                  Calculator engine
+                </div>
+                {CALCULATION_ENGINES.map((eng) => {
+                  const engineId = `${ENGINE_PREFIX}${eng.id}`;
+                  const isSelected = selectedId === engineId;
+                  return (
+                    <button
+                      key={eng.id}
+                      onClick={() => { setSelectedId(engineId); setView('detail'); }}
+                      aria-current={isSelected ? 'page' : undefined}
+                      aria-label={`Open ${eng.name} ${eng.description}`}
+                      title={`${eng.name} — ${eng.description}`}
+                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${isSelected ? 'bg-purple-500/20 text-white' : 'hover:bg-white/[0.04] text-gray-300'}`}
+                    >
+                      <Calculator className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" aria-hidden />
+                      <span className="flex-1 truncate text-xs font-medium">{eng.name}</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" aria-hidden />
+                    </button>
+                  );
+                })}
+              </div>
               {Array.from(sections.entries()).map(([section, list]) => (
                 <div key={section} className="mb-3">
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 px-2 mb-1">{section}</div>
@@ -180,7 +212,13 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
           </div>
         )}
         <div className="px-6 py-6">
-          {view === 'detail' && selectedMetric && (
+          {view === 'detail' && selectedId?.startsWith(ENGINE_PREFIX) && (
+            <DSCREngine
+              onBack={() => { setSelectedId(null); setView('list'); }}
+              onSaveMetric={handleSaveCreateFromEngine ?? handleSaveCreate}
+            />
+          )}
+          {view === 'detail' && selectedMetric && !selectedId?.startsWith(ENGINE_PREFIX) && (
             <MetricDetailView
               metric={selectedMetric}
               onBack={() => setView('list')}

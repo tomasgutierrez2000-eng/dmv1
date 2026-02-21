@@ -63,6 +63,8 @@ export interface LineageNode {
   sampleValue?: string;
   description?: string;
   formula?: string;
+  /** Optional filter context (e.g. "Product: CRE · Sub-product: Multifamily · Scenarios: BASE") so lineage shows how data is pulled. */
+  filterCriteria?: string;
 }
 
 export interface LineageEdge {

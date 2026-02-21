@@ -1,11 +1,26 @@
 import type { L3Metric, LineageNode, LineageEdge, SourceField, CalculationDimension } from '@/data/l3-metrics';
 import { CALCULATION_DIMENSION_LABELS } from '@/data/l3-metrics';
 
+/** Build filter criteria string for lineage nodes from metric context and optional dimension. */
+function lineageFilterCriteria(
+  metric: L3Metric,
+  calculationDimension?: CalculationDimension | null
+): string | undefined {
+  const parts: string[] = [];
+  if (calculationDimension) {
+    parts.push(`Dimension: ${CALCULATION_DIMENSION_LABELS[calculationDimension]}`);
+  }
+  if (metric.page) parts.push(`Page: ${metric.page}`);
+  if (metric.section) parts.push(`Section: ${metric.section}`);
+  return parts.length ? parts.join(' · ') : undefined;
+}
+
 /**
  * Generate nodes and edges for a metric that doesn't have pre-defined lineage.
  * Groups source fields by (layer, table) so that joins between tables are visually clear:
  * one node per table (with all its fields), then transform, then L3 output.
  * Optional calculationDimension is shown in transform/L3 node descriptions (at which grain the metric is calculated).
+ * Filter criteria (dimension, page, section) are set on L2 and transform nodes so lineage shows how data is pulled.
  */
 export function generateLineage(
   metric: L3Metric,
@@ -19,6 +34,7 @@ export function generateLineage(
   const nodes: LineageNode[] = [];
   const edges: LineageEdge[] = [];
   const dimLabel = calculationDimension ? CALCULATION_DIMENSION_LABELS[calculationDimension] : null;
+  const filterCriteria = lineageFilterCriteria(metric, calculationDimension);
 
   // Group by (layer, table) so we show one node per table — tells the "two tables" story
   const byTable = new Map<string, SourceField[]>();
@@ -41,6 +57,7 @@ export function generateLineage(
       fields: fieldNames.length > 1 ? fieldNames : undefined,
       description: fieldNames.length === 1 ? first.description : `Fields: ${fieldNames.join(', ')}`,
       sampleValue: first.sampleValue,
+      filterCriteria,
     });
     edges.push({ from: id, to: 'transform-formula', label: fieldNames.length > 1 ? `${fieldNames.length} fields` : '→' });
   });
@@ -53,6 +70,7 @@ export function generateLineage(
     formula: metric.formula,
     sampleValue: metric.sampleValue || '—',
     description: dimLabel ? `Calculation at ${dimLabel}` : 'Calculation',
+    filterCriteria,
   });
 
   nodes.push({
@@ -70,7 +88,7 @@ export function generateLineage(
   return { nodes, edges };
 }
 
-/** Return metric with lineage: use existing nodes/edges or generate from sourceFields. Optionally apply calculationDimension to transform/L3 descriptions. */
+/** Return metric with lineage: use existing nodes/edges or generate from sourceFields. Optionally apply calculationDimension to transform/L3 descriptions and filterCriteria so lineage shows how data is pulled. */
 export function metricWithLineage(
   metric: L3Metric,
   calculationDimension?: CalculationDimension | null
@@ -84,15 +102,23 @@ export function metricWithLineage(
 
   if (!calculationDimension || !base.nodes) return base;
 
-  // When dimension is set, overlay it on transform and L3 nodes so lineage reflects the selected dimension
+  const dimLabel = CALCULATION_DIMENSION_LABELS[calculationDimension];
+  const overlayFilter = lineageFilterCriteria(metric, calculationDimension);
+
+  // When dimension is set, overlay it on transform and L3 nodes and set filterCriteria on nodes that don't have it
   const nodes = base.nodes.map((n) => {
     if (n.layer === 'transform') {
-      const dimLabel = CALCULATION_DIMENSION_LABELS[calculationDimension];
-      return { ...n, description: `Calculation at ${dimLabel}` };
+      return {
+        ...n,
+        description: `Calculation at ${dimLabel}`,
+        filterCriteria: n.filterCriteria ?? overlayFilter,
+      };
     }
     if (n.layer === 'L3' && !base.edges?.some((e) => e.from === n.id)) {
-      const dimLabel = CALCULATION_DIMENSION_LABELS[calculationDimension];
       return { ...n, description: `${n.description || 'Result'} (at ${dimLabel})` };
+    }
+    if ((n.layer === 'L1' || n.layer === 'L2') && !n.filterCriteria && overlayFilter) {
+      return { ...n, filterCriteria: overlayFilter };
     }
     return n;
   });

@@ -256,6 +256,8 @@ export default function DSCREngine({ onBack, onSaveMetric }: DSCREngineProps) {
       denominatorSources: denComps.filter((c) => denToggles[c.code]).map((c) => ({ name: c.name, source: c.source })),
       dscrValue: dscr,
       sampleValue: dscr != null ? `${dscr.toFixed(2)}x` : '—',
+      numeratorFormatted: `$${numerator.toLocaleString()}`,
+      denominatorFormatted: `$${denominator.toLocaleString()}`,
     };
   }, [
     variantCode,

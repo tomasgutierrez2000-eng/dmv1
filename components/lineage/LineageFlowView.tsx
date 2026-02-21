@@ -146,11 +146,17 @@ export default function LineageFlowView({ metric }: { metric: L3Metric }) {
                 <div className="text-[10px] text-gray-400 font-mono truncate mt-px">
                   {node.formula ? <span className="text-purple-300">{node.formula}</span> : node.sampleValue}
                 </div>
+                {node.filterCriteria && (
+                  <div className="text-[9px] text-gray-500 truncate mt-1 border-t border-white/5 pt-1" title={node.filterCriteria}>
+                    {node.filterCriteria}
+                  </div>
+                )}
               </div>
-              {hovered === pos.id && node.description && (
+              {hovered === pos.id && (node.description || node.filterCriteria) && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-50 bg-gray-800 border border-white/10 rounded-lg px-2.5 py-2 shadow-xl min-w-[180px] max-w-[260px]">
-                  <div className="text-[10px] text-gray-300 leading-relaxed">{node.description}</div>
+                  {node.description && <div className="text-[10px] text-gray-300 leading-relaxed">{node.description}</div>}
                   {node.sampleValue && <div className="text-[10px] text-emerald-400 mt-0.5 font-mono">Value: {node.sampleValue}</div>}
+                  {node.filterCriteria && <div className="text-[9px] text-amber-300/90 mt-1.5 pt-1 border-t border-white/10">Data filter: {node.filterCriteria}</div>}
                 </div>
               )}
             </div>

@@ -13,7 +13,12 @@ export interface DSCRVariantConfig {
   numeratorSources: { name: string; source: string }[];
   denominatorSources: { name: string; source: string }[];
   dscrValue: number | null;
+  /** Final DSCR ratio (e.g. "1.25x") — used for transform and L3 nodes. */
   sampleValue: string;
+  /** Formatted dollar amount for numerator (e.g. "$780,000") — used for facility_financial_snapshot L2 nodes so sample is correct and consistent. */
+  numeratorFormatted?: string;
+  /** Formatted dollar amount for denominator (e.g. "$500,000") — used for cash_flow L2 nodes so sample is correct and consistent. */
+  denominatorFormatted?: string;
 }
 
 /**
@@ -114,9 +119,22 @@ export function dscrConfigToLineage(config: DSCRVariantConfig): { nodes: Lineage
     tableToFields.set('facility_financial_snapshot', ['noi_amt', 'total_debt_service_amt']);
   }
 
+  // Sample values: L2 nodes show dollar amounts (numerator vs denominator by table); transform and L3 show the same formula/result
+  const numeratorSample = config.numeratorFormatted ?? '—';
+  const denominatorSample = config.denominatorFormatted ?? '—';
+  const resultSample = config.sampleValue || '—';
+
+  // Filter context: product + sub-product + scenarios so lineage shows "data pulled with these filters"
+  const filterParts: string[] = [];
+  if (config.productLabel) filterParts.push(`Product: ${config.productLabel}`);
+  if (config.subProduct) filterParts.push(`Sub-product: ${config.subProduct}`);
+  if (config.scenarios?.length) filterParts.push(`Scenarios: ${config.scenarios.join(', ')}`);
+  const filterCriteria = filterParts.length ? filterParts.join(' · ') : undefined;
+
   // Same node id format as lib/lineage-generator: table-{layer}-{table}
   tableToFields.forEach((fieldNames, table) => {
     const id = `table-L2-${table}`.replace(/\s/g, '-');
+    const isCashFlow = table === 'cash_flow';
     nodes.push({
       id,
       layer: 'L2',
@@ -124,7 +142,8 @@ export function dscrConfigToLineage(config: DSCRVariantConfig): { nodes: Lineage
       field: fieldNames.length === 1 ? fieldNames[0] : fieldNames.join(', '),
       fields: fieldNames.length > 1 ? fieldNames : undefined,
       description: fieldNames.length === 1 ? `L2.${table}.${fieldNames[0]}` : `L2.${table}: ${fieldNames.slice(0, 3).join(', ')}${fieldNames.length > 3 ? '…' : ''}`,
-      sampleValue: config.sampleValue || '—',
+      sampleValue: isCashFlow ? denominatorSample : numeratorSample,
+      filterCriteria,
     });
     edges.push({ from: id, to: 'transform-formula', label: fieldNames.length > 1 ? `${fieldNames.length} fields` : '→' });
   });
@@ -135,8 +154,9 @@ export function dscrConfigToLineage(config: DSCRVariantConfig): { nodes: Lineage
     table: '',
     field: 'Formula',
     formula: config.formula,
-    sampleValue: config.sampleValue || '—',
+    sampleValue: resultSample,
     description: `DSCR at facility (${config.numeratorLabel} / ${config.denominatorLabel})`,
+    filterCriteria,
   });
 
   nodes.push({
@@ -144,7 +164,7 @@ export function dscrConfigToLineage(config: DSCRVariantConfig): { nodes: Lineage
     layer: 'L3',
     table: 'metric',
     field: config.variantName,
-    sampleValue: config.sampleValue || '—',
+    sampleValue: resultSample,
     formula: config.formula,
     description: `${config.variantCode} (DSCR variant)`,
   });

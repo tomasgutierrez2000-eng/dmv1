@@ -6,28 +6,28 @@
 TRUNCATE metric_library.metric_variants, metric_library.parent_metrics, metric_library.domains CASCADE;
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('CQ', 'Credit Quality', 'PD, Rating, DSCR, LTV, Criticized', '📊', '#1e40af', '["FR Y-14Q","SNC","Interagency CRE"]', '["CRO","Credit Committee"]');
+VALUES ('CQ', 'Credit Quality', 'PD, Rating, DSCR, LTV, Criticized', 'BarChart3', '#1e40af', '["FR Y-14Q","SNC","Interagency CRE"]', '["CRO","Credit Committee"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('EX', 'Exposure', 'Outstanding, Committed, Utilized, Undrawn, EAD', '💰', '#7c3aed', '["FR Y-14Q","Basel SA"]', '["CRO","Treasury"]');
+VALUES ('EX', 'Exposure', 'Outstanding, Committed, Utilized, Undrawn, EAD', 'Wallet', '#7c3aed', '["FR Y-14Q","Basel SA"]', '["CRO","Treasury"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('PR', 'Profitability', 'Revenue, NIM, ROE, ROA, All-In Rate, Spread', '📈', '#059669', '["Pillar 3","SEC"]', '["CFO","Desk Heads"]');
+VALUES ('PR', 'Profitability', 'Revenue, NIM, ROE, ROA, All-In Rate, Spread', 'TrendingUp', '#059669', '["Pillar 3","SEC"]', '["CFO","Desk Heads"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('LP', 'Loss & Provision', 'EL Rate, EL Dollar, LGD, CECL Allowance', '⚠️', '#dc2626', '["ASC 326","IFRS 9","FR Y-14Q"]', '["CFO","CRO"]');
+VALUES ('LP', 'Loss & Provision', 'EL Rate, EL Dollar, LGD, CECL Allowance', 'AlertTriangle', '#dc2626', '["ASC 326","IFRS 9","FR Y-14Q"]', '["CFO","CRO"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('CA', 'Capital', 'RWA, Capital Allocated, Leverage Ratio', '🏦', '#b45309', '["Basel III","FR Y-14Q","CCAR"]', '["CFO","Treasury"]');
+VALUES ('CA', 'Capital', 'RWA, Capital Allocated, Leverage Ratio', 'Building2', '#b45309', '["Basel III","FR Y-14Q","CCAR"]', '["CFO","Treasury"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('PC', 'Pricing', 'Spread, Fee Rate, All-In Rate, Pricing Exceptions', '🏷️', '#0891b2', '["SR 13-3","Pillar 3"]', '["Desk Heads","CRO"]');
+VALUES ('PC', 'Pricing', 'Spread, Fee Rate, All-In Rate, Pricing Exceptions', 'Tag', '#0891b2', '["SR 13-3","Pillar 3"]', '["Desk Heads","CRO"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('PO', 'Portfolio Composition', 'Tenor, Concentration, Collateral, Maturity', '🎯', '#6d28d9', '["FR Y-14Q","Concentration limits"]', '["CRO"]');
+VALUES ('PO', 'Portfolio Composition', 'Tenor, Concentration, Collateral, Maturity', 'Target', '#6d28d9', '["FR Y-14Q","Concentration limits"]', '["CRO"]');
 
 INSERT INTO metric_library.domains (domain_id, domain_name, domain_description, icon, color, regulatory_relevance, primary_stakeholders)
-VALUES ('EW', 'Early Warning', 'Rating Migration, PD Divergence, Utilization Trend, Amendment Activity', '🚨', '#e11d48', '["SR 11-7","OCC Handbook"]', '["CRO","Special Assets"]');
+VALUES ('EW', 'Early Warning', 'Rating Migration, PD Divergence, Utilization Trend, Amendment Activity', 'Bell', '#e11d48', '["SR 11-7","OCC Handbook"]', '["CRO","Special Assets"]');
 
 INSERT INTO metric_library.parent_metrics (metric_id, metric_name, definition, generic_formula, metric_class, unit_type, direction, risk_appetite_relevant, rollup_philosophy, rollup_description, domain_ids, variant_count, regulatory_references)
 VALUES ('PD', 'Probability of Default (PD)', 'The likelihood that a borrower will default on obligations within a specified time horizon. The most fundamental credit risk parameter — feeds EL, capital, pricing, and provisioning.', 'Model Output → Rating → Master Scale → PD', 'SOURCED', 'PERCENTAGE', 'LOWER_BETTER', true, 'Weighted Average by EAD + Distribution by rating grade.', 'PD is an OBLIGOR-level attribute inherited by all facilities. At desk/portfolio/LoB we report EAD-weighted average and rating distribution.', '["CQ","LP"]', 4, '["Basel IRB (BCBS 128)","SR 11-7","FR Y-14Q"]');

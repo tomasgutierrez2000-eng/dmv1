@@ -43,10 +43,23 @@ export interface SourcePayloadFieldSpec {
   required?: boolean;
 }
 
+/**
+ * Sourcing level category: where the bank provides the metric and how we use it.
+ * Aligns with Sourcing Level Architecture (obligor = counterparty-level; facility = facility-level; etc.).
+ */
+export type SourcingCategory =
+  | 'obligor'
+  | 'facility'
+  | 'facility_with_exceptions'
+  | 'dual_level'
+  | 'flexible_level'
+  | 'configuration';
+
 export interface MetricDomain {
   domain_id: string;
   domain_name: string;
   domain_description: string;
+  /** Lucide icon name for display (e.g. BarChart3, Wallet). No emojis. */
   icon: string;
   color: string;
   regulatory_relevance?: string[];
@@ -203,6 +216,20 @@ export interface MetricVariant {
   source_variant_identifier?: string;
   source_payload_spec?: SourcePayloadFieldSpec[];
   source_setup_validation_notes?: string;
+
+  /**
+   * Sourcing level: at which dimension the bank provides this metric (facility, counterparty, desk, portfolio, lob).
+   * Drives which feed and join key the GSIB tech team uses (e.g. counterparty_id vs facility_id).
+   */
+  atomic_sourcing_level?: RollupLevelKey;
+  /** Levels where we also source an aggregate from the bank for reconciliation (e.g. portfolio total RWA). */
+  reconciliation_anchor_levels?: RollupLevelKey[];
+  /** Why we source at this level (e.g. "PD is obligor-level; one per counterparty; facilities inherit"). */
+  sourcing_level_rationale?: string;
+  /** What NOT to source (e.g. "Do not source desk-level WAvg PD; we compute it"). */
+  sourcing_do_not_source?: string;
+  /** Sourcing category for display and filtering (obligor, facility, dual_level, etc.). */
+  sourcing_category?: SourcingCategory;
 
   version_history?: VariantVersionHistoryEntry[];
   created_at?: string;

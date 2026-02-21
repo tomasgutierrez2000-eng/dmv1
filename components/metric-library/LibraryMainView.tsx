@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { Download, Upload, FileSpreadsheet, Search, BookOpen } from 'lucide-react';
+import { Download, Upload, FileSpreadsheet, Search, BookOpen, ChevronLeft } from 'lucide-react';
 import type { MetricDomain } from '@/lib/metric-library/types';
 import { TypeBadge } from './badges';
+import { DomainIcon } from './domain-icons';
 import { LibraryLoading, LibraryError, LibraryEmpty } from './LibraryStates';
 
 interface ParentWithCount {
@@ -207,9 +208,10 @@ export default function LibraryMainView() {
           <div className="flex items-center gap-4">
             <Link
               href="/metrics"
-              className="text-sm text-gray-500 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+              className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
             >
-              ← Metrics Engine
+              <ChevronLeft className="w-4 h-4 flex-shrink-0" aria-hidden />
+              Metrics Engine
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">Metric Library</h1>
           </div>
@@ -335,7 +337,8 @@ export default function LibraryMainView() {
               style={selectedDomain === d.domain_id ? { backgroundColor: d.color } : {}}
               aria-pressed={selectedDomain === d.domain_id}
             >
-              <span aria-hidden>{d.icon}</span> {d.domain_name}
+              <DomainIcon iconKey={d.icon} className="w-4 h-4 flex-shrink-0" />
+              <span>{d.domain_name}</span>
             </button>
           ))}
         </div>
@@ -436,8 +439,9 @@ export default function LibraryMainView() {
                           {(m.domain_ids ?? []).map((dId) => {
                             const domain = domains.find((d) => d.domain_id === dId);
                             return domain ? (
-                              <span key={dId} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md">
-                                <span aria-hidden>{domain.icon}</span> {domain.domain_name}
+                              <span key={dId} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md inline-flex items-center gap-1">
+                                <DomainIcon iconKey={domain.icon} className="w-3 h-3 flex-shrink-0" />
+                                {domain.domain_name}
                               </span>
                             ) : null;
                           })}

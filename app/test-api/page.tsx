@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Loader2, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
 
 export default function TestAPIPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -38,14 +39,29 @@ export default function TestAPIPage() {
             status === 'success' ? 'bg-green-50 border border-green-200' :
             'bg-red-50 border border-red-200'
           }`}>
-            <p className={`font-medium ${
+            <p className={`font-medium flex items-center gap-2 ${
               status === 'loading' ? 'text-yellow-800' :
               status === 'success' ? 'text-green-800' :
               'text-red-800'
             }`}>
-              {status === 'loading' && '⏳ Loading...'}
-              {status === 'success' && '✅ Success'}
-              {status === 'error' && '❌ Error'}
+              {status === 'loading' && (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" aria-hidden />
+                  Loading...
+                </>
+              )}
+              {status === 'success' && (
+                <>
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" aria-hidden />
+                  Success
+                </>
+              )}
+              {status === 'error' && (
+                <>
+                  <XCircle className="w-4 h-4 flex-shrink-0" aria-hidden />
+                  Error
+                </>
+              )}
             </p>
             {message && (
               <p className="mt-2 text-sm">{message}</p>
@@ -77,9 +93,10 @@ export default function TestAPIPage() {
         <div className="mt-4">
           <a
             href="/overview"
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
           >
-            Go to Overview →
+            Go to Overview
+            <ChevronRight className="w-4 h-4" aria-hidden />
           </a>
         </div>
       </div>

@@ -12,6 +12,7 @@ export interface CalculationAuthorityTierConfig {
   shortDescription: string;
   color: string;
   bgLight: string;
+  /** Lucide icon name for display (e.g. Lock, RefreshCw, Settings). */
   icon: string;
   /** Optional: full criteria and product value for "What does T1/T2/T3 mean?" blurb. */
   criteria?: string[];
@@ -28,7 +29,7 @@ export const CALCULATION_AUTHORITY_TIERS: Record<CalculationAuthorityTier, Calcu
       'The bank has regulatory-grade models. You ingest, validate, version, aggregate, compare, and alert. You do not replicate the model.',
     color: '#1e40af',
     bgLight: '#dbeafe',
-    icon: '🔒',
+    icon: 'Lock',
     criteria: [
       'Output of a regulatory-validated model (SR 11-7)',
       'Model is examined / challenged by regulators',
@@ -54,7 +55,7 @@ export const CALCULATION_AUTHORITY_TIERS: Record<CalculationAuthorityTier, Calcu
       'The bank calculates these and you consume their answer, but you also have (or can get) the underlying components. Your move: calculate independently and RECONCILE against the bank’s number.',
     color: '#7c3aed',
     bgLight: '#ede9fe',
-    icon: '🔄',
+    icon: 'RefreshCw',
     criteria: [
       'Formula is well-defined and standardized (not proprietary model)',
       'Component data is available or obtainable in your data model',
@@ -80,7 +81,7 @@ export const CALCULATION_AUTHORITY_TIERS: Record<CalculationAuthorityTier, Calcu
       'These metrics are derived entirely from data already in your model. There is nothing to source — they are aggregations, ratios, distributions, and derived analytics that your product computes natively.',
     color: '#059669',
     bgLight: '#d1fae5',
-    icon: '⚙️',
+    icon: 'Settings',
     criteria: [
       'All inputs are already in your data model',
       'No external model or proprietary methodology involved',

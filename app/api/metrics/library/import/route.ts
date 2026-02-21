@@ -18,7 +18,8 @@ import {
   addVariant,
   refreshParentVariantCounts,
 } from '@/lib/metric-library/store';
-import type { MetricDomain, ParentMetric, MetricVariant, SourcePayloadFieldSpec } from '@/lib/metric-library/types';
+import type { MetricDomain, ParentMetric, MetricVariant, SourcePayloadFieldSpec, RollupLevelKey, SourcingCategory } from '@/lib/metric-library/types';
+import { ROLLUP_HIERARCHY_LEVELS } from '@/lib/metric-library/types';
 
 const METRIC_CLASSES = ['SOURCED', 'CALCULATED', 'HYBRID'] as const;
 const UNIT_TYPES = ['RATIO', 'PERCENTAGE', 'CURRENCY', 'COUNT', 'RATE', 'ORDINAL', 'DAYS', 'INDEX'] as const;
@@ -27,11 +28,23 @@ const VARIANT_TYPES = ['SOURCED', 'CALCULATED'] as const;
 const VARIANT_STATUSES = ['ACTIVE', 'DRAFT', 'DEPRECATED', 'PROPOSED', 'INACTIVE'] as const;
 const REVIEW_CYCLES = ['ANNUAL', 'SEMI_ANNUAL', 'QUARTERLY', 'AD_HOC'] as const;
 const WEIGHTING_BASIS = ['BY_EAD', 'BY_OUTSTANDING', 'BY_COMMITTED'] as const;
+const SOURCING_LEVELS = ROLLUP_HIERARCHY_LEVELS;
+const SOURCING_CATEGORIES = ['obligor', 'facility', 'facility_with_exceptions', 'dual_level', 'flexible_level', 'configuration'] as const;
 
 function pickEnum<T extends string>(value: string, allowed: readonly T[], defaultVal: T): T {
   const v = value.toUpperCase().replace(/\s/g, '_');
   if (allowed.includes(v as T)) return v as T;
   return defaultVal;
+}
+
+/** Normalize Excel value to rollup/sourcing level key (lowercase). */
+function normalizeSourcingLevel(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+/** Normalize Excel value to sourcing category (lowercase, spaces → underscores). */
+function normalizeSourcingCategory(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, '_');
 }
 
 function parsePayloadSpec(raw: string): { source_payload_spec?: SourcePayloadFieldSpec[] } {
@@ -140,7 +153,7 @@ export async function POST(request: NextRequest) {
             domain_id: id,
             domain_name: name,
             domain_description: getCell(row, idxDesc) || '',
-            icon: getCell(row, idxIcon) || 'folder',
+            icon: getCell(row, idxIcon) || 'Folder',
             color: getCell(row, idxColor) || '#6b7280',
             regulatory_relevance: parseCommaList(getCell(row, idxReg)).length ? parseCommaList(getCell(row, idxReg)) : undefined,
             primary_stakeholders: parseCommaList(getCell(row, idxStake)).length ? parseCommaList(getCell(row, idxStake)) : undefined,
@@ -260,6 +273,11 @@ export async function POST(request: NextRequest) {
         const idxSourceVariantId = findLibraryColumnIndex(headers, ['source_variant_identifier']);
         const idxPayloadSpec = findLibraryColumnIndex(headers, ['source_payload_spec']);
         const idxSetupNotes = findLibraryColumnIndex(headers, ['source_setup_validation_notes']);
+        const idxAtomicSourcing = findLibraryColumnIndex(headers, ['atomic_sourcing_level']);
+        const idxReconAnchors = findLibraryColumnIndex(headers, ['reconciliation_anchor_levels']);
+        const idxSourcingRationale = findLibraryColumnIndex(headers, ['sourcing_level_rationale']);
+        const idxSourcingDoNot = findLibraryColumnIndex(headers, ['sourcing_do_not_source']);
+        const idxSourcingCategory = findLibraryColumnIndex(headers, ['sourcing_category']);
         const idxDataFormat = findLibraryColumnIndex(headers, ['data_format']);
         const idxDataLag = findLibraryColumnIndex(headers, ['data_lag']);
 
@@ -339,6 +357,28 @@ export async function POST(request: NextRequest) {
             ...(getCell(row, idxEndpointFeed) && { source_endpoint_or_feed: getCell(row, idxEndpointFeed) }),
             ...(getCell(row, idxSourceVariantId) && { source_variant_identifier: getCell(row, idxSourceVariantId) }),
             ...(getCell(row, idxSetupNotes) && { source_setup_validation_notes: getCell(row, idxSetupNotes) }),
+            ...((): Partial<MetricVariant> => {
+              const rawLevel = getCell(row, idxAtomicSourcing);
+              if (!rawLevel) return {};
+              const level = normalizeSourcingLevel(rawLevel);
+              return SOURCING_LEVELS.includes(level as RollupLevelKey) ? { atomic_sourcing_level: level as RollupLevelKey } : {};
+            })(),
+            ...((): Partial<MetricVariant> => {
+              const raw = getCell(row, idxReconAnchors);
+              if (!raw) return {};
+              const levels = parseCommaList(raw)
+                .map((l) => normalizeSourcingLevel(l))
+                .filter((l): l is RollupLevelKey => SOURCING_LEVELS.includes(l as RollupLevelKey));
+              return { reconciliation_anchor_levels: levels };
+            })(),
+            ...(getCell(row, idxSourcingRationale) && { sourcing_level_rationale: getCell(row, idxSourcingRationale) }),
+            ...(getCell(row, idxSourcingDoNot) && { sourcing_do_not_source: getCell(row, idxSourcingDoNot) }),
+            ...((): Partial<MetricVariant> => {
+              const rawCat = getCell(row, idxSourcingCategory);
+              if (!rawCat) return {};
+              const cat = normalizeSourcingCategory(rawCat);
+              return SOURCING_CATEGORIES.includes(cat as SourcingCategory) ? { sourcing_category: cat as SourcingCategory } : {};
+            })(),
             ...(getCell(row, idxDataFormat) && { data_format: getCell(row, idxDataFormat) }),
             ...(getCell(row, idxDataLag) && { data_lag: getCell(row, idxDataLag) }),
             ...parsePayloadSpec(getCell(row, idxPayloadSpec)),

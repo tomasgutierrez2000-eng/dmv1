@@ -23,11 +23,12 @@ export async function GET() {
     ['Rollup columns (optional): rollup_facility, rollup_counterparty, rollup_desk, rollup_portfolio, rollup_lob'],
     ['Calculation Authority (optional): calculation_authority_tier (T1|T2|T3), expected_gsib_data_source, etc.'],
     ['Source & ingestion (optional): source_integration_pattern (PUSH|PULL), source_delivery_method, source_endpoint_or_feed, source_variant_identifier, source_payload_spec (JSON array), source_setup_validation_notes, data_format, data_lag'],
+    ['Sourcing level (optional): atomic_sourcing_level (facility|counterparty|desk|portfolio|lob), reconciliation_anchor_levels (comma-separated), sourcing_level_rationale, sourcing_do_not_source, sourcing_category (obligor|facility|facility_with_exceptions|dual_level|flexible_level|configuration)'],
   ];
 
   const domainsHeaders = ['domain_id', 'domain_name', 'domain_description', 'icon', 'color', 'regulatory_relevance', 'primary_stakeholders'];
   const domainsExample: unknown[][] = [
-    ['PR', 'Portfolio Risk', 'Portfolio and credit risk metrics', 'shield', '#6366f1', 'FR2590', 'Risk, Finance'],
+    ['PR', 'Portfolio Risk', 'Portfolio and credit risk metrics', 'BarChart3', '#6366f1', 'FR2590', 'Risk, Finance'],
   ];
 
   const parentHeaders = [
@@ -100,6 +101,11 @@ export async function GET() {
     'source_variant_identifier',
     'source_payload_spec',
     'source_setup_validation_notes',
+    'atomic_sourcing_level',
+    'reconciliation_anchor_levels',
+    'sourcing_level_rationale',
+    'sourcing_do_not_source',
+    'sourcing_category',
     'data_format',
     'data_lag',
   ];
@@ -142,6 +148,11 @@ export async function GET() {
       '/api/v1/dscr',
       'product_type=CRE',
       'Confirm NOI and debt service fields',
+      'facility',
+      'portfolio, lob',
+      'DSCR is facility-level; we roll up by EAD.',
+      '',
+      'facility',
       'JSON',
       'T+1',
     ],

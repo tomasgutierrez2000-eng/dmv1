@@ -18,6 +18,7 @@ export interface PageInfo {
   color: string;
   bgColor: string;
   borderColor: string;
+  /** Lucide icon name for display (e.g. BarChart3, Wallet). */
   icon: string;
   description: string;
 }
@@ -138,13 +139,13 @@ export interface ToggleDef {
 // ═══════════════════════════════════════════════════════════════
 
 export const DASHBOARD_PAGES: PageInfo[] = [
-  { id: 'P1', name: 'Executive Summary',      shortName: 'Executive',      color: '#ef4444', bgColor: 'bg-red-500/10',     borderColor: 'border-red-500/30',     icon: '📊', description: 'High-level KPIs, limit utilization, velocity, and action items' },
-  { id: 'P2', name: 'Exposure Composition',    shortName: 'Exposure',       color: '#3b82f6', bgColor: 'bg-blue-500/10',    borderColor: 'border-blue-500/30',    icon: '💰', description: 'Gross/net exposure breakdowns, coverage, counterparty analysis' },
-  { id: 'P3', name: 'Concentration & Limits',  shortName: 'Concentration',  color: '#10b981', bgColor: 'bg-emerald-500/10', borderColor: 'border-emerald-500/30', icon: '🎯', description: 'Limit utilization, sector concentration, headroom, breaches' },
-  { id: 'P4', name: 'Legal Entity & DQ',       shortName: 'Legal / DQ',     color: '#8b5cf6', bgColor: 'bg-purple-500/10',  borderColor: 'border-purple-500/30',  icon: '⚖️', description: 'Legal entity structure, cross-entity exposure, data quality' },
-  { id: 'P5', name: 'Trends & Stress',         shortName: 'Stress',         color: '#06b6d4', bgColor: 'bg-cyan-500/10',    borderColor: 'border-cyan-500/30',    icon: '📈', description: 'Stress testing, threshold breaches, anomaly detection' },
-  { id: 'P6', name: 'Facility & Events',       shortName: 'Facilities',     color: '#f59e0b', bgColor: 'bg-amber-500/10',   borderColor: 'border-amber-500/30',   icon: '🏗️', description: 'Facility lifecycle, amendments, events, pipeline' },
-  { id: 'P7', name: 'Portfolio Analysis',       shortName: 'Portfolio',      color: '#ec4899', bgColor: 'bg-pink-500/10',    borderColor: 'border-pink-500/30',    icon: '📋', description: 'Deterioration, rating migration, delinquency, profitability' },
+  { id: 'P1', name: 'Executive Summary',      shortName: 'Executive',      color: '#ef4444', bgColor: 'bg-red-500/10',     borderColor: 'border-red-500/30',     icon: 'BarChart3', description: 'High-level KPIs, limit utilization, velocity, and action items' },
+  { id: 'P2', name: 'Exposure Composition',    shortName: 'Exposure',       color: '#3b82f6', bgColor: 'bg-blue-500/10',    borderColor: 'border-blue-500/30',    icon: 'Wallet', description: 'Gross/net exposure breakdowns, coverage, counterparty analysis' },
+  { id: 'P3', name: 'Concentration & Limits',  shortName: 'Concentration',  color: '#10b981', bgColor: 'bg-emerald-500/10', borderColor: 'border-emerald-500/30', icon: 'Target', description: 'Limit utilization, sector concentration, headroom, breaches' },
+  { id: 'P4', name: 'Legal Entity & DQ',       shortName: 'Legal / DQ',     color: '#8b5cf6', bgColor: 'bg-purple-500/10',  borderColor: 'border-purple-500/30',  icon: 'Scale', description: 'Legal entity structure, cross-entity exposure, data quality' },
+  { id: 'P5', name: 'Trends & Stress',         shortName: 'Stress',         color: '#06b6d4', bgColor: 'bg-cyan-500/10',    borderColor: 'border-cyan-500/30',    icon: 'TrendingUp', description: 'Stress testing, threshold breaches, anomaly detection' },
+  { id: 'P6', name: 'Facility & Events',       shortName: 'Facilities',     color: '#f59e0b', bgColor: 'bg-amber-500/10',   borderColor: 'border-amber-500/30',   icon: 'Building2', description: 'Facility lifecycle, amendments, events, pipeline' },
+  { id: 'P7', name: 'Portfolio Analysis',       shortName: 'Portfolio',      color: '#ec4899', bgColor: 'bg-pink-500/10',    borderColor: 'border-pink-500/30',    icon: 'ClipboardList', description: 'Deterioration, rating migration, delinquency, profitability' },
 ];
 
 export const PAGE_MAP = new Map(DASHBOARD_PAGES.map(p => [p.id, p]));

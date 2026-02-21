@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import type { MetricDomain } from '@/lib/metric-library/types';
 import { TypeBadge, StatusBadge } from './badges';
+import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 
 interface ParentDetail {
@@ -255,7 +256,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                     className="bg-white border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm transition-shadow hover:shadow-md"
                     style={{ borderLeftWidth: 4, borderLeftColor: domain.color }}
                   >
-                    <span className="text-xl" aria-hidden>{domain.icon}</span>
+                    <DomainIcon iconKey={domain.icon} className="w-5 h-5 text-gray-600 flex-shrink-0" />
                     <span className="font-medium text-gray-900">{domain.domain_name}</span>
                   </div>
                 ) : null;

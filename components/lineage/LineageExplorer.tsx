@@ -5,6 +5,7 @@ import {
   Search, X, ChevronDown, ChevronRight, ArrowLeft, ExternalLink,
   Layers, Zap, Info, Grid3x3, Hash,
   TrendingUp, Table2, Tag, AlertTriangle, FileCode, FolderOpen,
+  BarChart3, Wallet, Target, Scale, Building2, ClipboardList,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -34,6 +35,16 @@ const LAYER_STYLE: Record<string, { bg: string; border: string; text: string; ba
   L2:        { bg: 'bg-amber-950/60',   border: 'border-amber-500/40',   text: 'text-amber-300',   badge: 'bg-amber-500/20 text-amber-300',   svgColor: '#f59e0b', label: 'L2 Snapshot' },
   L3:        { bg: 'bg-emerald-950/60', border: 'border-emerald-500/40', text: 'text-emerald-300', badge: 'bg-emerald-500/20 text-emerald-300', svgColor: '#10b981', label: 'L3 Derived' },
   transform: { bg: 'bg-purple-950/60',  border: 'border-purple-500/40',  text: 'text-purple-300',  badge: 'bg-purple-500/20 text-purple-300',  svgColor: '#a855f7', label: 'Transform' },
+};
+
+const PAGE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  BarChart3,
+  Wallet,
+  Target,
+  Scale,
+  TrendingUp,
+  Building2,
+  ClipboardList,
 };
 
 const METRIC_TYPE_ICON: Record<string, React.ReactNode> = {
@@ -493,7 +504,10 @@ export default function LineageExplorer() {
                     }`}
                     style={isActive ? { borderLeftColor: page.color } : undefined}
                   >
-                    <span className="text-base">{page.icon}</span>
+                    {(() => {
+                      const PageIcon = PAGE_ICON_MAP[page.icon];
+                      return PageIcon ? <PageIcon className="w-4 h-4 flex-shrink-0 text-gray-400" /> : null;
+                    })()}
                     <div className="flex-1 min-w-0">
                       <div className={`text-xs font-medium truncate ${isActive ? 'text-white' : 'text-gray-400'}`}>
                         {page.shortName}
@@ -606,7 +620,10 @@ export default function LineageExplorer() {
             <header className="sticky top-0 z-30 bg-[#0a0e1a]/95 backdrop-blur-xl border-b border-white/[0.04]">
               <div className="px-6 py-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{pageInfo.icon}</span>
+                  {(() => {
+                    const PageIcon = PAGE_ICON_MAP[pageInfo.icon];
+                    return PageIcon ? <PageIcon className="w-7 h-7 flex-shrink-0" style={{ color: pageInfo.color }} /> : null;
+                  })()}
                   <div>
                     <h2 className="text-lg font-bold" style={{ color: pageInfo.color }}>
                       {pageInfo.id}: {pageInfo.name}

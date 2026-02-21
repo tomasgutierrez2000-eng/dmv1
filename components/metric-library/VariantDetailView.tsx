@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ComponentType } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Pencil, Check, X } from 'lucide-react';
+import { ExternalLink, Pencil, Check, X, Lock, RefreshCw, Settings } from 'lucide-react';
 import type { MetricVariant } from '@/lib/metric-library/types';
 import { ROLLUP_HIERARCHY_LEVELS, ROLLUP_LEVEL_LABELS } from '@/lib/metric-library/types';
 import {
@@ -10,6 +10,7 @@ import {
   CALCULATION_AUTHORITY_TIERS,
   INTEGRATION_PATTERN_LABELS,
 } from '@/lib/metric-library/calculation-authority';
+import { SOURCING_LEVEL_LABELS } from '@/lib/metric-library/sourcing-level';
 import { TypeBadge, StatusBadge, CalculationAuthorityBadge } from './badges';
 import MetricLibraryLineageView from './MetricLibraryLineageView';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
@@ -19,14 +20,19 @@ interface VariantDetailResponse {
   parent?: { metric_id: string; metric_name: string } | null;
 }
 
+const TIER_ICONS: Record<string, ComponentType<{ className?: string }>> = {
+  Lock,
+  RefreshCw,
+  Settings,
+};
+
 const TABS = [
-  { id: 'definition' as const, label: 'Definition & Formula' },
+  { id: 'definition' as const, label: 'Definition & Rollup' },
   { id: 'calculationAuthority' as const, label: 'Calculation Authority' },
   { id: 'sourceIngestion' as const, label: 'Source & Ingestion' },
-  { id: 'rollup' as const, label: 'Rollup Logic' },
-  { id: 'lineage' as const, label: 'Data Lineage' },
-  { id: 'validation' as const, label: 'Validation Rules' },
-  { id: 'usage' as const, label: 'Where Used' },
+  { id: 'lineage' as const, label: 'Lineage' },
+  { id: 'validation' as const, label: 'Validation' },
+  { id: 'usage' as const, label: 'Usage' },
   { id: 'governance' as const, label: 'Governance' },
 ] as const;
 
@@ -307,8 +313,8 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             </div>
             {(v.companion_fields?.length ?? 0) > 0 && (
               <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Companion Metadata Fields</h2>
-                <p className="text-xs text-gray-500 mb-3">These fields must be ingested alongside the primary value for full context.</p>
+                <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Companion fields</h2>
+                <p className="text-xs text-gray-500 mb-3">Ingest alongside the primary value.</p>
                 <div className="flex flex-wrap gap-2">
                   {v.companion_fields!.map((f, i) => {
                     const label = typeof f === 'string' ? f : (f as { field_name?: string; display_name?: string }).field_name ?? (f as { display_name?: string }).display_name ?? String(f);
@@ -321,6 +327,37 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                 </div>
               </div>
             )}
+
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+              <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Rollup</h2>
+              <p className="text-xs text-gray-500 mb-4">Facility → Counterparty → Desk → Portfolio → LoB.</p>
+              {levels.length > 0 ? (
+                <div className="space-y-0">
+                  {levels.map((level, i) => (
+                    <div key={level} className="flex items-stretch">
+                      <div className="flex flex-col items-center w-10 mr-4">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm ${
+                            ['bg-gray-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-600'][i]
+                          }`}
+                        >
+                          {['F', 'C', 'D', 'P', 'L'][i]}
+                        </div>
+                        {i < levels.length - 1 && <div className="w-0.5 flex-1 bg-gradient-to-b from-gray-300 to-gray-200 my-1 min-h-[4px]" />}
+                      </div>
+                      <div className={`flex-1 border rounded-xl p-3 ${i < levels.length - 1 ? 'mb-3' : ''} border-gray-200 bg-gray-50/50`}>
+                        <div className="text-xs font-bold text-gray-900 uppercase mb-1">
+                          {ROLLUP_LEVEL_LABELS[level] ?? level}
+                        </div>
+                        <div className="text-sm text-gray-600">{rollupLogic![level] ?? '—'}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm py-2">No rollup logic specified.</p>
+              )}
+            </div>
           </section>
         )}
 
@@ -390,7 +427,12 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                       style={{ borderLeftWidth: 4, borderLeftColor: tierConfig.color }}
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xl" aria-hidden>{tierConfig.icon}</span>
+                        {(() => {
+                          const TierIcon = TIER_ICONS[tierConfig.icon];
+                          return TierIcon ? (
+                            <TierIcon className="w-5 h-5 text-gray-700" aria-hidden />
+                          ) : null;
+                        })()}
                         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
                           {tierConfig.name} — {tierConfig.subtitle}
                         </h2>
@@ -512,236 +554,151 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             className="space-y-6"
           >
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">How we get this metric</h2>
-              <p id="integration-pattern-desc" className="text-xs text-gray-500 mb-3">
-                Push = GSIB sends to us. Pull = we request from GSIB. This drives setup and validation.
+              <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Link to source</h2>
+              <p className="text-xs text-gray-500 mb-4">
+                Where this metric comes from and how to connect. Push = source sends to us; Pull = we request from source.
               </p>
-              {editing ? (
-                <select
-                  id="source-integration-pattern"
-                  value={editForm.source_integration_pattern ?? v.source_integration_pattern ?? ''}
-                  onChange={(e) =>
-                    setEditForm((f) => ({
-                      ...f,
-                      source_integration_pattern: (e.target.value || undefined) as MetricVariant['source_integration_pattern'],
-                    }))
-                  }
-                  className="block w-full max-w-md rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  aria-describedby="integration-pattern-desc"
-                >
-                  <option value="">Not set</option>
-                  <option value="PUSH">GSIB sends to us (Push)</option>
-                  <option value="PULL">We request from GSIB (Pull)</option>
-                </select>
-              ) : (
-                <p className="text-sm font-medium text-gray-900">
-                  {v.source_integration_pattern
-                    ? INTEGRATION_PATTERN_LABELS[v.source_integration_pattern] ?? v.source_integration_pattern
-                    : '—'}
-                </p>
-              )}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Where</h2>
-                <p className="text-xs text-gray-500 mb-2">
-                  Source system and feed/endpoint. For Push: where we receive. For Pull: where we request.
-                </p>
-                {editing ? (
-                  <>
+
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="source-link-name" className="block text-xs font-medium text-gray-600 mb-1">Source</label>
+                  {editing ? (
                     <input
+                      id="source-link-name"
                       type="text"
                       value={editForm.expected_gsib_data_source ?? editForm.source_system ?? v.expected_gsib_data_source ?? v.source_system ?? ''}
                       onChange={(e) =>
                         setEditForm((f) => ({ ...f, expected_gsib_data_source: e.target.value || undefined, source_system: e.target.value || undefined }))
                       }
-                      placeholder="Source system"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="e.g. Risk DW, Basel Engine, Spreading system"
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                     />
+                  ) : (
+                    <p className="text-sm text-gray-900">{v.expected_gsib_data_source ?? v.source_system ?? '—'}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="source-delivery" className="block text-xs font-medium text-gray-600 mb-1">Delivery</label>
+                  {editing ? (
+                    <select
+                      id="source-delivery"
+                      value={editForm.source_integration_pattern ?? v.source_integration_pattern ?? ''}
+                      onChange={(e) =>
+                        setEditForm((f) => ({
+                          ...f,
+                          source_integration_pattern: (e.target.value || undefined) as MetricVariant['source_integration_pattern'],
+                        }))
+                      }
+                      className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
+                    >
+                      <option value="">Not set</option>
+                      <option value="PUSH">Push — source sends to us</option>
+                      <option value="PULL">Pull — we request from source</option>
+                    </select>
+                  ) : (
+                    <p className="text-sm text-gray-900">
+                      {v.source_integration_pattern ? INTEGRATION_PATTERN_LABELS[v.source_integration_pattern] ?? v.source_integration_pattern : '—'}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="source-endpoint" className="block text-xs font-medium text-gray-600 mb-1">Endpoint or feed</label>
+                  {editing ? (
                     <input
+                      id="source-endpoint"
                       type="text"
                       value={editForm.source_endpoint_or_feed ?? v.source_endpoint_or_feed ?? ''}
                       onChange={(e) =>
                         setEditForm((f) => ({ ...f, source_endpoint_or_feed: e.target.value || undefined }))
                       }
-                      placeholder="Endpoint, feed, view, or file path"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="e.g. /api/v1/metrics/dscr, topic: metrics.dscr, or file path"
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                     />
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm text-gray-700">{v.expected_gsib_data_source ?? v.source_system ?? '—'}</p>
-                    {v.source_endpoint_or_feed && (
-                      <p className="text-sm text-gray-600 mt-1 font-mono">{v.source_endpoint_or_feed}</p>
-                    )}
-                  </>
-                )}
-              </div>
-              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">How</h2>
-                <p className="text-xs text-gray-500 mb-2">Delivery method, format, frequency, lag.</p>
-                {editing ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editForm.source_delivery_method ?? v.source_delivery_method ?? ''}
+                  ) : (
+                    <p className="text-sm font-mono text-gray-700">{v.source_endpoint_or_feed ?? '—'}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="source-instructions" className="block text-xs font-medium text-gray-600 mb-1">Instructions / code</label>
+                  {editing ? (
+                    <textarea
+                      id="source-instructions"
+                      value={editForm.source_setup_validation_notes ?? v.source_setup_validation_notes ?? ''}
                       onChange={(e) =>
-                        setEditForm((f) => ({ ...f, source_delivery_method: e.target.value || undefined }))
+                        setEditForm((f) => ({ ...f, source_setup_validation_notes: e.target.value || undefined }))
                       }
-                      placeholder="e.g. API, File drop, Batch export"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      rows={5}
+                      placeholder="Steps, config snippet, or code to connect (e.g. curl, SQL, or checklist)."
+                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
                     />
-                    <input
-                      type="text"
-                      value={editForm.data_format ?? v.data_format ?? ''}
-                      onChange={(e) => setEditForm((f) => ({ ...f, data_format: e.target.value || undefined }))}
-                      placeholder="Format (JSON, CSV, etc.)"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                    <input
-                      type="text"
-                      value={editForm.refresh_frequency ?? v.refresh_frequency ?? ''}
-                      onChange={(e) => setEditForm((f) => ({ ...f, refresh_frequency: e.target.value || undefined }))}
-                      placeholder="Frequency"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                    <input
-                      type="text"
-                      value={editForm.data_lag ?? v.data_lag ?? ''}
-                      onChange={(e) => setEditForm((f) => ({ ...f, data_lag: e.target.value || undefined }))}
-                      placeholder="Data lag"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                  </>
-                ) : (
-                  <dl className="text-sm space-y-1">
-                    <dt className="text-gray-500">Delivery</dt>
-                    <dd className="text-gray-900">{v.source_delivery_method ?? '—'}</dd>
-                    <dt className="text-gray-500 mt-2">Format</dt>
-                    <dd className="text-gray-900">{v.data_format ?? '—'}</dd>
-                    <dt className="text-gray-500 mt-2">Frequency</dt>
-                    <dd className="text-gray-900">{v.refresh_frequency ?? '—'}</dd>
-                    <dt className="text-gray-500 mt-2">Lag</dt>
-                    <dd className="text-gray-900">{v.data_lag ?? '—'}</dd>
-                  </dl>
-                )}
+                  ) : (
+                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded-lg p-3 border border-gray-100">
+                      {v.source_setup_validation_notes ?? '—'}
+                    </pre>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Right variant</h2>
-              <p className="text-xs text-gray-500 mb-2">
-                How the source system identifies this variant. When connecting, ensure you map to this variant (e.g. correct LGD type).
-              </p>
-              {editing ? (
-                <input
-                  type="text"
-                  value={editForm.source_variant_identifier ?? v.source_variant_identifier ?? ''}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, source_variant_identifier: e.target.value || undefined }))
-                  }
-                  placeholder="e.g. LGD_TYPE=DT, column: downturn_lgd"
-                  className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              ) : (
-                <p className="text-sm font-mono text-gray-900">{v.source_variant_identifier ?? '—'}</p>
-              )}
-            </div>
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">What the source sends</h2>
-              <p className="text-xs text-gray-500 mb-3">
-                Use this to validate that the source is sending the right information. When hooking up, ensure the feed provides these fields; compare a sample to confirm you capture the right variant.
-              </p>
-              {(v.source_payload_spec?.length ?? 0) > 0 ? (
-                <ul className="space-y-2">
-                  {v.source_payload_spec!.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="font-mono font-medium text-gray-900">{f.field_name}</span>
-                      {f.data_type && <span className="text-gray-500">({f.data_type})</span>}
-                      {f.required && <span className="text-amber-600 text-xs">required</span>}
-                      {f.description && <span className="text-gray-600">— {f.description}</span>}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <>
-                  {v.source_field_name && (
-                    <p className="text-sm text-gray-700">
-                      Primary field: <code className="font-mono bg-gray-100 px-1 rounded">{v.source_field_name}</code>
-                    </p>
+
+              {/* Compact details */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <h3 className="text-xs font-bold text-gray-500 uppercase mb-3">Details</h3>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  <div>
+                    <dt className="text-gray-500">Variant ID in source</dt>
+                    <dd className="font-mono text-gray-900 mt-0.5">
+                      {editing ? (
+                        <input
+                          type="text"
+                          value={editForm.source_variant_identifier ?? v.source_variant_identifier ?? ''}
+                          onChange={(e) =>
+                            setEditForm((f) => ({ ...f, source_variant_identifier: e.target.value || undefined }))
+                          }
+                          placeholder="e.g. product_type=CRE"
+                          className="block w-full rounded border border-gray-300 px-2 py-1 text-sm font-mono"
+                        />
+                      ) : (
+                        v.source_variant_identifier ?? '—'
+                      )}
+                    </dd>
+                  </div>
+                  {(v.atomic_sourcing_level || (v.reconciliation_anchor_levels?.length ?? 0) > 0) && (
+                    <div>
+                      <dt className="text-gray-500">Data grain</dt>
+                      <dd className="text-gray-900 mt-0.5">
+                        {v.atomic_sourcing_level ? SOURCING_LEVEL_LABELS[v.atomic_sourcing_level] : '—'}
+                        {(v.reconciliation_anchor_levels?.length ?? 0) > 0 && (
+                          <span className="text-gray-500 text-xs ml-1">
+                            (anchors: {v.reconciliation_anchor_levels!.map((l) => SOURCING_LEVEL_LABELS[l]).join(', ')})
+                          </span>
+                        )}
+                      </dd>
+                    </div>
                   )}
-                  {(v.companion_fields?.length ?? 0) > 0 && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      Companion: {v.companion_fields!.map((c) => (typeof c === 'string' ? c : (c as { field_name?: string }).field_name ?? String(c))).join(', ')}
-                    </p>
-                  )}
-                  {!v.source_field_name && !(v.companion_fields?.length ?? 0) && <p className="text-gray-500 text-sm">—</p>}
-                </>
-              )}
-            </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-              <h2 className="text-sm font-bold text-amber-800 mb-2 uppercase tracking-wide">Setup / validation notes</h2>
-              <p className="text-xs text-amber-800 mb-2">
-                Short checklist for connecting the source (e.g. confirm feed contains required fields).
-              </p>
-              {editing ? (
-                <textarea
-                  value={editForm.source_setup_validation_notes ?? v.source_setup_validation_notes ?? ''}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, source_setup_validation_notes: e.target.value || undefined }))
-                  }
-                  rows={3}
-                  placeholder="e.g. When connecting: confirm feed contains downturn_lgd_pct and facility_id"
-                  className="block w-full rounded-lg border border-amber-300 px-3 py-2 text-sm bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                />
-              ) : (
-                <p className="text-sm text-amber-900 whitespace-pre-wrap">
-                  {v.source_setup_validation_notes ?? '—'}
-                </p>
-              )}
+                  <div className="sm:col-span-2">
+                    <dt className="text-gray-500 mb-1">Expected fields</dt>
+                    <dd className="text-gray-900">
+                      {(v.source_payload_spec?.length ?? 0) > 0 ? (
+                        <span className="font-mono text-xs">
+                          {v.source_payload_spec!.map((f) => f.field_name).join(', ')}
+                        </span>
+                      ) : v.source_field_name ? (
+                        <span className="font-mono text-xs">{v.source_field_name}</span>
+                      ) : (
+                        '—'
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
             </div>
 
             {!editing && !v.source_integration_pattern && !v.expected_gsib_data_source && !v.source_system && (
               <p className="text-gray-500 text-sm">
-                No source configuration set. Click Edit to configure how we receive this metric (Push vs Pull, where, and what to expect).
+                No source linked. Click Edit to add source, delivery (Push/Pull), and instructions.
               </p>
-            )}
-          </section>
-        )}
-
-        {tab === 'rollup' && (
-          <section
-            id="variant-tab-rollup"
-            role="tabpanel"
-            aria-labelledby="variant-tab-rollup-btn"
-            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
-          >
-            <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Aggregation Hierarchy</h2>
-            <p className="text-xs text-gray-500 mb-4">How this variant rolls up: Facility → Counterparty → Desk → Portfolio → LoB.</p>
-            {levels.length > 0 ? (
-              <div className="space-y-0">
-                {levels.map((level, i) => (
-                  <div key={level} className="flex items-stretch">
-                    <div className="flex flex-col items-center w-10 mr-4">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm ${
-                          ['bg-gray-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-600'][i]
-                        }`}
-                      >
-                        {['F', 'C', 'D', 'P', 'L'][i]}
-                      </div>
-                      {i < levels.length - 1 && <div className="w-0.5 flex-1 bg-gradient-to-b from-gray-300 to-gray-200 my-1 min-h-[4px]" />}
-                    </div>
-                    <div className={`flex-1 border rounded-xl p-3 ${i < levels.length - 1 ? 'mb-3' : ''} border-gray-200 bg-gray-50/50`}>
-                      <div className="text-xs font-bold text-gray-900 uppercase mb-1">
-                        {ROLLUP_LEVEL_LABELS[level] ?? level}
-                      </div>
-                      <div className="text-sm text-gray-600">{rollupLogic![level] ?? '—'}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm py-4">No rollup logic specified.</p>
             )}
           </section>
         )}

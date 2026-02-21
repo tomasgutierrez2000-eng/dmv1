@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewContent() {
@@ -29,6 +29,13 @@ export default function OverviewContent() {
               >
                 <MessageCircle className="w-4 h-4" />
                 Ask the data model
+              </Link>
+              <Link
+                href="/guide"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <BookOpen className="w-4 h-4" />
+                Team Playbook
               </Link>
               <Link
                 href="/visualizer"

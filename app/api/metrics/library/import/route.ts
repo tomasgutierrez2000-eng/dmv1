@@ -18,7 +18,7 @@ import {
   addVariant,
   refreshParentVariantCounts,
 } from '@/lib/metric-library/store';
-import type { MetricDomain, ParentMetric, MetricVariant } from '@/lib/metric-library/types';
+import type { MetricDomain, ParentMetric, MetricVariant, SourcePayloadFieldSpec } from '@/lib/metric-library/types';
 
 const METRIC_CLASSES = ['SOURCED', 'CALCULATED', 'HYBRID'] as const;
 const UNIT_TYPES = ['RATIO', 'PERCENTAGE', 'CURRENCY', 'COUNT', 'RATE', 'ORDINAL', 'DAYS', 'INDEX'] as const;
@@ -32,6 +32,16 @@ function pickEnum<T extends string>(value: string, allowed: readonly T[], defaul
   const v = value.toUpperCase().replace(/\s/g, '_');
   if (allowed.includes(v as T)) return v as T;
   return defaultVal;
+}
+
+function parsePayloadSpec(raw: string): { source_payload_spec?: SourcePayloadFieldSpec[] } {
+  if (!raw?.trim()) return {};
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? { source_payload_spec: parsed as SourcePayloadFieldSpec[] } : {};
+  } catch {
+    return {};
+  }
 }
 
 type XlsxUtils = { utils: { sheet_to_json: (sheet: unknown, opts?: { header?: number; defval?: null }) => unknown[] } };
@@ -237,6 +247,21 @@ export async function POST(request: NextRequest) {
         const idxRefresh = findLibraryColumnIndex(headers, ['refresh_frequency']);
         const idxDash = findLibraryColumnIndex(headers, ['used_by_dashboards']);
         const idxRegRef = findLibraryColumnIndex(headers, ['regulatory_references']);
+        const idxCalcTier = findLibraryColumnIndex(headers, ['calculation_authority_tier']);
+        const idxCalcTierFuture = findLibraryColumnIndex(headers, ['calculation_authority_tier_future']);
+        const idxCalcRationale = findLibraryColumnIndex(headers, ['calculation_authority_rationale']);
+        const idxCalcComponents = findLibraryColumnIndex(headers, ['calculation_authority_components']);
+        const idxCalcFutureEvol = findLibraryColumnIndex(headers, ['calculation_authority_future_evolution']);
+        const idxCalcMigration = findLibraryColumnIndex(headers, ['calculation_authority_migration_path']);
+        const idxExpectedGsib = findLibraryColumnIndex(headers, ['expected_gsib_data_source']);
+        const idxIntPattern = findLibraryColumnIndex(headers, ['source_integration_pattern']);
+        const idxDeliveryMethod = findLibraryColumnIndex(headers, ['source_delivery_method']);
+        const idxEndpointFeed = findLibraryColumnIndex(headers, ['source_endpoint_or_feed']);
+        const idxSourceVariantId = findLibraryColumnIndex(headers, ['source_variant_identifier']);
+        const idxPayloadSpec = findLibraryColumnIndex(headers, ['source_payload_spec']);
+        const idxSetupNotes = findLibraryColumnIndex(headers, ['source_setup_validation_notes']);
+        const idxDataFormat = findLibraryColumnIndex(headers, ['data_format']);
+        const idxDataLag = findLibraryColumnIndex(headers, ['data_lag']);
 
         for (let i = 1; i < variantsData.length; i++) {
           const row = variantsData[i] as unknown[];
@@ -302,6 +327,21 @@ export async function POST(request: NextRequest) {
             regulatory_references: parseCommaList(getCell(row, idxRegRef)).length
               ? parseCommaList(getCell(row, idxRegRef))
               : undefined,
+            ...(getCell(row, idxCalcTier) && { calculation_authority_tier: pickEnum(getCell(row, idxCalcTier), ['T1', 'T2', 'T3'], 'T1') as 'T1' | 'T2' | 'T3' }),
+            ...(getCell(row, idxCalcTierFuture) && { calculation_authority_tier_future: pickEnum(getCell(row, idxCalcTierFuture), ['T1', 'T2', 'T3'], 'T1') as 'T1' | 'T2' | 'T3' }),
+            ...(getCell(row, idxCalcRationale) && { calculation_authority_rationale: getCell(row, idxCalcRationale) }),
+            ...(getCell(row, idxCalcComponents) && { calculation_authority_components: getCell(row, idxCalcComponents) }),
+            ...(getCell(row, idxCalcFutureEvol) && { calculation_authority_future_evolution: getCell(row, idxCalcFutureEvol) }),
+            ...(getCell(row, idxCalcMigration) && { calculation_authority_migration_path: getCell(row, idxCalcMigration) }),
+            ...(getCell(row, idxExpectedGsib) && { expected_gsib_data_source: getCell(row, idxExpectedGsib) }),
+            ...(getCell(row, idxIntPattern) && { source_integration_pattern: pickEnum(getCell(row, idxIntPattern), ['PUSH', 'PULL'], 'PULL') as 'PUSH' | 'PULL' }),
+            ...(getCell(row, idxDeliveryMethod) && { source_delivery_method: getCell(row, idxDeliveryMethod) }),
+            ...(getCell(row, idxEndpointFeed) && { source_endpoint_or_feed: getCell(row, idxEndpointFeed) }),
+            ...(getCell(row, idxSourceVariantId) && { source_variant_identifier: getCell(row, idxSourceVariantId) }),
+            ...(getCell(row, idxSetupNotes) && { source_setup_validation_notes: getCell(row, idxSetupNotes) }),
+            ...(getCell(row, idxDataFormat) && { data_format: getCell(row, idxDataFormat) }),
+            ...(getCell(row, idxDataLag) && { data_lag: getCell(row, idxDataLag) }),
+            ...parsePayloadSpec(getCell(row, idxPayloadSpec)),
           };
 
           const existingV = getVariant(variant_id);

@@ -64,6 +64,22 @@ export const COLUMN_ALIASES: Record<string, string[][]> = {
   source_field_name: [['source_field_name', 'source field name']],
   refresh_frequency: [['refresh_frequency', 'refresh frequency']],
   used_by_dashboards: [['used_by_dashboards', 'used by dashboards', 'dashboards']],
+
+  calculation_authority_tier: [['calculation_authority_tier', 'calculation authority tier', 'authority tier']],
+  calculation_authority_tier_future: [['calculation_authority_tier_future', 'calculation authority tier future']],
+  calculation_authority_rationale: [['calculation_authority_rationale', 'calculation authority rationale']],
+  calculation_authority_components: [['calculation_authority_components', 'calculation authority components']],
+  calculation_authority_future_evolution: [['calculation_authority_future_evolution', 'calculation authority future evolution']],
+  calculation_authority_migration_path: [['calculation_authority_migration_path', 'calculation authority migration path']],
+  expected_gsib_data_source: [['expected_gsib_data_source', 'expected gsib data source', 'gsib data source']],
+  source_integration_pattern: [['source_integration_pattern', 'source integration pattern', 'integration pattern']],
+  source_delivery_method: [['source_delivery_method', 'source delivery method', 'delivery method']],
+  source_endpoint_or_feed: [['source_endpoint_or_feed', 'source endpoint or feed', 'endpoint or feed']],
+  source_variant_identifier: [['source_variant_identifier', 'source variant identifier', 'variant identifier']],
+  source_payload_spec: [['source_payload_spec', 'source payload spec', 'payload spec']],
+  source_setup_validation_notes: [['source_setup_validation_notes', 'source setup validation notes', 'setup validation notes']],
+  data_format: [['data_format', 'data format']],
+  data_lag: [['data_lag', 'data lag']],
 };
 
 /** Find column index by header row and possible keys (uses COLUMN_ALIASES). */

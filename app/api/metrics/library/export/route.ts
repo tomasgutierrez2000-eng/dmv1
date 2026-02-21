@@ -81,6 +81,21 @@ export async function GET() {
     'refresh_frequency',
     'used_by_dashboards',
     'regulatory_references',
+    'calculation_authority_tier',
+    'calculation_authority_tier_future',
+    'calculation_authority_rationale',
+    'calculation_authority_components',
+    'calculation_authority_future_evolution',
+    'calculation_authority_migration_path',
+    'expected_gsib_data_source',
+    'source_integration_pattern',
+    'source_delivery_method',
+    'source_endpoint_or_feed',
+    'source_variant_identifier',
+    'source_payload_spec',
+    'source_setup_validation_notes',
+    'data_format',
+    'data_lag',
   ];
   const variants = getVariants();
   const variantRows: unknown[][] = variants.map((v: MetricVariant) => [
@@ -109,6 +124,21 @@ export async function GET() {
     v.refresh_frequency ?? '',
     Array.isArray(v.used_by_dashboards) ? v.used_by_dashboards.join(', ') : '',
     Array.isArray(v.regulatory_references) ? v.regulatory_references.join(', ') : '',
+    v.calculation_authority_tier ?? '',
+    v.calculation_authority_tier_future ?? '',
+    v.calculation_authority_rationale ?? '',
+    v.calculation_authority_components ?? '',
+    v.calculation_authority_future_evolution ?? '',
+    v.calculation_authority_migration_path ?? '',
+    v.expected_gsib_data_source ?? '',
+    v.source_integration_pattern ?? '',
+    v.source_delivery_method ?? '',
+    v.source_endpoint_or_feed ?? '',
+    v.source_variant_identifier ?? '',
+    Array.isArray(v.source_payload_spec) ? JSON.stringify(v.source_payload_spec) : '',
+    v.source_setup_validation_notes ?? '',
+    v.data_format ?? '',
+    v.data_lag ?? '',
   ]);
 
   const wb = XLSX.utils.book_new();

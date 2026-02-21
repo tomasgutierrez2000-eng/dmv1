@@ -21,6 +21,8 @@ export async function GET() {
     ['variant_type: SOURCED | CALCULATED'],
     ['status: ACTIVE | DRAFT | DEPRECATED | PROPOSED | INACTIVE'],
     ['Rollup columns (optional): rollup_facility, rollup_counterparty, rollup_desk, rollup_portfolio, rollup_lob'],
+    ['Calculation Authority (optional): calculation_authority_tier (T1|T2|T3), expected_gsib_data_source, etc.'],
+    ['Source & ingestion (optional): source_integration_pattern (PUSH|PULL), source_delivery_method, source_endpoint_or_feed, source_variant_identifier, source_payload_spec (JSON array), source_setup_validation_notes, data_format, data_lag'],
   ];
 
   const domainsHeaders = ['domain_id', 'domain_name', 'domain_description', 'icon', 'color', 'regulatory_relevance', 'primary_stakeholders'];
@@ -85,6 +87,21 @@ export async function GET() {
     'refresh_frequency',
     'used_by_dashboards',
     'regulatory_references',
+    'calculation_authority_tier',
+    'calculation_authority_tier_future',
+    'calculation_authority_rationale',
+    'calculation_authority_components',
+    'calculation_authority_future_evolution',
+    'calculation_authority_migration_path',
+    'expected_gsib_data_source',
+    'source_integration_pattern',
+    'source_delivery_method',
+    'source_endpoint_or_feed',
+    'source_variant_identifier',
+    'source_payload_spec',
+    'source_setup_validation_notes',
+    'data_format',
+    'data_lag',
   ];
   const variantExample: unknown[][] = [
     [
@@ -113,6 +130,20 @@ export async function GET() {
       '',
       '',
       '',
+      'T2',
+      'T3',
+      'Source + calculate to reconcile',
+      'NOI, Debt Service',
+      'Migrate to T3 when financial data in model',
+      'T2 → T3',
+      'Spreading system / Risk DW',
+      'PULL',
+      'API request',
+      '/api/v1/dscr',
+      'product_type=CRE',
+      'Confirm NOI and debt service fields',
+      'JSON',
+      'T+1',
     ],
   ];
 

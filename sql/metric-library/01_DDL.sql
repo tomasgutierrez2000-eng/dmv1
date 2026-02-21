@@ -91,6 +91,20 @@ CREATE TABLE IF NOT EXISTS metric_library.metric_variants (
     data_format             VARCHAR(128),
     companion_fields        JSONB DEFAULT '[]',
 
+    calculation_authority_tier          VARCHAR(4) CHECK (calculation_authority_tier IN ('T1','T2','T3')),
+    calculation_authority_tier_future   VARCHAR(4) CHECK (calculation_authority_tier_future IN ('T1','T2','T3')),
+    calculation_authority_rationale    TEXT,
+    calculation_authority_components   TEXT,
+    calculation_authority_future_evolution TEXT,
+    calculation_authority_migration_path  TEXT,
+    expected_gsib_data_source          TEXT,
+    source_integration_pattern         VARCHAR(8) CHECK (source_integration_pattern IN ('PUSH','PULL')),
+    source_delivery_method             VARCHAR(256),
+    source_endpoint_or_feed            VARCHAR(512),
+    source_variant_identifier         VARCHAR(256),
+    source_payload_spec                JSONB DEFAULT '[]',
+    source_setup_validation_notes     TEXT,
+
     version_history         JSONB DEFAULT '[]',
     created_at              TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at              TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -100,4 +114,5 @@ CREATE INDEX IF NOT EXISTS idx_metric_variants_parent ON metric_library.metric_v
 CREATE INDEX IF NOT EXISTS idx_metric_variants_status ON metric_library.metric_variants(status);
 CREATE INDEX IF NOT EXISTS idx_metric_variants_executable ON metric_library.metric_variants(executable_metric_id) WHERE executable_metric_id IS NOT NULL;
 
+COMMENT ON COLUMN metric_library.metric_variants.expected_gsib_data_source IS 'GSIB system/database/feed from which this metric is sourced; drives integration design.';
 COMMENT ON SCHEMA metric_library IS 'GSIB Metric Library: governed definitions, variants, rollup, and lineage';

@@ -29,6 +29,20 @@ export type Direction = 'HIGHER_BETTER' | 'LOWER_BETTER' | 'NEUTRAL';
 export type VariantStatus = 'ACTIVE' | 'DRAFT' | 'DEPRECATED' | 'PROPOSED' | 'INACTIVE';
 export type VariantType = 'SOURCED' | 'CALCULATED';
 
+/** Calculation Authority tier: T1 = Always Source, T2 = Source + Calculate to validate, T3 = Always Calculate. */
+export type CalculationAuthorityTier = 'T1' | 'T2' | 'T3';
+
+/** How we receive this metric: PUSH = GSIB sends to us, PULL = we request from GSIB. */
+export type SourceIntegrationPattern = 'PUSH' | 'PULL';
+
+/** One field in the payload the source sends for this variant (for validation and setup). */
+export interface SourcePayloadFieldSpec {
+  field_name: string;
+  description?: string;
+  data_type?: string;
+  required?: boolean;
+}
+
 export interface MetricDomain {
   domain_id: string;
   domain_name: string;
@@ -170,6 +184,25 @@ export interface MetricVariant {
   data_format?: string;
 
   companion_fields?: string[];
+
+  /** Calculation Authority: tier and narrative (T1/T2/T3, rationale, components, evolution, migration). */
+  calculation_authority_tier?: CalculationAuthorityTier;
+  calculation_authority_tier_future?: CalculationAuthorityTier;
+  calculation_authority_rationale?: string;
+  calculation_authority_components?: string;
+  calculation_authority_future_evolution?: string;
+  calculation_authority_migration_path?: string;
+
+  /** GSIB data source: where we get this metric (system / database / feed). */
+  expected_gsib_data_source?: string;
+
+  /** Source & ingestion: push vs pull, how/what the source delivers (for setup and validation). */
+  source_integration_pattern?: SourceIntegrationPattern;
+  source_delivery_method?: string;
+  source_endpoint_or_feed?: string;
+  source_variant_identifier?: string;
+  source_payload_spec?: SourcePayloadFieldSpec[];
+  source_setup_validation_notes?: string;
 
   version_history?: VariantVersionHistoryEntry[];
   created_at?: string;

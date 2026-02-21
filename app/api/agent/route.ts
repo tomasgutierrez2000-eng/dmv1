@@ -44,7 +44,7 @@ function getAnthropicApiKey(): string | undefined {
   return getEnvVar(ENV_VAR_ANTHROPIC);
 }
 
-const CLAUDE_MODEL = 'claude-3-5-haiku-latest';
+const CLAUDE_MODEL = 'claude-haiku-4-5';
 
 type ClaudeMessageParam = { role: 'user' | 'assistant'; content: string | Array<{ type: string; id?: string; name?: string; input?: Record<string, unknown>; tool_use_id?: string; content?: string }> };
 

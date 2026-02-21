@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { ArrowLeft, Layers, Hash, TrendingUp, Grid3x3, Zap, AlertTriangle, Table2, Tag, BarChart3, Copy, Check, ExternalLink } from 'lucide-react';
 import {
   DIMENSION_LABELS,
@@ -104,6 +105,23 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
   const [consumableDetail, setConsumableDetail] = useState<ConsumableDetail | null>(null);
   const [selectedLevels, setSelectedLevels] = useState<Set<string>>(new Set());
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
+  const [libraryLink, setLibraryLink] = useState<{ parentId: string; variantId: string } | null>(null);
+  useEffect(() => {
+    if (!metric.id) return;
+    fetch(`/api/metrics/library/variants/by-executable/${encodeURIComponent(metric.id)}`, { cache: 'no-store' })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data: { variant?: { parent_metric_id: string; variant_id: string }; parent?: { metric_id: string } } | null) => {
+        if (data?.variant?.parent_metric_id && data?.variant?.variant_id) {
+          setLibraryLink({
+            parentId: data.variant.parent_metric_id,
+            variantId: data.variant.variant_id,
+          });
+        } else {
+          setLibraryLink(null);
+        }
+      })
+      .catch(() => setLibraryLink(null));
+  }, [metric.id]);
   useEffect(() => {
     if (!showConsume || !metric.id) return;
     fetch(`/api/metrics/${encodeURIComponent(metric.id)}/consumable`, { cache: 'no-store' })
@@ -193,15 +211,26 @@ export default function MetricDetailView({ metric, onBack }: MetricDetailViewPro
           <ArrowLeft className="w-4 h-4" />
           Back to list
         </button>
-        <button
-          type="button"
-          onClick={() => setShowConsume((v) => !v)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
-          aria-expanded={showConsume}
-        >
-          <BarChart3 className="w-4 h-4" />
-          {showConsume ? 'Hide' : 'Consume API'}
-        </button>
+        <div className="flex items-center gap-2">
+          {libraryLink && (
+            <Link
+              href={`/metrics/library/${encodeURIComponent(libraryLink.parentId)}/${encodeURIComponent(libraryLink.variantId)}`}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+            >
+              <Layers className="w-4 h-4" />
+              View in Library
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowConsume((v) => !v)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+            aria-expanded={showConsume}
+          >
+            <BarChart3 className="w-4 h-4" />
+            {showConsume ? 'Hide' : 'Consume API'}
+          </button>
+        </div>
       </div>
 
       <header className="border-b border-white/10 pb-6 mb-6">

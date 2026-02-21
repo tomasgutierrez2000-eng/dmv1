@@ -21,19 +21,28 @@ export default function MetricsEngine() {
 
   const fetchMetrics = () => {
     setLoading(true);
-    fetch('/api/metrics')
-      .then(res => res.json())
-      .then((data: MetricWithSource[]) => setMetrics(Array.isArray(data) ? data : []))
-      .catch(() => setMetrics([]))
+    Promise.all([
+      fetch('/api/metrics').then((r) => r.json()).then((d: MetricWithSource[]) => Array.isArray(d) ? d : []),
+      fetch('/api/metrics/library/variants?executable_only=true').then((r) => r.json()).then((d: { executable_metric_id?: string }[]) => Array.isArray(d) ? d : []),
+    ])
+      .then(([allMetrics, libraryVariants]) => {
+        setMetrics(allMetrics);
+        setLibraryExecutableIds(new Set((libraryVariants as { executable_metric_id?: string }[]).map((v) => v.executable_metric_id).filter(Boolean) as string[]));
+      })
+      .catch(() => { setMetrics([]); setLibraryExecutableIds(new Set()); })
       .finally(() => setLoading(false));
   };
 
+  const [libraryExecutableIds, setLibraryExecutableIds] = useState<Set<string>>(new Set());
+
   useEffect(() => { fetchMetrics(); }, []);
 
-  const deepDiveMetrics = useMemo(
-    () => metrics.filter((m) => isDeepDiveMetric(m.id)),
-    [metrics]
-  );
+  const deepDiveMetrics = useMemo(() => {
+    const fromMetrics = metrics.filter((m) => isDeepDiveMetric(m.id));
+    if (libraryExecutableIds.size === 0) return fromMetrics;
+    const libraryList = fromMetrics.filter((m) => libraryExecutableIds.has(m.id));
+    return libraryList.length > 0 ? libraryList : fromMetrics;
+  }, [metrics, libraryExecutableIds]);
 
   const filtered = useMemo(() => {
     let list = deepDiveMetrics;

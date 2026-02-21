@@ -141,7 +141,11 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
             <Layers className="w-4 h-4 text-purple-400" />
             Metric Deep Dive
           </h1>
-          <p className="text-[11px] text-gray-500 mt-1">8 deep-dive metrics</p>
+          <p className="text-[11px] text-gray-500 mt-1">Create & edit definitions</p>
+          <Link href="/metrics/library" className="mt-2 flex items-center gap-2 text-[11px] text-purple-400 hover:text-purple-300 transition-colors">
+            <BarChart3 className="w-3.5 h-3.5" />
+            Metric Library →
+          </Link>
         </div>
         <div className="p-3 border-b border-white/[0.04]">
           <div className="relative">

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useMetricValues, type MetricValuesConfig } from '@/lib/use-metric-values';
 
 interface MetricValuesWidgetProps {
@@ -10,6 +12,23 @@ interface MetricValuesWidgetProps {
 
 export default function MetricValuesWidget({ config, maxRows = 10, className = '' }: MetricValuesWidgetProps) {
   const { data, error, loading } = useMetricValues(config);
+  const [libraryLink, setLibraryLink] = useState<{ parentId: string; variantId: string } | null>(null);
+  useEffect(() => {
+    if (!config?.metricId) {
+      setLibraryLink(null);
+      return;
+    }
+    fetch(`/api/metrics/library/variants/by-executable/${encodeURIComponent(config.metricId)}`, { cache: 'no-store' })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: { variant?: { parent_metric_id: string; variant_id: string } } | null) => {
+        if (d?.variant?.parent_metric_id && d?.variant?.variant_id) {
+          setLibraryLink({ parentId: d.variant.parent_metric_id, variantId: d.variant.variant_id });
+        } else {
+          setLibraryLink(null);
+        }
+      })
+      .catch(() => setLibraryLink(null));
+  }, [config?.metricId]);
 
   if (!config?.metricId || !config?.level) {
     return (
@@ -56,9 +75,19 @@ export default function MetricValuesWidget({ config, maxRows = 10, className = '
 
   return (
     <div className={className}>
-      <p className="text-xs text-gray-500 mb-2">
-        {data.metric.name} at {level} (as of {data.asOfDate || 'latest'})
-      </p>
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <p className="text-xs text-gray-500">
+          {data.metric.name} at {level} (as of {data.asOfDate || 'latest'})
+        </p>
+        {libraryLink && (
+          <Link
+            href={`/metrics/library/${encodeURIComponent(libraryLink.parentId)}/${encodeURIComponent(libraryLink.variantId)}`}
+            className="text-xs text-purple-400 hover:text-purple-300"
+          >
+            View in Library →
+          </Link>
+        )}
+      </div>
       <div className="overflow-x-auto rounded-lg border border-white/10">
         <table className="w-full text-left text-sm">
           <thead>

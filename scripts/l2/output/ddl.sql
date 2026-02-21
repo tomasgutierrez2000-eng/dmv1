@@ -1,492 +1,571 @@
--- L2 Schema DDL — DSCR Engine snapshot/observation tables.
+-- L2 Schema DDL (generated from scripts/l2/generate.ts)
 -- Run after scripts/l1/output/ddl.sql. PostgreSQL 15+.
--- All L2 tables reference L1 (counterparty, facility_master, etc.) in same path.
-
 SET search_path TO l1, l2, public;
 
 CREATE SCHEMA IF NOT EXISTS l2;
 
--- ============================================================================
--- L2: counterparty_financial_line_item (FK → counterparty_financial_statement, counterparty, currency_dim)
--- ============================================================================
-CREATE TABLE l2.counterparty_financial_line_item (
-  line_item_id                BIGINT          NOT NULL,
-  financial_statement_id      BIGINT          NOT NULL,
-  counterparty_id             BIGINT          NOT NULL,
-  line_item_code              VARCHAR(50)     NOT NULL,
-  line_item_name              VARCHAR(200)    NOT NULL,
-  line_item_category          VARCHAR(30)     NOT NULL,
-  line_item_subcategory       VARCHAR(50),
-  reported_amount             NUMERIC(18,2),
-  adjusted_amount             NUMERIC(18,2),
-  adjustment_amount           NUMERIC(18,2),
-  adjustment_reason           VARCHAR(4000),
-  adjustment_approved_by      VARCHAR(100),
-  adjustment_approved_ts      TIMESTAMP,
-  annualized_amount           NUMERIC(18,2),
-  is_annualized_flag          CHAR(1)         NOT NULL DEFAULT 'N',
-  currency_code               VARCHAR(20)     NOT NULL,
-  currency_amount_usd         NUMERIC(18,2),
-  fx_rate_used                NUMERIC(18,8),
-  period_start_date           DATE            NOT NULL,
-  period_end_date             DATE            NOT NULL,
-  period_months               SMALLINT        NOT NULL DEFAULT 12,
-  source_system_id            BIGINT,
-  source_record_id            BIGINT,
-  data_quality_flag           VARCHAR(20)     NOT NULL DEFAULT 'CLEAN',
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_cpty_fin_line_item PRIMARY KEY (line_item_id, as_of_date),
-  CONSTRAINT fk_cpty_line_stmt FOREIGN KEY (financial_statement_id) REFERENCES l1.counterparty_financial_statement (financial_statement_id),
-  CONSTRAINT fk_cpty_line_cpty FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty (counterparty_id),
-  CONSTRAINT fk_cpty_line_currency FOREIGN KEY (currency_code) REFERENCES l1.currency_dim (currency_code),
-  CONSTRAINT ck_line_category CHECK (line_item_category IN ('INCOME_STATEMENT', 'BALANCE_SHEET', 'CASH_FLOW_STATEMENT', 'ADDBACK', 'ADJUSTMENT', 'DERIVED', 'SUPPLEMENTAL')),
-  CONSTRAINT ck_line_annualized CHECK (is_annualized_flag IN ('Y', 'N')),
-  CONSTRAINT ck_line_dq_flag CHECK (data_quality_flag IN ('CLEAN', 'ESTIMATED', 'INTERPOLATED', 'MANUAL_OVERRIDE', 'STALE', 'UNVERIFIED', 'FLAGGED'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.position (
+  position_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  facility_id BIGINT,
+  instrument_id BIGINT,
+  position_type VARCHAR(50),
+  balance_amount NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  source_system_id BIGINT,
+  accrued_interest_amt NUMERIC(18,2),
+  book_value_amt NUMERIC(18,2),
+  contractual_maturity_date DATE,
+  counterparty_id BIGINT,
+  credit_agreement_id BIGINT,
+  credit_status_code VARCHAR(20),
+  effective_date DATE,
+  exposure_type_code VARCHAR(20),
+  external_risk_rating VARCHAR(100),
+  internal_risk_rating VARCHAR(100),
+  legal_entity_id BIGINT,
+  lgd_estimate VARCHAR(100),
+  market_value_amt NUMERIC(18,2),
+  netting_set_id BIGINT,
+  notional_amount NUMERIC(18,2),
+  pd_estimate VARCHAR(100),
+  position_currency VARCHAR(100),
+  trading_banking_book_flag CHAR(1),
+  ultimate_parent_id BIGINT,
+  CONSTRAINT fk_position_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_position_instrument_id FOREIGN KEY (instrument_id) REFERENCES l1.instrument_master(instrument_id),
+  CONSTRAINT fk_position_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_position_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
 
-CREATE TABLE l2.counterparty_financial_line_item_default PARTITION OF l2.counterparty_financial_line_item DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_cpty_line_cpty_code_period ON l2.counterparty_financial_line_item (counterparty_id, line_item_code, period_end_date DESC, as_of_date);
-CREATE INDEX IF NOT EXISTS ix_cpty_line_stmt ON l2.counterparty_financial_line_item (financial_statement_id, as_of_date);
+CREATE TABLE IF NOT EXISTS l2.position_detail (
+  position_detail_id BIGINT NOT NULL PRIMARY KEY,
+  position_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  detail_type VARCHAR(50),
+  amount NUMERIC(18,2),
+  maturity_date DATE,
+  cash_leg_amount NUMERIC(18,2),
+  ccf VARCHAR(100),
+  current_balance NUMERIC(18,2),
+  days_past_due INTEGER,
+  delinquency_status VARCHAR(30),
+  derivative_type VARCHAR(50),
+  fair_value NUMERIC(18,2),
+  funded_amount NUMERIC(18,2),
+  haircut_applied_pct NUMERIC(10,4),
+  insured_balance NUMERIC(18,2),
+  interest_rate NUMERIC(8,6),
+  mark_to_market NUMERIC(18,2),
+  origination_date DATE,
+  pfe VARCHAR(100),
+  quantity INTEGER,
+  rate_index NUMERIC(10,4),
+  rate_type CHAR(1),
+  replacement_cost NUMERIC(18,2),
+  sft_type VARCHAR(50),
+  spread_bps NUMERIC(8,2),
+  total_commitment NUMERIC(18,2),
+  unfunded_amount NUMERIC(18,2),
+  unrealized_gain_loss VARCHAR(100),
+  product_node_id BIGINT,
+  exposure_type_code VARCHAR(20),
+  notional_amount NUMERIC(18,2),
+  credit_conversion_factor NUMERIC(10,6),
+  lgd_pct NUMERIC(10,6),
+  risk_weight_pct NUMERIC(10,6),
+  CONSTRAINT fk_position_detail_position_id FOREIGN KEY (position_id) REFERENCES l2.position(position_id)
+);
 
--- ============================================================================
--- L2: property_income_snapshot (FK → collateral_asset_master, facility_master, counterparty, currency_dim)
--- ============================================================================
-CREATE TABLE l2.property_income_snapshot (
-  property_income_id          BIGINT          NOT NULL,
-  collateral_asset_id         BIGINT          NOT NULL,
-  facility_id                 BIGINT,
-  counterparty_id             BIGINT          NOT NULL,
-  property_type               VARCHAR(30)     NOT NULL,
-  property_subtype            VARCHAR(50),
-  income_basis                VARCHAR(20)     NOT NULL,
-  gross_potential_rent        NUMERIC(18,2),
-  loss_to_lease_amt           NUMERIC(18,2),
-  concessions_amt             NUMERIC(18,2),
-  other_income                NUMERIC(18,2),
-  other_income_detail         VARCHAR(2000),
-  percentage_rent             NUMERIC(18,2),
-  vacancy_pct                 NUMERIC(10,4),
-  credit_loss_pct             NUMERIC(10,4),
-  vacancy_credit_loss_amt     NUMERIC(18,2),
-  effective_gross_income      NUMERIC(18,2),
-  real_estate_taxes           NUMERIC(18,2),
-  insurance_expense           NUMERIC(18,2),
-  management_fee              NUMERIC(18,2),
-  management_fee_pct          NUMERIC(10,4),
-  is_management_fee_imputed   CHAR(1)         NOT NULL DEFAULT 'N',
-  repairs_maintenance         NUMERIC(18,2),
-  utilities_expense           NUMERIC(18,2),
-  general_admin_expense       NUMERIC(18,2),
-  other_operating_expense     NUMERIC(18,2),
-  total_operating_expenses    NUMERIC(18,2),
-  operating_expense_ratio     NUMERIC(10,4),
-  net_operating_income        NUMERIC(18,2),
-  replacement_reserves        NUMERIC(18,2),
-  replacement_reserve_per_unit NUMERIC(10,2),
-  ti_lc_reserves              NUMERIC(18,2),
-  ti_lc_per_sf                NUMERIC(10,2),
-  ground_lease_payment         NUMERIC(18,2),
-  ffe_reserve                 NUMERIC(18,2),
-  ffe_reserve_pct             NUMERIC(10,4),
-  other_below_line            NUMERIC(18,2),
-  net_cash_flow               NUMERIC(18,2),
-  occupancy_pct               NUMERIC(10,4),
-  number_of_units             INTEGER,
-  total_sf                    INTEGER,
-  avg_rent_per_unit           NUMERIC(18,2),
-  avg_rent_per_sf             NUMERIC(18,2),
-  weighted_avg_lease_term_yrs NUMERIC(6,2),
-  largest_tenant_pct          NUMERIC(10,4),
-  lease_rollover_12m_pct      NUMERIC(10,4),
-  lease_rollover_24m_pct      NUMERIC(10,4),
-  appraised_value             NUMERIC(18,2),
-  appraisal_date              DATE,
-  cap_rate_applied            NUMERIC(10,4),
-  income_source               VARCHAR(50),
-  currency_code               VARCHAR(20)     NOT NULL,
-  period_start_date           DATE,
-  period_end_date             DATE            NOT NULL,
-  source_system_id            BIGINT,
-  data_quality_flag           VARCHAR(20)     NOT NULL DEFAULT 'CLEAN',
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_prop_income PRIMARY KEY (property_income_id, as_of_date),
-  CONSTRAINT fk_prop_income_collateral FOREIGN KEY (collateral_asset_id) REFERENCES l1.collateral_asset_master (collateral_asset_id),
-  CONSTRAINT fk_prop_income_facility FOREIGN KEY (facility_id) REFERENCES l1.facility_master (facility_id),
-  CONSTRAINT fk_prop_income_cpty FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty (counterparty_id),
-  CONSTRAINT fk_prop_income_currency FOREIGN KEY (currency_code) REFERENCES l1.currency_dim (currency_code),
-  CONSTRAINT ck_prop_type CHECK (property_type IN ('MULTIFAMILY', 'OFFICE', 'RETAIL', 'INDUSTRIAL', 'HOTEL', 'HEALTHCARE', 'SELF_STORAGE', 'MIXED_USE', 'LAND', 'MANUFACTURED_HOUSING', 'STUDENT_HOUSING', 'SENIOR_LIVING', 'DATA_CENTER', 'LIFE_SCIENCE', 'OTHER')),
-  CONSTRAINT ck_prop_basis CHECK (income_basis IN ('INPLACE', 'STABILIZED', 'PROFORMA', 'STRESSED', 'DARK_VALUE', 'APPRAISER', 'UNDERWRITTEN')),
-  CONSTRAINT ck_prop_mgmt_imputed CHECK (is_management_fee_imputed IN ('Y', 'N')),
-  CONSTRAINT ck_prop_income_source CHECK (income_source IS NULL OR income_source IN ('RENT_ROLL', 'OPERATING_STATEMENT', 'APPRAISAL', 'BORROWER_BUDGET', 'BANK_UNDERWRITTEN', 'THIRD_PARTY_REPORT')),
-  CONSTRAINT ck_prop_dq_flag CHECK (data_quality_flag IN ('CLEAN', 'ESTIMATED', 'INTERPOLATED', 'MANUAL_OVERRIDE', 'STALE', 'UNVERIFIED', 'FLAGGED'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.exposure_counterparty_attribution (
+  attribution_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  exposure_type_id BIGINT NOT NULL,
+  counterparty_id BIGINT NOT NULL,
+  exposure_amount NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  attributed_exposure_usd NUMERIC(18,2),
+  attribution_pct NUMERIC(10,4),
+  counterparty_role_code VARCHAR(20),
+  facility_id BIGINT,
+  is_risk_shifted_flag CHAR(1),
+  risk_shifted_from_counterparty_id BIGINT,
+  PRIMARY KEY (attribution_id, as_of_date),
+  CONSTRAINT fk_exposure_counterparty_attribution_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
+  CONSTRAINT fk_exposure_counterparty_attribution_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_exposure_counterparty_attribution_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
 
-CREATE TABLE l2.property_income_snapshot_default PARTITION OF l2.property_income_snapshot DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_prop_income_collateral_basis ON l2.property_income_snapshot (collateral_asset_id, income_basis, period_end_date DESC, as_of_date);
-CREATE INDEX IF NOT EXISTS ix_prop_income_facility ON l2.property_income_snapshot (facility_id, as_of_date) WHERE facility_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_prop_income_cpty ON l2.property_income_snapshot (counterparty_id, as_of_date);
+CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  exposure_type_id BIGINT NOT NULL,
+  drawn_amount NUMERIC(18,2),
+  committed_amount NUMERIC(18,2),
+  undrawn_amount NUMERIC(18,2),
+  source_system_id BIGINT,
+  counterparty_id BIGINT,
+  coverage_ratio_pct NUMERIC(10,4),
+  currency_code VARCHAR(20),
+  exposure_amount_local NUMERIC(18,2),
+  facility_exposure_id BIGINT,
+  fr2590_category_code VARCHAR(20),
+  gross_exposure_usd NUMERIC(18,2),
+  legal_entity_id BIGINT,
+  lob_segment_id BIGINT,
+  net_exposure_usd NUMERIC(18,2),
+  product_node_id BIGINT,
+  outstanding_balance_amt NUMERIC(18,2),
+  undrawn_commitment_amt NUMERIC(18,2),
+  PRIMARY KEY (facility_id, as_of_date),
+  CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_exposure_snapshot_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
+  CONSTRAINT fk_facility_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
 
--- ============================================================================
--- L2: counterparty_debt_schedule (FK → counterparty, facility_master, credit_agreement_master, currency_dim)
--- ============================================================================
-CREATE TABLE l2.counterparty_debt_schedule (
-  debt_item_id                BIGINT          NOT NULL,
-  counterparty_id             BIGINT          NOT NULL,
-  facility_id                 BIGINT,
-  credit_agreement_id         BIGINT,
-  debt_type                   VARCHAR(30)     NOT NULL,
-  debt_subtype                VARCHAR(50),
-  lender_name                 VARCHAR(200),
-  lender_counterparty_id      BIGINT,
-  is_bank_facility_flag       CHAR(1)         NOT NULL DEFAULT 'N',
-  seniority_rank              SMALLINT,
-  seniority_class             VARCHAR(30),
-  original_amount             NUMERIC(18,2),
-  outstanding_balance         NUMERIC(18,2),
-  committed_amount            NUMERIC(18,2),
-  undrawn_amount              NUMERIC(18,2),
-  interest_rate_pct           NUMERIC(10,6),
-  rate_type                   VARCHAR(20),
-  rate_index_code             VARCHAR(30),
-  rate_spread_bps             NUMERIC(8,2),
-  rate_floor_pct              NUMERIC(10,4),
-  rate_cap_pct                NUMERIC(10,4),
-  is_hedged_flag              CHAR(1)         NOT NULL DEFAULT 'N',
-  hedged_rate_pct             NUMERIC(10,6),
-  annual_interest             NUMERIC(18,2),
-  annual_principal            NUMERIC(18,2),
-  annual_debt_service         NUMERIC(18,2),
-  monthly_payment             NUMERIC(18,2),
-  payment_frequency           VARCHAR(20),
-  amortization_type           VARCHAR(30),
-  amortization_term_months    INTEGER,
-  remaining_term_months        INTEGER,
-  io_period_end_date          DATE,
-  origination_date            DATE,
-  maturity_date               DATE,
-  is_pik_flag                 CHAR(1)         NOT NULL DEFAULT 'N',
-  pik_rate_pct                NUMERIC(10,4),
-  is_cross_defaulted_flag     CHAR(1)         NOT NULL DEFAULT 'N',
-  is_cross_collateralized_flag CHAR(1)        NOT NULL DEFAULT 'N',
-  collateral_description      VARCHAR(2000),
-  currency_code               VARCHAR(20)     NOT NULL,
-  amount_usd                  NUMERIC(18,2),
-  fx_rate_used                NUMERIC(18,8),
-  data_source                 VARCHAR(50)     NOT NULL,
-  source_system_id            BIGINT,
-  data_quality_flag           VARCHAR(20)     NOT NULL DEFAULT 'CLEAN',
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_cpty_debt PRIMARY KEY (debt_item_id, as_of_date),
-  CONSTRAINT fk_cpty_debt_cpty FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty (counterparty_id),
-  CONSTRAINT fk_cpty_debt_facility FOREIGN KEY (facility_id) REFERENCES l1.facility_master (facility_id),
-  CONSTRAINT fk_cpty_debt_agreement FOREIGN KEY (credit_agreement_id) REFERENCES l1.credit_agreement_master (credit_agreement_id),
-  CONSTRAINT fk_cpty_debt_currency FOREIGN KEY (currency_code) REFERENCES l1.currency_dim (currency_code),
-  CONSTRAINT ck_debt_type CHECK (debt_type IN ('SENIOR_TERM', 'SENIOR_REVOLVER', 'SENIOR_LOC', 'SENIOR_MORTGAGE', 'MEZZANINE', 'SUBORDINATED', 'SECOND_LIEN', 'CAPITAL_LEASE', 'OPERATING_LEASE', 'FINANCE_LEASE', 'PREFERRED_EQUITY', 'SELLER_NOTE', 'EARNOUT', 'GROUND_LEASE', 'EQUIPMENT_FINANCE', 'BOND', 'NOTE_PAYABLE', 'RELATED_PARTY_LOAN', 'PIK_NOTE', 'CONVERTIBLE', 'OTHER')),
-  CONSTRAINT ck_debt_seniority CHECK (seniority_class IS NULL OR seniority_class IN ('SUPER_SENIOR', 'SENIOR_SECURED', 'SENIOR_UNSECURED', 'SECOND_LIEN', 'MEZZANINE', 'SUBORDINATED', 'JUNIOR', 'EQUITY_LIKE')),
-  CONSTRAINT ck_debt_rate_type CHECK (rate_type IS NULL OR rate_type IN ('FIXED', 'FLOATING', 'VARIABLE', 'HYBRID', 'STEP_UP', 'PIK', 'ZERO')),
-  CONSTRAINT ck_debt_amort CHECK (amortization_type IS NULL OR amortization_type IN ('AMORTIZING', 'INTEREST_ONLY', 'BULLET', 'BALLOON', 'REVOLVING', 'STEP_UP', 'CUSTOM')),
-  CONSTRAINT ck_debt_bank CHECK (is_bank_facility_flag IN ('Y', 'N')),
-  CONSTRAINT ck_debt_hedged CHECK (is_hedged_flag IN ('Y', 'N')),
-  CONSTRAINT ck_debt_pik CHECK (is_pik_flag IN ('Y', 'N')),
-  CONSTRAINT ck_debt_cross_default CHECK (is_cross_defaulted_flag IN ('Y', 'N')),
-  CONSTRAINT ck_debt_cross_collat CHECK (is_cross_collateralized_flag IN ('Y', 'N')),
-  CONSTRAINT ck_debt_payment_freq CHECK (payment_frequency IS NULL OR payment_frequency IN ('MONTHLY', 'QUARTERLY', 'SEMI_ANNUAL', 'ANNUAL', 'AT_MATURITY', 'IRREGULAR')),
-  CONSTRAINT ck_debt_data_source CHECK (data_source IN ('BORROWER_FINANCIAL_STATEMENT', 'BORROWER_CERTIFICATION', 'CREDIT_BUREAU', 'INTERNAL_SYSTEM', 'LOAN_AGREEMENT', 'INTERCREDITOR_AGREEMENT', 'MANUAL_ENTRY', 'THIRD_PARTY_REPORT')),
-  CONSTRAINT ck_debt_dq_flag CHECK (data_quality_flag IN ('CLEAN', 'ESTIMATED', 'INTERPOLATED', 'MANUAL_OVERRIDE', 'STALE', 'UNVERIFIED', 'FLAGGED'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.netting_set_exposure_snapshot (
+  netting_set_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  netted_exposure_amount NUMERIC(18,2),
+  gross_exposure_amount NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  collateral_held_usd NUMERIC(18,2),
+  counterparty_id BIGINT,
+  gross_mtm_usd NUMERIC(18,2),
+  legal_entity_id BIGINT,
+  netting_set_exposure_id BIGINT,
+  pfe_usd NUMERIC(18,2),
+  netting_benefit_amt NUMERIC(18,2),
+  PRIMARY KEY (netting_set_id, as_of_date),
+  CONSTRAINT fk_netting_set_exposure_snapshot_netting_set_id FOREIGN KEY (netting_set_id) REFERENCES l1.netting_set(netting_set_id),
+  CONSTRAINT fk_netting_set_exposure_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
 
-CREATE TABLE l2.counterparty_debt_schedule_default PARTITION OF l2.counterparty_debt_schedule DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_cpty_debt_cpty_type ON l2.counterparty_debt_schedule (counterparty_id, debt_type, as_of_date);
-CREATE INDEX IF NOT EXISTS ix_cpty_debt_facility ON l2.counterparty_debt_schedule (facility_id, as_of_date) WHERE facility_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_cpty_debt_bank_flag ON l2.counterparty_debt_schedule (counterparty_id, is_bank_facility_flag, as_of_date);
+CREATE TABLE IF NOT EXISTS l2.facility_lob_attribution (
+  attribution_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  lob_segment_id BIGINT NOT NULL,
+  attribution_pct NUMERIC(10,4),
+  attributed_amount NUMERIC(18,2),
+  attribution_amount_usd NUMERIC(18,2),
+  attribution_type VARCHAR(50),
+  lob_node_id BIGINT,
+  hierarchy_id VARCHAR(64),
+  CONSTRAINT fk_facility_lob_attribution_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_lob_attribution_lob_segment_id FOREIGN KEY (lob_segment_id) REFERENCES l1.enterprise_business_taxonomy(managed_segment_id)
+);
 
--- ============================================================================
--- L2: dscr_calculation_result (FK → dscr_variant_definition, scenario_dim, context_dim, facility_master, counterparty, collateral_asset_master, portfolio_dim, currency_dim, dscr_rollup_recipe, counterparty_financial_statement)
--- ============================================================================
-CREATE TABLE l2.dscr_calculation_result (
-  calculation_id              BIGINT          NOT NULL,
-  variant_id                  BIGINT          NOT NULL,
-  scenario_id                 BIGINT,
-  context_id                  BIGINT,
-  run_version_id              BIGINT,
-  entity_type                 VARCHAR(30)     NOT NULL,
-  facility_id                 BIGINT,
-  counterparty_id             BIGINT,
-  collateral_asset_id         BIGINT,
-  portfolio_id                BIGINT,
-  lob_segment_id              BIGINT,
-  credit_agreement_id         BIGINT,
-  numerator_value             NUMERIC(18,2)   NOT NULL,
-  denominator_value           NUMERIC(18,2)   NOT NULL,
-  dscr_value                  NUMERIC(10,4)   NOT NULL,
-  threshold_status            VARCHAR(20),
-  applicable_threshold        NUMERIC(10,4),
-  threshold_delta             NUMERIC(10,4),
-  prior_period_dscr           NUMERIC(10,4),
-  period_over_period_delta    NUMERIC(10,4),
-  rollup_recipe_id            BIGINT,
-  rollup_override_id          BIGINT,
-  is_recomputed_flag          CHAR(1)         NOT NULL DEFAULT 'N',
-  recomputation_method         VARCHAR(30),
-  financial_statement_id      BIGINT,
-  data_as_of_date             DATE            NOT NULL,
-  financials_period_end_date  DATE,
-  financials_staleness_days   INTEGER,
-  calculation_date            TIMESTAMP       NOT NULL,
-  calculated_by               VARCHAR(100)    NOT NULL,
-  calculation_source          VARCHAR(30)     NOT NULL DEFAULT 'ENGINE',
-  approved_by                 VARCHAR(100),
-  approved_ts                 TIMESTAMP,
-  approval_status             VARCHAR(20)     NOT NULL DEFAULT 'AUTO_APPROVED',
-  is_override_flag            CHAR(1)         NOT NULL DEFAULT 'N',
-  override_reason             VARCHAR(4000),
-  data_quality_flag           VARCHAR(20)     NOT NULL DEFAULT 'CLEAN',
-  currency_code               VARCHAR(20)     NOT NULL,
-  numerator_value_usd         NUMERIC(18,2),
-  denominator_value_usd       NUMERIC(18,2),
-  fx_rate_used                NUMERIC(18,8),
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_dscr_calc_result PRIMARY KEY (calculation_id, as_of_date),
-  CONSTRAINT fk_dscr_calc_variant FOREIGN KEY (variant_id) REFERENCES l1.dscr_variant_definition (variant_id),
-  CONSTRAINT fk_dscr_calc_scenario FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim (scenario_id),
-  CONSTRAINT fk_dscr_calc_context FOREIGN KEY (context_id) REFERENCES l1.context_dim (context_id),
-  CONSTRAINT fk_dscr_calc_facility FOREIGN KEY (facility_id) REFERENCES l1.facility_master (facility_id),
-  CONSTRAINT fk_dscr_calc_cpty FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty (counterparty_id),
-  CONSTRAINT fk_dscr_calc_collateral FOREIGN KEY (collateral_asset_id) REFERENCES l1.collateral_asset_master (collateral_asset_id),
-  CONSTRAINT fk_dscr_calc_portfolio FOREIGN KEY (portfolio_id) REFERENCES l1.portfolio_dim (portfolio_id),
-  CONSTRAINT fk_dscr_calc_currency FOREIGN KEY (currency_code) REFERENCES l1.currency_dim (currency_code),
-  CONSTRAINT fk_dscr_calc_recipe FOREIGN KEY (rollup_recipe_id) REFERENCES l1.dscr_rollup_recipe (recipe_id),
-  CONSTRAINT fk_dscr_calc_stmt FOREIGN KEY (financial_statement_id) REFERENCES l1.counterparty_financial_statement (financial_statement_id),
-  CONSTRAINT ck_dscr_calc_entity_type CHECK (entity_type IN ('FACILITY', 'PROPERTY', 'OBLIGOR', 'GUARANTOR', 'PORTFOLIO', 'LOB', 'ENTERPRISE')),
-  CONSTRAINT ck_dscr_calc_threshold_status CHECK (threshold_status IS NULL OR threshold_status IN ('PASS', 'WATCH', 'ESCALATION', 'FAIL', 'NOT_EVALUATED')),
-  CONSTRAINT ck_dscr_calc_source CHECK (calculation_source IN ('ENGINE', 'MANUAL', 'IMPORT', 'SPREADING_SYSTEM', 'STRESS_MODEL')),
-  CONSTRAINT ck_dscr_calc_approval CHECK (approval_status IN ('AUTO_APPROVED', 'PENDING', 'APPROVED', 'REJECTED', 'NOT_REQUIRED')),
-  CONSTRAINT ck_dscr_calc_recomp CHECK (is_recomputed_flag IN ('Y', 'N')),
-  CONSTRAINT ck_dscr_calc_override CHECK (is_override_flag IN ('Y', 'N')),
-  CONSTRAINT ck_dscr_calc_dq CHECK (data_quality_flag IN ('CLEAN', 'ESTIMATED', 'STALE_FINANCIALS', 'MANUAL_OVERRIDE', 'PARTIAL_DATA', 'FLAGGED'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.collateral_snapshot (
+  collateral_asset_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  valuation_amount NUMERIC(18,2),
+  haircut_pct NUMERIC(10,4),
+  eligible_collateral_amount NUMERIC(18,2),
+  source_system_id BIGINT,
+  allocated_amount_usd NUMERIC(18,2),
+  collateral_snapshot_id BIGINT,
+  counterparty_id BIGINT,
+  crm_type_code VARCHAR(20),
+  current_valuation_usd NUMERIC(18,2),
+  facility_id BIGINT,
+  mitigant_group_code VARCHAR(20),
+  mitigant_subtype VARCHAR(100),
+  original_valuation_usd NUMERIC(18,2),
+  risk_shifting_flag CHAR(1),
+  PRIMARY KEY (collateral_asset_id, as_of_date),
+  CONSTRAINT fk_collateral_snapshot_collateral_asset_id FOREIGN KEY (collateral_asset_id) REFERENCES l1.collateral_asset_master(collateral_asset_id),
+  CONSTRAINT fk_collateral_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
 
-CREATE TABLE l2.dscr_calculation_result_default PARTITION OF l2.dscr_calculation_result DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_dscr_calc_facility_variant ON l2.dscr_calculation_result (facility_id, variant_id, as_of_date DESC) WHERE facility_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_dscr_calc_cpty ON l2.dscr_calculation_result (counterparty_id, as_of_date DESC) WHERE counterparty_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_dscr_calc_portfolio ON l2.dscr_calculation_result (portfolio_id, as_of_date) WHERE portfolio_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_dscr_calc_threshold_status ON l2.dscr_calculation_result (threshold_status, as_of_date) WHERE threshold_status IN ('WATCH', 'ESCALATION', 'FAIL');
-CREATE INDEX IF NOT EXISTS ix_dscr_calc_context_scenario ON l2.dscr_calculation_result (context_id, scenario_id, as_of_date);
+CREATE TABLE IF NOT EXISTS l2.cash_flow (
+  cash_flow_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT,
+  cash_flow_date DATE NOT NULL,
+  cash_flow_type VARCHAR(50),
+  amount NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  as_of_date DATE,
+  contractual_amt NUMERIC(18,2),
+  contractual_amt_usd NUMERIC(18,2),
+  counterparty_id BIGINT,
+  flow_date DATE,
+  flow_direction VARCHAR(100),
+  flow_id BIGINT,
+  flow_type VARCHAR(50),
+  maturity_bucket_id BIGINT,
+  position_id BIGINT,
+  CONSTRAINT fk_cash_flow_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_cash_flow_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
 
--- ============================================================================
--- L2: dscr_calculation_input_detail (FK → dscr_calculation_result, dscr_variant_component)
--- ============================================================================
-CREATE TABLE l2.dscr_calculation_input_detail (
-  input_detail_id             BIGINT          NOT NULL,
-  calculation_id              BIGINT          NOT NULL,
-  component_id                BIGINT          NOT NULL,
-  position_in_formula         VARCHAR(20)     NOT NULL,
-  component_code              VARCHAR(50)     NOT NULL,
-  component_name              VARCHAR(200)    NOT NULL,
-  operation                   VARCHAR(20)     NOT NULL,
-  component_order             SMALLINT        NOT NULL,
-  raw_value                   NUMERIC(18,2),
-  adjustment_value            NUMERIC(18,2),
-  cap_applied_value           NUMERIC(18,2),
-  stress_adjustment           NUMERIC(18,2),
-  final_value                 NUMERIC(18,2)   NOT NULL,
-  stress_parameter_key        VARCHAR(50),
-  stress_parameter_value      NUMERIC(18,6),
-  source_table                VARCHAR(128),
-  source_record_id            BIGINT,
-  source_field                VARCHAR(128),
-  source_period_end_date      DATE,
-  is_override_flag            CHAR(1)         NOT NULL DEFAULT 'N',
-  override_reason             VARCHAR(4000),
-  overridden_by               VARCHAR(100),
-  currency_code               VARCHAR(20),
-  value_usd                   NUMERIC(18,2),
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_dscr_calc_input PRIMARY KEY (input_detail_id, as_of_date),
-  CONSTRAINT fk_dscr_input_calc FOREIGN KEY (calculation_id, as_of_date) REFERENCES l2.dscr_calculation_result (calculation_id, as_of_date),
-  CONSTRAINT fk_dscr_input_component FOREIGN KEY (component_id) REFERENCES l1.dscr_variant_component (component_id),
-  CONSTRAINT ck_input_position CHECK (position_in_formula IN ('NUMERATOR', 'DENOMINATOR')),
-  CONSTRAINT ck_input_operation CHECK (operation IN ('ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE', 'DERIVED')),
-  CONSTRAINT ck_input_override CHECK (is_override_flag IN ('Y', 'N'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.facility_financial_snapshot (
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  noi_amt NUMERIC(18,2),
+  total_debt_service_amt NUMERIC(18,2),
+  revenue_amt NUMERIC(18,2),
+  operating_expense_amt NUMERIC(18,2),
+  ebitda_amt NUMERIC(18,2),
+  interest_expense_amt NUMERIC(18,2),
+  principal_payment_amt NUMERIC(18,2),
+  counterparty_id BIGINT,
+  currency_code VARCHAR(20),
+  reporting_period VARCHAR(20),
+  financial_snapshot_id BIGINT,
+  PRIMARY KEY (facility_id, as_of_date),
+  CONSTRAINT fk_facility_financial_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
+);
 
-CREATE TABLE l2.dscr_calculation_input_detail_default PARTITION OF l2.dscr_calculation_input_detail DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_dscr_input_calc ON l2.dscr_calculation_input_detail (calculation_id, as_of_date);
-CREATE INDEX IF NOT EXISTS ix_dscr_input_override ON l2.dscr_calculation_input_detail (as_of_date) WHERE is_override_flag = 'Y';
+CREATE TABLE IF NOT EXISTS l2.facility_delinquency_snapshot (
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  credit_status_code BIGINT NOT NULL,
+  days_past_due INTEGER,
+  watch_list_flag CHAR(1),
+  counterparty_id BIGINT,
+  currency_code VARCHAR(20),
+  days_past_due_max INTEGER,
+  delinquency_bucket_code VARCHAR(20),
+  delinquency_snapshot_id BIGINT,
+  delinquency_status_code VARCHAR(20),
+  last_payment_received_date DATE,
+  overdue_interest_amt NUMERIC(18,2),
+  overdue_principal_amt NUMERIC(18,2),
+  PRIMARY KEY (facility_id, as_of_date),
+  CONSTRAINT fk_facility_delinquency_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_delinquency_snapshot_credit_status_code FOREIGN KEY (credit_status_code) REFERENCES l1.credit_status_dim(credit_status_code)
+);
 
--- ============================================================================
--- L2: covenant_compliance_observation (FK → covenant_definition, dscr_calculation_result, credit_agreement_master, counterparty)
--- ============================================================================
-CREATE TABLE l2.covenant_compliance_observation (
-  compliance_id               BIGINT          NOT NULL,
-  covenant_id                 BIGINT          NOT NULL,
-  calculation_id              BIGINT,
-  credit_agreement_id         BIGINT          NOT NULL,
-  facility_id                 BIGINT,
-  counterparty_id             BIGINT          NOT NULL,
-  test_period_start_date      DATE            NOT NULL,
-  test_period_end_date        DATE            NOT NULL,
-  test_date                   DATE            NOT NULL,
-  actual_value                NUMERIC(18,4)   NOT NULL,
-  threshold_value             NUMERIC(18,4)   NOT NULL,
-  cushion_value               NUMERIC(18,4),
-  cushion_pct                 NUMERIC(10,4),
-  compliance_status           VARCHAR(20)     NOT NULL,
-  breach_date                 DATE,
-  breach_amount               NUMERIC(18,4),
-  waiver_flag                 CHAR(1)         NOT NULL DEFAULT 'N',
-  waiver_date                 DATE,
-  waiver_approved_by          VARCHAR(100),
-  waiver_conditions           VARCHAR(4000),
-  cure_flag                   CHAR(1)         NOT NULL DEFAULT 'N',
-  cure_date                   DATE,
-  cure_amount                 NUMERIC(18,2),
-  cure_type                   VARCHAR(30),
-  borrower_notified_date      DATE,
-  default_notice_issued_flag  CHAR(1)         NOT NULL DEFAULT 'N',
-  cross_default_triggered_flag CHAR(1)        NOT NULL DEFAULT 'N',
-  tested_by                   VARCHAR(100),
-  reviewed_by                 VARCHAR(100),
-  reviewed_ts                 TIMESTAMP,
-  notes                       VARCHAR(4000),
-  source_system_id            BIGINT,
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_covenant_compliance PRIMARY KEY (compliance_id, as_of_date),
-  CONSTRAINT fk_cov_comp_covenant FOREIGN KEY (covenant_id) REFERENCES l1.covenant_definition (covenant_id),
-  CONSTRAINT fk_cov_comp_calc FOREIGN KEY (calculation_id, as_of_date) REFERENCES l2.dscr_calculation_result (calculation_id, as_of_date),
-  CONSTRAINT fk_cov_comp_agreement FOREIGN KEY (credit_agreement_id) REFERENCES l1.credit_agreement_master (credit_agreement_id),
-  CONSTRAINT fk_cov_comp_cpty FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty (counterparty_id),
-  CONSTRAINT ck_cov_comp_status CHECK (compliance_status IN ('COMPLIANT', 'BREACH', 'WAIVED', 'CURED', 'PENDING', 'TECHNICAL_DEFAULT', 'EVENT_OF_DEFAULT', 'FORBEARANCE')),
-  CONSTRAINT ck_cov_comp_waiver CHECK (waiver_flag IN ('Y', 'N')),
-  CONSTRAINT ck_cov_comp_cure CHECK (cure_flag IN ('Y', 'N')),
-  CONSTRAINT ck_cov_comp_notice CHECK (default_notice_issued_flag IN ('Y', 'N')),
-  CONSTRAINT ck_cov_comp_cross CHECK (cross_default_triggered_flag IN ('Y', 'N'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.facility_pricing_snapshot (
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  spread_bps NUMERIC(10,2),
+  rate_index_id BIGINT,
+  all_in_rate_pct NUMERIC(10,4),
+  floor_pct NUMERIC(10,4),
+  base_rate_pct NUMERIC(10,4),
+  currency_code VARCHAR(20),
+  facility_pricing_id BIGINT,
+  min_spread_threshold_bps NUMERIC(8,2),
+  payment_frequency VARCHAR(30),
+  prepayment_penalty_flag CHAR(1),
+  rate_cap_pct NUMERIC(10,4),
+  rate_index_code NUMERIC(10,4),
+  PRIMARY KEY (facility_id, as_of_date),
+  CONSTRAINT fk_facility_pricing_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_pricing_snapshot_rate_index_id FOREIGN KEY (rate_index_id) REFERENCES l1.interest_rate_index_dim(rate_index_id)
+);
 
-CREATE TABLE l2.covenant_compliance_observation_default PARTITION OF l2.covenant_compliance_observation DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_cov_comp_covenant ON l2.covenant_compliance_observation (covenant_id, test_period_end_date DESC, as_of_date);
-CREATE INDEX IF NOT EXISTS ix_cov_comp_cpty ON l2.covenant_compliance_observation (counterparty_id, as_of_date);
-CREATE INDEX IF NOT EXISTS ix_cov_comp_status ON l2.covenant_compliance_observation (compliance_status, as_of_date) WHERE compliance_status IN ('BREACH', 'TECHNICAL_DEFAULT', 'EVENT_OF_DEFAULT');
+CREATE TABLE IF NOT EXISTS l2.facility_profitability_snapshot (
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  nii_ytd NUMERIC(18,2),
+  fee_income_ytd NUMERIC(18,2),
+  ledger_account_id BIGINT,
+  allocated_equity_amt NUMERIC(18,2),
+  avg_earning_assets_amt NUMERIC(18,2),
+  base_currency_code VARCHAR(20),
+  fee_income_amt NUMERIC(18,2),
+  interest_expense_amt NUMERIC(18,2),
+  interest_income_amt NUMERIC(18,2),
+  profitability_snapshot_id BIGINT,
+  PRIMARY KEY (facility_id, as_of_date),
+  CONSTRAINT fk_facility_profitability_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_profitability_snapshot_ledger_account_id FOREIGN KEY (ledger_account_id) REFERENCES l1.ledger_account_dim(ledger_account_id)
+);
 
--- ============================================================================
--- L2: dscr_rollup_override (FK → dscr_rollup_recipe, counterparty, facility_master)
--- ============================================================================
-CREATE TABLE l2.dscr_rollup_override (
-  override_id                 BIGINT          NOT NULL,
-  recipe_id                   BIGINT          NOT NULL,
-  counterparty_id             BIGINT          NOT NULL,
-  facility_id                 BIGINT,
-  override_field              VARCHAR(50)     NOT NULL,
-  original_value              VARCHAR(200)    NOT NULL,
-  override_value              VARCHAR(200)    NOT NULL,
-  override_reason             VARCHAR(4000)   NOT NULL,
-  supporting_documentation    VARCHAR(1000),
-  requested_by                VARCHAR(100)    NOT NULL,
-  requested_ts                TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  approved_by                 VARCHAR(100),
-  approved_ts                 TIMESTAMP,
-  approval_status             VARCHAR(20)     NOT NULL DEFAULT 'PENDING',
-  rejection_reason            VARCHAR(4000),
-  effective_from_date         DATE            NOT NULL,
-  effective_to_date           DATE,
-  review_date                 DATE,
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_rollup_override PRIMARY KEY (override_id, as_of_date),
-  CONSTRAINT fk_override_recipe FOREIGN KEY (recipe_id) REFERENCES l1.dscr_rollup_recipe (recipe_id),
-  CONSTRAINT fk_override_cpty FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty (counterparty_id),
-  CONSTRAINT fk_override_facility FOREIGN KEY (facility_id) REFERENCES l1.facility_master (facility_id),
-  CONSTRAINT ck_override_field CHECK (override_field IN ('income_consolidation_method', 'debt_scope', 'allocation_method', 'intercompany_treatment', 'minority_interest_treatment', 'guarantor_income_inclusion', 'debt_entity_scope', 'income_entity_scope', 'allocation_basis_field')),
-  CONSTRAINT ck_override_approval CHECK (approval_status IN ('PENDING', 'APPROVED', 'REJECTED', 'EXPIRED', 'REVOKED'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.limit_contribution_snapshot (
+  limit_rule_id BIGINT NOT NULL,
+  counterparty_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  contribution_amount NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  contribution_amount_usd NUMERIC(18,2),
+  contribution_id BIGINT,
+  contribution_pct NUMERIC(10,4),
+  facility_id BIGINT,
+  PRIMARY KEY (limit_rule_id, counterparty_id, as_of_date),
+  CONSTRAINT fk_limit_contribution_snapshot_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
+  CONSTRAINT fk_limit_contribution_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_limit_contribution_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
 
-CREATE TABLE l2.dscr_rollup_override_default PARTITION OF l2.dscr_rollup_override DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_override_cpty_active ON l2.dscr_rollup_override (counterparty_id, as_of_date) WHERE approval_status = 'APPROVED';
-CREATE INDEX IF NOT EXISTS ix_override_review ON l2.dscr_rollup_override (review_date) WHERE approval_status = 'APPROVED' AND effective_to_date IS NULL;
+CREATE TABLE IF NOT EXISTS l2.limit_utilization_event (
+  limit_rule_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  counterparty_id BIGINT,
+  utilized_amount NUMERIC(18,2),
+  available_amount NUMERIC(18,2),
+  reporting_ts TIMESTAMP,
+  utilization_event_id BIGINT,
+  utilized_amount_usd NUMERIC(18,2),
+  PRIMARY KEY (limit_rule_id, as_of_date),
+  CONSTRAINT fk_limit_utilization_event_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
+  CONSTRAINT fk_limit_utilization_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+);
 
--- ============================================================================
--- L2: dscr_aggregation_result (FK → dscr_aggregation_config, enterprise_business_taxonomy, portfolio_dim, scenario_dim, dscr_variant_definition)
--- ============================================================================
-CREATE TABLE l2.dscr_aggregation_result (
-  agg_result_id               BIGINT          NOT NULL,
-  agg_config_id               BIGINT          NOT NULL,
-  aggregation_level           VARCHAR(30)     NOT NULL,
-  aggregation_method          VARCHAR(30)     NOT NULL,
-  segment_type                VARCHAR(50),
-  segment_value               VARCHAR(100),
-  lob_segment_id              BIGINT,
-  portfolio_id                BIGINT,
-  org_unit_id                 BIGINT,
-  scenario_id                 BIGINT,
-  context_id                  BIGINT,
-  variant_id                  BIGINT,
-  weighted_avg_dscr           NUMERIC(10,4),
-  median_dscr                 NUMERIC(10,4),
-  min_dscr                    NUMERIC(10,4),
-  max_dscr                    NUMERIC(10,4),
-  stddev_dscr                 NUMERIC(10,4),
-  percentile_25_dscr           NUMERIC(10,4),
-  percentile_75_dscr          NUMERIC(10,4),
-  facility_count              INTEGER         NOT NULL,
-  counterparty_count          INTEGER,
-  total_commitment_usd        NUMERIC(18,2)   NOT NULL,
-  total_outstanding_usd       NUMERIC(18,2),
-  total_ead_usd               NUMERIC(18,2),
-  pct_below_1_00x             NUMERIC(10,4),
-  pct_1_00_to_1_15x           NUMERIC(10,4),
-  pct_1_15_to_1_25x           NUMERIC(10,4),
-  pct_1_25_to_1_50x           NUMERIC(10,4),
-  pct_above_1_50x             NUMERIC(10,4),
-  amt_below_1_00x_usd          NUMERIC(18,2),
-  amt_1_00_to_1_25x_usd        NUMERIC(18,2),
-  amt_above_1_25x_usd         NUMERIC(18,2),
-  prior_period_wa_dscr        NUMERIC(10,4),
-  wa_dscr_delta               NUMERIC(10,4),
-  prior_pct_below_1_25x       NUMERIC(10,4),
-  pct_below_1_25x_delta       NUMERIC(10,4),
-  migration_period_months     SMALLINT        NOT NULL DEFAULT 3,
-  appetite_wa_floor           NUMERIC(10,4),
-  appetite_max_pct_below_100  NUMERIC(10,4),
-  appetite_max_pct_below_125   NUMERIC(10,4),
-  appetite_breach_flag         CHAR(1)         NOT NULL DEFAULT 'N',
-  appetite_breach_details     JSONB,
-  computed_ts                 TIMESTAMP       NOT NULL,
-  computed_by                 VARCHAR(100)    NOT NULL DEFAULT 'BATCH_ENGINE',
-  run_version_id              BIGINT,
-  as_of_date                  DATE            NOT NULL,
-  created_ts                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_dscr_agg_result PRIMARY KEY (agg_result_id, as_of_date),
-  CONSTRAINT fk_agg_result_config FOREIGN KEY (agg_config_id) REFERENCES l1.dscr_aggregation_config (agg_config_id),
-  CONSTRAINT fk_agg_result_lob FOREIGN KEY (lob_segment_id) REFERENCES l1.enterprise_business_taxonomy (managed_segment_id),
-  CONSTRAINT fk_agg_result_portfolio FOREIGN KEY (portfolio_id) REFERENCES l1.portfolio_dim (portfolio_id),
-  CONSTRAINT fk_agg_result_scenario FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim (scenario_id),
-  CONSTRAINT fk_agg_result_variant FOREIGN KEY (variant_id) REFERENCES l1.dscr_variant_definition (variant_id),
-  CONSTRAINT ck_agg_result_level CHECK (aggregation_level IN ('DESK', 'PORTFOLIO', 'LOB', 'ENTERPRISE', 'CUSTOM')),
-  CONSTRAINT ck_agg_result_method CHECK (aggregation_method IN ('COMMITMENT_WEIGHTED_AVG', 'OUTSTANDING_WEIGHTED_AVG', 'EAD_WEIGHTED_AVG', 'MEDIAN', 'DISTRIBUTION', 'COUNT', 'PERCENTILE', 'CUSTOM')),
-  CONSTRAINT ck_agg_result_breach CHECK (appetite_breach_flag IN ('Y', 'N'))
-) PARTITION BY RANGE (as_of_date);
+CREATE TABLE IF NOT EXISTS l2.amendment_change_detail (
+  change_detail_id BIGINT NOT NULL PRIMARY KEY,
+  amendment_id BIGINT NOT NULL,
+  change_type VARCHAR(50),
+  old_value TEXT,
+  new_value TEXT,
+  amendment_event_id BIGINT,
+  change_currency_code VARCHAR(20),
+  change_field_name VARCHAR(200),
+  change_seq BIGINT,
+  CONSTRAINT fk_amendment_change_detail_amendment_id FOREIGN KEY (amendment_id) REFERENCES l2.amendment_event(amendment_id)
+);
 
-CREATE TABLE l2.dscr_aggregation_result_default PARTITION OF l2.dscr_aggregation_result DEFAULT;
-CREATE INDEX IF NOT EXISTS ix_agg_result_level_primary ON l2.dscr_aggregation_result (aggregation_level, aggregation_method, as_of_date DESC) WHERE aggregation_method = 'COMMITMENT_WEIGHTED_AVG';
-CREATE INDEX IF NOT EXISTS ix_agg_result_lob ON l2.dscr_aggregation_result (lob_segment_id, as_of_date DESC) WHERE lob_segment_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_agg_result_portfolio ON l2.dscr_aggregation_result (portfolio_id, as_of_date DESC) WHERE portfolio_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_agg_result_breach ON l2.dscr_aggregation_result (as_of_date) WHERE appetite_breach_flag = 'Y';
+CREATE TABLE IF NOT EXISTS l2.amendment_event (
+  amendment_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT NOT NULL,
+  credit_agreement_id BIGINT NOT NULL,
+  amendment_type_code VARCHAR(20) NOT NULL,
+  amendment_status_code VARCHAR(20) NOT NULL,
+  effective_date DATE,
+  event_ts TIMESTAMP,
+  amendment_description VARCHAR(2000),
+  amendment_event_id BIGINT,
+  amendment_status VARCHAR(30),
+  amendment_subtype VARCHAR(100),
+  amendment_type VARCHAR(50),
+  as_of_date DATE,
+  completed_date DATE,
+  counterparty_id BIGINT,
+  identified_date DATE,
+  last_updated_ts TIMESTAMP,
+  CONSTRAINT fk_amendment_event_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_amendment_event_credit_agreement_id FOREIGN KEY (credit_agreement_id) REFERENCES l1.credit_agreement_master(credit_agreement_id),
+  CONSTRAINT fk_amendment_event_amendment_type_code FOREIGN KEY (amendment_type_code) REFERENCES l1.amendment_type_dim(amendment_type_code),
+  CONSTRAINT fk_amendment_event_amendment_status_code FOREIGN KEY (amendment_status_code) REFERENCES l1.amendment_status_dim(amendment_status_code)
+);
 
--- ============================================================================
--- L2 sequences
--- ============================================================================
-CREATE SEQUENCE l2.seq_line_item_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_property_income_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_debt_item_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_calculation_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_input_detail_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_compliance_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_override_id START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE l2.seq_agg_result_id START WITH 1 INCREMENT BY 1;
+CREATE TABLE IF NOT EXISTS l2.credit_event (
+  credit_event_id BIGINT NOT NULL PRIMARY KEY,
+  counterparty_id BIGINT NOT NULL,
+  credit_event_type_code BIGINT NOT NULL,
+  event_date DATE NOT NULL,
+  event_ts TIMESTAMP,
+  default_definition_id BIGINT,
+  as_of_date DATE,
+  event_risk_rating VARCHAR(100),
+  event_status VARCHAR(30),
+  event_summary VARCHAR(2000),
+  loss_amount_usd NUMERIC(18,2),
+  recovery_amount_usd NUMERIC(18,2),
+  CONSTRAINT fk_credit_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_credit_event_credit_event_type_code FOREIGN KEY (credit_event_type_code) REFERENCES l1.credit_event_type_dim(credit_event_type_code),
+  CONSTRAINT fk_credit_event_default_definition_id FOREIGN KEY (default_definition_id) REFERENCES l1.default_definition_dim(default_definition_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.credit_event_facility_link (
+  link_id BIGINT NOT NULL PRIMARY KEY,
+  credit_event_id BIGINT NOT NULL,
+  facility_id BIGINT NOT NULL,
+  exposure_at_default NUMERIC(18,2),
+  as_of_date DATE,
+  estimated_loss_usd NUMERIC(18,2),
+  impact_pct NUMERIC(10,4),
+  CONSTRAINT fk_credit_event_facility_link_credit_event_id FOREIGN KEY (credit_event_id) REFERENCES l2.credit_event(credit_event_id),
+  CONSTRAINT fk_credit_event_facility_link_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.stress_test_breach (
+  breach_id BIGINT NOT NULL PRIMARY KEY,
+  scenario_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  limit_rule_id BIGINT,
+  counterparty_id BIGINT,
+  breach_amount NUMERIC(18,2),
+  breach_amount_usd NUMERIC(18,2),
+  breach_severity VARCHAR(100),
+  control_description VARCHAR(2000),
+  control_owner VARCHAR(100),
+  failure_description VARCHAR(2000),
+  lob_segment_id BIGINT,
+  stress_test_result_id BIGINT,
+  CONSTRAINT fk_stress_test_breach_scenario_id FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim(scenario_id),
+  CONSTRAINT fk_stress_test_breach_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
+  CONSTRAINT fk_stress_test_breach_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.stress_test_result (
+  result_id BIGINT NOT NULL PRIMARY KEY,
+  scenario_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  portfolio_id BIGINT,
+  loss_amount NUMERIC(18,2),
+  pnl_impact NUMERIC(18,2),
+  capital_impact_pct NUMERIC(10,4),
+  execution_date DATE,
+  expected_loss_usd NUMERIC(18,2),
+  result_description VARCHAR(2000),
+  result_status VARCHAR(30),
+  scenario_type VARCHAR(50),
+  stress_test_result_id BIGINT,
+  total_breaches INTEGER,
+  total_exposure_usd NUMERIC(18,2),
+  CONSTRAINT fk_stress_test_result_scenario_id FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim(scenario_id),
+  CONSTRAINT fk_stress_test_result_portfolio_id FOREIGN KEY (portfolio_id) REFERENCES l1.portfolio_dim(portfolio_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.deal_pipeline_fact (
+  pipeline_id BIGINT NOT NULL PRIMARY KEY,
+  counterparty_id BIGINT,
+  as_of_date DATE NOT NULL,
+  stage_code VARCHAR(50),
+  proposed_amount NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  expected_all_in_rate_pct NUMERIC(10,4),
+  expected_close_date DATE,
+  expected_committed_amt NUMERIC(18,2),
+  expected_coverage_ratio NUMERIC(10,4),
+  expected_exposure_amt NUMERIC(18,2),
+  expected_internal_risk_grade VARCHAR(255),
+  expected_spread_bps NUMERIC(8,2),
+  expected_tenor_months VARCHAR(255),
+  facility_id BIGINT,
+  lob_segment_id BIGINT,
+  pipeline_deal_id BIGINT,
+  pipeline_stage VARCHAR(100),
+  pipeline_status VARCHAR(30),
+  record_level_code VARCHAR(20),
+  CONSTRAINT fk_deal_pipeline_fact_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_deal_pipeline_fact_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
+
+CREATE TABLE IF NOT EXISTS l2.counterparty_rating_observation (
+  observation_id BIGINT NOT NULL PRIMARY KEY,
+  counterparty_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  rating_grade_id BIGINT NOT NULL,
+  rating_source_id BIGINT NOT NULL,
+  is_internal_flag CHAR(1),
+  pd_implied VARCHAR(100),
+  prior_rating_value NUMERIC(18,4),
+  rating_agency VARCHAR(100),
+  rating_date DATE,
+  rating_type VARCHAR(50),
+  rating_value NUMERIC(18,4),
+  CONSTRAINT fk_counterparty_rating_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_counterparty_rating_observation_rating_grade_id FOREIGN KEY (rating_grade_id) REFERENCES l1.rating_grade_dim(rating_grade_id),
+  CONSTRAINT fk_counterparty_rating_observation_rating_source_id FOREIGN KEY (rating_source_id) REFERENCES l1.rating_source(rating_source_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.financial_metric_observation (
+  observation_id BIGINT NOT NULL PRIMARY KEY,
+  counterparty_id BIGINT,
+  facility_id BIGINT,
+  as_of_date DATE NOT NULL,
+  metric_definition_id BIGINT NOT NULL,
+  value NUMERIC(18,4),
+  context_id BIGINT,
+  credit_agreement_id BIGINT,
+  metric_category VARCHAR(50),
+  metric_code VARCHAR(20),
+  metric_name VARCHAR(200),
+  metric_value NUMERIC(18,4),
+  metric_value_usd NUMERIC(18,2),
+  period_end_date DATE,
+  CONSTRAINT fk_financial_metric_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_financial_metric_observation_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_financial_metric_observation_metric_definition_id FOREIGN KEY (metric_definition_id) REFERENCES l1.metric_definition_dim(metric_definition_id),
+  CONSTRAINT fk_financial_metric_observation_context_id FOREIGN KEY (context_id) REFERENCES l1.context_dim(context_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.metric_threshold (
+  threshold_id BIGINT NOT NULL PRIMARY KEY,
+  metric_definition_id BIGINT NOT NULL,
+  threshold_type VARCHAR(50),
+  threshold_value NUMERIC(18,4),
+  effective_from_date DATE,
+  effective_to_date DATE,
+  active_flag CHAR(1),
+  inner_threshold_pct NUMERIC(10,4),
+  last_threshold_updated_date DATE,
+  limit_type VARCHAR(50),
+  limit_value NUMERIC(18,4),
+  lod1_sponsor VARCHAR(100),
+  lod2_sponsor VARCHAR(100),
+  metric_category VARCHAR(50),
+  metric_code VARCHAR(20),
+  metric_description VARCHAR(2000),
+  metric_id_display VARCHAR(100),
+  metric_name VARCHAR(200),
+  metric_owner VARCHAR(100),
+  metric_threshold_id BIGINT,
+  outer_threshold_pct NUMERIC(10,4),
+  report_deadline VARCHAR(100),
+  report_frequency VARCHAR(30),
+  CONSTRAINT fk_metric_threshold_metric_definition_id FOREIGN KEY (metric_definition_id) REFERENCES l1.metric_definition_dim(metric_definition_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.exception_event (
+  exception_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  exception_type VARCHAR(50),
+  facility_id BIGINT,
+  counterparty_id BIGINT,
+  raised_ts TIMESTAMP,
+  resolved_ts TIMESTAMP,
+  actual_remediation_date DATE,
+  approver VARCHAR(100),
+  breach_amount_usd NUMERIC(18,2),
+  breach_pct NUMERIC(10,4),
+  days_open INTEGER,
+  exception_description VARCHAR(2000),
+  exception_owner VARCHAR(100),
+  exception_severity VARCHAR(100),
+  exception_status VARCHAR(30),
+  exception_value NUMERIC(18,4),
+  identified_date DATE,
+  limit_rule_id BIGINT,
+  lob_segment_id BIGINT,
+  lod_sponsor VARCHAR(100),
+  metric_threshold_id BIGINT,
+  remediation_plan VARCHAR(2000),
+  target_remediation_date DATE,
+  threshold_value NUMERIC(18,4),
+  CONSTRAINT fk_exception_event_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_exception_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.risk_flag (
+  risk_flag_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT,
+  counterparty_id BIGINT,
+  flag_type VARCHAR(50) NOT NULL,
+  as_of_date DATE NOT NULL,
+  raised_ts TIMESTAMP,
+  cleared_ts TIMESTAMP,
+  created_ts TIMESTAMP,
+  flag_code VARCHAR(20),
+  flag_description VARCHAR(2000),
+  flag_scope VARCHAR(30),
+  flag_severity VARCHAR(100),
+  flag_trigger_value NUMERIC(18,4),
+  CONSTRAINT fk_risk_flag_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_risk_flag_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.data_quality_score_snapshot (
+  score_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  target_table VARCHAR(100),
+  source_system_id BIGINT,
+  completeness_pct NUMERIC(10,4),
+  validity_pct NUMERIC(10,4),
+  overall_score NUMERIC(10,4),
+  dimension_id BIGINT,
+  dimension_name VARCHAR(200),
+  dq_score_id BIGINT,
+  dq_score_pct NUMERIC(10,4),
+  impact_pct NUMERIC(10,4),
+  impacted_report_codes VARCHAR(20),
+  issue_count INTEGER,
+  reconciliation_break_count INTEGER,
+  score_dimension VARCHAR(30),
+  CONSTRAINT fk_data_quality_score_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);

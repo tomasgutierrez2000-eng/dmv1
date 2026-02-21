@@ -12,6 +12,7 @@ import {
 } from '@/data/l3-metrics';
 import {
   buildMetricValueRowsFromRunOutput,
+  getMetricValueRowsFromDb,
   type MetricValueRow,
 } from '@/lib/metrics-value-store';
 
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
   const dimension = CONSUMPTION_LEVEL_TO_DIMENSION[level];
   const trimmedMetricId = typeof metricId === 'string' ? metricId.trim() : '';
 
-  const applyFilters = (rows: MetricValueRow[]) => {
+  const applyFilters = (rows: MetricValueRow[]): MetricValueRow[] => {
     let out = rows;
     if (facilityId !== undefined) out = out.filter((r) => r.facility_id === facilityId);
     if (counterpartyId !== undefined) out = out.filter((r) => r.counterparty_id === counterpartyId);
@@ -60,6 +61,33 @@ export async function GET(request: NextRequest) {
   if (!trimmedMetricId) {
     const merged = getMergedMetrics();
     const metricsAtLevel = merged.filter((m) => resolveAllowedDimensions(m).includes(dimension));
+    const asOfDateUsed = asOfDate ?? '';
+
+    const dbRows = await getMetricValueRowsFromDb({
+      level,
+      runVersion,
+      asOfDate: asOfDateUsed,
+    });
+    if (dbRows !== null && dbRows.length > 0) {
+      const byMetric = new Map<string, MetricValueRow[]>();
+      for (const row of dbRows) {
+        const list = byMetric.get(row.metric_id) ?? [];
+        list.push(row);
+        byMetric.set(row.metric_id, list);
+      }
+      const results = metricsAtLevel.map((metric) => ({
+        metric: { id: metric.id, name: metric.name, displayFormat: metric.displayFormat },
+        rows: applyFilters(byMetric.get(metric.id) ?? []),
+      }));
+      const firstAsOf = results[0]?.rows?.[0]?.as_of_date ?? asOfDateUsed;
+      return NextResponse.json({
+        level,
+        asOfDate: firstAsOf,
+        runVersion,
+        metrics: results,
+      });
+    }
+
     const results: { metric: { id: string; name: string; displayFormat?: string }; rows: MetricValueRow[] }[] = [];
     const errors: { metricId: string; error: string }[] = [];
 
@@ -73,11 +101,11 @@ export async function GET(request: NextRequest) {
         errors.push({ metricId: metric.id, error: runOutput.error || 'Calculation failed' });
         continue;
       }
-      const asOfDateUsed = runOutput.asOfDateUsed ?? asOfDate ?? '';
+      const runAsOf = runOutput.asOfDateUsed ?? asOfDate ?? '';
       const rows = buildMetricValueRowsFromRunOutput(
         metric.id,
         dimension,
-        asOfDateUsed,
+        runAsOf,
         runVersion,
         runOutput,
         variantId
@@ -112,6 +140,27 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const asOfDateUsed = asOfDate ?? '';
+  const dbRows = await getMetricValueRowsFromDb({
+    level,
+    runVersion,
+    asOfDate: asOfDateUsed,
+    metricId: trimmedMetricId,
+  });
+  if (dbRows !== null && dbRows.length > 0) {
+    return NextResponse.json({
+      metric: {
+        id: metric.id,
+        name: metric.name,
+        displayFormat: metric.displayFormat,
+      },
+      level,
+      asOfDate: asOfDateUsed,
+      runVersion,
+      rows: applyFilters(dbRows),
+    });
+  }
+
   const runOutput = await runMetricCalculation({
     metric,
     dimension,
@@ -125,11 +174,11 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const asOfDateUsed = runOutput.asOfDateUsed ?? asOfDate ?? '';
+  const runAsOf = runOutput.asOfDateUsed ?? asOfDate ?? '';
   const rows: MetricValueRow[] = buildMetricValueRowsFromRunOutput(
     trimmedMetricId,
     dimension,
-    asOfDateUsed,
+    runAsOf,
     runVersion,
     runOutput,
     variantId
@@ -142,7 +191,7 @@ export async function GET(request: NextRequest) {
       displayFormat: metric.displayFormat,
     },
     level,
-    asOfDate: asOfDateUsed,
+    asOfDate: runAsOf,
     runVersion,
     rows: applyFilters(rows),
   });

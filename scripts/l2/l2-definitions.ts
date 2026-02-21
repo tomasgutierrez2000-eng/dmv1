@@ -72,6 +72,13 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'total_commitment', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'unfunded_amount', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'unrealized_gain_loss', type: 'VARCHAR(100)', nullable: true },
+      // L3 procedure compatibility
+      { name: 'product_node_id', type: 'BIGINT', nullable: true },
+      { name: 'exposure_type_code', type: 'VARCHAR(20)', nullable: true },
+      { name: 'notional_amount', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'credit_conversion_factor', type: 'DECIMAL(10,6)', nullable: true },
+      { name: 'lgd_pct', type: 'DECIMAL(10,6)', nullable: true },
+      { name: 'risk_weight_pct', type: 'DECIMAL(10,6)', nullable: true },
     ],
   },
   {
@@ -114,6 +121,9 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'lob_segment_id', type: 'BIGINT', nullable: true },
       { name: 'net_exposure_usd', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'product_node_id', type: 'BIGINT', nullable: true },
+      // L3 procedure compatibility: same as drawn_amount / undrawn_amount
+      { name: 'outstanding_balance_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'undrawn_commitment_amt', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
   {
@@ -131,6 +141,7 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'legal_entity_id', type: 'BIGINT', nullable: true },
       { name: 'netting_set_exposure_id', type: 'BIGINT', nullable: true },
       { name: 'pfe_usd', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'netting_benefit_amt', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
   {
@@ -145,6 +156,8 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'attributed_amount', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'attribution_amount_usd', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'attribution_type', type: 'VARCHAR(50)', nullable: true },
+      { name: 'lob_node_id', type: 'BIGINT', nullable: true },
+      { name: 'hierarchy_id', type: 'VARCHAR(64)', nullable: true },
     ],
   },
   {
@@ -469,7 +482,7 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'context_id', type: 'BIGINT', nullable: true, fk: 'l1.context_dim(context_id)' },
       { name: 'credit_agreement_id', type: 'BIGINT', nullable: true },
       { name: 'metric_category', type: 'VARCHAR(50)', nullable: true },
-      { name: 'metric_code', type: 'DECIMAL(10,4)', nullable: true },
+      { name: 'metric_code', type: 'VARCHAR(20)', nullable: true },
       { name: 'metric_name', type: 'VARCHAR(200)', nullable: true },
       { name: 'metric_value', type: 'DECIMAL(18,4)', nullable: true },
       { name: 'metric_value_usd', type: 'DECIMAL(18,2)', nullable: true },

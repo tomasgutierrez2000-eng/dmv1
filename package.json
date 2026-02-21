@@ -13,6 +13,7 @@
     "audit": "npm audit",
     "generate:l1": "tsx scripts/l1/generate.ts",
     "generate:l2": "tsx scripts/l2/generate.ts",
+    "populate:metric-value-fact": "tsx scripts/populate-metric-value-fact.ts",
     "test:metrics": "tsx scripts/test-metrics.ts",
     "test:calc-engine": "tsx scripts/test-calculation-engine.ts"
   },

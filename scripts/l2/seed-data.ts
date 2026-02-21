@@ -55,6 +55,12 @@ export function getL2SeedValue(
       if (columnName === 'detail_type') return ['PRINCIPAL', 'INTEREST', 'FEE', 'PRINCIPAL', 'INTEREST', 'FEE', 'PRINCIPAL', 'INTEREST', 'FEE', 'PRINCIPAL', 'INTEREST', 'FEE'][idx];
       if (columnName === 'amount') return [100_000, 2500, 500, 200_000, 3200, 800, 150_000, 1800, 400, 300_000, 4000, 600][idx];
       if (columnName === 'maturity_date') return '2027-06-30';
+      if (columnName === 'product_node_id') return (idx % 10) + 1;
+      if (columnName === 'exposure_type_code') return 'LOAN';
+      if (columnName === 'notional_amount') return DRAWN_AMOUNTS[idx];
+      if (columnName === 'credit_conversion_factor') return 1.0;
+      if (columnName === 'lgd_pct') return [45, 40, 35, 50, 45, 40, 55, 38, 42, 48, 44, 41][idx];
+      if (columnName === 'risk_weight_pct') return [100, 75, 50, 150, 100, 75, 125, 50, 100, 100, 75, 100][idx];
       break;
 
     case 'exposure_counterparty_attribution':
@@ -73,6 +79,9 @@ export function getL2SeedValue(
       if (columnName === 'drawn_amount') return DRAWN_AMOUNTS[idx];
       if (columnName === 'committed_amount') return COMMITTED_AMOUNTS[idx];
       if (columnName === 'undrawn_amount') return (COMMITTED_AMOUNTS[idx] ?? 0) - (DRAWN_AMOUNTS[idx] ?? 0);
+      if (columnName === 'outstanding_balance_amt') return DRAWN_AMOUNTS[idx];
+      if (columnName === 'undrawn_commitment_amt') return Math.max(0, (COMMITTED_AMOUNTS[idx] ?? 0) - (DRAWN_AMOUNTS[idx] ?? 0));
+      if (columnName === 'gross_exposure_usd') return (DRAWN_AMOUNTS[idx] ?? 0) + Math.max(0, (COMMITTED_AMOUNTS[idx] ?? 0) - (DRAWN_AMOUNTS[idx] ?? 0));
       if (columnName === 'source_system_id') return (idx % 10) + 1;
       break;
 
@@ -81,6 +90,7 @@ export function getL2SeedValue(
       if (columnName === 'as_of_date') return AS_OF_DATES[idx];
       if (columnName === 'netted_exposure_amount') return [10_000_000, 25_000_000, 0, 15_000_000, 40_000_000, 5_000_000, 30_000_000, 0, 20_000_000, 50_000_000, 8_000_000, 12_000_000][idx];
       if (columnName === 'gross_exposure_amount') return [45_000_000, 80_000_000, 22_000_000, 60_000_000, 120_000_000, 35_000_000, 90_000_000, 18_000_000, 70_000_000, 150_000_000, 40_000_000, 55_000_000][idx];
+      if (columnName === 'netting_benefit_amt') return [35_000_000, 55_000_000, 22_000_000, 45_000_000, 80_000_000, 30_000_000, 60_000_000, 18_000_000, 50_000_000, 100_000_000, 32_000_000, 43_000_000][idx];
       if (columnName === 'currency_code') return 'USD';
       break;
 
@@ -89,6 +99,8 @@ export function getL2SeedValue(
       if (columnName === 'facility_id') return (idx % 10) + 1;
       if (columnName === 'as_of_date') return AS_OF_DATES[idx];
       if (columnName === 'lob_segment_id') return (idx % 10) + 1;
+      if (columnName === 'lob_node_id') return (idx % 10) + 1;
+      if (columnName === 'hierarchy_id') return 'DEFAULT_LOB_HIERARCHY';
       if (columnName === 'attribution_pct') return 100;
       if (columnName === 'attributed_amount') return DRAWN_AMOUNTS[idx];
       break;
@@ -164,6 +176,7 @@ export function getL2SeedValue(
       if (columnName === 'as_of_date') return AS_OF_DATES[idx];
       if (columnName === 'counterparty_id') return (idx % 10) + 1;
       if (columnName === 'utilized_amount') return UTILIZED_AMOUNTS[idx];
+      if (columnName === 'utilized_amount_usd') return UTILIZED_AMOUNTS[idx];
       if (columnName === 'available_amount') return (LIMIT_AMOUNTS[idx] ?? 0) - (UTILIZED_AMOUNTS[idx] ?? 0);
       break;
 
@@ -244,6 +257,9 @@ export function getL2SeedValue(
       if (columnName === 'as_of_date') return AS_OF_DATES[idx];
       if (columnName === 'metric_definition_id') return (idx % 10) + 1;
       if (columnName === 'value') return METRIC_VALUES[idx];
+      if (columnName === 'metric_code') return ['PD', 'LGD', 'EL', 'RWA', 'CAPITAL_REQ', 'PD', 'LGD', 'EL', 'RWA', 'CAPITAL_REQ', 'PD', 'LGD'][idx];
+      if (columnName === 'metric_value') return METRIC_VALUES[idx];
+      if (columnName === 'metric_value_usd') return [420_000, 1_850_000, 2_100_000, 950_000, 3_200_000, 1_500_000, 2_750_000, 600_000, 1_900_000, 4_000_000, 1_200_000, 2_300_000][idx];
       if (columnName === 'context_id') return (idx % 10) + 1;
       break;
 

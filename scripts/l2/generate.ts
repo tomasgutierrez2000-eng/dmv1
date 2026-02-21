@@ -1,7 +1,7 @@
 /**
- * Generates L2 sample-data.json and relationships.json for the demo model.
+ * Generates L2 DDL, sample-data.json, seed.sql, and relationships.json for the demo model.
  * Run: npx tsx scripts/l2/generate.ts
- * Outputs: scripts/l2/output/sample-data.json, scripts/l2/output/relationships.json
+ * Outputs: scripts/l2/output/ddl.sql, seed.sql, sample-data.json, relationships.json
  * L2 data aligns to L1 IDs (facility_id, counterparty_id, etc. 1..10).
  */
 import * as fs from 'fs';
@@ -13,6 +13,51 @@ import { getL2SeedValue } from './seed-data';
 const OUT_DIR = path.join(__dirname, 'output');
 const ROWS_PER_TABLE = 12; // 10+ rows
 const SEED_AS_OF_DATE = '2025-01-31';
+
+function mapTypeToPg(type: string): string {
+  if (type.startsWith('VARCHAR') || type.startsWith('CHAR')) return type;
+  if (type === 'BIGINT' || type === 'INTEGER' || type === 'SMALLINT') return type;
+  if (type === 'DATE' || type === 'TIMESTAMP' || type === 'TEXT') return type;
+  if (type.includes('DECIMAL') || type.includes('NUMERIC')) return type.replace('DECIMAL', 'NUMERIC');
+  return type;
+}
+
+function columnToDDL(col: L2ColumnDef): string {
+  const type = mapTypeToPg(col.type);
+  const parts: string[] = [col.name, type];
+  if (col.nullable === false) parts.push('NOT NULL');
+  if (col.default) parts.push(`DEFAULT ${col.default}`);
+  return parts.join(' ');
+}
+
+function buildCreateTable(t: L2TableDef): string {
+  const lines: string[] = [];
+  lines.push(`CREATE TABLE IF NOT EXISTS l2.${t.tableName} (`);
+  const pkCols = t.columns.filter(c => c.pk).map(c => c.name);
+  const hasCompositePk = pkCols.length > 1;
+  const colLines = t.columns.map(c => {
+    let line = '  ' + columnToDDL(c);
+    if (c.pk && !hasCompositePk) line += ' PRIMARY KEY';
+    return line;
+  });
+  if (t.scd === 'Snapshot' && !t.columns.some(c => c.name === 'as_of_date')) {
+    colLines.push('  as_of_date DATE NOT NULL');
+  }
+  if (hasCompositePk) colLines.push(`  PRIMARY KEY (${pkCols.join(', ')})`);
+  const fkRefs = t.columns.filter(c => c.fk).map(c => {
+    const m1 = c.fk!.match(/l1\.(\w+)\((\w+)\)/);
+    if (m1) return `  CONSTRAINT fk_${t.tableName}_${c.name} FOREIGN KEY (${c.name}) REFERENCES l1.${m1[1]}(${m1[2]})`;
+    const m2 = c.fk!.match(/l2\.(\w+)\((\w+)\)/);
+    if (m2) return `  CONSTRAINT fk_${t.tableName}_${c.name} FOREIGN KEY (${c.name}) REFERENCES l2.${m2[1]}(${m2[2]})`;
+    return null;
+  }).filter(Boolean) as string[];
+  if (fkRefs.length) {
+    colLines.push(...fkRefs);
+  }
+  lines.push(colLines.join(',\n'));
+  lines.push(');');
+  return lines.join('\n');
+}
 
 function escapeSql(val: unknown): string {
   if (val === null || val === undefined) return 'NULL';
@@ -141,6 +186,25 @@ function buildTableMetadata(): Record<string, Record<string, { type: string; pk:
   return metadata;
 }
 
+function buildSeedSql(): string {
+  const parts: string[] = [
+    '-- L2 Seed Data (generated from scripts/l2/generate.ts)',
+    '-- Run after L1 seed and L2 DDL. Uses facility_id/counterparty_id 1..10, as_of_date 2025-01-31.',
+    'SET search_path TO l1, l2, public;',
+    '',
+  ];
+  for (const t of L2_TABLES) {
+    const columns = t.columns.map(c => c.name);
+    parts.push(`-- ${t.tableName}`);
+    for (let r = 0; r < ROWS_PER_TABLE; r++) {
+      const values = t.columns.map(c => seedValue(c, r, t.tableName));
+      parts.push(`INSERT INTO l2.${t.tableName} (${columns.join(', ')}) VALUES (${values.map(escapeSql).join(', ')});`);
+    }
+    parts.push('');
+  }
+  return parts.join('\n');
+}
+
 function main() {
   if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -153,11 +217,26 @@ function main() {
   const relationships = buildRelationships();
   const tableMetadata = buildTableMetadata();
 
+  const ddlParts: string[] = [
+    '-- L2 Schema DDL (generated from scripts/l2/generate.ts)',
+    '-- Run after scripts/l1/output/ddl.sql. PostgreSQL 15+.',
+    'SET search_path TO l1, l2, public;',
+    '',
+    'CREATE SCHEMA IF NOT EXISTS l2;',
+    '',
+  ];
+  for (const t of L2_TABLES) {
+    ddlParts.push(buildCreateTable(t));
+    ddlParts.push('');
+  }
+
+  fs.writeFileSync(path.join(OUT_DIR, 'ddl.sql'), ddlParts.join('\n'), 'utf-8');
+  fs.writeFileSync(path.join(OUT_DIR, 'seed.sql'), buildSeedSql(), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'sample-data.json'), JSON.stringify(sampleData, null, 2), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'relationships.json'), JSON.stringify(relationships, null, 2), 'utf-8');
   fs.writeFileSync(path.join(OUT_DIR, 'table-metadata.json'), JSON.stringify(tableMetadata, null, 2), 'utf-8');
 
-  console.log(`Generated: ${OUT_DIR}/sample-data.json, ${OUT_DIR}/relationships.json, ${OUT_DIR}/table-metadata.json`);
+  console.log(`Generated: ${OUT_DIR}/ddl.sql, ${OUT_DIR}/seed.sql, sample-data.json, relationships.json, table-metadata.json`);
   console.log(`L2 Tables: ${L2_TABLES.length}, Relationships: ${relationships.length}`);
 }
 

@@ -337,6 +337,42 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exposure_type_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "notional_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "credit_conversion_factor": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lgd_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_weight_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.exposure_counterparty_attribution": {
@@ -521,6 +557,18 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "outstanding_balance_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "undrawn_commitment_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.netting_set_exposure_snapshot": {
@@ -589,6 +637,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "netting_benefit_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.facility_lob_attribution": {
@@ -636,6 +690,18 @@
     },
     "attribution_type": {
       "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lob_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hierarchy_id": {
+      "type": "VARCHAR(64)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1971,7 +2037,7 @@
       "nullable": true
     },
     "metric_code": {
-      "type": "DECIMAL(10,4)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true

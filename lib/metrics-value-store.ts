@@ -3,7 +3,10 @@
  * Rows can be stored in l3.metric_value_fact (SQL) or produced on-demand from runMetricCalculation.
  */
 
-import type { CalculationDimension, ConsumptionLevel } from '@/data/l3-metrics';
+import type {
+  CalculationDimension,
+  ConsumptionLevel,
+} from '@/data/l3-metrics';
 import { DIMENSION_TO_CONSUMPTION_LEVEL } from '@/data/l3-metrics';
 import type { RunMetricOutput } from './metrics-calculation/types';
 
@@ -23,6 +26,51 @@ export interface MetricValueRow {
   value: number | null;
   unit?: string | null;
   display_format?: string | null;
+}
+
+/**
+ * Fetch metric value rows from l3.metric_value_fact when DATABASE_URL is set.
+ * Returns null if DB not configured or query fails; otherwise returns rows (may be empty).
+ */
+export async function getMetricValueRowsFromDb(params: {
+  level: ConsumptionLevel;
+  runVersion: string;
+  asOfDate: string;
+  metricId?: string;
+}): Promise<MetricValueRow[] | null> {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) return null;
+  try {
+    const pg = await import('pg');
+    const client = new pg.Client({ connectionString: databaseUrl });
+    await client.connect();
+    try {
+      const { level, runVersion, asOfDate, metricId } = params;
+      const values: unknown[] = [level, runVersion, asOfDate];
+      const sql = metricId
+        ? `
+          SELECT run_version_id, as_of_date, metric_id, variant_id, aggregation_level,
+                 facility_id, counterparty_id, desk_id, portfolio_id, lob_id,
+                 value, unit, display_format
+          FROM l3.metric_value_fact
+          WHERE aggregation_level = $1 AND run_version_id = $2 AND as_of_date = $3 AND metric_id = $4
+        `
+        : `
+          SELECT run_version_id, as_of_date, metric_id, variant_id, aggregation_level,
+                 facility_id, counterparty_id, desk_id, portfolio_id, lob_id,
+                 value, unit, display_format
+          FROM l3.metric_value_fact
+          WHERE aggregation_level = $1 AND run_version_id = $2 AND as_of_date = $3
+        `;
+      if (metricId) values.push(metricId);
+      const res = await client.query(sql, values);
+      return (res.rows as MetricValueRow[]) ?? [];
+    } finally {
+      await client.end();
+    }
+  } catch {
+    return null;
+  }
 }
 
 const EMPTY = '';

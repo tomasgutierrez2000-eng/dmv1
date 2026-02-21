@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { EXCEL_TEMPLATE_COLUMN_MAPPING } from '@/EXCEL_TEMPLATE_CONFIG';
+import { readDataDictionary } from '@/lib/data-dictionary';
+import { writeDdlFiles, executeDdl } from '@/lib/data-model-sync';
 import { findColumnIndex, getDetectedColumns } from './column-mapping';
 
 interface FieldDefinition {
@@ -122,6 +124,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const applyDdl = String(formData.get('applyDdl') ?? '').toLowerCase() === 'true';
 
     if (!file) {
       return NextResponse.json(
@@ -449,6 +452,22 @@ export async function POST(request: NextRequest) {
       JSON.stringify(dataDictionary, null, 2)
     );
 
+    // When parse succeeded: generate DDL files and optionally apply to database
+    let ddlPaths: string[] = [];
+    let ddlApplied: boolean | undefined;
+    let ddlApplyError: string | undefined;
+    if (errors.length === 0) {
+      const dd = readDataDictionary();
+      if (dd) {
+        ddlPaths = writeDdlFiles(dd);
+        if (applyDdl) {
+          const result = await executeDdl(dd);
+          ddlApplied = result.ok;
+          if (!result.ok) ddlApplyError = result.error;
+        }
+      }
+    }
+
     // Generate summary statistics
     const stats = {
       L1_tables: dataDictionary.L1.length,
@@ -466,6 +485,14 @@ export async function POST(request: NextRequest) {
       message: errors.length === 0
         ? `Successfully parsed data dictionary: ${stats.L1_tables} L1, ${stats.L2_tables} L2, ${stats.L3_tables} L3 tables`
         : `Parsed with ${errors.length} error(s)`,
+      ...(errors.length === 0 && {
+        ddlGenerated: true,
+        ddlPaths,
+        ...(applyDdl && {
+          ddlApplied: ddlApplied ?? false,
+          ...(ddlApplyError && { ddlApplyError }),
+        }),
+      }),
       details: {
         statistics: stats,
         tables: {

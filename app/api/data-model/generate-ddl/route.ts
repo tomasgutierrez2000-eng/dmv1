@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { readDataDictionary } from '@/lib/data-dictionary';
-import { generateL3Ddl, generateLayerDdl } from '@/lib/ddl-generator';
-import path from 'path';
-import fs from 'fs';
+import { writeDdlFiles } from '@/lib/data-model-sync';
 
 /** Regenerate DDL files from current data dictionary (viz cache). */
 export async function POST() {
@@ -15,20 +13,7 @@ export async function POST() {
       );
     }
 
-    const written: string[] = [];
-
-    for (const layer of ['L1', 'L2', 'L3'] as const) {
-      if (dd[layer].length === 0) continue;
-      const sqlDir = path.join(process.cwd(), 'sql', layer.toLowerCase());
-      if (!fs.existsSync(sqlDir)) {
-        fs.mkdirSync(sqlDir, { recursive: true });
-      }
-      const ddlPath = path.join(sqlDir, '01_DDL_all_tables.sql');
-      const content =
-        layer === 'L3' ? generateL3Ddl(dd) : generateLayerDdl(dd, layer);
-      fs.writeFileSync(ddlPath, content, 'utf-8');
-      written.push(ddlPath);
-    }
+    const written = writeDdlFiles(dd);
 
     return NextResponse.json({
       success: true,

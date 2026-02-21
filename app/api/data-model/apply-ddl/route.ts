@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDataDictionary } from '@/lib/data-dictionary';
-import { generateL3Ddl, generateLayerDdl } from '@/lib/ddl-generator';
-import path from 'path';
-import fs from 'fs';
+import { buildFullDdl, executeDdl } from '@/lib/data-model-sync';
 
 /**
  * Apply DDL: dry run returns SQL; execute runs against PostgreSQL when DATABASE_URL is set.
@@ -21,14 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parts: string[] = [];
-    for (const layer of ['L1', 'L2', 'L3'] as const) {
-      if (dd[layer].length === 0) continue;
-      const content =
-        layer === 'L3' ? generateL3Ddl(dd) : generateLayerDdl(dd, layer);
-      parts.push(`-- ${layer}\n${content}`);
-    }
-    const fullSql = parts.join('\n\n');
+    const fullSql = buildFullDdl(dd);
 
     if (!fullSql.trim()) {
       return NextResponse.json({
@@ -48,49 +39,21 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl) {
-      return NextResponse.json(
-        {
-          error: 'DATABASE_URL is not set. Set it in environment to execute DDL against PostgreSQL.',
-          sql: fullSql,
-        },
-        { status: 503 }
-      );
+    const result = await executeDdl(dd);
+    if (result.ok) {
+      return NextResponse.json({
+        success: true,
+        dryRun: false,
+        message: 'DDL executed successfully.',
+      });
     }
-
-    try {
-      let pg: { Client: new (config: { connectionString: string }) => { connect(): Promise<void>; query(sql: string): Promise<void>; end(): Promise<void> } };
-      try {
-        pg = await import('pg');
-      } catch {
-        return NextResponse.json(
-          {
-            error: 'Optional dependency "pg" is not installed. Run: npm install pg. Then set DATABASE_URL to execute DDL.',
-            sql: fullSql,
-          },
-          { status: 503 }
-        );
-      }
-      const client = new pg.Client({ connectionString: databaseUrl });
-      await client.connect();
-      try {
-        await client.query(fullSql);
-        return NextResponse.json({
-          success: true,
-          dryRun: false,
-          message: 'DDL executed successfully.',
-        });
-      } finally {
-        await client.end();
-      }
-    } catch (pgError) {
-      const message = pgError instanceof Error ? pgError.message : String(pgError);
-      return NextResponse.json(
-        { error: `Database execution failed: ${message}`, sql: fullSql },
-        { status: 500 }
-      );
-    }
+    const status = result.error?.includes('DATABASE_URL') || result.error?.includes('pg')
+      ? 503
+      : 500;
+    return NextResponse.json(
+      { error: result.error, sql: fullSql },
+      { status }
+    );
   } catch (error) {
     console.error('Apply DDL error:', error);
     return NextResponse.json(

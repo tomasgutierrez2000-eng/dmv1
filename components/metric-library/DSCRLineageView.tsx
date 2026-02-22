@@ -31,7 +31,7 @@ import {
 
 interface NumeratorComponent {
   name: string;
-  op: '+' | '\u2212';
+  op: '+' | '−';
   field: string;
   table: string;
   value: number;
@@ -87,7 +87,7 @@ const CRE: VariantData = {
   purpose: 'Quarterly Monitoring',
   numeratorLabel: 'NOI',
   denominatorLabel: 'Senior DS',
-  formula: 'NOI \u00f7 Senior DS',
+  formula: 'NOI ÷ Senior DS',
   numerator: 1585000,
   denominator: 1200000,
   result: '1.32x',
@@ -99,8 +99,8 @@ const CRE: VariantData = {
   numeratorComponents: [
     { name: 'Gross Potential Rent', op: '+', field: 'revenue_amt', table: 'facility_financial_snapshot', value: 2400000 },
     { name: 'Other Income', op: '+', field: 'revenue_amt', table: 'facility_financial_snapshot', value: 85000 },
-    { name: 'Vacancy & Credit Loss', op: '\u2212', field: 'revenue_amt', table: 'facility_financial_snapshot', value: 120000 },
-    { name: 'Operating Expenses', op: '\u2212', field: 'operating_expense_amt', table: 'facility_financial_snapshot', value: 780000 },
+    { name: 'Vacancy & Credit Loss', op: '−', field: 'revenue_amt', table: 'facility_financial_snapshot', value: 120000 },
+    { name: 'Operating Expenses', op: '−', field: 'operating_expense_amt', table: 'facility_financial_snapshot', value: 780000 },
   ],
   denominatorComponents: [
     { name: 'Senior Interest', field: 'amount', table: 'cash_flow', value: 720000 },
@@ -118,7 +118,7 @@ const CI: VariantData = {
   purpose: 'Annual Review',
   numeratorLabel: 'EBITDA',
   denominatorLabel: 'Global DS',
-  formula: 'EBITDA \u00f7 Global DS',
+  formula: 'EBITDA ÷ Global DS',
   numerator: 5640000,
   denominator: 1380000,
   result: '4.09x',
@@ -165,31 +165,31 @@ const L2_FIELDS_FFS = [
 const L3_OUTPUT_TABLES = [
   {
     table: 'metric_value_fact',
-    desc: 'Generic metric storage \u2014 all DSCR variants at every aggregation level (facility, counterparty, desk, portfolio, LoB)',
+    desc: 'Generic metric storage — all DSCR variants at every aggregation level (facility, counterparty, desk, portfolio, LoB)',
     fields: ['metric_id = DSCR', 'variant_id', 'aggregation_level', 'facility_id | counterparty_id | lob_id', 'value', 'unit = x', 'display_format = 0.00x'],
     primary: true,
   },
   {
     table: 'lob_credit_quality_summary',
-    desc: 'LoB-level credit quality \u2014 includes dscr_value for LoB roll-ups',
+    desc: 'LoB-level credit quality — includes dscr_value for LoB roll-ups',
     fields: ['lob_node_id', 'dscr_value', 'avg_internal_risk_rating'],
     primary: false,
   },
   {
     table: 'lob_risk_ratio_summary',
-    desc: 'LoB-level risk ratios \u2014 DSCR alongside FCCR, LTV, capital adequacy',
+    desc: 'LoB-level risk ratios — DSCR alongside FCCR, LTV, capital adequacy',
     fields: ['lob_node_id', 'dscr_value', 'fccr_value', 'ltv_pct', 'capital_adequacy_ratio_pct'],
     primary: false,
   },
   {
     table: 'risk_appetite_metric_state',
-    desc: 'Executive dashboard \u2014 DSCR vs. risk appetite limits with RAG status & velocity',
+    desc: 'Executive dashboard — DSCR vs. risk appetite limits with RAG status & velocity',
     fields: ['metric_id = DSCR', 'current_value', 'limit_value', 'inner_threshold_value', 'status_code', 'velocity_30d_pct'],
     primary: false,
   },
   {
     table: 'facility_detail_snapshot',
-    desc: 'Facility-level analytics \u2014 coverage_ratio_pct (DSCR-derived) for drawer pop-ups',
+    desc: 'Facility-level analytics — coverage_ratio_pct (DSCR-derived) for drawer pop-ups',
     fields: ['facility_id', 'coverage_ratio_pct', 'committed_amt', 'utilized_amt', 'counterparty_id'],
     primary: false,
   },
@@ -210,9 +210,9 @@ function TierBadge({ tier, className = '' }: { tier: string; className?: string 
     T3: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
   };
   const labels: Record<string, string> = {
-    T1: 'T1 \u2014 Always Source',
-    T2: 'T2 \u2014 Source + Validate',
-    T3: 'T3 \u2014 Always Calculate',
+    T1: 'T1 — Always Source',
+    T2: 'T2 — Source + Validate',
+    T3: 'T3 — Always Calculate',
   };
   return (
     <span
@@ -302,7 +302,7 @@ function VariantDefCard({ v }: { v: VariantData }) {
       {/* Numerator */}
       <div className="mt-3 pt-3 border-t border-white/5">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
-          Numerator \u2014 {v.numeratorLabel}
+          Numerator — {v.numeratorLabel}
         </div>
         <div className="space-y-1">
           {v.numeratorComponents.map((c) => (
@@ -318,7 +318,7 @@ function VariantDefCard({ v }: { v: VariantData }) {
       {/* Denominator */}
       <div className="mt-3 pt-3 border-t border-white/5">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
-          Denominator \u2014 {v.denominatorLabel}
+          Denominator — {v.denominatorLabel}
         </div>
         <div className="space-y-1">
           {v.denominatorComponents.map((c) => (
@@ -367,7 +367,7 @@ function ComponentRow({
     <div className="flex items-center justify-between text-xs group">
       <div className="flex items-center gap-1.5 min-w-0">
         <span className={op === '+' ? 'text-emerald-400 flex-shrink-0' : 'text-red-400 flex-shrink-0'}>
-          {op === '+' ? '+' : '\u2212'}
+          {op === '+' ? '+' : '−'}
         </span>
         <span className="text-gray-300 truncate">{name}</span>
       </div>
@@ -390,19 +390,19 @@ function L1Tables() {
     {
       name: 'facility_master',
       scd: 'SCD-2',
-      desc: 'Facility identity \u2014 links to LoB, product, counterparty, and credit agreement',
+      desc: 'Facility identity — links to LoB, product, counterparty, and credit agreement',
       fields: ['facility_id (PK)', 'facility_name', 'facility_type', 'counterparty_id (FK)', 'credit_agreement_id (FK)', 'lob_segment_id (FK)', 'product_node_id (FK)', 'portfolio_id (FK)', 'currency_code (FK)'],
     },
     {
       name: 'counterparty',
       scd: 'SCD-2',
-      desc: 'Borrower / obligor \u2014 risk ratings, industry, domicile',
+      desc: 'Borrower / obligor — risk ratings, industry, domicile',
       fields: ['counterparty_id (PK)', 'legal_name', 'counterparty_type', 'internal_risk_rating', 'industry_id (FK)', 'country_code (FK)', 'pd_annual', 'lgd_unsecured'],
     },
     {
       name: 'credit_agreement_master',
       scd: 'SCD-2',
-      desc: 'Credit agreement \u2014 links borrower and lender entities',
+      desc: 'Credit agreement — links borrower and lender entities',
       fields: ['credit_agreement_id (PK)', 'borrower_counterparty_id (FK)', 'lender_legal_entity_id (FK)', 'agreement_type', 'currency_code (FK)'],
     },
   ];
@@ -411,37 +411,37 @@ function L1Tables() {
     {
       name: 'enterprise_business_taxonomy',
       scd: 'SCD-1',
-      desc: 'Line of Business hierarchy \u2014 self-referencing tree for LoB rollup',
+      desc: 'Line of Business hierarchy — self-referencing tree for LoB rollup',
       fields: ['managed_segment_id (PK)', 'segment_code', 'segment_name', 'parent_segment_id', 'tree_level'],
     },
     {
       name: 'enterprise_product_taxonomy',
       scd: 'SCD-1',
-      desc: 'Product hierarchy \u2014 CRE, C&I, PF, FF, Consumer classification',
+      desc: 'Product hierarchy — CRE, C&I, PF, FF, Consumer classification',
       fields: ['product_node_id (PK)', 'product_code', 'product_name', 'parent_node_id', 'tree_level'],
     },
     {
       name: 'scenario_dim',
       scd: 'SCD-1',
-      desc: 'Stress test scenarios \u2014 Base, Rate+100bps, NOI\u221210%, etc.',
+      desc: 'Stress test scenarios — Base, Rate+100bps, NOI−10%, etc.',
       fields: ['scenario_id (PK)', 'scenario_code', 'scenario_name', 'scenario_type', 'shock_parameters_json'],
     },
     {
       name: 'currency_dim',
       scd: 'SCD-0',
-      desc: 'Currency reference \u2014 normalizes amounts across snapshots',
+      desc: 'Currency reference — normalizes amounts across snapshots',
       fields: ['currency_code (PK)', 'currency_name', 'is_g10_currency'],
     },
     {
       name: 'date_dim',
       scd: 'SCD-0',
-      desc: 'Calendar / fiscal periods \u2014 temporal dimension for all snapshots',
+      desc: 'Calendar / fiscal periods — temporal dimension for all snapshots',
       fields: ['date_id (PK)', 'calendar_date', 'calendar_quarter', 'fiscal_year', 'is_quarter_end'],
     },
     {
       name: 'metric_definition_dim',
       scd: 'SCD-1',
-      desc: 'Metric catalog \u2014 defines DSCR as a metric in the library',
+      desc: 'Metric catalog — defines DSCR as a metric in the library',
       fields: ['metric_code = DSCR', 'metric_name', 'unit_type = RATIO', 'direction = HIGHER_BETTER'],
     },
   ];
@@ -585,7 +585,7 @@ function L2FieldTable({ activeVariant }: { activeVariant: 'both' | 'CRE' | 'CI' 
           <Database className="w-4 h-4 text-amber-400" aria-hidden="true" />
           <code className="text-xs font-bold text-amber-300 font-mono">L2.cash_flow</code>
         </div>
-        <p className="text-[10px] text-gray-600 mb-3">Individual cash flow events \u2014 interest &amp; principal payments</p>
+        <p className="text-[10px] text-gray-600 mb-3">Individual cash flow events — interest &amp; principal payments</p>
         <div className="space-y-1">
           {[
             { field: 'amount', desc: 'Cash flow amount (DECIMAL 18,2)', filter: 'type = interest', measure: true },
@@ -636,7 +636,7 @@ function TransformCard({ v }: { v: VariantData }) {
           <span className="text-gray-500">{v.numeratorLabel}</span>
           <span className="text-white font-mono font-bold">{fmt(v.numerator)}</span>
         </div>
-        <div className="flex items-center justify-center text-gray-600 text-sm my-1">\u00f7</div>
+        <div className="flex items-center justify-center text-gray-600 text-sm my-1">÷</div>
         <div className="flex items-center justify-between text-xs mt-1">
           <span className="text-gray-500">{v.denominatorLabel}</span>
           <span className="text-white font-mono font-bold">{fmt(v.denominator)}</span>
@@ -737,11 +737,11 @@ function RollupDetail({ variant, isFirst, levelIndex }: { variant: 'CRE' | 'CI';
       <div className={`text-[10px] font-bold ${textColor} mb-1`}>{label}</div>
       {isFirst ? (
         <div className="text-xs text-gray-300">
-          <span className={`font-mono ${textColor}`}>{result}</span> \u2014 direct from calculation
+          <span className={`font-mono ${textColor}`}>{result}</span> — direct from calculation
         </div>
       ) : (
         <div className="text-xs text-gray-300">
-          <span className={`font-mono ${textColor}`}>{'\u03a3'}(DSCR {'\u00d7'} EAD) / {'\u03a3'}(EAD)</span>
+          <span className={`font-mono ${textColor}`}>{'Σ'}(DSCR {'×'} EAD) / {'Σ'}(EAD)</span>
           <div className="mt-1 text-[10px] text-gray-500">
             Exposure-weighted average across {levelIndex === 1 ? 'facilities' : ROLLUP_LEVELS[levelIndex - 1].label.toLowerCase() + 's'}
           </div>
@@ -780,7 +780,7 @@ function DashboardConsumption() {
               }`}
             >
               <span className="font-semibold">CRE DSCR (NOI)</span>
-              <span className="block text-[10px] mt-0.5 opacity-70">Multifamily {'\u2022'} Quarterly</span>
+              <span className="block text-[10px] mt-0.5 opacity-70">Multifamily {'•'} Quarterly</span>
             </button>
             <button
               onClick={() => setSelectedVariant('CI')}
@@ -791,7 +791,7 @@ function DashboardConsumption() {
               }`}
             >
               <span className="font-semibold">C&I DSCR (EBITDA)</span>
-              <span className="block text-[10px] mt-0.5 opacity-70">Middle Market {'\u2022'} Annual</span>
+              <span className="block text-[10px] mt-0.5 opacity-70">Middle Market {'•'} Annual</span>
             </button>
           </div>
         </div>
@@ -851,7 +851,7 @@ function DashboardConsumption() {
             </div>
             <div className="mt-3 pt-3 border-t border-white/5 flex items-center gap-1.5 text-[10px] text-emerald-400">
               <Zap className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-              <span>Platform handles the join \u2014 no SQL, no guesswork</span>
+              <span>Platform handles the join — no SQL, no guesswork</span>
             </div>
           </div>
         </div>
@@ -953,7 +953,7 @@ function FooterLegend() {
         <div>
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Rollup Formula</div>
           <div className="text-gray-400 font-mono text-[11px] leading-relaxed">
-            {'\u03a3'}(DSCR{'\u1d62'} {'\u00d7'} EAD{'\u1d62'}) / {'\u03a3'}(EAD{'\u1d62'})
+            {'Σ'}(DSCR{'ᵢ'} {'×'} EAD{'ᵢ'}) / {'Σ'}(EAD{'ᵢ'})
           </div>
           <p className="text-[10px] text-gray-500 mt-1">
             Exposure-weighted average applied at every aggregation level above facility
@@ -989,7 +989,7 @@ export default function DSCRLineageView() {
               </Link>
               <h1 className="text-xl font-bold text-white">DSCR End-to-End Lineage</h1>
               <p className="text-xs text-gray-500 mt-0.5">
-                From user definition through data model to dashboard \u2014 two product variants side by side
+                From user definition through data model to dashboard — two product variants side by side
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -1013,7 +1013,7 @@ export default function DSCRLineageView() {
           <SectionHeading
             id={`${headingPrefix}-step1`}
             icon={Calculator}
-            step="Step 1 \u2014 User Definition"
+            step="Step 1 — User Definition"
             layerColor="bg-purple-600"
             title="Metric Configuration"
             subtitle="User selects product, components, and formula in the DSCR Engine"
@@ -1036,10 +1036,10 @@ export default function DSCRLineageView() {
           <SectionHeading
             id={`${headingPrefix}-step2`}
             icon={Database}
-            step="Step 2 \u2014 L1 Reference Data"
+            step="Step 2 — L1 Reference Data"
             layerColor="bg-blue-600"
             title="Dimensional Anchors"
-            subtitle={'Reference tables that identify the \u201cwho\u201d and \u201cwhat\u201d \u2014 unchanged across variants'}
+            subtitle={'Reference tables that identify the “who” and “what” — unchanged across variants'}
           />
           <L1Tables />
           <InsightCallout>
@@ -1057,10 +1057,10 @@ export default function DSCRLineageView() {
           <SectionHeading
             id={`${headingPrefix}-step3`}
             icon={Layers}
-            step="Step 3 \u2014 L2 Snapshot Data"
+            step="Step 3 — L2 Snapshot Data"
             layerColor="bg-amber-600"
             title="Source Data Tables"
-            subtitle="Same two tables serve both variants \u2014 different fields activate per product"
+            subtitle="Same two tables serve both variants — different fields activate per product"
           />
           <div className="flex items-center gap-2 mb-4" role="group" aria-label="Filter by variant">
             <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Highlight:</span>
@@ -1099,10 +1099,10 @@ export default function DSCRLineageView() {
           <SectionHeading
             id={`${headingPrefix}-step4`}
             icon={Zap}
-            step="Step 4 \u2014 Calculation Engine"
+            step="Step 4 — Calculation Engine"
             layerColor="bg-emerald-600"
             title="DSCR Calculation"
-            subtitle="Formula applied at facility level \u2014 T2 authority (source + validate)"
+            subtitle="Formula applied at facility level — T2 authority (source + validate)"
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TransformCard v={CRE} />
@@ -1111,7 +1111,7 @@ export default function DSCRLineageView() {
           <InsightCallout>
             <strong>T2 Calculation Authority at facility level.</strong> The GSIB sends their own DSCR value AND the platform independently
             recalculates from raw components. If the values differ beyond tolerance, reconciliation flags are raised.
-            All rollups above facility are <strong>T3 (always calculated)</strong> by the platform \u2014 the bank never provides aggregated DSCR.
+            All rollups above facility are <strong>T3 (always calculated)</strong> by the platform — the bank never provides aggregated DSCR.
           </InsightCallout>
         </section>
 
@@ -1122,10 +1122,10 @@ export default function DSCRLineageView() {
           <SectionHeading
             id={`${headingPrefix}-step5`}
             icon={GitBranch}
-            step="Step 5 \u2014 L3 Output & Rollup Hierarchy"
+            step="Step 5 — L3 Output & Rollup Hierarchy"
             layerColor="bg-emerald-600"
             title="Storage & Aggregation"
-            subtitle={'\u03a3(DSCR \u00d7 EAD) / \u03a3(EAD) \u2014 exposure-weighted average at each level'}
+            subtitle={'Σ(DSCR × EAD) / Σ(EAD) — exposure-weighted average at each level'}
           />
 
           <div className="mb-4">
@@ -1139,7 +1139,7 @@ export default function DSCRLineageView() {
           <div className="mb-2">
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
               <Link2 className="w-3 h-3" aria-hidden="true" />
-              Rollup Hierarchy \u2014 click to expand
+              Rollup Hierarchy — click to expand
             </div>
           </div>
           <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
@@ -1152,10 +1152,10 @@ export default function DSCRLineageView() {
           <SectionHeading
             id={`${headingPrefix}-step6`}
             icon={LayoutDashboard}
-            step="Step 6 \u2014 Dashboard Consumption"
+            step="Step 6 — Dashboard Consumption"
             layerColor="bg-pink-600"
             title="Self-Service Connection"
-            subtitle="Pick the metric, pick the dimension, build \u2014 no SQL needed"
+            subtitle="Pick the metric, pick the dimension, build — no SQL needed"
           />
           <DashboardConsumption />
         </section>

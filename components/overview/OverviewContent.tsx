@@ -251,20 +251,28 @@ export default function OverviewContent() {
               </div>
             </Link>
 
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 opacity-60 cursor-default" aria-disabled="true">
+            <Link
+              href="/guide"
+              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
+            >
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
-                  <Network className="w-6 h-6 text-slate-500" />
+                <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
+                  <BookOpen className="w-6 h-6 text-slate-300" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1 text-slate-400">Impact Analysis</h4>
-                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-500 bg-slate-700/60 px-2 py-0.5 rounded">Coming soon</span>
+                  <h4 className="font-semibold text-lg mb-1 text-white">Team Playbook</h4>
+                  <p className="text-sm text-slate-400">End-to-end platform guide</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-500 mb-4">
-                Select a table or field and see everything upstream and downstream that depends on it.
+              <p className="text-sm text-slate-300 mb-4 leading-relaxed">
+                Complete guide covering the data model, SQL files, metrics system, code organization, APIs, dashboards, and step-by-step recipes for common changes.
               </p>
-            </div>
+              <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
+                <Play className="w-4 h-4" />
+                <span>Open Playbook</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
           </div>
         </div>
 

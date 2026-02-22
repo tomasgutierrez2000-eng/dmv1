@@ -1,10 +1,139 @@
 [
-  {"domain_id":"CQ","domain_name":"Credit Quality","domain_description":"PD, Rating, DSCR, LTV, Criticized","icon":"BarChart3","color":"#1e40af","regulatory_relevance":["FR Y-14Q","SNC","Interagency CRE"],"primary_stakeholders":["CRO","Credit Committee"]},
-  {"domain_id":"EX","domain_name":"Exposure","domain_description":"Outstanding, Committed, Utilized, Undrawn, EAD","icon":"Wallet","color":"#7c3aed","regulatory_relevance":["FR Y-14Q","Basel SA"],"primary_stakeholders":["CRO","Treasury"]},
-  {"domain_id":"PR","domain_name":"Profitability","domain_description":"Revenue, NIM, ROE, ROA, All-In Rate, Spread","icon":"TrendingUp","color":"#059669","regulatory_relevance":["Pillar 3","SEC"],"primary_stakeholders":["CFO","Desk Heads"]},
-  {"domain_id":"LP","domain_name":"Loss & Provision","domain_description":"EL Rate, EL Dollar, LGD, CECL Allowance","icon":"AlertTriangle","color":"#dc2626","regulatory_relevance":["ASC 326","IFRS 9","FR Y-14Q"],"primary_stakeholders":["CFO","CRO"]},
-  {"domain_id":"CA","domain_name":"Capital","domain_description":"RWA, Capital Allocated, Leverage Ratio","icon":"Building2","color":"#b45309","regulatory_relevance":["Basel III","FR Y-14Q","CCAR"],"primary_stakeholders":["CFO","Treasury"]},
-  {"domain_id":"PC","domain_name":"Pricing","domain_description":"Spread, Fee Rate, All-In Rate, Pricing Exceptions","icon":"Tag","color":"#0891b2","regulatory_relevance":["SR 13-3","Pillar 3"],"primary_stakeholders":["Desk Heads","CRO"]},
-  {"domain_id":"PO","domain_name":"Portfolio Composition","domain_description":"Tenor, Concentration, Collateral, Maturity","icon":"Target","color":"#6d28d9","regulatory_relevance":["FR Y-14Q","Concentration limits"],"primary_stakeholders":["CRO"]},
-  {"domain_id":"EW","domain_name":"Early Warning","domain_description":"Rating Migration, PD Divergence, Utilization Trend, Amendment Activity","icon":"Bell","color":"#e11d48","regulatory_relevance":["SR 11-7","OCC Handbook"],"primary_stakeholders":["CRO","Special Assets"]}
+  {
+    "domain_id": "CR",
+    "domain_name": "Credit Risk",
+    "domain_description": "Credit risk measurement metrics including PD, LGD, EAD, expected loss, ratings, and delinquency",
+    "icon": "ShieldAlert",
+    "color": "#ef4444",
+    "regulatory_relevance": [
+      "FR2590",
+      "CCAR",
+      "DFAST",
+      "Basel III"
+    ],
+    "primary_stakeholders": [
+      "Risk",
+      "Finance",
+      "Regulatory"
+    ]
+  },
+  {
+    "domain_id": "EL",
+    "domain_name": "Exposure & Limits",
+    "domain_description": "Exposure balances, committed amounts, utilization, and limit management metrics",
+    "icon": "Landmark",
+    "color": "#3b82f6",
+    "regulatory_relevance": [
+      "FR2590",
+      "FR Y-14Q",
+      "FR Y-14M"
+    ],
+    "primary_stakeholders": [
+      "Risk",
+      "Finance",
+      "Treasury"
+    ]
+  },
+  {
+    "domain_id": "FP",
+    "domain_name": "Financial Performance",
+    "domain_description": "Profitability, pricing, and return metrics including ROE, ROA, NIM, DSCR, and yield analysis",
+    "icon": "TrendingUp",
+    "color": "#22c55e",
+    "regulatory_relevance": [
+      "FR Y-9C",
+      "CCAR revenue projection"
+    ],
+    "primary_stakeholders": [
+      "Finance",
+      "Risk",
+      "Business Line"
+    ]
+  },
+  {
+    "domain_id": "CM",
+    "domain_name": "Collateral & Mitigation",
+    "domain_description": "Collateral valuation, LTV, and credit risk mitigation metrics",
+    "icon": "Shield",
+    "color": "#f59e0b",
+    "regulatory_relevance": [
+      "FR2590",
+      "Basel III CRM",
+      "FR Y-14Q"
+    ],
+    "primary_stakeholders": [
+      "Risk",
+      "Collateral Ops",
+      "Finance"
+    ]
+  },
+  {
+    "domain_id": "PA",
+    "domain_name": "Portfolio Analytics",
+    "domain_description": "Aggregated portfolio analytics including concentration, migration, and duration metrics",
+    "icon": "BarChart3",
+    "color": "#6366f1",
+    "regulatory_relevance": [
+      "FR2590",
+      "CCAR",
+      "Pillar 3 disclosures"
+    ],
+    "primary_stakeholders": [
+      "Risk",
+      "Finance",
+      "Strategy"
+    ]
+  },
+  {
+    "domain_id": "GO",
+    "domain_name": "Governance & Operations",
+    "domain_description": "Operational control metrics including limit status, pricing exceptions, and facility lifecycle",
+    "icon": "Settings",
+    "color": "#8b5cf6",
+    "regulatory_relevance": [
+      "OCC Heightened Standards",
+      "SR 11-7"
+    ],
+    "primary_stakeholders": [
+      "Risk",
+      "Compliance",
+      "Operations"
+    ]
+  },
+  {
+    "domain_id": "ST",
+    "domain_name": "Stress Testing",
+    "domain_description": "Scenario-based stressed metrics for CCAR/DFAST/internal stress testing",
+    "icon": "Zap",
+    "color": "#dc2626",
+    "regulatory_relevance": [
+      "CCAR",
+      "DFAST",
+      "FR Y-14A",
+      "Basel III Pillar 2"
+    ],
+    "primary_stakeholders": [
+      "Risk",
+      "Finance",
+      "Capital Planning"
+    ]
+  },
+  {
+    "domain_id": "RC",
+    "domain_name": "Regulatory Capital",
+    "domain_description": "Basel III/IV regulatory capital metrics including RWA, capital ratios, leverage, and Pillar 3",
+    "icon": "Building",
+    "color": "#0d9488",
+    "regulatory_relevance": [
+      "Basel III",
+      "FR Y-9C",
+      "FR2590",
+      "Pillar 3"
+    ],
+    "primary_stakeholders": [
+      "Finance",
+      "Risk",
+      "Regulatory"
+    ]
+  }
 ]

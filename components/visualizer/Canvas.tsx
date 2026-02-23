@@ -80,6 +80,7 @@ export default function Canvas() {
     setSelectedField,
     setSelectedSampleDataCell,
     setFocusMode,
+    clearSelection,
     toggleExpandedTable,
     resetView,
     requestFitToView,
@@ -500,7 +501,9 @@ export default function Canvas() {
     if (layoutMode !== 'domain-overview' && layoutMode !== 'snowflake') return;
     if (savedPositionsRef.current) return; // don't override focus-compact
     if (prevSelectedTableRef.current === selectedTable) return;
-    const pos = tablePositions[selectedTable];
+    // Read positions from store directly (not from dependency) to avoid re-running
+    // this effect every time ANY table position changes (e.g. focus-compact restore).
+    const pos = useModelStore.getState().tablePositions[selectedTable];
     if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
       fitToTable(selectedTable);
       return;
@@ -511,24 +514,27 @@ export default function Canvas() {
       fitToTable(selectedTable);
     }, 80);
     return () => clearTimeout(id);
-  }, [selectedTable, layoutMode, tablePositions, fitToTable]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- tablePositions excluded to prevent re-runs on position changes
+  }, [selectedTable, layoutMode, fitToTable]);
 
   useEffect(() => {
     if (!selectedTable) prevSelectedTableRef.current = null;
   }, [selectedTable]);
 
   // ── Focus-compact: bring related tables closer when a field is selected ──
+  // IMPORTANT: This effect intentionally does NOT depend on visibleRelationships or
+  // focusVisibleTableKeys because those change as part of the same selection flow
+  // (selectedField → focusMode → visibleRelationships), causing cascading re-runs.
+  // Instead we compute field-level relationships directly from model.relationships.
   useEffect(() => {
-    const shouldCompact =
-      focusMode && !!selectedField && focusVisibleTableKeys != null && focusVisibleTableKeys.size > 0;
+    const shouldCompact = focusMode && !!selectedField;
 
     // ─ EXIT focus-compact: restore original positions ─
     if (!shouldCompact) {
       if (savedPositionsRef.current) {
         const saved = savedPositionsRef.current;
-        savedPositionsRef.current = null; // Clear immediately to prevent effect from re-running restore (avoids React #185 infinite loop)
+        savedPositionsRef.current = null;
         focusFieldKeyRef.current = null;
-        // Restore only valid positions so we never call setTablePosition(key, undefined)
         Object.entries(saved).forEach(([key, pos]) => {
           if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
             setTablePosition(key, pos);
@@ -536,11 +542,12 @@ export default function Canvas() {
         });
         // Animate camera back to fit all visible tables
         setIsAnimating(true);
-        const allPositions = visibleTables
+        const vt = visibleTables;
+        const allPositions = vt
           .map((t) => saved[t.key])
           .filter((p): p is TablePosition => !!p && typeof p.x === 'number' && typeof p.y === 'number');
         if (allPositions.length > 0) {
-          runFitToView(allPositions, visibleTables.length);
+          runFitToView(allPositions, vt.length);
         }
         setTimeout(() => setIsAnimating(false), 400);
       }
@@ -552,13 +559,21 @@ export default function Canvas() {
     if (fieldKey === focusFieldKeyRef.current) return;
 
     // ─ ENTER / UPDATE focus-compact ─
-    // Save original positions only on first entry (not when switching fields)
     if (!savedPositionsRef.current) {
       savedPositionsRef.current = { ...useModelStore.getState().tablePositions };
     }
     focusFieldKeyRef.current = fieldKey;
 
-    // Compute table dimensions for current layout mode
+    // Compute relationships for this specific field directly from the model
+    // (avoids depending on the visibleRelationships memo which changes with selection state)
+    const fieldRels = model?.relationships.filter(
+      (rel) =>
+        (rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName) ||
+        (rel.target.tableKey === selectedField.tableKey && rel.target.field === selectedField.fieldName)
+    ) ?? [];
+
+    if (fieldRels.length === 0) return;
+
     const overviewDims = getOverviewTableDimensions(tableSize);
     const BASE_TW = 560;
     const BASE_TH = 320;
@@ -571,11 +586,10 @@ export default function Canvas() {
     const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
     const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
 
-    // Classify connected tables by relationship direction relative to the anchor
     const anchorKey = selectedField.tableKey;
-    const leftKeys: string[] = [];  // incoming: other → anchor
-    const rightKeys: string[] = []; // outgoing: anchor → other
-    for (const rel of visibleRelationships) {
+    const leftKeys: string[] = [];
+    const rightKeys: string[] = [];
+    for (const rel of fieldRels) {
       if (rel.source.tableKey === anchorKey && rel.target.tableKey !== anchorKey) {
         if (!rightKeys.includes(rel.target.tableKey)) rightKeys.push(rel.target.tableKey);
       }
@@ -584,7 +598,6 @@ export default function Canvas() {
       }
     }
 
-    // Layout: anchor centred at origin, sources left, targets right
     const hGap = isOverview ? tw * 0.7 : tw * 0.5;
     const vGap = th * 0.25;
     const cx = 0;
@@ -603,22 +616,20 @@ export default function Canvas() {
       compact.push({ key, x: cx + tw + hGap, y: stackY(rightKeys.length, i) })
     );
 
-    // Apply compact positions
     for (const { key, x, y } of compact) {
       setTablePosition(key, { x, y });
     }
 
-    // Fit camera to the compact group
     setIsAnimating(true);
     runFitToView(
       compact.map((p) => ({ x: p.x, y: p.y })),
       compact.length
     );
     setTimeout(() => setIsAnimating(false), 400);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- visibleRelationships/focusVisibleTableKeys intentionally excluded to prevent cascade
   }, [
-    focusMode, selectedField, focusVisibleTableKeys,
-    visibleRelationships, visibleTables,
-    layoutMode, tableSize, setTablePosition, runFitToView,
+    focusMode, selectedField, model,
+    visibleTables, layoutMode, tableSize, setTablePosition, runFitToView,
   ]);
 
   // Clear focus-compact state when layout fundamentals change (prevents stale saved positions)
@@ -652,19 +663,22 @@ export default function Canvas() {
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
         return;
       }
+      // Only start panning on left-click on truly empty canvas (SVG element or its root <g>).
+      // Do NOT clear selections here — that is handled by handleCanvasClick on mouseUp
+      // so we avoid double-set when the user clicks a table (mouseDown fires on container
+      // before the table's stopPropagation can prevent it).
+      const target = e.target as Element;
       const canvas = canvasRef.current;
       const hitEmptyCanvas =
-        e.target === canvas ||
-        (canvas?.firstElementChild != null && e.target === canvas.firstElementChild);
+        target === canvas ||
+        (canvas?.firstElementChild != null && target === canvas.firstElementChild);
       if (e.button === 0 && hitEmptyCanvas) {
         setShowHint(false);
         setIsPanning(true);
         setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-        setSelectedTable(null);
-        setSelectedRelationship(null);
       }
     },
-    [pan, setSelectedTable, setSelectedRelationship]
+    [pan]
   );
 
   const handleMouseMove = useCallback(
@@ -835,14 +849,16 @@ export default function Canvas() {
   );
 
   // Single click on empty canvas: clear selections and exit focus mode. If a double-click zoom-in was pending, treat as triple-click and fit-to-view all content.
+  // IMPORTANT: Only fire when the click target is genuinely the SVG canvas or its root <g>,
+  // NOT the outer container div — table click events bubble to the container div and would
+  // incorrectly clear selection otherwise.
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent) => {
-      const target = e.target as Node | null;
+      const target = e.target as Element | null;
       if (!target) return;
-      const container = containerRef.current;
       const canvas = canvasRef.current;
+      // Strictly check for SVG background clicks only — exclude the container div
       const hitCanvas =
-        target === container ||
         target === canvas ||
         (canvas?.firstElementChild != null && target === canvas.firstElementChild);
       if (hitCanvas) {
@@ -860,14 +876,12 @@ export default function Canvas() {
           }
           setTimeout(() => setIsAnimating(false), 280);
         }
-        setSelectedField(null);
-        setSelectedTable(null);
-        setSelectedRelationship(null);
-        setSelectedSampleDataCell(null);
-        setFocusMode(false);
+        // Clear all selections in a single batched Zustand update to avoid
+        // multiple re-renders and cascading effect triggers.
+        clearSelection();
       }
     },
-    [visibleTables, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode]
+    [visibleTables, runFitToView, clearSelection]
   );
 
   // Keyboard shortcuts
@@ -906,16 +920,13 @@ export default function Canvas() {
           setSelectedSampleDataCell(null);
           e.preventDefault();
         } else {
-          setSelectedField(null);
-          setSelectedTable(null);
-          setSelectedRelationship(null);
-          setFocusMode(false);
+          clearSelection();
         }
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode, selectedSampleDataCell, marqueeStart]);
+  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, clearSelection, setSelectedSampleDataCell, selectedSampleDataCell, marqueeStart]);
 
   // Auto-hide navigation hint after first interaction or 8 seconds
   useEffect(() => {

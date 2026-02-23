@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
 
@@ -14,8 +14,16 @@ export default function Minimap() {
     visibleLayers,
     tableSize,
     setPan,
-    setZoom,
   } = useModelStore();
+
+  // Track actual viewport dimensions for an accurate minimap viewport rectangle
+  const [vpSize, setVpSize] = useState({ w: 1200, h: 800 });
+  useEffect(() => {
+    const update = () => setVpSize({ w: window.innerWidth, h: window.innerHeight });
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const bounds = useMemo(() => {
     if (!model) return { minX: 0, minY: 0, maxX: 1000, maxY: 1000 };
@@ -38,7 +46,7 @@ export default function Minimap() {
     const multiplier = SIZE_MULTIPLIERS[tableSize];
     const tableWidth = BASE_TABLE_WIDTH * multiplier.width;
     const tableHeight = BASE_TABLE_HEIGHT * multiplier.height;
-    
+
     const minX = Math.min(...positions.map((p) => p.x));
     const maxX = Math.max(...positions.map((p) => p.x + tableWidth));
     const minY = Math.min(...positions.map((p) => p.y));
@@ -60,8 +68,8 @@ export default function Minimap() {
     visibleLayers[table.layer]
   );
 
-  const viewportWidth = 1200 / zoom;
-  const viewportHeight = 800 / zoom;
+  const viewportWidth = vpSize.w / zoom;
+  const viewportHeight = vpSize.h / zoom;
   const viewportX = (-pan.x / zoom - bounds.minX) * scale;
   const viewportY = (-pan.y / zoom - bounds.minY) * scale;
 
@@ -85,8 +93,8 @@ export default function Minimap() {
                 className="cursor-pointer hover:r-4 transition-all"
                 onClick={() => {
                   setPan({
-                    x: -(pos.x * zoom - 600),
-                    y: -(pos.y * zoom - 400),
+                    x: -(pos.x * zoom - vpSize.w / 2),
+                    y: -(pos.y * zoom - vpSize.h / 2),
                   });
                 }}
               />

@@ -34,7 +34,7 @@ export default function TestAPIPage() {
         
         <div className="bg-white rounded-lg shadow p-6 mb-4">
           <h2 className="text-lg font-semibold mb-2">Status</h2>
-          <div className={`p-4 rounded ${
+          <div className={`p-4 rounded-lg ${
             status === 'loading' ? 'bg-yellow-50 border border-yellow-200' :
             status === 'success' ? 'bg-green-50 border border-green-200' :
             'bg-red-50 border border-red-200'

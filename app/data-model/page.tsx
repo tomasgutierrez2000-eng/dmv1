@@ -73,9 +73,9 @@ interface AddTablePayload {
 }
 
 const layerColors = {
-  L1: { bg: '#D04A02', border: '#D04A02', text: '#ffffff', badge: 'bg-pwc-orange/20 text-pwc-orange' },
-  L2: { bg: '#E87722', border: '#E87722', text: '#ffffff', badge: 'bg-pwc-orange-light/20 text-pwc-orange-light' },
-  L3: { bg: '#6B7280', border: '#6B7280', text: '#ffffff', badge: 'bg-pwc-gray/50 text-pwc-gray-light' },
+  L1: { bg: '#D04A02', border: '#D04A02', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-orange-100 text-orange-800' },
+  L2: { bg: '#E87722', border: '#E87722', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-amber-100 text-amber-800' },
+  L3: { bg: '#6B7280', border: '#6B7280', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-gray-100 text-gray-700' },
 };
 
 // Transform parsed data dictionary to visualization format
@@ -514,22 +514,23 @@ export default function DataModelPage() {
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-pwc-gray-light" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tables..."
-                className="pl-10 pr-4 py-2 w-full border border-pwc-gray-light rounded-lg focus:ring-2 focus:ring-pwc-orange focus:border-pwc-orange"
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                style={{ color: '#111827' }}
               />
             </div>
             <div className="flex space-x-2">
               <button
                 onClick={() => setViewMode('layers')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   viewMode === 'layers'
-                    ? 'bg-pwc-orange text-pwc-white'
-                    : 'bg-pwc-gray text-pwc-gray-light hover:bg-pwc-gray-light'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 <Layers className="w-4 h-4 inline mr-2" />
@@ -537,10 +538,10 @@ export default function DataModelPage() {
               </button>
               <button
                 onClick={() => setViewMode('relationships')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   viewMode === 'relationships'
-                    ? 'bg-pwc-orange text-pwc-white'
-                    : 'bg-pwc-gray text-pwc-gray-light hover:bg-pwc-gray-light'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 <Link2 className="w-4 h-4 inline mr-2" />
@@ -562,7 +563,7 @@ export default function DataModelPage() {
 
       {addTableOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => !actionLoading && setAddTableOpen(false)}>
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-4">Add table</h3>
             <form
               onSubmit={(e) => {
@@ -724,7 +725,7 @@ export default function DataModelPage() {
                       <h2 className="text-xl font-bold">
                         {layer} - {layer === 'L1' ? 'Master Data' : layer === 'L2' ? 'Snapshots & Events' : 'Roll-ups'}
                       </h2>
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-pwc-gray/50 text-pwc-gray-light">
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600">
                         {tables.length} tables
                       </span>
                     </div>
@@ -759,7 +760,7 @@ export default function DataModelPage() {
                                   </h3>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span className={`px-2 py-0.5 rounded text-xs font-semibold ${colors.badge}`}>
+                                  <span className={`px-2 py-0.5 rounded text-xs font-semibold ${colors.cardBadge}`}>
                                     {table.layer}
                                   </span>
                                   <button
@@ -775,18 +776,18 @@ export default function DataModelPage() {
                               </div>
 
                               {table.description && (
-                                <p className="text-xs text-gray-600 mb-3">{table.description}</p>
+                                <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.75)' }}>{table.description}</p>
                               )}
 
                               <div className="space-y-2 text-xs">
                                 <div className="flex items-center space-x-1">
-                                  <Key className="w-3 h-3 text-gray-500" />
-                                  <span className="font-mono text-pwc-gray-light">{table.primaryKey}</span>
+                                  <Key className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                                  <span className="font-mono" style={{ color: 'rgba(255,255,255,0.8)' }}>{table.primaryKey}</span>
                                 </div>
                                 {hasFKs && (
                                   <div className="flex items-center space-x-1">
-                                    <Link2 className="w-3 h-3 text-gray-500" />
-                                    <span className="text-pwc-gray-light">
+                                    <Link2 className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                                    <span style={{ color: 'rgba(255,255,255,0.8)' }}>
                                       {table.foreignKeys.length} relationship{table.foreignKeys.length > 1 ? 's' : ''}
                                     </span>
                                   </div>
@@ -798,7 +799,8 @@ export default function DataModelPage() {
                                   e.stopPropagation();
                                   toggleTable(table.id);
                                 }}
-                                className="mt-3 text-xs text-pwc-orange hover:text-pwc-orange-light font-medium"
+                                className="mt-3 text-xs font-medium hover:underline"
+                                style={{ color: 'rgba(255,255,255,0.9)' }}
                               >
                                 {isTableExpanded ? 'Hide' : 'Show'} fields ({table.fields.length})
                               </button>
@@ -1056,7 +1058,7 @@ export default function DataModelPage() {
 
       {removeConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => !actionLoading && setRemoveConfirm(null)}>
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-semibold text-gray-900 mb-2">
               {removeConfirm.type === 'table' ? 'Remove table?' : 'Remove field?'}
             </h3>
@@ -1090,7 +1092,7 @@ export default function DataModelPage() {
 
       {editTableOpen && editTableForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => !actionLoading && (setEditTableOpen(false), setEditTableForm(null))}>
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-semibold text-gray-900 mb-2">Edit table</h3>
             <p className="text-sm text-gray-500 mb-3">{editTableForm.tableName}</p>
             <form
@@ -1123,7 +1125,7 @@ export default function DataModelPage() {
 
       {editFieldOpen && editFieldForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => !actionLoading && (setEditFieldOpen(false), setEditFieldForm(null))}>
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-semibold text-gray-900 mb-2">Edit field</h3>
             <p className="text-sm text-gray-500 mb-3">{editFieldForm.tableName}.{editFieldForm.fieldName}</p>
             <form

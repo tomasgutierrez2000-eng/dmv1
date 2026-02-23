@@ -115,7 +115,7 @@ export default function VisualizerPage() {
               <div className="max-w-lg w-full">
                 {/* Hero empty state - Apple/Google clean design */}
                 <div className="text-center mb-8">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl flex items-center justify-center shadow-sm">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center shadow-sm">
                     <Database className="w-8 h-8 text-blue-600" />
                   </div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">Get started</h2>
@@ -131,7 +131,7 @@ export default function VisualizerPage() {
                   disabled={demoLoading}
                   aria-busy={demoLoading}
                   aria-label={demoLoading ? 'Loading demo data' : 'Load L1 bank data demo (78 tables)'}
-                  className="w-full mb-4 py-3.5 px-6 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
+                  className="w-full mb-4 py-3.5 px-6 rounded-lg bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   {demoLoading ? (
                     <>
@@ -152,7 +152,7 @@ export default function VisualizerPage() {
                   onClick={loadFromDataDictionary}
                   disabled={dictLoading}
                   aria-busy={dictLoading}
-                  className="w-full mb-4 py-3 px-6 rounded-xl border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-800 font-medium text-sm flex items-center justify-center gap-2"
+                  className="w-full mb-4 py-3 px-6 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium text-sm flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   {dictLoading ? (
                     <>
@@ -177,7 +177,7 @@ export default function VisualizerPage() {
 
                 {/* Inline feedback */}
                 {result?.error && (
-                  <div className="mt-5 bg-red-50 border border-red-100 rounded-xl p-4 flex items-start gap-3" role="alert">
+                  <div className="mt-5 bg-red-50 border border-red-100 rounded-lg p-4 flex items-start gap-3" role="alert">
                     <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-red-800 text-sm">Parse error</p>
@@ -186,7 +186,7 @@ export default function VisualizerPage() {
                   </div>
                 )}
                 {result?.statistics && (
-                  <div className="mt-5 bg-emerald-50 border border-emerald-100 rounded-xl p-4" role="status">
+                  <div className="mt-5 bg-emerald-50 border border-emerald-100 rounded-lg p-4" role="status">
                     <p className="font-medium text-emerald-800 text-sm mb-2">Parsed successfully</p>
                     <div className="grid grid-cols-2 gap-2">
                       {[

@@ -41,6 +41,7 @@ export default function LibraryMainView() {
   const [searchVariantHits, setSearchVariantHits] = useState<{ variant_id: string; variant_name: string; parent_metric_id: string; parent_metric_name?: string }[]>([]);
   const [searchApiLoading, setSearchApiLoading] = useState(false);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [errorsExpanded, setErrorsExpanded] = useState(false);
 
   const fetchData = useCallback(() => {
     setError(null);
@@ -272,18 +273,26 @@ export default function LibraryMainView() {
             >
               <p>{importResult.message}</p>
               {importResult.errors && importResult.errors.length > 0 && (
-                <ul className="mt-2 list-disc list-inside">
-                  {importResult.errors.slice(0, 8).map((err, i) => (
-                    <li key={i}>
-                      {err.sheet != null && `[${err.sheet}] `}
-                      {err.row != null && `Row ${err.row}: `}
-                      {err.message}
-                    </li>
-                  ))}
+                <div className="mt-2">
+                  <ul className="list-disc list-inside">
+                    {(errorsExpanded ? importResult.errors : importResult.errors.slice(0, 8)).map((err, i) => (
+                      <li key={i}>
+                        {err.sheet != null && `[${err.sheet}] `}
+                        {err.row != null && `Row ${err.row}: `}
+                        {err.message}
+                      </li>
+                    ))}
+                  </ul>
                   {importResult.errors.length > 8 && (
-                    <li>…and {importResult.errors.length - 8} more</li>
+                    <button
+                      type="button"
+                      onClick={() => setErrorsExpanded((v) => !v)}
+                      className="mt-1.5 text-xs font-medium underline hover:no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                    >
+                      {errorsExpanded ? 'Show fewer' : `Show all ${importResult.errors.length} errors`}
+                    </button>
                   )}
-                </ul>
+                </div>
               )}
             </div>
           )}
@@ -300,7 +309,7 @@ export default function LibraryMainView() {
                 setSearchQuery(e.target.value);
                 setSelectedDomain(null);
               }}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-shadow"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow"
               aria-describedby={searchQuery.trim() ? 'search-results-count' : undefined}
             />
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
@@ -405,7 +414,7 @@ export default function LibraryMainView() {
                 <Link
                   key={m.metric_id}
                   href={`/metrics/library/${encodeURIComponent(m.metric_id)}`}
-                  className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
+                  className="bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -466,7 +475,7 @@ export default function LibraryMainView() {
                     <li key={v.variant_id}>
                       <Link
                         href={`/metrics/library/${encodeURIComponent(v.parent_metric_id)}/${encodeURIComponent(v.variant_id)}`}
-                        className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 hover:border-blue-200 hover:shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 px-4 py-3 hover:border-blue-200 hover:shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       >
                         <span className="font-medium text-gray-900 truncate">{v.variant_name}</span>
                         {v.parent_metric_name && (

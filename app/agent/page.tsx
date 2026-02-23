@@ -165,7 +165,7 @@ export default function AgentPage() {
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-pwc-gray-light hover:text-pwc-white hover:bg-pwc-gray/50 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-pwc-orange focus:ring-offset-2 focus:ring-offset-pwc-black"
+            className="flex items-center gap-2 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-pwc-gray-light hover:text-pwc-white hover:bg-pwc-gray/50 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-pwc-black"
             aria-label="Back to overview"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
@@ -184,7 +184,7 @@ export default function AgentPage() {
         <main className="flex-1 flex items-center justify-center px-4">
           <div className="w-full max-w-sm">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-pwc-gray border border-pwc-gray-light mb-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-pwc-gray border border-pwc-gray-light mb-4">
                 <Lock className="w-7 h-7 text-pwc-gray-light" />
               </div>
               <p className="text-pwc-gray-light text-sm">Enter the password to use the agent.</p>
@@ -249,7 +249,7 @@ export default function AgentPage() {
 
           {messages.length === 0 && (
             <div className="text-center py-12 px-4">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-pwc-gray border border-pwc-gray-light mb-4" aria-hidden="true">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-pwc-gray border border-pwc-gray-light mb-4" aria-hidden="true">
                 <MessageCircle className="w-7 h-7 text-pwc-gray-light" />
               </div>
               <p className="text-pwc-gray-light text-sm mb-3">Ask about tables, relationships, metrics, or lineage.</p>
@@ -277,7 +277,7 @@ export default function AgentPage() {
                 className={`mb-6 ${m.role === 'user' ? 'flex justify-end' : ''}`}
               >
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[85%] rounded-xl px-4 py-3 ${
                   m.role === 'user'
                     ? 'bg-pwc-gray text-pwc-white'
                     : 'bg-pwc-gray/80 border border-pwc-gray-light/30 text-pwc-white'
@@ -310,7 +310,7 @@ export default function AgentPage() {
 
           {loading && (
             <div className="flex justify-start mb-6" aria-live="polite" aria-busy="true">
-              <div className="rounded-2xl px-4 py-3 bg-pwc-gray/80 border border-pwc-gray-light/30 inline-flex items-center gap-2 text-pwc-gray-light text-sm">
+              <div className="rounded-xl px-4 py-3 bg-pwc-gray/80 border border-pwc-gray-light/30 inline-flex items-center gap-2 text-pwc-gray-light text-sm">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Thinking…
               </div>

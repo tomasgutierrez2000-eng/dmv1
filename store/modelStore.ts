@@ -134,7 +134,7 @@ export const useModelStore = create<ModelStore>((set) => ({
     })),
   setUploadedSampleDataBulk: (data) => set({ uploadedSampleData: data }),
   clearUploadedSampleData: () => set({ uploadedSampleData: {} }),
-  setZoom: (zoom) => set({ zoom: Math.max(0.1, Math.min(3, zoom)) }),
+  setZoom: (zoom) => set({ zoom: Math.max(0.05, Math.min(4, zoom)) }),
   setPan: (pan) => set({ pan }),
   setTablePosition: (tableKey, position) =>
     set((state) => ({
@@ -247,8 +247,7 @@ export const useModelStore = create<ModelStore>((set) => ({
           viewMode: 'detailed',
           tableSize: 'large',
           fieldDisplayMode: 'full',
-          zoom: 0.4,
-          pan: { x: 0, y: 0 },
+          // zoom/pan handled by Canvas fit-to-view on layout change
         });
         break;
       case 'compact':
@@ -257,22 +256,20 @@ export const useModelStore = create<ModelStore>((set) => ({
           viewMode: 'compact',
           tableSize: 'small',
           fieldDisplayMode: 'minimal',
-          zoom: 1.0,
-          pan: { x: 0, y: 0 },
           expandedTables: new Set(),
+          // zoom/pan handled by Canvas fit-to-view on layout change
         });
         break;
     }
   },
   resetView: () =>
     set({
-      zoom: 1,
-      pan: { x: 0, y: 0 },
       selectedTable: null,
       selectedRelationship: null,
       selectedField: null,
       selectedSampleDataCell: null,
       focusMode: false,
+      requestFitToView: Date.now(), // trigger fit-to-view so content is always visible
     }),
   setRequestFitToView: () => set({ requestFitToView: Date.now() }),
   setRequestFitToDomain: (domain) => set({ requestFitToDomain: domain }),

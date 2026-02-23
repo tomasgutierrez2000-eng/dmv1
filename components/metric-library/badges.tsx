@@ -25,7 +25,7 @@ const TIER_COLORS: Record<string, string> = {
 export function TypeBadge({ type }: { type: string }) {
   return (
     <span
-      className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${TYPE_COLORS[type] ?? 'bg-gray-100 text-gray-700 border-gray-200'}`}
+      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[type] ?? 'bg-gray-100 text-gray-700 border border-gray-200'}`}
       aria-label={`Type: ${type}`}
     >
       {type}
@@ -53,7 +53,7 @@ export function CalculationAuthorityBadge({
 }) {
   return (
     <span
-      className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${TIER_COLORS[tier] ?? 'bg-gray-100 text-gray-700 border-gray-200'}`}
+      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TIER_COLORS[tier] ?? 'bg-gray-100 text-gray-700 border border-gray-200'}`}
       aria-label={`Calculation Authority: ${tier} ${tierName ?? ''}`}
     >
       {tier}

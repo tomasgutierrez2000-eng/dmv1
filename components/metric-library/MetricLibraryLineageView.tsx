@@ -120,7 +120,7 @@ export default function MetricLibraryLineageView({ variant }: { variant: MetricV
   const hasLineage = nodes.length > 1 || (nodes.length === 1 && nodes[0].id !== 'this-metric');
   if (!hasLineage) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-gray-50/50 p-6 text-center text-gray-500">
+      <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-6 text-center text-gray-500">
         <p className="text-sm">No lineage defined for this variant.</p>
         <p className="mt-1 text-xs">Add upstream_inputs and downstream_consumers (with optional data_tier: L1, L2, L3, EXTERNAL) to show how this metric is built from atomic data.</p>
       </div>
@@ -135,7 +135,7 @@ export default function MetricLibraryLineageView({ variant }: { variant: MetricV
           : 'This metric is calculated from L1/L2 atomic and snapshot data. The flow below shows how inputs are combined by the formula to produce this metric.'}
       </p>
 
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-6 shadow-sm relative" style={{ scrollbarWidth: 'thin', scrollbarColor: '#cbd5e1 #f1f5f9' }}>
         <div className="flex items-stretch gap-4 min-w-max">
           {columns.map((col, colIndex) => (
             <React.Fragment key={colIndex}>
@@ -199,6 +199,10 @@ export default function MetricLibraryLineageView({ variant }: { variant: MetricV
           ))}
         </div>
       </div>
+
+      {columns.length > 3 && (
+        <p className="text-xs text-gray-400 text-right mt-1">Scroll horizontally to see the full lineage</p>
+      )}
 
       {!isSourced && (variant.numerator_field_refs?.length ?? 0) + (variant.denominator_field_refs?.length ?? 0) > 0 && (
         <div className="rounded-lg border border-gray-200 bg-gray-50/80 p-4">

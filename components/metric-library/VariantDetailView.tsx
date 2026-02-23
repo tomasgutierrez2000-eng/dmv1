@@ -193,7 +193,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                   setEditing(true);
                   setSaveError(null);
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
                 aria-label="Edit variant"
               >
                 <Pencil className="w-4 h-4" aria-hidden />
@@ -229,7 +229,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                       setSaving(false);
                     }
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition-colors disabled:opacity-50"
                   aria-label="Save changes"
                 >
                   <Check className="w-4 h-4" aria-hidden />
@@ -243,7 +243,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                     setEditForm({});
                     setSaveError(null);
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors disabled:opacity-50"
                   aria-label="Cancel editing"
                 >
                   <X className="w-4 h-4" aria-hidden />
@@ -254,7 +254,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             {v.executable_metric_id && (
               <Link
                 href={`/metrics/deep-dive/${encodeURIComponent(v.executable_metric_id)}`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
               >
                 <ExternalLink className="w-4 h-4" aria-hidden />
                 Open in Metrics Engine
@@ -266,7 +266,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
         {saveError && (
           <div
             role="alert"
-            className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
           >
             {saveError}
           </div>
@@ -275,7 +275,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
           <div
             role="status"
             aria-live="polite"
-            className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+            className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
           >
             Saved successfully.
           </div>
@@ -284,7 +284,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
         <div
           role="tablist"
           aria-label="Variant detail sections"
-          className="flex gap-1 border-b border-gray-200 mb-6 -mb-px flex-wrap"
+          className="flex gap-1 border-b border-gray-200 mb-6 overflow-x-auto scrollbar-hide"
         >
           {TABS.map((t) => (
             <button
@@ -295,7 +295,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               aria-controls={`variant-tab-${t.id}`}
               id={`variant-tab-${t.id}-btn`}
               onClick={() => setTab(t.id)}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                 tab === t.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -312,19 +312,19 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             className="space-y-6"
           >
             {v.detailed_description && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+              <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
                 <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Description</h2>
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{v.detailed_description}</p>
               </div>
             )}
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Formula</h2>
-              <div className="bg-gray-900 rounded-xl p-4 font-mono text-sm text-green-400 whitespace-pre-wrap overflow-x-auto">
+              <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 whitespace-pre-wrap overflow-x-auto">
                 {v.formula_display || '—'}
               </div>
             </div>
             {(v.companion_fields?.length ?? 0) > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+              <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
                 <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Companion fields</h2>
                 <p className="text-xs text-gray-500 mb-3">Ingest alongside the primary value.</p>
                 <div className="flex flex-wrap gap-2">
@@ -340,7 +340,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Rollup</h2>
               <p className="text-xs text-gray-500 mb-4">Facility → Counterparty → Desk → Portfolio → LoB.</p>
               {levels.length > 0 ? (
@@ -357,7 +357,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                         </div>
                         {i < levels.length - 1 && <div className="w-0.5 flex-1 bg-gradient-to-b from-gray-300 to-gray-200 my-1 min-h-[4px]" />}
                       </div>
-                      <div className={`flex-1 border rounded-xl p-3 ${i < levels.length - 1 ? 'mb-3' : ''} border-gray-200 bg-gray-50/50`}>
+                      <div className={`flex-1 border rounded-lg p-3 ${i < levels.length - 1 ? 'mb-3' : ''} border-gray-200 bg-gray-50/50`}>
                         <div className="text-xs font-bold text-gray-900 uppercase mb-1">
                           {ROLLUP_LEVEL_LABELS[level] ?? level}
                         </div>
@@ -386,7 +386,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               return (
                 <>
                   {editing ? (
-                    <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
                       <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Calculation Authority tier</h2>
                       <div className="space-y-3">
                         <label htmlFor="calc-tier-current" className="block text-xs font-bold text-gray-500 uppercase">
@@ -435,7 +435,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                     </div>
                   ) : tierConfig ? (
                     <div
-                      className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+                      className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
                       style={{ borderLeftWidth: 4, borderLeftColor: tierConfig.color }}
                     >
                       <div className="flex items-center gap-2 mb-2">
@@ -452,7 +452,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                       <p className="text-sm text-gray-600 mb-4">{tierConfig.shortDescription}</p>
                     </div>
                   ) : null}
-                  <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                  <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
                     <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">
                       Expected GSIB data source
                     </h2>
@@ -478,7 +478,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                     )}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
                       <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Classification rationale</h2>
                       {editing ? (
                         <textarea
@@ -510,7 +510,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                         </p>
                       )}
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
                       <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Future evolution</h2>
                       {editing ? (
                         <textarea
@@ -566,7 +566,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             className="space-y-6"
           >
             {!editing && !v.expected_gsib_data_source && !v.source_system && !v.source_endpoint_or_feed && (
-              <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/50 p-6 text-center">
+              <div className="rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-6 text-center">
                 <p className="text-sm font-medium text-blue-900 mb-2">Connect this metric to a source system</p>
                 <p className="text-xs text-blue-700 mb-4 max-w-md mx-auto">
                   Set the source name, delivery (Push or Pull), endpoint, and connection instructions so your team can plug in the feed.
@@ -574,7 +574,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                 <button
                   type="button"
                   onClick={() => { setEditing(true); setEditForm({ ...v }); setSaveError(null); }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
                   aria-label="Connect source — open edit mode to set source, delivery, endpoint, and instructions"
                 >
                   <Pencil className="w-4 h-4" aria-hidden />
@@ -583,7 +583,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Link to source</h2>
               <p className="text-xs text-gray-500 mb-1">
                 Where this metric comes from and how to connect. Push = source sends to us; Pull = we request from source.
@@ -772,7 +772,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             id="variant-tab-lineage"
             role="tabpanel"
             aria-labelledby="variant-tab-lineage-btn"
-            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Data Lineage</h2>
             <p className="text-xs text-gray-500 mb-4">How this metric is built from L1/L2 atomic data and where it is consumed.</p>
@@ -785,7 +785,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             id="variant-tab-validation"
             role="tabpanel"
             aria-labelledby="variant-tab-validation-btn"
-            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Validation Rules</h2>
             {(v.validation_rules?.length ?? 0) > 0 ? (
@@ -819,7 +819,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             aria-labelledby="variant-tab-usage-btn"
             className="space-y-6"
           >
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Use in dashboard</h2>
               <p className="text-xs text-gray-500 mb-3">
                 Add this metric to a dashboard by using its ID when configuring the dashboard or data source.
@@ -854,7 +854,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Used in</h2>
               <p className="text-xs text-gray-500 mb-3">
                 Record which dashboards and reports use this metric (optional).
@@ -930,7 +930,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               )}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
               <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Regulatory references</h2>
               {(v.regulatory_references?.length ?? 0) > 0 ? (
                 <ul className="divide-y divide-gray-100">
@@ -953,7 +953,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             id="variant-tab-governance"
             role="tabpanel"
             aria-labelledby="variant-tab-governance-btn"
-            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Governance & Version</h2>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
@@ -964,7 +964,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               <div><dt className="text-gray-500">Review Cycle</dt><dd className="font-medium text-gray-900 mt-0.5">{v.review_cycle ?? '—'}</dd></div>
             </dl>
             {v.executable_metric_id && (
-              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                 <h3 className="text-xs font-bold text-amber-800 uppercase mb-1">Run in Engine</h3>
                 <p className="text-sm text-amber-700 mb-3">
                   This variant is linked to metric <code className="font-mono bg-amber-100/50 px-1 rounded">{v.executable_metric_id}</code>. Use the Metrics Engine to edit the formula and run calculations.

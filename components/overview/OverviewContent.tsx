@@ -32,23 +32,23 @@ export default function OverviewContent() {
               </Link>
               <Link
                 href="/agent"
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4" aria-hidden />
                 Ask the data model
               </Link>
               <Link
                 href="/guide"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
-                <BookOpen className="w-4 h-4" />
+                <BookOpen className="w-4 h-4" aria-hidden />
                 Team Playbook
               </Link>
               <Link
                 href="/visualizer"
-                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
-                <Network className="w-4 h-4" />
+                <Network className="w-4 h-4" aria-hidden />
                 Interactive Visualizer
               </Link>
             </div>
@@ -210,10 +210,11 @@ export default function OverviewContent() {
             how different parts of the model work together.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <button
+              type="button"
               onClick={() => setActiveWalkthrough('facility-summary')}
-              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
+              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
@@ -229,15 +230,15 @@ export default function OverviewContent() {
                 including calculations for EAD, expected loss, and coverage ratios.
               </p>
               <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
-                <Play className="w-4 h-4" />
+                <Play className="w-4 h-4" aria-hidden />
                 <span>Start Walkthrough</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" aria-hidden />
               </div>
-            </div>
+            </button>
 
             <Link
               href="/metrics"
-              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
+              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
@@ -252,9 +253,9 @@ export default function OverviewContent() {
                 See all metrics, walk through how each is calculated, edit formulas and source fields, create new metrics, and visualize lineage. Export and import via Excel or JSON.
               </p>
               <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
-                <Play className="w-4 h-4" />
+                <Play className="w-4 h-4" aria-hidden />
                 <span>Open Metrics Engine</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4" aria-hidden />
               </div>
             </Link>
 
@@ -304,7 +305,7 @@ export default function OverviewContent() {
           <div className="grid md:grid-cols-1 gap-4 max-w-md mx-auto">
             <Link
               href="/visualizer"
-              className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               <Network className="w-8 h-8 mx-auto mb-3 text-slate-300" />
               <h4 className="font-semibold mb-2 text-white">Interactive Visualizer</h4>

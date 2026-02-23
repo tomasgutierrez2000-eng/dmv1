@@ -64,7 +64,7 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br bg-pwc-black text-pwc-white flex items-center justify-center px-6">
       <div className="max-w-md w-full">
-        <div className="w-16 h-16 rounded-2xl bg-pwc-gray border border-pwc-gray-light flex items-center justify-center mx-auto mb-6">
+        <div className="w-16 h-16 rounded-xl bg-pwc-gray border border-pwc-gray-light flex items-center justify-center mx-auto mb-6">
           <FileUp className="w-8 h-8 text-pwc-gray-light" />
         </div>
         <h1 className="text-2xl font-bold mb-2 text-center">Upload Excel</h1>

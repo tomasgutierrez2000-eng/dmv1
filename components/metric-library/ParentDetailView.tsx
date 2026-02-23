@@ -113,8 +113,12 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
               <h1 className="text-2xl font-bold text-gray-900">{m.metric_name}</h1>
               <TypeBadge type={m.metric_class} />
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-                  m.direction === 'HIGHER_BETTER' ? 'bg-green-100 text-green-700' : m.direction === 'LOWER_BETTER' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  m.direction === 'HIGHER_BETTER'
+                    ? 'bg-green-50 text-green-600'
+                    : m.direction === 'LOWER_BETTER'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'bg-gray-50 text-gray-500'
                 }`}
               >
                 {m.direction === 'HIGHER_BETTER' ? '↑ Higher Better' : m.direction === 'LOWER_BETTER' ? '↓ Lower Better' : 'Neutral'}
@@ -132,19 +136,19 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
             <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Generic Formula</div>
             <div className="font-mono text-sm text-gray-900 break-words">{m.generic_formula}</div>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
             <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Unit</div>
             <div className="text-lg font-bold text-gray-900">{m.unit_type}</div>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
             <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Rollup Philosophy</div>
             <div className="text-sm text-gray-700">{(m.rollup_philosophy ?? m.rollup_description ?? '').split('.')[0] || '—'}</div>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
             <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Risk Appetite</div>
             <div className={`text-sm font-bold ${m.risk_appetite_relevant ? 'text-green-600' : 'text-gray-400'}`}>
               {m.risk_appetite_relevant ? 'Yes — Linked' : 'No'}
@@ -155,7 +159,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
         <div
           role="tablist"
           aria-label="Parent metric sections"
-          className="flex gap-1 border-b border-gray-200 mb-4 -mb-px"
+          className="flex gap-1 border-b border-gray-200 mb-6"
         >
           {TABS.map((t) => (
             <button
@@ -190,7 +194,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                 <Link
                   key={v.variant_id}
                   href={`/metrics/library/${encodeURIComponent(parentId)}/${encodeURIComponent(v.variant_id)}`}
-                  className="bg-white rounded-2xl border border-gray-200 p-4 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
+                  className="group bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -216,13 +220,16 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                         )}
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" aria-hidden />
+                    <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-500" aria-hidden />
                   </div>
                 </Link>
               ))
             ) : (
-              <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center text-gray-500 shadow-sm">
-                No variants yet.
+              <div className="bg-white rounded-lg border border-gray-200 p-8 text-center shadow-sm">
+                <p className="text-gray-700 font-medium">No variants yet</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Create variants by importing an Excel file from the library page, or check back once the data team has added them.
+                </p>
               </div>
             )}
           </section>
@@ -233,7 +240,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
             id="parent-tab-rollup"
             role="tabpanel"
             aria-labelledby="parent-tab-rollup-btn"
-            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Rollup Philosophy</h2>
             <p className="text-sm text-gray-700">{m.rollup_description || m.rollup_philosophy || 'Not specified.'}</p>
@@ -253,7 +260,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                 return domain ? (
                   <div
                     key={dId}
-                    className="bg-white border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm transition-shadow hover:shadow-md"
+                    className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-2 shadow-sm transition-shadow hover:shadow-md"
                     style={{ borderLeftWidth: 4, borderLeftColor: domain.color }}
                   >
                     <DomainIcon iconKey={domain.icon} className="w-5 h-5 text-gray-600 flex-shrink-0" />

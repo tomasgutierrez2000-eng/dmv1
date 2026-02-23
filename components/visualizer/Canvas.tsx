@@ -23,7 +23,7 @@ export default function Canvas() {
   const DRAG_THRESHOLD_PX = 6;
   const MARQUEE_MIN_SIZE_PX = 10;
   const DOUBLE_CLICK_ZOOM_IN_DELAY_MS = 300;
-  const TRIPLE_CLICK_ZOOM_OUT = 0.15;
+  // Triple-click now uses fit-to-view (handled in handleCanvasClick)
   const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
   const isInteractingRef = useRef(false);
   const doubleClickZoomInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -239,9 +239,12 @@ export default function Canvas() {
     } else {
       setTablePositionsBulk(newPositions);
     }
-    // Do NOT auto fit-to-view on layout change. Zoom/fit only on: double-click empty, toolbar "Fit to view", or key "0".
+    // Fit camera to the new layout so content is always visible after layout changes.
+    // Deferred to next frame so positions are committed before fit reads them.
+    const id = requestAnimationFrame(() => setRequestFitToView());
+    return () => cancelAnimationFrame(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
-  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setTablePositionsReplace]);
+  }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setTablePositionsReplace, setRequestFitToView]);
 
   // Fit to visible tables when layout or full-view state change. Skipped when focus-compact
   // or when search/filter is active (delayed effect below handles those for one consistent fit).
@@ -800,7 +803,7 @@ export default function Canvas() {
   }, [setZoom, setPan]);
 
   // Double-click: zoom in toward the click point (keeps that point under the cursor).
-  // If user clicks again within DOUBLE_CLICK_ZOOM_IN_DELAY_MS (triple-click), zoom out to TRIPLE_CLICK_ZOOM_OUT (handled in handleCanvasClick).
+  // If user clicks again within DOUBLE_CLICK_ZOOM_IN_DELAY_MS (triple-click), fit-to-view all content (handled in handleCanvasClick).
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       if (!model || visibleTables.length === 0) return;
@@ -831,7 +834,7 @@ export default function Canvas() {
     [model, visibleTables.length, setPan, setZoom]
   );
 
-  // Single click on empty canvas: clear selections and exit focus mode. If a double-click zoom-in was pending, treat as triple-click and zoom out to 15%.
+  // Single click on empty canvas: clear selections and exit focus mode. If a double-click zoom-in was pending, treat as triple-click and fit-to-view all content.
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent) => {
       const target = e.target as Node | null;
@@ -847,8 +850,14 @@ export default function Canvas() {
         if (doubleClickZoomInTimeoutRef.current) {
           clearTimeout(doubleClickZoomInTimeoutRef.current);
           doubleClickZoomInTimeoutRef.current = null;
+          // Triple-click: fit-to-view (zoom out to show all content, centered)
           setIsAnimating(true);
-          setZoom(TRIPLE_CLICK_ZOOM_OUT);
+          const allPositions = visibleTables
+            .map((t) => useModelStore.getState().tablePositions[t.key])
+            .filter((p): p is TablePosition => !!p);
+          if (allPositions.length > 0) {
+            runFitToView(allPositions, visibleTables.length);
+          }
           setTimeout(() => setIsAnimating(false), 280);
         }
         setSelectedField(null);
@@ -858,7 +867,7 @@ export default function Canvas() {
         setFocusMode(false);
       }
     },
-    [setZoom, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode]
+    [visibleTables, runFitToView, setSelectedField, setSelectedTable, setSelectedRelationship, setSelectedSampleDataCell, setFocusMode]
   );
 
   // Keyboard shortcuts

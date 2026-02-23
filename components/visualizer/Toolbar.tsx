@@ -86,7 +86,9 @@ export default function Toolbar() {
     uploadedSampleData,
     setUploadedSampleDataBulk,
     zoom,
+    pan,
     setZoom,
+    setPan,
     resetView,
     setRequestFitToView,
     layoutMode,
@@ -114,6 +116,21 @@ export default function Toolbar() {
   const [sampleImportLayer, setSampleImportLayer] = useState<'L1' | 'L2'>('L1');
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+
+  /** Zoom toward the viewport center so content doesn't drift off-screen */
+  const zoomToCenter = (factor: number) => {
+    const vpW = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const vpH = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const cx = vpW / 2;
+    const cy = vpH / 2;
+    const newZoom = Math.max(0.05, Math.min(4, zoom * factor));
+    const zoomChange = newZoom / zoom;
+    setPan({
+      x: cx - (cx - pan.x) * zoomChange,
+      y: cy - (cy - pan.y) * zoomChange,
+    });
+    setZoom(newZoom);
+  };
 
   const handleExport = async (format: ExportFormat) => {
     setExportOpen(false);
@@ -299,7 +316,7 @@ export default function Toolbar() {
         <div className="flex items-center gap-1">
           {/* Zoom Controls */}
           <div className="flex items-center gap-0.5" role="group" aria-label="Zoom controls">
-            <ToolbarIconButton onClick={() => setZoom(zoom * 0.9)} label="Zoom out (-)">
+            <ToolbarIconButton onClick={() => zoomToCenter(0.9)} label="Zoom out (-)">
               <ZoomOut className="w-4 h-4" />
             </ToolbarIconButton>
             <div
@@ -309,7 +326,7 @@ export default function Toolbar() {
             >
               {Math.round(zoom * 100)}%
             </div>
-            <ToolbarIconButton onClick={() => setZoom(zoom * 1.1)} label="Zoom in (+)">
+            <ToolbarIconButton onClick={() => zoomToCenter(1.1)} label="Zoom in (+)">
               <ZoomIn className="w-4 h-4" />
             </ToolbarIconButton>
             <ToolbarIconButton onClick={resetView} label="Reset zoom">

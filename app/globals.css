@@ -97,4 +97,13 @@ body.dashboard-active .text-gray-600 {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 #f1f5f9;
   }
+
+  /* Hide scrollbar but keep scroll functional (tabs, horizontal nav) */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

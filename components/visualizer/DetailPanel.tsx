@@ -70,6 +70,7 @@ export default function DetailPanel() {
     setSelectedRelationship,
     setSelectedField,
     setSelectedSampleDataCell,
+    clearSelection,
     uploadedSampleData,
   } = useModelStore();
 
@@ -236,13 +237,7 @@ export default function DetailPanel() {
         <h2 className="text-sm font-semibold text-gray-900 tracking-tight">Details</h2>
         <button
           ref={closeButtonRef}
-          onClick={() => {
-            setDetailPanelOpen(false);
-            setSelectedTable(null);
-            setSelectedRelationship(null);
-            setSelectedField(null);
-            setSelectedSampleDataCell(null);
-          }}
+          onClick={() => clearSelection()}
           className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
           aria-label="Close detail panel (Esc)"
         >

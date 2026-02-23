@@ -80,6 +80,8 @@ interface ModelStore {
   setShowPrimaryRelationships: (show: boolean) => void;
   setShowSecondaryRelationships: (show: boolean) => void;
   applyViewPreset: (preset: 'detailed' | 'compact') => void;
+  /** Clears all selections and focus mode in a single batch (no fit-to-view). */
+  clearSelection: () => void;
   resetView: () => void;
   requestFitToView: number;
   setRequestFitToView: () => void;
@@ -257,6 +259,15 @@ export const useModelStore = create<ModelStore>((set) => ({
         break;
     }
   },
+  clearSelection: () =>
+    set({
+      selectedTable: null,
+      selectedRelationship: null,
+      selectedField: null,
+      selectedSampleDataCell: null,
+      focusMode: false,
+      detailPanelOpen: false,
+    }),
   resetView: () =>
     set({
       selectedTable: null,

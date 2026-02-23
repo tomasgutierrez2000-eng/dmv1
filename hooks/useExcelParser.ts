@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { DataModel, TableDef, Field, Relationship } from '../types/model';
 import { mapColumnsForLayer, getDetectedColumns } from '../utils/columnMapper';
 import { parsePKFK, parseSourceTables } from '../utils/pkFkParser';
@@ -21,6 +21,8 @@ export function useExcelParser() {
     error: null,
     statistics: null,
   });
+  const mountedRef = useRef(true);
+  useEffect(() => { return () => { mountedRef.current = false; }; }, []);
 
   const parseExcel = useCallback(async (file: File) => {
     setLoading(true);
@@ -645,6 +647,7 @@ export function useExcelParser() {
         categories: categoriesSize,
       });
 
+      if (!mountedRef.current) return;
       setResult({
         model,
         error: errors.length > 0 ? errors.join('; ') : null,
@@ -656,19 +659,16 @@ export function useExcelParser() {
         },
       });
     } catch (error) {
-      console.error('❌ [DEBUG] Fatal error during parsing:', error);
-      console.error('❌ [DEBUG] Error type:', error instanceof Error ? error.constructor.name : typeof error);
-      console.error('❌ [DEBUG] Error message:', error instanceof Error ? error.message : String(error));
-      console.error('❌ [DEBUG] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      
+      console.error('[useExcelParser] Parse error:', error instanceof Error ? error.message : String(error));
+
+      if (!mountedRef.current) return;
       setResult({
         model: null,
         error: error instanceof Error ? error.message : 'Failed to parse Excel file',
         statistics: null,
       });
     } finally {
-      setLoading(false);
-      console.log('🔍 [DEBUG] Parsing finished, loading set to false');
+      if (mountedRef.current) setLoading(false);
     }
   }, []);
 

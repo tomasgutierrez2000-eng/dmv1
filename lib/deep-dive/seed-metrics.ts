@@ -33,12 +33,8 @@ function buildGroupedFormula(
   return out;
 }
 
-function mkMetric(metric: L3Metric): L3Metric {
-  return metric;
-}
-
 export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
-  mkMetric({
+  ({
     id: 'C100',
     name: 'Weighted Average Spread (%)',
     page: 'P4',
@@ -74,7 +70,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C101',
     name: 'DSCR (Debt Service Coverage Ratio)',
     page: 'P4',
@@ -102,7 +98,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C102',
     name: 'Outstanding Exposure ($)',
     page: 'P4',
@@ -126,7 +122,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C103',
     name: 'Utilized Exposure ($)',
     page: 'P4',
@@ -150,7 +146,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C104',
     name: 'LTV (Loan-to-Value %)',
     page: 'P4',
@@ -178,7 +174,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C105',
     name: 'Probability of Default (PD %)',
     page: 'P4',
@@ -208,7 +204,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C106',
     name: 'Loss Given Default (LGD %)',
     page: 'P4',
@@ -238,7 +234,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
-  mkMetric({
+  ({
     id: 'C107',
     name: 'Expected Loss ($)',
     page: 'P4',

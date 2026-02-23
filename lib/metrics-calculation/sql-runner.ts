@@ -75,28 +75,43 @@ function inferColumnType(colValues: unknown[]): string {
   return 'TEXT';
 }
 
+/** Module-level cache to avoid re-reading large JSON files on every metric run. */
+let _cachedL1: SampleDataByTable | null = null;
+let _cachedL2: SampleDataByTable | null = null;
+let _cacheTs = 0;
+const CACHE_TTL_MS = 60_000; // 1 minute
+
 function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; error?: string } {
   const data: SampleDataByTable = {};
-  const l1Exists = fs.existsSync(L1_PATH);
-  const l2Exists = fs.existsSync(L2_PATH);
+  const needsL1 = tableKeys.some((k) => k.startsWith('L1.'));
+  const needsL2 = tableKeys.some((k) => k.startsWith('L2.'));
+  const now = Date.now();
+  const cacheStale = now - _cacheTs > CACHE_TTL_MS;
 
-  if (!l1Exists && tableKeys.some((k) => k.startsWith('L1.'))) {
-    return { data: {}, error: 'L1 sample data not found. Run: npx tsx scripts/l1/generate.ts' };
-  }
-  if (!l2Exists && tableKeys.some((k) => k.startsWith('L2.'))) {
-    return { data: {}, error: 'L2 sample data not found. Run: npx tsx scripts/l2/generate.ts' };
-  }
-
-  let l1: SampleDataByTable = {};
-  let l2: SampleDataByTable = {};
   try {
-    if (l1Exists) l1 = JSON.parse(fs.readFileSync(L1_PATH, 'utf-8')) as SampleDataByTable;
-    if (l2Exists) l2 = JSON.parse(fs.readFileSync(L2_PATH, 'utf-8')) as SampleDataByTable;
+    if (needsL1) {
+      if (!_cachedL1 || cacheStale) {
+        if (!fs.existsSync(L1_PATH)) {
+          return { data: {}, error: 'L1 sample data not found. Run: npx tsx scripts/l1/generate.ts' };
+        }
+        _cachedL1 = JSON.parse(fs.readFileSync(L1_PATH, 'utf-8')) as SampleDataByTable;
+        _cacheTs = now;
+      }
+    }
+    if (needsL2) {
+      if (!_cachedL2 || cacheStale) {
+        if (!fs.existsSync(L2_PATH)) {
+          return { data: {}, error: 'L2 sample data not found. Run: npx tsx scripts/l2/generate.ts' };
+        }
+        _cachedL2 = JSON.parse(fs.readFileSync(L2_PATH, 'utf-8')) as SampleDataByTable;
+        _cacheTs = now;
+      }
+    }
   } catch {
     return { data: {}, error: 'Failed to read sample data files' };
   }
 
-  const all = { ...l1, ...l2 };
+  const all = { ...(_cachedL1 ?? {}), ...(_cachedL2 ?? {}) };
   for (const key of tableKeys) {
     const entry = all[key];
     if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {

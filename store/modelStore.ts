@@ -52,7 +52,6 @@ interface ModelStore {
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
   setTablePosition: (tableKey: string, position: TablePosition) => void;
-  setTablePositions: (tableKey: string, position: TablePosition) => void;
   setTablePositionsBulk: (positions: Record<string, TablePosition>) => void;
   setTablePositionsReplace: (positions: Record<string, TablePosition>) => void;
   setSelectedTable: (tableKey: string | null) => void;
@@ -137,10 +136,6 @@ export const useModelStore = create<ModelStore>((set) => ({
   setZoom: (zoom) => set({ zoom: Math.max(0.05, Math.min(4, zoom)) }),
   setPan: (pan) => set({ pan }),
   setTablePosition: (tableKey, position) =>
-    set((state) => ({
-      tablePositions: { ...state.tablePositions, [tableKey]: position },
-    })),
-  setTablePositions: (tableKey, position) =>
     set((state) => ({
       tablePositions: { ...state.tablePositions, [tableKey]: position },
     })),

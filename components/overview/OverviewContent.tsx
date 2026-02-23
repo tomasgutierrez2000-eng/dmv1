@@ -302,14 +302,30 @@ export default function OverviewContent() {
         {/* Quick Actions */}
         <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-8">
           <h3 className="text-xl font-semibold mb-6 text-center text-white">Quick Actions</h3>
-          <div className="grid md:grid-cols-1 gap-4 max-w-md mx-auto">
+          <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <Link
               href="/visualizer"
               className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
               <Network className="w-8 h-8 mx-auto mb-3 text-slate-300" />
               <h4 className="font-semibold mb-2 text-white">Interactive Visualizer</h4>
-              <p className="text-sm text-slate-400">Explore the full bank data model with interactive ERD and L1 sample data</p>
+              <p className="text-sm text-slate-400">Explore the full data model with interactive ERD and sample data</p>
+            </Link>
+            <Link
+              href="/metrics/library"
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"
+            >
+              <BarChart3 className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+              <h4 className="font-semibold mb-2 text-white">Metric Library</h4>
+              <p className="text-sm text-slate-400">Browse all metrics with lineage, formulas, and variant governance</p>
+            </Link>
+            <Link
+              href="/guide"
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"
+            >
+              <BookOpen className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+              <h4 className="font-semibold mb-2 text-white">Team Playbook</h4>
+              <p className="text-sm text-slate-400">Architecture guide, recipes, and glossary for the team</p>
             </Link>
           </div>
         </div>

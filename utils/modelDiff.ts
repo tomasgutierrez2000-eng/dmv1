@@ -28,12 +28,12 @@ function fieldSignature(f: { name: string; dataType?: string; description?: stri
 export function computeModelDiff(current: DataModel | null, imported: DataModel): ModelDiff {
   const tablesAdded: string[] = [];
   const tablesRemoved: string[] = [];
-  const tablesModified: string[] = [];
   const fieldsAdded: Array<{ tableKey: string; fieldName: string }> = [];
   const fieldsRemoved: Array<{ tableKey: string; fieldName: string }> = [];
   const fieldsModified: Array<{ tableKey: string; fieldName: string }> = [];
   const relationshipsAdded: string[] = [];
   const relationshipsRemoved: string[] = [];
+  const modifiedTableKeys = new Set<string>();
 
   const currentTables = current?.tables ?? {};
   const currentRels = new Set((current?.relationships ?? []).map((r) => r.id));
@@ -41,23 +41,28 @@ export function computeModelDiff(current: DataModel | null, imported: DataModel)
   const currentTableKeys = new Set(Object.keys(currentTables));
 
   for (const key of importedTableKeys) {
-    if (!currentTableKeys.has(key)) tablesAdded.push(key);
-    else {
+    if (!currentTableKeys.has(key)) {
+      tablesAdded.push(key);
+    } else {
       const curr = currentTables[key];
       const imp = imported.tables[key];
       const currSigs = new Set(curr.fields.map(fieldSignature));
-      const impSigs = new Set(imp.fields.map(fieldSignature));
       const currNames = new Set(curr.fields.map((f) => f.name));
       const impNames = new Set(imp.fields.map((f) => f.name));
       for (const f of imp.fields) {
-        if (!currNames.has(f.name)) fieldsAdded.push({ tableKey: key, fieldName: f.name });
-        else if (!currSigs.has(fieldSignature(f))) fieldsModified.push({ tableKey: key, fieldName: f.name });
+        if (!currNames.has(f.name)) {
+          fieldsAdded.push({ tableKey: key, fieldName: f.name });
+          modifiedTableKeys.add(key);
+        } else if (!currSigs.has(fieldSignature(f))) {
+          fieldsModified.push({ tableKey: key, fieldName: f.name });
+          modifiedTableKeys.add(key);
+        }
       }
       for (const f of curr.fields) {
-        if (!impNames.has(f.name)) fieldsRemoved.push({ tableKey: key, fieldName: f.name });
-      }
-      if (fieldsAdded.some((x) => x.tableKey === key) || fieldsRemoved.some((x) => x.tableKey === key) || fieldsModified.some((x) => x.tableKey === key)) {
-        tablesModified.push(key);
+        if (!impNames.has(f.name)) {
+          fieldsRemoved.push({ tableKey: key, fieldName: f.name });
+          modifiedTableKeys.add(key);
+        }
       }
     }
   }
@@ -73,10 +78,12 @@ export function computeModelDiff(current: DataModel | null, imported: DataModel)
     if (!importedRels.has(id)) relationshipsRemoved.push(id);
   }
 
+  const tablesModified = [...modifiedTableKeys];
+
   return {
     tablesAdded,
     tablesRemoved,
-    tablesModified: [...new Set(tablesModified)],
+    tablesModified,
     fieldsAdded,
     fieldsRemoved,
     fieldsModified,

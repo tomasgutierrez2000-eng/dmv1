@@ -185,6 +185,12 @@ export async function POST(request: NextRequest) {
           const uniIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.category);
           const tableNameIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.tableName, true);
           const dataElementIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.dataElement, true);
+
+          // Guard: if required columns were not found, skip this sheet
+          if (tableNameIdx < 0 || dataElementIdx < 0) {
+            errors.push(`L1 sheet missing required columns (tableName: ${tableNameIdx}, dataElement: ${dataElementIdx})`);
+            throw new Error('skip');
+          }
           const descriptionIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.description);
           const whyRequiredIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.whyRequired);
           const pkFkIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L1.pkFk);
@@ -277,6 +283,12 @@ export async function POST(request: NextRequest) {
           const categoryIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.category);
           const tableNameIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.tableName, true);
           const dataElementIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.dataElement, true);
+
+          if (tableNameIdx < 0 || dataElementIdx < 0) {
+            errors.push(`L2 sheet missing required columns (tableName: ${tableNameIdx}, dataElement: ${dataElementIdx})`);
+            throw new Error('skip');
+          }
+
           const descriptionIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.description);
           const whyRequiredIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.whyRequired);
           const pkFkIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L2.pkFk);
@@ -368,6 +380,12 @@ export async function POST(request: NextRequest) {
           const categoryIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L3.category);
           const tableNameIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L3.tableName, true);
           const fieldIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L3.field, true);
+
+          if (tableNameIdx < 0 || fieldIdx < 0) {
+            errors.push(`L3 sheet missing required columns (tableName: ${tableNameIdx}, field: ${fieldIdx})`);
+            throw new Error('skip');
+          }
+
           const dataTypeIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L3.dataType);
           const formulaIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L3.formula);
           const sourceTablesIdx = findColumnIndex(headers, EXCEL_TEMPLATE_COLUMN_MAPPING.L3.sourceTables);

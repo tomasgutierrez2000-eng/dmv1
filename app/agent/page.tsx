@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Send, Loader2, MessageCircle, Wrench, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, MessageCircle, Wrench, CheckCircle, XCircle, AlertTriangle, Lock } from 'lucide-react';
 
 const SUGGESTIONS = [
   'What tables are in L2?',
@@ -36,6 +36,8 @@ type Message = {
   partial?: boolean;
 };
 
+const SESSION_KEY = 'agent-password';
+
 export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -43,15 +45,28 @@ export default function AgentPage() {
   const [error, setError] = useState<string | null>(null);
   const [envOk, setEnvOk] = useState<boolean | null>(null);
   const [provider, setProvider] = useState<'claude' | 'gemini' | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [passwordRequired, setPasswordRequired] = useState<boolean | null>(null);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Restore password from sessionStorage and check if password is required
   useEffect(() => {
     fetch('/api/agent/env-check')
       .then((r) => r.json())
       .then((d) => {
         setEnvOk(d.ok === true);
         setProvider(d.provider ?? null);
+        const needsPassword = d.passwordRequired === true;
+        setPasswordRequired(needsPassword);
+        if (!needsPassword) {
+          setUnlocked(true);
+        } else {
+          const saved = sessionStorage.getItem(SESSION_KEY);
+          if (saved) setUnlocked(true);
+        }
       })
       .catch(() => setEnvOk(false));
   }, []);
@@ -80,10 +95,11 @@ export default function AgentPage() {
       const timeoutId = setTimeout(() => controller.abort(), CLIENT_TIMEOUT_MS);
       let res: Response;
       try {
+        const savedPassword = sessionStorage.getItem(SESSION_KEY);
         res = await fetch('/api/agent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history }),
+          body: JSON.stringify({ messages: history, ...(savedPassword && { password: savedPassword }) }),
           signal: controller.signal,
         });
       } finally {
@@ -94,6 +110,14 @@ export default function AgentPage() {
         data = (await res.json()) as AgentApiResponse | AgentErrorResponse;
       } catch {
         setError('Server returned invalid JSON. Is the dev server running? Run: npm run dev');
+        setMessages((prev) => prev.slice(0, -1));
+        setLoading(false);
+        return;
+      }
+      if (res.status === 401) {
+        sessionStorage.removeItem(SESSION_KEY);
+        setUnlocked(false);
+        setPasswordError('Invalid password. Please try again.');
         setMessages((prev) => prev.slice(0, -1));
         setLoading(false);
         return;
@@ -155,8 +179,54 @@ export default function AgentPage() {
         </div>
       </header>
 
+      {/* Password gate */}
+      {!unlocked && passwordRequired && (
+        <main className="flex-1 flex items-center justify-center px-4">
+          <div className="w-full max-w-sm">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-pwc-gray border border-pwc-gray-light mb-4">
+                <Lock className="w-7 h-7 text-pwc-gray-light" />
+              </div>
+              <p className="text-pwc-gray-light text-sm">Enter the password to use the agent.</p>
+            </div>
+            {passwordError && (
+              <div className="rounded-xl px-4 py-2 bg-red-950/50 border border-red-800 text-red-200 text-sm mb-4 text-center" role="alert">
+                {passwordError}
+              </div>
+            )}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const pw = passwordInput.trim();
+                if (!pw) return;
+                sessionStorage.setItem(SESSION_KEY, pw);
+                setPasswordError(null);
+                setUnlocked(true);
+              }}
+              className="flex flex-col gap-3"
+            >
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="Password"
+                autoFocus
+                className="w-full min-h-[44px] px-4 py-3 rounded-xl bg-pwc-gray border border-pwc-gray-light text-pwc-white placeholder-pwc-gray-light text-sm focus:outline-none focus:ring-2 focus:ring-pwc-orange focus:border-transparent"
+              />
+              <button
+                type="submit"
+                disabled={!passwordInput.trim()}
+                className="min-h-[44px] px-5 rounded-xl bg-pwc-orange hover:bg-pwc-orange-light disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-pwc-orange focus:ring-offset-2 focus:ring-offset-pwc-gray"
+              >
+                Unlock
+              </button>
+            </form>
+          </div>
+        </main>
+      )}
+
       {/* Messages - role="log" so assistive tech announces new messages */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden" role="log" aria-live="polite" aria-label="Chat messages">
+      {unlocked && <main className="flex-1 overflow-y-auto overflow-x-hidden" role="log" aria-live="polite" aria-label="Chat messages">
         <div className="max-w-3xl mx-auto px-4 py-6">
           {envOk === false && (
             <div className="rounded-xl px-4 py-3 bg-amber-950/50 border border-amber-700 text-amber-200 text-sm mb-6 flex flex-col gap-2" role="alert">
@@ -263,10 +333,10 @@ export default function AgentPage() {
 
           <div ref={bottomRef} />
         </div>
-      </main>
+      </main>}
 
       {/* Input */}
-      <footer className="border-t border-pwc-gray bg-pwc-gray/20 backdrop-blur-sm shrink-0">
+      {unlocked && <footer className="border-t border-pwc-gray bg-pwc-gray/20 backdrop-blur-sm shrink-0">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <form onSubmit={handleSubmit} className="flex gap-3" aria-label="Send a message">
             <textarea
@@ -302,7 +372,7 @@ export default function AgentPage() {
             </button>
           </form>
         </div>
-      </footer>
+      </footer>}
     </div>
   );
 }

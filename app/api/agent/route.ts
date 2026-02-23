@@ -161,6 +161,7 @@ async function runClaudeAgent(params: {
 interface AgentRequestBody {
   message?: string;
   messages?: Array<{ role: 'user' | 'model'; content: string }>;
+  password?: string;
 }
 
 /**
@@ -190,6 +191,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Invalid JSON body' },
       { status: 400 }
+    );
+  }
+
+  // Password gate: if AGENT_PASSWORD is set, require it in the request body.
+  const requiredPassword = getEnvVar('AGENT_PASSWORD');
+  if (requiredPassword && body.password !== requiredPassword) {
+    return NextResponse.json(
+      { error: 'Unauthorized', details: 'Invalid or missing password.' },
+      { status: 401 }
     );
   }
 

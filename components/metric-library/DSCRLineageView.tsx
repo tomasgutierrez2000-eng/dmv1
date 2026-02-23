@@ -23,6 +23,11 @@ import {
   Info,
   Layers,
   Link2,
+  AlertTriangle,
+  Scale,
+  Building2,
+  TrendingUp,
+  BarChart3,
 } from 'lucide-react';
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -143,11 +148,51 @@ const CI: VariantData = {
 };
 
 const ROLLUP_LEVELS = [
-  { key: 'facility', label: 'Facility', icon: Table2, desc: 'Raw calculated value', tier: 'T2' },
-  { key: 'counterparty', label: 'Counterparty', icon: Users, desc: 'Wtd avg by EAD across facilities', tier: 'T3' },
-  { key: 'desk', label: 'Desk', icon: Briefcase, desc: 'Wtd avg by EAD across counterparties', tier: 'T3' },
-  { key: 'portfolio', label: 'Portfolio', icon: FolderTree, desc: 'Wtd avg by EAD across desks', tier: 'T3' },
-  { key: 'lob', label: 'Line of Business', icon: PieChart, desc: 'Wtd avg by EAD across portfolios', tier: 'T3' },
+  {
+    key: 'facility',
+    label: 'Facility',
+    icon: Table2,
+    desc: 'Direct Calculation — raw formula applied to one borrower',
+    method: 'Direct Calculation',
+    purpose: 'Covenant compliance, underwriting',
+    tier: 'T2',
+  },
+  {
+    key: 'counterparty',
+    label: 'Counterparty',
+    icon: Users,
+    desc: 'Pooled Ratio — sum cash flows / sum debt service across facilities',
+    method: 'Pooled Ratio',
+    purpose: 'Obligor-level credit assessment',
+    tier: 'T3',
+  },
+  {
+    key: 'desk',
+    label: 'Desk',
+    icon: Briefcase,
+    desc: 'Product-Segmented Pooled Ratio — pool within product type, report side-by-side',
+    method: 'Product-Segmented Pooled Ratio',
+    purpose: 'Book quality monitoring',
+    tier: 'T3',
+  },
+  {
+    key: 'portfolio',
+    label: 'Portfolio',
+    icon: FolderTree,
+    desc: 'Exposure-Weighted Average + Distribution buckets',
+    method: 'Exposure-Weighted Average + Distribution',
+    purpose: 'Portfolio health trending',
+    tier: 'T3',
+  },
+  {
+    key: 'lob',
+    label: 'Line of Business',
+    icon: PieChart,
+    desc: 'Exposure-Weighted Average — directional early warning only',
+    method: 'Exposure-Weighted Average',
+    purpose: 'Directional early warning',
+    tier: 'T3',
+  },
 ] as const;
 
 /** L2 fields in facility_financial_snapshot — which variant uses which */
@@ -663,6 +708,71 @@ function TransformCard({ v }: { v: VariantData }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
+ * PLAIN ENGLISH HELPER
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function PlainEnglish({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-1.5 mt-1.5">
+      <span className="text-[9px] font-bold text-gray-600 bg-white/5 px-1.5 py-0.5 rounded flex-shrink-0">
+        Plain English
+      </span>
+      <span className="text-[10px] text-gray-500 italic leading-relaxed">{children}</span>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * FOUNDATIONAL RULE CALLOUT
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function FoundationalRule() {
+  return (
+    <div className="rounded-xl border border-red-500/30 bg-red-500/[0.06] p-4 mb-5">
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <Scale className="w-4 h-4 text-red-400" aria-hidden="true" />
+        </div>
+        <div>
+          <div className="text-xs font-bold text-red-300 mb-1.5">
+            Foundational Rule: Never Average Pre-Computed Ratios
+          </div>
+          <p className="text-xs text-gray-300 leading-relaxed">
+            At every level above the facility, DSCR must be <strong className="text-white">re-derived</strong> by
+            summing the Cash Flow Available for Debt Service (numerator) independently from Total Debt Service
+            (denominator) and dividing only at the level being displayed. You never take facility DSCRs and
+            average them.
+          </p>
+          <div className="mt-2 bg-black/30 rounded-lg p-3">
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex-1 text-center">
+                <div className="text-red-400 font-mono line-through mb-1 opacity-70">
+                  avg(DSCR<sub>1</sub>, DSCR<sub>2</sub>, ... DSCR<sub>n</sub>)
+                </div>
+                <div className="text-[9px] text-red-400/60">Wrong</div>
+              </div>
+              <div className="text-gray-600 text-lg">vs.</div>
+              <div className="flex-1 text-center">
+                <div className="text-emerald-400 font-mono mb-1">
+                  {'Σ'} Cash Flow / {'Σ'} Debt Service
+                </div>
+                <div className="text-[9px] text-emerald-400/60">Correct</div>
+              </div>
+            </div>
+          </div>
+          <PlainEnglish>
+            Think of it like calculating a school&apos;s GPA: you don&apos;t average GPAs from each classroom.
+            You add up all grade points and all credit hours from every student, then divide once.
+            Rating agencies like S&P calculate pooled DSCR across mortgage portfolios the same way &mdash;
+            aggregate NOI divided by aggregate debt service, not an average of individual property DSCRs.
+          </PlainEnglish>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
  * STEP 5 — ROLLUP PYRAMID
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -676,7 +786,6 @@ function RollupPyramid({
   return (
     <div className="space-y-2">
       {ROLLUP_LEVELS.map((level, i) => {
-        const isFirst = i === 0;
         const expanded = expandedLevel === level.key;
         const Icon = level.icon;
         return (
@@ -697,8 +806,13 @@ function RollupPyramid({
                   <Icon className={`w-4 h-4 ${expanded ? 'text-emerald-400' : 'text-gray-500'}`} aria-hidden="true" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-white">{level.label}</div>
-                  <div className="text-[10px] text-gray-500">{level.desc}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-white">{level.label}</span>
+                    <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-gray-800">
+                      {level.method}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-gray-500">{level.purpose}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -712,9 +826,8 @@ function RollupPyramid({
             </div>
 
             {expanded && (
-              <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
-                <RollupDetail variant="CRE" isFirst={isFirst} levelIndex={i} />
-                <RollupDetail variant="CI" isFirst={isFirst} levelIndex={i} />
+              <div className="mt-3 pt-3 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+                <LevelDetail levelKey={level.key} />
               </div>
             )}
           </button>
@@ -724,29 +837,360 @@ function RollupPyramid({
   );
 }
 
-function RollupDetail({ variant, isFirst, levelIndex }: { variant: 'CRE' | 'CI'; isFirst: boolean; levelIndex: number }) {
-  const isCRE = variant === 'CRE';
-  const borderColor = isCRE ? 'border-blue-500/20' : 'border-purple-500/20';
-  const bgColor = isCRE ? 'bg-blue-500/10' : 'bg-purple-500/10';
-  const textColor = isCRE ? 'text-blue-300' : 'text-purple-300';
-  const label = isCRE ? 'CRE DSCR' : 'C&I DSCR';
-  const result = isCRE ? '1.32x' : '4.09x';
+/* ────────────────────────────────────────────────────────────────────────────
+ * LEVEL-SPECIFIC DETAIL PANELS
+ * ──────────────────────────────────────────────────────────────────────────── */
 
+function LevelDetail({ levelKey }: { levelKey: string }) {
+  switch (levelKey) {
+    case 'facility':
+      return <FacilityDetail />;
+    case 'counterparty':
+      return <CounterpartyDetail />;
+    case 'desk':
+      return <DeskDetail />;
+    case 'portfolio':
+      return <PortfolioDetail />;
+    case 'lob':
+      return <LoBDetail />;
+    default:
+      return null;
+  }
+}
+
+/* ── FACILITY ── */
+function FacilityDetail() {
   return (
-    <div className={`rounded-lg ${bgColor} border ${borderColor} p-2.5`}>
-      <div className={`text-[10px] font-bold ${textColor} mb-1`}>{label}</div>
-      {isFirst ? (
-        <div className="text-xs text-gray-300">
-          <span className={`font-mono ${textColor}`}>{result}</span> — direct from calculation
+    <div className="space-y-3">
+      {/* Formula */}
+      <div className="bg-black/30 rounded-lg p-3">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Formula (Applied Directly)</div>
+        <div className="text-sm font-mono text-emerald-400 text-center">
+          DSCR = Cash Flow Available for Debt Service / Total Debt Service
         </div>
-      ) : (
-        <div className="text-xs text-gray-300">
-          <span className={`font-mono ${textColor}`}>{'Σ'}(DSCR {'×'} EAD) / {'Σ'}(EAD)</span>
-          <div className="mt-1 text-[10px] text-gray-500">
-            Exposure-weighted average across {levelIndex === 1 ? 'facilities' : ROLLUP_LEVELS[levelIndex - 1].label.toLowerCase() + 's'}
+        <PlainEnglish>
+          How much income does this one borrower generate, versus how much they owe in loan payments?
+          A DSCR of 1.5x means they earn $1.50 for every $1.00 of debt payments.
+        </PlainEnglish>
+      </div>
+
+      {/* Variant-specific numerators */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-2.5">
+          <div className="text-[10px] font-bold text-blue-300 mb-1">CRE</div>
+          <div className="text-xs text-gray-300">Numerator = <strong className="text-blue-300">NOI</strong> (Net Operating Income from property)</div>
+        </div>
+        <div className="rounded-lg bg-purple-500/10 border border-purple-500/20 p-2.5">
+          <div className="text-[10px] font-bold text-purple-300 mb-1">C&I / Corporate</div>
+          <div className="text-xs text-gray-300">Numerator = <strong className="text-purple-300">EBITDA</strong> (with institution-defined adjustments)</div>
+        </div>
+        <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5">
+          <div className="text-[10px] font-bold text-amber-300 mb-1">Project Finance</div>
+          <div className="text-xs text-gray-300">Numerator = <strong className="text-amber-300">Distributable Cash Flow</strong></div>
+        </div>
+      </div>
+
+      {/* Governance notes */}
+      <div className="space-y-1.5">
+        <div className="flex items-start gap-2 text-xs text-gray-400">
+          <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-gray-600" aria-hidden="true" />
+          <span><strong className="text-gray-300">Temporal lag:</strong> Financial data is quarterly or annual. DSCR at any point reflects the most recent financial spread, not a real-time value.</span>
+        </div>
+        <div className="flex items-start gap-2 text-xs text-gray-400">
+          <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-gray-600" aria-hidden="true" />
+          <span><strong className="text-gray-300">Covenant vs. monitoring DSCR:</strong> These may already diverge at facility level if the credit agreement definition differs from the institution&apos;s credit policy definition.</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── COUNTERPARTY ── */
+function CounterpartyDetail() {
+  return (
+    <div className="space-y-3">
+      <div className="text-xs text-gray-400 leading-relaxed">
+        This is the first aggregation point and where most GSIB implementation errors originate.
+        A single counterparty may have multiple facilities &mdash; the critical question is whether those
+        facilities share the same borrower cash flow or have independent cash flow bases.
+      </div>
+
+      {/* Two scenarios */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Scenario A */}
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/[0.04] p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Building2 className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+            <span className="text-xs font-bold text-emerald-300">Scenario A: Single Obligor, Multiple Facilities</span>
+          </div>
+          <div className="text-[10px] text-gray-500 mb-2">Most common in corporate lending (e.g., revolver + term loan)</div>
+          <div className="bg-black/30 rounded-lg p-2.5 mb-2">
+            <div className="text-xs font-mono text-emerald-400 text-center">
+              Borrower EBITDA / (DS<sub>facility1</sub> + DS<sub>facility2</sub> + ...)
+            </div>
+          </div>
+          <PlainEnglish>
+            One company&apos;s income covers all its loans. You use the same income number in the numerator
+            and add up all loan payments in the denominator.
+          </PlainEnglish>
+        </div>
+
+        {/* Scenario B */}
+        <div className="rounded-lg border border-blue-500/20 bg-blue-500/[0.04] p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Building2 className="w-4 h-4 text-blue-400" aria-hidden="true" />
+            <span className="text-xs font-bold text-blue-300">Scenario B: Multiple Independent Cash Flows</span>
+          </div>
+          <div className="text-[10px] text-gray-500 mb-2">Common in CRE and project finance (e.g., multiple properties)</div>
+          <div className="bg-black/30 rounded-lg p-2.5 mb-2">
+            <div className="text-xs font-mono text-blue-400 text-center">
+              {'Σ'} Property NOIs / {'Σ'} Property Debt Service
+            </div>
+          </div>
+          <div className="text-[9px] text-blue-400/70 text-center mb-2">
+            &ldquo;Global DSCR&rdquo; &mdash; assesses total debt capacity across all assets
+          </div>
+          <PlainEnglish>
+            Add up all rental income from every property. Add up all the mortgage payments.
+            Then divide. Each property earns independently, so you pool them all.
+          </PlainEnglish>
+        </div>
+      </div>
+
+      {/* Role-based attribution */}
+      <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.04] p-3">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div>
+            <div className="text-xs font-bold text-amber-300 mb-1">Role-Based Attribution</div>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              When a facility has multiple counterparties (borrower, guarantor, co-obligor), DSCR cannot be
+              assigned at full value to each. The <strong className="text-gray-300">primary obligor carries the full facility DSCR</strong>.
+              Guarantors carry a pro-rata or exposure-weighted share depending on the guarantee structure.
+              This attribution must be resolved before rolling up to the desk level.
+            </p>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  );
+}
+
+/* ── DESK ── */
+function DeskDetail() {
+  return (
+    <div className="space-y-3">
+      <div className="text-xs text-gray-400 leading-relaxed">
+        At the desk level, DSCR transitions from a borrower-specific metric to a <strong className="text-gray-300">portfolio health
+        indicator</strong> for that book of business. The challenge is product heterogeneity &mdash; a desk may hold CRE loans
+        (NOI-based), corporate loans (EBITDA-based), and project finance (distributable cash flow). These numerators
+        were constructed differently, so they are not directly comparable.
+      </div>
+
+      {/* Two approaches */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Approach 1 — Preferred */}
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/[0.06] p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+            <span className="text-xs font-bold text-emerald-300">Product-Segmented DSCR</span>
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Preferred
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 leading-relaxed mb-2">
+            Report DSCR separately by product type. Don&apos;t pool across definitionally incompatible numerators.
+            This is what model risk and internal audit functions prefer.
+          </p>
+          <div className="bg-black/30 rounded-lg p-2.5">
+            <div className="text-xs font-mono text-gray-300 space-y-1">
+              <div><span className="text-blue-400">CRE DSCR:</span> {'Σ'} NOI / {'Σ'} DS <span className="text-gray-600">(CRE facilities only)</span></div>
+              <div><span className="text-purple-400">C&I DSCR:</span> {'Σ'} EBITDA / {'Σ'} DS <span className="text-gray-600">(C&I facilities only)</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Approach 2 — Alternative */}
+        <div className="rounded-lg border border-gray-700 bg-white/[0.02] p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400" aria-hidden="true" />
+            <span className="text-xs font-bold text-gray-300">Normalized DSCR</span>
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              Adds Model Risk
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 leading-relaxed mb-2">
+            Apply a single normalized cash flow definition across all facilities to enable pooling.
+            Requires a policy decision on which definition to use. The normalized value will deviate
+            from the covenant definition for some facilities.
+          </p>
+          <div className="bg-black/30 rounded-lg p-2.5">
+            <div className="text-xs font-mono text-gray-400">
+              {'Σ'} Normalized CF / {'Σ'} DS <span className="text-gray-600">(all facilities, one definition)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <PlainEnglish>
+        Comparing NOI-based DSCR and EBITDA-based DSCR is like comparing apples and oranges.
+        It&apos;s better to show separate scores per product type than to blend them into one number.
+        Most GSIBs use the segmented approach at the desk level and only blend at higher levels
+        where granularity is intentionally sacrificed for executive visibility.
+      </PlainEnglish>
+    </div>
+  );
+}
+
+/* ── PORTFOLIO ── */
+const DSCR_BUCKETS = [
+  { range: '< 1.0x', status: 'Critical', count: 3, exposure: 45, color: 'text-red-400', bg: 'bg-red-500/10' },
+  { range: '1.0 - 1.25x', status: 'Watch', count: 8, exposure: 180, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  { range: '1.25 - 1.5x', status: 'Adequate', count: 15, exposure: 420, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+  { range: '1.5 - 2.0x', status: 'Good', count: 22, exposure: 890, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  { range: '> 2.0x', status: 'Strong', count: 12, exposure: 650, color: 'text-emerald-300', bg: 'bg-emerald-500/10' },
+];
+
+function PortfolioDetail() {
+  const totalExposure = DSCR_BUCKETS.reduce((s, b) => s + b.exposure, 0);
+
+  return (
+    <div className="space-y-3">
+      {/* Formula */}
+      <div className="bg-black/30 rounded-lg p-3">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Exposure-Weighted Average</div>
+        <div className="text-sm font-mono text-emerald-400 text-center">
+          {'Σ'}(Counterparty DSCR {'×'} Counterparty Exposure) / {'Σ'}(Counterparty Exposure)
+        </div>
+        <PlainEnglish>
+          Bigger loans count more. A $100M borrower&apos;s DSCR matters more than a $1M borrower&apos;s.
+          This is a pragmatic compromise at the portfolio level because the pure pooled ratio becomes hard
+          to interpret when spanning dozens of industries, borrower types, and product definitions.
+        </PlainEnglish>
+      </div>
+
+      {/* DSCR Distribution Buckets */}
+      <div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+          <BarChart3 className="w-3 h-3" aria-hidden="true" />
+          DSCR Distribution Buckets (sample)
+        </div>
+        <div className="rounded-lg border border-gray-800 overflow-hidden">
+          <div className="grid grid-cols-5 text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-white/[0.03] px-3 py-1.5">
+            <div>Bucket</div>
+            <div>Status</div>
+            <div className="text-right">Count</div>
+            <div className="text-right">Exposure ($M)</div>
+            <div className="text-right">% of Total</div>
+          </div>
+          {DSCR_BUCKETS.map((b) => (
+            <div key={b.range} className={`grid grid-cols-5 text-xs px-3 py-1.5 border-t border-gray-800/50 ${b.bg}`}>
+              <div className={`font-mono font-bold ${b.color}`}>{b.range}</div>
+              <div className="text-gray-400">{b.status}</div>
+              <div className="text-right text-gray-300 font-mono">{b.count}</div>
+              <div className="text-right text-gray-300 font-mono">${b.exposure}M</div>
+              <div className="text-right text-gray-400 font-mono">{((b.exposure / totalExposure) * 100).toFixed(1)}%</div>
+            </div>
+          ))}
+        </div>
+        <PlainEnglish>
+          Sort all borrowers into health grades and show how much money sits in each grade.
+          This bucket breakdown should appear alongside the headline weighted average on the dashboard.
+        </PlainEnglish>
+      </div>
+
+      {/* Simpson's Paradox */}
+      <div className="rounded-lg border border-red-500/20 bg-red-500/[0.04] p-3">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div>
+            <div className="text-xs font-bold text-red-300 mb-1">Simpson&apos;s Paradox Warning</div>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              A portfolio with a healthy weighted average DSCR can still contain a significant sub-segment
+              with DSCR below 1.0x. High-quality borrowers with large exposure can mask concentrations
+              of weakness. <strong className="text-gray-300">This is exactly why the distribution buckets exist</strong> &mdash;
+              they reveal what the average hides.
+            </p>
+            <PlainEnglish>
+              A few large, healthy loans can make the whole portfolio look fine even if many smaller loans
+              are struggling. Always look at the buckets, not just the average.
+            </PlainEnglish>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── LOB ── */
+function LoBDetail() {
+  return (
+    <div className="space-y-3">
+      {/* Formula */}
+      <div className="bg-black/30 rounded-lg p-3">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Exposure-Weighted Average (same as Portfolio)</div>
+        <div className="text-sm font-mono text-emerald-400 text-center">
+          {'Σ'}(Counterparty DSCR {'×'} Exposure) / {'Σ'}(Exposure)
+        </div>
+        <PlainEnglish>
+          This is a health thermometer, not a speed limit. It tells you which direction
+          the Line of Business is moving &mdash; toward or away from covenant thresholds.
+        </PlainEnglish>
+      </div>
+
+      {/* Two governance complications */}
+      <div className="space-y-2">
+        {/* Definitional inconsistency */}
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.04] p-3">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div>
+              <div className="text-xs font-bold text-amber-300 mb-1">Definitional Inconsistency Across LoBs</div>
+              <p className="text-xs text-gray-400 leading-relaxed mb-2">
+                When a CRO asks for enterprise-wide DSCR across all LoBs, the metric is <strong className="text-gray-300">not
+                directly comparable</strong> across segments:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="rounded bg-blue-500/10 border border-blue-500/20 px-2.5 py-1.5 text-[10px]">
+                  <span className="text-blue-300 font-bold">CRE:</span>
+                  <span className="text-gray-400"> NOI-based DSCR</span>
+                </div>
+                <div className="rounded bg-purple-500/10 border border-purple-500/20 px-2.5 py-1.5 text-[10px]">
+                  <span className="text-purple-300 font-bold">Large Corporate:</span>
+                  <span className="text-gray-400"> EBITDA-based DSCR</span>
+                </div>
+                <div className="rounded bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 text-[10px]">
+                  <span className="text-amber-300 font-bold">Leveraged Finance:</span>
+                  <span className="text-gray-400"> Adjusted EBITDA with add-backs</span>
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-500 mt-2">
+                Most GSIBs report LoB-segmented DSCR values side by side, or add a disclaimer that LoB-level
+                DSCRs are computed on non-comparable bases.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Not a limit metric */}
+        <div className="rounded-lg border border-blue-500/20 bg-blue-500/[0.04] p-3">
+          <div className="flex items-start gap-2">
+            <TrendingUp className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div>
+              <div className="text-xs font-bold text-blue-300 mb-1">Monitoring Metric, Not a Limit Metric</div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                LoB-level limits are set on <strong className="text-gray-300">exposure, concentration, and capital</strong> &mdash; not
+                DSCR. At this level, DSCR is used to identify trend deterioration, benchmark against prior periods,
+                and flag whether overall borrower quality is improving or declining.
+              </p>
+              <p className="text-[10px] text-gray-500 mt-1.5">
+                On the dashboard, LoB DSCR should appear in the <strong className="text-gray-400">Risk Profile</strong> group as a trend
+                indicator, not in the Exposure Details group with a limit and breach status.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -951,13 +1395,21 @@ function FooterLegend() {
           </div>
         </div>
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Rollup Formula</div>
-          <div className="text-gray-400 font-mono text-[11px] leading-relaxed">
-            {'Σ'}(DSCR{'ᵢ'} {'×'} EAD{'ᵢ'}) / {'Σ'}(EAD{'ᵢ'})
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Aggregation by Level</div>
+          <div className="space-y-1">
+            {[
+              { level: 'Facility', method: 'Direct calc' },
+              { level: 'Counterparty', method: 'Pooled ratio' },
+              { level: 'Desk', method: 'Segmented pooled' },
+              { level: 'Portfolio', method: 'Wtd avg + buckets' },
+              { level: 'LoB', method: 'Wtd avg (monitoring)' },
+            ].map((r) => (
+              <div key={r.level} className="flex justify-between text-[10px]">
+                <span className="text-gray-500">{r.level}</span>
+                <span className="text-gray-400 font-mono">{r.method}</span>
+              </div>
+            ))}
           </div>
-          <p className="text-[10px] text-gray-500 mt-1">
-            Exposure-weighted average applied at every aggregation level above facility
-          </p>
         </div>
       </div>
     </div>
@@ -1125,7 +1577,7 @@ export default function DSCRLineageView() {
             step="Step 5 — L3 Output & Rollup Hierarchy"
             layerColor="bg-emerald-600"
             title="Storage & Aggregation"
-            subtitle={'Σ(DSCR × EAD) / Σ(EAD) — exposure-weighted average at each level'}
+            subtitle="Different aggregation at each level — from pooled ratio to exposure-weighted average"
           />
 
           <div className="mb-4">
@@ -1136,10 +1588,12 @@ export default function DSCRLineageView() {
             <L3OutputTables />
           </div>
 
+          <FoundationalRule />
+
           <div className="mb-2">
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
               <Link2 className="w-3 h-3" aria-hidden="true" />
-              Rollup Hierarchy — click to expand
+              Rollup Hierarchy — Facility {'→'} Counterparty {'→'} Desk {'→'} Portfolio {'→'} LoB — click to expand
             </div>
           </div>
           <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />

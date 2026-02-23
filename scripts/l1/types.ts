@@ -19,4 +19,6 @@ export interface TableDef {
   tableName: string;
   scd: SCDType;
   columns: ColumnDef[];
+  /** Max rows for this table when scaling up. Dimension tables stay small. */
+  maxRows?: number;
 }

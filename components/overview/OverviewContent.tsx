@@ -44,6 +44,48 @@ export default function OverviewContent() {
                 <Network className="w-4 h-4" />
                 Interactive Visualizer
               </Link>
+              <Link
+                href="/lineage"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <BarChart3 className="w-4 h-4" />
+                L3 Lineage
+              </Link>
+              <Link
+                href="/source-mapping"
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <Database className="w-4 h-4" />
+                Source Mapping
+              </Link>
+              <Link
+                href="/metrics/library"
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Metric Library
+              </Link>
+              <Link
+                href="/data-catalog"
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <Database className="w-4 h-4" />
+                Data Catalog
+              </Link>
+              <Link
+                href="/data-integrity"
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <Layers className="w-4 h-4" />
+                Data Integrity
+              </Link>
+              <Link
+                href="/platform-operations"
+                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <Layers className="w-4 h-4" />
+                Operations
+              </Link>
             </div>
           </div>
         </div>
@@ -193,6 +235,43 @@ export default function OverviewContent() {
             Raw reference data flows through time-series snapshots, then gets enriched with calculations and
             aggregations to produce the final dashboard-ready views that drive business decisions.
           </p>
+        </div>
+
+        {/* Load & link your data — GSIB onboarding */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-semibold mb-2 text-center text-white">Load & link your data to the model</h3>
+          <p className="text-center text-slate-400 mb-8 max-w-2xl mx-auto text-sm">
+            Register your source systems, catalog tables and fields, then map them to metrics so the dashboard can trace every number to its source.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <Link
+              href="/source-mapping"
+              className="block rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 hover:border-amber-500/50 hover:bg-amber-500/10 transition-all text-left group"
+            >
+              <span className="text-amber-400 font-semibold text-sm">Step 1</span>
+              <h4 className="text-lg font-semibold text-white mt-1 group-hover:text-amber-100">Register sources</h4>
+              <p className="text-slate-400 text-sm mt-2">Add your source systems (e.g. LoanIQ, Murex) and their feeds. Only Production mappings feed the dashboard.</p>
+              <span className="inline-flex items-center gap-1 text-amber-400 text-sm font-medium mt-3">Source Mapping →</span>
+            </Link>
+            <Link
+              href="/data-catalog"
+              className="block rounded-xl border border-blue-500/30 bg-blue-500/5 p-6 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all text-left group"
+            >
+              <span className="text-blue-400 font-semibold text-sm">Step 2</span>
+              <h4 className="text-lg font-semibold text-white mt-1 group-hover:text-blue-100">Catalog tables & fields</h4>
+              <p className="text-slate-400 text-sm mt-2">Define tables and fields (Raw, Conformed, Reporting). Link to your warehouse or add manually for lineage.</p>
+              <span className="inline-flex items-center gap-1 text-blue-400 text-sm font-medium mt-3">Data Catalog →</span>
+            </Link>
+            <Link
+              href="/source-mapping"
+              className="block rounded-xl border border-purple-500/30 bg-purple-500/5 p-6 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all text-left group"
+            >
+              <span className="text-purple-400 font-semibold text-sm">Step 3</span>
+              <h4 className="text-lg font-semibold text-white mt-1 group-hover:text-purple-100">Map to metrics</h4>
+              <p className="text-slate-400 text-sm mt-2">Connect each metric to its source path (system → feed → table → field). Build full lineage for audit and Explain This Number.</p>
+              <span className="inline-flex items-center gap-1 text-purple-400 text-sm font-medium mt-3">Source Mapping →</span>
+            </Link>
+          </div>
         </div>
 
         {/* Walkthroughs Section */}

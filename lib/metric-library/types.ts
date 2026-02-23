@@ -66,6 +66,18 @@ export interface MetricDomain {
   primary_stakeholders?: string[];
 }
 
+/** Metric criticality: drives validation rigor and change-management approval. */
+export type MetricCriticality = 'TIER_1' | 'TIER_2' | 'TIER_3';
+
+/** Business purpose tag for filtering and reporting. */
+export type BusinessPurposeTag =
+  | 'Risk Appetite'
+  | 'Regulatory Compliance'
+  | 'Management Information'
+  | 'Early Warning Signal'
+  | 'Performance Measurement'
+  | 'Operational Monitoring';
+
 export interface ParentMetric {
   metric_id: string;
   metric_name: string;
@@ -80,6 +92,11 @@ export interface ParentMetric {
   domain_ids: string[];
   variant_count?: number;
   regulatory_references?: string[];
+  /** Tier 1 Regulatory-Mandated, Tier 2 Board/Risk Committee, Tier 3 Management Information. */
+  metric_criticality?: MetricCriticality;
+  /** Dashboard page IDs (e.g. P1–P8) where this metric appears. */
+  dashboard_pages?: string[];
+  business_purpose_tags?: BusinessPurposeTag[];
   created_at?: string;
   updated_at?: string;
 }
@@ -232,8 +249,28 @@ export interface MetricVariant {
   sourcing_category?: SourcingCategory;
 
   version_history?: VariantVersionHistoryEntry[];
+  /** Relative weight in overall Data Quality Score (Page 4). */
+  quality_score_weight?: number;
+  last_full_review_date?: string;
+  next_scheduled_review_date?: string;
+  /** Reconciliation point refs (target name, tolerance, description). */
+  reconciliation_points?: Array<{ target_name: string; target_type?: string; tolerance_absolute?: number; tolerance_pct?: number; description?: string }>;
+  /** Data quality rules (completeness, reasonableness, etc.) for Accuracy Assurance. */
+  data_quality_rules?: ValidationRule[];
   created_at?: string;
   updated_at?: string;
+}
+
+/** Threshold configuration per metric (warning/breach, ceiling/floor, effective dates). */
+export interface MetricThreshold {
+  threshold_id: string;
+  parent_metric_id: string;
+  inner_value?: number;
+  outer_value?: number;
+  limit_type: 'CEILING' | 'FLOOR';
+  threshold_source?: string;
+  effective_date: string;
+  expiration_date?: string;
 }
 
 export interface LibrarySeed {

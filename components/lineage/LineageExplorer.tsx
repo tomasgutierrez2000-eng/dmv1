@@ -8,6 +8,7 @@ import {
   BarChart3, Wallet, Target, Scale, Building2, ClipboardList,
 } from 'lucide-react';
 import Link from 'next/link';
+import ExplainThisNumber from '@/components/lineage/ExplainThisNumber';
 import {
   DASHBOARD_PAGES, DIMENSION_LABELS,
   metricsByPage,
@@ -298,6 +299,10 @@ function MetricCard({ metric, pageInfo }: { metric: L3Metric; pageInfo: PageInfo
         {/* Sample value */}
         <span className="text-sm font-mono font-semibold text-emerald-400 flex-shrink-0 w-20 text-right">
           {metric.sampleValue}
+        </span>
+        {/* Explain this number — stopPropagation so card doesn't expand */}
+        <span className="flex-shrink-0" onClick={e => e.stopPropagation()}>
+          <ExplainThisNumber metricId={metric.id} trigger="button" />
         </span>
         {/* Lineage indicator */}
         {hasLineage && (

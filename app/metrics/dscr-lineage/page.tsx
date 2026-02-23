@@ -1,4 +1,4 @@
-import DSCRLineageView from '@/components/metric-library/DSCRLineageView';
+import DSCRLineageWithDemo from './DSCRLineageWithDemo';
 
 export const metadata = {
   title: 'DSCR End-to-End Lineage',
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function DSCRLineagePage() {
-  return <DSCRLineageView />;
+  return <DSCRLineageWithDemo />;
 }

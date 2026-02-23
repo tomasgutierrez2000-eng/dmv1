@@ -28,6 +28,7 @@ import {
   Building2,
   TrendingUp,
   BarChart3,
+  Play,
 } from 'lucide-react';
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -345,39 +346,43 @@ function VariantDefCard({ v }: { v: VariantData }) {
       </div>
 
       {/* Numerator */}
-      <div className="mt-3 pt-3 border-t border-white/5">
+      <div data-demo={`num-section-${v.id.toLowerCase()}`} className="mt-3 pt-3 border-t border-white/5">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
           Numerator — {v.numeratorLabel}
         </div>
         <div className="space-y-1">
-          {v.numeratorComponents.map((c) => (
-            <ComponentRow key={c.name} name={c.name} op={c.op} value={c.value} field={c.field} table={c.table} />
+          {v.numeratorComponents.map((c, i) => (
+            <div key={c.name} data-demo={`num-component-${v.id.toLowerCase()}-${i}`}>
+              <ComponentRow name={c.name} op={c.op} value={c.value} field={c.field} table={c.table} />
+            </div>
           ))}
         </div>
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 text-xs font-bold">
+        <div data-demo={`num-total-${v.id.toLowerCase()}`} className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 text-xs font-bold">
           <span className={v.colorText}>{v.numeratorLabel}</span>
           <span className="text-white font-mono">{fmt(v.numerator)}</span>
         </div>
       </div>
 
       {/* Denominator */}
-      <div className="mt-3 pt-3 border-t border-white/5">
+      <div data-demo={`den-section-${v.id.toLowerCase()}`} className="mt-3 pt-3 border-t border-white/5">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
           Denominator — {v.denominatorLabel}
         </div>
         <div className="space-y-1">
-          {v.denominatorComponents.map((c) => (
-            <ComponentRow key={c.name} name={c.name} op="+" value={c.value} field={c.field} table={c.table} />
+          {v.denominatorComponents.map((c, i) => (
+            <div key={c.name} data-demo={`den-component-${v.id.toLowerCase()}-${i}`}>
+              <ComponentRow name={c.name} op="+" value={c.value} field={c.field} table={c.table} />
+            </div>
           ))}
         </div>
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 text-xs font-bold">
+        <div data-demo={`den-total-${v.id.toLowerCase()}`} className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 text-xs font-bold">
           <span className={v.colorText}>{v.denominatorLabel}</span>
           <span className="text-white font-mono">{fmt(v.denominator)}</span>
         </div>
       </div>
 
       {/* Result */}
-      <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+      <div data-demo={`result-${v.id.toLowerCase()}`} className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
         <code className="text-xs text-gray-400 font-mono">{v.formula}</code>
         <div className={`text-xl font-black ${v.colorText} tabular-nums`}>{v.result}</div>
       </div>
@@ -791,6 +796,7 @@ function RollupPyramid({
         return (
           <button
             key={level.key}
+            data-demo={`rollup-${level.key}`}
             onClick={() => onToggle(level.key)}
             aria-expanded={expanded}
             className={`w-full rounded-xl border p-3 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
@@ -1420,15 +1426,34 @@ function FooterLegend() {
  * MAIN EXPORT
  * ──────────────────────────────────────────────────────────────────────────── */
 
-export default function DSCRLineageView() {
-  const [expandedLevel, setExpandedLevel] = useState<string | null>('facility');
-  const [l2Filter, setL2Filter] = useState<'both' | 'CRE' | 'CI'>('both');
+export interface DSCRLineageViewProps {
+  /** Demo-controlled rollup level override */
+  demoExpandedLevel?: string | null;
+  /** Demo-controlled L2 filter override */
+  demoL2Filter?: 'both' | 'CRE' | 'CI';
+  /** Show the guided demo button */
+  onStartDemo?: () => void;
+}
+
+export default function DSCRLineageView({
+  demoExpandedLevel,
+  demoL2Filter,
+  onStartDemo,
+}: DSCRLineageViewProps = {}) {
+  const [expandedLevelInternal, setExpandedLevelInternal] = useState<string | null>('facility');
+  const [l2FilterInternal, setL2FilterInternal] = useState<'both' | 'CRE' | 'CI'>('both');
   const headingPrefix = useId();
+
+  // Demo overrides local state when active
+  const expandedLevel = demoExpandedLevel !== undefined ? demoExpandedLevel : expandedLevelInternal;
+  const l2Filter = demoL2Filter !== undefined ? demoL2Filter : l2FilterInternal;
+  const setExpandedLevel = (k: string | null) => setExpandedLevelInternal(k);
+  const setL2Filter = (f: 'both' | 'CRE' | 'CI') => setL2FilterInternal(f);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-20 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-gray-800 shadow-lg">
+      <header data-demo="header" className="sticky top-0 z-20 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-gray-800 shadow-lg">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
@@ -1445,6 +1470,15 @@ export default function DSCRLineageView() {
               </p>
             </div>
             <div className="flex items-center gap-4">
+              {onStartDemo && (
+                <button
+                  onClick={onStartDemo}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-pwc-orange/15 text-pwc-orange border border-pwc-orange/30 hover:bg-pwc-orange/25 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pwc-orange"
+                >
+                  <Play className="w-3.5 h-3.5" />
+                  Guided Demo
+                </button>
+              )}
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                 <span className="text-xs text-gray-400">CRE (NOI)</span>
@@ -1461,7 +1495,7 @@ export default function DSCRLineageView() {
       {/* ── BODY ── */}
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-2">
         {/* ── STEP 1: USER DEFINITION ── */}
-        <section aria-labelledby={`${headingPrefix}-step1`}>
+        <section data-demo="step1" aria-labelledby={`${headingPrefix}-step1`}>
           <SectionHeading
             id={`${headingPrefix}-step1`}
             icon={Calculator}
@@ -1476,15 +1510,15 @@ export default function DSCRLineageView() {
             The formula, data sources, and rollup logic are automatically resolved. Hover any component to see the source field it maps to.
           </InsightCallout>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <VariantDefCard v={CRE} />
-            <VariantDefCard v={CI} />
+            <div data-demo="step1-variant-cre"><VariantDefCard v={CRE} /></div>
+            <div data-demo="step1-variant-ci"><VariantDefCard v={CI} /></div>
           </div>
         </section>
 
         <FlowArrow label="Components map to data model fields" />
 
         {/* ── STEP 2: L1 REFERENCE ── */}
-        <section aria-labelledby={`${headingPrefix}-step2`}>
+        <section data-demo="step2" aria-labelledby={`${headingPrefix}-step2`}>
           <SectionHeading
             id={`${headingPrefix}-step2`}
             icon={Database}
@@ -1505,7 +1539,7 @@ export default function DSCRLineageView() {
         <FlowArrow label="Dimension keys join to snapshot data" />
 
         {/* ── STEP 3: L2 SNAPSHOT ── */}
-        <section aria-labelledby={`${headingPrefix}-step3`}>
+        <section data-demo="step3" aria-labelledby={`${headingPrefix}-step3`}>
           <SectionHeading
             id={`${headingPrefix}-step3`}
             icon={Layers}
@@ -1547,7 +1581,7 @@ export default function DSCRLineageView() {
         <FlowArrow label="Fields feed into calculation engine" />
 
         {/* ── STEP 4: CALCULATION ── */}
-        <section aria-labelledby={`${headingPrefix}-step4`}>
+        <section data-demo="step4" aria-labelledby={`${headingPrefix}-step4`}>
           <SectionHeading
             id={`${headingPrefix}-step4`}
             icon={Zap}
@@ -1557,8 +1591,8 @@ export default function DSCRLineageView() {
             subtitle="Formula applied at facility level — T2 authority (source + validate)"
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <TransformCard v={CRE} />
-            <TransformCard v={CI} />
+            <div data-demo="step4-variant-cre"><TransformCard v={CRE} /></div>
+            <div data-demo="step4-variant-ci"><TransformCard v={CI} /></div>
           </div>
           <InsightCallout>
             <strong>T2 Calculation Authority at facility level.</strong> The GSIB sends their own DSCR value AND the platform independently
@@ -1570,7 +1604,7 @@ export default function DSCRLineageView() {
         <FlowArrow label="Results stored in L3 tables, then rolled up" />
 
         {/* ── STEP 5: L3 OUTPUT + ROLLUP ── */}
-        <section aria-labelledby={`${headingPrefix}-step5`}>
+        <section data-demo="step5" aria-labelledby={`${headingPrefix}-step5`}>
           <SectionHeading
             id={`${headingPrefix}-step5`}
             icon={GitBranch}
@@ -1588,7 +1622,7 @@ export default function DSCRLineageView() {
             <L3OutputTables />
           </div>
 
-          <FoundationalRule />
+          <div data-demo="foundational-rule"><FoundationalRule /></div>
 
           <div className="mb-2">
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
@@ -1602,7 +1636,7 @@ export default function DSCRLineageView() {
         <FlowArrow label="Dashboard builder selects variant + dimension" />
 
         {/* ── STEP 6: DASHBOARD ── */}
-        <section aria-labelledby={`${headingPrefix}-step6`}>
+        <section data-demo="step6" aria-labelledby={`${headingPrefix}-step6`}>
           <SectionHeading
             id={`${headingPrefix}-step6`}
             icon={LayoutDashboard}

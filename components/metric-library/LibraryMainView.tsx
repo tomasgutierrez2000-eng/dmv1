@@ -207,11 +207,11 @@ export default function LibraryMainView() {
         <div className="max-w-6xl mx-auto px-6 py-5">
           <div className="flex items-center gap-4">
             <Link
-              href="/metrics"
+              href="/overview"
               className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
             >
               <ChevronLeft className="w-4 h-4 flex-shrink-0" aria-hidden />
-              Metrics Engine
+              Overview
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">Metric Library</h1>
           </div>
@@ -344,7 +344,7 @@ export default function LibraryMainView() {
         </div>
 
         {error && (
-          <LibraryError message={error} onRetry={fetchData} backHref="/metrics" backLabel="Back to Metrics" />
+          <LibraryError message={error} onRetry={fetchData} backHref="/overview" backLabel="Back to Overview" />
         )}
 
         {!error && loading && <LibraryLoading />}

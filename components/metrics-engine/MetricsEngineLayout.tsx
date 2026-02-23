@@ -133,10 +133,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
             Metric Deep Dive
           </h1>
           <p className="text-[11px] text-gray-500 mt-1">Create & edit definitions</p>
-          <Link href="/metrics/library" className="mt-2 flex items-center gap-2 text-[11px] text-purple-400 hover:text-purple-300 transition-colors">
-            <BarChart3 className="w-3.5 h-3.5" />
-            Metric Library →
-          </Link>
         </div>
         <div className="flex-1 overflow-y-auto overscroll-contain py-2">
           <div className="px-2">
@@ -161,9 +157,6 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
                 </button>
               );
             })}
-            <p className="px-2 mt-3 text-[11px] text-gray-500">
-              All metrics live in the <Link href="/metrics/library" className="text-purple-400 hover:text-purple-300">Metric Library</Link>.
-            </p>
           </div>
         </div>
         <div className="p-3 border-t border-white/[0.04] space-y-2">
@@ -244,7 +237,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               <header className="mb-6">
                 <h2 className="text-lg font-bold text-white">Calculator engine</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  Use <strong className="text-purple-300">DSCR</strong> in the sidebar to build variants, or browse all metrics in the <Link href="/metrics/library" className="text-purple-400 hover:text-purple-300">Metric Library</Link>.
+                  Use <strong className="text-purple-300">DSCR</strong> in the sidebar to build variants. Saved metrics are added to the Metric Library.
                 </p>
               </header>
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen, Library } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewContent() {
@@ -23,6 +23,13 @@ export default function OverviewContent() {
               <p className="text-sm text-slate-400 mt-1">Three-layer architecture for banking and financial services data</p>
             </div>
             <div className="flex items-center gap-3">
+              <Link
+                href="/metrics/library"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <Library className="w-4 h-4" />
+                Metric Library
+              </Link>
               <Link
                 href="/agent"
                 className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
@@ -203,7 +210,7 @@ export default function OverviewContent() {
             how different parts of the model work together.
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <div
               onClick={() => setActiveWalkthrough('facility-summary')}
               className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
@@ -247,6 +254,29 @@ export default function OverviewContent() {
               <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
                 <Play className="w-4 h-4" />
                 <span>Open Metrics Engine</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
+
+            <Link
+              href="/metrics/library"
+              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
+                  <Library className="w-6 h-6 text-slate-300" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-lg mb-1 text-white">Metric Library</h4>
+                  <p className="text-sm text-slate-400">Browse all metrics &amp; variants</p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-300 mb-4 leading-relaxed">
+                The comprehensive catalog of all parent metrics, variants, domains, lineage, governance, and validation rules. Search, filter, and explore the full metric taxonomy.
+              </p>
+              <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
+                <Play className="w-4 h-4" />
+                <span>Open Metric Library</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </Link>

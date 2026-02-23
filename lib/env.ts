@@ -10,8 +10,9 @@ export function getEnvVar(name: string): string | undefined {
   let key = process.env[name];
   if (key && key.trim()) return key.trim();
   try {
-    // Optional dotenv fallback when Next.js hasn't loaded .env (e.g. serverless)
-    require('dotenv').config({ path: path.join(process.cwd(), '.env') });
+    // Optional dotenv fallback when Next.js hasn't loaded .env (e.g. serverless).
+    // Use override:true so shell-level empty vars (e.g. ANTHROPIC_API_KEY="") don't shadow .env values.
+    require('dotenv').config({ path: path.join(process.cwd(), '.env'), override: true });
     key = process.env[name];
     if (key && key.trim()) return key.trim();
   } catch {

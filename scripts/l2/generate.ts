@@ -11,7 +11,7 @@ import { L2_TABLES } from './l2-definitions';
 import { getL2SeedValue } from './seed-data';
 
 const OUT_DIR = path.join(__dirname, 'output');
-const ROWS_PER_TABLE = 12; // 10+ rows
+const ROWS_PER_TABLE = 50; // 5 cycles × 10 facilities
 const SEED_AS_OF_DATE = '2025-01-31';
 
 function mapTypeToPg(type: string): string {

@@ -121,10 +121,18 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   product_node_id BIGINT,
   outstanding_balance_amt NUMERIC(18,2),
   undrawn_commitment_amt NUMERIC(18,2),
+  number_of_loans INTEGER,
+  number_of_facilities INTEGER,
+  days_until_maturity INTEGER,
+  facility_utilization_status VARCHAR(30),
+  limit_status_code VARCHAR(30),
+  rwa_amt NUMERIC(18,2),
+  internal_risk_rating_bucket_code VARCHAR(20),
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
   CONSTRAINT fk_facility_exposure_snapshot_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
-  CONSTRAINT fk_facility_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+  CONSTRAINT fk_facility_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id),
+  CONSTRAINT fk_facility_exposure_snapshot_irr_bucket FOREIGN KEY (internal_risk_rating_bucket_code) REFERENCES l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)
 );
 
 CREATE TABLE IF NOT EXISTS l2.netting_set_exposure_snapshot (
@@ -217,6 +225,10 @@ CREATE TABLE IF NOT EXISTS l2.facility_financial_snapshot (
   currency_code VARCHAR(20),
   reporting_period VARCHAR(20),
   financial_snapshot_id BIGINT,
+  dscr_value NUMERIC(12,6),
+  ltv_pct NUMERIC(10,6),
+  net_income_amt NUMERIC(18,2),
+  interest_rate_sensitivity_pct NUMERIC(10,6),
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_financial_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
 );
@@ -461,6 +473,8 @@ CREATE TABLE IF NOT EXISTS l2.counterparty_rating_observation (
   rating_date DATE,
   rating_type VARCHAR(50),
   rating_value NUMERIC(18,4),
+  risk_rating_status VARCHAR(30),
+  risk_rating_change_steps INTEGER,
   CONSTRAINT fk_counterparty_rating_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_counterparty_rating_observation_rating_grade_id FOREIGN KEY (rating_grade_id) REFERENCES l1.rating_grade_dim(rating_grade_id),
   CONSTRAINT fk_counterparty_rating_observation_rating_source_id FOREIGN KEY (rating_source_id) REFERENCES l1.rating_source(rating_source_id)

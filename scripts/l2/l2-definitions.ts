@@ -128,6 +128,13 @@ export const L2_TABLES: L2TableDef[] = [
       // L3 procedure compatibility: same as drawn_amount / undrawn_amount
       { name: 'outstanding_balance_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'undrawn_commitment_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'number_of_loans', type: 'INTEGER', nullable: true },
+      { name: 'number_of_facilities', type: 'INTEGER', nullable: true },
+      { name: 'days_until_maturity', type: 'INTEGER', nullable: true },
+      { name: 'facility_utilization_status', type: 'VARCHAR(30)', nullable: true },
+      { name: 'limit_status_code', type: 'VARCHAR(30)', nullable: true },
+      { name: 'rwa_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'internal_risk_rating_bucket_code', type: 'VARCHAR(20)', nullable: true, fk: 'l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)' },
     ],
   },
   {
@@ -226,6 +233,10 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'currency_code', type: 'VARCHAR(20)', nullable: true },
       { name: 'reporting_period', type: 'VARCHAR(20)', nullable: true },
       { name: 'financial_snapshot_id', type: 'BIGINT', nullable: true },
+      { name: 'dscr_value', type: 'DECIMAL(12,6)', nullable: true },
+      { name: 'ltv_pct', type: 'DECIMAL(10,6)', nullable: true },
+      { name: 'net_income_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'interest_rate_sensitivity_pct', type: 'DECIMAL(10,6)', nullable: true },
     ],
   },
   // ----- Facility snapshots -----
@@ -478,6 +489,8 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'rating_date', type: 'DATE', nullable: true },
       { name: 'rating_type', type: 'VARCHAR(50)', nullable: true },
       { name: 'rating_value', type: 'DECIMAL(18,4)', nullable: true },
+      { name: 'risk_rating_status', type: 'VARCHAR(30)', nullable: true },
+      { name: 'risk_rating_change_steps', type: 'INTEGER', nullable: true },
     ],
   },
   {

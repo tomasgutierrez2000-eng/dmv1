@@ -1524,31 +1524,149 @@ function FooterLegend() {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
+ * SIDEBAR NAV ITEMS
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+const NAV_SECTIONS = [
+  { id: 'definition', label: 'Definition', icon: Calculator, color: 'text-teal-400', step: '1' },
+  { id: 'join-map', label: 'Join Map', icon: Network, color: 'text-cyan-400', step: null },
+  { id: 'l1-reference', label: 'L1 Reference', icon: Database, color: 'text-blue-400', step: '2' },
+  { id: 'l2-snapshot', label: 'L2 Snapshot', icon: Layers, color: 'text-amber-400', step: '3' },
+  { id: 'syndication', label: 'Syndication', icon: Building2, color: 'text-blue-400', step: null },
+  { id: 'query-plan', label: 'Query Plan', icon: Search, color: 'text-purple-400', step: null },
+  { id: 'calculation', label: 'Calculation', icon: Zap, color: 'text-teal-400', step: '4' },
+  { id: 'denominator', label: 'Denominator', icon: Scale, color: 'text-red-400', step: null },
+  { id: 'data-flow', label: 'Data Flow', icon: Sparkles, color: 'text-amber-400', step: null },
+  { id: 'rollup', label: 'Rollup', icon: GitBranch, color: 'text-emerald-400', step: '5' },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-pink-400', step: '6' },
+] as const;
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SCROLL SPY HOOK
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function useActiveSection(): string {
+  const [active, setActive] = useState<string>(NAV_SECTIONS[0].id);
+
+  React.useEffect(() => {
+    let rafId = 0;
+    const handleScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        let current: string = NAV_SECTIONS[0].id;
+        for (const s of NAV_SECTIONS) {
+          const el = document.getElementById(`section-${s.id}`);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= 120) current = s.id;
+          }
+        }
+        setActive(current);
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  return active;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SIDEBAR NAV COMPONENT
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function SidebarNav({ activeSection }: { activeSection: string }) {
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(`section-${id}`);
+    if (el) {
+      const headerOffset = 80;
+      const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <nav className="sticky top-[73px] h-[calc(100vh-73px)] w-48 flex-shrink-0 overflow-y-auto border-r border-gray-800/60 bg-[#0a0a0a]/80 backdrop-blur-sm py-4 px-2 hidden lg:block">
+      <div className="space-y-0.5">
+        {NAV_SECTIONS.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeSection === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => scrollTo(item.id)}
+              className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all duration-150 group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+                isActive
+                  ? 'bg-white/[0.06] border border-gray-700/60'
+                  : 'border border-transparent hover:bg-white/[0.03]'
+              }`}
+            >
+              {/* Active indicator bar */}
+              <div className={`w-0.5 h-5 rounded-full flex-shrink-0 transition-colors duration-150 ${isActive ? 'bg-teal-500' : 'bg-transparent group-hover:bg-gray-700'}`} />
+              <Icon className={`w-3.5 h-3.5 flex-shrink-0 transition-colors ${isActive ? item.color : 'text-gray-600 group-hover:text-gray-500'}`} aria-hidden="true" />
+              <div className="min-w-0 flex-1">
+                <span className={`text-[11px] font-medium block truncate transition-colors ${isActive ? 'text-gray-200' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                  {item.label}
+                </span>
+              </div>
+              {item.step && (
+                <span className={`text-[8px] font-bold px-1 py-0.5 rounded flex-shrink-0 ${
+                  isActive ? 'bg-teal-500/20 text-teal-400' : 'bg-white/[0.03] text-gray-600'
+                }`}>
+                  {item.step}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Progress indicator */}
+      <div className="mt-4 pt-3 border-t border-gray-800/60 px-2">
+        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-600 mb-2">Progress</div>
+        <div className="w-full h-1 rounded-full bg-gray-800 overflow-hidden">
+          <div
+            className="h-full bg-teal-500/60 rounded-full transition-all duration-300"
+            style={{ width: `${((NAV_SECTIONS.findIndex(s => s.id === activeSection) + 1) / NAV_SECTIONS.length) * 100}%` }}
+          />
+        </div>
+        <div className="text-[9px] text-gray-600 mt-1 tabular-nums">
+          {NAV_SECTIONS.findIndex(s => s.id === activeSection) + 1} / {NAV_SECTIONS.length}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
  * MAIN EXPORT
  * ──────────────────────────────────────────────────────────────────────────── */
 
 export default function WABRLineageView() {
   const [expandedLevel, setExpandedLevel] = useState<string | null>('facility');
   const headingPrefix = useId();
+  const activeSection = useActiveSection();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-20 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-gray-800 shadow-lg">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      <header className="sticky top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-gray-800 shadow-lg">
+        <div className="max-w-[1400px] mx-auto px-6 py-3">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <Link
                 href="/metrics/library"
-                className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-teal-400 transition-colors mb-1 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded"
+                className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-teal-400 transition-colors mb-0.5 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded"
               >
                 <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
                 Metric Library
               </Link>
-              <h1 className="text-xl font-bold text-white">Weighted Average Base Rate — End-to-End Lineage</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                From position-level rate_index through commitment weighting to dashboard — with GSIB syndication adjustment
-              </p>
+              <h1 className="text-lg font-bold text-white">Weighted Average Base Rate — End-to-End Lineage</h1>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
@@ -1561,247 +1679,252 @@ export default function WABRLineageView() {
         </div>
       </header>
 
-      {/* ── BODY ── */}
-      <main className="max-w-6xl mx-auto px-6 py-8 space-y-2">
+      {/* ── LAYOUT: SIDEBAR + CONTENT ── */}
+      <div className="flex max-w-[1400px] mx-auto">
+        {/* Sidebar */}
+        <SidebarNav activeSection={activeSection} />
 
-        {/* ── STEP 1: METRIC DEFINITION ── */}
-        <section aria-labelledby={`${headingPrefix}-step1`}>
-          <SectionHeading
-            id={`${headingPrefix}-step1`}
-            icon={Calculator}
-            step="Step 1 — Metric Definition"
-            layerColor="bg-teal-600"
-            title="Weighted Average Base Rate (%)"
-            subtitle="Commitment-weighted benchmark rate across positions — adjusted for bank syndication share"
-          />
-          <MetricDefinitionCard />
-          <InsightCallout>
-            <strong>Three components drive this metric:</strong> (1) <code className="text-teal-300">rate_index</code> from position_detail — the benchmark
-            rate per position, (2) <code className="text-emerald-300">total_commitment</code> — the weight base, and (3) <code className="text-blue-300">bank_share_pct</code> from
-            facility_lender_allocation — the GSIB syndication adjustment. The formula is simple; the join path and denominator scoping are where
-            implementation errors occur.
-          </InsightCallout>
-        </section>
+        {/* Main content */}
+        <main className="flex-1 min-w-0 px-6 lg:px-8 py-8 space-y-2">
 
-        <FlowArrow label="Metric definition determines source tables" />
+          {/* ── STEP 1: METRIC DEFINITION ── */}
+          <section id="section-definition" aria-labelledby={`${headingPrefix}-step1`}>
+            <SectionHeading
+              id={`${headingPrefix}-step1`}
+              icon={Calculator}
+              step="Step 1 — Metric Definition"
+              layerColor="bg-teal-600"
+              title="Weighted Average Base Rate (%)"
+              subtitle="Commitment-weighted benchmark rate across positions — adjusted for bank syndication share"
+            />
+            <MetricDefinitionCard />
+            <InsightCallout>
+              <strong>Three components drive this metric:</strong> (1) <code className="text-teal-300">rate_index</code> from position_detail — the benchmark
+              rate per position, (2) <code className="text-emerald-300">total_commitment</code> — the weight base, and (3) <code className="text-blue-300">bank_share_pct</code> from
+              facility_lender_allocation — the GSIB syndication adjustment. The formula is simple; the join path and denominator scoping are where
+              implementation errors occur.
+            </InsightCallout>
+          </section>
 
-        {/* ── JOIN MAP ── */}
-        <section aria-labelledby={`${headingPrefix}-join-map`}>
-          <SectionHeading
-            id={`${headingPrefix}-join-map`}
-            icon={Network}
-            step="Data Plumbing"
-            layerColor="bg-cyan-600"
-            title="Table-to-Table Join Map"
-            subtitle="Every FK relationship used to compute and roll up WABR — hover any table to trace connections"
-          />
-          <InteractiveJoinMap />
-          <InsightCallout>
-            <strong>4 layers, 8 tables, 8 join relationships.</strong> The critical path is
-            <code className="text-amber-300"> position</code> {'\u2192'} <code className="text-amber-300">position_detail</code> for
-            rate + commitment, with <code className="text-blue-300">facility_lender_allocation</code> injecting the bank share adjustment.
-            The <code className="text-blue-300">facility_master</code> table is the central hub connecting L1 dimensions to L2 snapshots.
-          </InsightCallout>
-        </section>
+          <FlowArrow label="Metric definition determines source tables" />
 
-        <FlowArrow label="L1 dimensions anchor L2 snapshots" />
+          {/* ── JOIN MAP ── */}
+          <section id="section-join-map" aria-labelledby={`${headingPrefix}-join-map`}>
+            <SectionHeading
+              id={`${headingPrefix}-join-map`}
+              icon={Network}
+              step="Data Plumbing"
+              layerColor="bg-cyan-600"
+              title="Table-to-Table Join Map"
+              subtitle="Every FK relationship used to compute and roll up WABR — hover any table to trace connections"
+            />
+            <InteractiveJoinMap />
+            <InsightCallout>
+              <strong>4 layers, 8 tables, 8 join relationships.</strong> The critical path is
+              <code className="text-amber-300"> position</code> {'\u2192'} <code className="text-amber-300">position_detail</code> for
+              rate + commitment, with <code className="text-blue-300">facility_lender_allocation</code> injecting the bank share adjustment.
+              The <code className="text-blue-300">facility_master</code> table is the central hub connecting L1 dimensions to L2 snapshots.
+            </InsightCallout>
+          </section>
 
-        {/* ── STEP 2: L1 REFERENCE ── */}
-        <section aria-labelledby={`${headingPrefix}-step2`}>
-          <SectionHeading
-            id={`${headingPrefix}-step2`}
-            icon={Database}
-            step="Step 2 — L1 Reference Data"
-            layerColor="bg-blue-600"
-            title="Dimensional Anchors"
-            subtitle="Reference tables that identify facility identity, bank ownership share, and LoB hierarchy"
-          />
-          <L1Tables />
-          <InsightCallout>
-            <strong>facility_lender_allocation is the GSIB differentiator.</strong> Without it, you weight by total deal size
-            regardless of your participation. For a GSIB with thousands of syndicated facilities, this distortion is massive.
-            This table was added specifically to support issuer-side bank share tracking.
-          </InsightCallout>
-        </section>
+          <FlowArrow label="L1 dimensions anchor L2 snapshots" />
 
-        <FlowArrow label="Dimension keys join to snapshot data" />
+          {/* ── STEP 2: L1 REFERENCE ── */}
+          <section id="section-l1-reference" aria-labelledby={`${headingPrefix}-step2`}>
+            <SectionHeading
+              id={`${headingPrefix}-step2`}
+              icon={Database}
+              step="Step 2 — L1 Reference Data"
+              layerColor="bg-blue-600"
+              title="Dimensional Anchors"
+              subtitle="Reference tables that identify facility identity, bank ownership share, and LoB hierarchy"
+            />
+            <L1Tables />
+            <InsightCallout>
+              <strong>facility_lender_allocation is the GSIB differentiator.</strong> Without it, you weight by total deal size
+              regardless of your participation. For a GSIB with thousands of syndicated facilities, this distortion is massive.
+              This table was added specifically to support issuer-side bank share tracking.
+            </InsightCallout>
+          </section>
 
-        {/* ── STEP 3: L2 SNAPSHOT ── */}
-        <section aria-labelledby={`${headingPrefix}-step3`}>
-          <SectionHeading
-            id={`${headingPrefix}-step3`}
-            icon={Layers}
-            step="Step 3 — L2 Snapshot Data"
-            layerColor="bg-amber-600"
-            title="Source Data Tables"
-            subtitle="Two L2 tables provide rate and commitment — click any row for X-Ray column detail"
-          />
-          <L2FieldTable />
-          <InsightCallout>
-            <strong>rate_index vs interest_rate — the critical distinction.</strong> <code className="text-teal-300">rate_index</code> is the
-            benchmark component (SOFR, Prime). <code className="text-red-400 line-through">interest_rate</code> is the all-in contractual rate
-            (benchmark + spread). This metric requires the benchmark only. Using the wrong column is the most common implementation mistake.
-          </InsightCallout>
-        </section>
+          <FlowArrow label="Dimension keys join to snapshot data" />
 
-        <FlowArrow label="Fields feed into calculation engine" />
+          {/* ── STEP 3: L2 SNAPSHOT ── */}
+          <section id="section-l2-snapshot" aria-labelledby={`${headingPrefix}-step3`}>
+            <SectionHeading
+              id={`${headingPrefix}-step3`}
+              icon={Layers}
+              step="Step 3 — L2 Snapshot Data"
+              layerColor="bg-amber-600"
+              title="Source Data Tables"
+              subtitle="Two L2 tables provide rate and commitment — click any row for X-Ray column detail"
+            />
+            <L2FieldTable />
+            <InsightCallout>
+              <strong>rate_index vs interest_rate — the critical distinction.</strong> <code className="text-teal-300">rate_index</code> is the
+              benchmark component (SOFR, Prime). <code className="text-red-400 line-through">interest_rate</code> is the all-in contractual rate
+              (benchmark + spread). This metric requires the benchmark only. Using the wrong column is the most common implementation mistake.
+            </InsightCallout>
+          </section>
 
-        {/* ── GSIB SYNDICATION ── */}
-        <section aria-labelledby={`${headingPrefix}-syndication`}>
-          <SectionHeading
-            id={`${headingPrefix}-syndication`}
-            icon={Building2}
-            step="GSIB Context"
-            layerColor="bg-blue-600"
-            title="Syndication Share Adjustment"
-            subtitle="Why raw total_commitment is wrong for a GSIB — the bank_share_pct correction"
-          />
-          <SyndicationCallout />
-        </section>
+          <FlowArrow label="Fields feed into calculation engine" />
 
-        <FlowArrow label="Adjusted commitments feed into weighting" />
+          {/* ── GSIB SYNDICATION ── */}
+          <section id="section-syndication" aria-labelledby={`${headingPrefix}-syndication`}>
+            <SectionHeading
+              id={`${headingPrefix}-syndication`}
+              icon={Building2}
+              step="GSIB Context"
+              layerColor="bg-blue-600"
+              title="Syndication Share Adjustment"
+              subtitle="Why raw total_commitment is wrong for a GSIB — the bank_share_pct correction"
+            />
+            <SyndicationCallout />
+          </section>
 
-        {/* ── QUERY PLAN ── */}
-        <section aria-labelledby={`${headingPrefix}-query-plan`}>
-          <SectionHeading
-            id={`${headingPrefix}-query-plan`}
-            icon={Search}
-            step="Under the Hood"
-            layerColor="bg-purple-600"
-            title="How the Engine Thinks"
-            subtitle="Logical query steps — click any step or toggle 'Show SQL' for the technical view"
-          />
-          <QueryPlanView />
-        </section>
+          <FlowArrow label="Adjusted commitments feed into weighting" />
 
-        <FlowArrow label="Query results feed into WABR formula" />
+          {/* ── QUERY PLAN ── */}
+          <section id="section-query-plan" aria-labelledby={`${headingPrefix}-query-plan`}>
+            <SectionHeading
+              id={`${headingPrefix}-query-plan`}
+              icon={Search}
+              step="Under the Hood"
+              layerColor="bg-purple-600"
+              title="How the Engine Thinks"
+              subtitle="Logical query steps — click any step or toggle 'Show SQL' for the technical view"
+            />
+            <QueryPlanView />
+          </section>
 
-        {/* ── STEP 4: CALCULATION ── */}
-        <section aria-labelledby={`${headingPrefix}-step4`}>
-          <SectionHeading
-            id={`${headingPrefix}-step4`}
-            icon={Zap}
-            step="Step 4 — Calculation Engine"
-            layerColor="bg-teal-600"
-            title="WABR Calculation"
-            subtitle="Worked examples at Facility and Counterparty level — T3 authority (always calculated)"
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <PositionTable positions={FACILITY_POSITIONS} title="Facility Level — F-5001 (3 positions)" result={FACILITY_WABR} />
-            <PositionTable positions={COUNTERPARTY_POSITIONS.filter(p => p.contractWeight > 0)} title="Counterparty Level — 2 facilities, cross-facility weights" result={COUNTERPARTY_WABR} />
-          </div>
-          <InsightCallout>
-            <strong>T3 — Always Calculated.</strong> WABR is never sourced from the bank. The platform computes it from raw position data
-            at every level. Notice how the counterparty-level denominator spans both facilities — positions from F-5001 and F-5002
-            contribute to a single set of weights that sums to 1.0 across the counterparty.
-          </InsightCallout>
-        </section>
+          <FlowArrow label="Query results feed into WABR formula" />
 
-        <FlowArrow label="Results stored in L3 tables, then rolled up" />
-
-        {/* ── DENOMINATOR SCOPE ── */}
-        <section aria-labelledby={`${headingPrefix}-denominator`}>
-          <SectionHeading
-            id={`${headingPrefix}-denominator`}
-            icon={Scale}
-            step="Critical Rule"
-            layerColor="bg-red-600"
-            title="Denominator Scope at Each Level"
-            subtitle="The single most common implementation error — getting the weight denominator wrong"
-          />
-          <DenominatorScopeComparison />
-        </section>
-
-        <FlowArrow label="Individual results aggregate up the hierarchy" />
-
-        {/* ── ANIMATED DATA FLOW ── */}
-        <section aria-labelledby={`${headingPrefix}-data-flow`}>
-          <SectionHeading
-            id={`${headingPrefix}-data-flow`}
-            icon={Sparkles}
-            step="End-to-End Trace"
-            layerColor="bg-amber-600"
-            title="Watch a Number Travel"
-            subtitle="Follow a syndicated facility's data through the entire WABR pipeline"
-          />
-          <AnimatedDataFlow />
-        </section>
-
-        <FlowArrow label="Results aggregate up the hierarchy" />
-
-        {/* ── STEP 5: ROLLUP HIERARCHY ── */}
-        <section aria-labelledby={`${headingPrefix}-step5`}>
-          <SectionHeading
-            id={`${headingPrefix}-step5`}
-            icon={GitBranch}
-            step="Step 5 — Rollup Hierarchy"
-            layerColor="bg-emerald-600"
-            title="Aggregation at Each Level"
-            subtitle="Same formula, widening scope — click each level to see join path and aggregation method"
-          />
-          <div className="mb-2">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
-              <Link2 className="w-3 h-3" aria-hidden="true" />
-              Rollup Hierarchy — Facility {'\u2192'} Counterparty {'\u2192'} Desk {'\u2192'} Portfolio {'\u2192'} LoB — click to expand
+          {/* ── STEP 4: CALCULATION ── */}
+          <section id="section-calculation" aria-labelledby={`${headingPrefix}-step4`}>
+            <SectionHeading
+              id={`${headingPrefix}-step4`}
+              icon={Zap}
+              step="Step 4 — Calculation Engine"
+              layerColor="bg-teal-600"
+              title="WABR Calculation"
+              subtitle="Worked examples at Facility and Counterparty level — T3 authority (always calculated)"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <PositionTable positions={FACILITY_POSITIONS} title="Facility Level — F-5001 (3 positions)" result={FACILITY_WABR} />
+              <PositionTable positions={COUNTERPARTY_POSITIONS.filter(p => p.contractWeight > 0)} title="Counterparty Level — 2 facilities, cross-facility weights" result={COUNTERPARTY_WABR} />
             </div>
-          </div>
-          <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
-          <InsightCallout>
-            <strong>The formula never changes — only the scope widens.</strong> At every level above facility, the denominator
-            expands to include all positions in the broader aggregation scope. The join path changes (adding LoB hierarchy lookups),
-            but the math remains: <code className="text-teal-300">{'Σ'}(rate_index {'×'} adjusted_weight)</code>.
-            The key insight: WABR is <strong>recomputed from raw position data</strong> at each level, not rolled up from the level below.
-          </InsightCallout>
-        </section>
+            <InsightCallout>
+              <strong>T3 — Always Calculated.</strong> WABR is never sourced from the bank. The platform computes it from raw position data
+              at every level. Notice how the counterparty-level denominator spans both facilities — positions from F-5001 and F-5002
+              contribute to a single set of weights that sums to 1.0 across the counterparty.
+            </InsightCallout>
+          </section>
 
-        <FlowArrow label="Dashboard builder selects dimension" />
+          <FlowArrow label="Results stored in L3 tables, then rolled up" />
 
-        {/* ── STEP 6: DASHBOARD ── */}
-        <section aria-labelledby={`${headingPrefix}-step6`}>
-          <SectionHeading
-            id={`${headingPrefix}-step6`}
-            icon={LayoutDashboard}
-            step="Step 6 — Dashboard Consumption"
-            layerColor="bg-pink-600"
-            title="Dashboard Display"
-            subtitle="WABR appears at every level — displayed alongside spread and all-in rate for full pricing context"
-          />
-          <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Sample cards */}
-              {[
-                { level: 'Facility', value: '5.275%', context: 'F-5001 Sunrise Term Loan', spread: '+175bps', allIn: '7.025%' },
-                { level: 'Counterparty', value: '5.042%', context: 'Sunrise Properties LLC (2 facilities)', spread: '+162bps avg', allIn: '6.662%' },
-                { level: 'L3 Desk', value: '5.18%', context: 'CRE Origination Desk (142 facilities)', spread: '+168bps avg', allIn: '6.86%' },
-              ].map((card) => (
-                <div key={card.level} className="rounded-lg border border-gray-800 bg-black/30 p-3">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">{card.level}</div>
-                  <div className="text-2xl font-black text-teal-400 tabular-nums mb-1">{card.value}</div>
-                  <div className="text-[10px] text-gray-500 mb-2">{card.context}</div>
-                  <div className="grid grid-cols-2 gap-2 text-[10px] pt-2 border-t border-white/5">
-                    <div>
-                      <span className="text-gray-600">Spread</span>
-                      <div className="text-amber-300 font-mono">{card.spread}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">All-In Rate</span>
-                      <div className="text-emerald-300 font-mono">{card.allIn}</div>
+          {/* ── DENOMINATOR SCOPE ── */}
+          <section id="section-denominator" aria-labelledby={`${headingPrefix}-denominator`}>
+            <SectionHeading
+              id={`${headingPrefix}-denominator`}
+              icon={Scale}
+              step="Critical Rule"
+              layerColor="bg-red-600"
+              title="Denominator Scope at Each Level"
+              subtitle="The single most common implementation error — getting the weight denominator wrong"
+            />
+            <DenominatorScopeComparison />
+          </section>
+
+          <FlowArrow label="Individual results aggregate up the hierarchy" />
+
+          {/* ── ANIMATED DATA FLOW ── */}
+          <section id="section-data-flow" aria-labelledby={`${headingPrefix}-data-flow`}>
+            <SectionHeading
+              id={`${headingPrefix}-data-flow`}
+              icon={Sparkles}
+              step="End-to-End Trace"
+              layerColor="bg-amber-600"
+              title="Watch a Number Travel"
+              subtitle="Follow a syndicated facility's data through the entire WABR pipeline"
+            />
+            <AnimatedDataFlow />
+          </section>
+
+          <FlowArrow label="Results aggregate up the hierarchy" />
+
+          {/* ── STEP 5: ROLLUP HIERARCHY ── */}
+          <section id="section-rollup" aria-labelledby={`${headingPrefix}-step5`}>
+            <SectionHeading
+              id={`${headingPrefix}-step5`}
+              icon={GitBranch}
+              step="Step 5 — Rollup Hierarchy"
+              layerColor="bg-emerald-600"
+              title="Aggregation at Each Level"
+              subtitle="Same formula, widening scope — click each level to see join path and aggregation method"
+            />
+            <div className="mb-2">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+                <Link2 className="w-3 h-3" aria-hidden="true" />
+                Rollup Hierarchy — Facility {'\u2192'} Counterparty {'\u2192'} Desk {'\u2192'} Portfolio {'\u2192'} LoB — click to expand
+              </div>
+            </div>
+            <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
+            <InsightCallout>
+              <strong>The formula never changes — only the scope widens.</strong> At every level above facility, the denominator
+              expands to include all positions in the broader aggregation scope. The join path changes (adding LoB hierarchy lookups),
+              but the math remains: <code className="text-teal-300">{'Σ'}(rate_index {'×'} adjusted_weight)</code>.
+              The key insight: WABR is <strong>recomputed from raw position data</strong> at each level, not rolled up from the level below.
+            </InsightCallout>
+          </section>
+
+          <FlowArrow label="Dashboard builder selects dimension" />
+
+          {/* ── STEP 6: DASHBOARD ── */}
+          <section id="section-dashboard" aria-labelledby={`${headingPrefix}-step6`}>
+            <SectionHeading
+              id={`${headingPrefix}-step6`}
+              icon={LayoutDashboard}
+              step="Step 6 — Dashboard Consumption"
+              layerColor="bg-pink-600"
+              title="Dashboard Display"
+              subtitle="WABR appears at every level — displayed alongside spread and all-in rate for full pricing context"
+            />
+            <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { level: 'Facility', value: '5.275%', context: 'F-5001 Sunrise Term Loan', spread: '+175bps', allIn: '7.025%' },
+                  { level: 'Counterparty', value: '5.042%', context: 'Sunrise Properties LLC (2 facilities)', spread: '+162bps avg', allIn: '6.662%' },
+                  { level: 'L3 Desk', value: '5.18%', context: 'CRE Origination Desk (142 facilities)', spread: '+168bps avg', allIn: '6.86%' },
+                ].map((card) => (
+                  <div key={card.level} className="rounded-lg border border-gray-800 bg-black/30 p-3">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">{card.level}</div>
+                    <div className="text-2xl font-black text-teal-400 tabular-nums mb-1">{card.value}</div>
+                    <div className="text-[10px] text-gray-500 mb-2">{card.context}</div>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] pt-2 border-t border-white/5">
+                      <div>
+                        <span className="text-gray-600">Spread</span>
+                        <div className="text-amber-300 font-mono">{card.spread}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">All-In Rate</span>
+                        <div className="text-emerald-300 font-mono">{card.allIn}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <PlainEnglish>
+                WABR is most useful when shown alongside the spread (margin above the base rate) and the all-in rate
+                (base rate + spread). Together, these three numbers tell the full pricing story: is revenue being driven
+                by market rates moving, or by the bank pricing wider spreads?
+              </PlainEnglish>
             </div>
-            <PlainEnglish>
-              WABR is most useful when shown alongside the spread (margin above the base rate) and the all-in rate
-              (base rate + spread). Together, these three numbers tell the full pricing story: is revenue being driven
-              by market rates moving, or by the bank pricing wider spreads?
-            </PlainEnglish>
-          </div>
-        </section>
+          </section>
 
-        {/* ── LEGEND ── */}
-        <FooterLegend />
-      </main>
+          {/* ── LEGEND ── */}
+          <FooterLegend />
+        </main>
+      </div>
     </div>
   );
 }

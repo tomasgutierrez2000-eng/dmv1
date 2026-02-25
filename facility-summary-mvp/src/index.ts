@@ -115,6 +115,12 @@ const validateSummaries = (
         (item) => item.facility_participation_id
       ),
     },
+    {
+      name: "facility_lender_allocation",
+      ids: l1.facilityLenderAllocation.map(
+        (item) => item.lender_allocation_id
+      ),
+    },
     { name: "facility_exposure_snapshot", ids: l2.facilityExposureSnapshot.map((item) => item.facility_exposure_id) },
     { name: "collateral_snapshot", ids: l2.collateralSnapshot.map((item) => item.collateral_snapshot_id) },
     { name: "amendment_event", ids: l2.amendmentEvent.map((item) => item.amendment_event_id) },
@@ -145,6 +151,10 @@ const main = () => {
   writeJson(
     path.join(OUTPUT_ROOT, "l1", "facility-counterparty-participation.json"),
     l1.facilityCounterpartyParticipation
+  );
+  writeJson(
+    path.join(OUTPUT_ROOT, "l1", "facility-lender-allocation.json"),
+    l1.facilityLenderAllocation
   );
   writeJson(path.join(OUTPUT_ROOT, "l1", "fr2590-category-dim.json"), l1.fr2590CategoryDim);
   writeJson(path.join(OUTPUT_ROOT, "l1", "industry-dim.json"), l1.industryDim);
@@ -199,6 +209,7 @@ const main = () => {
     counterparty_hierarchy: l1.counterpartyHierarchy.length,
     legal_entity: l1.legalEntity.length,
     facility_counterparty_participation: l1.facilityCounterpartyParticipation.length,
+    facility_lender_allocation: l1.facilityLenderAllocation.length,
     fr2590_category_dim: l1.fr2590CategoryDim.length,
     industry_dim: l1.industryDim.length,
     facility_exposure_snapshot: l2.facilityExposureSnapshot.length,

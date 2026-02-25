@@ -12,6 +12,7 @@ import {
 import { Counterparty } from "../schemas/l1/counterparty";
 import { CounterpartyHierarchy } from "../schemas/l1/counterparty-hierarchy";
 import { FacilityCounterpartyParticipation } from "../schemas/l1/facility-counterparty-participation";
+import { FacilityLenderAllocation } from "../schemas/l1/facility-lender-allocation";
 import { FacilityMaster } from "../schemas/l1/facility-master";
 import { Fr2590CategoryDim } from "../schemas/l1/fr2590-category-dim";
 import { IndustryDim } from "../schemas/l1/industry-dim";
@@ -92,6 +93,7 @@ export interface L1Data {
   counterpartyHierarchy: CounterpartyHierarchy[];
   legalEntity: LegalEntity[];
   facilityCounterpartyParticipation: FacilityCounterpartyParticipation[];
+  facilityLenderAllocation: FacilityLenderAllocation[];
   fr2590CategoryDim: Fr2590CategoryDim[];
   industryDim: IndustryDim[];
 }
@@ -289,12 +291,68 @@ export const generateL1Data = (): L1Data => {
     participationSeq += 1;
   });
 
+  // --- facility_lender_allocation: issuer-side bank share per facility ---
+  const facilityLenderAllocation: FacilityLenderAllocation[] = [];
+  let allocationSeq = 1;
+
+  // Syndicated share splits for first 10 facilities (two legal entities each)
+  const syndicatedSplits: Array<{
+    pcts: [number, number];
+    roles: [string, string];
+    leads: [boolean, boolean];
+    leIndices: [number, number];
+  }> = [
+    { pcts: [60, 40], roles: ["LEAD_ARRANGER", "CO_LENDER"], leads: [true, false], leIndices: [0, 1] },
+    { pcts: [55, 45], roles: ["LEAD_ARRANGER", "PARTICIPANT"], leads: [true, false], leIndices: [0, 2] },
+    { pcts: [45, 55], roles: ["CO_LENDER", "LEAD_ARRANGER"], leads: [false, true], leIndices: [1, 0] },
+    { pcts: [70, 30], roles: ["LEAD_ARRANGER", "PARTICIPANT"], leads: [true, false], leIndices: [0, 3] },
+    { pcts: [50, 50], roles: ["CO_LENDER", "CO_LENDER"], leads: [false, false], leIndices: [0, 1] },
+    { pcts: [80, 20], roles: ["LEAD_ARRANGER", "PARTICIPANT"], leads: [true, false], leIndices: [0, 2] },
+    { pcts: [65, 35], roles: ["LEAD_ARRANGER", "CO_LENDER"], leads: [true, false], leIndices: [1, 0] },
+    { pcts: [40, 60], roles: ["PARTICIPANT", "LEAD_ARRANGER"], leads: [false, true], leIndices: [0, 1] },
+    { pcts: [75, 25], roles: ["LEAD_ARRANGER", "PARTICIPANT"], leads: [true, false], leIndices: [0, 2] },
+    { pcts: [55, 45], roles: ["LEAD_ARRANGER", "CO_LENDER"], leads: [true, false], leIndices: [1, 0] },
+  ];
+
+  syndicatedFacilities.forEach((facility, index) => {
+    const split = syndicatedSplits[index % syndicatedSplits.length];
+    split.pcts.forEach((pct, slotIndex) => {
+      const le = legalEntity[split.leIndices[slotIndex] % legalEntity.length];
+      facilityLenderAllocation.push({
+        lender_allocation_id: `FLA-${padId(allocationSeq, 4)}`,
+        facility_id: facility.facility_id,
+        legal_entity_id: le.legal_entity_id,
+        bank_share_pct: pct,
+        bank_commitment_amt: Math.round(facility.committed_facility_amt * pct / 100),
+        allocation_role: split.roles[slotIndex],
+        is_lead_flag: split.leads[slotIndex],
+      });
+      allocationSeq += 1;
+    });
+  });
+
+  // Bilateral facilities: 100% to a single rotating legal entity
+  facilityMaster.slice(10).forEach((facility, index) => {
+    const le = legalEntity[index % legalEntity.length];
+    facilityLenderAllocation.push({
+      lender_allocation_id: `FLA-${padId(allocationSeq, 4)}`,
+      facility_id: facility.facility_id,
+      legal_entity_id: le.legal_entity_id,
+      bank_share_pct: 100,
+      bank_commitment_amt: facility.committed_facility_amt,
+      allocation_role: "SOLE_LENDER",
+      is_lead_flag: true,
+    });
+    allocationSeq += 1;
+  });
+
   return {
     facilityMaster,
     counterparty: counterparties,
     counterpartyHierarchy,
     legalEntity,
     facilityCounterpartyParticipation,
+    facilityLenderAllocation,
     fr2590CategoryDim,
     industryDim,
   };

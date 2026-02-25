@@ -1241,6 +1241,40 @@
     "relationshipType": "primary"
   },
   {
+    "id": "L1.facility_lender_allocation.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_lender_allocation",
+      "field": "facility_id",
+      "tableKey": "L1.facility_lender_allocation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.facility_lender_allocation.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_lender_allocation",
+      "field": "legal_entity_id",
+      "tableKey": "L1.facility_lender_allocation"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
     "id": "L1.sccl_counterparty_group_member.sccl_group_id->L1.sccl_counterparty_group.sccl_group_id",
     "source": {
       "layer": "L1",

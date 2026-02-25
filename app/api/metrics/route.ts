@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, nextCustomMetricId, isReadOnlyFsError } from '@/lib/metrics-store';
 import type { L3Metric, DashboardPage } from '@/data/l3-metrics';
 import { normalizeMetric, PAGES, validateMetric } from '@/lib/metrics-calculation';
-import { getParentMetric, upsertParentMetric, saveVariant, refreshParentVariantCounts } from '@/lib/metric-library/store';
+import { getParentMetric, upsertParentMetric, saveVariant } from '@/lib/metric-library/store';
 import type { MetricVariant, ParentMetric } from '@/lib/metric-library/types';
 
 export type MetricSource = 'builtin' | 'custom';
@@ -72,9 +72,7 @@ export async function POST(request: NextRequest) {
         metric_class: 'CALCULATED',
         unit_type: 'RATIO',
         direction: 'HIGHER_BETTER',
-        risk_appetite_relevant: true,
         rollup_philosophy: 'Weighted average by EAD at each level',
-        rollup_description: 'Facility-level DSCR is calculated directly; higher levels use EAD-weighted averages.',
         domain_ids: ['credit_risk'],
       };
       upsertParentMetric(dscrParent);
@@ -86,17 +84,18 @@ export async function POST(request: NextRequest) {
       parent_metric_id: DSCR_PARENT_ID,
       variant_type: 'CALCULATED',
       status: 'DRAFT',
-      version: '1.0.0',
-      effective_date: new Date().toISOString().slice(0, 10),
       formula_display: metric.formula || '',
-      detailed_description: metric.description,
-      product_scope: metric.description,
+      rollup_logic: {
+        facility: 'Raw calculated value',
+        counterparty: 'SUM(dscr * facility_ead) / SUM(facility_ead)',
+        desk: 'SUM(dscr * cpty_ead) / SUM(cpty_ead)',
+        portfolio: 'SUM(dscr * desk_ead) / SUM(desk_ead)',
+        lob: 'SUM(dscr * portfolio_ead) / SUM(portfolio_ead)',
+      },
+      weighting_basis: 'BY_EAD',
       executable_metric_id: metric.id,
-      owner_team: 'Calculator',
-      created_at: new Date().toISOString(),
     };
     saveVariant(variant);
-    refreshParentVariantCounts();
   } catch {
     // Library write is best-effort; metric was already saved successfully.
   }

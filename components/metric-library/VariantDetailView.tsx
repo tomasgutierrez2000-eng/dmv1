@@ -1,18 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, type ComponentType } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Pencil, Check, X, Lock, RefreshCw, Settings, Copy, LayoutDashboard } from 'lucide-react';
+import { ExternalLink, Pencil, Check, X } from 'lucide-react';
 import type { MetricVariant } from '@/lib/metric-library/types';
 import { ROLLUP_HIERARCHY_LEVELS, ROLLUP_LEVEL_LABELS } from '@/lib/metric-library/types';
-import {
-  getTierConfig,
-  CALCULATION_AUTHORITY_TIERS,
-  INTEGRATION_PATTERN_LABELS,
-} from '@/lib/metric-library/calculation-authority';
-import { SOURCING_LEVEL_LABELS } from '@/lib/metric-library/sourcing-level';
-import { TypeBadge, StatusBadge, CalculationAuthorityBadge } from './badges';
-import MetricLibraryLineageView from './MetricLibraryLineageView';
+import { TypeBadge, StatusBadge } from './badges';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 
 interface VariantDetailResponse {
@@ -20,83 +13,15 @@ interface VariantDetailResponse {
   parent?: { metric_id: string; metric_name: string } | null;
 }
 
-const TIER_ICONS: Record<string, ComponentType<{ className?: string }>> = {
-  Lock,
-  RefreshCw,
-  Settings,
-};
-
-const TABS = [
-  { id: 'definition' as const, label: 'Definition & Rollup' },
-  { id: 'calculationAuthority' as const, label: 'Calculation Authority' },
-  { id: 'sourceIngestion' as const, label: 'Source & Ingestion' },
-  { id: 'lineage' as const, label: 'Lineage' },
-  { id: 'validation' as const, label: 'Validation' },
-  { id: 'usage' as const, label: 'Usage' },
-  { id: 'governance' as const, label: 'Governance' },
-] as const;
-
-function validationSeverityStyle(severity: string): string {
-  switch (severity) {
-    case 'ERROR':
-      return 'bg-red-50 border border-red-200';
-    case 'WARNING':
-      return 'bg-amber-50 border border-amber-200';
-    case 'INFO':
-      return 'bg-slate-50 border border-slate-200';
-    default:
-      return 'bg-gray-50 border border-gray-200';
-  }
-}
-
-function validationDotStyle(severity: string): string {
-  switch (severity) {
-    case 'ERROR':
-      return 'bg-red-500';
-    case 'WARNING':
-      return 'bg-amber-400';
-    case 'INFO':
-      return 'bg-slate-400';
-    default:
-      return 'bg-gray-400';
-  }
-}
-
-function validationTextStyle(severity: string): string {
-  switch (severity) {
-    case 'ERROR':
-      return 'text-red-600';
-    case 'WARNING':
-      return 'text-amber-600';
-    case 'INFO':
-      return 'text-slate-600';
-    default:
-      return 'text-gray-600';
-  }
-}
-
 export default function VariantDetailView({ parentId, variantId }: { parentId: string; variantId: string }) {
   const [data, setData] = useState<VariantDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('definition');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [editForm, setEditForm] = useState<Partial<MetricVariant>>({});
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const copyToClipboard = useCallback((text: string, id: string) => {
-    if (!text.trim()) return;
-    navigator.clipboard.writeText(text).then(
-      () => {
-        setCopiedId(id);
-        setTimeout(() => setCopiedId(null), 2000);
-      },
-      () => {}
-    );
-  }, []);
 
   const fetchData = useCallback(() => {
     setError(null);
@@ -131,7 +56,6 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
 
   const v = data.variant;
   const parent = data.parent;
-
   const rollupLogic = v.rollup_logic as Record<string, string> | undefined;
   const levels = rollupLogic ? [...ROLLUP_HIERARCHY_LEVELS] : [];
 
@@ -167,14 +91,8 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               <h1 className="text-2xl font-bold text-gray-900">{v.variant_name}</h1>
               <TypeBadge type={v.variant_type} />
               <StatusBadge status={v.status} />
-              {v.calculation_authority_tier && (
-                <CalculationAuthorityBadge
-                  tier={v.calculation_authority_tier}
-                  tierName={getTierConfig(v.calculation_authority_tier)?.name}
-                />
-              )}
             </div>
-            <p className="text-gray-600 text-sm max-w-3xl">{v.detailed_description ?? v.formula_display ?? '—'}</p>
+            <p className="text-gray-600 text-sm max-w-3xl">{v.formula_display ?? '—'}</p>
             <code className="block mt-2 text-xs bg-gray-800 text-green-400 px-3 py-1.5 rounded font-mono w-fit">
               {v.variant_id}
             </code>
@@ -183,8 +101,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             {parent && (
               <div>Parent: <span className="font-semibold text-gray-700">{parent.metric_name}</span></div>
             )}
-            {v.source_system && <div>Source: <span className="font-medium">{v.source_system}</span></div>}
-            {v.refresh_frequency && <div>Refresh: <span className="font-medium">{v.refresh_frequency}</span></div>}
+            {v.source_table && <div>Source: <span className="font-medium">{v.source_table}.{v.source_field ?? '*'}</span></div>}
             {!editing ? (
               <button
                 type="button"
@@ -264,722 +181,110 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
         </div>
 
         {saveError && (
-          <div
-            role="alert"
-            className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-          >
+          <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {saveError}
           </div>
         )}
         {saveSuccess && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
-          >
+          <div role="status" aria-live="polite" className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
             Saved successfully.
           </div>
         )}
 
-        <div
-          role="tablist"
-          aria-label="Variant detail sections"
-          className="flex gap-1 border-b border-gray-200 mb-6 overflow-x-auto scrollbar-hide"
-        >
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.id}
-              aria-controls={`variant-tab-${t.id}`}
-              id={`variant-tab-${t.id}-btn`}
-              onClick={() => setTab(t.id)}
-              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-                tab === t.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'definition' && (
-          <section
-            id="variant-tab-definition"
-            role="tabpanel"
-            aria-labelledby="variant-tab-definition-btn"
-            className="space-y-6"
-          >
-            {v.detailed_description && (
-              <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Description</h2>
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{v.detailed_description}</p>
-              </div>
-            )}
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Formula</h2>
+        <div className="space-y-6">
+          {/* Formula */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Formula</h2>
+            {editing ? (
+              <textarea
+                value={editForm.formula_display ?? v.formula_display ?? ''}
+                onChange={(e) => setEditForm((f) => ({ ...f, formula_display: e.target.value }))}
+                rows={2}
+                className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
+              />
+            ) : (
               <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400 whitespace-pre-wrap overflow-x-auto">
                 {v.formula_display || '—'}
               </div>
-            </div>
-            {(v.companion_fields?.length ?? 0) > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Companion fields</h2>
-                <p className="text-xs text-gray-500 mb-3">Ingest alongside the primary value.</p>
-                <div className="flex flex-wrap gap-2">
-                  {v.companion_fields!.map((f, i) => {
-                    const label = typeof f === 'string' ? f : (f as { field_name?: string; display_name?: string }).field_name ?? (f as { display_name?: string }).display_name ?? String(f);
-                    return (
-                      <span key={typeof f === 'string' ? f : `f-${i}`} className="bg-gray-100 text-gray-700 text-xs font-mono px-2.5 py-1 rounded border border-gray-200">
-                        {label}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
             )}
+          </div>
 
+          {/* Source info */}
+          {(v.source_table || v.source_field || v.weighting_basis) && (
             <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Rollup</h2>
-              <p className="text-xs text-gray-500 mb-4">Facility → Counterparty → Desk → Portfolio → LoB.</p>
-              {levels.length > 0 ? (
-                <div className="space-y-0">
-                  {levels.map((level, i) => (
-                    <div key={level} className="flex items-stretch">
-                      <div className="flex flex-col items-center w-10 mr-4">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm ${
-                            ['bg-gray-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-600'][i]
-                          }`}
-                        >
-                          {['F', 'C', 'D', 'P', 'L'][i]}
-                        </div>
-                        {i < levels.length - 1 && <div className="w-0.5 flex-1 bg-gradient-to-b from-gray-300 to-gray-200 my-1 min-h-[4px]" />}
-                      </div>
-                      <div className={`flex-1 border rounded-lg p-3 ${i < levels.length - 1 ? 'mb-3' : ''} border-gray-200 bg-gray-50/50`}>
-                        <div className="text-xs font-bold text-gray-900 uppercase mb-1">
-                          {ROLLUP_LEVEL_LABELS[level] ?? level}
-                        </div>
-                        <div className="text-sm text-gray-600">{rollupLogic![level] ?? '—'}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-sm py-2">No rollup logic specified.</p>
-              )}
-            </div>
-          </section>
-        )}
-
-        {tab === 'calculationAuthority' && (
-          <section
-            id="variant-tab-calculationAuthority"
-            role="tabpanel"
-            aria-labelledby="variant-tab-calculationAuthority-btn"
-            className="space-y-6"
-          >
-            {(() => {
-              const tier = editing ? editForm.calculation_authority_tier ?? v.calculation_authority_tier : v.calculation_authority_tier;
-              const tierConfig = tier ? CALCULATION_AUTHORITY_TIERS[tier] : null;
-              return (
-                <>
-                  {editing ? (
-                    <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                      <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Calculation Authority tier</h2>
-                      <div className="space-y-3">
-                        <label htmlFor="calc-tier-current" className="block text-xs font-bold text-gray-500 uppercase">
-                          Current tier
-                        </label>
-                        <select
-                          id="calc-tier-current"
-                          value={editForm.calculation_authority_tier ?? v.calculation_authority_tier ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({
-                              ...f,
-                              calculation_authority_tier: (e.target.value || undefined) as MetricVariant['calculation_authority_tier'],
-                            }))
-                          }
-                          className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                          aria-describedby="calc-tier-current-desc"
-                        >
-                          <option value="">Not set</option>
-                          <option value="T1">T1 — Always Source</option>
-                          <option value="T2">T2 — Source + Calculate to Validate</option>
-                          <option value="T3">T3 — Always Calculate</option>
-                        </select>
-                        <p id="calc-tier-current-desc" className="text-xs text-gray-500">
-                          T1 = always sourced from GSIB; T2 = source + calculate to validate; T3 = always calculated in-platform.
-                        </p>
-                        <label htmlFor="calc-tier-future" className="block text-xs font-bold text-gray-500 uppercase mt-3">
-                          Future tier (optional)
-                        </label>
-                        <select
-                          id="calc-tier-future"
-                          value={editForm.calculation_authority_tier_future ?? v.calculation_authority_tier_future ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({
-                              ...f,
-                              calculation_authority_tier_future: (e.target.value || undefined) as MetricVariant['calculation_authority_tier_future'],
-                            }))
-                          }
-                          className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        >
-                          <option value="">Not set</option>
-                          <option value="T1">T1</option>
-                          <option value="T2">T2</option>
-                          <option value="T3">T3</option>
-                        </select>
-                      </div>
-                    </div>
-                  ) : tierConfig ? (
-                    <div
-                      className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
-                      style={{ borderLeftWidth: 4, borderLeftColor: tierConfig.color }}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        {(() => {
-                          const TierIcon = TIER_ICONS[tierConfig.icon];
-                          return TierIcon ? (
-                            <TierIcon className="w-5 h-5 text-gray-700" aria-hidden />
-                          ) : null;
-                        })()}
-                        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
-                          {tierConfig.name} — {tierConfig.subtitle}
-                        </h2>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-4">{tierConfig.shortDescription}</p>
-                    </div>
-                  ) : null}
-                  <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                    <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">
-                      Expected GSIB data source
-                    </h2>
-                    <p id="expected-gsib-desc" className="text-xs text-gray-500 mb-2">
-                      Where we get this metric&apos;s data from the GSIB (system / database / feed). Drives where implementation pulls data.
-                    </p>
-                    {editing ? (
-                      <input
-                        id="expected-gsib-source"
-                        type="text"
-                        value={editForm.expected_gsib_data_source ?? v.expected_gsib_data_source ?? v.source_system ?? ''}
-                        onChange={(e) =>
-                          setEditForm((f) => ({ ...f, expected_gsib_data_source: e.target.value || undefined }))
-                        }
-                        placeholder="e.g. Basel Engine, Risk DW, Spreading system"
-                        className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        aria-describedby="expected-gsib-desc"
-                      />
-                    ) : (
-                      <p className="text-sm text-gray-700">
-                        {v.expected_gsib_data_source ?? v.source_system ?? '—'}
-                      </p>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                      <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Classification rationale</h2>
-                      {editing ? (
-                        <textarea
-                          value={editForm.calculation_authority_rationale ?? v.calculation_authority_rationale ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({ ...f, calculation_authority_rationale: e.target.value || undefined }))
-                          }
-                          rows={3}
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        />
-                      ) : (
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                          {v.calculation_authority_rationale ?? '—'}
-                        </p>
-                      )}
-                      <h2 className="text-sm font-bold text-gray-900 mt-4 mb-2 uppercase tracking-wide">Component data needed</h2>
-                      {editing ? (
-                        <textarea
-                          value={editForm.calculation_authority_components ?? v.calculation_authority_components ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({ ...f, calculation_authority_components: e.target.value || undefined }))
-                          }
-                          rows={2}
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        />
-                      ) : (
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                          {v.calculation_authority_components ?? '—'}
-                        </p>
-                      )}
-                    </div>
-                    <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-                      <h2 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">Future evolution</h2>
-                      {editing ? (
-                        <textarea
-                          value={editForm.calculation_authority_future_evolution ?? v.calculation_authority_future_evolution ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({ ...f, calculation_authority_future_evolution: e.target.value || undefined }))
-                          }
-                          rows={3}
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        />
-                      ) : (
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                          {v.calculation_authority_future_evolution ?? '—'}
-                        </p>
-                      )}
-                      <h2 className="text-sm font-bold text-gray-900 mt-4 mb-2 uppercase tracking-wide">Migration path</h2>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.calculation_authority_migration_path ?? v.calculation_authority_migration_path ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({ ...f, calculation_authority_migration_path: e.target.value || undefined }))
-                          }
-                          placeholder="e.g. T1 → T2 when CDS data is ingested"
-                          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        />
-                      ) : (
-                        <p className="text-sm font-medium" style={v.calculation_authority_migration_path && tierConfig ? { color: tierConfig.color } : undefined}>
-                          {v.calculation_authority_migration_path ?? '—'}
-                        </p>
-                      )}
-                      {!editing && v.calculation_authority_tier_future && v.calculation_authority_tier !== v.calculation_authority_tier_future && (
-                        <p className="text-xs text-amber-700 mt-2">
-                          Future tier: {v.calculation_authority_tier_future}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {!tier && !editing && (
-                    <p className="text-gray-500 text-sm">No Calculation Authority tier set. Click Edit to add one.</p>
-                  )}
-                </>
-              );
-            })()}
-          </section>
-        )}
-
-        {tab === 'sourceIngestion' && (
-          <section
-            id="variant-tab-sourceIngestion"
-            role="tabpanel"
-            aria-labelledby="variant-tab-sourceIngestion-btn"
-            className="space-y-6"
-          >
-            {!editing && !v.expected_gsib_data_source && !v.source_system && !v.source_endpoint_or_feed && (
-              <div className="rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-6 text-center">
-                <p className="text-sm font-medium text-blue-900 mb-2">Connect this metric to a source system</p>
-                <p className="text-xs text-blue-700 mb-4 max-w-md mx-auto">
-                  Set the source name, delivery (Push or Pull), endpoint, and connection instructions so your team can plug in the feed.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => { setEditing(true); setEditForm({ ...v }); setSaveError(null); }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
-                  aria-label="Connect source — open edit mode to set source, delivery, endpoint, and instructions"
-                >
-                  <Pencil className="w-4 h-4" aria-hidden />
-                  Connect source
-                </button>
-              </div>
-            )}
-
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Link to source</h2>
-              <p className="text-xs text-gray-500 mb-1">
-                Where this metric comes from and how to connect. Push = source sends to us; Pull = we request from source.
-              </p>
-              <p className="text-xs text-gray-400 mb-4">
-                To connect: set Source → Delivery → Endpoint → paste Instructions below.
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="source-link-name" className="block text-xs font-medium text-gray-600 mb-1">Source</label>
-                  {editing ? (
-                    <input
-                      id="source-link-name"
-                      type="text"
-                      value={editForm.expected_gsib_data_source ?? editForm.source_system ?? v.expected_gsib_data_source ?? v.source_system ?? ''}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, expected_gsib_data_source: e.target.value || undefined, source_system: e.target.value || undefined }))
-                      }
-                      placeholder="e.g. Risk DW, Basel Engine, Spreading system"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-900">{v.expected_gsib_data_source ?? v.source_system ?? '—'}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="source-delivery" className="block text-xs font-medium text-gray-600 mb-1">Delivery</label>
-                  {editing ? (
-                    <select
-                      id="source-delivery"
-                      value={editForm.source_integration_pattern ?? v.source_integration_pattern ?? ''}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          source_integration_pattern: (e.target.value || undefined) as MetricVariant['source_integration_pattern'],
-                        }))
-                      }
-                      className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                    >
-                      <option value="">Not set</option>
-                      <option value="PUSH">Push — source sends to us</option>
-                      <option value="PULL">Pull — we request from source</option>
-                    </select>
-                  ) : (
-                    <p className="text-sm text-gray-900">
-                      {v.source_integration_pattern ? INTEGRATION_PATTERN_LABELS[v.source_integration_pattern] ?? v.source_integration_pattern : '—'}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="source-endpoint" className="block text-xs font-medium text-gray-600 mb-1">Endpoint or feed</label>
-                  {editing ? (
-                    <input
-                      id="source-endpoint"
-                      type="text"
-                      value={editForm.source_endpoint_or_feed ?? v.source_endpoint_or_feed ?? ''}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, source_endpoint_or_feed: e.target.value || undefined }))
-                      }
-                      placeholder="e.g. /api/v1/metrics/dscr, topic: metrics.dscr, or file path"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-mono text-gray-700 flex-1 min-w-0 truncate" title={v.source_endpoint_or_feed ?? undefined}>
-                        {v.source_endpoint_or_feed ?? '—'}
-                      </p>
-                      {v.source_endpoint_or_feed && (
-                        <button
-                          type="button"
-                          onClick={() => copyToClipboard(v.source_endpoint_or_feed!, 'endpoint')}
-                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                          aria-label="Copy endpoint"
-                          title="Copy endpoint"
-                        >
-                          {copiedId === 'endpoint' ? (
-                            <span className="text-xs text-emerald-600 font-medium">Copied!</span>
-                          ) : (
-                            <Copy className="w-4 h-4" aria-hidden />
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="source-instructions" className="block text-xs font-medium text-gray-600 mb-1">Instructions / code</label>
-                  {editing ? (
-                    <textarea
-                      id="source-instructions"
-                      value={editForm.source_setup_validation_notes ?? v.source_setup_validation_notes ?? ''}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, source_setup_validation_notes: e.target.value || undefined }))
-                      }
-                      rows={5}
-                      placeholder="Steps, config snippet, or code to connect (e.g. curl, SQL, or checklist)."
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                    />
-                  ) : (
-                    <div className="relative">
-                      <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded-lg p-3 border border-gray-100 pr-12">
-                        {v.source_setup_validation_notes ?? '—'}
-                      </pre>
-                      {v.source_setup_validation_notes && (
-                        <button
-                          type="button"
-                          onClick={() => copyToClipboard(v.source_setup_validation_notes!, 'instructions')}
-                          className="absolute top-2 right-2 p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                          aria-label="Copy instructions and code"
-                          title="Copy instructions"
-                        >
-                          {copiedId === 'instructions' ? (
-                            <span className="text-xs text-emerald-600 font-medium">Copied!</span>
-                          ) : (
-                            <Copy className="w-4 h-4" aria-hidden />
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Compact details */}
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <h3 className="text-xs font-bold text-gray-500 uppercase mb-3">Details</h3>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Source & Weighting</h2>
+              <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                {v.source_table && (
                   <div>
-                    <dt className="text-gray-500">Variant ID in source</dt>
-                    <dd className="font-mono text-gray-900 mt-0.5">
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.source_variant_identifier ?? v.source_variant_identifier ?? ''}
-                          onChange={(e) =>
-                            setEditForm((f) => ({ ...f, source_variant_identifier: e.target.value || undefined }))
-                          }
-                          placeholder="e.g. product_type=CRE"
-                          className="block w-full rounded border border-gray-300 px-2 py-1 text-sm font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                        />
-                      ) : (
-                        v.source_variant_identifier ?? '—'
-                      )}
-                    </dd>
+                    <dt className="text-gray-500">Source Table</dt>
+                    <dd className="font-mono text-gray-900 mt-0.5">{v.source_table}</dd>
                   </div>
-                  {(v.atomic_sourcing_level || (v.reconciliation_anchor_levels?.length ?? 0) > 0) && (
-                    <div>
-                      <dt className="text-gray-500">Data grain</dt>
-                      <dd className="text-gray-900 mt-0.5">
-                        {v.atomic_sourcing_level ? SOURCING_LEVEL_LABELS[v.atomic_sourcing_level] : '—'}
-                        {(v.reconciliation_anchor_levels?.length ?? 0) > 0 && (
-                          <span className="text-gray-500 text-xs ml-1">
-                            (anchors: {v.reconciliation_anchor_levels!.map((l) => SOURCING_LEVEL_LABELS[l]).join(', ')})
-                          </span>
-                        )}
-                      </dd>
-                    </div>
-                  )}
-                  <div className="sm:col-span-2">
-                    <dt className="text-gray-500 mb-1">Expected fields</dt>
-                    <dd className="text-gray-900">
-                      {(v.source_payload_spec?.length ?? 0) > 0 ? (
-                        <span className="font-mono text-xs">
-                          {v.source_payload_spec!.map((f) => f.field_name).join(', ')}
-                        </span>
-                      ) : v.source_field_name ? (
-                        <span className="font-mono text-xs">{v.source_field_name}</span>
-                      ) : (
-                        '—'
-                      )}
-                    </dd>
+                )}
+                {v.source_field && (
+                  <div>
+                    <dt className="text-gray-500">Source Field</dt>
+                    <dd className="font-mono text-gray-900 mt-0.5">{v.source_field}</dd>
                   </div>
-                </dl>
-              </div>
+                )}
+                {v.weighting_basis && (
+                  <div>
+                    <dt className="text-gray-500">Weighting Basis</dt>
+                    <dd className="font-medium text-gray-900 mt-0.5">{v.weighting_basis.replace('BY_', 'By ')}</dd>
+                  </div>
+                )}
+              </dl>
             </div>
+          )}
 
-          </section>
-        )}
-
-        {tab === 'lineage' && (
-          <section
-            id="variant-tab-lineage"
-            role="tabpanel"
-            aria-labelledby="variant-tab-lineage-btn"
-            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
-          >
-            <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Data Lineage</h2>
-            <p className="text-xs text-gray-500 mb-4">How this metric is built from L1/L2 atomic data and where it is consumed.</p>
-            <MetricLibraryLineageView variant={v} />
-          </section>
-        )}
-
-        {tab === 'validation' && (
-          <section
-            id="variant-tab-validation"
-            role="tabpanel"
-            aria-labelledby="variant-tab-validation-btn"
-            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
-          >
-            <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Validation Rules</h2>
-            {(v.validation_rules?.length ?? 0) > 0 ? (
-              <ul className="space-y-2">
-                {v.validation_rules!.map((r, i) => (
-                  <li
-                    key={i}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg ${validationSeverityStyle(r.severity)}`}
-                  >
-                    <span
-                      className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${validationDotStyle(r.severity)}`}
-                      aria-hidden
-                    />
-                    <span className="text-sm text-gray-800 flex-1">{r.description}</span>
-                    <span className={`text-xs font-bold flex-shrink-0 ${validationTextStyle(r.severity)}`}>
-                      {r.severity}
-                    </span>
-                  </li>
+          {/* Rollup */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Rollup</h2>
+            <p className="text-xs text-gray-500 mb-4">Facility → Counterparty → Desk → Portfolio → LoB.</p>
+            {levels.length > 0 ? (
+              <div className="space-y-0">
+                {levels.map((level, i) => (
+                  <div key={level} className="flex items-stretch">
+                    <div className="flex flex-col items-center w-10 mr-4">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm ${
+                          ['bg-gray-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-600'][i]
+                        }`}
+                      >
+                        {['F', 'C', 'D', 'P', 'L'][i]}
+                      </div>
+                      {i < levels.length - 1 && <div className="w-0.5 flex-1 bg-gradient-to-b from-gray-300 to-gray-200 my-1 min-h-[4px]" />}
+                    </div>
+                    <div className={`flex-1 border rounded-lg p-3 ${i < levels.length - 1 ? 'mb-3' : ''} border-gray-200 bg-gray-50/50`}>
+                      <div className="text-xs font-bold text-gray-900 uppercase mb-1">
+                        {ROLLUP_LEVEL_LABELS[level] ?? level}
+                      </div>
+                      <div className="text-sm text-gray-600">{rollupLogic![level] ?? '—'}</div>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
-              <p className="text-gray-500">No validation rules defined.</p>
+              <p className="text-gray-500 text-sm py-2">No rollup logic specified.</p>
             )}
-          </section>
-        )}
+          </div>
 
-        {tab === 'usage' && (
-          <section
-            id="variant-tab-usage"
-            role="tabpanel"
-            aria-labelledby="variant-tab-usage-btn"
-            className="space-y-6"
-          >
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Use in dashboard</h2>
-              <p className="text-xs text-gray-500 mb-3">
-                Add this metric to a dashboard by using its ID when configuring the dashboard or data source.
+          {/* Executable link */}
+          {v.executable_metric_id && (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <h3 className="text-xs font-bold text-amber-800 uppercase mb-1">Run in Engine</h3>
+              <p className="text-sm text-amber-700 mb-3">
+                This variant is linked to metric <code className="font-mono bg-amber-100/50 px-1 rounded">{v.executable_metric_id}</code>.
               </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <code className="text-sm font-mono bg-gray-100 text-gray-800 px-3 py-1.5 rounded border border-gray-200">
-                  {v.variant_id}
-                </code>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(v.variant_id, 'variant-id')}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                  aria-label={copiedId === 'variant-id' ? 'Copied to clipboard' : 'Copy metric ID to clipboard'}
-                >
-                  {copiedId === 'variant-id' ? (
-                    <span className="text-emerald-600">Copied!</span>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" aria-hidden />
-                      Copy metric ID
-                    </>
-                  )}
-                </button>
-                <Link
-                  href="/overview"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                  aria-label="Open overview and dashboards"
-                >
-                  <LayoutDashboard className="w-4 h-4" aria-hidden />
-                  Open overview
-                </Link>
-              </div>
+              <Link
+                href={`/metrics/deep-dive/${encodeURIComponent(v.executable_metric_id)}`}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden />
+                Open in Metrics Engine
+              </Link>
             </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Used in</h2>
-              <p className="text-xs text-gray-500 mb-3">
-                Record which dashboards and reports use this metric (optional).
-              </p>
-              {editing ? (
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="used-by-dashboards" className="block text-xs font-medium text-gray-600 mb-1">Dashboards</label>
-                    <input
-                      id="used-by-dashboards"
-                      type="text"
-                      value={(editForm.used_by_dashboards ?? v.used_by_dashboards ?? []).join(', ')}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          used_by_dashboards: e.target.value ? e.target.value.split(',').map((s) => s.trim()).filter(Boolean) : [],
-                        }))
-                      }
-                      placeholder="e.g. CRO Dashboard, Risk Appetite"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="used-by-reports" className="block text-xs font-medium text-gray-600 mb-1">Reports</label>
-                    <input
-                      id="used-by-reports"
-                      type="text"
-                      value={(editForm.used_by_reports ?? v.used_by_reports ?? []).join(', ')}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          used_by_reports: e.target.value ? e.target.value.split(',').map((s) => s.trim()).filter(Boolean) : [],
-                        }))
-                      }
-                      placeholder="e.g. FR Y-14Q, Pillar 3"
-                      className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:outline-none"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-xs font-medium text-gray-500 mb-2">Dashboards</h3>
-                    {(v.used_by_dashboards?.length ?? 0) > 0 ? (
-                      <ul className="space-y-1">
-                        {v.used_by_dashboards!.map((u, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" aria-hidden />
-                            {u}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-gray-500">—</p>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-medium text-gray-500 mb-2">Reports</h3>
-                    {(v.used_by_reports?.length ?? 0) > 0 ? (
-                      <ul className="space-y-1">
-                        {v.used_by_reports!.map((r, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" aria-hidden />
-                            {r}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-gray-500">—</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Regulatory references</h2>
-              {(v.regulatory_references?.length ?? 0) > 0 ? (
-                <ul className="divide-y divide-gray-100">
-                  {v.regulatory_references!.map((r, i) => (
-                    <li key={i} className="flex items-center gap-2 py-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" aria-hidden />
-                      <span className="text-sm text-gray-700">{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-500">—</p>
-              )}
-            </div>
-          </section>
-        )}
-
-        {tab === 'governance' && (
-          <section
-            id="variant-tab-governance"
-            role="tabpanel"
-            aria-labelledby="variant-tab-governance-btn"
-            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
-          >
-            <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Governance & Version</h2>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-              <div><dt className="text-gray-500">Owner Team</dt><dd className="font-medium text-gray-900 mt-0.5">{v.owner_team ?? '—'}</dd></div>
-              <div><dt className="text-gray-500">Approver</dt><dd className="font-medium text-gray-900 mt-0.5">{v.approver ?? '—'}</dd></div>
-              <div><dt className="text-gray-500">Version</dt><dd className="font-medium text-gray-900 mt-0.5">{v.version ?? '—'}</dd></div>
-              <div><dt className="text-gray-500">Effective Date</dt><dd className="font-medium text-gray-900 mt-0.5">{v.effective_date ?? '—'}</dd></div>
-              <div><dt className="text-gray-500">Review Cycle</dt><dd className="font-medium text-gray-900 mt-0.5">{v.review_cycle ?? '—'}</dd></div>
-            </dl>
-            {v.executable_metric_id && (
-              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <h3 className="text-xs font-bold text-amber-800 uppercase mb-1">Run in Engine</h3>
-                <p className="text-sm text-amber-700 mb-3">
-                  This variant is linked to metric <code className="font-mono bg-amber-100/50 px-1 rounded">{v.executable_metric_id}</code>. Use the Metrics Engine to edit the formula and run calculations.
-                </p>
-                <Link
-                  href={`/metrics/deep-dive/${encodeURIComponent(v.executable_metric_id)}`}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" aria-hidden />
-                  Open in Metrics Engine
-                </Link>
-              </div>
-            )}
-          </section>
-        )}
+          )}
+        </div>
       </main>
     </div>
   );

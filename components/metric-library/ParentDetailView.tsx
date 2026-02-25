@@ -16,11 +16,8 @@ interface ParentDetail {
   metric_class: string;
   unit_type: string;
   direction: string;
-  risk_appetite_relevant: boolean;
   rollup_philosophy: string;
-  rollup_description: string;
   domain_ids: string[];
-  variant_count?: number;
   variants: VariantSummary[];
 }
 
@@ -30,12 +27,9 @@ interface VariantSummary {
   variant_type: string;
   status: string;
   formula_display?: string;
-  detailed_description?: string;
-  source_system?: string;
-  refresh_frequency?: string;
   executable_metric_id?: string | null;
-  used_by_dashboards?: string[];
-  used_by_reports?: string[];
+  source_table?: string;
+  source_field?: string;
 }
 
 const TABS = [
@@ -88,7 +82,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
   }
 
   const m = data;
-  const variantCount = m.variants?.length ?? m.variant_count ?? 0;
+  const variantCount = m.variants?.length ?? 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -146,13 +140,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
           </div>
           <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
             <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Rollup Philosophy</div>
-            <div className="text-sm text-gray-700">{(m.rollup_philosophy ?? m.rollup_description ?? '').split('.')[0] || '—'}</div>
-          </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
-            <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Risk Appetite</div>
-            <div className={`text-sm font-bold ${m.risk_appetite_relevant ? 'text-green-600' : 'text-gray-400'}`}>
-              {m.risk_appetite_relevant ? 'Yes — Linked' : 'No'}
-            </div>
+            <div className="text-sm text-gray-700">{(m.rollup_philosophy ?? '').split('.')[0] || '—'}</div>
           </div>
         </div>
 
@@ -204,16 +192,10 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                         <StatusBadge status={v.status} />
                       </div>
                       <code className="text-xs text-gray-400 font-mono">{v.variant_id}</code>
-                      <p className="text-sm text-gray-600 mt-1.5 line-clamp-2">{v.detailed_description ?? v.formula_display ?? '—'}</p>
+                      <p className="text-sm text-gray-600 mt-1.5 line-clamp-2">{v.formula_display ?? '—'}</p>
                       <div className="flex gap-4 mt-2 text-xs text-gray-500 flex-wrap">
-                        {v.source_system && (
-                          <span>Source: <span className="font-medium text-gray-700">{v.source_system}</span></span>
-                        )}
-                        {v.refresh_frequency && (
-                          <span>Refresh: <span className="font-medium text-gray-700">{v.refresh_frequency}</span></span>
-                        )}
-                        {((v.used_by_dashboards?.length ?? 0) + (v.used_by_reports?.length ?? 0)) > 0 && (
-                          <span>Used by: <span className="font-medium text-gray-700">{(v.used_by_dashboards?.length ?? 0) + (v.used_by_reports?.length ?? 0)} dashboards/reports</span></span>
+                        {v.source_table && (
+                          <span>Source: <span className="font-medium text-gray-700 font-mono">{v.source_table}{v.source_field ? `.${v.source_field}` : ''}</span></span>
                         )}
                         {v.executable_metric_id && (
                           <span className="font-medium text-green-600">Runnable in Engine</span>
@@ -243,7 +225,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
             className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Rollup Philosophy</h2>
-            <p className="text-sm text-gray-700">{m.rollup_description || m.rollup_philosophy || 'Not specified.'}</p>
+            <p className="text-sm text-gray-700">{m.rollup_philosophy || 'Not specified.'}</p>
           </section>
         )}
 

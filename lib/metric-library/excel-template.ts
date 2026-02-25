@@ -10,11 +10,11 @@ export const LIBRARY_SHEET_NAMES = {
   VARIANTS: 'Variants',
 } as const;
 
-/** Required column keys per sheet (at least one header must match). */
+/** Required column keys per sheet. */
 export const REQUIRED_COLUMNS = {
   Domains: ['domain_id', 'domain_name'],
   ParentMetrics: ['metric_id', 'metric_name', 'definition', 'generic_formula', 'metric_class', 'unit_type', 'direction', 'domain_ids'],
-  Variants: ['variant_id', 'variant_name', 'parent_metric_id', 'variant_type', 'status', 'version', 'effective_date', 'formula_display'],
+  Variants: ['variant_id', 'variant_name', 'parent_metric_id', 'variant_type', 'status', 'formula_display'],
 } as const;
 
 /** Alternate header names for flexible parsing (case-insensitive match). */
@@ -34,9 +34,7 @@ export const COLUMN_ALIASES: Record<string, string[][]> = {
   metric_class: [['metric_class', 'metric class', 'class']],
   unit_type: [['unit_type', 'unit type', 'unit']],
   direction: [['direction']],
-  risk_appetite_relevant: [['risk_appetite_relevant', 'risk appetite relevant']],
   rollup_philosophy: [['rollup_philosophy', 'rollup philosophy']],
-  rollup_description: [['rollup_description', 'rollup description']],
   domain_ids: [['domain_ids', 'domain ids', 'domains']],
   regulatory_references: [['regulatory_references', 'regulatory references']],
 
@@ -45,11 +43,7 @@ export const COLUMN_ALIASES: Record<string, string[][]> = {
   parent_metric_id: [['parent_metric_id', 'parent metric id', 'parent_id', 'parent id']],
   variant_type: [['variant_type', 'variant type', 'type']],
   status: [['status']],
-  version: [['version']],
-  effective_date: [['effective_date', 'effective date', 'effective date']],
   formula_display: [['formula_display', 'formula display', 'formula']],
-  formula_specification: [['formula_specification', 'formula specification']],
-  detailed_description: [['detailed_description', 'detailed description', 'description']],
   rollup_facility: [['rollup_facility', 'rollup facility', 'facility']],
   rollup_counterparty: [['rollup_counterparty', 'rollup counterparty', 'counterparty']],
   rollup_desk: [['rollup_desk', 'rollup desk', 'desk']],
@@ -57,34 +51,8 @@ export const COLUMN_ALIASES: Record<string, string[][]> = {
   rollup_lob: [['rollup_lob', 'rollup lob', 'lob']],
   weighting_basis: [['weighting_basis', 'weighting basis']],
   executable_metric_id: [['executable_metric_id', 'executable metric id']],
-  owner_team: [['owner_team', 'owner team', 'owner']],
-  approver: [['approver']],
-  review_cycle: [['review_cycle', 'review cycle']],
-  source_system: [['source_system', 'source system']],
-  source_field_name: [['source_field_name', 'source field name']],
-  refresh_frequency: [['refresh_frequency', 'refresh frequency']],
-  used_by_dashboards: [['used_by_dashboards', 'used by dashboards', 'dashboards']],
-
-  calculation_authority_tier: [['calculation_authority_tier', 'calculation authority tier', 'authority tier']],
-  calculation_authority_tier_future: [['calculation_authority_tier_future', 'calculation authority tier future']],
-  calculation_authority_rationale: [['calculation_authority_rationale', 'calculation authority rationale']],
-  calculation_authority_components: [['calculation_authority_components', 'calculation authority components']],
-  calculation_authority_future_evolution: [['calculation_authority_future_evolution', 'calculation authority future evolution']],
-  calculation_authority_migration_path: [['calculation_authority_migration_path', 'calculation authority migration path']],
-  expected_gsib_data_source: [['expected_gsib_data_source', 'expected gsib data source', 'gsib data source']],
-  source_integration_pattern: [['source_integration_pattern', 'source integration pattern', 'integration pattern']],
-  source_delivery_method: [['source_delivery_method', 'source delivery method', 'delivery method']],
-  source_endpoint_or_feed: [['source_endpoint_or_feed', 'source endpoint or feed', 'endpoint or feed']],
-  source_variant_identifier: [['source_variant_identifier', 'source variant identifier', 'variant identifier']],
-  source_payload_spec: [['source_payload_spec', 'source payload spec', 'payload spec']],
-  source_setup_validation_notes: [['source_setup_validation_notes', 'source setup validation notes', 'setup validation notes']],
-  atomic_sourcing_level: [['atomic_sourcing_level', 'atomic sourcing level', 'sourcing level']],
-  reconciliation_anchor_levels: [['reconciliation_anchor_levels', 'reconciliation anchor levels', 'anchor levels']],
-  sourcing_level_rationale: [['sourcing_level_rationale', 'sourcing level rationale', 'sourcing rationale']],
-  sourcing_do_not_source: [['sourcing_do_not_source', 'sourcing do not source', 'do not source']],
-  sourcing_category: [['sourcing_category', 'sourcing category', 'sourcing category']],
-  data_format: [['data_format', 'data format']],
-  data_lag: [['data_lag', 'data lag']],
+  source_table: [['source_table', 'source table']],
+  source_field: [['source_field', 'source field']],
 };
 
 /** Find column index by header row and possible keys (uses COLUMN_ALIASES). */

@@ -1095,6 +1095,24 @@ CREATE TABLE IF NOT EXISTS l1.facility_counterparty_participation (
   CONSTRAINT fk_facility_counterparty_participation_counterparty_role_code FOREIGN KEY (counterparty_role_code) REFERENCES l1.counterparty_role_dim(counterparty_role_code)
 );
 
+CREATE TABLE IF NOT EXISTS l1.facility_lender_allocation (
+  lender_allocation_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  bank_share_pct DECIMAL(10,4),
+  bank_commitment_amt DECIMAL(18,2),
+  allocation_role VARCHAR(50) NOT NULL,
+  is_lead_flag CHAR(1),
+  source_record_id BIGINT,
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_facility_lender_allocation_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_lender_allocation_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id)
+);
+
 CREATE TABLE IF NOT EXISTS l1.sccl_counterparty_group (
   sccl_group_id BIGINT NOT NULL PRIMARY KEY,
   group_name VARCHAR(200),

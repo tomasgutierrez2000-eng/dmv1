@@ -1057,6 +1057,20 @@ export const L1_TABLES: TableDef[] = [
     ],
   },
   {
+    tableName: 'facility_lender_allocation',
+    scd: 'SCD-2',
+    columns: [
+      { name: 'lender_allocation_id', type: 'BIGINT', nullable: false, pk: true },
+      { name: 'facility_id', type: 'BIGINT', nullable: false, fk: 'l1.facility_master(facility_id)' },
+      { name: 'legal_entity_id', type: 'BIGINT', nullable: false, fk: 'l1.legal_entity(legal_entity_id)' },
+      { name: 'bank_share_pct', type: 'DECIMAL(10,4)', nullable: true },
+      { name: 'bank_commitment_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'allocation_role', type: 'VARCHAR(50)', nullable: false },
+      { name: 'is_lead_flag', type: 'CHAR(1)', nullable: true },
+      { name: 'source_record_id', type: 'BIGINT', nullable: true },
+    ],
+  },
+  {
     tableName: 'sccl_counterparty_group',
     scd: 'SCD-1',
     columns: [

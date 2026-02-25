@@ -1542,6 +1542,24 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
     }
 
+    /* ──────────── facility_lender_allocation ──────────── */
+    case 'facility_lender_allocation': {
+      // Tracks the bank's (issuer-side) share of each facility via legal_entity_id.
+      // Syndicated deals split across two legal entities; bilateral = 100% to one.
+      const isSyndicated = AGREEMENT_TYPES[idx] === 'SYNDICATED';
+      const sharePcts    = [60.0, 100.0, 45.0, 100.0, 70.0, 50.0, 100.0, 80.0, 55.0, 100.0];
+      const allocRoles   = ['LEAD_ARRANGER', 'SOLE_LENDER', 'CO_LENDER', 'SOLE_LENDER', 'LEAD_ARRANGER', 'CO_LENDER', 'SOLE_LENDER', 'LEAD_ARRANGER', 'LEAD_ARRANGER', 'SOLE_LENDER'];
+      const leadFlags    = ['Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y'];
+      const leIds        = [1, 1, 2, 1, 1, 2, 1, 1, 2, 1]; // legal_entity_id for primary row
+      if (columnName === 'legal_entity_id') return leIds[idx];
+      if (columnName === 'bank_share_pct') return sharePcts[idx];
+      if (columnName === 'bank_commitment_amt') return Math.round(COMMITTED_AMOUNTS[idx] * sharePcts[idx] / 100);
+      if (columnName === 'allocation_role') return allocRoles[idx];
+      if (columnName === 'is_lead_flag') return leadFlags[idx];
+      if (columnName === 'source_record_id') return 400_000 + idx + 1;
+      break;
+    }
+
     /* ──────────── rating_mapping ──────────── */
     case 'rating_mapping': {
       const rmExtRatings = ['AAA', 'AA+', 'AA', 'A+', 'A', 'BBB+', 'BBB', 'BBB-', 'BB+', 'BB'];

@@ -1,0 +1,542 @@
+[
+  {
+    "lender_allocation_id": "FLA-0001",
+    "facility_id": "FAC-2024-00001",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 60,
+    "bank_commitment_amt": 30,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0002",
+    "facility_id": "FAC-2024-00001",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 40,
+    "bank_commitment_amt": 20,
+    "allocation_role": "CO_LENDER",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0003",
+    "facility_id": "FAC-2024-00002",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 55,
+    "bank_commitment_amt": 48,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0004",
+    "facility_id": "FAC-2024-00002",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 45,
+    "bank_commitment_amt": 39,
+    "allocation_role": "PARTICIPANT",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0005",
+    "facility_id": "FAC-2024-00003",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 45,
+    "bank_commitment_amt": 56,
+    "allocation_role": "CO_LENDER",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0006",
+    "facility_id": "FAC-2024-00003",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 55,
+    "bank_commitment_amt": 68,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0007",
+    "facility_id": "FAC-2024-00004",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 70,
+    "bank_commitment_amt": 113,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0008",
+    "facility_id": "FAC-2024-00004",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 30,
+    "bank_commitment_amt": 48,
+    "allocation_role": "PARTICIPANT",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0009",
+    "facility_id": "FAC-2024-00005",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 50,
+    "bank_commitment_amt": 99,
+    "allocation_role": "CO_LENDER",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0010",
+    "facility_id": "FAC-2024-00005",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 50,
+    "bank_commitment_amt": 99,
+    "allocation_role": "CO_LENDER",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0011",
+    "facility_id": "FAC-2024-00006",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 80,
+    "bank_commitment_amt": 188,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0012",
+    "facility_id": "FAC-2024-00006",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 20,
+    "bank_commitment_amt": 47,
+    "allocation_role": "PARTICIPANT",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0013",
+    "facility_id": "FAC-2024-00007",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 65,
+    "bank_commitment_amt": 177,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0014",
+    "facility_id": "FAC-2024-00007",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 35,
+    "bank_commitment_amt": 95,
+    "allocation_role": "CO_LENDER",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0015",
+    "facility_id": "FAC-2024-00008",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 40,
+    "bank_commitment_amt": 124,
+    "allocation_role": "PARTICIPANT",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0016",
+    "facility_id": "FAC-2024-00008",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 60,
+    "bank_commitment_amt": 185,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0017",
+    "facility_id": "FAC-2024-00009",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 75,
+    "bank_commitment_amt": 260,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0018",
+    "facility_id": "FAC-2024-00009",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 25,
+    "bank_commitment_amt": 87,
+    "allocation_role": "PARTICIPANT",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0019",
+    "facility_id": "FAC-2024-00010",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 55,
+    "bank_commitment_amt": 504,
+    "allocation_role": "LEAD_ARRANGER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0020",
+    "facility_id": "FAC-2024-00010",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 45,
+    "bank_commitment_amt": 413,
+    "allocation_role": "CO_LENDER",
+    "is_lead_flag": false
+  },
+  {
+    "lender_allocation_id": "FLA-0021",
+    "facility_id": "FAC-2024-00011",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 420,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0022",
+    "facility_id": "FAC-2024-00012",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 457,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0023",
+    "facility_id": "FAC-2024-00013",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 494,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0024",
+    "facility_id": "FAC-2024-00014",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 81,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0025",
+    "facility_id": "FAC-2024-00015",
+    "legal_entity_id": "LE-005",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 118,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0026",
+    "facility_id": "FAC-2024-00016",
+    "legal_entity_id": "LE-006",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 155,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0027",
+    "facility_id": "FAC-2024-00017",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 192,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0028",
+    "facility_id": "FAC-2024-00018",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 229,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0029",
+    "facility_id": "FAC-2024-00019",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 266,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0030",
+    "facility_id": "FAC-2024-00020",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 1047,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0031",
+    "facility_id": "FAC-2024-00021",
+    "legal_entity_id": "LE-005",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 340,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0032",
+    "facility_id": "FAC-2024-00022",
+    "legal_entity_id": "LE-006",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 377,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0033",
+    "facility_id": "FAC-2024-00023",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 414,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0034",
+    "facility_id": "FAC-2024-00024",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 451,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0035",
+    "facility_id": "FAC-2024-00025",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 488,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0036",
+    "facility_id": "FAC-2024-00026",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 75,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0037",
+    "facility_id": "FAC-2024-00027",
+    "legal_entity_id": "LE-005",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 112,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0038",
+    "facility_id": "FAC-2024-00028",
+    "legal_entity_id": "LE-006",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 149,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0039",
+    "facility_id": "FAC-2024-00029",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 186,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0040",
+    "facility_id": "FAC-2024-00030",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 1177,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0041",
+    "facility_id": "FAC-2024-00031",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 260,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0042",
+    "facility_id": "FAC-2024-00032",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 297,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0043",
+    "facility_id": "FAC-2024-00033",
+    "legal_entity_id": "LE-005",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 334,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0044",
+    "facility_id": "FAC-2024-00034",
+    "legal_entity_id": "LE-006",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 371,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0045",
+    "facility_id": "FAC-2024-00035",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 408,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0046",
+    "facility_id": "FAC-2024-00036",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 445,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0047",
+    "facility_id": "FAC-2024-00037",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 482,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0048",
+    "facility_id": "FAC-2024-00038",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 69,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0049",
+    "facility_id": "FAC-2024-00039",
+    "legal_entity_id": "LE-005",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 106,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0050",
+    "facility_id": "FAC-2024-00040",
+    "legal_entity_id": "LE-006",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 1307,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0051",
+    "facility_id": "FAC-2024-00041",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 180,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0052",
+    "facility_id": "FAC-2024-00042",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 217,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0053",
+    "facility_id": "FAC-2024-00043",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 254,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0054",
+    "facility_id": "FAC-2024-00044",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 291,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0055",
+    "facility_id": "FAC-2024-00045",
+    "legal_entity_id": "LE-005",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 328,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0056",
+    "facility_id": "FAC-2024-00046",
+    "legal_entity_id": "LE-006",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 365,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0057",
+    "facility_id": "FAC-2024-00047",
+    "legal_entity_id": "LE-001",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 402,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0058",
+    "facility_id": "FAC-2024-00048",
+    "legal_entity_id": "LE-002",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 439,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0059",
+    "facility_id": "FAC-2024-00049",
+    "legal_entity_id": "LE-003",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 476,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  },
+  {
+    "lender_allocation_id": "FLA-0060",
+    "facility_id": "FAC-2024-00050",
+    "legal_entity_id": "LE-004",
+    "bank_share_pct": 100,
+    "bank_commitment_amt": 1437,
+    "allocation_role": "SOLE_LENDER",
+    "is_lead_flag": true
+  }
+]

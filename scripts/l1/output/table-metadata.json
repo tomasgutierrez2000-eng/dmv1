@@ -4195,6 +4195,56 @@
       "nullable": true
     }
   },
+  "L1.facility_lender_allocation": {
+    "lender_allocation_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "bank_share_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "bank_commitment_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "allocation_role": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_lead_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "source_record_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
   "L1.sccl_counterparty_group": {
     "sccl_group_id": {
       "type": "BIGINT",

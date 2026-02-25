@@ -79,6 +79,10 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'credit_conversion_factor', type: 'DECIMAL(10,6)', nullable: true },
       { name: 'lgd_pct', type: 'DECIMAL(10,6)', nullable: true },
       { name: 'risk_weight_pct', type: 'DECIMAL(10,6)', nullable: true },
+      { name: 'delinquent_payment_flag', type: 'CHAR(1)', nullable: true },
+      { name: 'overdue_amt_0_30', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'overdue_amt_31_60', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'overdue_amt_61_90_plus', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
   {
@@ -243,6 +247,10 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'last_payment_received_date', type: 'DATE', nullable: true },
       { name: 'overdue_interest_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'overdue_principal_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'delinquent_payment_flag', type: 'CHAR(1)', nullable: true },
+      { name: 'overdue_amt_0_30', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'overdue_amt_31_60', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'overdue_amt_61_90_plus', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
   {
@@ -263,6 +271,9 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'prepayment_penalty_flag', type: 'CHAR(1)', nullable: true },
       { name: 'rate_cap_pct', type: 'DECIMAL(10,4)', nullable: true },
       { name: 'rate_index_code', type: 'DECIMAL(10,4)', nullable: true },
+      { name: 'pricing_tier', type: 'VARCHAR(20)', nullable: true, fk: 'l1.pricing_tier_dim(pricing_tier_code)' },
+      { name: 'pricing_exception_flag', type: 'CHAR(1)', nullable: true },
+      { name: 'fee_rate_pct', type: 'DECIMAL(10,6)', nullable: true },
     ],
   },
   {

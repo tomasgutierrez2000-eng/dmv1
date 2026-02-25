@@ -1,6 +1,12 @@
 -- L1 Seed Data (generated, requested=10 rows)
 -- Run after DDL. Referentially consistent.
 
+-- internal_risk_rating_bucket_dim (4 rows)
+INSERT INTO l1.internal_risk_rating_bucket_dim (internal_risk_rating_bucket_code, internal_risk_rating_bucket_name, rating_range_low, rating_range_high, description, display_order, is_active_flag, created_ts, updated_ts) VALUES ('CRITICAL', 'Critical', 15, 16, 'Internal risk rating 15-16', 1, 'Y', '2024-06-15', '2024-06-15 12:00:00');
+INSERT INTO l1.internal_risk_rating_bucket_dim (internal_risk_rating_bucket_code, internal_risk_rating_bucket_name, rating_range_low, rating_range_high, description, display_order, is_active_flag, created_ts, updated_ts) VALUES ('HIGH', 'High', 10, 14, 'Internal risk rating 10-14', 2, 'Y', '2024-06-15', '2024-06-15 12:00:00');
+INSERT INTO l1.internal_risk_rating_bucket_dim (internal_risk_rating_bucket_code, internal_risk_rating_bucket_name, rating_range_low, rating_range_high, description, display_order, is_active_flag, created_ts, updated_ts) VALUES ('MODERATE', 'Moderate', 5, 9, 'Internal risk rating 5-9', 3, 'Y', '2024-06-15', '2024-06-15 12:00:00');
+INSERT INTO l1.internal_risk_rating_bucket_dim (internal_risk_rating_bucket_code, internal_risk_rating_bucket_name, rating_range_low, rating_range_high, description, display_order, is_active_flag, created_ts, updated_ts) VALUES ('NON_HIGH_RISK', 'Non-High Risk', 1, 4, 'Internal risk rating 1-4 (all others)', 4, 'Y', '2024-06-15', '2024-06-15 12:00:00');
+
 -- currency_dim (10 rows)
 INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('USD', 'US Dollar', '$', 'Y', '840', 2, 'Y');
 INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('EUR', 'Euro', '€', 'Y', '978', 2, 'Y');

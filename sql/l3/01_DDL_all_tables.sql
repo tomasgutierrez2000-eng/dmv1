@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS l3.counterparty_exposure_summary (
     limit_status_code                             VARCHAR(30),
     region_code                                   VARCHAR(30),
     industry_code                                 VARCHAR(30),
+    number_of_loans                               INTEGER,
     PRIMARY KEY (run_version_id, as_of_date, scenario_id, legal_entity_id, counterparty_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
@@ -640,6 +641,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_exposure_summary (
     scenario_scope_desc                           TEXT,
     coverage_ratio_pct                            NUMERIC(10,6),
     total_crm_amt                                 NUMERIC(20,4),
+    number_of_loans                               INTEGER,
     PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id, scenario_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
@@ -672,6 +674,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_profitability_summary (
     revenue_change_pct                            NUMERIC(10,6),
     prior_period_net_income_amt                   NUMERIC(20,4),
     net_income_change_pct                         NUMERIC(10,6),
+    return_on_rwa_pct                             NUMERIC(10,6),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_ts                                    TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
@@ -700,6 +703,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_pricing_summary (
     documented_exception_count                    INTEGER,
     prior_period_avg_spread_bps                   NUMERIC(10,4),
     avg_spread_change_bps                         NUMERIC(10,4),
+    weighted_avg_fee_rate_pct                     NUMERIC(10,6),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_ts                                    TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
@@ -726,6 +730,10 @@ CREATE TABLE IF NOT EXISTS l3.lob_delinquency_summary (
     overdue_change_pct                            NUMERIC(10,6),
     prior_period_delinquency_rate_pct             NUMERIC(10,6),
     delinquency_rate_change_pct                   NUMERIC(10,6),
+    delinquent_loan_count                         INTEGER,
+    overdue_amt_0_30                              NUMERIC(20,4),
+    overdue_amt_31_60                             NUMERIC(20,4),
+    overdue_amt_61_90_plus                        NUMERIC(20,4),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_ts                                    TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
@@ -1205,6 +1213,9 @@ CREATE TABLE IF NOT EXISTS l3.facility_detail_snapshot (
     prepayment_penalty_desc                       TEXT,
     has_amendment_flag                            BOOLEAN,
     amendment_count                               INTEGER,
+    pricing_tier                                  VARCHAR(20),
+    pricing_exception_flag                        CHAR(1),
+    number_of_loans                               INTEGER,
     base_currency_code                            VARCHAR(30),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, facility_id)
@@ -1213,6 +1224,7 @@ CREATE TABLE IF NOT EXISTS l3.facility_detail_snapshot (
     -- FK: facility_id → L1.facility_master.facility_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
+    -- FK: pricing_tier → L1.pricing_tier_dim.pricing_tier_code
 
 -- T46: lob_risk_ratio_summary (LoB Summary)
 CREATE TABLE IF NOT EXISTS l3.lob_risk_ratio_summary (
@@ -1228,6 +1240,8 @@ CREATE TABLE IF NOT EXISTS l3.lob_risk_ratio_summary (
     tangible_net_worth_amt                        NUMERIC(20,4),
     cash_interest_expense_amt                     NUMERIC(20,4),
     exception_rate_pct                            NUMERIC(10,6),
+    interest_rate_sensitivity_pct                  NUMERIC(10,6),
+    return_on_rwa_pct                             NUMERIC(10,6),
     base_currency_code                            VARCHAR(30),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
@@ -1270,6 +1284,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_rating_distribution (
     as_of_date                                    DATE NOT NULL,
     hierarchy_id                                  VARCHAR(64) NOT NULL,
     lob_node_id                                   VARCHAR(64) NOT NULL,
+    internal_risk_rating_bucket_code              VARCHAR(30) NOT NULL,
     rating_bucket_code                            VARCHAR(30) NOT NULL,
     rating_bucket_name                            VARCHAR(500),
     counterparty_count                            INTEGER,
@@ -1282,6 +1297,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_rating_distribution (
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
     -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: internal_risk_rating_bucket_code → L1.internal_risk_rating_bucket_dim.internal_risk_rating_bucket_code
 
 -- T49: lob_top_contributors (LoB Summary)
 CREATE TABLE IF NOT EXISTS l3.lob_top_contributors (

@@ -74,6 +74,10 @@ CREATE TABLE IF NOT EXISTS l2.position_detail (
   credit_conversion_factor NUMERIC(10,6),
   lgd_pct NUMERIC(10,6),
   risk_weight_pct NUMERIC(10,6),
+  delinquent_payment_flag CHAR(1),
+  overdue_amt_0_30 NUMERIC(18,2),
+  overdue_amt_31_60 NUMERIC(18,2),
+  overdue_amt_61_90_plus NUMERIC(18,2),
   CONSTRAINT fk_position_detail_position_id FOREIGN KEY (position_id) REFERENCES l2.position(position_id)
 );
 
@@ -232,6 +236,10 @@ CREATE TABLE IF NOT EXISTS l2.facility_delinquency_snapshot (
   last_payment_received_date DATE,
   overdue_interest_amt NUMERIC(18,2),
   overdue_principal_amt NUMERIC(18,2),
+  delinquent_payment_flag CHAR(1),
+  overdue_amt_0_30 NUMERIC(18,2),
+  overdue_amt_31_60 NUMERIC(18,2),
+  overdue_amt_61_90_plus NUMERIC(18,2),
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_delinquency_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
   CONSTRAINT fk_facility_delinquency_snapshot_credit_status_code FOREIGN KEY (credit_status_code) REFERENCES l1.credit_status_dim(credit_status_code)
@@ -252,9 +260,13 @@ CREATE TABLE IF NOT EXISTS l2.facility_pricing_snapshot (
   prepayment_penalty_flag CHAR(1),
   rate_cap_pct NUMERIC(10,4),
   rate_index_code NUMERIC(10,4),
+  pricing_tier VARCHAR(20),
+  pricing_exception_flag CHAR(1),
+  fee_rate_pct NUMERIC(10,6),
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_pricing_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_facility_pricing_snapshot_rate_index_id FOREIGN KEY (rate_index_id) REFERENCES l1.interest_rate_index_dim(rate_index_id)
+  CONSTRAINT fk_facility_pricing_snapshot_rate_index_id FOREIGN KEY (rate_index_id) REFERENCES l1.interest_rate_index_dim(rate_index_id),
+  CONSTRAINT fk_facility_pricing_snapshot_pricing_tier FOREIGN KEY (pricing_tier) REFERENCES l1.pricing_tier_dim(pricing_tier_code)
 );
 
 CREATE TABLE IF NOT EXISTS l2.facility_profitability_snapshot (

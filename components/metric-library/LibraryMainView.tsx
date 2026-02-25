@@ -15,9 +15,8 @@ interface ParentWithCount {
   generic_formula: string;
   metric_class: string;
   direction: string;
-  risk_appetite_relevant: boolean;
   domain_ids: string[];
-  variant_count: number;
+  variant_count?: number;
 }
 
 export default function LibraryMainView() {
@@ -27,8 +26,6 @@ export default function LibraryMainView() {
   const [error, setError] = useState<string | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [migrating, setMigrating] = useState(false);
-  const [migrateError, setMigrateError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<{
     success: boolean;
@@ -143,20 +140,6 @@ export default function LibraryMainView() {
     },
     [fetchData]
   );
-
-  const runMigration = useCallback(() => {
-    setMigrateError(null);
-    setMigrating(true);
-    fetch('/api/metrics/library/migrate', { method: 'POST' })
-      .then((r) => {
-        if (!r.ok) return r.json().then((body) => { throw new Error(body?.error ?? 'Migration failed'); });
-      })
-      .then(() => window.location.reload())
-      .catch((err) => {
-        setMigrateError(err instanceof Error ? err.message : 'Migration failed.');
-      })
-      .finally(() => setMigrating(false));
-  }, []);
 
   useEffect(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -364,27 +347,11 @@ export default function LibraryMainView() {
             title="No metrics found"
             description={
               parents.length === 0
-                ? 'Run migration to import your existing metrics into the library.'
+                ? 'Import metrics using the Excel template above.'
                 : 'No metrics match your search or filter.'
             }
             action={
-              parents.length === 0 ? (
-                <div>
-                  <button
-                    type="button"
-                    onClick={runMigration}
-                    disabled={migrating}
-                    className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  >
-                    {migrating ? 'Migrating…' : 'Migrate now'}
-                  </button>
-                  {migrateError && (
-                    <p className="mt-2 text-sm text-red-600" role="alert">
-                      {migrateError}
-                    </p>
-                  )}
-                </div>
-              ) : (
+              (
                 <button
                   type="button"
                   onClick={() => {
@@ -395,8 +362,7 @@ export default function LibraryMainView() {
                 >
                   Clear search and filters
                 </button>
-              )
-            }
+              )}
           />
         )}
 
@@ -433,11 +399,6 @@ export default function LibraryMainView() {
                         >
                           {m.direction === 'HIGHER_BETTER' ? '↑ Higher Better' : m.direction === 'LOWER_BETTER' ? '↓ Lower Better' : 'Neutral'}
                         </span>
-                        {m.risk_appetite_relevant && (
-                          <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">
-                            Risk Appetite
-                          </span>
-                        )}
                       </div>
                       <p className="text-sm text-gray-600 line-clamp-2">{m.definition}</p>
                       <div className="flex items-center gap-4 mt-3 flex-wrap">

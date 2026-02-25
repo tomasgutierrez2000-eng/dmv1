@@ -39,7 +39,6 @@ export async function PUT(
     ...existing,
     ...body,
     variant_id: existing.variant_id,
-    updated_at: new Date().toISOString(),
   };
   saveVariant(updated);
   return NextResponse.json(updated);

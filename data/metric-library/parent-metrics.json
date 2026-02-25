@@ -7,9 +7,7 @@
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by EAD at each aggregation level",
     "domain_ids": [
       "CR"
     ],
@@ -17,8 +15,7 @@
       "FR2590",
       "Basel III IRB",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "LGD",
@@ -28,9 +25,7 @@
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by EAD at each aggregation level",
     "domain_ids": [
       "CR"
     ],
@@ -38,8 +33,7 @@
       "FR2590",
       "Basel III IRB",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "EAD",
@@ -49,9 +43,7 @@
     "metric_class": "HYBRID",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "CR",
       "EL"
@@ -60,8 +52,7 @@
       "FR2590",
       "Basel III",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "EL",
@@ -71,9 +62,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive; sum of facility-level EL",
     "domain_ids": [
       "CR"
     ],
@@ -82,8 +71,7 @@
       "Basel III",
       "CCAR",
       "CECL"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "EL_RATE",
@@ -93,17 +81,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated at each level as \u03a3 EL / \u03a3 Exposure",
     "domain_ids": [
       "CR"
     ],
     "regulatory_references": [
       "CCAR",
       "Internal risk appetite"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "IRR",
@@ -113,9 +98,7 @@
     "metric_class": "SOURCED",
     "unit_type": "ORDINAL",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Numeric mapping weighted by exposure for aggregation",
     "domain_ids": [
       "CR"
     ],
@@ -123,8 +106,7 @@
       "FR2590",
       "OCC guidelines",
       "SR 11-7"
-    ],
-    "variant_count": 8
+    ]
   },
   {
     "metric_id": "EXT_RATING",
@@ -134,9 +116,7 @@
     "metric_class": "SOURCED",
     "unit_type": "ORDINAL",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Distribution / mode",
-    "rollup_description": "Report distribution across rating buckets at aggregated levels",
     "domain_ids": [
       "CR"
     ],
@@ -144,8 +124,7 @@
       "FR2590",
       "Basel III SA",
       "Pillar 3"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "DELINQ_RATE",
@@ -155,9 +134,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Recalculate at level",
-    "rollup_description": "Recalculated at each aggregation level",
     "domain_ids": [
       "CR"
     ],
@@ -165,8 +142,7 @@
       "FR Y-14M",
       "CCAR",
       "OCC guidelines"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CRITICIZED",
@@ -176,9 +152,7 @@
     "metric_class": "SOURCED",
     "unit_type": "COUNT",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Count / percentage",
-    "rollup_description": "Count criticized; % criticized = count/total",
     "domain_ids": [
       "CR",
       "GO"
@@ -186,8 +160,7 @@
     "regulatory_references": [
       "OCC Shared National Credits",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "DETERIORATED",
@@ -197,17 +170,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "COUNT",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Count / percentage",
-    "rollup_description": "Count deteriorated; % at each level",
     "domain_ids": [
       "CR"
     ],
     "regulatory_references": [
       "Internal risk appetite",
       "OCC guidelines"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "DAYS_OVERDUE",
@@ -217,9 +187,7 @@
     "metric_class": "SOURCED",
     "unit_type": "DAYS",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Maximum / weighted average",
-    "rollup_description": "Max for worst-case; exposure-weighted avg for portfolio",
     "domain_ids": [
       "CR"
     ],
@@ -227,8 +195,7 @@
       "FR Y-14M",
       "CECL",
       "IFRS 9"
-    ],
-    "variant_count": 1
+    ]
   },
   {
     "metric_id": "EXPOSURE",
@@ -238,9 +205,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "EL"
     ],
@@ -248,8 +213,7 @@
       "FR2590",
       "FR Y-14Q",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "COMMITTED",
@@ -259,9 +223,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "EL"
     ],
@@ -269,8 +231,7 @@
       "FR2590",
       "FR Y-14Q",
       "FR Y-14M"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "UNDRAWN",
@@ -280,9 +241,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "EL"
     ],
@@ -290,8 +249,7 @@
       "FR2590",
       "Basel III CCF",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "UTILIZED",
@@ -301,17 +259,14 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "EL"
     ],
     "regulatory_references": [
       "FR2590",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "UTIL_PCT",
@@ -321,17 +276,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Recalculate at level",
-    "rollup_description": "Recalculated as \u03a3 Exposure / \u03a3 Committed at each level",
     "domain_ids": [
       "EL"
     ],
     "regulatory_references": [
       "FR2590",
       "Internal limits framework"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "LIMIT",
@@ -341,9 +293,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive; sum of counterparty limits",
     "domain_ids": [
       "EL",
       "GO"
@@ -351,8 +301,7 @@
     "regulatory_references": [
       "FR2590",
       "OCC Heightened Standards"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "CROSS_ENTITY_EXP",
@@ -362,17 +311,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across entities",
     "domain_ids": [
       "EL"
     ],
     "regulatory_references": [
       "FR2590",
       "Basel III large exposures"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "GROSS_EXP",
@@ -382,9 +328,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "EL"
     ],
@@ -392,8 +336,7 @@
       "FR2590",
       "Basel III",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "NET_EXP",
@@ -403,9 +346,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "EL"
     ],
@@ -413,8 +354,7 @@
       "FR2590",
       "Basel III",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "DSCR",
@@ -424,9 +364,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "RATIO",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each aggregation level",
     "domain_ids": [
       "FP",
       "CR"
@@ -435,8 +373,7 @@
       "CRE underwriting",
       "CCAR",
       "FR Y-14Q"
-    ],
-    "variant_count": 6
+    ]
   },
   {
     "metric_id": "LTV",
@@ -446,9 +383,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each aggregation level",
     "domain_ids": [
       "FP",
       "CM"
@@ -457,8 +392,7 @@
       "CRE underwriting",
       "FR Y-14Q",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "ROE",
@@ -468,17 +402,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by capital allocated at each level",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "FR Y-9C",
       "CCAR revenue projection"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "ROA",
@@ -488,17 +419,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "FR Y-9C",
       "CCAR revenue projection"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "NIM",
@@ -508,17 +436,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "FR Y-9C",
       "NII stress testing"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "ALL_IN_RATE",
@@ -528,17 +453,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "Internal pricing",
       "CCAR NII"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "SPREAD",
@@ -548,16 +470,13 @@
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "Internal pricing framework"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "BASE_RATE",
@@ -567,17 +486,14 @@
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "CCAR NII",
       "ALM"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "REVENUE",
@@ -587,17 +503,14 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "FR Y-9C",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "NET_INCOME",
@@ -607,17 +520,14 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "FR Y-9C",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CASHFLOW",
@@ -627,9 +537,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP",
       "CR"
@@ -637,8 +545,7 @@
     "regulatory_references": [
       "CRE underwriting",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "TDS",
@@ -648,9 +555,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP",
       "CR"
@@ -658,8 +563,7 @@
     "regulatory_references": [
       "CRE underwriting",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "FEE_RATE",
@@ -669,16 +573,13 @@
     "metric_class": "SOURCED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by committed amount",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "Internal pricing framework"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "COST_OF_FUNDS",
@@ -688,17 +589,14 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "FR Y-9C",
       "ALM/FTP"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CAP_ALLOC",
@@ -708,9 +606,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP"
     ],
@@ -718,8 +614,7 @@
       "Basel III",
       "CCAR",
       "Internal RAROC"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "OP_COST",
@@ -729,17 +624,14 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "FP"
     ],
     "regulatory_references": [
       "Internal P&L",
       "FR Y-9C"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "COLLATERAL",
@@ -749,9 +641,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "CM"
     ],
@@ -759,8 +649,7 @@
       "FR2590",
       "Basel III CRM",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CRM_AMOUNT",
@@ -770,17 +659,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across facilities",
     "domain_ids": [
       "CM"
     ],
     "regulatory_references": [
       "Basel III CRM",
       "FR2590"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CRM_TYPE",
@@ -790,17 +676,14 @@
     "metric_class": "SOURCED",
     "unit_type": "INDEX",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Distribution",
-    "rollup_description": "Report distribution of types at aggregated levels",
     "domain_ids": [
       "CM"
     ],
     "regulatory_references": [
       "Basel III CRM",
       "FR2590"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "COLLATERAL_COV",
@@ -810,17 +693,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated as \u03a3 Collateral / \u03a3 Exposure at each level",
     "domain_ids": [
       "CM"
     ],
     "regulatory_references": [
       "CRE underwriting",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "AVG_SPREAD",
@@ -830,9 +710,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated at each aggregation level",
     "domain_ids": [
       "PA",
       "FP"
@@ -840,8 +718,7 @@
     "regulatory_references": [
       "Internal pricing",
       "CCAR NII"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "AVG_TENOR",
@@ -851,9 +728,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "DAYS",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated at each aggregation level",
     "domain_ids": [
       "PA"
     ],
@@ -861,8 +736,7 @@
       "ALM",
       "CCAR",
       "Pillar 3"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "DAYS_DELINQ",
@@ -872,9 +746,7 @@
     "metric_class": "SOURCED",
     "unit_type": "DAYS",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Maximum / average",
-    "rollup_description": "Max for worst-case; EAD-weighted avg for portfolio",
     "domain_ids": [
       "PA",
       "CR"
@@ -883,8 +755,7 @@
       "FR Y-14M",
       "CECL",
       "IFRS 9"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "DELINQ_AMT",
@@ -894,9 +765,7 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "PA",
       "CR"
@@ -905,8 +774,7 @@
       "FR Y-14M",
       "CECL",
       "FR2590"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "DAYS_TO_MAT",
@@ -916,9 +784,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "DAYS",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "PA"
     ],
@@ -926,8 +792,7 @@
       "ALM",
       "Liquidity risk",
       "FR Y-14Q"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CPTY_ALLOC",
@@ -937,9 +802,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "N/A at cpty; recalc at portfolio",
-    "rollup_description": "Meaningful only at portfolio/desk/LOB level",
     "domain_ids": [
       "PA"
     ],
@@ -947,8 +810,7 @@
       "FR2590",
       "Large Exposure Framework",
       "Basel III"
-    ],
-    "variant_count": 3
+    ]
   },
   {
     "metric_id": "RATING_MIG_INT",
@@ -958,9 +820,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "INDEX",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Distribution / count",
-    "rollup_description": "Count upgrades/downgrades/stable at each level",
     "domain_ids": [
       "PA",
       "CR"
@@ -968,8 +828,7 @@
     "regulatory_references": [
       "Internal risk appetite",
       "OCC guidelines"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "RATING_MIG_EXT",
@@ -979,9 +838,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "INDEX",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Distribution / count",
-    "rollup_description": "Count upgrades/downgrades/stable at each level",
     "domain_ids": [
       "PA",
       "CR"
@@ -989,8 +846,7 @@
     "regulatory_references": [
       "Pillar 3",
       "Investor reporting"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "EXT_RATING_CHG_STEPS",
@@ -1000,9 +856,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure for severity",
     "domain_ids": [
       "PA",
       "CR"
@@ -1010,8 +864,7 @@
     "regulatory_references": [
       "Pillar 3",
       "Investor reporting"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "LOAN_COUNT",
@@ -1021,16 +874,13 @@
     "metric_class": "CALCULATED",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive count at each level",
     "domain_ids": [
       "PA"
     ],
     "regulatory_references": [
       "Internal reporting"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "INT_RATING_CHG",
@@ -1040,9 +890,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure for severity assessment",
     "domain_ids": [
       "PA",
       "CR"
@@ -1050,8 +898,7 @@
     "regulatory_references": [
       "Internal risk appetite",
       "OCC guidelines"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "PRICING_EXCEPTION",
@@ -1061,17 +908,14 @@
     "metric_class": "SOURCED",
     "unit_type": "INDEX",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Count / percentage",
-    "rollup_description": "Count exceptions; % at each level",
     "domain_ids": [
       "GO"
     ],
     "regulatory_references": [
       "OCC Heightened Standards",
       "Internal policy"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "LIMIT_STATUS",
@@ -1081,17 +925,14 @@
     "metric_class": "SOURCED",
     "unit_type": "INDEX",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Count / percentage",
-    "rollup_description": "Count by status category at each level",
     "domain_ids": [
       "GO"
     ],
     "regulatory_references": [
       "FR2590",
       "OCC Heightened Standards"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "EXCEPTION_RATE",
@@ -1101,17 +942,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Recalculate at level",
-    "rollup_description": "Recalculated at each aggregation level",
     "domain_ids": [
       "GO"
     ],
     "regulatory_references": [
       "OCC Heightened Standards",
       "Internal policy"
-    ],
-    "variant_count": 3
+    ]
   },
   {
     "metric_id": "FAC_UTIL_STATUS",
@@ -1121,17 +959,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "INDEX",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Count / percentage",
-    "rollup_description": "Count by category at each level",
     "domain_ids": [
       "GO",
       "EL"
     ],
     "regulatory_references": [
       "Internal limits framework"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "STRESSED_PD",
@@ -1141,9 +976,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by stressed EAD at each level",
     "domain_ids": [
       "ST",
       "CR"
@@ -1152,8 +985,7 @@
       "CCAR",
       "DFAST",
       "FR Y-14A Schedule A"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESSED_LGD",
@@ -1163,9 +995,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by stressed EAD at each level",
     "domain_ids": [
       "ST",
       "CR"
@@ -1174,8 +1004,7 @@
       "CCAR",
       "DFAST",
       "FR Y-14A Schedule A"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESSED_EL",
@@ -1185,9 +1014,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "ST",
       "CR"
@@ -1196,8 +1023,7 @@
       "CCAR",
       "DFAST",
       "FR Y-14A"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESSED_EL_RATE",
@@ -1207,9 +1033,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated as \u03a3 Stressed EL / \u03a3 Stressed Exp at each level",
     "domain_ids": [
       "ST",
       "CR"
@@ -1217,8 +1041,7 @@
     "regulatory_references": [
       "CCAR",
       "DFAST"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESS_CAP_IMPACT",
@@ -1228,9 +1051,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Recalculate at level",
-    "rollup_description": "Recalculated using aggregated EL and capital at each level",
     "domain_ids": [
       "ST",
       "RC"
@@ -1239,8 +1060,7 @@
       "CCAR",
       "DFAST",
       "FR Y-14A"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESS_LOSS_DELTA",
@@ -1250,9 +1070,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "ST"
     ],
@@ -1260,8 +1078,7 @@
       "CCAR",
       "DFAST",
       "Internal stress testing"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESSED_DSCR",
@@ -1271,9 +1088,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "RATIO",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "ST",
       "FP"
@@ -1282,8 +1097,7 @@
       "CCAR",
       "CRE stress",
       "FR Y-14Q"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "STRESSED_LTV",
@@ -1293,9 +1107,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Weighted by exposure at each level",
     "domain_ids": [
       "ST",
       "CM"
@@ -1304,8 +1116,7 @@
       "CCAR",
       "CRE stress",
       "FR Y-14Q"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "PROVISION_RATE",
@@ -1315,9 +1126,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated at each level",
     "domain_ids": [
       "ST"
     ],
@@ -1325,8 +1134,7 @@
       "CCAR",
       "CECL",
       "IFRS 9"
-    ],
-    "variant_count": 15
+    ]
   },
   {
     "metric_id": "PPNR",
@@ -1336,9 +1144,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "ST",
       "FP"
@@ -1347,8 +1153,7 @@
       "CCAR",
       "DFAST",
       "FR Y-14A"
-    ],
-    "variant_count": 9
+    ]
   },
   {
     "metric_id": "RWA",
@@ -1358,9 +1163,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "RC"
     ],
@@ -1368,8 +1171,7 @@
       "Basel III",
       "FR Y-9C",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "RWA_DENSITY",
@@ -1379,17 +1181,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated as \u03a3 RWA / \u03a3 Exposure at each level",
     "domain_ids": [
       "RC"
     ],
     "regulatory_references": [
       "Basel III",
       "Pillar 3"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "CET1_CONSUMPTION",
@@ -1399,9 +1198,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "RC"
     ],
@@ -1409,8 +1206,7 @@
       "Basel III",
       "CCAR",
       "FR Y-9C"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "LEVERAGE_EXP",
@@ -1420,17 +1216,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "RC"
     ],
     "regulatory_references": [
       "Basel III SLR",
       "FR Y-9C"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "RAROC",
@@ -1440,9 +1233,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "HIGHER_BETTER",
-    "risk_appetite_relevant": true,
     "rollup_philosophy": "Exposure-weighted average",
-    "rollup_description": "Recalculated at each level",
     "domain_ids": [
       "RC",
       "FP"
@@ -1450,8 +1241,7 @@
     "regulatory_references": [
       "Internal RAROC framework",
       "CCAR"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "SA_RWA",
@@ -1461,9 +1251,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "RC"
     ],
@@ -1471,8 +1259,7 @@
       "Basel III SA",
       "FR Y-9C",
       "Capital floor"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "IRB_RWA",
@@ -1482,9 +1269,7 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "RC"
     ],
@@ -1492,8 +1277,7 @@
       "Basel III IRB",
       "FR Y-9C",
       "FR 2590"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "FR2590_EXP",
@@ -1503,17 +1287,14 @@
     "metric_class": "CALCULATED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum per counterparty",
-    "rollup_description": "Aggregated at counterparty level; filtered by threshold",
     "domain_ids": [
       "RC",
       "EL"
     ],
     "regulatory_references": [
       "FR 2590"
-    ],
-    "variant_count": 4
+    ]
   },
   {
     "metric_id": "Y14Q_EXP",
@@ -1523,17 +1304,14 @@
     "metric_class": "HYBRID",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive; mapped to Y-14Q schedule fields",
     "domain_ids": [
       "RC",
       "EL"
     ],
     "regulatory_references": [
       "FR Y-14Q Schedule H.1"
-    ],
-    "variant_count": 5
+    ]
   },
   {
     "metric_id": "Y14M_EXP",
@@ -1543,16 +1321,13 @@
     "metric_class": "SOURCED",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
-    "risk_appetite_relevant": false,
     "rollup_philosophy": "Sum",
-    "rollup_description": "Additive across all levels",
     "domain_ids": [
       "RC",
       "EL"
     ],
     "regulatory_references": [
       "FR Y-14M"
-    ],
-    "variant_count": 5
+    ]
   }
 ]

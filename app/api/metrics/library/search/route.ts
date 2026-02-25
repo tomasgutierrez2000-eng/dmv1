@@ -22,11 +22,10 @@ export async function GET(request: NextRequest) {
     (p.definition ?? '').toLowerCase().includes(q) ||
     (p.generic_formula ?? '').toLowerCase().includes(q);
 
-  const matchVariant = (v: { variant_id: string; variant_name: string; formula_display?: string; detailed_description?: string }) =>
+  const matchVariant = (v: { variant_id: string; variant_name: string; formula_display?: string }) =>
     v.variant_id.toLowerCase().includes(q) ||
     v.variant_name.toLowerCase().includes(q) ||
-    (v.formula_display ?? '').toLowerCase().includes(q) ||
-    (v.detailed_description ?? '').toLowerCase().includes(q);
+    (v.formula_display ?? '').toLowerCase().includes(q);
 
   const matchedParents = parents.filter(matchParent);
   const matchedVariants = variants.filter(matchVariant);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getVariants, getVariant, addVariant } from '@/lib/metric-library/store';
+import { getVariants, addVariant, getVariant } from '@/lib/metric-library/store';
 import { isReadOnlyFsError } from '@/lib/metrics-store';
 import type { MetricVariant } from '@/lib/metric-library/types';
 
@@ -44,10 +44,6 @@ export async function POST(request: NextRequest) {
       parent_metric_id,
       variant_name,
       status: body.status ?? 'DRAFT',
-      version: body.version ?? 'v1.0',
-      effective_date: body.effective_date ?? new Date().toISOString().slice(0, 10),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Failed to add variant';

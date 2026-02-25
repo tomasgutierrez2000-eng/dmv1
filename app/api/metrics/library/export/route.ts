@@ -3,7 +3,7 @@ import { LIBRARY_SHEET_NAMES } from '@/lib/metric-library/excel-template';
 import { getDomains, getParentMetrics, getVariants } from '@/lib/metric-library/store';
 import type { MetricDomain, ParentMetric, MetricVariant } from '@/lib/metric-library/types';
 
-/** GET: export current Metric Library to Excel (same format as template). */
+/** GET: export current Metric Library to Excel. */
 export async function GET() {
   const XLSX = await import('xlsx');
 
@@ -26,18 +26,9 @@ export async function GET() {
   ]);
 
   const parentHeaders = [
-    'metric_id',
-    'metric_name',
-    'definition',
-    'generic_formula',
-    'metric_class',
-    'unit_type',
-    'direction',
-    'risk_appetite_relevant',
-    'rollup_philosophy',
-    'rollup_description',
-    'domain_ids',
-    'regulatory_references',
+    'metric_id', 'metric_name', 'definition', 'generic_formula',
+    'metric_class', 'unit_type', 'direction', 'rollup_philosophy',
+    'domain_ids', 'regulatory_references',
   ];
   const parents = getParentMetrics();
   const parentRows: unknown[][] = parents.map((p: ParentMetric) => [
@@ -48,59 +39,16 @@ export async function GET() {
     p.metric_class,
     p.unit_type,
     p.direction,
-    p.risk_appetite_relevant ?? false,
     p.rollup_philosophy ?? '',
-    p.rollup_description ?? '',
     Array.isArray(p.domain_ids) ? p.domain_ids.join(', ') : '',
     Array.isArray(p.regulatory_references) ? p.regulatory_references.join(', ') : '',
   ]);
 
   const variantHeaders = [
-    'variant_id',
-    'variant_name',
-    'parent_metric_id',
-    'variant_type',
-    'status',
-    'version',
-    'effective_date',
-    'formula_display',
-    'formula_specification',
-    'detailed_description',
-    'rollup_facility',
-    'rollup_counterparty',
-    'rollup_desk',
-    'rollup_portfolio',
-    'rollup_lob',
-    'weighting_basis',
-    'executable_metric_id',
-    'owner_team',
-    'approver',
-    'review_cycle',
-    'source_system',
-    'source_field_name',
-    'refresh_frequency',
-    'used_by_dashboards',
-    'regulatory_references',
-    'calculation_authority_tier',
-    'calculation_authority_tier_future',
-    'calculation_authority_rationale',
-    'calculation_authority_components',
-    'calculation_authority_future_evolution',
-    'calculation_authority_migration_path',
-    'expected_gsib_data_source',
-    'source_integration_pattern',
-    'source_delivery_method',
-    'source_endpoint_or_feed',
-    'source_variant_identifier',
-    'source_payload_spec',
-    'source_setup_validation_notes',
-    'atomic_sourcing_level',
-    'reconciliation_anchor_levels',
-    'sourcing_level_rationale',
-    'sourcing_do_not_source',
-    'sourcing_category',
-    'data_format',
-    'data_lag',
+    'variant_id', 'variant_name', 'parent_metric_id', 'variant_type', 'status',
+    'formula_display', 'rollup_facility', 'rollup_counterparty', 'rollup_desk',
+    'rollup_portfolio', 'rollup_lob', 'weighting_basis',
+    'source_table', 'source_field', 'executable_metric_id',
   ];
   const variants = getVariants();
   const variantRows: unknown[][] = variants.map((v: MetricVariant) => [
@@ -109,69 +57,23 @@ export async function GET() {
     v.parent_metric_id,
     v.variant_type,
     v.status,
-    v.version,
-    v.effective_date,
     v.formula_display ?? '',
-    v.formula_specification ?? '',
-    v.detailed_description ?? '',
     v.rollup_logic?.facility ?? '',
     v.rollup_logic?.counterparty ?? '',
     v.rollup_logic?.desk ?? '',
     v.rollup_logic?.portfolio ?? '',
     v.rollup_logic?.lob ?? '',
     v.weighting_basis ?? '',
+    v.source_table ?? '',
+    v.source_field ?? '',
     v.executable_metric_id ?? '',
-    v.owner_team ?? '',
-    v.approver ?? '',
-    v.review_cycle ?? '',
-    v.source_system ?? '',
-    v.source_field_name ?? '',
-    v.refresh_frequency ?? '',
-    Array.isArray(v.used_by_dashboards) ? v.used_by_dashboards.join(', ') : '',
-    Array.isArray(v.regulatory_references) ? v.regulatory_references.join(', ') : '',
-    v.calculation_authority_tier ?? '',
-    v.calculation_authority_tier_future ?? '',
-    v.calculation_authority_rationale ?? '',
-    v.calculation_authority_components ?? '',
-    v.calculation_authority_future_evolution ?? '',
-    v.calculation_authority_migration_path ?? '',
-    v.expected_gsib_data_source ?? '',
-    v.source_integration_pattern ?? '',
-    v.source_delivery_method ?? '',
-    v.source_endpoint_or_feed ?? '',
-    v.source_variant_identifier ?? '',
-    Array.isArray(v.source_payload_spec) ? JSON.stringify(v.source_payload_spec) : '',
-    v.source_setup_validation_notes ?? '',
-    v.atomic_sourcing_level ?? '',
-    Array.isArray(v.reconciliation_anchor_levels) ? v.reconciliation_anchor_levels.join(', ') : '',
-    v.sourcing_level_rationale ?? '',
-    v.sourcing_do_not_source ?? '',
-    v.sourcing_category ?? '',
-    v.data_format ?? '',
-    v.data_lag ?? '',
   ]);
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(
-    wb,
-    XLSX.utils.aoa_to_sheet(instructionsData),
-    LIBRARY_SHEET_NAMES.INSTRUCTIONS
-  );
-  XLSX.utils.book_append_sheet(
-    wb,
-    XLSX.utils.aoa_to_sheet([domainsHeaders, ...domainsRows]),
-    LIBRARY_SHEET_NAMES.DOMAINS
-  );
-  XLSX.utils.book_append_sheet(
-    wb,
-    XLSX.utils.aoa_to_sheet([parentHeaders, ...parentRows]),
-    LIBRARY_SHEET_NAMES.PARENT_METRICS
-  );
-  XLSX.utils.book_append_sheet(
-    wb,
-    XLSX.utils.aoa_to_sheet([variantHeaders, ...variantRows]),
-    LIBRARY_SHEET_NAMES.VARIANTS
-  );
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(instructionsData), LIBRARY_SHEET_NAMES.INSTRUCTIONS);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([domainsHeaders, ...domainsRows]), LIBRARY_SHEET_NAMES.DOMAINS);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([parentHeaders, ...parentRows]), LIBRARY_SHEET_NAMES.PARENT_METRICS);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([variantHeaders, ...variantRows]), LIBRARY_SHEET_NAMES.VARIANTS);
 
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   return new NextResponse(buf, {

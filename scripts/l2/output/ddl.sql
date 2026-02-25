@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
   CONSTRAINT fk_facility_exposure_snapshot_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
   CONSTRAINT fk_facility_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id),
-  CONSTRAINT fk_facility_exposure_snapshot_irr_bucket FOREIGN KEY (internal_risk_rating_bucket_code) REFERENCES l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)
+  CONSTRAINT fk_facility_exposure_snapshot_internal_risk_rating_bucket_code FOREIGN KEY (internal_risk_rating_bucket_code) REFERENCES l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)
 );
 
 CREATE TABLE IF NOT EXISTS l2.netting_set_exposure_snapshot (

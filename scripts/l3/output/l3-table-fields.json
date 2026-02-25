@@ -2806,6 +2806,10 @@
         "dataType": "NUMERIC"
       },
       {
+        "name": "weighted_avg_fee_rate_pct",
+        "dataType": "NUMERIC"
+      },
+      {
         "name": "created_ts",
         "dataType": "TIMESTAMP"
       },
@@ -2902,6 +2906,22 @@
       },
       {
         "name": "delinquency_rate_change_pct",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "delinquent_loan_count",
+        "dataType": "INTEGER"
+      },
+      {
+        "name": "overdue_amt_0_30",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "overdue_amt_31_60",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "overdue_amt_61_90_plus",
         "dataType": "NUMERIC"
       },
       {
@@ -4712,15 +4732,7 @@
         "sourceFields": "L1.lob_node.lob_node_id"
       },
       {
-        "name": "dscr_value",
-        "dataType": "NUMERIC"
-      },
-      {
         "name": "fccr_value",
-        "dataType": "NUMERIC"
-      },
-      {
-        "name": "ltv_pct",
         "dataType": "NUMERIC"
       },
       {
@@ -5003,6 +5015,67 @@
       {
         "name": "contribution_pct",
         "dataType": "NUMERIC"
+      },
+      {
+        "name": "created_ts",
+        "dataType": "TIMESTAMP"
+      }
+    ]
+  },
+  "metric_value_fact": {
+    "category": "Dashboard consumption — pre-calculated metric values by level",
+    "fields": [
+      {
+        "name": "run_version_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "as_of_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "metric_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "variant_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "aggregation_level",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "facility_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "counterparty_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "desk_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "portfolio_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "lob_id",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "value",
+        "dataType": "NUMERIC"
+      },
+      {
+        "name": "unit",
+        "dataType": "VARCHAR"
+      },
+      {
+        "name": "display_format",
+        "dataType": "VARCHAR"
       },
       {
         "name": "created_ts",

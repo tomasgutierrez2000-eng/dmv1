@@ -373,6 +373,30 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "delinquent_payment_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_amt_0_30": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_amt_31_60": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_amt_61_90_plus": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.exposure_counterparty_attribution": {
@@ -568,6 +592,48 @@
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
+      "nullable": true
+    },
+    "number_of_loans": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "number_of_facilities": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "days_until_maturity": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "facility_utilization_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "limit_status_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rwa_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "internal_risk_rating_bucket_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)",
       "nullable": true
     }
   },
@@ -981,6 +1047,30 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "dscr_value": {
+      "type": "DECIMAL(12,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ltv_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "net_income_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_rate_sensitivity_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.facility_delinquency_snapshot": {
@@ -1063,6 +1153,30 @@
       "nullable": true
     },
     "overdue_principal_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "delinquent_payment_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_amt_0_30": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_amt_31_60": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "overdue_amt_61_90_plus": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
@@ -1150,6 +1264,24 @@
     },
     "rate_index_code": {
       "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pricing_tier": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.pricing_tier_dim(pricing_tier_code)",
+      "nullable": true
+    },
+    "pricing_exception_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fee_rate_pct": {
+      "type": "DECIMAL(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1976,6 +2108,18 @@
     },
     "rating_value": {
       "type": "DECIMAL(18,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_rating_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_rating_change_steps": {
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true

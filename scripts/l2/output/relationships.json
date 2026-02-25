@@ -187,6 +187,23 @@
     "relationshipType": "primary"
   },
   {
+    "id": "L2.facility_exposure_snapshot.internal_risk_rating_bucket_code->L1.internal_risk_rating_bucket_dim.internal_risk_rating_bucket_code",
+    "source": {
+      "layer": "L2",
+      "table": "facility_exposure_snapshot",
+      "field": "internal_risk_rating_bucket_code",
+      "tableKey": "L2.facility_exposure_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "internal_risk_rating_bucket_dim",
+      "field": "internal_risk_rating_bucket_code",
+      "tableKey": "L1.internal_risk_rating_bucket_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
     "id": "L2.netting_set_exposure_snapshot.netting_set_id->L1.netting_set.netting_set_id",
     "source": {
       "layer": "L2",
@@ -403,6 +420,23 @@
       "table": "interest_rate_index_dim",
       "field": "rate_index_id",
       "tableKey": "L1.interest_rate_index_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.facility_pricing_snapshot.pricing_tier->L1.pricing_tier_dim.pricing_tier_code",
+    "source": {
+      "layer": "L2",
+      "table": "facility_pricing_snapshot",
+      "field": "pricing_tier",
+      "tableKey": "L2.facility_pricing_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "pricing_tier_dim",
+      "field": "pricing_tier_code",
+      "tableKey": "L1.pricing_tier_dim"
     },
     "isCrossLayer": true,
     "relationshipType": "primary"

@@ -28,9 +28,10 @@ import { computeModelDiff } from '../../utils/modelDiff';
 import type { DataModel } from '../../types/model';
 import type { SchemaExport } from '../../types/schemaExport';
 import SchemaImportModal from './SchemaImportModal';
+import DdlExportModal from './DdlExportModal';
 import { useToast } from '../ui/Toast';
 
-type ExportFormat = 'png' | 'svg' | 'sql' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2';
+type ExportFormat = 'png' | 'svg' | 'sql' | 'sql-postgres' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2';
 
 function ToolbarTooltip({ children, label }: { children: React.ReactNode; label: string }) {
   return (
@@ -116,6 +117,7 @@ export default function Toolbar() {
   const [sampleImportLayer, setSampleImportLayer] = useState<'L1' | 'L2'>('L1');
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [ddlModalOpen, setDdlModalOpen] = useState(false);
 
   /** Zoom toward the viewport center so content doesn't drift off-screen */
   const zoomToCenter = (factor: number) => {
@@ -134,6 +136,14 @@ export default function Toolbar() {
 
   const handleExport = async (format: ExportFormat) => {
     setExportOpen(false);
+    if (format === 'sql-postgres') {
+      if (!model) {
+        toast({ type: 'warning', title: 'No model loaded', description: 'Load a data model first before exporting.' });
+        return;
+      }
+      setDdlModalOpen(true);
+      return;
+    }
     if (format === 'schema-json' || format === 'schema-excel') {
       if (!model) {
         toast({ type: 'warning', title: 'No model loaded', description: 'Load a data model first before exporting.' });
@@ -307,6 +317,22 @@ export default function Toolbar() {
           onClose={() => setImportModal(null)}
         />
       )}
+      {ddlModalOpen && model && (
+        <DdlExportModal
+          model={model}
+          onClose={() => setDdlModalOpen(false)}
+          onDownload={(sql, tableCount) => {
+            const blob = new Blob([sql], { type: 'text/sql' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `ddl-cloud-sql-${new Date().toISOString().slice(0, 10)}.sql`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            setDdlModalOpen(false);
+            toast({ type: 'success', title: 'DDL exported', description: `${tableCount} table(s) exported as PostgreSQL DDL.` });
+          }}
+        />
+      )}
       <div
         className="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-3 shadow-sm flex-shrink-0"
         role="toolbar"
@@ -471,6 +497,9 @@ export default function Toolbar() {
                     <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Schema</div>
                     <button onClick={() => handleExport('schema-json')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Data model (JSON)</button>
                     <button onClick={() => handleExport('schema-excel')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">Data model (Excel)</button>
+                    <div className="h-px bg-gray-100 my-1" />
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">DDL</div>
+                    <button onClick={() => handleExport('sql-postgres')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">PostgreSQL DDL (Cloud SQL Studio)</button>
                     <div className="h-px bg-gray-100 my-1" />
                     <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Sample Data</div>
                     <button onClick={() => handleExport('sample-L1')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L1 sample data (Excel)</button>

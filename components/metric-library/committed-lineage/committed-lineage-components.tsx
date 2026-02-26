@@ -1172,92 +1172,6 @@ export function RollupPyramid({ expandedLevel, onToggle }: { expandedLevel: stri
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * SECTION 12: DASHBOARD CONSUMPTION
- * ──────────────────────────────────────────────────────────────────────────── */
-
-export function DashboardConsumption() {
-  const [selectedPath, setSelectedPath] = useState<'facility' | 'counterparty'>('facility');
-  const [selectedLevel, setSelectedLevel] = useState('facility');
-
-  const levelValues: Record<string, string> = {
-    facility: '$150.0M (F-1 Meridian Revolver)',
-    counterparty: '$341.6M (CP-3 Pacific Ridge)',
-    desk: '$569.3M (CRED desk under GBM)',
-    portfolio: '$150.0M (WM portfolio under GCB)',
-    lob: '$569.3M (GBM)',
-    enterprise: '$1,261.8M (total)',
-  };
-
-  return (
-    <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Step 1: Path */}
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-2">1. Calculation Path</div>
-          <div className="space-y-1.5">
-            {(['facility', 'counterparty'] as const).map(p => (
-              <button
-                key={p}
-                onClick={() => setSelectedPath(p)}
-                className={`w-full px-3 py-2 rounded-lg text-left text-xs transition-colors ${
-                  selectedPath === p ? 'bg-teal-500/15 text-teal-300 border border-teal-500/30' : 'bg-white/[0.02] text-gray-500 border border-gray-800'
-                }`}
-              >
-                {p === 'facility' ? 'Facility (Direct Calc)' : 'Counterparty (Attributed)'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Step 2: Level */}
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-2">2. Rollup Level</div>
-          <div className="space-y-1">
-            {ROLLUP_LEVELS.map(l => {
-              const Icon = l.icon;
-              return (
-                <button
-                  key={l.key}
-                  onClick={() => setSelectedLevel(l.key)}
-                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-[10px] transition-colors ${
-                    selectedLevel === l.key ? 'bg-teal-500/15 text-teal-300 border border-teal-500/30' : 'bg-white/[0.02] text-gray-500 border border-gray-800'
-                  }`}
-                >
-                  <Icon className="w-3 h-3" />
-                  {l.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Step 3: Output */}
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-2">3. Dashboard Output</div>
-          <div className="rounded-lg border border-teal-500/20 bg-teal-500/[0.04] p-3 space-y-2">
-            <div className="grid grid-cols-[80px_1fr] gap-y-1.5 text-[10px]">
-              <span className="text-gray-600 font-bold">Metric</span>
-              <span className="text-teal-300 font-mono">committed_amount_usd</span>
-              <span className="text-gray-600 font-bold">Level</span>
-              <span className="text-gray-300">{ROLLUP_LEVELS.find(l => l.key === selectedLevel)?.label}</span>
-              <span className="text-gray-600 font-bold">L3 Table</span>
-              <code className="text-emerald-300 font-mono">metric_value_fact</code>
-              <span className="text-gray-600 font-bold">Value</span>
-              <span className="text-teal-400 font-mono font-bold">{levelValues[selectedLevel] || '$—'}</span>
-              <span className="text-gray-600 font-bold">SQL</span>
-              <span className="text-gray-400">None — auto-resolved</span>
-            </div>
-          </div>
-          <div className="mt-2 text-center">
-            <span className="text-[9px] text-teal-400/60 font-medium">Platform handles the join — no SQL, no guesswork</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ────────────────────────────────────────────────────────────────────────────
  * SECTION 13: LINEAGE AUDIT TRAIL
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -1681,7 +1595,6 @@ export function FooterLegend() {
               { color: 'bg-amber-600', label: '3. L2 Snapshot' },
               { color: 'bg-emerald-600', label: '4. Calculation' },
               { color: 'bg-emerald-600', label: '5. Rollup Hierarchy' },
-              { color: 'bg-pink-600', label: '6. Dashboard' },
             ].map((s) => (
               <div key={s.label} className="flex items-center gap-2">
                 <span className={`w-3 h-3 rounded ${s.color} flex-shrink-0`} />

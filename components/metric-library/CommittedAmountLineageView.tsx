@@ -16,7 +16,6 @@ import {
   Zap,
   Sparkles,
   GitBranch,
-  LayoutDashboard,
 } from 'lucide-react';
 
 /* ── Data ── */
@@ -43,7 +42,6 @@ import {
   CounterpartyCalcTable,
   AnimatedDataFlow,
   RollupPyramid,
-  DashboardConsumption,
   LineageAuditTrail,
   ProvenanceBreadcrumb,
   useActiveSection,
@@ -316,21 +314,6 @@ export default function CommittedAmountLineageView() {
             addition — facility values sum to counterparty, counterparty sums to desk, and so on up to enterprise. The multi-borrower
             scenario (F-3) is the key complexity: CP-3 and CP-7 each get their attributed share, not the full facility amount.
           </InsightCallout>
-        </section>
-
-        <FlowArrow label="Dashboard builder selects dimension" />
-
-        {/* ── SECTION 12: DASHBOARD CONSUMPTION ── */}
-        <section id="section-dashboard" aria-labelledby="heading-dashboard">
-          <SectionHeading
-            id="heading-dashboard"
-            icon={LayoutDashboard}
-            step="Step 6 — Dashboard Consumption"
-            layerColor="bg-pink-600"
-            title="Self-Service Connection"
-            subtitle="Pick the metric, pick the dimension, build — no SQL needed"
-          />
-          <DashboardConsumption />
         </section>
 
         <FlowArrow label="Can we trace this number back to source?" />

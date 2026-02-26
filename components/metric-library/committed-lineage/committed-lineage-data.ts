@@ -385,7 +385,6 @@ export const BREADCRUMB_STEPS: BreadcrumbStep[] = [
   { id: 'calculation', label: 'Calculation', layer: 'Calc', color: 'emerald', anchor: 'calculation' },
   { id: 'data-flow', label: 'Data Flow', layer: 'Trace', color: 'amber', anchor: 'data-flow' },
   { id: 'rollup', label: 'Rollup', layer: 'Hierarchy', color: 'emerald', anchor: 'rollup' },
-  { id: 'dashboard', label: 'Dashboard', layer: 'Output', color: 'pink', anchor: 'dashboard' },
   { id: 'audit-trail', label: 'Audit Trail', layer: 'Validate', color: 'emerald', anchor: 'audit-trail' },
 ];
 

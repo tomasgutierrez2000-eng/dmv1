@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen, Library, History } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
-import ReleaseTracker from '@/components/overview/ReleaseTracker';
 
 export default function OverviewContent() {
   const [activeWalkthrough, setActiveWalkthrough] = useState<string | null>(null);
@@ -332,17 +331,20 @@ export default function OverviewContent() {
         </div>
 
         {/* Release Tracker */}
-        <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-8 mt-16">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-slate-700/80 flex items-center justify-center">
-              <History className="w-5 h-5 text-slate-300" />
+        <div className="mt-8">
+          <Link
+            href="/release-tracker"
+            className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 flex items-center gap-4 hover:border-slate-600 hover:bg-slate-900 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          >
+            <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
+              <History className="w-6 h-6 text-slate-300" />
             </div>
-            <div>
-              <h3 className="text-xl font-semibold text-white">Release Tracker</h3>
-              <p className="text-sm text-slate-400">Data model changes — tables and fields added, removed, or moved</p>
+            <div className="flex-1">
+              <h4 className="font-semibold text-lg text-white">Release Tracker</h4>
+              <p className="text-sm text-slate-400">View all data model changes — tables and fields added, removed, or moved across L1, L2, and L3</p>
             </div>
-          </div>
-          <ReleaseTracker />
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-slate-300 transition-colors" aria-hidden />
+          </Link>
         </div>
       </section>
     </div>

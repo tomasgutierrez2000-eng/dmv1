@@ -45,6 +45,7 @@ export default function AgentPage() {
   const [error, setError] = useState<string | null>(null);
   const [envOk, setEnvOk] = useState<boolean | null>(null);
   const [provider, setProvider] = useState<'llama' | 'claude' | 'gemini' | null>(null);
+  const [ollamaBaseUrlSet, setOllamaBaseUrlSet] = useState<boolean>(false);
   const [unlocked, setUnlocked] = useState(false);
   const [passwordRequired, setPasswordRequired] = useState<boolean | null>(null);
   const [passwordInput, setPasswordInput] = useState('');
@@ -59,6 +60,7 @@ export default function AgentPage() {
       .then((d) => {
         setEnvOk(d.ok === true);
         setProvider(d.provider ?? null);
+        setOllamaBaseUrlSet(d.ollamaBaseUrlSet === true);
         const needsPassword = d.passwordRequired === true;
         setPasswordRequired(needsPassword);
         if (!needsPassword) {
@@ -246,10 +248,17 @@ export default function AgentPage() {
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 shrink-0" />
                 {provider === 'llama' ? 'Using Llama (Ollama)' : provider === 'claude' ? 'Using Claude' : 'Using Gemini'}
+                {provider === 'llama' && <span className="text-emerald-400/80 text-xs font-normal">(OLLAMA_BASE_URL is set)</span>}
               </div>
               {provider === 'llama' && (
                 <p className="text-emerald-400/80 text-xs">Ensure Ollama is running locally (<code className="bg-emerald-900/50 px-1 rounded">ollama serve</code>) and the model is pulled (e.g. <code className="bg-emerald-900/50 px-1 rounded">ollama pull llama3.2</code>).</p>
               )}
+            </div>
+          )}
+          {envOk === true && !ollamaBaseUrlSet && provider !== 'llama' && (
+            <div className="rounded-xl px-4 py-3 bg-amber-950/40 border border-amber-700 text-amber-200 text-sm mb-6 flex flex-col gap-2" role="alert">
+              <p className="font-medium">Ollama is not configured — using {provider === 'claude' ? 'Claude' : 'Gemini'}.</p>
+              <p className="text-xs text-amber-300/90">To use Llama (Ollama) instead: add <code className="bg-amber-900/50 px-1 rounded">OLLAMA_BASE_URL=http://localhost:11434</code> to <code className="bg-amber-900/50 px-1 rounded">.env</code> in the project root and restart the dev server. No API key needed for Ollama.</p>
             </div>
           )}
 

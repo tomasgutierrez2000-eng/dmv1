@@ -38,6 +38,8 @@ const ENV_VAR_GEMINI = 'GOOGLE_GEMINI_API_KEY';
 const ENV_VAR_ANTHROPIC = 'ANTHROPIC_API_KEY';
 const ENV_OLLAMA_BASE_URL = 'OLLAMA_BASE_URL';
 const ENV_OLLAMA_MODEL = 'OLLAMA_MODEL';
+/** When set to "llama", agent uses only Llama (Ollama); other backends are ignored. */
+const ENV_AGENT_PROVIDER = 'AGENT_PROVIDER';
 
 function getApiKey(): string | undefined {
   return getEnvVar(ENV_VAR_GEMINI);
@@ -52,6 +54,12 @@ function getOllamaBaseUrl(): string | undefined {
   const v = getEnvVar(ENV_OLLAMA_BASE_URL);
   if (v && typeof v === 'string' && v.trim()) return v.trim();
   return undefined;
+}
+
+/** If AGENT_PROVIDER=llama, we use only Llama (and require OLLAMA_BASE_URL). */
+function useLlamaOnly(): boolean {
+  const p = getEnvVar(ENV_AGENT_PROVIDER);
+  return p?.toLowerCase().trim() === 'llama';
 }
 
 function getOllamaModel(): string {
@@ -320,12 +328,23 @@ interface AgentRequestBody {
  * POST /api/agent
  * Body: { message: string } or { messages: Array<{ role: "user" | "model", content: string }> }
  * Returns: { reply: string, toolCalls?: Array<{ name, args }> }
- * Prefers Llama (Ollama) if OLLAMA_BASE_URL is set, then Claude (ANTHROPIC_API_KEY), then Gemini (GOOGLE_GEMINI_API_KEY).
+ * Uses Llama when OLLAMA_BASE_URL is set (or when AGENT_PROVIDER=llama); otherwise Claude, then Gemini.
  */
 export async function POST(request: NextRequest) {
+  const wantLlamaOnly = useLlamaOnly();
   const ollamaBaseUrl = getOllamaBaseUrl();
-  const anthropicKey = getAnthropicApiKey();
-  const apiKey = getApiKey();
+  const anthropicKey = wantLlamaOnly ? undefined : getAnthropicApiKey();
+  const apiKey = wantLlamaOnly ? undefined : getApiKey();
+
+  if (wantLlamaOnly && !ollamaBaseUrl) {
+    return NextResponse.json(
+      {
+        error: 'Agent is set to Llama only',
+        details: 'Set AGENT_PROVIDER=llama but OLLAMA_BASE_URL is missing. Add OLLAMA_BASE_URL=http://localhost:11434 to .env and ensure Ollama is running.',
+      },
+      { status: 500 }
+    );
+  }
 
   if (!ollamaBaseUrl && !anthropicKey && !apiKey) {
     return NextResponse.json(
@@ -383,6 +402,7 @@ export async function POST(request: NextRequest) {
     const bundle = getSchemaBundle();
 
     const timeoutMs = getAgentTimeoutMs();
+    // Use Llama whenever OLLAMA_BASE_URL is set (or AGENT_PROVIDER=llama)
     if (ollamaBaseUrl) {
       return await runLlamaAgent({
         baseUrl: ollamaBaseUrl,

@@ -7,11 +7,12 @@ import { getEnvKeyInfo, getEnvVar } from '@/lib/env';
  * Also reports whether a password is required.
  */
 export async function GET() {
+  const useLlamaOnly = getEnvVar('AGENT_PROVIDER')?.toLowerCase().trim() === 'llama';
   const ollamaBaseUrl = getEnvVar('OLLAMA_BASE_URL')?.trim();
   const anthropic = getEnvKeyInfo('ANTHROPIC_API_KEY');
   const gemini = getEnvKeyInfo('GOOGLE_GEMINI_API_KEY');
-  const ok = Boolean(ollamaBaseUrl) || anthropic.set || gemini.set;
-  const provider = ollamaBaseUrl ? 'llama' : anthropic.set ? 'claude' : gemini.set ? 'gemini' : null;
+  const ok = useLlamaOnly ? Boolean(ollamaBaseUrl) : Boolean(ollamaBaseUrl) || anthropic.set || gemini.set;
+  const provider = ollamaBaseUrl ? 'llama' : useLlamaOnly ? null : anthropic.set ? 'claude' : gemini.set ? 'gemini' : null;
   const passwordRequired = Boolean(getEnvVar('AGENT_PASSWORD'));
   const message = ok
     ? provider === 'llama'

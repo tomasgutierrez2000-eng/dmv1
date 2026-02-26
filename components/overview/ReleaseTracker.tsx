@@ -7,14 +7,13 @@ import { RELEASE_ENTRIES, type ReleaseEntry } from '@/lib/release-tracker-data';
 type SortField = 'date' | 'layer' | 'table' | 'field' | 'changeType';
 type SortDir = 'asc' | 'desc';
 
-const LAYERS = ['L1', 'L2', 'L3', 'Metric Library'] as const;
+const LAYERS = ['L1', 'L2', 'L3'] as const;
 const CHANGE_TYPES = ['Added', 'Removed', 'Moved'] as const;
 
 const LAYER_COLORS: Record<string, string> = {
   L1: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   L2: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
   L3: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  'Metric Library': 'bg-purple-500/15 text-purple-400 border-purple-500/30',
 };
 
 const CHANGE_COLORS: Record<string, string> = {

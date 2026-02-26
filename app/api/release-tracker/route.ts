@@ -42,7 +42,7 @@ export async function GET() {
   });
 }
 
-const VALID_LAYERS = new Set(['L1', 'L2', 'L3', 'Metric Library']);
+const VALID_LAYERS = new Set(['L1', 'L2', 'L3']);
 const VALID_CHANGE_TYPES = new Set(['Added', 'Removed', 'Moved']);
 
 /** POST: import release tracker entries from uploaded Excel. */
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (!VALID_LAYERS.has(layer)) {
-        errors.push(`Row ${rowNum}: invalid layer "${layer}" — must be L1, L2, L3, or Metric Library`);
+        errors.push(`Row ${rowNum}: invalid layer "${layer}" — must be L1, L2, or L3`);
         continue;
       }
 

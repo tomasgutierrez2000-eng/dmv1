@@ -1,6 +1,6 @@
 export interface ReleaseEntry {
   date: string;
-  layer: 'L1' | 'L2' | 'L3' | 'Metric Library';
+  layer: 'L1' | 'L2' | 'L3';
   table: string;
   field: string;
   changeType: 'Added' | 'Removed' | 'Moved';
@@ -9,11 +9,6 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
-  // ── 2026-02-25: Metric library simplification ──────────────────────
-  { date: '2026-02-25', layer: 'Metric Library', table: 'metric_variants', field: 'calculation_authority_tiers', changeType: 'Removed', rationale: 'Multi-tier governance added complexity without being used; simplified to one canonical variant per parent' },
-  { date: '2026-02-25', layer: 'Metric Library', table: 'metric_variants', field: 'sourcing_levels', changeType: 'Removed', rationale: 'Removed unused sourcing level hierarchy during metric library simplification' },
-  { date: '2026-02-25', layer: 'Metric Library', table: 'metric_variants', field: 'approval_deprecation_workflow', changeType: 'Removed', rationale: 'Approval/deprecation workflows removed — not exercised in practice' },
-
   // ── 2026-02-25: Atomic metrics moved L3 → L2 ──────────────────────
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_loans', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2 — L2 holds source-system values, L3 only derived' },
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_facilities', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2' },

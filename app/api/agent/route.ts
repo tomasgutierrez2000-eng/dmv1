@@ -57,7 +57,7 @@ function getOllamaBaseUrl(): string | undefined {
 }
 
 /** If AGENT_PROVIDER=llama, we use only Llama (and require OLLAMA_BASE_URL). */
-function useLlamaOnly(): boolean {
+function agentUsesLlamaOnly(): boolean {
   const p = getEnvVar(ENV_AGENT_PROVIDER);
   return p?.toLowerCase().trim() === 'llama';
 }
@@ -331,7 +331,7 @@ interface AgentRequestBody {
  * Uses Llama when OLLAMA_BASE_URL is set (or when AGENT_PROVIDER=llama); otherwise Claude, then Gemini.
  */
 export async function POST(request: NextRequest) {
-  const wantLlamaOnly = useLlamaOnly();
+  const wantLlamaOnly = agentUsesLlamaOnly();
   const ollamaBaseUrl = getOllamaBaseUrl();
   const anthropicKey = wantLlamaOnly ? undefined : getAnthropicApiKey();
   const apiKey = wantLlamaOnly ? undefined : getApiKey();

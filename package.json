@@ -15,7 +15,10 @@
     "generate:l2": "tsx scripts/l2/generate.ts",
     "populate:metric-value-fact": "tsx scripts/populate-metric-value-fact.ts",
     "test:metrics": "tsx scripts/test-metrics.ts",
-    "test:calc-engine": "tsx scripts/test-calculation-engine.ts"
+    "test:calc-engine": "tsx scripts/test-calculation-engine.ts",
+    "release-tracker:sync": "tsx scripts/release-tracker-sync.ts",
+    "release-tracker:init": "tsx scripts/release-tracker-sync.ts --init",
+    "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

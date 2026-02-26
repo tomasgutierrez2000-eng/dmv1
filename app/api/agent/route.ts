@@ -5,6 +5,7 @@ import {
   createUserContent,
   type Content,
 } from '@google/genai';
+import OpenAI from 'openai';
 import { getSchemaBundle, getSchemaSummary } from '@/lib/schema-bundle';
 import { buildSystemPrompt } from '@/lib/agent/prompt';
 import { TOOL_DECLARATIONS, runTool } from '@/lib/agent/tools';
@@ -35,6 +36,8 @@ function getAgentTimeoutMs(): number {
 
 const ENV_VAR_GEMINI = 'GOOGLE_GEMINI_API_KEY';
 const ENV_VAR_ANTHROPIC = 'ANTHROPIC_API_KEY';
+const ENV_OLLAMA_BASE_URL = 'OLLAMA_BASE_URL';
+const ENV_OLLAMA_MODEL = 'OLLAMA_MODEL';
 
 function getApiKey(): string | undefined {
   return getEnvVar(ENV_VAR_GEMINI);
@@ -44,7 +47,30 @@ function getAnthropicApiKey(): string | undefined {
   return getEnvVar(ENV_VAR_ANTHROPIC);
 }
 
+/** When set, use local Llama via Ollama (OpenAI-compatible API). No API key needed. */
+function getOllamaBaseUrl(): string | undefined {
+  const v = getEnvVar(ENV_OLLAMA_BASE_URL);
+  if (v && typeof v === 'string' && v.trim()) return v.trim();
+  return undefined;
+}
+
+function getOllamaModel(): string {
+  const v = getEnvVar(ENV_OLLAMA_MODEL);
+  if (v && typeof v === 'string' && v.trim()) return v.trim();
+  return 'llama3.2';
+}
+
 const CLAUDE_MODEL = 'claude-haiku-4-5';
+
+/** OpenAI-format tools for Ollama (same as Claude tools, different shape). */
+const OPENAI_TOOLS = CLAUDE_TOOLS.map((t) => ({
+  type: 'function' as const,
+  function: {
+    name: t.name,
+    description: t.description,
+    parameters: t.input_schema,
+  },
+}));
 
 type ClaudeMessageParam = { role: 'user' | 'assistant'; content: string | Array<{ type: string; id?: string; name?: string; input?: Record<string, unknown>; tool_use_id?: string; content?: string }> };
 
@@ -157,6 +183,132 @@ async function runClaudeAgent(params: {
   }
 }
 
+/** Build OpenAI chat messages from request (system passed separately). */
+function toOpenAIMessages(
+  message: string | undefined,
+  messages: Array<{ role: string; content: string }> | undefined
+): OpenAI.Chat.ChatCompletionMessageParam[] {
+  if (message && typeof message === 'string') {
+    return [{ role: 'user', content: message }];
+  }
+  if (Array.isArray(messages) && messages.length > 0) {
+    return messages.map((m) => ({
+      role: (m.role === 'model' ? 'assistant' : 'user') as 'user' | 'assistant',
+      content: m.content,
+    }));
+  }
+  return [];
+}
+
+async function runLlamaAgent(params: {
+  baseUrl: string;
+  model: string;
+  message: string | undefined;
+  messages: Array<{ role: string; content: string }> | undefined;
+  systemPrompt: string;
+  bundle: ReturnType<typeof getSchemaBundle>;
+  timeoutMs: number;
+}): Promise<NextResponse> {
+  const { baseUrl, model, message, messages, systemPrompt, bundle, timeoutMs } = params;
+  const openAIMessages = toOpenAIMessages(message, messages);
+  if (openAIMessages.length === 0) {
+    return NextResponse.json(
+      { error: 'Provide "message" (string) or "messages" (array of { role, content })' },
+      { status: 400 }
+    );
+  }
+
+  const client = new OpenAI({
+    baseURL: baseUrl.replace(/\/$/, '') + '/v1',
+    apiKey: 'ollama', // Ollama ignores key; OpenAI client requires something
+  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    let currentMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+      { role: 'system', content: systemPrompt },
+      ...openAIMessages,
+    ];
+    const toolCallsMade: Array<{ name: string; args: Record<string, unknown> }> = [];
+    let rounds = 0;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const response = await client.chat.completions.create(
+        {
+          model,
+          messages: currentMessages,
+          tools: OPENAI_TOOLS,
+          tool_choice: 'auto',
+          max_tokens: CLAUDE_MAX_TOKENS,
+        },
+        { signal: controller.signal, timeout: timeoutMs }
+      );
+
+      const choice = response.choices?.[0];
+      const msg = choice?.message;
+      const content = msg?.content?.trim() ?? '';
+      const toolCalls = msg?.tool_calls ?? [];
+
+      if (toolCalls.length === 0 || rounds >= MAX_TOOL_ROUNDS) {
+        clearTimeout(timeoutId);
+        return NextResponse.json({
+          reply: content || '(No text in response.)',
+          ...(toolCallsMade.length > 0 && { toolCalls: toolCallsMade }),
+        });
+      }
+
+      rounds += 1;
+      type ToolCallLike = { id?: string; function?: { name?: string; arguments?: string } };
+      const toolCallsTyped = toolCalls as ToolCallLike[];
+      currentMessages = [
+        ...currentMessages,
+        {
+          role: 'assistant',
+          content: content || null,
+          tool_calls: toolCallsTyped.map((tc) => ({
+            id: tc.id ?? '',
+            type: 'function' as const,
+            function: { name: tc.function?.name ?? '', arguments: tc.function?.arguments ?? '{}' },
+          })),
+        },
+      ] as OpenAI.Chat.ChatCompletionMessageParam[];
+
+      for (const tc of toolCallsTyped) {
+        const name = tc.function?.name ?? 'unknown';
+        let args: Record<string, unknown> = {};
+        try {
+          args = JSON.parse(tc.function?.arguments ?? '{}') as Record<string, unknown>;
+        } catch {
+          // ignore
+        }
+        toolCallsMade.push({ name, args });
+        const result = runTool(name, args, bundle);
+        currentMessages.push({
+          role: 'tool',
+          tool_call_id: tc.id ?? '',
+          content: JSON.stringify(result),
+        });
+      }
+    }
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[agent] Llama', err);
+    let userError = 'Agent request failed';
+    let userHint = message;
+    if (message.includes('ECONNREFUSED') || message.includes('fetch failed')) {
+      userError = 'Cannot reach Ollama';
+      userHint = 'Start Ollama (e.g. run `ollama serve`) and ensure OLLAMA_BASE_URL in .env points to it (default http://localhost:11434).';
+    } else if (message.includes('abort') || message.includes('timeout') || message.includes('ETIMEDOUT')) {
+      userError = 'Request timed out';
+      userHint = `The request took too long. Try a shorter question or increase AGENT_TIMEOUT_MS.`;
+    }
+    return NextResponse.json({ error: userError, details: userHint }, { status: 500 });
+  }
+}
+
 /** Request body for POST /api/agent. */
 interface AgentRequestBody {
   message?: string;
@@ -168,17 +320,18 @@ interface AgentRequestBody {
  * POST /api/agent
  * Body: { message: string } or { messages: Array<{ role: "user" | "model", content: string }> }
  * Returns: { reply: string, toolCalls?: Array<{ name, args }> }
- * Uses Claude if ANTHROPIC_API_KEY is set, otherwise Gemini (GOOGLE_GEMINI_API_KEY).
+ * Prefers Llama (Ollama) if OLLAMA_BASE_URL is set, then Claude (ANTHROPIC_API_KEY), then Gemini (GOOGLE_GEMINI_API_KEY).
  */
 export async function POST(request: NextRequest) {
+  const ollamaBaseUrl = getOllamaBaseUrl();
   const anthropicKey = getAnthropicApiKey();
   const apiKey = getApiKey();
 
-  if (!anthropicKey && !apiKey) {
+  if (!ollamaBaseUrl && !anthropicKey && !apiKey) {
     return NextResponse.json(
       {
-        error: 'No API key set',
-        details: 'Add either ANTHROPIC_API_KEY (for Claude) or GOOGLE_GEMINI_API_KEY (for Gemini) to .env in the project root, then restart the dev server.',
+        error: 'No agent backend configured',
+        details: 'Set OLLAMA_BASE_URL (e.g. http://localhost:11434 for Llama), or ANTHROPIC_API_KEY (Claude), or GOOGLE_GEMINI_API_KEY (Gemini) in .env, then restart the dev server.',
       },
       { status: 500 }
     );
@@ -230,6 +383,17 @@ export async function POST(request: NextRequest) {
     const bundle = getSchemaBundle();
 
     const timeoutMs = getAgentTimeoutMs();
+    if (ollamaBaseUrl) {
+      return await runLlamaAgent({
+        baseUrl: ollamaBaseUrl,
+        model: getOllamaModel(),
+        message,
+        messages: validatedMessages,
+        systemPrompt,
+        bundle,
+        timeoutMs,
+      });
+    }
     if (anthropicKey) {
       return await runClaudeAgent({ anthropicKey, message, messages: validatedMessages, systemPrompt, bundle, timeoutMs });
     }

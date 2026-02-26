@@ -44,7 +44,7 @@ export default function AgentPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [envOk, setEnvOk] = useState<boolean | null>(null);
-  const [provider, setProvider] = useState<'claude' | 'gemini' | null>(null);
+  const [provider, setProvider] = useState<'llama' | 'claude' | 'gemini' | null>(null);
   const [unlocked, setUnlocked] = useState(false);
   const [passwordRequired, setPasswordRequired] = useState<boolean | null>(null);
   const [passwordInput, setPasswordInput] = useState('');
@@ -232,18 +232,19 @@ export default function AgentPage() {
             <div className="rounded-xl px-4 py-3 bg-amber-950/50 border border-amber-700 text-amber-200 text-sm mb-6 flex flex-col gap-2" role="alert">
               <div className="flex items-center gap-2">
                 <XCircle className="w-4 h-4 shrink-0" />
-                <span>No API key set. Add ANTHROPIC_API_KEY or GOOGLE_GEMINI_API_KEY to .env in the project root, then restart the dev server (Ctrl+C, then npm run dev).</span>
+                <span>No agent backend configured. Set OLLAMA_BASE_URL (e.g. http://localhost:11434 for Llama), or ANTHROPIC_API_KEY, or GOOGLE_GEMINI_API_KEY in .env, then restart the dev server (Ctrl+C, then npm run dev).</span>
               </div>
               <div className="flex flex-wrap gap-3 text-xs">
-                <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 underline w-fit">Get Claude API key (Anthropic)</a>
-                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 underline w-fit">Get Gemini API key (Google AI Studio)</a>
+                <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 underline w-fit">Llama via Ollama (local)</a>
+                <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 underline w-fit">Claude API key (Anthropic)</a>
+                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 underline w-fit">Gemini API key (Google AI Studio)</a>
               </div>
             </div>
           )}
           {envOk === true && (
             <div className="rounded-xl px-4 py-2 bg-emerald-950/30 border border-emerald-800 text-emerald-300 text-sm mb-6 flex items-center gap-2 w-fit">
               <CheckCircle className="w-4 h-4 shrink-0" />
-              {provider === 'claude' ? 'Using Claude' : 'Using Gemini'}
+              {provider === 'llama' ? 'Using Llama (Ollama)' : provider === 'claude' ? 'Using Claude' : 'Using Gemini'}
             </div>
           )}
 
@@ -267,7 +268,7 @@ export default function AgentPage() {
                   </button>
                 ))}
               </div>
-              <p className="text-pwc-gray-light/70 text-xs mt-4">Run <code className="bg-pwc-gray px-1 rounded">npm run dev</code> in the project folder, then open the URL from the terminal. Need a key? <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-pwc-gray-light hover:text-pwc-white underline">Claude</a> or <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-pwc-gray-light hover:text-pwc-white underline">Gemini</a>.</p>
+              <p className="text-pwc-gray-light/70 text-xs mt-4">Run <code className="bg-pwc-gray px-1 rounded">npm run dev</code> in the project folder, then open the URL from the terminal. Backend: <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-pwc-gray-light hover:text-pwc-white underline">Llama (Ollama)</a>, <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="text-pwc-gray-light hover:text-pwc-white underline">Claude</a>, or <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-pwc-gray-light hover:text-pwc-white underline">Gemini</a>.</p>
             </div>
           )}
 

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen, Library } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen, Library, History } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
+import ReleaseTracker from '@/components/overview/ReleaseTracker';
 
 export default function OverviewContent() {
   const [activeWalkthrough, setActiveWalkthrough] = useState<string | null>(null);
@@ -328,6 +329,20 @@ export default function OverviewContent() {
               <p className="text-sm text-slate-400">Architecture guide, recipes, and glossary for the team</p>
             </Link>
           </div>
+        </div>
+
+        {/* Release Tracker */}
+        <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-8 mt-16">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-slate-700/80 flex items-center justify-center">
+              <History className="w-5 h-5 text-slate-300" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white">Release Tracker</h3>
+              <p className="text-sm text-slate-400">Data model changes — tables and fields added, removed, or moved</p>
+            </div>
+          </div>
+          <ReleaseTracker />
         </div>
       </section>
     </div>

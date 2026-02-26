@@ -1,11 +1,11 @@
-import CommittedLineageView from '@/components/metric-library/CommittedLineageView';
+import CommittedAmountLineageView from '@/components/metric-library/CommittedAmountLineageView';
 
 export const metadata = {
-  title: 'Committed Amount — End-to-End Lineage',
+  title: 'Committed Amount (USD) — End-to-End Lineage',
   description:
-    'Visualization of Committed metric definition, Facility and Counterparty calculation paths, data lineage, and rollup hierarchy from facility to enterprise.',
+    'Interactive visualization of Committed Amount metric definition, data lineage with FX conversion and syndication share, rollup hierarchy across facility → counterparty → desk → portfolio → LoB → enterprise, and dashboard consumption',
 };
 
-export default function CommittedLineagePage() {
-  return <CommittedLineageView />;
+export default function CommittedAmountLineagePage() {
+  return <CommittedAmountLineageView />;
 }

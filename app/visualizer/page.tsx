@@ -45,33 +45,7 @@ export default function VisualizerPage() {
     }
   };
 
-  const [demoLoading, setDemoLoading] = useState(false);
   const [dictLoading, setDictLoading] = useState(false);
-
-  const loadL1Demo = async () => {
-    setDemoLoading(true);
-    try {
-      const res = await fetch('/api/l1-demo-model');
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || res.statusText);
-      }
-      const model = (await res.json()) as DataModel;
-      setModel(model);
-      const { calculateLayout } = require('../../utils/layoutEngine');
-      const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
-      const positions = calculateLayout(model, layoutMode, {}, undefined, tableSize, visibleLayers, compactOverview);
-      const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
-      if (isOverview) setTablePositionsReplace(positions);
-      else setTablePositionsBulk(positions);
-      toast({ type: 'success', title: 'Demo loaded', description: `${Object.keys(model.tables).length} tables loaded.` });
-    } catch (e) {
-      console.error('Load L1 demo failed:', e);
-      toast({ type: 'error', title: 'Failed to load demo', description: e instanceof Error ? e.message : 'Unknown error.' });
-    } finally {
-      setDemoLoading(false);
-    }
-  };
 
   const loadFromDataDictionary = async () => {
     setDictLoading(true);
@@ -120,39 +94,18 @@ export default function VisualizerPage() {
                   </div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">Get started</h2>
                   <p className="text-sm text-gray-500 max-w-sm mx-auto">
-                    Load a demo dataset to explore the banking data model, or upload your own data dictionary.
+                    Load the data model from the Data Model page, or upload your own data dictionary.
                   </p>
                 </div>
 
-                {/* Primary CTA - Load demo */}
-                <button
-                  type="button"
-                  onClick={loadL1Demo}
-                  disabled={demoLoading}
-                  aria-busy={demoLoading}
-                  aria-label={demoLoading ? 'Loading demo data' : 'Load L1 bank data demo (78 tables)'}
-                  className="w-full mb-4 py-3.5 px-6 rounded-lg bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                >
-                  {demoLoading ? (
-                    <>
-                      <Loader className="w-4 h-4 animate-spin" />
-                      <span>Loading demo data…</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Load L1 bank data demo (78 tables)</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-
-                {/* Load from data dictionary (reflects Data Model page add/edit/remove + SQL/DDL) */}
+                {/* Primary CTA - Load from Data Model */}
                 <button
                   type="button"
                   onClick={loadFromDataDictionary}
                   disabled={dictLoading}
                   aria-busy={dictLoading}
-                  className="w-full mb-4 py-3 px-6 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium text-sm flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  aria-label={dictLoading ? 'Loading from Data Model' : 'Load from Data Model (current tables & fields)'}
+                  className="w-full mb-4 py-3.5 px-6 rounded-lg bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   {dictLoading ? (
                     <>
@@ -160,7 +113,10 @@ export default function VisualizerPage() {
                       <span>Loading…</span>
                     </>
                   ) : (
-                    <span>Load from Data Model (current tables &amp; fields)</span>
+                    <>
+                      <span>Load from Data Model (current tables &amp; fields)</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
                   )}
                 </button>
 

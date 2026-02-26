@@ -440,34 +440,6 @@ CREATE TABLE IF NOT EXISTS l1.ledger_account_dim (
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS l1.internal_risk_rating_bucket_dim (
-  internal_risk_rating_bucket_code VARCHAR(20) NOT NULL PRIMARY KEY,
-  internal_risk_rating_bucket_name VARCHAR(200),
-  rating_range_low INTEGER,
-  rating_range_high INTEGER,
-  description VARCHAR(2000),
-  display_order INTEGER,
-  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
-  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Seed: Internal Risk Rating Buckets
--- CRITICAL: 15-16
--- HIGH: 10-14
--- MODERATE: 5-9
--- NON_HIGH_RISK: all others (1-4)
-
-CREATE TABLE IF NOT EXISTS l1.pricing_tier_dim (
-  pricing_tier_code VARCHAR(20) NOT NULL PRIMARY KEY,
-  pricing_tier_name VARCHAR(200),
-  tier_rank INTEGER,
-  description VARCHAR(2000),
-  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
-  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS l1.context_dim (
   context_id BIGINT NOT NULL PRIMARY KEY,
   context_domain VARCHAR(100),

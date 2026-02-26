@@ -242,9 +242,14 @@ export default function AgentPage() {
             </div>
           )}
           {envOk === true && (
-            <div className="rounded-xl px-4 py-2 bg-emerald-950/30 border border-emerald-800 text-emerald-300 text-sm mb-6 flex items-center gap-2 w-fit">
-              <CheckCircle className="w-4 h-4 shrink-0" />
-              {provider === 'llama' ? 'Using Llama (Ollama)' : provider === 'claude' ? 'Using Claude' : 'Using Gemini'}
+            <div className="rounded-xl px-4 py-2 bg-emerald-950/30 border border-emerald-800 text-emerald-300 text-sm mb-6 flex flex-col gap-1 w-full max-w-2xl">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 shrink-0" />
+                {provider === 'llama' ? 'Using Llama (Ollama)' : provider === 'claude' ? 'Using Claude' : 'Using Gemini'}
+              </div>
+              {provider === 'llama' && (
+                <p className="text-emerald-400/80 text-xs">Ensure Ollama is running locally (<code className="bg-emerald-900/50 px-1 rounded">ollama serve</code>) and the model is pulled (e.g. <code className="bg-emerald-900/50 px-1 rounded">ollama pull llama3.2</code>).</p>
+              )}
             </div>
           )}
 

@@ -241,6 +241,7 @@ async function runLlamaAgent(params: {
     const toolCallsMade: Array<{ name: string; args: Record<string, unknown> }> = [];
     let rounds = 0;
 
+    // Ollama /v1/chat/completions supports tools but NOT tool_choice - omit it to avoid 400
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const response = await client.chat.completions.create(
@@ -248,7 +249,6 @@ async function runLlamaAgent(params: {
           model,
           messages: currentMessages,
           tools: OPENAI_TOOLS,
-          tool_choice: 'auto',
           max_tokens: CLAUDE_MAX_TOKENS,
         },
         { signal: controller.signal, timeout: timeoutMs }
@@ -304,6 +304,40 @@ async function runLlamaAgent(params: {
     clearTimeout(timeoutId);
     const message = err instanceof Error ? err.message : String(err);
     console.error('[agent] Llama', err);
+
+    // Fallback: if tools caused the failure (e.g. model or Ollama version), try once without tools
+    if (
+      message.includes('400') ||
+      message.includes('tool') ||
+      message.includes('function') ||
+      message.includes('invalid') ||
+      message.includes('not supported')
+    ) {
+      try {
+        const fallbackController = new AbortController();
+        const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), timeoutMs);
+        const fallbackResponse = await client.chat.completions.create(
+          {
+            model,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...openAIMessages,
+            ],
+            max_tokens: CLAUDE_MAX_TOKENS,
+          },
+          { signal: fallbackController.signal, timeout: timeoutMs }
+        );
+        clearTimeout(fallbackTimeoutId);
+        const text = fallbackResponse.choices?.[0]?.message?.content?.trim() ?? '';
+        return NextResponse.json({
+          reply: text || '(No text in response.)',
+          _fallback: 'Responded without tools; model may not support tool calling.',
+        });
+      } catch (fallbackErr) {
+        console.error('[agent] Llama fallback (no tools) also failed', fallbackErr);
+      }
+    }
+
     let userError = 'Agent request failed';
     let userHint = message;
     if (message.includes('ECONNREFUSED') || message.includes('fetch failed')) {
@@ -312,6 +346,9 @@ async function runLlamaAgent(params: {
     } else if (message.includes('abort') || message.includes('timeout') || message.includes('ETIMEDOUT')) {
       userError = 'Request timed out';
       userHint = `The request took too long. Try a shorter question or increase AGENT_TIMEOUT_MS.`;
+    } else if (message.includes('404') || message.includes('not found')) {
+      userError = 'Model not found';
+      userHint = `Run \`ollama pull ${getOllamaModel()}\` to download the model. Check OLLAMA_MODEL in .env.`;
     }
     return NextResponse.json({ error: userError, details: userHint }, { status: 500 });
   }

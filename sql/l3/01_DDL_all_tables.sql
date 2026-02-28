@@ -1211,6 +1211,11 @@ CREATE TABLE IF NOT EXISTS l3.facility_detail_snapshot (
     prepayment_penalty_desc                       TEXT,
     has_amendment_flag                            BOOLEAN,
     amendment_count                               INTEGER,
+    facility_active_flag                          CHAR(1) CHECK (facility_active_flag IN ('Y','N')),
+    maturity_date_bucket                          VARCHAR(20),
+    origination_date_bucket                       VARCHAR(20),
+    effective_date_bucket                         VARCHAR(20),
+    bank_share_pct                                NUMERIC(10,4),
     base_currency_code                            VARCHAR(30),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, facility_id)

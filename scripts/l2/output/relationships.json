@@ -1086,5 +1086,192 @@
     },
     "isCrossLayer": true,
     "relationshipType": "primary"
+  },
+  {
+    "id": "L2.loan_position_detail.position_id->L2.position.position_id",
+    "source": {
+      "layer": "L2",
+      "table": "loan_position_detail",
+      "field": "position_id",
+      "tableKey": "L2.loan_position_detail"
+    },
+    "target": {
+      "layer": "L2",
+      "table": "position",
+      "field": "position_id",
+      "tableKey": "L2.position"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_position_detail.position_id->L2.position.position_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_position_detail",
+      "field": "position_id",
+      "tableKey": "L2.derivative_position_detail"
+    },
+    "target": {
+      "layer": "L2",
+      "table": "position",
+      "field": "position_id",
+      "tableKey": "L2.position"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_position_detail.netting_set_id->L1.netting_set.netting_set_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_position_detail",
+      "field": "netting_set_id",
+      "tableKey": "L2.derivative_position_detail"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "netting_set",
+      "field": "netting_set_id",
+      "tableKey": "L1.netting_set"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.sft_position_detail.position_id->L2.position.position_id",
+    "source": {
+      "layer": "L2",
+      "table": "sft_position_detail",
+      "field": "position_id",
+      "tableKey": "L2.sft_position_detail"
+    },
+    "target": {
+      "layer": "L2",
+      "table": "position",
+      "field": "position_id",
+      "tableKey": "L2.position"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.sft_position_detail.netting_set_id->L1.netting_set.netting_set_id",
+    "source": {
+      "layer": "L2",
+      "table": "sft_position_detail",
+      "field": "netting_set_id",
+      "tableKey": "L2.sft_position_detail"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "netting_set",
+      "field": "netting_set_id",
+      "tableKey": "L1.netting_set"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.guarantee_lc_position_detail.position_id->L2.position.position_id",
+    "source": {
+      "layer": "L2",
+      "table": "guarantee_lc_position_detail",
+      "field": "position_id",
+      "tableKey": "L2.guarantee_lc_position_detail"
+    },
+    "target": {
+      "layer": "L2",
+      "table": "position",
+      "field": "position_id",
+      "tableKey": "L2.position"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.guarantee_lc_position_detail.beneficiary_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L2",
+      "table": "guarantee_lc_position_detail",
+      "field": "beneficiary_counterparty_id",
+      "tableKey": "L2.guarantee_lc_position_detail"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.bond_security_position_detail.position_id->L2.position.position_id",
+    "source": {
+      "layer": "L2",
+      "table": "bond_security_position_detail",
+      "field": "position_id",
+      "tableKey": "L2.bond_security_position_detail"
+    },
+    "target": {
+      "layer": "L2",
+      "table": "position",
+      "field": "position_id",
+      "tableKey": "L2.position"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.bond_security_position_detail.issuer_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L2",
+      "table": "bond_security_position_detail",
+      "field": "issuer_counterparty_id",
+      "tableKey": "L2.bond_security_position_detail"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.counterparty_financial_snapshot.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L2",
+      "table": "counterparty_financial_snapshot",
+      "field": "counterparty_id",
+      "tableKey": "L2.counterparty_financial_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.counterparty_financial_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "counterparty_financial_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.counterparty_financial_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
   }
 ]

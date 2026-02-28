@@ -95,4 +95,12 @@ export interface FacilitySummary {
   counterparty_limit_usd: number | null;
   counterparty_limit_utilized_usd: number | null;
   counterparty_limit_status: string | null;
+
+  // Enrichment fields - Date Buckets (derived)
+  maturity_date_bucket: string;
+  origination_date_bucket: string;
+  effective_date_bucket: string;
+
+  // Enrichment fields - Bank Share
+  bank_share_pct: number;
 }

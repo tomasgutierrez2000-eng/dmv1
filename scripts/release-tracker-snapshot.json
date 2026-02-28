@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-02-28T04:48:30.307Z",
+  "createdAt": "2026-02-28T20:58:27.330Z",
   "tables": [
     {
       "layer": "L1",
@@ -3346,9 +3346,6 @@
         },
         {
           "name": "ultimate_parent_id"
-        },
-        {
-          "name": "product_node_id"
         }
       ]
     },
@@ -4738,6 +4735,426 @@
         },
         {
           "name": "score_dimension"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "loan_position_detail",
+      "fields": [
+        {
+          "name": "loan_position_detail_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "loan_type"
+        },
+        {
+          "name": "amortization_type"
+        },
+        {
+          "name": "payment_frequency"
+        },
+        {
+          "name": "interest_rate_type"
+        },
+        {
+          "name": "current_rate_pct"
+        },
+        {
+          "name": "rate_index_code"
+        },
+        {
+          "name": "spread_bps"
+        },
+        {
+          "name": "original_balance_amt"
+        },
+        {
+          "name": "current_balance_amt"
+        },
+        {
+          "name": "funded_amount"
+        },
+        {
+          "name": "unfunded_commitment_amt"
+        },
+        {
+          "name": "days_past_due"
+        },
+        {
+          "name": "accrual_status"
+        },
+        {
+          "name": "next_payment_date"
+        },
+        {
+          "name": "prepayment_penalty_flag"
+        },
+        {
+          "name": "collateral_coverage_pct"
+        },
+        {
+          "name": "covenant_compliance_flag"
+        },
+        {
+          "name": "hqla_eligible_flag"
+        },
+        {
+          "name": "lcr_outflow_category"
+        },
+        {
+          "name": "nsfr_factor_pct"
+        },
+        {
+          "name": "capital_risk_weight_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "derivative_position_detail",
+      "fields": [
+        {
+          "name": "derivative_position_detail_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "derivative_type"
+        },
+        {
+          "name": "derivative_subtype"
+        },
+        {
+          "name": "underlying_asset_class"
+        },
+        {
+          "name": "notional_amount"
+        },
+        {
+          "name": "mark_to_market_amt"
+        },
+        {
+          "name": "replacement_cost_amt"
+        },
+        {
+          "name": "potential_future_exposure_amt"
+        },
+        {
+          "name": "exposure_at_default_amt"
+        },
+        {
+          "name": "cva_charge_amt"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "collateral_posted_amt"
+        },
+        {
+          "name": "collateral_received_amt"
+        },
+        {
+          "name": "initial_margin_amt"
+        },
+        {
+          "name": "variation_margin_amt"
+        },
+        {
+          "name": "settlement_type"
+        },
+        {
+          "name": "clearing_method"
+        },
+        {
+          "name": "is_centrally_cleared_flag"
+        },
+        {
+          "name": "trade_date"
+        },
+        {
+          "name": "effective_date"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "sa_ccr_exposure_amt"
+        },
+        {
+          "name": "capital_risk_weight_pct"
+        },
+        {
+          "name": "lcr_outflow_category"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "sft_position_detail",
+      "fields": [
+        {
+          "name": "sft_position_detail_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "sft_type"
+        },
+        {
+          "name": "sft_subtype"
+        },
+        {
+          "name": "cash_leg_amt"
+        },
+        {
+          "name": "security_leg_amt"
+        },
+        {
+          "name": "collateral_value_amt"
+        },
+        {
+          "name": "haircut_applied_pct"
+        },
+        {
+          "name": "margin_call_frequency"
+        },
+        {
+          "name": "repo_rate_pct"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "settlement_date"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "is_open_maturity_flag"
+        },
+        {
+          "name": "security_type"
+        },
+        {
+          "name": "security_issuer_country"
+        },
+        {
+          "name": "hqla_eligible_flag"
+        },
+        {
+          "name": "lcr_inflow_category"
+        },
+        {
+          "name": "nsfr_factor_pct"
+        },
+        {
+          "name": "capital_risk_weight_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "guarantee_lc_position_detail",
+      "fields": [
+        {
+          "name": "guarantee_lc_detail_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "instrument_type"
+        },
+        {
+          "name": "guarantee_type"
+        },
+        {
+          "name": "lc_type"
+        },
+        {
+          "name": "issued_amount"
+        },
+        {
+          "name": "outstanding_amount"
+        },
+        {
+          "name": "utilized_amount"
+        },
+        {
+          "name": "credit_conversion_factor"
+        },
+        {
+          "name": "beneficiary_counterparty_id"
+        },
+        {
+          "name": "expiry_date"
+        },
+        {
+          "name": "is_irrevocable_flag"
+        },
+        {
+          "name": "is_financial_standby_flag"
+        },
+        {
+          "name": "fee_rate_bps"
+        },
+        {
+          "name": "lcr_outflow_category"
+        },
+        {
+          "name": "capital_risk_weight_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "bond_security_position_detail",
+      "fields": [
+        {
+          "name": "bond_security_detail_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "security_type"
+        },
+        {
+          "name": "security_subtype"
+        },
+        {
+          "name": "isin"
+        },
+        {
+          "name": "cusip"
+        },
+        {
+          "name": "face_value_amt"
+        },
+        {
+          "name": "market_value_amt"
+        },
+        {
+          "name": "book_value_amt"
+        },
+        {
+          "name": "accrued_interest_amt"
+        },
+        {
+          "name": "unrealized_gain_loss_amt"
+        },
+        {
+          "name": "coupon_rate_pct"
+        },
+        {
+          "name": "coupon_frequency"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "issuer_counterparty_id"
+        },
+        {
+          "name": "issuer_country_code"
+        },
+        {
+          "name": "accounting_classification"
+        },
+        {
+          "name": "hqla_level"
+        },
+        {
+          "name": "hqla_eligible_flag"
+        },
+        {
+          "name": "lcr_haircut_pct"
+        },
+        {
+          "name": "nsfr_factor_pct"
+        },
+        {
+          "name": "capital_risk_weight_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "counterparty_financial_snapshot",
+      "fields": [
+        {
+          "name": "financial_snapshot_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "reporting_period"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "tax_expense_amt"
+        },
+        {
+          "name": "depreciation_amt"
+        },
+        {
+          "name": "amortization_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "total_liabilities_amt"
+        },
+        {
+          "name": "shareholders_equity_amt"
+        },
+        {
+          "name": "ebitda_amt"
+        },
+        {
+          "name": "noi_amt"
         }
       ]
     },
@@ -6315,9 +6732,6 @@
           "name": "criticized_portfolio_count"
         },
         {
-          "name": "criticized_exposure_amt"
-        },
-        {
           "name": "deteriorated_deal_count"
         },
         {
@@ -7203,6 +7617,21 @@
           "name": "amendment_count"
         },
         {
+          "name": "facility_active_flag"
+        },
+        {
+          "name": "maturity_date_bucket"
+        },
+        {
+          "name": "origination_date_bucket"
+        },
+        {
+          "name": "effective_date_bucket"
+        },
+        {
+          "name": "bank_share_pct"
+        },
+        {
           "name": "base_currency_code"
         },
         {
@@ -7279,9 +7708,6 @@
         },
         {
           "name": "criticized_portfolio_count"
-        },
-        {
-          "name": "criticized_exposure_amt"
         },
         {
           "name": "doi_pct"

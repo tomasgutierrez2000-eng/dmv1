@@ -1363,6 +1363,226 @@ export function getL2SeedValue(
       if (columnName === 'reconciliation_break_count') return dqReconBreaks(idx);
       if (columnName === 'score_dimension') return dqDim(idx);
       break;
+
+    // ═══════════════════════════════════════════════════════════════════
+    // LOAN_POSITION_DETAIL
+    // Extension table for loan-type positions
+    // ═══════════════════════════════════════════════════════════════════
+    case 'loan_position_detail': {
+      const loanTypes = ['TERM_LOAN_A', 'TERM_LOAN_B', 'REVOLVER', 'BRIDGE_LOAN', 'DELAYED_DRAW', 'TERM_LOAN_A', 'REVOLVER', 'TERM_LOAN_B', 'BRIDGE_LOAN', 'REVOLVER'];
+      const amortTypes = ['STRAIGHT_LINE', 'BULLET', 'AMORTIZING', 'BULLET', 'INTEREST_ONLY', 'STRAIGHT_LINE', 'INTEREST_ONLY', 'BULLET', 'AMORTIZING', 'INTEREST_ONLY'];
+      const payFreqs = ['MONTHLY', 'QUARTERLY', 'MONTHLY', 'SEMI_ANNUAL', 'QUARTERLY', 'MONTHLY', 'MONTHLY', 'QUARTERLY', 'MONTHLY', 'QUARTERLY'];
+      const rateTypes = ['FLOATING', 'FIXED', 'FLOATING', 'FIXED', 'FLOATING', 'FLOATING', 'FLOATING', 'FIXED', 'FLOATING', 'FIXED'];
+      const rateIndexes = ['SOFR', 'NONE', 'SOFR', 'NONE', 'PRIME', 'SOFR', 'SOFR', 'NONE', 'PRIME', 'NONE'];
+      const lcrCategories = ['CREDIT_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY', 'CREDIT_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY'];
+      if (columnName === 'loan_position_detail_id') return i;
+      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'loan_type') return loanTypes[fid(idx) - 1];
+      if (columnName === 'amortization_type') return amortTypes[fid(idx) - 1];
+      if (columnName === 'payment_frequency') return payFreqs[fid(idx) - 1];
+      if (columnName === 'interest_rate_type') return rateTypes[fid(idx) - 1];
+      if (columnName === 'current_rate_pct') return allInRate(idx) / 100;
+      if (columnName === 'rate_index_code') return rateIndexes[fid(idx) - 1];
+      if (columnName === 'spread_bps') return spread(idx);
+      if (columnName === 'original_balance_amt') return committed(idx);
+      if (columnName === 'current_balance_amt') return drawn(idx);
+      if (columnName === 'funded_amount') return drawn(idx);
+      if (columnName === 'unfunded_commitment_amt') return Math.max(0, committed(idx) - drawn(idx));
+      if (columnName === 'days_past_due') return dpd(idx);
+      if (columnName === 'accrual_status') return dpd(idx) > 90 ? 'NON_ACCRUAL' : 'ACCRUING';
+      if (columnName === 'next_payment_date') return '2025-02-28';
+      if (columnName === 'prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
+      if (columnName === 'collateral_coverage_pct') return Math.round(100 + (fid(idx) * 7) % 60);
+      if (columnName === 'covenant_compliance_flag') return dpd(idx) > 30 ? 'N' : 'Y';
+      if (columnName === 'hqla_eligible_flag') return 'N';
+      if (columnName === 'lcr_outflow_category') return lcrCategories[fid(idx) - 1];
+      if (columnName === 'nsfr_factor_pct') return [85, 100, 50, 100, 50, 85, 50, 100, 85, 50][fid(idx) - 1];
+      if (columnName === 'capital_risk_weight_pct') return riskWeight(idx);
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // DERIVATIVE_POSITION_DETAIL
+    // Extension table for derivative-type positions
+    // ═══════════════════════════════════════════════════════════════════
+    case 'derivative_position_detail': {
+      const derivTypes = ['IRS', 'CDS', 'FX_FORWARD', 'IRS', 'EQUITY_SWAP', 'CDS', 'SWAPTION', 'FX_OPTION', 'IRS', 'CDS'];
+      const derivSubtypes = ['PLAIN_VANILLA', 'SINGLE_NAME', 'DELIVERABLE', 'AMORTIZING', 'TOTAL_RETURN', 'INDEX', 'PAYER', 'CALL', 'PLAIN_VANILLA', 'BASKET'];
+      const underlyingClasses = ['INTEREST_RATE', 'CREDIT', 'FX', 'INTEREST_RATE', 'EQUITY', 'CREDIT', 'INTEREST_RATE', 'FX', 'INTEREST_RATE', 'CREDIT'];
+      const clearingMethods = ['CCP', 'BILATERAL', 'CCP', 'CCP', 'BILATERAL', 'CCP', 'BILATERAL', 'CCP', 'CCP', 'BILATERAL'];
+      const settlementTypes = ['CASH', 'PHYSICAL', 'CASH', 'CASH', 'CASH', 'PHYSICAL', 'CASH', 'CASH', 'CASH', 'PHYSICAL'];
+      const mtm = (i2: number) => Math.round(drawn(i2) * (0.03 + (fid(i2) * 0.007) % 0.05) * (fid(i2) % 2 === 0 ? 1 : -1));
+      if (columnName === 'derivative_position_detail_id') return i;
+      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'derivative_type') return derivTypes[fid(idx) - 1];
+      if (columnName === 'derivative_subtype') return derivSubtypes[fid(idx) - 1];
+      if (columnName === 'underlying_asset_class') return underlyingClasses[fid(idx) - 1];
+      if (columnName === 'notional_amount') return committed(idx);
+      if (columnName === 'mark_to_market_amt') return mtm(idx);
+      if (columnName === 'replacement_cost_amt') return Math.abs(mtm(idx));
+      if (columnName === 'potential_future_exposure_amt') return Math.round(committed(idx) * 0.05);
+      if (columnName === 'exposure_at_default_amt') return Math.abs(mtm(idx)) + Math.round(committed(idx) * 0.05);
+      if (columnName === 'cva_charge_amt') return Math.round(Math.abs(mtm(idx)) * 0.02);
+      if (columnName === 'netting_set_id') return fid(idx);
+      if (columnName === 'collateral_posted_amt') return Math.round(Math.abs(mtm(idx)) * 0.8);
+      if (columnName === 'collateral_received_amt') return Math.round(Math.abs(mtm(idx)) * 0.5);
+      if (columnName === 'initial_margin_amt') return Math.round(committed(idx) * 0.03);
+      if (columnName === 'variation_margin_amt') return Math.abs(mtm(idx));
+      if (columnName === 'settlement_type') return settlementTypes[fid(idx) - 1];
+      if (columnName === 'clearing_method') return clearingMethods[fid(idx) - 1];
+      if (columnName === 'is_centrally_cleared_flag') return clearingMethods[fid(idx) - 1] === 'CCP' ? 'Y' : 'N';
+      if (columnName === 'trade_date') return originationDate(idx);
+      if (columnName === 'effective_date') return originationDate(idx);
+      if (columnName === 'maturity_date') return maturityDate(idx);
+      if (columnName === 'sa_ccr_exposure_amt') return Math.abs(mtm(idx)) + Math.round(committed(idx) * 0.04);
+      if (columnName === 'capital_risk_weight_pct') return clearingMethods[fid(idx) - 1] === 'CCP' ? 2.0 : 20.0;
+      if (columnName === 'lcr_outflow_category') return 'DERIVATIVE_EXPOSURE';
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // SFT_POSITION_DETAIL
+    // Extension table for Securities Financing Transaction positions
+    // ═══════════════════════════════════════════════════════════════════
+    case 'sft_position_detail': {
+      const sftTypes = ['REPO', 'REVERSE_REPO', 'SEC_LENDING', 'REPO', 'SEC_BORROWING', 'REVERSE_REPO', 'REPO', 'SEC_LENDING', 'REVERSE_REPO', 'SEC_BORROWING'];
+      const sftSubtypes = ['OVERNIGHT', 'TERM', 'OPEN', 'TERM', 'OVERNIGHT', 'TERM', 'OVERNIGHT', 'OPEN', 'TERM', 'OVERNIGHT'];
+      const secTypes = ['GOVT_BOND', 'CORP_BOND', 'EQUITY', 'GOVT_BOND', 'AGENCY_MBS', 'CORP_BOND', 'GOVT_BOND', 'EQUITY', 'AGENCY_MBS', 'CORP_BOND'];
+      const secCountries = ['US', 'US', 'JP', 'DE', 'US', 'GB', 'US', 'US', 'US', 'CA'];
+      const marginFreqs = ['DAILY', 'DAILY', 'WEEKLY', 'DAILY', 'DAILY', 'DAILY', 'DAILY', 'WEEKLY', 'DAILY', 'DAILY'];
+      if (columnName === 'sft_position_detail_id') return i;
+      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'sft_type') return sftTypes[fid(idx) - 1];
+      if (columnName === 'sft_subtype') return sftSubtypes[fid(idx) - 1];
+      if (columnName === 'cash_leg_amt') return drawn(idx);
+      if (columnName === 'security_leg_amt') return Math.round(drawn(idx) * 1.02);
+      if (columnName === 'collateral_value_amt') return Math.round(drawn(idx) * (1 + haircut(idx) / 100));
+      if (columnName === 'haircut_applied_pct') return haircut(idx);
+      if (columnName === 'margin_call_frequency') return marginFreqs[fid(idx) - 1];
+      if (columnName === 'repo_rate_pct') return Math.round(baseRate(idx) * 0.8) / 100;
+      if (columnName === 'netting_set_id') return fid(idx);
+      if (columnName === 'settlement_date') return originationDate(idx);
+      if (columnName === 'maturity_date') return sftSubtypes[fid(idx) - 1] === 'OPEN' ? undefined : maturityDate(idx);
+      if (columnName === 'is_open_maturity_flag') return sftSubtypes[fid(idx) - 1] === 'OPEN' ? 'Y' : 'N';
+      if (columnName === 'security_type') return secTypes[fid(idx) - 1];
+      if (columnName === 'security_issuer_country') return secCountries[fid(idx) - 1];
+      if (columnName === 'hqla_eligible_flag') return secTypes[fid(idx) - 1] === 'GOVT_BOND' ? 'Y' : 'N';
+      if (columnName === 'lcr_inflow_category') return sftTypes[fid(idx) - 1].startsWith('REVERSE') ? 'SFT_INFLOW' : 'SFT_OUTFLOW';
+      if (columnName === 'nsfr_factor_pct') return sftSubtypes[fid(idx) - 1] === 'OVERNIGHT' ? 0 : 50;
+      if (columnName === 'capital_risk_weight_pct') return secTypes[fid(idx) - 1] === 'GOVT_BOND' ? 0 : 20;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // GUARANTEE_LC_POSITION_DETAIL
+    // Extension table for guarantee and letter of credit positions
+    // ═══════════════════════════════════════════════════════════════════
+    case 'guarantee_lc_position_detail': {
+      const instTypes = ['GUARANTEE', 'STANDBY_LC', 'COMMERCIAL_LC', 'GUARANTEE', 'STANDBY_LC', 'PERFORMANCE_GUARANTEE', 'COMMERCIAL_LC', 'GUARANTEE', 'STANDBY_LC', 'COMMERCIAL_LC'];
+      const guarTypes = ['FINANCIAL', 'PERFORMANCE', undefined, 'FINANCIAL', undefined, 'PERFORMANCE', undefined, 'FINANCIAL', undefined, undefined];
+      const lcTypes = [undefined, 'STANDBY', 'IMPORT', undefined, 'STANDBY', undefined, 'EXPORT', undefined, 'STANDBY', 'IMPORT'];
+      const ccfs = [1.0, 1.0, 0.2, 1.0, 1.0, 0.5, 0.2, 1.0, 1.0, 0.2];
+      if (columnName === 'guarantee_lc_detail_id') return i;
+      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'instrument_type') return instTypes[fid(idx) - 1];
+      if (columnName === 'guarantee_type') return guarTypes[fid(idx) - 1];
+      if (columnName === 'lc_type') return lcTypes[fid(idx) - 1];
+      if (columnName === 'issued_amount') return committed(idx);
+      if (columnName === 'outstanding_amount') return committed(idx);
+      if (columnName === 'utilized_amount') return Math.round(committed(idx) * 0.3);
+      if (columnName === 'credit_conversion_factor') return ccfs[fid(idx) - 1];
+      if (columnName === 'beneficiary_counterparty_id') return ((cid(idx) % 10) + 1);
+      if (columnName === 'expiry_date') return maturityDate(idx);
+      if (columnName === 'is_irrevocable_flag') return fid(idx) % 2 === 0 ? 'Y' : 'N';
+      if (columnName === 'is_financial_standby_flag') return instTypes[fid(idx) - 1] === 'STANDBY_LC' ? 'Y' : 'N';
+      if (columnName === 'fee_rate_bps') return [75, 100, 50, 125, 80, 60, 45, 110, 90, 55][fid(idx) - 1];
+      if (columnName === 'lcr_outflow_category') return instTypes[fid(idx) - 1].includes('LC') ? 'TRADE_FINANCE' : 'CONTINGENT_FUNDING';
+      if (columnName === 'capital_risk_weight_pct') return Math.round(ccfs[fid(idx) - 1] * 100);
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // BOND_SECURITY_POSITION_DETAIL
+    // Extension table for bond and security positions
+    // ═══════════════════════════════════════════════════════════════════
+    case 'bond_security_position_detail': {
+      const secTypes = ['GOVT_BOND', 'CORP_BOND', 'AGENCY_MBS', 'COVERED_BOND', 'MUNI_BOND', 'CORP_BOND', 'GOVT_BOND', 'ABS', 'CORP_BOND', 'AGENCY_MBS'];
+      const secSubtypes = ['TREASURY', 'INVESTMENT_GRADE', 'PASS_THROUGH', 'PFANDBRIEF', 'GENERAL_OBLIGATION', 'HIGH_YIELD', 'SOVEREIGN', 'CLO', 'INVESTMENT_GRADE', 'CMO'];
+      const acctClasses = ['HTM', 'AFS', 'AFS', 'HTM', 'AFS', 'TRADING', 'HTM', 'TRADING', 'AFS', 'AFS'];
+      const hqlaLevels = ['L1', 'L2B', 'L2A', 'L2A', 'L2B', 'NONE', 'L1', 'NONE', 'L2B', 'L2A'];
+      const lcrHaircuts = [0, 50, 15, 15, 50, 100, 0, 100, 50, 15];
+      const nsfrFactors = [5, 50, 15, 15, 50, 85, 5, 85, 50, 15];
+      const riskWeights = [0, 100, 20, 10, 20, 100, 0, 100, 100, 20];
+      if (columnName === 'bond_security_detail_id') return i;
+      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'security_type') return secTypes[fid(idx) - 1];
+      if (columnName === 'security_subtype') return secSubtypes[fid(idx) - 1];
+      if (columnName === 'isin') return `US${String(fid(idx)).padStart(10, '0')}`;
+      if (columnName === 'cusip') return `${String(fid(idx)).padStart(6, '0')}AA${cycle(idx)}`;
+      if (columnName === 'face_value_amt') return committed(idx);
+      if (columnName === 'market_value_amt') return Math.round(committed(idx) * (0.95 + fid(idx) * 0.01));
+      if (columnName === 'book_value_amt') return committed(idx);
+      if (columnName === 'accrued_interest_amt') return Math.round(committed(idx) * 0.01);
+      if (columnName === 'unrealized_gain_loss_amt') return Math.round(committed(idx) * (0.95 + fid(idx) * 0.01)) - committed(idx);
+      if (columnName === 'coupon_rate_pct') return [2.5, 4.75, 3.25, 2.0, 3.5, 6.0, 1.75, 5.5, 4.25, 3.0][fid(idx) - 1] / 100;
+      if (columnName === 'coupon_frequency') return fid(idx) % 2 === 0 ? 'SEMI_ANNUAL' : 'QUARTERLY';
+      if (columnName === 'maturity_date') return maturityDate(idx);
+      if (columnName === 'issuer_counterparty_id') return cid(idx);
+      if (columnName === 'issuer_country_code') return ['US', 'US', 'US', 'DE', 'US', 'GB', 'US', 'US', 'CA', 'US'][fid(idx) - 1];
+      if (columnName === 'accounting_classification') return acctClasses[fid(idx) - 1];
+      if (columnName === 'hqla_level') return hqlaLevels[fid(idx) - 1];
+      if (columnName === 'hqla_eligible_flag') return hqlaLevels[fid(idx) - 1] !== 'NONE' ? 'Y' : 'N';
+      if (columnName === 'lcr_haircut_pct') return lcrHaircuts[fid(idx) - 1];
+      if (columnName === 'nsfr_factor_pct') return nsfrFactors[fid(idx) - 1];
+      if (columnName === 'capital_risk_weight_pct') return riskWeights[fid(idx) - 1];
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // COUNTERPARTY_FINANCIAL_SNAPSHOT
+    // Borrower-level financial statement data — 5 cycles per counterparty
+    // Cycle 0: Base, 1: Watch (stress), 2: Stress, 3: Recovery, 4: Current
+    // ═══════════════════════════════════════════════════════════════════
+    case 'counterparty_financial_snapshot': {
+      const baseRevenue = [5000, 8200, 3100, 12500, 6700, 9800, 4500, 15000, 7200, 11000];
+      const revenueMultiplier = [1.0, 0.92, 0.85, 0.95, 1.02][cycle(idx)];
+      const rev = Math.round(baseRevenue[fid(idx) - 1] * revenueMultiplier * 1000000);
+      const opex = Math.round(rev * [0.72, 0.68, 0.75, 0.65, 0.70, 0.73, 0.71, 0.66, 0.69, 0.74][fid(idx) - 1]);
+      const intExp = Math.round(rev * 0.08);
+      const taxExp = Math.round((rev - opex - intExp) * 0.21);
+      const depr = Math.round(rev * 0.04);
+      const amort = Math.round(rev * 0.02);
+      const netIncome = rev - opex - intExp - taxExp;
+      const totalAssets = Math.round(rev * [3.2, 2.8, 4.1, 2.5, 3.0, 3.5, 2.9, 2.3, 3.3, 2.7][fid(idx) - 1]);
+      const totalLiabilities = Math.round(totalAssets * [0.65, 0.58, 0.72, 0.55, 0.62, 0.68, 0.60, 0.52, 0.66, 0.59][fid(idx) - 1]);
+      const equity = totalAssets - totalLiabilities;
+      const ebitda = netIncome + intExp + taxExp + depr + amort;
+      const noi = rev - opex;
+
+      if (columnName === 'financial_snapshot_id') return i;
+      if (columnName === 'counterparty_id') return cid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'reporting_period') return ['Q4-2024', 'Q1-2025', 'Q2-2025', 'Q3-2025', 'Q4-2025'][cycle(idx)];
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'revenue_amt') return rev;
+      if (columnName === 'operating_expense_amt') return opex;
+      if (columnName === 'net_income_amt') return netIncome;
+      if (columnName === 'interest_expense_amt') return intExp;
+      if (columnName === 'tax_expense_amt') return taxExp;
+      if (columnName === 'depreciation_amt') return depr;
+      if (columnName === 'amortization_amt') return amort;
+      if (columnName === 'total_assets_amt') return totalAssets;
+      if (columnName === 'total_liabilities_amt') return totalLiabilities;
+      if (columnName === 'shareholders_equity_amt') return equity;
+      if (columnName === 'ebitda_amt') return ebitda;
+      if (columnName === 'noi_amt') return noi;
+      break;
+    }
   }
 
   return null;

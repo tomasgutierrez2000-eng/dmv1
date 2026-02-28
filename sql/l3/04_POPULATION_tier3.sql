@@ -234,6 +234,36 @@ SELECT
     fes.has_amendment_flag,
     (SELECT COUNT(*) FROM l2.amendment_event ae WHERE ae.facility_id = fes.facility_id),
 
+    -- FACILITY ACTIVE FLAG (derived from L1 active_flag)
+    COALESCE(fm.active_flag, 'N'),
+
+    -- MATURITY DATE BUCKET (standard GSIB remaining-maturity bands)
+    CASE WHEN (fm.maturity_date - p_as_of_date) <= 0       THEN 'Expired'
+         WHEN (fm.maturity_date - p_as_of_date) <= 365     THEN '0-1Y'
+         WHEN (fm.maturity_date - p_as_of_date) <= 1095    THEN '1-3Y'
+         WHEN (fm.maturity_date - p_as_of_date) <= 1825    THEN '3-5Y'
+         WHEN (fm.maturity_date - p_as_of_date) <= 3650    THEN '5-10Y'
+         ELSE '10Y+' END,
+
+    -- ORIGINATION DATE BUCKET (vintage since origination)
+    CASE WHEN (p_as_of_date - fm.effective_date) <= 0      THEN 'New'
+         WHEN (p_as_of_date - fm.effective_date) <= 365    THEN '0-1Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1095   THEN '1-3Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1825   THEN '3-5Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 2555   THEN '5-7Y'
+         ELSE '7Y+' END,
+
+    -- EFFECTIVE DATE BUCKET (same logic as origination — effective_date = origination_date)
+    CASE WHEN (p_as_of_date - fm.effective_date) <= 0      THEN 'New'
+         WHEN (p_as_of_date - fm.effective_date) <= 365    THEN '0-1Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1095   THEN '1-3Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1825   THEN '3-5Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 2555   THEN '5-7Y'
+         ELSE '7Y+' END,
+
+    -- BANK SHARE % from lender allocation (lead allocation)
+    COALESCE(fla.bank_share_pct, 100.0),
+
     fes.base_currency_code, CURRENT_TIMESTAMP
 
 FROM l3.facility_exposure_summary fes
@@ -250,6 +280,11 @@ LEFT JOIN (
     FROM l3.crm_allocation_summary WHERE run_version_id = p_run_version_id AND allocation_target_level = 'FACILITY'
     GROUP BY facility_id
 ) crm ON fes.facility_id = crm.facility_id
+LEFT JOIN (
+    SELECT facility_id, MAX(bank_share_pct) AS bank_share_pct
+    FROM l1.facility_lender_allocation
+    GROUP BY facility_id
+) fla ON fes.facility_id = fla.facility_id
 WHERE fes.run_version_id = p_run_version_id AND fes.scenario_id = 'BASE';
 $$;
 

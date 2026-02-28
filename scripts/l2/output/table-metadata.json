@@ -2686,5 +2686,785 @@
       "fk": null,
       "nullable": true
     }
+  },
+  "L2.loan_position_detail": {
+    "loan_position_detail_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "position_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.position(position_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "loan_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amortization_type": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "payment_frequency": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_rate_type": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "current_rate_pct": {
+      "type": "DECIMAL(8,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_index_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "spread_bps": {
+      "type": "DECIMAL(8,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "original_balance_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "current_balance_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "funded_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "unfunded_commitment_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "days_past_due": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "accrual_status": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "next_payment_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "prepayment_penalty_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_coverage_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "covenant_compliance_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hqla_eligible_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lcr_outflow_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "nsfr_factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "capital_risk_weight_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L2.derivative_position_detail": {
+    "derivative_position_detail_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "position_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.position(position_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "derivative_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "derivative_subtype": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "underlying_asset_class": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "notional_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "mark_to_market_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "replacement_cost_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "potential_future_exposure_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exposure_at_default_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "cva_charge_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "netting_set_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.netting_set(netting_set_id)",
+      "nullable": true
+    },
+    "collateral_posted_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_received_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "initial_margin_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "variation_margin_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "settlement_type": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "clearing_method": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_centrally_cleared_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "trade_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "effective_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "sa_ccr_exposure_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "capital_risk_weight_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lcr_outflow_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L2.sft_position_detail": {
+    "sft_position_detail_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "position_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.position(position_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "sft_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "sft_subtype": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "cash_leg_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "security_leg_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "haircut_applied_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "margin_call_frequency": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "repo_rate_pct": {
+      "type": "DECIMAL(8,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "netting_set_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.netting_set(netting_set_id)",
+      "nullable": true
+    },
+    "settlement_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_open_maturity_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "security_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "security_issuer_country": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hqla_eligible_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lcr_inflow_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "nsfr_factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "capital_risk_weight_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L2.guarantee_lc_position_detail": {
+    "guarantee_lc_detail_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "position_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.position(position_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "instrument_type": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "guarantee_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lc_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "issued_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "outstanding_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilized_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "credit_conversion_factor": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "beneficiary_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "expiry_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_irrevocable_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_financial_standby_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "fee_rate_bps": {
+      "type": "DECIMAL(8,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lcr_outflow_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "capital_risk_weight_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L2.bond_security_position_detail": {
+    "bond_security_detail_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "position_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.position(position_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "security_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "security_subtype": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "isin": {
+      "type": "VARCHAR(12)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "cusip": {
+      "type": "VARCHAR(9)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "face_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "market_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "book_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "accrued_interest_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "unrealized_gain_loss_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "coupon_rate_pct": {
+      "type": "DECIMAL(8,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "coupon_frequency": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "issuer_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "issuer_country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "accounting_classification": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hqla_level": {
+      "type": "VARCHAR(10)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hqla_eligible_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lcr_haircut_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "nsfr_factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "capital_risk_weight_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L2.counterparty_financial_snapshot": {
+    "financial_snapshot_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "reporting_period": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": true
+    },
+    "revenue_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "operating_expense_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "net_income_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "interest_expense_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "tax_expense_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "depreciation_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "amortization_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "total_assets_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "total_liabilities_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "shareholders_equity_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ebitda_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "noi_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
   }
 }

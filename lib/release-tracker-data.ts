@@ -9,9 +9,38 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-02-28: Date bucket derived fields ────────────────────────
+  { date: '2026-02-28', layer: 'L3', table: 'facility_detail_snapshot', field: 'maturity_date_bucket', changeType: 'Added', rationale: 'Derived remaining-maturity bucket (0-1Y/1-3Y/3-5Y/5-10Y/10Y+/Expired) for GSIB maturity concentration analysis' },
+  { date: '2026-02-28', layer: 'L3', table: 'facility_detail_snapshot', field: 'origination_date_bucket', changeType: 'Added', rationale: 'Derived vintage bucket (0-1Y/1-3Y/3-5Y/5-7Y/7Y+/New) for portfolio age distribution analysis' },
+  { date: '2026-02-28', layer: 'L3', table: 'facility_detail_snapshot', field: 'effective_date_bucket', changeType: 'Added', rationale: 'Derived effective-date bucket — same logic as origination bucket since effective_date = origination_date' },
+
+  // ── 2026-02-28: Facility active_flag ──────────────────────────────
+  { date: '2026-02-28', layer: 'L1', table: 'facility_master', field: 'active_flag', changeType: 'Added', rationale: 'Boolean Y/N flag derived from facility_status — follows standard L1 dimension pattern for operational gating' },
+  { date: '2026-02-28', layer: 'L3', table: 'facility_detail_snapshot', field: 'facility_active_flag', changeType: 'Added', rationale: 'Propagates L1 facility_master.active_flag to L3 facility detail for snapshot-level filtering' },
+
+  // ── 2026-02-28: Bank share % surfaced to facility atomic record ───
+  { date: '2026-02-28', layer: 'L3', table: 'facility_detail_snapshot', field: 'bank_share_pct', changeType: 'Added', rationale: 'Surfaces bank_share_pct from L1.facility_lender_allocation to facility atomic record for syndication analysis' },
+
+  // ── 2026-02-28: Counterparty financial snapshot (total_assets_amt) ─
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: '(new table)', changeType: 'Added', rationale: 'Borrower-level financial statement data (revenue, OPEX, net income, total assets/liabilities, EBITDA, NOI) for credit analysis metrics' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'financial_snapshot_id', changeType: 'Added', rationale: 'Primary key for counterparty financial snapshot records' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'counterparty_id', changeType: 'Added', rationale: 'FK to counterparty — links financial data to borrower' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'total_assets_amt', changeType: 'Added', rationale: 'Borrower total assets from financial statements — source field for ROA and balance sheet analysis' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'revenue_amt', changeType: 'Added', rationale: 'Top-line revenue for borrower financial health analysis' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'net_income_amt', changeType: 'Added', rationale: 'Bottom-line net income for borrower profitability analysis' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'ebitda_amt', changeType: 'Added', rationale: 'EBITDA for DSCR and leveraged lending analysis' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'noi_amt', changeType: 'Added', rationale: 'Net Operating Income for CRE and real estate portfolio analysis' },
+  { date: '2026-02-28', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'shareholders_equity_amt', changeType: 'Added', rationale: 'Equity for leverage and ROE calculations' },
+
+  // ── 2026-02-28: Product-specific position extension tables ────────
+  { date: '2026-02-28', layer: 'L2', table: 'loan_position_detail', field: '(new table)', changeType: 'Added', rationale: 'Loan-specific position extension with amortization, rate index, DPD, covenant compliance, and LCR/NSFR/capital fields' },
+  { date: '2026-02-28', layer: 'L2', table: 'derivative_position_detail', field: '(new table)', changeType: 'Added', rationale: 'Derivative-specific extension with MTM, PFE, CVA, netting, margin, clearing method, and SA-CCR exposure fields' },
+  { date: '2026-02-28', layer: 'L2', table: 'sft_position_detail', field: '(new table)', changeType: 'Added', rationale: 'SFT-specific extension with repo rate, haircut, collateral, security type, and HQLA/LCR/NSFR fields' },
+  { date: '2026-02-28', layer: 'L2', table: 'guarantee_lc_position_detail', field: '(new table)', changeType: 'Added', rationale: 'Guarantee/LC-specific extension with CCF, beneficiary, irrevocability, fee rate, and capital fields' },
+  { date: '2026-02-28', layer: 'L2', table: 'bond_security_position_detail', field: '(new table)', changeType: 'Added', rationale: 'Bond/security-specific extension with ISIN/CUSIP, coupon, accounting classification, HQLA level, and capital risk weight' },
+
   // ── 2026-02-27: Data model enhancements — product tagging, active flag, criticized portfolios, cross-entity exposure ──
   { date: '2026-02-27', layer: 'L2', table: 'position', field: 'product_node_id', changeType: 'Added', rationale: 'Added position-level product tagging (FK to enterprise_product_taxonomy) to capture granular product type (e.g. Revolving Loan, Term Loan). Facility-level product_node_id remains for parent product groups.' },
-  { date: '2026-02-27', layer: 'L1', table: 'facility_master', field: 'active_flag', changeType: 'Added', rationale: 'Added explicit active flag (CHAR(1), Y/N) to facility_master, derived from facility_status. Follows the same pattern used by 33+ other L1 reference tables. Replaces application-layer derivation of is_active.' },
   { date: '2026-02-27', layer: 'L3', table: 'lob_credit_quality_summary', field: 'criticized_exposure_amt', changeType: 'Added', rationale: 'Added total exposure amount for facilities flagged as CRITICIZED within each LOB. Complements the existing criticized_portfolio_count (which was already in the DDL but had no population SQL). Population procedure l3.populate_lob_credit_quality_criticized now computes both fields.' },
   { date: '2026-02-27', layer: 'L3', table: 'lob_deterioration_summary', field: 'criticized_exposure_amt', changeType: 'Added', rationale: 'Added total exposure amount for criticized facilities to the deterioration summary. Population procedure l3.populate_lob_deterioration_criticized now computes both criticized_portfolio_count and criticized_exposure_amt.' },
 

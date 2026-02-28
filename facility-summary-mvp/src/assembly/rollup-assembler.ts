@@ -223,6 +223,10 @@ export const assembleRollups = (
         ? interconnectedInGroup.length / uniqueCounterparties.size
         : 0;
 
+    // Bank share weighted average
+    const bankShares = facilities.map((f) => f.bank_share_pct);
+    const avgBankShare = weightedAverage(bankShares, exposures);
+
     return {
       facility_count: facilities.length,
       total_exposure_usd: roundTo(totalExposure, 1),
@@ -256,6 +260,7 @@ export const assembleRollups = (
       top_region_pct: roundTo(topRegionPct, 4),
       unique_counterparty_count: uniqueCounterparties.size,
       doi_pct: roundTo(doiPct, 4),
+      avg_bank_share_pct: roundTo(avgBankShare, 2),
     };
   };
 

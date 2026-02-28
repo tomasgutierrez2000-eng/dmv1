@@ -19,6 +19,26 @@ const daysBetween = (from: string, to: string) => {
   return Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 };
 
+/** Classify remaining maturity into standard GSIB bands */
+const classifyMaturityBucket = (daysRemaining: number): string => {
+  if (daysRemaining <= 0) return "Expired";
+  if (daysRemaining <= 365) return "0-1Y";
+  if (daysRemaining <= 3 * 365) return "1-3Y";
+  if (daysRemaining <= 5 * 365) return "3-5Y";
+  if (daysRemaining <= 10 * 365) return "5-10Y";
+  return "10Y+";
+};
+
+/** Classify vintage/age since origination into standard bands */
+const classifyOriginationBucket = (daysSinceOrigination: number): string => {
+  if (daysSinceOrigination <= 0) return "New";
+  if (daysSinceOrigination <= 365) return "0-1Y";
+  if (daysSinceOrigination <= 3 * 365) return "1-3Y";
+  if (daysSinceOrigination <= 5 * 365) return "3-5Y";
+  if (daysSinceOrigination <= 7 * 365) return "5-7Y";
+  return "7Y+";
+};
+
 const classifyPortfolio = (
   internalRating: number,
   product: string,
@@ -138,6 +158,13 @@ export const assembleFacilitySummary = (
     if (limit.limit_scope === "COUNTERPARTY" && limit.counterparty_id) {
       limitDefByCounterparty.set(limit.counterparty_id, limit);
     }
+  });
+
+  // Lender allocation map: facility_id → sum of bank_share_pct for this bank
+  const bankShareByFacility = new Map<string, number>();
+  l1.facilityLenderAllocation.forEach((alloc) => {
+    const existing = bankShareByFacility.get(alloc.facility_id) ?? 0;
+    bankShareByFacility.set(alloc.facility_id, Math.max(existing, alloc.bank_share_pct));
   });
 
   const limitUtilByLimit = new Map<string, typeof l2Enrichment.limitUtilizationEvent>();
@@ -401,6 +428,14 @@ export const assembleFacilitySummary = (
       counterparty_limit_usd: limitAmount,
       counterparty_limit_utilized_usd: limitUtilized,
       counterparty_limit_status: limitStatus,
+
+      // Enrichment fields - Date Buckets (derived)
+      maturity_date_bucket: classifyMaturityBucket(daysBetween(TODAY, facility.maturity_date)),
+      origination_date_bucket: classifyOriginationBucket(daysBetween(facility.origination_date, TODAY)),
+      effective_date_bucket: classifyOriginationBucket(daysBetween(facility.origination_date, TODAY)),
+
+      // Enrichment fields - Bank Share
+      bank_share_pct: bankShareByFacility.get(facility.facility_id) ?? 100,
     };
   });
 };

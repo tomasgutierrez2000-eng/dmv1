@@ -86,10 +86,16 @@ export interface FacilitySummary {
   has_external_downgrade: boolean;
   has_any_downgrade: boolean;
 
+  // Enrichment fields - Exposure & Loss
+  ead_usd: number;
+  expected_loss_usd: number;
+  expected_loss_rate_pct: number;
+
   // Enrichment fields - Financial Metrics
   dscr: number | null;
   ltv: number | null;
   fccr: number | null;
+  tangible_net_worth_usd: number | null;
 
   // Enrichment fields - Limits
   counterparty_limit_usd: number | null;

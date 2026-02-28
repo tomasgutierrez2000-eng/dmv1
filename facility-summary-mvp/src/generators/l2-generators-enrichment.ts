@@ -419,7 +419,7 @@ export const generateL2EnrichmentData = (
     });
   });
 
-  // 8. Financial Metric Observations (100 records: 50 facilities × 2 metrics)
+  // 8. Financial Metric Observations (facility-level: DSCR, LTV, FCCR)
   const financialMetricObservation: FinancialMetricObservation[] = [];
   let metricObsSeq = 1;
 
@@ -451,6 +451,48 @@ export const generateL2EnrichmentData = (
       });
       metricObsSeq += 1;
     }
+
+    // FCCR - Fixed Charge Coverage Ratio: (EBITDA - Capex) / (Interest + Lease)
+    // Generate for ~70% of facilities (those with sufficient financial data)
+    if (index % 10 < 7) {
+      const fccr = clamp(0.9 + (index % 30) / 10, 0.9, 3.5);
+      financialMetricObservation.push({
+        observation_id: `FMO-${padId(metricObsSeq, 6)}`,
+        metric_code: "FCCR",
+        metric_name: "Fixed Charge Coverage Ratio",
+        facility_id: facility.facility_id,
+        counterparty_id: null,
+        metric_value: roundTo(fccr, 2),
+        as_of_date: AS_OF_DATE,
+      });
+      metricObsSeq += 1;
+    }
+  });
+
+  // 9. Counterparty-level Financial Metrics: Tangible Net Worth (TNW)
+  // TNW = Total Equity - Intangible Assets (Goodwill, Patents, etc.)
+  // Stored as counterparty-level observation, attributed to each facility via counterparty_id
+  const counterpartiesWithTnw = l1.counterparty.slice(0, Math.ceil(l1.counterparty.length * 0.8));
+  counterpartiesWithTnw.forEach((counterparty, index) => {
+    // TNW scales with counterparty size; GSIB counterparties range from $50M to $5B
+    const riskRating = counterparty.internal_risk_rating;
+    const baseTnw = riskRating <= 2
+      ? 500 + (index % 20) * 100   // Investment grade: $500M-$2.5B
+      : riskRating <= 4
+      ? 100 + (index % 15) * 50    // BBB/BB: $100M-$850M
+      : 20 + (index % 10) * 10;    // Speculative: $20M-$120M
+    const tnw = roundTo(baseTnw, 1);
+
+    financialMetricObservation.push({
+      observation_id: `FMO-${padId(metricObsSeq, 6)}`,
+      metric_code: "TNW",
+      metric_name: "Tangible Net Worth",
+      facility_id: null,
+      counterparty_id: counterparty.counterparty_id,
+      metric_value: tnw,
+      as_of_date: AS_OF_DATE,
+    });
+    metricObsSeq += 1;
   });
 
   return {

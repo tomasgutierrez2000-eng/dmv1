@@ -86,10 +86,16 @@ export interface FacilitySummary {
   has_external_downgrade: boolean;
   has_any_downgrade: boolean;
 
+  // Enrichment fields - Exposure & Loss
+  ead_usd: number;
+  expected_loss_usd: number;
+  expected_loss_rate_pct: number;
+
   // Enrichment fields - Financial Metrics
   dscr: number | null;
   ltv: number | null;
   fccr: number | null;
+  tangible_net_worth_usd: number | null;
 
   // Enrichment fields - Limits
   counterparty_limit_usd: number | null;
@@ -120,7 +126,15 @@ export interface DeskSummary {
   downgrade_count: number;
   avg_dscr: number | null;
   avg_ltv: number | null;
+  avg_fccr: number | null;
   avg_internal_risk_rating: number;
+  total_ead_usd: number;
+  total_expected_loss_usd: number;
+  avg_expected_loss_rate_pct: number;
+  total_cross_entity_exposure_usd: number;
+  cross_entity_facility_count: number;
+  active_facility_count: number;
+  avg_tangible_net_worth_usd: number | null;
 }
 
 export interface LobL2Summary extends DeskSummary {
@@ -169,7 +183,15 @@ export interface LobL1Summary {
   downgrade_count: number;
   avg_dscr: number | null;
   avg_ltv: number | null;
+  avg_fccr: number | null;
   avg_internal_risk_rating: number;
+  total_ead_usd: number;
+  total_expected_loss_usd: number;
+  avg_expected_loss_rate_pct: number;
+  total_cross_entity_exposure_usd: number;
+  cross_entity_facility_count: number;
+  active_facility_count: number;
+  avg_tangible_net_worth_usd: number | null;
   desk_count: number;
   top_desk_by_exposure: string | null;
   bottom_desk_by_exposure: string | null;

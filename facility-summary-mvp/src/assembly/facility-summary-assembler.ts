@@ -125,11 +125,17 @@ export const assembleFacilitySummary = (
   });
 
   const metricsByFacility = new Map<string, typeof l2Enrichment.financialMetricObservation>();
+  const metricsByCounterparty = new Map<string, typeof l2Enrichment.financialMetricObservation>();
   l2Enrichment.financialMetricObservation.forEach((obs) => {
     if (obs.facility_id) {
       const list = metricsByFacility.get(obs.facility_id) ?? [];
       list.push(obs);
       metricsByFacility.set(obs.facility_id, list);
+    }
+    if (obs.counterparty_id) {
+      const list = metricsByCounterparty.get(obs.counterparty_id) ?? [];
+      list.push(obs);
+      metricsByCounterparty.set(obs.counterparty_id, list);
     }
   });
 
@@ -269,11 +275,24 @@ export const assembleFacilitySummary = (
       priorExternalIdx >= 0 && currentExternalIdx < priorExternalIdx;
     const hasAnyDowngrade = hasInternalDowngrade || hasExternalDowngrade;
 
+    // Enrichment: EAD & Expected Loss
+    const eadUsd = latestExposure?.ead_amount ?? 0;
+    // PD approximation from internal risk rating (1=0.01%, 2=0.05%, 3=0.25%, 4=1.5%, 5=5%, 6+=10%)
+    const ratingForPd = counterparty?.internal_risk_rating ?? 3;
+    const pdByRating: Record<number, number> = { 1: 0.0001, 2: 0.0005, 3: 0.0025, 4: 0.015, 5: 0.05, 6: 0.1 };
+    const pd = pdByRating[ratingForPd] ?? 0.0025;
+    const lgd = primaryCollateral ? 0.35 : 0.45; // Secured = 35% LGD, Unsecured = 45% LGD
+    const expectedLossUsd = pd * lgd * eadUsd;
+    const outstandingForRate = latestExposure?.gross_exposure_usd ?? 0;
+    const expectedLossRatePct = outstandingForRate > 0 ? expectedLossUsd / outstandingForRate : 0;
+
     // Enrichment: Financial Metrics
     const metrics = metricsByFacility.get(facility.facility_id) ?? [];
+    const counterpartyMetrics = metricsByCounterparty.get(facility.counterparty_id) ?? [];
     const dscr = metrics.find((m) => m.metric_code === "DSCR")?.metric_value ?? null;
     const ltv = metrics.find((m) => m.metric_code === "LTV")?.metric_value ?? null;
     const fccr = metrics.find((m) => m.metric_code === "FCCR")?.metric_value ?? null;
+    const tangibleNetWorthUsd = counterpartyMetrics.find((m) => m.metric_code === "TNW")?.metric_value ?? null;
 
     // Enrichment: Limits
     const counterpartyLimit = limitDefByCounterparty.get(facility.counterparty_id);
@@ -394,10 +413,16 @@ export const assembleFacilitySummary = (
       has_external_downgrade: hasExternalDowngrade,
       has_any_downgrade: hasAnyDowngrade,
 
+      // Enrichment fields - Exposure & Loss
+      ead_usd: roundTo(eadUsd, 1),
+      expected_loss_usd: roundTo(expectedLossUsd, 4),
+      expected_loss_rate_pct: roundTo(expectedLossRatePct, 6),
+
       // Enrichment fields - Financial Metrics
       dscr: dscr,
       ltv: ltv,
       fccr: fccr,
+      tangible_net_worth_usd: tangibleNetWorthUsd,
 
       // Enrichment fields - Limits
       counterparty_limit_usd: limitAmount,

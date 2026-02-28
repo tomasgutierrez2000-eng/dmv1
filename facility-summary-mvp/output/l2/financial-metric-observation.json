@@ -10,9 +10,9 @@
   },
   {
     "observation_id": "FMO-000002",
-    "metric_code": "DSCR",
-    "metric_name": "Debt Service Coverage Ratio",
-    "facility_id": "FAC-2024-00002",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00001",
     "counterparty_id": null,
     "metric_value": 0.9,
     "as_of_date": "2026-02-28"
@@ -21,13 +21,40 @@
     "observation_id": "FMO-000003",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
+    "facility_id": "FAC-2024-00002",
+    "counterparty_id": null,
+    "metric_value": 0.9,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000004",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00002",
+    "counterparty_id": null,
+    "metric_value": 1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000005",
+    "metric_code": "DSCR",
+    "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00003",
     "counterparty_id": null,
     "metric_value": 1,
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000004",
+    "observation_id": "FMO-000006",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00003",
+    "counterparty_id": null,
+    "metric_value": 1.1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000007",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00004",
@@ -36,7 +63,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000005",
+    "observation_id": "FMO-000008",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00004",
+    "counterparty_id": null,
+    "metric_value": 1.2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000009",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00005",
@@ -45,7 +81,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000006",
+    "observation_id": "FMO-000010",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00005",
+    "counterparty_id": null,
+    "metric_value": 1.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000011",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00006",
@@ -54,7 +99,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000007",
+    "observation_id": "FMO-000012",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00006",
+    "counterparty_id": null,
+    "metric_value": 1.4,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000013",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00007",
@@ -63,7 +117,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000008",
+    "observation_id": "FMO-000014",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00007",
@@ -72,7 +126,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000009",
+    "observation_id": "FMO-000015",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00007",
+    "counterparty_id": null,
+    "metric_value": 1.5,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000016",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00008",
@@ -81,7 +144,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000010",
+    "observation_id": "FMO-000017",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00008",
@@ -90,7 +153,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000011",
+    "observation_id": "FMO-000018",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00009",
@@ -99,7 +162,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000012",
+    "observation_id": "FMO-000019",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00009",
@@ -108,7 +171,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000013",
+    "observation_id": "FMO-000020",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00010",
@@ -117,7 +180,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000014",
+    "observation_id": "FMO-000021",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00010",
@@ -126,7 +189,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000015",
+    "observation_id": "FMO-000022",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00011",
@@ -135,7 +198,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000016",
+    "observation_id": "FMO-000023",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00011",
@@ -144,7 +207,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000017",
+    "observation_id": "FMO-000024",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00011",
+    "counterparty_id": null,
+    "metric_value": 1.9,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000025",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00012",
@@ -153,7 +225,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000018",
+    "observation_id": "FMO-000026",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00012",
@@ -162,7 +234,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000019",
+    "observation_id": "FMO-000027",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00012",
+    "counterparty_id": null,
+    "metric_value": 2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000028",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00013",
@@ -171,7 +252,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000020",
+    "observation_id": "FMO-000029",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00013",
@@ -180,7 +261,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000021",
+    "observation_id": "FMO-000030",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00013",
+    "counterparty_id": null,
+    "metric_value": 2.1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000031",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00014",
@@ -189,7 +279,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000022",
+    "observation_id": "FMO-000032",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00014",
@@ -198,7 +288,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000023",
+    "observation_id": "FMO-000033",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00014",
+    "counterparty_id": null,
+    "metric_value": 2.2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000034",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00015",
@@ -207,7 +306,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000024",
+    "observation_id": "FMO-000035",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00015",
@@ -216,7 +315,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000025",
+    "observation_id": "FMO-000036",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00015",
+    "counterparty_id": null,
+    "metric_value": 2.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000037",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00016",
@@ -225,7 +333,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000026",
+    "observation_id": "FMO-000038",
     "metric_code": "LTV",
     "metric_name": "Loan-to-Value",
     "facility_id": "FAC-2024-00016",
@@ -234,7 +342,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000027",
+    "observation_id": "FMO-000039",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00016",
+    "counterparty_id": null,
+    "metric_value": 2.4,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000040",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00017",
@@ -243,7 +360,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000028",
+    "observation_id": "FMO-000041",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00017",
+    "counterparty_id": null,
+    "metric_value": 2.5,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000042",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00018",
@@ -252,7 +378,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000029",
+    "observation_id": "FMO-000043",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00019",
@@ -261,7 +387,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000030",
+    "observation_id": "FMO-000044",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00020",
@@ -270,7 +396,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000031",
+    "observation_id": "FMO-000045",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00021",
@@ -279,7 +405,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000032",
+    "observation_id": "FMO-000046",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00021",
+    "counterparty_id": null,
+    "metric_value": 2.9,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000047",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00022",
@@ -288,7 +423,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000033",
+    "observation_id": "FMO-000048",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00022",
+    "counterparty_id": null,
+    "metric_value": 3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000049",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00023",
@@ -297,7 +441,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000034",
+    "observation_id": "FMO-000050",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00023",
+    "counterparty_id": null,
+    "metric_value": 3.1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000051",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00024",
@@ -306,7 +459,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000035",
+    "observation_id": "FMO-000052",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00024",
+    "counterparty_id": null,
+    "metric_value": 3.2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000053",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00025",
@@ -315,7 +477,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000036",
+    "observation_id": "FMO-000054",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00025",
+    "counterparty_id": null,
+    "metric_value": 3.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000055",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00026",
@@ -324,7 +495,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000037",
+    "observation_id": "FMO-000056",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00026",
+    "counterparty_id": null,
+    "metric_value": 3.4,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000057",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00027",
@@ -333,7 +513,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000038",
+    "observation_id": "FMO-000058",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00027",
+    "counterparty_id": null,
+    "metric_value": 3.5,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000059",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00028",
@@ -342,7 +531,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000039",
+    "observation_id": "FMO-000060",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00029",
@@ -351,7 +540,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000040",
+    "observation_id": "FMO-000061",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00030",
@@ -360,7 +549,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000041",
+    "observation_id": "FMO-000062",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00031",
@@ -369,7 +558,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000042",
+    "observation_id": "FMO-000063",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00031",
+    "counterparty_id": null,
+    "metric_value": 0.9,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000064",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00032",
@@ -378,7 +576,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000043",
+    "observation_id": "FMO-000065",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00032",
+    "counterparty_id": null,
+    "metric_value": 1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000066",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00033",
@@ -387,7 +594,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000044",
+    "observation_id": "FMO-000067",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00033",
+    "counterparty_id": null,
+    "metric_value": 1.1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000068",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00034",
@@ -396,7 +612,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000045",
+    "observation_id": "FMO-000069",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00034",
+    "counterparty_id": null,
+    "metric_value": 1.2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000070",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00035",
@@ -405,7 +630,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000046",
+    "observation_id": "FMO-000071",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00035",
+    "counterparty_id": null,
+    "metric_value": 1.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000072",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00036",
@@ -414,7 +648,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000047",
+    "observation_id": "FMO-000073",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00036",
+    "counterparty_id": null,
+    "metric_value": 1.4,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000074",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00037",
@@ -423,7 +666,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000048",
+    "observation_id": "FMO-000075",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00037",
+    "counterparty_id": null,
+    "metric_value": 1.5,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000076",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00038",
@@ -432,7 +684,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000049",
+    "observation_id": "FMO-000077",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00039",
@@ -441,7 +693,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000050",
+    "observation_id": "FMO-000078",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00040",
@@ -450,7 +702,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000051",
+    "observation_id": "FMO-000079",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00041",
@@ -459,7 +711,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000052",
+    "observation_id": "FMO-000080",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00041",
+    "counterparty_id": null,
+    "metric_value": 1.9,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000081",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00042",
@@ -468,7 +729,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000053",
+    "observation_id": "FMO-000082",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00042",
+    "counterparty_id": null,
+    "metric_value": 2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000083",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00043",
@@ -477,7 +747,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000054",
+    "observation_id": "FMO-000084",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00043",
+    "counterparty_id": null,
+    "metric_value": 2.1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000085",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00044",
@@ -486,7 +765,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000055",
+    "observation_id": "FMO-000086",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00044",
+    "counterparty_id": null,
+    "metric_value": 2.2,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000087",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00045",
@@ -495,7 +783,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000056",
+    "observation_id": "FMO-000088",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00045",
+    "counterparty_id": null,
+    "metric_value": 2.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000089",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00046",
@@ -504,7 +801,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000057",
+    "observation_id": "FMO-000090",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00046",
+    "counterparty_id": null,
+    "metric_value": 2.4,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000091",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00047",
@@ -513,7 +819,16 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000058",
+    "observation_id": "FMO-000092",
+    "metric_code": "FCCR",
+    "metric_name": "Fixed Charge Coverage Ratio",
+    "facility_id": "FAC-2024-00047",
+    "counterparty_id": null,
+    "metric_value": 2.5,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000093",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00048",
@@ -522,7 +837,7 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000059",
+    "observation_id": "FMO-000094",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00049",
@@ -531,12 +846,228 @@
     "as_of_date": "2026-02-28"
   },
   {
-    "observation_id": "FMO-000060",
+    "observation_id": "FMO-000095",
     "metric_code": "DSCR",
     "metric_name": "Debt Service Coverage Ratio",
     "facility_id": "FAC-2024-00050",
     "counterparty_id": null,
     "metric_value": 1.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000096",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00001",
+    "metric_value": 500,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000097",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00002",
+    "metric_value": 150,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000098",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00003",
+    "metric_value": 700,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000099",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00004",
+    "metric_value": 800,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000100",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00005",
+    "metric_value": 300,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000101",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00006",
+    "metric_value": 1000,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000102",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00007",
+    "metric_value": 400,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000103",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00008",
+    "metric_value": 1200,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000104",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00009",
+    "metric_value": 500,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000105",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00010",
+    "metric_value": 110,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000106",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00011",
+    "metric_value": 1500,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000107",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00012",
+    "metric_value": 650,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000108",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00013",
+    "metric_value": 1700,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000109",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00014",
+    "metric_value": 750,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000110",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00015",
+    "metric_value": 1900,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000111",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00016",
+    "metric_value": 100,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000112",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00017",
+    "metric_value": 2100,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000113",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00018",
+    "metric_value": 200,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000114",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00019",
+    "metric_value": 250,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000115",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00020",
+    "metric_value": 2400,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000116",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00021",
+    "metric_value": 350,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000117",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00022",
+    "metric_value": 600,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000118",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00023",
+    "metric_value": 450,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "observation_id": "FMO-000119",
+    "metric_code": "TNW",
+    "metric_name": "Tangible Net Worth",
+    "facility_id": null,
+    "counterparty_id": "CP-00024",
+    "metric_value": 50,
     "as_of_date": "2026-02-28"
   }
 ]

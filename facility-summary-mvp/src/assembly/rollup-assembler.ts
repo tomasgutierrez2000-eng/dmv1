@@ -161,6 +161,12 @@ export const assembleRollups = (
     const ltvs = facilities
       .map((f) => f.ltv)
       .filter((l): l is number => l !== null);
+    const fccrs = facilities
+      .map((f) => f.fccr)
+      .filter((v): v is number => v !== null);
+    const tnws = facilities
+      .map((f) => f.tangible_net_worth_usd)
+      .filter((v): v is number => v !== null);
     const avgDscr =
       dscrs.length > 0
         ? weightedAverage(dscrs, dscrs.map((_, i) => exposures[i]))
@@ -169,6 +175,35 @@ export const assembleRollups = (
       ltvs.length > 0
         ? weightedAverage(ltvs, ltvs.map((_, i) => exposures[i]))
         : null;
+    const avgFccr =
+      fccrs.length > 0
+        ? weightedAverage(fccrs, fccrs.map((_, i) => exposures[i]))
+        : null;
+    const avgTnw =
+      tnws.length > 0
+        ? weightedAverage(tnws, tnws.map((_, i) => exposures[i]))
+        : null;
+
+    // EAD & Expected Loss
+    const totalEad = facilities.reduce((sum, f) => sum + f.ead_usd, 0);
+    const totalExpectedLoss = facilities.reduce(
+      (sum, f) => sum + f.expected_loss_usd,
+      0
+    );
+    const avgExpectedLossRate =
+      totalExposure > 0 ? totalExpectedLoss / totalExposure : 0;
+
+    // Cross-entity exposure
+    const totalCrossEntityExposure = facilities.reduce(
+      (sum, f) => sum + f.cross_entity_exposure_usd,
+      0
+    );
+    const crossEntityFacilityCount = facilities.filter(
+      (f) => f.has_cross_entity_exposure
+    ).length;
+
+    // Active count
+    const activeFacilityCount = facilities.filter((f) => f.is_active).length;
 
     // Profitability
     const totalNii = facilities.reduce(
@@ -238,7 +273,15 @@ export const assembleRollups = (
       downgrade_count: downgradeCount,
       avg_dscr: avgDscr !== null ? roundTo(avgDscr, 2) : null,
       avg_ltv: avgLtv !== null ? roundTo(avgLtv, 2) : null,
+      avg_fccr: avgFccr !== null ? roundTo(avgFccr, 2) : null,
       avg_internal_risk_rating: roundTo(avgRiskRating, 2),
+      total_ead_usd: roundTo(totalEad, 1),
+      total_expected_loss_usd: roundTo(totalExpectedLoss, 2),
+      avg_expected_loss_rate_pct: roundTo(avgExpectedLossRate, 6),
+      total_cross_entity_exposure_usd: roundTo(totalCrossEntityExposure, 1),
+      cross_entity_facility_count: crossEntityFacilityCount,
+      active_facility_count: activeFacilityCount,
+      avg_tangible_net_worth_usd: avgTnw !== null ? roundTo(avgTnw, 1) : null,
       prior_month_exposure_usd: roundTo(priorMonthExposure, 1),
       total_nii_amt: roundTo(totalNii, 2),
       total_revenue_amt: roundTo(totalRevenue, 2),

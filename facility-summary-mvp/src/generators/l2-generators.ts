@@ -39,15 +39,35 @@ export interface L2Data {
   amendmentChangeDetail: AmendmentChangeDetail[];
 }
 
+const riskWeightForRating = (rating: number): number => {
+  if (rating <= 2) return 0.5;   // Investment grade
+  if (rating === 3) return 0.75; // BBB
+  if (rating === 4) return 1.0;  // High yield
+  return 1.5;                    // Distressed
+};
+
+const bucketCodeForRating = (rating: number): string => {
+  if (rating <= 2) return "NHR"; // Non-High Risk
+  if (rating === 3) return "MOD"; // Moderate
+  if (rating === 4) return "HGH"; // High
+  return "CRT";                   // Critical
+};
+
 export const generateL2Data = (l1: L1Data): L2Data => {
   const facilityExposureSnapshot: FacilityExposureSnapshot[] = [];
   const facilityIdsWithCrossEntity = new Set(
     l1.facilityMaster.slice(0, 5).map((facility) => facility.facility_id)
   );
 
+  const counterpartyById = new Map(
+    l1.counterparty.map((cp) => [cp.counterparty_id, cp])
+  );
+
   let exposureSeq = 1;
   l1.facilityMaster.forEach((facility, index) => {
     const committed = facility.committed_facility_amt;
+    const counterparty = counterpartyById.get(facility.counterparty_id);
+    const riskRating = counterparty?.internal_risk_rating ?? 3;
     const baseUtil = clamp(0.25 + ((index * 13) % 60) / 100, 0.25, 0.85);
     const delta = ((index % 14) - 5) / 100;
     const delta2 = ((index % 9) - 4) / 100;
@@ -81,6 +101,8 @@ export const generateL2Data = (l1: L1Data): L2Data => {
         ead_amount: roundTo(ead, 1),
         currency_code: "USD",
         fr2590_category_code: PRODUCT_TO_FR2590[facility.product_id],
+        rwa_amt: roundTo(ead * riskWeightForRating(riskRating), 1),
+        internal_risk_rating_bucket_code: bucketCodeForRating(riskRating),
         as_of_date: asOfDate,
       });
       exposureSeq += 1;

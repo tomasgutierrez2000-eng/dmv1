@@ -181,8 +181,26 @@ export const assembleRollups = (
     );
     const nims = facilities.map((f) => f.nim_pct);
     const roas = facilities.map((f) => f.roa_pct);
+    const roes = facilities.map((f) => f.roe_pct);
     const avgNim = weightedAverage(nims, exposures);
     const avgRoa = weightedAverage(roas, exposures);
+    const avgRoe = weightedAverage(roes, exposures);
+
+    // Debt service, RWA, IR sensitivity, pricing exceptions
+    const totalDebtService = facilities.reduce(
+      (sum, f) => sum + f.total_debt_service_amt,
+      0
+    );
+    const totalRwa = facilities.reduce(
+      (sum, f) => sum + f.rwa_amt,
+      0
+    );
+    const irSensitivities = facilities.map((f) => f.interest_rate_sensitivity_pct);
+    const avgIrSensitivity = weightedAverage(irSensitivities, exposures);
+    const avgReturnOnRwa = totalRwa > 0 ? (totalRevenue / totalRwa) * 100 : 0;
+    const pricingExceptionCount = facilities.filter(
+      (f) => f.pricing_exception_flag
+    ).length;
 
     // Concentration
     const byIndustry = new Map<string, number>();
@@ -239,6 +257,12 @@ export const assembleRollups = (
       avg_dscr: avgDscr !== null ? roundTo(avgDscr, 2) : null,
       avg_ltv: avgLtv !== null ? roundTo(avgLtv, 2) : null,
       avg_internal_risk_rating: roundTo(avgRiskRating, 2),
+      avg_roe_pct: roundTo(avgRoe, 2),
+      total_debt_service_amt: roundTo(totalDebtService, 2),
+      total_rwa_amt: roundTo(totalRwa, 1),
+      avg_ir_sensitivity_pct: roundTo(avgIrSensitivity, 2),
+      avg_return_on_rwa_pct: roundTo(avgReturnOnRwa, 2),
+      pricing_exception_count: pricingExceptionCount,
       prior_month_exposure_usd: roundTo(priorMonthExposure, 1),
       total_nii_amt: roundTo(totalNii, 2),
       total_revenue_amt: roundTo(totalRevenue, 2),

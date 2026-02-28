@@ -9,5 +9,7 @@ export interface FacilityExposureSnapshot {
   ead_amount: number;
   currency_code: string;
   fr2590_category_code: string;
+  rwa_amt: number;
+  internal_risk_rating_bucket_code: string;
   as_of_date: string;
 }

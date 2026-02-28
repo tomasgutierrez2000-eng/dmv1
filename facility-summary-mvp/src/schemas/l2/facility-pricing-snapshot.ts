@@ -9,4 +9,5 @@ export interface FacilityPricingSnapshot {
   rate_cap_pct: number | null;
   min_spread_threshold_bps: number;
   below_threshold_flag: boolean;
+  pricing_exception_flag: boolean;
 }

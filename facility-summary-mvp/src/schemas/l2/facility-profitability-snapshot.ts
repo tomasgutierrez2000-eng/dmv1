@@ -7,4 +7,6 @@ export interface FacilityProfitabilitySnapshot {
   nim_pct: number;
   roa_pct: number;
   roe_pct: number;
+  total_debt_service_amt: number;
+  interest_rate_sensitivity_pct: number;
 }

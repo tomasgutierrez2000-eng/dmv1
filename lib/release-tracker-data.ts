@@ -9,6 +9,26 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-02-28: Derived KPI fields surfaced into FacilitySummary + rollups ──
+  { date: '2026-02-28', layer: 'L2', table: 'facility_exposure_snapshot', field: 'rwa_amt (MVP)', changeType: 'Added', rationale: 'Surfaced RWA amount into FacilitySummary from L2 exposure snapshot — derived as EAD × risk weight' },
+  { date: '2026-02-28', layer: 'L2', table: 'facility_exposure_snapshot', field: 'internal_risk_rating_bucket_code (MVP)', changeType: 'Added', rationale: 'Surfaced risk rating bucket into FacilitySummary from L2 exposure snapshot — categorical bucketing of numeric rating' },
+  { date: '2026-02-28', layer: 'L2', table: 'facility_profitability_snapshot', field: 'total_debt_service_amt (MVP)', changeType: 'Added', rationale: 'Surfaced total debt service into FacilitySummary from L2 profitability snapshot' },
+  { date: '2026-02-28', layer: 'L2', table: 'facility_profitability_snapshot', field: 'interest_rate_sensitivity_pct (MVP)', changeType: 'Added', rationale: 'Surfaced IR sensitivity into FacilitySummary from L2 profitability snapshot' },
+  { date: '2026-02-28', layer: 'L2', table: 'facility_pricing_snapshot', field: 'pricing_exception_flag (MVP)', changeType: 'Added', rationale: 'Surfaced pricing exception flag into FacilitySummary from L2 pricing snapshot' },
+  { date: '2026-02-28', layer: 'L3', table: 'facility_summary', field: 'return_on_rwa_pct', changeType: 'Added', rationale: 'Facility-level return on RWA (total_revenue_amt / rwa_amt × 100) — derived metric added to FacilitySummary' },
+  { date: '2026-02-28', layer: 'L3', table: 'desk_summary', field: 'avg_roe_pct', changeType: 'Added', rationale: 'Exposure-weighted avg ROE added to desk/LOB rollup summaries — ROE already existed at facility level' },
+  { date: '2026-02-28', layer: 'L3', table: 'desk_summary', field: 'total_rwa_amt', changeType: 'Added', rationale: 'Sum of RWA amounts added to desk/LOB rollup summaries' },
+  { date: '2026-02-28', layer: 'L3', table: 'desk_summary', field: 'total_debt_service_amt', changeType: 'Added', rationale: 'Sum of total debt service added to desk/LOB rollup summaries' },
+  { date: '2026-02-28', layer: 'L3', table: 'desk_summary', field: 'avg_ir_sensitivity_pct', changeType: 'Added', rationale: 'Exposure-weighted avg IR sensitivity added to desk/LOB rollup summaries' },
+  { date: '2026-02-28', layer: 'L3', table: 'desk_summary', field: 'avg_return_on_rwa_pct', changeType: 'Added', rationale: 'Return on RWA (total_revenue / total_rwa × 100) added to desk/LOB rollup summaries' },
+  { date: '2026-02-28', layer: 'L3', table: 'desk_summary', field: 'pricing_exception_count', changeType: 'Added', rationale: 'Count of pricing exceptions added to desk/LOB rollup summaries' },
+  { date: '2026-02-28', layer: 'L3', table: 'lob_l1_summary', field: 'avg_roe_pct', changeType: 'Added', rationale: 'Exposure-weighted avg ROE added to L1 LOB summary — LobL1Summary is standalone, not inherited from DeskSummary' },
+  { date: '2026-02-28', layer: 'L3', table: 'lob_l1_summary', field: 'total_rwa_amt', changeType: 'Added', rationale: 'Sum of RWA amounts added to L1 LOB summary' },
+  { date: '2026-02-28', layer: 'L3', table: 'lob_l1_summary', field: 'total_debt_service_amt', changeType: 'Added', rationale: 'Sum of total debt service added to L1 LOB summary' },
+  { date: '2026-02-28', layer: 'L3', table: 'lob_l1_summary', field: 'avg_ir_sensitivity_pct', changeType: 'Added', rationale: 'Exposure-weighted avg IR sensitivity added to L1 LOB summary' },
+  { date: '2026-02-28', layer: 'L3', table: 'lob_l1_summary', field: 'avg_return_on_rwa_pct', changeType: 'Added', rationale: 'Return on RWA added to L1 LOB summary' },
+  { date: '2026-02-28', layer: 'L3', table: 'lob_l1_summary', field: 'pricing_exception_count', changeType: 'Added', rationale: 'Count of pricing exceptions added to L1 LOB summary' },
+
   // ── 2026-02-25: Atomic metrics moved L3 → L2 ──────────────────────
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_loans', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2 — L2 holds source-system values, L3 only derived' },
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_facilities', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2' },

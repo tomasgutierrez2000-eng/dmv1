@@ -93,6 +93,7 @@ export const generateL2EnrichmentData = (
         rate_cap_pct: rateIndex === "FIXED" ? null : roundTo(allInRate + 2.5, 2),
         min_spread_threshold_bps: minThreshold,
         below_threshold_flag: belowThreshold,
+        pricing_exception_flag: index % 8 === 0,
       });
       pricingSeq += 1;
     });
@@ -182,6 +183,9 @@ export const generateL2EnrichmentData = (
       const roa = clamp(nim * 0.4 + (index % 10) / 100, 0.8, 1.5);
       const roe = clamp(roa * 10 + (index % 5), 8, 15);
 
+      const debtService = nii * 0.6 + (outstanding * 0.02 / 12);
+      const irSensitivity = clamp(spread / 100 * 0.3 + (index % 10) / 100, 0.1, 2.5);
+
       facilityProfitabilitySnapshot.push({
         profitability_snapshot_id: `FPS-${padId(profitabilitySeq, 6)}`,
         facility_id: facility.facility_id,
@@ -191,6 +195,8 @@ export const generateL2EnrichmentData = (
         nim_pct: roundTo(nim, 2),
         roa_pct: roundTo(roa, 2),
         roe_pct: roundTo(roe, 2),
+        total_debt_service_amt: roundTo(debtService, 2),
+        interest_rate_sensitivity_pct: roundTo(irSensitivity, 2),
       });
       profitabilitySeq += 1;
     });

@@ -372,12 +372,27 @@ export const assembleFacilitySummary = (
       delinquency_bucket_code: latestDelinquency?.delinquency_bucket_code ?? "0",
       is_delinquent: isDelinquent,
 
+      // Enrichment fields - Pricing Exception
+      pricing_exception_flag: latestPricing?.pricing_exception_flag ?? false,
+
       // Enrichment fields - Profitability
       net_interest_income_amt: latestProfitability?.net_interest_income_amt ?? 0,
       total_revenue_amt: latestProfitability?.total_revenue_amt ?? 0,
       nim_pct: latestProfitability?.nim_pct ?? 0,
       roa_pct: latestProfitability?.roa_pct ?? 0,
       roe_pct: latestProfitability?.roe_pct ?? 0,
+      total_debt_service_amt: latestProfitability?.total_debt_service_amt ?? 0,
+      interest_rate_sensitivity_pct: latestProfitability?.interest_rate_sensitivity_pct ?? 0,
+
+      // Enrichment fields - RWA & Rating Bucket
+      rwa_amt: latestExposure?.rwa_amt ?? 0,
+      internal_risk_rating_bucket_code: latestExposure?.internal_risk_rating_bucket_code ?? "",
+      return_on_rwa_pct: roundTo(
+        (latestExposure?.rwa_amt ?? 0) > 0
+          ? ((latestProfitability?.total_revenue_amt ?? 0) / (latestExposure?.rwa_amt ?? 1)) * 100
+          : 0,
+        2
+      ),
 
       // Enrichment fields - Risk Flags
       is_deteriorated: isDeteriorated,

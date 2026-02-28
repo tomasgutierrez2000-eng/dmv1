@@ -64,12 +64,22 @@ export interface FacilitySummary {
   delinquency_bucket_code: string;
   is_delinquent: boolean;
 
+  // Enrichment fields - Pricing Exception
+  pricing_exception_flag: boolean;
+
   // Enrichment fields - Profitability
   net_interest_income_amt: number;
   total_revenue_amt: number;
   nim_pct: number;
   roa_pct: number;
   roe_pct: number;
+  total_debt_service_amt: number;
+  interest_rate_sensitivity_pct: number;
+
+  // Enrichment fields - RWA & Rating Bucket
+  rwa_amt: number;
+  internal_risk_rating_bucket_code: string;
+  return_on_rwa_pct: number;
 
   // Enrichment fields - Risk Flags
   is_deteriorated: boolean;
@@ -121,6 +131,12 @@ export interface DeskSummary {
   avg_dscr: number | null;
   avg_ltv: number | null;
   avg_internal_risk_rating: number;
+  avg_roe_pct: number;
+  total_debt_service_amt: number;
+  total_rwa_amt: number;
+  avg_ir_sensitivity_pct: number;
+  avg_return_on_rwa_pct: number;
+  pricing_exception_count: number;
 }
 
 export interface LobL2Summary extends DeskSummary {
@@ -170,6 +186,12 @@ export interface LobL1Summary {
   avg_dscr: number | null;
   avg_ltv: number | null;
   avg_internal_risk_rating: number;
+  avg_roe_pct: number;
+  total_debt_service_amt: number;
+  total_rwa_amt: number;
+  avg_ir_sensitivity_pct: number;
+  avg_return_on_rwa_pct: number;
+  pricing_exception_count: number;
   desk_count: number;
   top_desk_by_exposure: string | null;
   bottom_desk_by_exposure: string | null;

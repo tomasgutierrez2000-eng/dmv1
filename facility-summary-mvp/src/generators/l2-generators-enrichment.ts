@@ -179,6 +179,7 @@ export const generateL2EnrichmentData = (
       const nim = clamp(1.5 + (spread / 100) * 0.5 + (index % 15) / 100, 1.5, 4.0);
       const nii = (outstanding * nim) / 100 / 12; // Monthly NII
       const totalRevenue = nii * 1.15; // Add fees
+      const operatingExpense = totalRevenue * (0.4 + (index % 20) / 100); // 40-60% of revenue
       const roa = clamp(nim * 0.4 + (index % 10) / 100, 0.8, 1.5);
       const roe = clamp(roa * 10 + (index % 5), 8, 15);
 
@@ -188,6 +189,7 @@ export const generateL2EnrichmentData = (
         as_of_date: asOfDate,
         net_interest_income_amt: roundTo(nii, 2),
         total_revenue_amt: roundTo(totalRevenue, 2),
+        operating_expense_amt: roundTo(operatingExpense, 2),
         nim_pct: roundTo(nim, 2),
         roa_pct: roundTo(roa, 2),
         roe_pct: roundTo(roe, 2),

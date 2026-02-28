@@ -689,6 +689,7 @@ export const L1_TABLES: TableDef[] = [
       { name: 'rate_floor_pct', type: 'DECIMAL(10,4)', nullable: true },
       { name: 'region_code', type: 'VARCHAR(20)', nullable: true },
       { name: 'revolving_flag', type: 'CHAR(1)', nullable: true },
+      { name: 'active_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
     ],
   },
   {

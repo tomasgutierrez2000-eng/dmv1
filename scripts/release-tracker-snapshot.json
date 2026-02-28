@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-02-26T06:24:30.358Z",
+  "createdAt": "2026-02-28T04:48:30.307Z",
   "tables": [
     {
       "layer": "L1",
@@ -1588,6 +1588,9 @@
         },
         {
           "name": "revolving_flag"
+        },
+        {
+          "name": "active_flag"
         }
       ]
     },
@@ -3343,6 +3346,9 @@
         },
         {
           "name": "ultimate_parent_id"
+        },
+        {
+          "name": "product_node_id"
         }
       ]
     },
@@ -6309,6 +6315,9 @@
           "name": "criticized_portfolio_count"
         },
         {
+          "name": "criticized_exposure_amt"
+        },
+        {
           "name": "deteriorated_deal_count"
         },
         {
@@ -7270,6 +7279,9 @@
         },
         {
           "name": "criticized_portfolio_count"
+        },
+        {
+          "name": "criticized_exposure_amt"
         },
         {
           "name": "doi_pct"

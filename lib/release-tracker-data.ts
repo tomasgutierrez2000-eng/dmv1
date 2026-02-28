@@ -9,6 +9,12 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-02-27: Data model enhancements — product tagging, active flag, criticized portfolios, cross-entity exposure ──
+  { date: '2026-02-27', layer: 'L2', table: 'position', field: 'product_node_id', changeType: 'Added', rationale: 'Added position-level product tagging (FK to enterprise_product_taxonomy) to capture granular product type (e.g. Revolving Loan, Term Loan). Facility-level product_node_id remains for parent product groups.' },
+  { date: '2026-02-27', layer: 'L1', table: 'facility_master', field: 'active_flag', changeType: 'Added', rationale: 'Added explicit active flag (CHAR(1), Y/N) to facility_master, derived from facility_status. Follows the same pattern used by 33+ other L1 reference tables. Replaces application-layer derivation of is_active.' },
+  { date: '2026-02-27', layer: 'L3', table: 'lob_credit_quality_summary', field: 'criticized_exposure_amt', changeType: 'Added', rationale: 'Added total exposure amount for facilities flagged as CRITICIZED within each LOB. Complements the existing criticized_portfolio_count (which was already in the DDL but had no population SQL). Population procedure l3.populate_lob_credit_quality_criticized now computes both fields.' },
+  { date: '2026-02-27', layer: 'L3', table: 'lob_deterioration_summary', field: 'criticized_exposure_amt', changeType: 'Added', rationale: 'Added total exposure amount for criticized facilities to the deterioration summary. Population procedure l3.populate_lob_deterioration_criticized now computes both criticized_portfolio_count and criticized_exposure_amt.' },
+
   // ── 2026-02-25: Atomic metrics moved L3 → L2 ──────────────────────
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_loans', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2 — L2 holds source-system values, L3 only derived' },
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_facilities', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2' },

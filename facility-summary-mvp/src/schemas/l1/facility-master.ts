@@ -16,4 +16,5 @@ export interface FacilityMaster {
   lob_l3_name: string;
   region_code: string;
   industry_code: string;
+  active_flag: string;
 }

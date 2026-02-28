@@ -37,6 +37,7 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'position_currency', type: 'VARCHAR(100)', nullable: true },
       { name: 'trading_banking_book_flag', type: 'CHAR(1)', nullable: true },
       { name: 'ultimate_parent_id', type: 'BIGINT', nullable: true },
+      { name: 'product_node_id', type: 'BIGINT', nullable: true, fk: 'l1.enterprise_product_taxonomy(product_node_id)' },
     ],
   },
   {

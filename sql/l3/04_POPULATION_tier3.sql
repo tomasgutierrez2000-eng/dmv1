@@ -317,6 +317,80 @@ $$;
 
 
 -- ============================================================
+-- T28: lob_credit_quality_summary (partial — criticized fields)
+-- Reads: L2.risk_flag, T1 (exposure_metric_cube), L2.facility_lob_attribution
+-- Key formulas:
+--   criticized_portfolio_count = COUNT(DISTINCT facilities with CRITICIZED flag)
+--   criticized_exposure_amt = SUM(gross_exposure for criticized facilities)
+-- ============================================================
+CREATE OR REPLACE PROCEDURE l3.populate_lob_credit_quality_criticized(
+    p_run_version_id VARCHAR, p_as_of_date DATE
+)
+LANGUAGE SQL AS $$
+
+-- Update criticized fields in existing lob_credit_quality_summary rows
+UPDATE l3.lob_credit_quality_summary cqs
+SET
+    criticized_portfolio_count = crit.criticized_count,
+    criticized_exposure_amt = crit.criticized_exposure
+FROM (
+    SELECT
+        fla.lob_node_id,
+        COUNT(DISTINCT rf.facility_id) AS criticized_count,
+        COALESCE(SUM(DISTINCT emc.gross_exposure_amt), 0) AS criticized_exposure
+    FROM l2.risk_flag rf
+    JOIN l2.facility_lob_attribution fla
+        ON rf.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
+    LEFT JOIN l3.exposure_metric_cube emc
+        ON rf.facility_id = emc.facility_id
+        AND emc.run_version_id = p_run_version_id
+        AND emc.scenario_id = 'BASE'
+    WHERE rf.flag_code = 'CRITICIZED'
+      AND rf.as_of_date = p_as_of_date
+      AND rf.cleared_ts IS NULL
+    GROUP BY fla.lob_node_id
+) crit
+WHERE cqs.lob_node_id = crit.lob_node_id
+  AND cqs.run_version_id = p_run_version_id;
+$$;
+
+
+-- ============================================================
+-- T47: lob_deterioration_summary (partial — criticized fields)
+-- Same source logic as T28 but targets lob_deterioration_summary
+-- ============================================================
+CREATE OR REPLACE PROCEDURE l3.populate_lob_deterioration_criticized(
+    p_run_version_id VARCHAR, p_as_of_date DATE
+)
+LANGUAGE SQL AS $$
+
+UPDATE l3.lob_deterioration_summary ds
+SET
+    criticized_portfolio_count = crit.criticized_count,
+    criticized_exposure_amt = crit.criticized_exposure
+FROM (
+    SELECT
+        fla.lob_node_id,
+        COUNT(DISTINCT rf.facility_id) AS criticized_count,
+        COALESCE(SUM(DISTINCT emc.gross_exposure_amt), 0) AS criticized_exposure
+    FROM l2.risk_flag rf
+    JOIN l2.facility_lob_attribution fla
+        ON rf.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
+    LEFT JOIN l3.exposure_metric_cube emc
+        ON rf.facility_id = emc.facility_id
+        AND emc.run_version_id = p_run_version_id
+        AND emc.scenario_id = 'BASE'
+    WHERE rf.flag_code = 'CRITICIZED'
+      AND rf.as_of_date = p_as_of_date
+      AND rf.cleared_ts IS NULL
+    GROUP BY fla.lob_node_id
+) crit
+WHERE ds.lob_node_id = crit.lob_node_id
+  AND ds.run_version_id = p_run_version_id;
+$$;
+
+
+-- ============================================================
 -- Remaining Tier 3: T23-T25, T28, T34, T36, T46-T49
 -- Key formulas documented per table:
 --

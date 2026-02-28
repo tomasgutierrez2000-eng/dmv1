@@ -1,0 +1,110 @@
+[
+  {
+    "item_id": "LTV",
+    "item_name": "Loan to Value Ratio (%)",
+    "abbreviation": "LTV",
+    "kind": "METRIC",
+    "definition": "Committed facility amount divided by collateral value, expressed as a percentage. Measures the degree of leverage on a secured facility — how much of the collateral value is consumed by the loan commitment. A key underwriting and ongoing monitoring KPI for secured lending, required in FR Y-14Q CRE Schedule and OCC Comptroller's Handbook for real estate lending. Higher LTV indicates greater loss severity risk if the borrower defaults and collateral must be liquidated.",
+    "generic_formula": "Committed_Facility_Amt / Collateral_Value × 100",
+    "data_type": "Decimal",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": ["CM", "CR"],
+    "regulatory_references": ["FR Y-14Q", "CCAR", "CRE underwriting", "OCC Comptroller's Handbook"],
+    "insight": "Loan risk concentration relative to collateral",
+    "ingredient_fields": [
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "committed_facility_amt",
+        "description": "Total authorized credit line — the committed limit for this facility",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "50000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "collateral_snapshot",
+        "field": "valuation_amount",
+        "description": "Raw collateral value (pre-haircut) as of the snapshot date",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "75000000.00"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility LTV (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id) THEN [committed_facility_amt] / [collateral_value] × 100",
+        "source_references": [
+          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
+          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
+          { "layer": "L1", "table": "facility_master", "field": "facility_id", "description": "Primary key — grain of calculation" }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty LTV (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] WHERE IS([counterparty_id]). For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "source_references": [
+          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
+          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
+          { "layer": "L1", "table": "facility_master", "field": "counterparty_id", "description": "FK to counterparty — grouping key" },
+          { "layer": "L1", "table": "facility_master", "field": "facility_id", "description": "Facility identifier for join" }
+        ]
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk LTV (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "source_references": [
+          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
+          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
+          { "layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to LoB taxonomy — desk resolution" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "LoB hierarchy node — L3 leaf segment" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L3" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "segment_name", "description": "Desk name at L3 level" }
+        ]
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio LTV (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "source_references": [
+          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
+          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
+          { "layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to LoB taxonomy" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "LoB hierarchy node — L2 parent segment" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "parent_segment_id", "description": "Self-referential FK — traverse up from L3 to L2" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L2" }
+        ]
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "LTV",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "source_references": [
+          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
+          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
+          { "layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to LoB taxonomy" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "LoB hierarchy node — L1 root segment" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "parent_segment_id", "description": "Self-referential FK — recursive traversal to collect all descendants" },
+          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L1" }
+        ]
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
+  }
+]

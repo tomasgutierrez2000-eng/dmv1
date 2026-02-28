@@ -1,10 +1,11 @@
 /**
- * Metric Library — simplified types for Domain, Parent Metric, and Metric Variant.
+ * Data Catalogue — unified types for the metric/data-element catalogue.
  *
  * ARCHITECTURE:
- * - One PARENT METRIC = one business concept (e.g. DSCR, PD, LTV).
- * - One canonical METRIC VARIANT per parent with correct GSIB rollup logic.
+ * - One CATALOGUE ITEM = one business concept (metric or raw data element).
+ * - Each item has per-level definitions showing how it rolls up across the hierarchy.
  * - Rollup hierarchy: Facility → Counterparty → Desk → Portfolio → LoB.
+ * - Flat structure: easy to map to DB rows or Python dicts.
  */
 
 /** Canonical order for aggregation hierarchy. */
@@ -15,16 +16,16 @@ export type RollupLevelKey = (typeof ROLLUP_HIERARCHY_LEVELS)[number];
 export const ROLLUP_LEVEL_LABELS: Record<RollupLevelKey, string> = {
   facility: 'Facility',
   counterparty: 'Counterparty',
-  desk: 'Desk',
-  portfolio: 'Portfolio',
-  lob: 'Line of Business',
+  desk: 'Desk (L3)',
+  portfolio: 'Portfolio (L2)',
+  lob: 'Department / LoB (L1)',
 };
 
 export type MetricClass = 'SOURCED' | 'CALCULATED' | 'HYBRID';
 export type UnitType = 'RATIO' | 'PERCENTAGE' | 'CURRENCY' | 'COUNT' | 'RATE' | 'ORDINAL' | 'DAYS' | 'INDEX';
 export type Direction = 'HIGHER_BETTER' | 'LOWER_BETTER' | 'NEUTRAL';
-export type VariantStatus = 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
-export type VariantType = 'SOURCED' | 'CALCULATED';
+export type CatalogueItemKind = 'DATA_ELEMENT' | 'METRIC';
+export type SourcingType = 'Raw' | 'Calc' | 'Agg' | 'Avg';
 
 export interface MetricDomain {
   domain_id: string;
@@ -35,6 +36,54 @@ export interface MetricDomain {
   regulatory_relevance?: string[];
   primary_stakeholders?: string[];
 }
+
+/** A source field reference — an atomic ingredient used to compose a metric. */
+export interface IngredientField {
+  layer: 'L1' | 'L2' | 'L3';
+  table: string;
+  field: string;
+  description: string;
+  data_type?: string;
+  sample_value?: string;
+}
+
+/** Per-level definition: how the item is computed/available at one rollup level. */
+export interface LevelDefinition {
+  level: RollupLevelKey;
+  dashboard_display_name: string;
+  in_record: boolean;
+  sourcing_type: SourcingType;
+  level_logic: string;
+  source_references: IngredientField[];
+}
+
+/** The unified catalogue item — replaces ParentMetric + MetricVariant. */
+export interface CatalogueItem {
+  item_id: string;
+  item_name: string;
+  abbreviation: string;
+  kind: CatalogueItemKind;
+  definition: string;
+  generic_formula: string;
+  data_type: string;
+  unit_type: UnitType;
+  direction: Direction;
+  metric_class: MetricClass;
+  domain_ids: string[];
+  regulatory_references?: string[];
+  insight: string;
+  ingredient_fields: IngredientField[];
+  level_definitions: LevelDefinition[];
+  number_of_instances: number;
+  directly_displayed: boolean;
+  status: 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
+  executable_metric_id?: string | null;
+}
+
+/* ── Legacy types (kept for backward compat during migration) ── */
+
+export type VariantStatus = 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
+export type VariantType = 'SOURCED' | 'CALCULATED';
 
 export interface ParentMetric {
   metric_id: string;
@@ -49,7 +98,6 @@ export interface ParentMetric {
   regulatory_references?: string[];
 }
 
-/** Per-level rollup logic for Facility → Counterparty → Desk → Portfolio → LoB. */
 export interface RollupLevel {
   facility?: string;
   counterparty?: string;

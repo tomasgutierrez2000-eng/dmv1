@@ -1165,9 +1165,7 @@ export default function Canvas() {
           })}
 
           {/* Table Nodes - in domain-overview hide tables whose category is collapsed.
-              Render in stable order (no sorting) to avoid foreignObject re-creation bugs.
-              Position is applied via CSS transform on the wrapper <g> so it can be
-              animated during focus-compact transitions. TableNode gets {x:0,y:0}. */}
+              Render in stable order (no sorting) to avoid foreignObject re-creation bugs. */}
           {visibleTables.map((table) => {
             if (layoutMode === 'domain-overview' && !effectiveExpandedDomains.has(table.category)) {
               return null;
@@ -1187,25 +1185,18 @@ export default function Canvas() {
             if (beingDragged) tableOpacity = 0.85;
             else if (focusDimmed) tableOpacity = 0.12;
 
-            const shouldAnimatePosition = isAnimating && !beingDragged;
-
             return (
               <g
                 key={table.key}
                 style={{
-                  transform: `translate(${position.x}px, ${position.y}px)`,
                   opacity: tableOpacity,
                   filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
-                  transition: beingDragged
-                    ? 'none'
-                    : shouldAnimatePosition
-                      ? 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease'
-                      : 'opacity 0.28s ease',
+                  transition: beingDragged ? 'none' : 'opacity 0.28s ease',
                 }}
               >
                 <TableNode
                   table={table}
-                  position={{ x: 0, y: 0 }}
+                  position={position}
                   isSelected={isThisSelected}
                   isExpanded={layoutMode === 'domain-overview' ? false : expandedTables.has(table.key)}
                   onSelect={() => {

@@ -14,6 +14,7 @@ import type { CatalogueItem, DemoFacility } from '@/lib/metric-library/types';
 import LevelStepWalkthrough from './LevelStepWalkthrough';
 import type { FlowStep } from './LevelStepWalkthrough';
 import { PositionTable, FacilityTable } from './WorkedExampleTable';
+import HierarchyPyramid from './HierarchyPyramid';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -356,6 +357,9 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
           The formula never changes — only the <strong className="text-purple-200">scope of facilities</strong> varies by level. Every rollup resolves back to &quot;which facilities are in scope?&quot; then applies the same calculation.
         </p>
       </div>
+
+      {/* Hierarchy pyramid — visual overview */}
+      <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />
 
       {/* Tab bar */}
       <div className="flex gap-1.5 flex-wrap" role="tablist" aria-label="Deep-dive level tabs">

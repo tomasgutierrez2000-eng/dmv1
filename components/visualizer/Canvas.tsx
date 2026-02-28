@@ -625,6 +625,14 @@ export default function Canvas() {
     const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
 
     const anchorKey = selectedField.tableKey;
+    const currentPositions = useModelStore.getState().tablePositions;
+    const anchorPos = currentPositions[anchorKey];
+    if (!anchorPos) return;
+
+    // Keep the selected table in place — use its current position as the center
+    const cx = anchorPos.x;
+    const cy = anchorPos.y;
+
     const leftKeys: string[] = [];
     const rightKeys: string[] = [];
     for (const rel of fieldRels) {
@@ -638,13 +646,12 @@ export default function Canvas() {
 
     const hGap = isOverview ? tw * 0.7 : tw * 0.5;
     const vGap = th * 0.25;
-    const cx = 0;
-    const cy = 0;
     const stackY = (count: number, idx: number) => {
       const totalH = count * th + (count - 1) * vGap;
       return cy + (th - totalH) / 2 + idx * (th + vGap);
     };
 
+    // Only reposition the RELATED tables — anchor stays put
     const compact: { key: string; x: number; y: number }[] = [];
     compact.push({ key: anchorKey, x: cx, y: cy });
     leftKeys.forEach((key, i) =>
@@ -655,9 +662,12 @@ export default function Canvas() {
     );
 
     for (const { key, x, y } of compact) {
-      setTablePosition(key, { x, y });
+      if (key !== anchorKey) {
+        setTablePosition(key, { x, y });
+      }
     }
 
+    // Zoom into the cluster around the anchor table
     setIsAnimating(true);
     runFitToView(
       compact.map((p) => ({ x: p.x, y: p.y })),

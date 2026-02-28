@@ -1111,111 +1111,76 @@ export default function Canvas() {
               (rel.source.tableKey === selectedField.tableKey && rel.source.field === selectedField.fieldName) ||
               (rel.target.tableKey === selectedField.tableKey && rel.target.field === selectedField.fieldName)
             );
-
-            // Dim relationship lines not connected to the selected table
-            const involvesSelectedTable = selectedTable && !focusMode && (
-              rel.source.tableKey === selectedTable || rel.target.tableKey === selectedTable
-            );
-            const relDimmed = selectedTable && !focusMode && !involvesSelectedTable && !involvesSelectedField;
             
             return (
-              <g key={rel.id} style={{ opacity: relDimmed ? 0.12 : 1, transition: 'opacity 0.3s ease' }}>
-                <RelationshipLine
-                  relationship={rel}
-                  sourcePos={sourcePos}
-                  targetPos={targetPos}
-                  sourceFieldIndex={sourceFieldIndex !== undefined && sourceFieldIndex >= 0 ? sourceFieldIndex : undefined}
-                  targetFieldIndex={targetFieldIndex !== undefined && targetFieldIndex >= 0 ? targetFieldIndex : undefined}
-                  sourceTableFields={sourceTable?.fields.length || 0}
-                  targetTableFields={targetTable?.fields.length || 0}
-                  isSelected={selectedRelationship === rel.id || !!involvesSelectedField}
-                  isHovered={hoveredRelationship === rel.id}
-                  involvesSelectedField={!!involvesSelectedField}
-                  onSelect={() => setSelectedRelationship(rel.id)}
-                  onHover={(hovered) => setHoveredRelationship(hovered ? rel.id : null)}
+              <RelationshipLine
+                key={rel.id}
+                relationship={rel}
+                sourcePos={sourcePos}
+                targetPos={targetPos}
+                sourceFieldIndex={sourceFieldIndex !== undefined && sourceFieldIndex >= 0 ? sourceFieldIndex : undefined}
+                targetFieldIndex={targetFieldIndex !== undefined && targetFieldIndex >= 0 ? targetFieldIndex : undefined}
+                sourceTableFields={sourceTable?.fields.length || 0}
+                targetTableFields={targetTable?.fields.length || 0}
+                isSelected={selectedRelationship === rel.id || !!involvesSelectedField}
+                isHovered={hoveredRelationship === rel.id}
+                involvesSelectedField={!!involvesSelectedField}
+                onSelect={() => setSelectedRelationship(rel.id)}
+                onHover={(hovered) => setHoveredRelationship(hovered ? rel.id : null)}
+              />
+            );
+          })}
+
+          {/* Table Nodes - in domain-overview hide tables whose category is collapsed.
+              Render in stable order (no sorting) to avoid foreignObject re-creation bugs. */}
+          {visibleTables.map((table) => {
+            if (layoutMode === 'domain-overview' && !effectiveExpandedDomains.has(table.category)) {
+              return null;
+            }
+            const position = tablePositions[table.key] || { x: 0, y: 0 };
+            const relationshipCounts = model ? {
+              incoming: model.relationships.filter(r => r.target.tableKey === table.key).length,
+              outgoing: model.relationships.filter(r => r.source.tableKey === table.key).length,
+            } : { incoming: 0, outgoing: 0 };
+
+            const beingDragged = isDraggingTable === table.key;
+            const isThisSelected = selectedTable === table.key;
+
+            return (
+              <g
+                key={table.key}
+                style={{
+                  opacity: beingDragged ? 0.85 : 1,
+                  filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
+                  transition: beingDragged ? 'none' : 'opacity 0.2s ease',
+                }}
+              >
+                <TableNode
+                  table={table}
+                  position={position}
+                  isSelected={isThisSelected}
+                  isExpanded={layoutMode === 'domain-overview' ? false : expandedTables.has(table.key)}
+                  onSelect={() => {
+                    if (!tableDragOccurredRef.current) {
+                      setSelectedTable(table.key);
+                    }
+                  }}
+                  onToggleExpand={() => {
+                    if (layoutMode !== 'domain-overview') {
+                      toggleExpandedTable(table.key);
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    pendingDragRef.current = { tableKey: table.key, startX: e.clientX, startY: e.clientY };
+                  }}
+                  searchQuery={searchQuery}
+                  relationshipCounts={relationshipCounts}
+                  selectedField={selectedField}
+                  onFieldSelect={(tableKey, fieldName) => setSelectedField({ tableKey, fieldName })}
                 />
               </g>
             );
           })}
-
-          {/* Table Nodes - in domain-overview hide tables whose category is collapsed */}
-          {/* Sort so selected table renders last (on top in SVG) */}
-          {(() => {
-            const relatedToSelected = new Set<string>();
-            if (selectedTable && model && !focusMode) {
-              relatedToSelected.add(selectedTable);
-              for (const rel of model.relationships) {
-                if (rel.source.tableKey === selectedTable) relatedToSelected.add(rel.target.tableKey);
-                if (rel.target.tableKey === selectedTable) relatedToSelected.add(rel.source.tableKey);
-              }
-            }
-            const hasTableSelection = !!selectedTable && !focusMode;
-
-            const sorted = [...visibleTables].sort((a, b) => {
-              if (!selectedTable) return 0;
-              const aSelected = a.key === selectedTable ? 2 : relatedToSelected.has(a.key) ? 1 : 0;
-              const bSelected = b.key === selectedTable ? 2 : relatedToSelected.has(b.key) ? 1 : 0;
-              return aSelected - bSelected;
-            });
-
-            return sorted.map((table) => {
-              if (layoutMode === 'domain-overview' && !effectiveExpandedDomains.has(table.category)) {
-                return null;
-              }
-              const position = tablePositions[table.key] || { x: 0, y: 0 };
-              const relationshipCounts = model ? {
-                incoming: model.relationships.filter(r => r.target.tableKey === table.key).length,
-                outgoing: model.relationships.filter(r => r.source.tableKey === table.key).length,
-              } : { incoming: 0, outgoing: 0 };
-
-              const beingDragged = isDraggingTable === table.key;
-              const isThisSelected = selectedTable === table.key;
-              const isRelated = relatedToSelected.has(table.key);
-
-              let tableOpacity = 1;
-              if (hasTableSelection && !beingDragged) {
-                if (isThisSelected) tableOpacity = 1;
-                else if (isRelated) tableOpacity = 0.55;
-                else tableOpacity = 0.18;
-              }
-              if (beingDragged) tableOpacity = 0.85;
-
-              return (
-                <g
-                  key={table.key}
-                  style={{
-                    opacity: tableOpacity,
-                    filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
-                    transition: beingDragged ? 'none' : 'opacity 0.3s ease',
-                  }}
-                >
-                  <TableNode
-                    table={table}
-                    position={position}
-                    isSelected={isThisSelected}
-                    isExpanded={layoutMode === 'domain-overview' ? false : expandedTables.has(table.key)}
-                    onSelect={() => {
-                      if (!tableDragOccurredRef.current) {
-                        setSelectedTable(table.key);
-                      }
-                    }}
-                    onToggleExpand={() => {
-                      if (layoutMode !== 'domain-overview') {
-                        toggleExpandedTable(table.key);
-                      }
-                    }}
-                    onMouseDown={(e) => {
-                      pendingDragRef.current = { tableKey: table.key, startX: e.clientX, startY: e.clientY };
-                    }}
-                    searchQuery={searchQuery}
-                    relationshipCounts={relationshipCounts}
-                    selectedField={selectedField}
-                    onFieldSelect={(tableKey, fieldName) => setSelectedField({ tableKey, fieldName })}
-                  />
-                </g>
-              );
-            });
-          })()}
         </g>
       </svg>
     </div>

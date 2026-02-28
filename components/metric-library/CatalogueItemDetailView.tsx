@@ -9,7 +9,7 @@ import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 import IngredientFieldsTable from './IngredientFieldsTable';
 import LevelRollupTable from './LevelRollupTable';
-import CatalogueLineageDiagram from './CatalogueLineageDiagram';
+import CatalogueDeepDive from './CatalogueDeepDive';
 
 export default function CatalogueItemDetailView({ itemId }: { itemId: string }) {
   const [item, setItem] = useState<CatalogueItem | null>(null);
@@ -142,13 +142,13 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
           </div>
         </section>
 
-        {/* ── Section 5: Lineage Diagram ── */}
+        {/* ── Section 5: Interactive Deep-Dive ── */}
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
-            Data Lineage
+            Deep-Dive: How This Metric Rolls Up
           </h2>
           <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-800">
-            <CatalogueLineageDiagram item={item} />
+            <CatalogueDeepDive item={item} />
           </div>
         </section>
 

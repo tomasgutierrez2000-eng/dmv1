@@ -15,6 +15,46 @@
     "insight": "Loan risk concentration relative to collateral",
     "ingredient_fields": [
       {
+        "layer": "L2",
+        "table": "position",
+        "field": "position_id",
+        "description": "Individual exposure identifier — finest grain in the data model",
+        "data_type": "BIGINT",
+        "sample_value": "1"
+      },
+      {
+        "layer": "L2",
+        "table": "position",
+        "field": "facility_id",
+        "description": "FK linking each position to its parent facility",
+        "data_type": "BIGINT",
+        "sample_value": "1"
+      },
+      {
+        "layer": "L2",
+        "table": "position",
+        "field": "balance_amount",
+        "description": "Outstanding balance of the individual position/exposure",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "35000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "position",
+        "field": "position_type",
+        "description": "Exposure type: LOAN, DERIVATIVE, SECURITY, DEPOSIT, SFT, COMMITMENT",
+        "data_type": "VARCHAR(50)",
+        "sample_value": "LOAN"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key — grain of facility-level calculation",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
         "layer": "L1",
         "table": "facility_master",
         "field": "committed_facility_amt",
@@ -29,6 +69,54 @@
         "description": "Raw collateral value (pre-haircut) as of the snapshot date",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "75000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK to counterparty — grouping key for counterparty-level rollup",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to enterprise_business_taxonomy — desk/portfolio/lob resolution",
+        "data_type": "BIGINT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node ID — links facility to organizational segment",
+        "data_type": "BIGINT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "Self-referential FK — traverses L3→L2→L1 hierarchy",
+        "data_type": "BIGINT",
+        "sample_value": "302"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "tree_level",
+        "description": "Hierarchy depth (1=LoB, 2=Portfolio, 3=Desk)",
+        "data_type": "INT",
+        "sample_value": "3"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "segment_name",
+        "description": "Human-readable name of the desk/portfolio/lob",
+        "data_type": "VARCHAR(200)",
+        "sample_value": "CRE Lending Desk"
       }
     ],
     "level_definitions": [
@@ -105,6 +193,97 @@
     ],
     "number_of_instances": 5,
     "directly_displayed": true,
-    "status": "ACTIVE"
+    "status": "ACTIVE",
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-001",
+          "facility_name": "Sunrise Tower CRE Loan",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 50000000,
+          "collateral_value": 75000000,
+          "ltv_pct": 66.7,
+          "positions": [
+            { "position_id": "P-001", "facility_id": "F-001", "position_type": "LOAN", "balance_amount": 35000000, "description": "Term Loan Tranche A" },
+            { "position_id": "P-002", "facility_id": "F-001", "position_type": "LOAN", "balance_amount": 10000000, "description": "Term Loan Tranche B" },
+            { "position_id": "P-003", "facility_id": "F-001", "position_type": "COMMITMENT", "balance_amount": 5000000, "description": "Undrawn Commitment" }
+          ]
+        },
+        {
+          "facility_id": "F-002",
+          "facility_name": "Sunrise Office Complex",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 30000000,
+          "collateral_value": 40000000,
+          "ltv_pct": 75.0,
+          "positions": [
+            { "position_id": "P-004", "facility_id": "F-002", "position_type": "LOAN", "balance_amount": 22000000, "description": "Senior Secured Loan" },
+            { "position_id": "P-005", "facility_id": "F-002", "position_type": "COMMITMENT", "balance_amount": 8000000, "description": "Revolver Undrawn" }
+          ]
+        },
+        {
+          "facility_id": "F-003",
+          "facility_name": "Meridian Term Loan A",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 80000000,
+          "collateral_value": 100000000,
+          "ltv_pct": 80.0,
+          "positions": [
+            { "position_id": "P-006", "facility_id": "F-003", "position_type": "LOAN", "balance_amount": 55000000, "description": "Term Loan A" },
+            { "position_id": "P-007", "facility_id": "F-003", "position_type": "LOAN", "balance_amount": 20000000, "description": "Term Loan B" },
+            { "position_id": "P-008", "facility_id": "F-003", "position_type": "COMMITMENT", "balance_amount": 5000000, "description": "Delayed Draw" }
+          ]
+        },
+        {
+          "facility_id": "F-004",
+          "facility_name": "Meridian Warehouse Facility",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 25000000,
+          "collateral_value": 20000000,
+          "ltv_pct": 125.0,
+          "positions": [
+            { "position_id": "P-009", "facility_id": "F-004", "position_type": "LOAN", "balance_amount": 18000000, "description": "Warehouse Drawdown" },
+            { "position_id": "P-010", "facility_id": "F-004", "position_type": "COMMITMENT", "balance_amount": 7000000, "description": "Undrawn Portion" }
+          ]
+        },
+        {
+          "facility_id": "F-005",
+          "facility_name": "Meridian Revolver",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 15000000,
+          "collateral_value": 25000000,
+          "ltv_pct": 60.0,
+          "positions": [
+            { "position_id": "P-011", "facility_id": "F-005", "position_type": "LOAN", "balance_amount": 9000000, "description": "Drawn Revolver" },
+            { "position_id": "P-012", "facility_id": "F-005", "position_type": "COMMITMENT", "balance_amount": 6000000, "description": "Undrawn Revolver" }
+          ]
+        }
+      ]
+    }
   }
 ]

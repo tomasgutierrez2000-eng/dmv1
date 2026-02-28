@@ -57,6 +57,36 @@ export interface LevelDefinition {
   source_references: IngredientField[];
 }
 
+/** Individual position (exposure) within a facility — for demo walkthrough. */
+export interface DemoPosition {
+  position_id: string;
+  facility_id: string;
+  position_type: string;
+  balance_amount: number;
+  description: string;
+}
+
+/** Curated demo data for interactive walkthrough examples. */
+export interface DemoFacility {
+  facility_id: string;
+  facility_name: string;
+  counterparty_id: string;
+  counterparty_name: string;
+  lob_segment_id: string;
+  desk_name: string;
+  portfolio_name: string;
+  lob_name: string;
+  committed_amt: number;
+  collateral_value: number;
+  ltv_pct: number;
+  positions: DemoPosition[];
+}
+
+/** Demo data bundle stored per CatalogueItem. */
+export interface DemoData {
+  facilities: DemoFacility[];
+}
+
 /** The unified catalogue item — replaces ParentMetric + MetricVariant. */
 export interface CatalogueItem {
   item_id: string;
@@ -78,6 +108,7 @@ export interface CatalogueItem {
   directly_displayed: boolean;
   status: 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
   executable_metric_id?: string | null;
+  demo_data?: DemoData;
 }
 
 /* ── Legacy types (kept for backward compat during migration) ── */

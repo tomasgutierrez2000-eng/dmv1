@@ -11,6 +11,8 @@ export const L2_CATEGORY_ORDER = [
   'Stress test & pipeline',
   'Ratings & metrics',
   'Exceptions & data quality',
+  'Liquidity snapshots',
+  'Capital snapshots',
 ] as const;
 
 export const L2_TABLE_CATEGORIES: Record<string, string> = {
@@ -40,6 +42,17 @@ export const L2_TABLE_CATEGORIES: Record<string, string> = {
   exception_event: 'Exceptions & data quality',
   risk_flag: 'Exceptions & data quality',
   data_quality_score_snapshot: 'Exceptions & data quality',
+  // Liquidity snapshots
+  securities_position_snapshot: 'Liquidity snapshots',
+  deposit_balance_snapshot: 'Liquidity snapshots',
+  wholesale_funding_snapshot: 'Liquidity snapshots',
+  liquidity_cash_flow_projection: 'Liquidity snapshots',
+  derivative_margin_snapshot: 'Liquidity snapshots',
+  // Capital snapshots
+  capital_instrument_snapshot: 'Capital snapshots',
+  capital_deduction_snapshot: 'Capital snapshots',
+  rwa_snapshot: 'Capital snapshots',
+  leverage_exposure_snapshot: 'Capital snapshots',
 };
 
 const DEFAULT_L2_CATEGORY = 'L2';

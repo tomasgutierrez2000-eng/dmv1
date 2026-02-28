@@ -1981,6 +1981,136 @@ const REPORT_DESCRIPTIONS = [
   'Large Financial Institution Shared National Credits', 'Country Exposure Report', 'Monthly Capital Assessment Report',
 ];
 
+/* ──────────────────── Liquidity & Capital seed data ──────────────────── */
+
+// hqla_classification_dim
+const HQLA_LEVEL_CODES = ['L1', 'L1', 'L1', 'L2A', 'L2A', 'L2B', 'L2B', 'NON_HQLA', 'NON_HQLA', 'NON_HQLA'];
+const HQLA_LEVEL_NAMES = ['Level 1 HQLA', 'Level 1 HQLA', 'Level 1 HQLA', 'Level 2A HQLA', 'Level 2A HQLA', 'Level 2B HQLA', 'Level 2B HQLA', 'Non-HQLA', 'Non-HQLA', 'Non-HQLA'];
+const HQLA_ASSET_SUBTYPES = ['UST', 'AGENCY_DEBT', 'SOVEREIGN_0RW', 'AGENCY_MBS', 'IG_CORP_BOND', 'IG_EQUITY', 'CLO_AAA', 'HY_CORP_BOND', 'CRE_LOAN', 'STRUCTURED_NOTE'];
+const HQLA_HAIRCUTS = [0.0, 0.0, 0.0, 0.15, 0.15, 0.50, 0.50, 1.0, 1.0, 1.0];
+const HQLA_CAPS: (number | null)[] = [null, null, null, 0.40, 0.40, 0.15, 0.15, null, null, null];
+
+// nsfr_factor_dim
+const NSFR_FACTOR_TYPES = ['ASF', 'ASF', 'ASF', 'ASF', 'ASF', 'RSF', 'RSF', 'RSF', 'RSF', 'RSF'];
+const NSFR_CATEGORY_CODES = ['CAPITAL', 'RETAIL_STABLE', 'RETAIL_LESS_STABLE', 'WHOLESALE_GT1Y', 'WHOLESALE_LT6M', 'HQLA_L1', 'HQLA_L2', 'PERFORMING_LOANS_LT1Y', 'PERFORMING_LOANS_GT1Y', 'OBS_COMMITMENTS'];
+const NSFR_CATEGORY_NAMES = ['Regulatory Capital', 'Stable Retail Deposits', 'Less Stable Retail Deposits', 'Wholesale Funding >1Y', 'Wholesale Funding <6M', 'Level 1 HQLA', 'Level 2 HQLA', 'Performing Loans <1Y', 'Performing Loans >1Y', 'Off-BS Commitments'];
+const NSFR_FACTOR_PCTS = [1.00, 0.95, 0.90, 1.00, 0.00, 0.00, 0.15, 0.50, 0.85, 0.05];
+const NSFR_MATURITY_BUCKETS: (string | null)[] = [null, null, null, '>=1y', '<6m', null, null, '<1y', '>=1y', null];
+
+// liquidity_time_bucket_dim
+const LIQ_BUCKET_CODES = ['ON', '1D', '2_7D', '8_15D', '16_30D', '31_90D', '91_180D', '181_365D', '1_3Y', 'GT3Y'];
+const LIQ_BUCKET_NAMES = ['Overnight', '1 Day', '2-7 Days', '8-15 Days', '16-30 Days', '31-90 Days', '91-180 Days', '181-365 Days', '1-3 Years', 'Greater than 3 Years'];
+const LIQ_BUCKET_START = [0, 1, 2, 8, 16, 31, 91, 181, 366, 1096];
+const LIQ_BUCKET_END = [0, 1, 7, 15, 30, 90, 180, 365, 1095, 99999];
+const LIQ_IS_LCR = ['Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N', 'N'];
+const LIQ_IS_NSFR = ['N', 'N', 'N', 'N', 'N', 'N', 'Y', 'Y', 'Y', 'Y'];
+
+// funding_source_type_dim
+const FUNDING_TYPE_CODES = ['RETAIL_DEMAND', 'RETAIL_TERM', 'WHOLESALE_UNSEC', 'REPO', 'FHLB', 'CP', 'FED_FUNDS', 'CB_FACILITY', 'INTERCOMPANY', 'EQUITY'];
+const FUNDING_TYPE_NAMES = ['Retail Demand Deposits', 'Retail Term Deposits', 'Wholesale Unsecured', 'Repurchase Agreements', 'FHLB Advances', 'Commercial Paper', 'Fed Funds Purchased', 'Central Bank Facility', 'Intercompany Funding', 'Equity / Capital'];
+const FUNDING_CATEGORIES = ['DEPOSIT', 'DEPOSIT', 'UNSECURED_WHOLESALE', 'SECURED_FUNDING', 'SECURED_FUNDING', 'UNSECURED_WHOLESALE', 'UNSECURED_WHOLESALE', 'CENTRAL_BANK', 'INTERCOMPANY', 'EQUITY'];
+const FUNDING_STABLE_FLAGS = ['Y', 'Y', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'Y'];
+const FUNDING_LCR_OUTFLOW = [0.03, 0.03, 0.40, 1.00, 0.25, 1.00, 1.00, 0.00, 0.00, 0.00];
+const FUNDING_ASF_FACTOR = [0.95, 0.95, 0.00, 0.00, 0.50, 0.00, 0.00, 0.00, 0.50, 1.00];
+
+// liquidity_stress_scenario_dim
+const LIQ_STRESS_SEVERITY = ['MILD', 'MILD', 'MODERATE', 'MODERATE', 'SEVERE', 'SEVERE', 'MODERATE', 'SEVERE', 'MILD', 'MODERATE'];
+const LIQ_STRESS_HORIZON = [30, 90, 30, 90, 30, 90, 365, 365, 30, 90];
+const LIQ_DEPOSIT_RUNOFF = [0.03, 0.05, 0.05, 0.08, 0.10, 0.15, 0.05, 0.12, 0.02, 0.06];
+const LIQ_WF_ROLLOVER = [0.90, 0.85, 0.80, 0.70, 0.50, 0.40, 0.75, 0.45, 0.95, 0.80];
+const LIQ_CL_DRAWDOWN = [0.05, 0.08, 0.10, 0.15, 0.25, 0.30, 0.10, 0.28, 0.03, 0.12];
+const LIQ_COLL_HAIRCUT = [0.02, 0.03, 0.05, 0.08, 0.12, 0.15, 0.05, 0.14, 0.01, 0.06];
+const LIQ_MV_SHOCK = [0.01, 0.02, 0.05, 0.08, 0.15, 0.20, 0.05, 0.18, 0.01, 0.05];
+
+// lcr_outflow_rate_dim
+const LCR_FLOW_DIRS = ['OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'INFLOW', 'INFLOW', 'INFLOW'];
+const LCR_RATE_CATS = ['RETAIL_STABLE_INSURED', 'RETAIL_LESS_STABLE', 'WHOLESALE_OPERATIONAL', 'WHOLESALE_NON_OPERATIONAL', 'SECURED_BY_L1', 'SECURED_BY_L2A', 'COMMITMENT_REVOCABLE', 'RETAIL_INFLOW', 'WHOLESALE_INFLOW', 'SECURED_LENDING_L1'];
+const LCR_RATE_NAMES = ['Retail Stable Insured', 'Retail Less Stable', 'Wholesale Operational', 'Wholesale Non-Operational', 'Secured by Level 1', 'Secured by Level 2A', 'Revocable Commitment', 'Retail Contractual Inflow', 'Wholesale Contractual Inflow', 'Secured Lending by Level 1'];
+const LCR_REG_RATES = [0.03, 0.10, 0.25, 0.40, 0.00, 0.15, 0.05, 0.50, 1.00, 0.00];
+
+// deposit_product_master
+const DEP_CATEGORIES = ['RETAIL_STABLE', 'RETAIL_STABLE', 'RETAIL_LESS_STABLE', 'RETAIL_LESS_STABLE', 'WHOLESALE_OPERATIONAL', 'WHOLESALE_OPERATIONAL', 'WHOLESALE_NON_OPERATIONAL', 'WHOLESALE_NON_OPERATIONAL', 'RETAIL_STABLE', 'WHOLESALE_NON_OPERATIONAL'];
+const DEP_TYPES = ['DEMAND', 'SAVINGS', 'MMDA', 'CD', 'DEMAND', 'DEMAND', 'DEMAND', 'NEGOTIABLE_CD', 'SAVINGS', 'BROKERED'];
+const DEP_INSURED = ['Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'Y', 'N'];
+const DEP_TRANSACTIONAL = ['Y', 'N', 'N', 'N', 'Y', 'Y', 'N', 'N', 'N', 'N'];
+const DEP_BROKERED = ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'Y'];
+const DEP_EARLY_PENALTY = ['N', 'N', 'N', 'Y', 'N', 'N', 'N', 'Y', 'N', 'N'];
+const DEP_LCR_OUTFLOW = [0.03, 0.03, 0.10, 0.10, 0.25, 0.25, 0.40, 0.40, 0.05, 1.00];
+const DEP_NSFR_ASF = [0.95, 0.95, 0.90, 0.90, 0.50, 0.50, 0.00, 0.00, 0.95, 0.00];
+const DEP_MIN_BALANCE: (number | null)[] = [null, null, null, null, 250000, 1000000, null, null, null, null];
+
+// wholesale_funding_instrument_master
+const WF_INSTRUMENT_TYPES = ['REPO', 'REVERSE_REPO', 'FED_FUNDS_PURCHASED', 'CP', 'FHLB_ADVANCE', 'REPO', 'CP', 'CB_REPO', 'FED_FUNDS_PURCHASED', 'FHLB_ADVANCE'];
+const WF_NOTIONALS = [500_000_000, 300_000_000, 200_000_000, 150_000_000, 1_000_000_000, 750_000_000, 250_000_000, 400_000_000, 100_000_000, 800_000_000];
+const WF_RATES = [5.30, 5.25, 5.33, 5.45, 5.10, 5.28, 5.50, 4.75, 5.35, 5.15];
+const WF_RATE_TYPES = ['FIXED', 'FIXED', 'FIXED', 'FIXED', 'FIXED', 'FLOATING', 'FIXED', 'FIXED', 'FIXED', 'FLOATING'];
+const WF_SECURED = ['Y', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'N', 'Y'];
+const WF_CALLABLE = ['N', 'N', 'N', 'N', 'Y', 'N', 'N', 'N', 'N', 'Y'];
+const WF_LCR_OUTFLOW = [1.00, 0.00, 1.00, 1.00, 0.25, 1.00, 1.00, 0.00, 1.00, 0.25];
+const WF_NSFR_ASF = [0.00, 0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.50];
+const WF_FUNDING_SRC_TYPE_IDS = [4, 4, 7, 6, 5, 4, 6, 8, 7, 5]; // FK → funding_source_type_dim
+
+// securities_position_master
+const SEC_ACCOUNTING = ['AFS', 'HTM', 'AFS', 'HTM', 'AFS', 'HFT', 'AFS', 'HTM', 'AFS', 'HFT'];
+const SEC_PAR_AMOUNTS = [1_000_000_000, 750_000_000, 500_000_000, 2_000_000_000, 300_000_000, 100_000_000, 400_000_000, 1_500_000_000, 200_000_000, 150_000_000];
+const SEC_ENCUMBERED = ['N', 'N', 'Y', 'N', 'N', 'N', 'Y', 'N', 'Y', 'N'];
+const SEC_ENCUMBRANCE_TYPES: (string | null)[] = [null, null, 'REPO', null, null, null, 'FHLB', null, 'SWAP_MARGIN', null];
+const SEC_ASSET_CLASSES = ['UST', 'AGENCY', 'AGENCY_MBS', 'UST', 'IG_CORP', 'EQUITY', 'AGENCY_MBS', 'SOVEREIGN', 'IG_CORP', 'MUNI'];
+const SEC_RATINGS = ['AAA', 'AA+', 'AA+', 'AAA', 'A', 'NR', 'AA', 'AAA', 'BBB+', 'AA'];
+const SEC_MATURITY_DAYS = [365, 730, 1825, 180, 1095, 0, 2555, 3650, 547, 1460];
+const SEC_HQLA_IDS: (number | null)[] = [1, 2, 4, 1, 5, 6, 4, 3, 8, 9];
+
+// off_balance_sheet_commitment_master
+const OBS_TYPES = ['UNDRAWN_REVOLVER', 'STANDBY_LC', 'TRADE_LC', 'GUARANTEE', 'LIQUIDITY_FACILITY', 'UNDRAWN_REVOLVER', 'STANDBY_LC', 'GUARANTEE', 'UNDRAWN_REVOLVER', 'LIQUIDITY_FACILITY'];
+const OBS_TOTAL_AMT = [500_000_000, 100_000_000, 50_000_000, 200_000_000, 300_000_000, 750_000_000, 75_000_000, 150_000_000, 250_000_000, 400_000_000];
+const OBS_DRAWN_AMT = [200_000_000, 10_000_000, 30_000_000, 0, 0, 300_000_000, 5_000_000, 0, 100_000_000, 0];
+const OBS_UNDRAWN_AMT = [300_000_000, 90_000_000, 20_000_000, 200_000_000, 300_000_000, 450_000_000, 70_000_000, 150_000_000, 150_000_000, 400_000_000];
+const OBS_REVOCABLE = ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'Y', 'N'];
+const OBS_LCR_DRAWDOWN = [0.10, 0.10, 0.10, 0.10, 1.00, 0.10, 0.10, 0.10, 0.05, 1.00];
+const OBS_NOTICE_DAYS: (number | null)[] = [null, null, null, null, null, null, null, null, 30, null];
+const OBS_HISTORICAL_DRAWDOWN = [0.08, 0.05, 0.15, 0.02, 0.50, 0.07, 0.04, 0.01, 0.03, 0.45];
+
+// central_bank_facility_master
+const CB_NAMES = ['Federal Reserve', 'Federal Reserve', 'ECB', 'Bank of England', 'Bank of Japan', 'Federal Reserve', 'ECB', 'SNB', 'Bank of Canada', 'MAS'];
+const CB_TYPES = ['DISCOUNT_WINDOW', 'BTFP', 'STANDING_REPO', 'DISCOUNT_WINDOW', 'DISCOUNT_WINDOW', 'STANDING_REPO', 'TLTRO', 'DISCOUNT_WINDOW', 'STANDING_FACILITY', 'MAS_STANDING'];
+const CB_CAPACITY = [5_000_000_000, 2_000_000_000, 3_000_000_000, 1_000_000_000, 1_500_000_000, 4_000_000_000, 2_500_000_000, 500_000_000, 800_000_000, 600_000_000];
+const CB_DRAWN = [0, 0, 0, 0, 0, 0, 500_000_000, 0, 0, 0];
+const CB_AVAILABLE = [5_000_000_000, 2_000_000_000, 3_000_000_000, 1_000_000_000, 1_500_000_000, 4_000_000_000, 2_000_000_000, 500_000_000, 800_000_000, 600_000_000];
+const CB_COLLATERAL_PLEDGED = [3_500_000_000, 1_800_000_000, 2_500_000_000, 750_000_000, 1_200_000_000, 3_000_000_000, 2_200_000_000, 400_000_000, 600_000_000, 450_000_000];
+const CB_RATES = [5.50, 4.76, 4.50, 5.25, 0.10, 5.30, 4.00, 1.75, 5.00, 3.50];
+const CB_CONTINGENT = ['Y', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y'];
+const CB_COUNT_LCR = ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N'];
+
+// capital_deduction_type_dim
+const CAP_DED_CODES = ['GOODWILL', 'OTHER_INTANGIBLES', 'DTA_TIMING', 'DTA_CARRYFORWARD', 'MORTGAGE_SERVICING', 'SIGNIFICANT_INVESTMENTS', 'DEFINED_BENEFIT_PENSION', 'GAIN_ON_SALE', 'AOCI_FILTER', 'MINORITY_INTEREST'];
+const CAP_DED_NAMES = ['Goodwill', 'Other Intangible Assets', 'DTA Arising from Timing Differences', 'DTA Carryforward', 'Mortgage Servicing Assets', 'Significant Investments in FIs', 'Defined Benefit Pension Fund Net Assets', 'Gain on Sale from Securitization', 'AOCI Filter', 'Minority Interest Excess'];
+const CAP_DED_TIERS = ['CET1', 'CET1', 'CET1', 'CET1', 'CET1', 'CET1', 'CET1', 'CET1', 'CET1', 'CET1'];
+const CAP_DED_THRESHOLD_FLAG = ['N', 'N', 'Y', 'N', 'Y', 'Y', 'N', 'N', 'N', 'N'];
+const CAP_DED_THRESHOLD_PCT: (number | null)[] = [null, null, 0.10, null, 0.10, 0.10, null, null, null, null];
+const CAP_DED_RW_BELOW: (number | null)[] = [null, null, 2.50, null, 2.50, 2.50, null, null, null, null];
+
+// capital_buffer_requirement_dim
+const CAP_BUF_CODES = ['CCB', 'CCYB_US', 'CCYB_GB', 'CCYB_DE', 'GSIB_B1', 'GSIB_B2', 'GSIB_B3', 'GSIB_B4', 'SCB', 'DSIB'];
+const CAP_BUF_NAMES = ['Capital Conservation Buffer', 'Countercyclical Buffer - US', 'Countercyclical Buffer - UK', 'Countercyclical Buffer - Germany', 'G-SIB Bucket 1', 'G-SIB Bucket 2', 'G-SIB Bucket 3', 'G-SIB Bucket 4', 'Stress Capital Buffer', 'D-SIB Surcharge'];
+const CAP_BUF_RATES = [0.025, 0.00, 0.02, 0.0075, 0.01, 0.015, 0.02, 0.025, 0.025, 0.01];
+const CAP_BUF_COUNTRY: (string | null)[] = [null, 'US', 'GB', 'DE', null, null, null, null, null, null];
+
+// rwa_risk_type_dim
+const RWA_TYPE_CODES = ['CREDIT_SA', 'CREDIT_IRB', 'MARKET_SA', 'MARKET_IMA', 'OPERATIONAL_SA', 'OPERATIONAL_AMA', 'CVA_SA', 'CVA_BA', 'SECURITIZATION', 'EQUITY'];
+const RWA_TYPE_NAMES = ['Credit Risk - Standardized', 'Credit Risk - IRB', 'Market Risk - Standardized', 'Market Risk - Internal Models', 'Operational Risk - Standardized', 'Operational Risk - AMA', 'CVA - Standardized', 'CVA - Basic', 'Securitization', 'Equity Risk'];
+const RWA_RISK_CATEGORIES = ['CREDIT', 'CREDIT', 'MARKET', 'MARKET', 'OPERATIONAL', 'OPERATIONAL', 'CVA', 'CVA', 'CREDIT', 'MARKET'];
+const RWA_CALC_APPROACHES = ['STANDARDIZED', 'ADVANCED', 'STANDARDIZED', 'ADVANCED', 'STANDARDIZED', 'ADVANCED', 'STANDARDIZED', 'STANDARDIZED', 'STANDARDIZED', 'STANDARDIZED'];
+
+// capital_instrument_master
+const CAP_INST_TIERS = ['CET1', 'CET1', 'CET1', 'AT1', 'AT1', 'AT1', 'T2', 'T2', 'T2', 'T2'];
+const CAP_INST_TYPES = ['COMMON_STOCK', 'RETAINED_EARNINGS', 'AOCI', 'PREFERRED_PERP', 'CONTINGENT_CONVERTIBLE', 'PREFERRED_PERP', 'SUB_DEBT', 'SUB_DEBT', 'GENERAL_PROVISIONS', 'SUB_DEBT'];
+const CAP_INST_PAR = [25_000_000_000, 40_000_000_000, -2_000_000_000, 5_000_000_000, 3_000_000_000, 2_000_000_000, 8_000_000_000, 5_000_000_000, 1_500_000_000, 4_000_000_000];
+const CAP_INST_COUPON: (number | null)[] = [null, null, null, 0.0525, 0.0700, 0.0600, 0.0475, 0.0425, null, 0.0500];
+const CAP_INST_MATURITY: (string | null)[] = [null, null, null, null, null, null, '2034-06-15', '2032-09-01', null, '2033-03-15'];
+const CAP_INST_CALL: (string | null)[] = [null, null, null, '2028-06-15', '2027-12-01', '2029-03-15', '2029-06-15', '2027-09-01', null, '2028-03-15'];
+const CAP_INST_GRANDFATHERED = ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N'];
+const CAP_INST_LOSS_MECHANISM: (string | null)[] = [null, null, null, 'WRITE_DOWN', 'CONVERSION', 'WRITE_DOWN', null, null, null, null];
+
 /* ───────────────────────────── N = 10 ──────────────────────────── */
 
 const N = 10;
@@ -3342,6 +3472,234 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
     }
 
+    /* ──────────── hqla_classification_dim ──────────── */
+    case 'hqla_classification_dim':
+      if (columnName === 'hqla_classification_id') return idx + 1;
+      if (columnName === 'hqla_level_code') return HQLA_LEVEL_CODES[idx];
+      if (columnName === 'hqla_level_name') return HQLA_LEVEL_NAMES[idx];
+      if (columnName === 'asset_subtype_code') return HQLA_ASSET_SUBTYPES[idx];
+      if (columnName === 'haircut_pct') return HQLA_HAIRCUTS[idx];
+      if (columnName === 'cap_pct') return HQLA_CAPS[idx];
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[idx];
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── nsfr_factor_dim ──────────── */
+    case 'nsfr_factor_dim':
+      if (columnName === 'nsfr_factor_id') return idx + 1;
+      if (columnName === 'factor_type') return NSFR_FACTOR_TYPES[idx];
+      if (columnName === 'category_code') return NSFR_CATEGORY_CODES[idx];
+      if (columnName === 'category_name') return NSFR_CATEGORY_NAMES[idx];
+      if (columnName === 'factor_pct') return NSFR_FACTOR_PCTS[idx];
+      if (columnName === 'residual_maturity_bucket') return NSFR_MATURITY_BUCKETS[idx];
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[idx];
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── liquidity_time_bucket_dim ──────────── */
+    case 'liquidity_time_bucket_dim':
+      if (columnName === 'liquidity_bucket_id') return idx + 1;
+      if (columnName === 'bucket_code') return LIQ_BUCKET_CODES[idx];
+      if (columnName === 'bucket_name') return LIQ_BUCKET_NAMES[idx];
+      if (columnName === 'bucket_start_days') return LIQ_BUCKET_START[idx];
+      if (columnName === 'bucket_end_days') return LIQ_BUCKET_END[idx];
+      if (columnName === 'is_lcr_bucket_flag') return LIQ_IS_LCR[idx];
+      if (columnName === 'is_nsfr_bucket_flag') return LIQ_IS_NSFR[idx];
+      if (columnName === 'display_order') return idx + 1;
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── funding_source_type_dim ──────────── */
+    case 'funding_source_type_dim':
+      if (columnName === 'funding_source_type_id') return idx + 1;
+      if (columnName === 'funding_source_type_code') return FUNDING_TYPE_CODES[idx];
+      if (columnName === 'funding_source_type_name') return FUNDING_TYPE_NAMES[idx];
+      if (columnName === 'funding_category') return FUNDING_CATEGORIES[idx];
+      if (columnName === 'is_stable_funding_flag') return FUNDING_STABLE_FLAGS[idx];
+      if (columnName === 'lcr_outflow_rate_pct') return FUNDING_LCR_OUTFLOW[idx];
+      if (columnName === 'asf_factor_pct') return FUNDING_ASF_FACTOR[idx];
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── liquidity_stress_scenario_dim ──────────── */
+    case 'liquidity_stress_scenario_dim':
+      if (columnName === 'liquidity_scenario_id') return idx + 1;
+      if (columnName === 'scenario_id') return idx + 1;
+      if (columnName === 'scenario_severity') return LIQ_STRESS_SEVERITY[idx];
+      if (columnName === 'scenario_horizon_days') return LIQ_STRESS_HORIZON[idx];
+      if (columnName === 'deposit_runoff_rate_pct') return LIQ_DEPOSIT_RUNOFF[idx];
+      if (columnName === 'wholesale_funding_rollover_pct') return LIQ_WF_ROLLOVER[idx];
+      if (columnName === 'credit_line_drawdown_pct') return LIQ_CL_DRAWDOWN[idx];
+      if (columnName === 'collateral_haircut_stress_pct') return LIQ_COLL_HAIRCUT[idx];
+      if (columnName === 'market_value_shock_pct') return LIQ_MV_SHOCK[idx];
+      if (columnName === 'contingent_funding_probability_pct') return 0;
+      if (columnName === 'is_regulatory_flag') return idx < 5 ? 'Y' : 'N';
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── lcr_outflow_rate_dim ──────────── */
+    case 'lcr_outflow_rate_dim':
+      if (columnName === 'lcr_rate_id') return idx + 1;
+      if (columnName === 'flow_direction') return LCR_FLOW_DIRS[idx];
+      if (columnName === 'rate_category_code') return LCR_RATE_CATS[idx];
+      if (columnName === 'rate_category_name') return LCR_RATE_NAMES[idx];
+      if (columnName === 'regulatory_rate_pct') return LCR_REG_RATES[idx];
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[0]; // US
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── deposit_product_master ──────────── */
+    case 'deposit_product_master':
+      if (columnName === 'deposit_product_id') return idx + 1;
+      if (columnName === 'product_node_id') return idx + 1;
+      if (columnName === 'legal_entity_id') return (idx % 5) + 1;
+      if (columnName === 'currency_code') return CURRENCY_CODES[idx];
+      if (columnName === 'deposit_category') return DEP_CATEGORIES[idx];
+      if (columnName === 'deposit_type') return DEP_TYPES[idx];
+      if (columnName === 'is_insured_flag') return DEP_INSURED[idx];
+      if (columnName === 'is_transactional_flag') return DEP_TRANSACTIONAL[idx];
+      if (columnName === 'is_brokered_flag') return DEP_BROKERED[idx];
+      if (columnName === 'early_withdrawal_penalty_flag') return DEP_EARLY_PENALTY[idx];
+      if (columnName === 'lcr_outflow_rate_pct') return DEP_LCR_OUTFLOW[idx];
+      if (columnName === 'nsfr_asf_factor_pct') return DEP_NSFR_ASF[idx];
+      if (columnName === 'min_balance_for_operational') return DEP_MIN_BALANCE[idx];
+      break;
+
+    /* ──────────── wholesale_funding_instrument_master ──────────── */
+    case 'wholesale_funding_instrument_master':
+      if (columnName === 'wholesale_funding_id') return idx + 1;
+      if (columnName === 'funding_source_type_id') return WF_FUNDING_SRC_TYPE_IDS[idx];
+      if (columnName === 'counterparty_id') return idx + 1;
+      if (columnName === 'legal_entity_id') return (idx % 5) + 1;
+      if (columnName === 'currency_code') return CURRENCY_CODES[idx];
+      if (columnName === 'instrument_type') return WF_INSTRUMENT_TYPES[idx];
+      if (columnName === 'notional_amount') return WF_NOTIONALS[idx];
+      if (columnName === 'issue_date') return '2024-01-15';
+      if (columnName === 'maturity_date') return ['2024-04-15', '2024-07-15', '2024-02-15', '2024-06-15', '2025-01-15', '2024-10-15', '2024-03-15', '2024-09-15', '2024-05-15', '2026-01-15'][idx];
+      if (columnName === 'rate_pct') return WF_RATES[idx];
+      if (columnName === 'rate_type') return WF_RATE_TYPES[idx];
+      if (columnName === 'is_secured_flag') return WF_SECURED[idx];
+      if (columnName === 'collateral_asset_id') return WF_SECURED[idx] === 'Y' ? idx + 1 : null;
+      if (columnName === 'is_callable_flag') return WF_CALLABLE[idx];
+      if (columnName === 'call_date') return WF_CALLABLE[idx] === 'Y' ? '2024-12-15' : null;
+      if (columnName === 'lcr_outflow_rate_pct') return WF_LCR_OUTFLOW[idx];
+      if (columnName === 'nsfr_asf_factor_pct') return WF_NSFR_ASF[idx];
+      break;
+
+    /* ──────────── securities_position_master ──────────── */
+    case 'securities_position_master':
+      if (columnName === 'securities_position_id') return idx + 1;
+      if (columnName === 'instrument_id') return idx + 1;
+      if (columnName === 'legal_entity_id') return (idx % 5) + 1;
+      if (columnName === 'hqla_classification_id') return SEC_HQLA_IDS[idx];
+      if (columnName === 'currency_code') return CURRENCY_CODES[idx];
+      if (columnName === 'accounting_portfolio') return SEC_ACCOUNTING[idx];
+      if (columnName === 'par_amount') return SEC_PAR_AMOUNTS[idx];
+      if (columnName === 'is_encumbered_flag') return SEC_ENCUMBERED[idx];
+      if (columnName === 'encumbrance_type') return SEC_ENCUMBRANCE_TYPES[idx];
+      if (columnName === 'encumbrance_counterparty_id') return SEC_ENCUMBERED[idx] === 'Y' ? (idx % 5) + 1 : null;
+      if (columnName === 'encumbrance_maturity_date') return SEC_ENCUMBERED[idx] === 'Y' ? '2024-12-31' : null;
+      if (columnName === 'issuer_counterparty_id') return idx + 1;
+      if (columnName === 'issuer_country_code') return COUNTRY_CODES[idx];
+      if (columnName === 'credit_rating_external') return SEC_RATINGS[idx];
+      if (columnName === 'asset_class') return SEC_ASSET_CLASSES[idx];
+      if (columnName === 'remaining_maturity_days') return SEC_MATURITY_DAYS[idx];
+      break;
+
+    /* ──────────── off_balance_sheet_commitment_master ──────────── */
+    case 'off_balance_sheet_commitment_master':
+      if (columnName === 'obs_commitment_id') return idx + 1;
+      if (columnName === 'facility_id') return idx + 1;
+      if (columnName === 'counterparty_id') return idx + 1;
+      if (columnName === 'legal_entity_id') return (idx % 5) + 1;
+      if (columnName === 'currency_code') return CURRENCY_CODES[idx];
+      if (columnName === 'product_node_id') return idx + 1;
+      if (columnName === 'commitment_type') return OBS_TYPES[idx];
+      if (columnName === 'total_commitment_amt') return OBS_TOTAL_AMT[idx];
+      if (columnName === 'drawn_amt') return OBS_DRAWN_AMT[idx];
+      if (columnName === 'undrawn_amt') return OBS_UNDRAWN_AMT[idx];
+      if (columnName === 'is_unconditionally_revocable_flag') return OBS_REVOCABLE[idx];
+      if (columnName === 'lcr_drawdown_rate_pct') return OBS_LCR_DRAWDOWN[idx];
+      if (columnName === 'maturity_date') return '2026-06-30';
+      if (columnName === 'contractual_notice_period_days') return OBS_NOTICE_DAYS[idx];
+      if (columnName === 'historical_drawdown_pct') return OBS_HISTORICAL_DRAWDOWN[idx];
+      break;
+
+    /* ──────────── central_bank_facility_master ──────────── */
+    case 'central_bank_facility_master':
+      if (columnName === 'cb_facility_id') return idx + 1;
+      if (columnName === 'legal_entity_id') return (idx % 5) + 1;
+      if (columnName === 'central_bank_name') return CB_NAMES[idx];
+      if (columnName === 'facility_type') return CB_TYPES[idx];
+      if (columnName === 'currency_code') return CURRENCY_CODES[idx];
+      if (columnName === 'total_capacity_amt') return CB_CAPACITY[idx];
+      if (columnName === 'drawn_amt') return CB_DRAWN[idx];
+      if (columnName === 'available_amt') return CB_AVAILABLE[idx];
+      if (columnName === 'collateral_pledged_amt') return CB_COLLATERAL_PLEDGED[idx];
+      if (columnName === 'rate_pct') return CB_RATES[idx];
+      if (columnName === 'maturity_date') return null;
+      if (columnName === 'is_contingent_flag') return CB_CONTINGENT[idx];
+      if (columnName === 'count_in_lcr_buffer_flag') return CB_COUNT_LCR[idx];
+      break;
+
+    /* ──────────── capital_deduction_type_dim ──────────── */
+    case 'capital_deduction_type_dim':
+      if (columnName === 'deduction_type_id') return idx + 1;
+      if (columnName === 'deduction_type_code') return CAP_DED_CODES[idx];
+      if (columnName === 'deduction_type_name') return CAP_DED_NAMES[idx];
+      if (columnName === 'deducted_from_tier') return CAP_DED_TIERS[idx];
+      if (columnName === 'threshold_applicable_flag') return CAP_DED_THRESHOLD_FLAG[idx];
+      if (columnName === 'threshold_pct') return CAP_DED_THRESHOLD_PCT[idx];
+      if (columnName === 'risk_weight_if_below_threshold') return CAP_DED_RW_BELOW[idx];
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[0]; // US
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── capital_buffer_requirement_dim ──────────── */
+    case 'capital_buffer_requirement_dim':
+      if (columnName === 'buffer_requirement_id') return idx + 1;
+      if (columnName === 'buffer_type_code') return CAP_BUF_CODES[idx];
+      if (columnName === 'buffer_type_name') return CAP_BUF_NAMES[idx];
+      if (columnName === 'buffer_rate_pct') return CAP_BUF_RATES[idx];
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[idx];
+      if (columnName === 'country_code') return CAP_BUF_COUNTRY[idx];
+      if (columnName === 'effective_from_date') return '2024-01-01';
+      if (columnName === 'effective_to_date') return '9999-12-31';
+      if (columnName === 'announced_date') return '2023-10-01';
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── rwa_risk_type_dim ──────────── */
+    case 'rwa_risk_type_dim':
+      if (columnName === 'rwa_risk_type_id') return idx + 1;
+      if (columnName === 'rwa_risk_type_code') return RWA_TYPE_CODES[idx];
+      if (columnName === 'rwa_risk_type_name') return RWA_TYPE_NAMES[idx];
+      if (columnName === 'risk_category') return RWA_RISK_CATEGORIES[idx];
+      if (columnName === 'calculation_approach') return RWA_CALC_APPROACHES[idx];
+      if (columnName === 'active_flag') return 'Y';
+      break;
+
+    /* ──────────── capital_instrument_master ──────────── */
+    case 'capital_instrument_master':
+      if (columnName === 'capital_instrument_id') return idx + 1;
+      if (columnName === 'instrument_id') return idx + 1;
+      if (columnName === 'legal_entity_id') return (idx % 5) + 1;
+      if (columnName === 'currency_code') return CURRENCY_CODES[idx];
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[idx];
+      if (columnName === 'capital_tier') return CAP_INST_TIERS[idx];
+      if (columnName === 'instrument_type') return CAP_INST_TYPES[idx];
+      if (columnName === 'par_value_amt') return CAP_INST_PAR[idx];
+      if (columnName === 'issue_date') return '2020-01-15';
+      if (columnName === 'maturity_date') return CAP_INST_MATURITY[idx];
+      if (columnName === 'coupon_rate_pct') return CAP_INST_COUPON[idx];
+      if (columnName === 'first_call_date') return CAP_INST_CALL[idx];
+      if (columnName === 'is_grandfathered_flag') return CAP_INST_GRANDFATHERED[idx];
+      if (columnName === 'amortization_start_date') return null;
+      if (columnName === 'conversion_trigger_pct') return CAP_INST_TIERS[idx] === 'AT1' ? 0.0525 : null;
+      if (columnName === 'loss_absorption_mechanism') return CAP_INST_LOSS_MECHANISM[idx];
+      if (columnName === 'is_regulatory_eligible_flag') return 'Y';
+      break;
+
     default:
       break;
   }
@@ -3364,6 +3722,10 @@ const DIMENSION_TABLES = new Set([
   'fr2590_category_dim', 'counterparty_role_dim', 'rating_scale_dim', 'crm_type_dim',
   'date_dim', 'date_time_dim', 'regulatory_capital_basis_dim', 'risk_mitigant_type_dim',
   'reporting_calendar_dim', 'scenario_dim',
+  // Liquidity & Capital reference dims
+  'hqla_classification_dim', 'nsfr_factor_dim', 'liquidity_time_bucket_dim',
+  'funding_source_type_dim', 'liquidity_stress_scenario_dim', 'lcr_outflow_rate_dim',
+  'capital_deduction_type_dim', 'capital_buffer_requirement_dim', 'rwa_risk_type_dim',
 ]);
 
 /** Tables that should stay at 10 rows even when scaling (internal config/metadata). */

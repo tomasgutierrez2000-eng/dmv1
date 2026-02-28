@@ -1461,3 +1461,285 @@ CREATE TABLE IF NOT EXISTS l1.scenario_dim (
 ,
   CONSTRAINT fk_scenario_dim_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
+
+CREATE TABLE IF NOT EXISTS l1.hqla_classification_dim (
+  hqla_classification_id BIGINT NOT NULL PRIMARY KEY,
+  hqla_level_code VARCHAR(20) NOT NULL,
+  hqla_level_name VARCHAR(200),
+  asset_subtype_code VARCHAR(50) NOT NULL,
+  haircut_pct DECIMAL(10,4) NOT NULL,
+  cap_pct DECIMAL(10,4),
+  jurisdiction_code VARCHAR(20),
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+,
+  CONSTRAINT fk_hqla_classification_dim_jurisdiction_code FOREIGN KEY (jurisdiction_code) REFERENCES l1.regulatory_jurisdiction(jurisdiction_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.nsfr_factor_dim (
+  nsfr_factor_id BIGINT NOT NULL PRIMARY KEY,
+  factor_type VARCHAR(10) NOT NULL,
+  category_code VARCHAR(50) NOT NULL,
+  category_name VARCHAR(200),
+  factor_pct DECIMAL(10,4) NOT NULL,
+  residual_maturity_bucket VARCHAR(30),
+  jurisdiction_code VARCHAR(20),
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+,
+  CONSTRAINT fk_nsfr_factor_dim_jurisdiction_code FOREIGN KEY (jurisdiction_code) REFERENCES l1.regulatory_jurisdiction(jurisdiction_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.liquidity_time_bucket_dim (
+  liquidity_bucket_id BIGINT NOT NULL PRIMARY KEY,
+  bucket_code VARCHAR(20) NOT NULL,
+  bucket_name VARCHAR(200),
+  bucket_start_days INTEGER NOT NULL,
+  bucket_end_days INTEGER NOT NULL,
+  is_lcr_bucket_flag CHAR(1) NOT NULL DEFAULT 'N',
+  is_nsfr_bucket_flag CHAR(1) NOT NULL DEFAULT 'N',
+  display_order INTEGER,
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+);
+
+CREATE TABLE IF NOT EXISTS l1.funding_source_type_dim (
+  funding_source_type_id BIGINT NOT NULL PRIMARY KEY,
+  funding_source_type_code VARCHAR(30) NOT NULL,
+  funding_source_type_name VARCHAR(200),
+  funding_category VARCHAR(50) NOT NULL,
+  is_stable_funding_flag CHAR(1) NOT NULL DEFAULT 'N',
+  lcr_outflow_rate_pct DECIMAL(10,4),
+  asf_factor_pct DECIMAL(10,4),
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+);
+
+CREATE TABLE IF NOT EXISTS l1.liquidity_stress_scenario_dim (
+  liquidity_scenario_id BIGINT NOT NULL PRIMARY KEY,
+  scenario_id BIGINT NOT NULL,
+  scenario_severity VARCHAR(30) NOT NULL,
+  scenario_horizon_days INTEGER NOT NULL,
+  deposit_runoff_rate_pct DECIMAL(10,4),
+  wholesale_funding_rollover_pct DECIMAL(10,4),
+  credit_line_drawdown_pct DECIMAL(10,4),
+  collateral_haircut_stress_pct DECIMAL(10,4),
+  market_value_shock_pct DECIMAL(10,4),
+  contingent_funding_probability_pct DECIMAL(10,4),
+  is_regulatory_flag CHAR(1) NOT NULL DEFAULT 'N',
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+,
+  CONSTRAINT fk_liquidity_stress_scenario_dim_scenario_id FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim(scenario_id)
+);
+
+CREATE TABLE IF NOT EXISTS l1.lcr_outflow_rate_dim (
+  lcr_rate_id BIGINT NOT NULL PRIMARY KEY,
+  flow_direction VARCHAR(10) NOT NULL,
+  rate_category_code VARCHAR(50) NOT NULL,
+  rate_category_name VARCHAR(200),
+  regulatory_rate_pct DECIMAL(10,4) NOT NULL,
+  jurisdiction_code VARCHAR(20),
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+,
+  CONSTRAINT fk_lcr_outflow_rate_dim_jurisdiction_code FOREIGN KEY (jurisdiction_code) REFERENCES l1.regulatory_jurisdiction(jurisdiction_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.deposit_product_master (
+  deposit_product_id BIGINT NOT NULL PRIMARY KEY,
+  product_node_id BIGINT,
+  legal_entity_id BIGINT NOT NULL,
+  currency_code VARCHAR(20) NOT NULL,
+  deposit_category VARCHAR(30) NOT NULL,
+  deposit_type VARCHAR(50) NOT NULL,
+  is_insured_flag CHAR(1) NOT NULL DEFAULT 'Y',
+  is_transactional_flag CHAR(1) NOT NULL DEFAULT 'N',
+  is_brokered_flag CHAR(1) NOT NULL DEFAULT 'N',
+  early_withdrawal_penalty_flag CHAR(1) NOT NULL DEFAULT 'N',
+  lcr_outflow_rate_pct DECIMAL(10,4) NOT NULL,
+  nsfr_asf_factor_pct DECIMAL(10,4),
+  min_balance_for_operational DECIMAL(18,2),
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_deposit_product_master_product_node_id FOREIGN KEY (product_node_id) REFERENCES l1.enterprise_product_taxonomy(product_node_id),
+  CONSTRAINT fk_deposit_product_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_deposit_product_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.wholesale_funding_instrument_master (
+  wholesale_funding_id BIGINT NOT NULL PRIMARY KEY,
+  funding_source_type_id BIGINT NOT NULL,
+  counterparty_id BIGINT NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  currency_code VARCHAR(20) NOT NULL,
+  instrument_type VARCHAR(50) NOT NULL,
+  notional_amount DECIMAL(18,2) NOT NULL,
+  issue_date DATE NOT NULL,
+  maturity_date DATE,
+  rate_pct DECIMAL(10,4),
+  rate_type VARCHAR(20),
+  is_secured_flag CHAR(1) NOT NULL DEFAULT 'N',
+  collateral_asset_id BIGINT,
+  is_callable_flag CHAR(1) NOT NULL DEFAULT 'N',
+  call_date DATE,
+  lcr_outflow_rate_pct DECIMAL(10,4),
+  nsfr_asf_factor_pct DECIMAL(10,4),
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_wholesale_funding_instrument_master_funding_source_type_id FOREIGN KEY (funding_source_type_id) REFERENCES l1.funding_source_type_dim(funding_source_type_id),
+  CONSTRAINT fk_wholesale_funding_instrument_master_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_wholesale_funding_instrument_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_wholesale_funding_instrument_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_wholesale_funding_instrument_master_collateral_asset_id FOREIGN KEY (collateral_asset_id) REFERENCES l1.collateral_asset_master(collateral_asset_id)
+);
+
+CREATE TABLE IF NOT EXISTS l1.securities_position_master (
+  securities_position_id BIGINT NOT NULL PRIMARY KEY,
+  instrument_id BIGINT NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  hqla_classification_id BIGINT,
+  currency_code VARCHAR(20) NOT NULL,
+  accounting_portfolio VARCHAR(30) NOT NULL,
+  par_amount DECIMAL(18,2) NOT NULL,
+  is_encumbered_flag CHAR(1) NOT NULL DEFAULT 'N',
+  encumbrance_type VARCHAR(50),
+  encumbrance_counterparty_id BIGINT,
+  encumbrance_maturity_date DATE,
+  issuer_counterparty_id BIGINT,
+  issuer_country_code VARCHAR(20),
+  credit_rating_external VARCHAR(20),
+  asset_class VARCHAR(50) NOT NULL,
+  remaining_maturity_days INTEGER,
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_securities_position_master_instrument_id FOREIGN KEY (instrument_id) REFERENCES l1.instrument_master(instrument_id),
+  CONSTRAINT fk_securities_position_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_securities_position_master_hqla_classification_id FOREIGN KEY (hqla_classification_id) REFERENCES l1.hqla_classification_dim(hqla_classification_id),
+  CONSTRAINT fk_securities_position_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_securities_position_master_encumbrance_counterparty_id FOREIGN KEY (encumbrance_counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_securities_position_master_issuer_counterparty_id FOREIGN KEY (issuer_counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_securities_position_master_issuer_country_code FOREIGN KEY (issuer_country_code) REFERENCES l1.country_dim(country_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.off_balance_sheet_commitment_master (
+  obs_commitment_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT,
+  counterparty_id BIGINT NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  currency_code VARCHAR(20) NOT NULL,
+  product_node_id BIGINT,
+  commitment_type VARCHAR(50) NOT NULL,
+  total_commitment_amt DECIMAL(18,2) NOT NULL,
+  drawn_amt DECIMAL(18,2),
+  undrawn_amt DECIMAL(18,2),
+  is_unconditionally_revocable_flag CHAR(1) NOT NULL DEFAULT 'N',
+  lcr_drawdown_rate_pct DECIMAL(10,4),
+  maturity_date DATE,
+  contractual_notice_period_days INTEGER,
+  historical_drawdown_pct DECIMAL(10,4),
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_off_balance_sheet_commitment_master_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_off_balance_sheet_commitment_master_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_off_balance_sheet_commitment_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_off_balance_sheet_commitment_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_off_balance_sheet_commitment_master_product_node_id FOREIGN KEY (product_node_id) REFERENCES l1.enterprise_product_taxonomy(product_node_id)
+);
+
+CREATE TABLE IF NOT EXISTS l1.central_bank_facility_master (
+  cb_facility_id BIGINT NOT NULL PRIMARY KEY,
+  legal_entity_id BIGINT NOT NULL,
+  central_bank_name VARCHAR(100) NOT NULL,
+  facility_type VARCHAR(50) NOT NULL,
+  currency_code VARCHAR(20) NOT NULL,
+  total_capacity_amt DECIMAL(18,2) NOT NULL,
+  drawn_amt DECIMAL(18,2),
+  available_amt DECIMAL(18,2),
+  collateral_pledged_amt DECIMAL(18,2),
+  rate_pct DECIMAL(10,4),
+  maturity_date DATE,
+  is_contingent_flag CHAR(1) NOT NULL DEFAULT 'Y',
+  count_in_lcr_buffer_flag CHAR(1) NOT NULL DEFAULT 'N',
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_central_bank_facility_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_central_bank_facility_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.capital_deduction_type_dim (
+  deduction_type_id BIGINT NOT NULL PRIMARY KEY,
+  deduction_type_code VARCHAR(30) NOT NULL,
+  deduction_type_name VARCHAR(200),
+  deducted_from_tier VARCHAR(10) NOT NULL,
+  threshold_applicable_flag CHAR(1) NOT NULL DEFAULT 'N',
+  threshold_pct DECIMAL(10,4),
+  risk_weight_if_below_threshold DECIMAL(10,4),
+  jurisdiction_code VARCHAR(20),
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+,
+  CONSTRAINT fk_capital_deduction_type_dim_jurisdiction_code FOREIGN KEY (jurisdiction_code) REFERENCES l1.regulatory_jurisdiction(jurisdiction_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.capital_buffer_requirement_dim (
+  buffer_requirement_id BIGINT NOT NULL PRIMARY KEY,
+  buffer_type_code VARCHAR(30) NOT NULL,
+  buffer_type_name VARCHAR(200),
+  buffer_rate_pct DECIMAL(10,4) NOT NULL,
+  jurisdiction_code VARCHAR(20),
+  country_code VARCHAR(20),
+  effective_from_date DATE,
+  effective_to_date DATE,
+  announced_date DATE,
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+,
+  CONSTRAINT fk_capital_buffer_requirement_dim_jurisdiction_code FOREIGN KEY (jurisdiction_code) REFERENCES l1.regulatory_jurisdiction(jurisdiction_code),
+  CONSTRAINT fk_capital_buffer_requirement_dim_country_code FOREIGN KEY (country_code) REFERENCES l1.country_dim(country_code)
+);
+
+CREATE TABLE IF NOT EXISTS l1.rwa_risk_type_dim (
+  rwa_risk_type_id BIGINT NOT NULL PRIMARY KEY,
+  rwa_risk_type_code VARCHAR(30) NOT NULL,
+  rwa_risk_type_name VARCHAR(200),
+  risk_category VARCHAR(30) NOT NULL,
+  calculation_approach VARCHAR(30) NOT NULL,
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+);
+
+CREATE TABLE IF NOT EXISTS l1.capital_instrument_master (
+  capital_instrument_id BIGINT NOT NULL PRIMARY KEY,
+  instrument_id BIGINT,
+  legal_entity_id BIGINT NOT NULL,
+  currency_code VARCHAR(20) NOT NULL,
+  jurisdiction_code VARCHAR(20),
+  capital_tier VARCHAR(10) NOT NULL,
+  instrument_type VARCHAR(50) NOT NULL,
+  par_value_amt DECIMAL(18,2) NOT NULL,
+  issue_date DATE NOT NULL,
+  maturity_date DATE,
+  coupon_rate_pct DECIMAL(10,4),
+  first_call_date DATE,
+  is_grandfathered_flag CHAR(1) NOT NULL DEFAULT 'N',
+  amortization_start_date DATE,
+  conversion_trigger_pct DECIMAL(10,4),
+  loss_absorption_mechanism VARCHAR(30),
+  is_regulatory_eligible_flag CHAR(1) NOT NULL DEFAULT 'Y',
+  effective_start_date DATE NOT NULL,
+  effective_end_date DATE,
+  is_current_flag CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_capital_instrument_master_instrument_id FOREIGN KEY (instrument_id) REFERENCES l1.instrument_master(instrument_id),
+  CONSTRAINT fk_capital_instrument_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_capital_instrument_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_capital_instrument_master_jurisdiction_code FOREIGN KEY (jurisdiction_code) REFERENCES l1.regulatory_jurisdiction(jurisdiction_code)
+);

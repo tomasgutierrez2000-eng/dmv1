@@ -12,6 +12,10 @@ export const L1_CATEGORY_ORDER = [
   'Hierarchies & participation',
   'Limits & FX',
   'Run & reporting',
+  'Liquidity reference',
+  'Liquidity products',
+  'Capital reference',
+  'Capital instruments',
 ] as const;
 
 /**
@@ -106,6 +110,25 @@ export const L1_TABLE_CATEGORIES: Record<string, string> = {
   report_cell_definition: 'Run & reporting',
   rating_mapping: 'Run & reporting',
   scenario_dim: 'Run & reporting',
+  // Liquidity reference
+  hqla_classification_dim: 'Liquidity reference',
+  nsfr_factor_dim: 'Liquidity reference',
+  liquidity_time_bucket_dim: 'Liquidity reference',
+  funding_source_type_dim: 'Liquidity reference',
+  liquidity_stress_scenario_dim: 'Liquidity reference',
+  lcr_outflow_rate_dim: 'Liquidity reference',
+  // Liquidity products
+  deposit_product_master: 'Liquidity products',
+  wholesale_funding_instrument_master: 'Liquidity products',
+  securities_position_master: 'Liquidity products',
+  off_balance_sheet_commitment_master: 'Liquidity products',
+  central_bank_facility_master: 'Liquidity products',
+  // Capital reference
+  capital_deduction_type_dim: 'Capital reference',
+  capital_buffer_requirement_dim: 'Capital reference',
+  rwa_risk_type_dim: 'Capital reference',
+  // Capital instruments
+  capital_instrument_master: 'Capital instruments',
 };
 
 const DEFAULT_CATEGORY = 'L1';

@@ -1362,6 +1362,231 @@ export function getL2SeedValue(
       if (columnName === 'reconciliation_break_count') return dqReconBreaks(idx);
       if (columnName === 'score_dimension') return dqDim(idx);
       break;
+
+    // ═══════════════════════════════════════════════════════════════════
+    // SECURITIES_POSITION_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'securities_position_snapshot': {
+      const basePar = [1_000_000_000, 750_000_000, 500_000_000, 2_000_000_000, 300_000_000, 100_000_000, 400_000_000, 1_500_000_000, 200_000_000, 150_000_000];
+      const baseMV =  [1_005_000_000, 748_000_000, 510_000_000, 2_010_000_000, 295_000_000,  98_000_000, 405_000_000, 1_490_000_000, 198_000_000, 152_000_000];
+      const durations = [1.2, 3.5, 5.8, 0.5, 4.2, 0.0, 6.5, 8.3, 2.1, 3.9];
+      const spreads = [0, 5, 25, 0, 85, 0, 30, 10, 120, 15];
+      const encFlags = ['N', 'N', 'Y', 'N', 'N', 'N', 'Y', 'N', 'Y', 'N'];
+      if (columnName === 'securities_position_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'par_amount') return vary(basePar[fid(idx) - 1], idx, 0.05);
+      if (columnName === 'market_value_amt') return vary(baseMV[fid(idx) - 1], idx, 0.08);
+      if (columnName === 'book_value_amt') return vary(basePar[fid(idx) - 1], idx, 0.02);
+      if (columnName === 'unrealized_gain_loss_amt') return vary(baseMV[fid(idx) - 1], idx, 0.08) - vary(basePar[fid(idx) - 1], idx, 0.02);
+      if (columnName === 'accrued_interest_amt') return Math.round(basePar[fid(idx) - 1] * 0.04 / 12);
+      if (columnName === 'hqla_eligible_value_amt') {
+        const enc = encFlags[fid(idx) - 1];
+        return enc === 'Y' ? 0 : vary(baseMV[fid(idx) - 1], idx, 0.08);
+      }
+      if (columnName === 'is_encumbered_flag') return encFlags[fid(idx) - 1];
+      if (columnName === 'encumbered_value_amt') return encFlags[fid(idx) - 1] === 'Y' ? vary(baseMV[fid(idx) - 1], idx, 0.08) : 0;
+      if (columnName === 'unencumbered_value_amt') return encFlags[fid(idx) - 1] === 'N' ? vary(baseMV[fid(idx) - 1], idx, 0.08) : 0;
+      if (columnName === 'remaining_maturity_days') return [365, 730, 1825, 180, 1095, 0, 2555, 3650, 547, 1460][fid(idx) - 1];
+      if (columnName === 'duration_years') return durations[fid(idx) - 1];
+      if (columnName === 'credit_spread_bps') return spreads[fid(idx) - 1];
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // DEPOSIT_BALANCE_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'deposit_balance_snapshot': {
+      const baseBalances = [15_000_000_000, 8_000_000_000, 5_000_000_000, 3_000_000_000, 12_000_000_000, 10_000_000_000, 4_000_000_000, 2_000_000_000, 6_000_000_000, 1_500_000_000];
+      const insuredPcts = [0.85, 0.80, 0.60, 0.70, 0.40, 0.30, 0.20, 0.10, 0.75, 0.05];
+      const acctCounts = [250000, 150000, 80000, 40000, 5000, 3000, 1500, 500, 120000, 200];
+      const bal = vary(baseBalances[fid(idx) - 1], idx, 0.10);
+      if (columnName === 'deposit_product_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'legal_entity_id') return ((fid(idx) - 1) % 5) + 1;
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'total_balance_amt') return bal;
+      if (columnName === 'insured_balance_amt') return Math.round(bal * insuredPcts[fid(idx) - 1]);
+      if (columnName === 'uninsured_balance_amt') return Math.round(bal * (1 - insuredPcts[fid(idx) - 1]));
+      if (columnName === 'account_count') return acctCounts[fid(idx) - 1];
+      if (columnName === 'weighted_avg_maturity_days') return [0, 0, 0, 180, 0, 0, 0, 365, 0, 90][fid(idx) - 1];
+      if (columnName === 'weighted_avg_rate_pct') return [0.01, 0.50, 4.20, 4.80, 0.10, 0.05, 0.00, 5.10, 0.75, 5.25][fid(idx) - 1];
+      if (columnName === 'lcr_outflow_amt') return Math.round(bal * [0.03, 0.03, 0.10, 0.10, 0.25, 0.25, 0.40, 0.40, 0.05, 1.00][fid(idx) - 1]);
+      if (columnName === 'nsfr_asf_amt') return Math.round(bal * [0.95, 0.95, 0.90, 0.90, 0.50, 0.50, 0.00, 0.00, 0.95, 0.00][fid(idx) - 1]);
+      if (columnName === 'concentration_top10_pct') return [0.02, 0.03, 0.05, 0.08, 0.15, 0.20, 0.30, 0.45, 0.04, 0.60][fid(idx) - 1];
+      if (columnName === 'behavioral_maturity_days') return [1825, 1460, 365, 180, 90, 60, 30, 365, 1095, 30][fid(idx) - 1];
+      if (columnName === 'surge_balance_amt') return Math.round(bal * [0.05, 0.08, 0.15, 0.10, 0.20, 0.25, 0.30, 0.15, 0.10, 0.40][fid(idx) - 1]);
+      if (columnName === 'core_deposit_amt') return Math.round(bal * [0.85, 0.80, 0.65, 0.70, 0.50, 0.40, 0.30, 0.20, 0.75, 0.10][fid(idx) - 1]);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // WHOLESALE_FUNDING_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'wholesale_funding_snapshot': {
+      const baseOutstanding = [500_000_000, 300_000_000, 200_000_000, 150_000_000, 1_000_000_000, 750_000_000, 250_000_000, 400_000_000, 100_000_000, 800_000_000];
+      const rates = [5.30, 5.25, 5.33, 5.45, 5.10, 5.28, 5.50, 4.75, 5.35, 5.15];
+      const spreads = [10, 5, 13, 25, -10, 8, 30, -45, 15, -5];
+      const matDays = [90, 180, 30, 120, 365, 60, 45, 270, 14, 730];
+      const rollovers = [0.90, 0.85, 0.95, 0.80, 0.70, 0.88, 0.75, 0.60, 0.98, 0.65];
+      const out = vary(baseOutstanding[fid(idx) - 1], idx, 0.10);
+      if (columnName === 'wholesale_funding_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'outstanding_amount') return out;
+      if (columnName === 'market_value_collateral_amt') return ['Y', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'N', 'Y'][fid(idx) - 1] === 'Y' ? Math.round(out * 1.05) : 0;
+      if (columnName === 'remaining_maturity_days') return matDays[fid(idx) - 1];
+      if (columnName === 'rollover_assumption_pct') return rollovers[fid(idx) - 1];
+      if (columnName === 'lcr_outflow_amt') return Math.round(out * [1.00, 0.00, 1.00, 1.00, 0.25, 1.00, 1.00, 0.00, 1.00, 0.25][fid(idx) - 1]);
+      if (columnName === 'nsfr_asf_amt') return Math.round(out * [0.00, 0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.50][fid(idx) - 1]);
+      if (columnName === 'cost_rate_pct') return rates[fid(idx) - 1];
+      if (columnName === 'spread_to_benchmark_bps') return spreads[fid(idx) - 1];
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // LIQUIDITY_CASH_FLOW_PROJECTION
+    // ═══════════════════════════════════════════════════════════════════
+    case 'liquidity_cash_flow_projection': {
+      const flowTypes = ['LOAN_PRINCIPAL', 'LOAN_INTEREST', 'DEPOSIT_OUTFLOW', 'FUNDING_MATURITY', 'DERIVATIVE_MARGIN', 'COMMITMENT_DRAWDOWN', 'SECURITIES_MATURITY', 'LOAN_PRINCIPAL', 'DEPOSIT_OUTFLOW', 'FUNDING_MATURITY'];
+      const flowDirs = ['INFLOW', 'INFLOW', 'OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'OUTFLOW', 'INFLOW', 'INFLOW', 'OUTFLOW', 'OUTFLOW'];
+      const categories = ['CONTRACTUAL', 'CONTRACTUAL', 'BEHAVIORAL', 'CONTRACTUAL', 'CONTINGENT', 'BEHAVIORAL', 'CONTRACTUAL', 'CONTRACTUAL', 'BEHAVIORAL', 'CONTRACTUAL'];
+      const baseAmts = [50_000_000, 15_000_000, 200_000_000, 100_000_000, 25_000_000, 80_000_000, 75_000_000, 30_000_000, 150_000_000, 120_000_000];
+      const haircuts = [0.00, 0.00, 0.10, 0.00, 0.50, 0.30, 0.00, 0.00, 0.08, 0.00];
+      if (columnName === 'cash_flow_projection_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'legal_entity_id') return ((fid(idx) - 1) % 5) + 1;
+      if (columnName === 'liquidity_bucket_id') return fid(idx);
+      if (columnName === 'cash_flow_category') return categories[fid(idx) - 1];
+      if (columnName === 'flow_type') return flowTypes[fid(idx) - 1];
+      if (columnName === 'flow_direction') return flowDirs[fid(idx) - 1];
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'gross_amount') return vary(baseAmts[fid(idx) - 1], idx, 0.12);
+      if (columnName === 'haircut_or_runoff_pct') return haircuts[fid(idx) - 1];
+      if (columnName === 'net_amount') { const g = vary(baseAmts[fid(idx) - 1], idx, 0.12); return Math.round(g * (1 - haircuts[fid(idx) - 1])); }
+      if (columnName === 'scenario_id') return cycle(idx) < 3 ? null : cycle(idx);
+      if (columnName === 'source_instrument_type') return ['TERM_LOAN', 'TERM_LOAN', 'DEMAND_DEPOSIT', 'REPO', 'SWAP', 'REVOLVER', 'UST', 'TERM_LOAN', 'CD', 'CP'][fid(idx) - 1];
+      if (columnName === 'source_record_id') return fid(idx);
+      if (columnName === 'model_id') return categories[fid(idx) - 1] === 'BEHAVIORAL' ? 1 : null;
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // DERIVATIVE_MARGIN_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'derivative_margin_snapshot': {
+      const baseMTM = [25_000_000, -15_000_000, 40_000_000, -8_000_000, 60_000_000, -30_000_000, 12_000_000, -5_000_000, 35_000_000, -20_000_000];
+      const mtm = vary(baseMTM[fid(idx) - 1], idx, 0.20);
+      if (columnName === 'netting_set_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'csa_id') return fid(idx);
+      if (columnName === 'counterparty_id') return cid(idx);
+      if (columnName === 'legal_entity_id') return 1;
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'gross_mtm_amt') return Math.round(mtm * 1.3);
+      if (columnName === 'net_mtm_amt') return mtm;
+      if (columnName === 'vm_posted_amt') return mtm < 0 ? Math.abs(mtm) : 0;
+      if (columnName === 'vm_received_amt') return mtm > 0 ? mtm : 0;
+      if (columnName === 'im_posted_amt') return Math.round(Math.abs(mtm) * 0.15);
+      if (columnName === 'im_received_amt') return Math.round(Math.abs(mtm) * 0.10);
+      if (columnName === 'potential_vm_call_amt') return Math.round(Math.abs(mtm) * 0.25);
+      if (columnName === 'potential_im_call_amt') return Math.round(Math.abs(mtm) * 0.10);
+      if (columnName === 'lcr_outflow_from_margin_amt') return Math.round(Math.abs(mtm) * 0.35);
+      if (columnName === 'downgrade_trigger_notional_amt') return Math.round(Math.abs(mtm) * 3);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CAPITAL_INSTRUMENT_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'capital_instrument_snapshot': {
+      const baseCarrying = [25_000_000_000, 40_000_000_000, -2_000_000_000, 5_000_000_000, 3_000_000_000, 2_000_000_000, 8_000_000_000, 5_000_000_000, 1_500_000_000, 4_000_000_000];
+      const cv = vary(baseCarrying[fid(idx) - 1], idx, 0.03);
+      if (columnName === 'capital_instrument_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'carrying_value_amt') return cv;
+      if (columnName === 'regulatory_value_amt') return Math.round(cv * 0.98);
+      if (columnName === 'accrued_interest_amt') return fid(idx) > 3 ? Math.round(Math.abs(cv) * 0.05 / 12) : 0;
+      if (columnName === 'fair_value_amt') return Math.round(cv * (fid(idx) <= 3 ? 1.0 : 0.99));
+      if (columnName === 'amortization_remaining_amt') return fid(idx) >= 7 ? Math.round(Math.abs(cv) * 0.80) : null;
+      if (columnName === 'transitional_adjustment_amt') return 0;
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'fx_rate_to_reporting') return 1.0;
+      if (columnName === 'reporting_currency_value_amt') return Math.round(cv * 0.98);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CAPITAL_DEDUCTION_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'capital_deduction_snapshot': {
+      const baseDeductions = [5_000_000_000, 2_500_000_000, 1_200_000_000, 800_000_000, 1_800_000_000, 3_000_000_000, 500_000_000, 200_000_000, -1_500_000_000, 400_000_000];
+      const ded = vary(baseDeductions[fid(idx) - 1], idx, 0.05);
+      if (columnName === 'deduction_snapshot_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'legal_entity_id') return ((fid(idx) - 1) % 5) + 1;
+      if (columnName === 'deduction_type_id') return fid(idx);
+      if (columnName === 'gross_deduction_amt') return Math.abs(ded);
+      if (columnName === 'threshold_allowance_amt') return [3, 5, 6].includes(fid(idx)) ? Math.round(Math.abs(ded) * 0.10) : 0;
+      if (columnName === 'net_deduction_amt') return [3, 5, 6].includes(fid(idx)) ? Math.round(Math.abs(ded) * 0.90) : Math.abs(ded);
+      if (columnName === 'deducted_from_tier') return 'CET1';
+      if (columnName === 'transitional_adjustment_amt') return 0;
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // RWA_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'rwa_snapshot': {
+      const baseEAD = [150_000_000_000, 120_000_000_000, 20_000_000_000, 15_000_000_000, 30_000_000_000, 25_000_000_000, 8_000_000_000, 5_000_000_000, 10_000_000_000, 3_000_000_000];
+      const riskWeights = [0.50, 0.65, 0.20, 0.25, 0.12, 0.15, 0.10, 0.08, 0.45, 1.00];
+      const ead = vary(baseEAD[fid(idx) - 1], idx, 0.08);
+      const rwa = Math.round(ead * riskWeights[fid(idx) - 1]);
+      if (columnName === 'rwa_snapshot_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'legal_entity_id') return ((fid(idx) - 1) % 5) + 1;
+      if (columnName === 'rwa_risk_type_id') return fid(idx);
+      if (columnName === 'portfolio_id') return fid(idx);
+      if (columnName === 'exposure_amount') return ead;
+      if (columnName === 'risk_weight_pct') return riskWeights[fid(idx) - 1];
+      if (columnName === 'rwa_amount') return rwa;
+      if (columnName === 'capital_requirement_amt') return Math.round(rwa * 0.08);
+      if (columnName === 'prior_period_rwa_amount') return Math.round(rwa * 0.97);
+      if (columnName === 'rwa_density_pct') return riskWeights[fid(idx) - 1];
+      if (columnName === 'model_id') return fid(idx) <= 6 ? 1 : null;
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // LEVERAGE_EXPOSURE_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'leverage_exposure_snapshot': {
+      const expCats = ['ON_BALANCE_SHEET', 'ON_BALANCE_SHEET', 'DERIVATIVE_EXPOSURE', 'DERIVATIVE_EXPOSURE', 'SFT_EXPOSURE', 'SFT_EXPOSURE', 'OFF_BALANCE_SHEET', 'OFF_BALANCE_SHEET', 'CET1_DEDUCTIONS', 'CET1_DEDUCTIONS'];
+      const subCats = ['LOANS', 'SECURITIES', 'SA_CCR', 'CEM', 'REPO', 'SEC_LENDING', 'COMMITMENTS', 'GUARANTEES', 'GOODWILL', 'INTANGIBLES'];
+      const baseGross = [200_000_000_000, 150_000_000_000, 40_000_000_000, 25_000_000_000, 80_000_000_000, 30_000_000_000, 60_000_000_000, 20_000_000_000, 5_000_000_000, 2_500_000_000];
+      const adjPcts = [0.00, 0.00, -0.40, -0.35, -0.20, -0.15, -0.60, -0.50, -1.00, -1.00];
+      const gross = vary(baseGross[fid(idx) - 1], idx, 0.06);
+      if (columnName === 'leverage_snapshot_id') return i;
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'legal_entity_id') return ((fid(idx) - 1) % 5) + 1;
+      if (columnName === 'exposure_category') return expCats[fid(idx) - 1];
+      if (columnName === 'exposure_subcategory') return subCats[fid(idx) - 1];
+      if (columnName === 'gross_exposure_amt') return gross;
+      if (columnName === 'adjustment_amt') return Math.round(gross * adjPcts[fid(idx) - 1]);
+      if (columnName === 'net_exposure_amt') return Math.round(gross * (1 + adjPcts[fid(idx) - 1]));
+      if (columnName === 'currency_code') return currency(idx);
+      if (columnName === 'source_system_id') return 1;
+      break;
+    }
   }
 
   return null;

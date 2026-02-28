@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-02-26T06:24:30.358Z",
+  "createdAt": "2026-02-28T20:06:12.295Z",
   "tables": [
     {
       "layer": "L1",
@@ -3260,6 +3260,600 @@
       ]
     },
     {
+      "layer": "L1",
+      "tableName": "hqla_classification_dim",
+      "fields": [
+        {
+          "name": "hqla_classification_id"
+        },
+        {
+          "name": "hqla_level_code"
+        },
+        {
+          "name": "hqla_level_name"
+        },
+        {
+          "name": "asset_subtype_code"
+        },
+        {
+          "name": "haircut_pct"
+        },
+        {
+          "name": "cap_pct"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "nsfr_factor_dim",
+      "fields": [
+        {
+          "name": "nsfr_factor_id"
+        },
+        {
+          "name": "factor_type"
+        },
+        {
+          "name": "category_code"
+        },
+        {
+          "name": "category_name"
+        },
+        {
+          "name": "factor_pct"
+        },
+        {
+          "name": "residual_maturity_bucket"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "liquidity_time_bucket_dim",
+      "fields": [
+        {
+          "name": "liquidity_bucket_id"
+        },
+        {
+          "name": "bucket_code"
+        },
+        {
+          "name": "bucket_name"
+        },
+        {
+          "name": "bucket_start_days"
+        },
+        {
+          "name": "bucket_end_days"
+        },
+        {
+          "name": "is_lcr_bucket_flag"
+        },
+        {
+          "name": "is_nsfr_bucket_flag"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "funding_source_type_dim",
+      "fields": [
+        {
+          "name": "funding_source_type_id"
+        },
+        {
+          "name": "funding_source_type_code"
+        },
+        {
+          "name": "funding_source_type_name"
+        },
+        {
+          "name": "funding_category"
+        },
+        {
+          "name": "is_stable_funding_flag"
+        },
+        {
+          "name": "lcr_outflow_rate_pct"
+        },
+        {
+          "name": "asf_factor_pct"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "liquidity_stress_scenario_dim",
+      "fields": [
+        {
+          "name": "liquidity_scenario_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "scenario_severity"
+        },
+        {
+          "name": "scenario_horizon_days"
+        },
+        {
+          "name": "deposit_runoff_rate_pct"
+        },
+        {
+          "name": "wholesale_funding_rollover_pct"
+        },
+        {
+          "name": "credit_line_drawdown_pct"
+        },
+        {
+          "name": "collateral_haircut_stress_pct"
+        },
+        {
+          "name": "market_value_shock_pct"
+        },
+        {
+          "name": "contingent_funding_probability_pct"
+        },
+        {
+          "name": "is_regulatory_flag"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "lcr_outflow_rate_dim",
+      "fields": [
+        {
+          "name": "lcr_rate_id"
+        },
+        {
+          "name": "flow_direction"
+        },
+        {
+          "name": "rate_category_code"
+        },
+        {
+          "name": "rate_category_name"
+        },
+        {
+          "name": "regulatory_rate_pct"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "deposit_product_master",
+      "fields": [
+        {
+          "name": "deposit_product_id"
+        },
+        {
+          "name": "product_node_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "deposit_category"
+        },
+        {
+          "name": "deposit_type"
+        },
+        {
+          "name": "is_insured_flag"
+        },
+        {
+          "name": "is_transactional_flag"
+        },
+        {
+          "name": "is_brokered_flag"
+        },
+        {
+          "name": "early_withdrawal_penalty_flag"
+        },
+        {
+          "name": "lcr_outflow_rate_pct"
+        },
+        {
+          "name": "nsfr_asf_factor_pct"
+        },
+        {
+          "name": "min_balance_for_operational"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "wholesale_funding_instrument_master",
+      "fields": [
+        {
+          "name": "wholesale_funding_id"
+        },
+        {
+          "name": "funding_source_type_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "instrument_type"
+        },
+        {
+          "name": "notional_amount"
+        },
+        {
+          "name": "issue_date"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "rate_pct"
+        },
+        {
+          "name": "rate_type"
+        },
+        {
+          "name": "is_secured_flag"
+        },
+        {
+          "name": "collateral_asset_id"
+        },
+        {
+          "name": "is_callable_flag"
+        },
+        {
+          "name": "call_date"
+        },
+        {
+          "name": "lcr_outflow_rate_pct"
+        },
+        {
+          "name": "nsfr_asf_factor_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "securities_position_master",
+      "fields": [
+        {
+          "name": "securities_position_id"
+        },
+        {
+          "name": "instrument_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "hqla_classification_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "accounting_portfolio"
+        },
+        {
+          "name": "par_amount"
+        },
+        {
+          "name": "is_encumbered_flag"
+        },
+        {
+          "name": "encumbrance_type"
+        },
+        {
+          "name": "encumbrance_counterparty_id"
+        },
+        {
+          "name": "encumbrance_maturity_date"
+        },
+        {
+          "name": "issuer_counterparty_id"
+        },
+        {
+          "name": "issuer_country_code"
+        },
+        {
+          "name": "credit_rating_external"
+        },
+        {
+          "name": "asset_class"
+        },
+        {
+          "name": "remaining_maturity_days"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "off_balance_sheet_commitment_master",
+      "fields": [
+        {
+          "name": "obs_commitment_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "product_node_id"
+        },
+        {
+          "name": "commitment_type"
+        },
+        {
+          "name": "total_commitment_amt"
+        },
+        {
+          "name": "drawn_amt"
+        },
+        {
+          "name": "undrawn_amt"
+        },
+        {
+          "name": "is_unconditionally_revocable_flag"
+        },
+        {
+          "name": "lcr_drawdown_rate_pct"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "contractual_notice_period_days"
+        },
+        {
+          "name": "historical_drawdown_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "central_bank_facility_master",
+      "fields": [
+        {
+          "name": "cb_facility_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "central_bank_name"
+        },
+        {
+          "name": "facility_type"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "total_capacity_amt"
+        },
+        {
+          "name": "drawn_amt"
+        },
+        {
+          "name": "available_amt"
+        },
+        {
+          "name": "collateral_pledged_amt"
+        },
+        {
+          "name": "rate_pct"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "is_contingent_flag"
+        },
+        {
+          "name": "count_in_lcr_buffer_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "capital_deduction_type_dim",
+      "fields": [
+        {
+          "name": "deduction_type_id"
+        },
+        {
+          "name": "deduction_type_code"
+        },
+        {
+          "name": "deduction_type_name"
+        },
+        {
+          "name": "deducted_from_tier"
+        },
+        {
+          "name": "threshold_applicable_flag"
+        },
+        {
+          "name": "threshold_pct"
+        },
+        {
+          "name": "risk_weight_if_below_threshold"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "capital_buffer_requirement_dim",
+      "fields": [
+        {
+          "name": "buffer_requirement_id"
+        },
+        {
+          "name": "buffer_type_code"
+        },
+        {
+          "name": "buffer_type_name"
+        },
+        {
+          "name": "buffer_rate_pct"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "country_code"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "announced_date"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "rwa_risk_type_dim",
+      "fields": [
+        {
+          "name": "rwa_risk_type_id"
+        },
+        {
+          "name": "rwa_risk_type_code"
+        },
+        {
+          "name": "rwa_risk_type_name"
+        },
+        {
+          "name": "risk_category"
+        },
+        {
+          "name": "calculation_approach"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "capital_instrument_master",
+      "fields": [
+        {
+          "name": "capital_instrument_id"
+        },
+        {
+          "name": "instrument_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "capital_tier"
+        },
+        {
+          "name": "instrument_type"
+        },
+        {
+          "name": "par_value_amt"
+        },
+        {
+          "name": "issue_date"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "coupon_rate_pct"
+        },
+        {
+          "name": "first_call_date"
+        },
+        {
+          "name": "is_grandfathered_flag"
+        },
+        {
+          "name": "amortization_start_date"
+        },
+        {
+          "name": "conversion_trigger_pct"
+        },
+        {
+          "name": "loss_absorption_mechanism"
+        },
+        {
+          "name": "is_regulatory_eligible_flag"
+        }
+      ]
+    },
+    {
       "layer": "L2",
       "tableName": "position",
       "fields": [
@@ -4732,6 +5326,432 @@
         },
         {
           "name": "score_dimension"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "securities_position_snapshot",
+      "fields": [
+        {
+          "name": "securities_position_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "par_amount"
+        },
+        {
+          "name": "market_value_amt"
+        },
+        {
+          "name": "book_value_amt"
+        },
+        {
+          "name": "unrealized_gain_loss_amt"
+        },
+        {
+          "name": "accrued_interest_amt"
+        },
+        {
+          "name": "hqla_eligible_value_amt"
+        },
+        {
+          "name": "is_encumbered_flag"
+        },
+        {
+          "name": "encumbered_value_amt"
+        },
+        {
+          "name": "unencumbered_value_amt"
+        },
+        {
+          "name": "remaining_maturity_days"
+        },
+        {
+          "name": "duration_years"
+        },
+        {
+          "name": "credit_spread_bps"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "deposit_balance_snapshot",
+      "fields": [
+        {
+          "name": "deposit_product_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "total_balance_amt"
+        },
+        {
+          "name": "insured_balance_amt"
+        },
+        {
+          "name": "uninsured_balance_amt"
+        },
+        {
+          "name": "account_count"
+        },
+        {
+          "name": "weighted_avg_maturity_days"
+        },
+        {
+          "name": "weighted_avg_rate_pct"
+        },
+        {
+          "name": "lcr_outflow_amt"
+        },
+        {
+          "name": "nsfr_asf_amt"
+        },
+        {
+          "name": "concentration_top10_pct"
+        },
+        {
+          "name": "behavioral_maturity_days"
+        },
+        {
+          "name": "surge_balance_amt"
+        },
+        {
+          "name": "core_deposit_amt"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "wholesale_funding_snapshot",
+      "fields": [
+        {
+          "name": "wholesale_funding_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "outstanding_amount"
+        },
+        {
+          "name": "market_value_collateral_amt"
+        },
+        {
+          "name": "remaining_maturity_days"
+        },
+        {
+          "name": "rollover_assumption_pct"
+        },
+        {
+          "name": "lcr_outflow_amt"
+        },
+        {
+          "name": "nsfr_asf_amt"
+        },
+        {
+          "name": "cost_rate_pct"
+        },
+        {
+          "name": "spread_to_benchmark_bps"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "liquidity_cash_flow_projection",
+      "fields": [
+        {
+          "name": "cash_flow_projection_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "liquidity_bucket_id"
+        },
+        {
+          "name": "cash_flow_category"
+        },
+        {
+          "name": "flow_type"
+        },
+        {
+          "name": "flow_direction"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "gross_amount"
+        },
+        {
+          "name": "haircut_or_runoff_pct"
+        },
+        {
+          "name": "net_amount"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "source_instrument_type"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "model_id"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "derivative_margin_snapshot",
+      "fields": [
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "csa_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "gross_mtm_amt"
+        },
+        {
+          "name": "net_mtm_amt"
+        },
+        {
+          "name": "vm_posted_amt"
+        },
+        {
+          "name": "vm_received_amt"
+        },
+        {
+          "name": "im_posted_amt"
+        },
+        {
+          "name": "im_received_amt"
+        },
+        {
+          "name": "potential_vm_call_amt"
+        },
+        {
+          "name": "potential_im_call_amt"
+        },
+        {
+          "name": "lcr_outflow_from_margin_amt"
+        },
+        {
+          "name": "downgrade_trigger_notional_amt"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "capital_instrument_snapshot",
+      "fields": [
+        {
+          "name": "capital_instrument_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "carrying_value_amt"
+        },
+        {
+          "name": "regulatory_value_amt"
+        },
+        {
+          "name": "accrued_interest_amt"
+        },
+        {
+          "name": "fair_value_amt"
+        },
+        {
+          "name": "amortization_remaining_amt"
+        },
+        {
+          "name": "transitional_adjustment_amt"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "fx_rate_to_reporting"
+        },
+        {
+          "name": "reporting_currency_value_amt"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "capital_deduction_snapshot",
+      "fields": [
+        {
+          "name": "deduction_snapshot_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "deduction_type_id"
+        },
+        {
+          "name": "gross_deduction_amt"
+        },
+        {
+          "name": "threshold_allowance_amt"
+        },
+        {
+          "name": "net_deduction_amt"
+        },
+        {
+          "name": "deducted_from_tier"
+        },
+        {
+          "name": "transitional_adjustment_amt"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "rwa_snapshot",
+      "fields": [
+        {
+          "name": "rwa_snapshot_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "rwa_risk_type_id"
+        },
+        {
+          "name": "portfolio_id"
+        },
+        {
+          "name": "exposure_amount"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "rwa_amount"
+        },
+        {
+          "name": "capital_requirement_amt"
+        },
+        {
+          "name": "prior_period_rwa_amount"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "model_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "leverage_exposure_snapshot",
+      "fields": [
+        {
+          "name": "leverage_snapshot_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "exposure_category"
+        },
+        {
+          "name": "exposure_subcategory"
+        },
+        {
+          "name": "gross_exposure_amt"
+        },
+        {
+          "name": "adjustment_amt"
+        },
+        {
+          "name": "net_exposure_amt"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "source_system_id"
         }
       ]
     },
@@ -7417,6 +8437,747 @@
         },
         {
           "name": "display_format"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "lcr_summary",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "total_hqla_amt"
+        },
+        {
+          "name": "hqla_level1_amt"
+        },
+        {
+          "name": "hqla_level2a_amt"
+        },
+        {
+          "name": "hqla_level2b_amt"
+        },
+        {
+          "name": "total_gross_outflow_amt"
+        },
+        {
+          "name": "total_inflow_amt"
+        },
+        {
+          "name": "inflow_cap_amt"
+        },
+        {
+          "name": "total_net_outflow_amt"
+        },
+        {
+          "name": "lcr_ratio_pct"
+        },
+        {
+          "name": "lcr_surplus_deficit_amt"
+        },
+        {
+          "name": "regulatory_minimum_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "lcr_component_detail",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "component_category"
+        },
+        {
+          "name": "component_name"
+        },
+        {
+          "name": "gross_amount"
+        },
+        {
+          "name": "haircut_or_runoff_rate_pct"
+        },
+        {
+          "name": "weighted_amount"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "nsfr_summary",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "total_asf_amt"
+        },
+        {
+          "name": "asf_capital_amt"
+        },
+        {
+          "name": "asf_stable_retail_amt"
+        },
+        {
+          "name": "asf_less_stable_retail_amt"
+        },
+        {
+          "name": "asf_wholesale_gt1y_amt"
+        },
+        {
+          "name": "asf_wholesale_6m_1y_amt"
+        },
+        {
+          "name": "asf_wholesale_lt6m_amt"
+        },
+        {
+          "name": "total_rsf_amt"
+        },
+        {
+          "name": "rsf_hqla_l1_amt"
+        },
+        {
+          "name": "rsf_hqla_l2_amt"
+        },
+        {
+          "name": "rsf_performing_loans_lt1y_amt"
+        },
+        {
+          "name": "rsf_performing_loans_gt1y_amt"
+        },
+        {
+          "name": "rsf_obs_commitments_amt"
+        },
+        {
+          "name": "rsf_other_assets_amt"
+        },
+        {
+          "name": "nsfr_ratio_pct"
+        },
+        {
+          "name": "nsfr_surplus_deficit_amt"
+        },
+        {
+          "name": "regulatory_minimum_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "liquidity_gap_analysis",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "liquidity_bucket_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "total_inflow_amt"
+        },
+        {
+          "name": "total_outflow_amt"
+        },
+        {
+          "name": "net_gap_amt"
+        },
+        {
+          "name": "cumulative_gap_amt"
+        },
+        {
+          "name": "hqla_buffer_available_amt"
+        },
+        {
+          "name": "adjusted_gap_amt"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "liquidity_stress_test_result",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "survival_horizon_days"
+        },
+        {
+          "name": "min_liquidity_buffer_amt"
+        },
+        {
+          "name": "min_buffer_day"
+        },
+        {
+          "name": "starting_buffer_amt"
+        },
+        {
+          "name": "total_stress_outflow_amt"
+        },
+        {
+          "name": "total_stress_inflow_amt"
+        },
+        {
+          "name": "contingent_funding_used_amt"
+        },
+        {
+          "name": "asset_monetization_amt"
+        },
+        {
+          "name": "deposit_runoff_amt"
+        },
+        {
+          "name": "wholesale_funding_loss_amt"
+        },
+        {
+          "name": "commitment_drawdown_amt"
+        },
+        {
+          "name": "derivative_margin_call_amt"
+        },
+        {
+          "name": "pass_fail_flag"
+        },
+        {
+          "name": "result_status_code"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "funding_concentration_summary",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "concentration_dimension"
+        },
+        {
+          "name": "dimension_value"
+        },
+        {
+          "name": "dimension_name"
+        },
+        {
+          "name": "total_funding_amt"
+        },
+        {
+          "name": "concentration_pct"
+        },
+        {
+          "name": "rank_order"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "capital_adequacy_summary",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "cet1_gross_amt"
+        },
+        {
+          "name": "cet1_deductions_amt"
+        },
+        {
+          "name": "cet1_net_amt"
+        },
+        {
+          "name": "at1_instruments_amt"
+        },
+        {
+          "name": "at1_deductions_amt"
+        },
+        {
+          "name": "at1_net_amt"
+        },
+        {
+          "name": "tier1_capital_amt"
+        },
+        {
+          "name": "t2_instruments_amt"
+        },
+        {
+          "name": "t2_deductions_amt"
+        },
+        {
+          "name": "t2_net_amt"
+        },
+        {
+          "name": "total_capital_amt"
+        },
+        {
+          "name": "total_rwa_amt"
+        },
+        {
+          "name": "credit_rwa_amt"
+        },
+        {
+          "name": "market_rwa_amt"
+        },
+        {
+          "name": "operational_rwa_amt"
+        },
+        {
+          "name": "cva_rwa_amt"
+        },
+        {
+          "name": "cet1_ratio_pct"
+        },
+        {
+          "name": "tier1_ratio_pct"
+        },
+        {
+          "name": "total_capital_ratio_pct"
+        },
+        {
+          "name": "leverage_exposure_amt"
+        },
+        {
+          "name": "supplementary_leverage_ratio_pct"
+        },
+        {
+          "name": "buffer_requirement_pct"
+        },
+        {
+          "name": "buffer_available_pct"
+        },
+        {
+          "name": "mda_trigger_pct"
+        },
+        {
+          "name": "is_above_mda_flag"
+        },
+        {
+          "name": "prior_period_cet1_ratio_pct"
+        },
+        {
+          "name": "cet1_ratio_change_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "rwa_composition_summary",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "rwa_risk_type_code"
+        },
+        {
+          "name": "portfolio_id"
+        },
+        {
+          "name": "lob_node_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "capital_requirement_amt"
+        },
+        {
+          "name": "prior_period_rwa_amt"
+        },
+        {
+          "name": "rwa_change_amt"
+        },
+        {
+          "name": "rwa_change_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "capital_planning_projection",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "projection_quarter"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "projected_cet1_amt"
+        },
+        {
+          "name": "projected_rwa_amt"
+        },
+        {
+          "name": "projected_cet1_ratio_pct"
+        },
+        {
+          "name": "projected_tier1_ratio_pct"
+        },
+        {
+          "name": "projected_total_capital_ratio_pct"
+        },
+        {
+          "name": "projected_slr_pct"
+        },
+        {
+          "name": "ppnr_amt"
+        },
+        {
+          "name": "provision_for_credit_losses_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "other_comprehensive_income_amt"
+        },
+        {
+          "name": "dividends_amt"
+        },
+        {
+          "name": "share_repurchase_amt"
+        },
+        {
+          "name": "other_capital_actions_amt"
+        },
+        {
+          "name": "is_minimum_quarter_flag"
+        },
+        {
+          "name": "headroom_to_minimum_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "capital_buffer_compliance",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "buffer_type_code"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "required_buffer_pct"
+        },
+        {
+          "name": "actual_buffer_pct"
+        },
+        {
+          "name": "surplus_deficit_pct"
+        },
+        {
+          "name": "surplus_deficit_amt"
+        },
+        {
+          "name": "mda_restriction_flag"
+        },
+        {
+          "name": "prior_period_buffer_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "leverage_ratio_summary",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "tier1_capital_amt"
+        },
+        {
+          "name": "on_balance_sheet_exposure_amt"
+        },
+        {
+          "name": "derivative_exposure_amt"
+        },
+        {
+          "name": "sft_exposure_amt"
+        },
+        {
+          "name": "off_balance_sheet_exposure_amt"
+        },
+        {
+          "name": "other_adjustments_amt"
+        },
+        {
+          "name": "total_leverage_exposure_amt"
+        },
+        {
+          "name": "supplementary_leverage_ratio_pct"
+        },
+        {
+          "name": "eslr_buffer_pct"
+        },
+        {
+          "name": "regulatory_minimum_pct"
+        },
+        {
+          "name": "prior_period_slr_pct"
+        },
+        {
+          "name": "slr_change_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "ccar_stress_capital_result",
+      "fields": [
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "planning_horizon_quarters"
+        },
+        {
+          "name": "starting_cet1_ratio_pct"
+        },
+        {
+          "name": "minimum_cet1_ratio_pct"
+        },
+        {
+          "name": "minimum_cet1_quarter"
+        },
+        {
+          "name": "ending_cet1_ratio_pct"
+        },
+        {
+          "name": "starting_tier1_ratio_pct"
+        },
+        {
+          "name": "minimum_tier1_ratio_pct"
+        },
+        {
+          "name": "starting_total_capital_ratio_pct"
+        },
+        {
+          "name": "minimum_total_capital_ratio_pct"
+        },
+        {
+          "name": "starting_slr_pct"
+        },
+        {
+          "name": "minimum_slr_pct"
+        },
+        {
+          "name": "cumulative_ppnr_amt"
+        },
+        {
+          "name": "cumulative_credit_losses_amt"
+        },
+        {
+          "name": "cumulative_market_losses_amt"
+        },
+        {
+          "name": "cumulative_operational_losses_amt"
+        },
+        {
+          "name": "cumulative_aoci_impact_amt"
+        },
+        {
+          "name": "cumulative_capital_actions_amt"
+        },
+        {
+          "name": "total_capital_depletion_amt"
+        },
+        {
+          "name": "scb_implied_pct"
+        },
+        {
+          "name": "pass_fail_flag"
+        },
+        {
+          "name": "submission_cycle"
         },
         {
           "name": "created_ts"

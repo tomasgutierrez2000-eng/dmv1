@@ -1069,5 +1069,617 @@
     },
     "isCrossLayer": true,
     "relationshipType": "primary"
+  },
+  {
+    "id": "L2.securities_position_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "securities_position_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.securities_position_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.deposit_balance_snapshot.deposit_product_id->L1.deposit_product_master.deposit_product_id",
+    "source": {
+      "layer": "L2",
+      "table": "deposit_balance_snapshot",
+      "field": "deposit_product_id",
+      "tableKey": "L2.deposit_balance_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "deposit_product_master",
+      "field": "deposit_product_id",
+      "tableKey": "L1.deposit_product_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.deposit_balance_snapshot.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L2",
+      "table": "deposit_balance_snapshot",
+      "field": "legal_entity_id",
+      "tableKey": "L2.deposit_balance_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.deposit_balance_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "deposit_balance_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.deposit_balance_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.deposit_balance_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "deposit_balance_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.deposit_balance_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.wholesale_funding_snapshot.wholesale_funding_id->L1.wholesale_funding_instrument_master.wholesale_funding_id",
+    "source": {
+      "layer": "L2",
+      "table": "wholesale_funding_snapshot",
+      "field": "wholesale_funding_id",
+      "tableKey": "L2.wholesale_funding_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "wholesale_funding_instrument_master",
+      "field": "wholesale_funding_id",
+      "tableKey": "L1.wholesale_funding_instrument_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.wholesale_funding_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "wholesale_funding_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.wholesale_funding_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.wholesale_funding_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "wholesale_funding_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.wholesale_funding_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.liquidity_cash_flow_projection.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L2",
+      "table": "liquidity_cash_flow_projection",
+      "field": "legal_entity_id",
+      "tableKey": "L2.liquidity_cash_flow_projection"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.liquidity_cash_flow_projection.liquidity_bucket_id->L1.liquidity_time_bucket_dim.liquidity_bucket_id",
+    "source": {
+      "layer": "L2",
+      "table": "liquidity_cash_flow_projection",
+      "field": "liquidity_bucket_id",
+      "tableKey": "L2.liquidity_cash_flow_projection"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "liquidity_time_bucket_dim",
+      "field": "liquidity_bucket_id",
+      "tableKey": "L1.liquidity_time_bucket_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.liquidity_cash_flow_projection.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "liquidity_cash_flow_projection",
+      "field": "currency_code",
+      "tableKey": "L2.liquidity_cash_flow_projection"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.liquidity_cash_flow_projection.scenario_id->L1.scenario_dim.scenario_id",
+    "source": {
+      "layer": "L2",
+      "table": "liquidity_cash_flow_projection",
+      "field": "scenario_id",
+      "tableKey": "L2.liquidity_cash_flow_projection"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "scenario_dim",
+      "field": "scenario_id",
+      "tableKey": "L1.scenario_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.liquidity_cash_flow_projection.model_id->L1.model_registry_dim.model_id",
+    "source": {
+      "layer": "L2",
+      "table": "liquidity_cash_flow_projection",
+      "field": "model_id",
+      "tableKey": "L2.liquidity_cash_flow_projection"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "model_registry_dim",
+      "field": "model_id",
+      "tableKey": "L1.model_registry_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.liquidity_cash_flow_projection.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "liquidity_cash_flow_projection",
+      "field": "source_system_id",
+      "tableKey": "L2.liquidity_cash_flow_projection"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_margin_snapshot.netting_set_id->L1.netting_set.netting_set_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_margin_snapshot",
+      "field": "netting_set_id",
+      "tableKey": "L2.derivative_margin_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "netting_set",
+      "field": "netting_set_id",
+      "tableKey": "L1.netting_set"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_margin_snapshot.csa_id->L1.csa_master.csa_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_margin_snapshot",
+      "field": "csa_id",
+      "tableKey": "L2.derivative_margin_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "csa_master",
+      "field": "csa_id",
+      "tableKey": "L1.csa_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_margin_snapshot.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_margin_snapshot",
+      "field": "counterparty_id",
+      "tableKey": "L2.derivative_margin_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_margin_snapshot.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_margin_snapshot",
+      "field": "legal_entity_id",
+      "tableKey": "L2.derivative_margin_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_margin_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_margin_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.derivative_margin_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.derivative_margin_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "derivative_margin_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.derivative_margin_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_instrument_snapshot.capital_instrument_id->L1.capital_instrument_master.capital_instrument_id",
+    "source": {
+      "layer": "L2",
+      "table": "capital_instrument_snapshot",
+      "field": "capital_instrument_id",
+      "tableKey": "L2.capital_instrument_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "capital_instrument_master",
+      "field": "capital_instrument_id",
+      "tableKey": "L1.capital_instrument_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_instrument_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "capital_instrument_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.capital_instrument_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_instrument_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "capital_instrument_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.capital_instrument_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_deduction_snapshot.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L2",
+      "table": "capital_deduction_snapshot",
+      "field": "legal_entity_id",
+      "tableKey": "L2.capital_deduction_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_deduction_snapshot.deduction_type_id->L1.capital_deduction_type_dim.deduction_type_id",
+    "source": {
+      "layer": "L2",
+      "table": "capital_deduction_snapshot",
+      "field": "deduction_type_id",
+      "tableKey": "L2.capital_deduction_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "capital_deduction_type_dim",
+      "field": "deduction_type_id",
+      "tableKey": "L1.capital_deduction_type_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_deduction_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "capital_deduction_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.capital_deduction_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.capital_deduction_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "capital_deduction_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.capital_deduction_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.rwa_snapshot.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L2",
+      "table": "rwa_snapshot",
+      "field": "legal_entity_id",
+      "tableKey": "L2.rwa_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.rwa_snapshot.rwa_risk_type_id->L1.rwa_risk_type_dim.rwa_risk_type_id",
+    "source": {
+      "layer": "L2",
+      "table": "rwa_snapshot",
+      "field": "rwa_risk_type_id",
+      "tableKey": "L2.rwa_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "rwa_risk_type_dim",
+      "field": "rwa_risk_type_id",
+      "tableKey": "L1.rwa_risk_type_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.rwa_snapshot.portfolio_id->L1.portfolio_dim.portfolio_id",
+    "source": {
+      "layer": "L2",
+      "table": "rwa_snapshot",
+      "field": "portfolio_id",
+      "tableKey": "L2.rwa_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "portfolio_dim",
+      "field": "portfolio_id",
+      "tableKey": "L1.portfolio_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.rwa_snapshot.model_id->L1.model_registry_dim.model_id",
+    "source": {
+      "layer": "L2",
+      "table": "rwa_snapshot",
+      "field": "model_id",
+      "tableKey": "L2.rwa_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "model_registry_dim",
+      "field": "model_id",
+      "tableKey": "L1.model_registry_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.rwa_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "rwa_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.rwa_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.rwa_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "rwa_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.rwa_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.leverage_exposure_snapshot.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L2",
+      "table": "leverage_exposure_snapshot",
+      "field": "legal_entity_id",
+      "tableKey": "L2.leverage_exposure_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.leverage_exposure_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "leverage_exposure_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.leverage_exposure_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.leverage_exposure_snapshot.source_system_id->L1.source_system_registry.source_system_id",
+    "source": {
+      "layer": "L2",
+      "table": "leverage_exposure_snapshot",
+      "field": "source_system_id",
+      "tableKey": "L2.leverage_exposure_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "source_system_registry",
+      "field": "source_system_id",
+      "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
   }
 ]

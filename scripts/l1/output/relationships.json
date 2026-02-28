@@ -1528,5 +1528,566 @@
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
+  },
+  {
+    "id": "L1.hqla_classification_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "hqla_classification_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.hqla_classification_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.nsfr_factor_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "nsfr_factor_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.nsfr_factor_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.liquidity_stress_scenario_dim.scenario_id->L1.scenario_dim.scenario_id",
+    "source": {
+      "layer": "L1",
+      "table": "liquidity_stress_scenario_dim",
+      "field": "scenario_id",
+      "tableKey": "L1.liquidity_stress_scenario_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "scenario_dim",
+      "field": "scenario_id",
+      "tableKey": "L1.scenario_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.lcr_outflow_rate_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "lcr_outflow_rate_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.lcr_outflow_rate_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.deposit_product_master.product_node_id->L1.enterprise_product_taxonomy.product_node_id",
+    "source": {
+      "layer": "L1",
+      "table": "deposit_product_master",
+      "field": "product_node_id",
+      "tableKey": "L1.deposit_product_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_product_taxonomy",
+      "field": "product_node_id",
+      "tableKey": "L1.enterprise_product_taxonomy"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.deposit_product_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "deposit_product_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.deposit_product_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.deposit_product_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "deposit_product_master",
+      "field": "currency_code",
+      "tableKey": "L1.deposit_product_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.wholesale_funding_instrument_master.funding_source_type_id->L1.funding_source_type_dim.funding_source_type_id",
+    "source": {
+      "layer": "L1",
+      "table": "wholesale_funding_instrument_master",
+      "field": "funding_source_type_id",
+      "tableKey": "L1.wholesale_funding_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "funding_source_type_dim",
+      "field": "funding_source_type_id",
+      "tableKey": "L1.funding_source_type_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.wholesale_funding_instrument_master.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "wholesale_funding_instrument_master",
+      "field": "counterparty_id",
+      "tableKey": "L1.wholesale_funding_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.wholesale_funding_instrument_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "wholesale_funding_instrument_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.wholesale_funding_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.wholesale_funding_instrument_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "wholesale_funding_instrument_master",
+      "field": "currency_code",
+      "tableKey": "L1.wholesale_funding_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.wholesale_funding_instrument_master.collateral_asset_id->L1.collateral_asset_master.collateral_asset_id",
+    "source": {
+      "layer": "L1",
+      "table": "wholesale_funding_instrument_master",
+      "field": "collateral_asset_id",
+      "tableKey": "L1.wholesale_funding_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "collateral_asset_master",
+      "field": "collateral_asset_id",
+      "tableKey": "L1.collateral_asset_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.instrument_id->L1.instrument_master.instrument_id",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "instrument_id",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "instrument_master",
+      "field": "instrument_id",
+      "tableKey": "L1.instrument_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.hqla_classification_id->L1.hqla_classification_dim.hqla_classification_id",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "hqla_classification_id",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "hqla_classification_dim",
+      "field": "hqla_classification_id",
+      "tableKey": "L1.hqla_classification_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "currency_code",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.encumbrance_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "encumbrance_counterparty_id",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.issuer_counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "issuer_counterparty_id",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.securities_position_master.issuer_country_code->L1.country_dim.country_code",
+    "source": {
+      "layer": "L1",
+      "table": "securities_position_master",
+      "field": "issuer_country_code",
+      "tableKey": "L1.securities_position_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "country_dim",
+      "field": "country_code",
+      "tableKey": "L1.country_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.off_balance_sheet_commitment_master.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L1",
+      "table": "off_balance_sheet_commitment_master",
+      "field": "facility_id",
+      "tableKey": "L1.off_balance_sheet_commitment_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.off_balance_sheet_commitment_master.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L1",
+      "table": "off_balance_sheet_commitment_master",
+      "field": "counterparty_id",
+      "tableKey": "L1.off_balance_sheet_commitment_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.off_balance_sheet_commitment_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "off_balance_sheet_commitment_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.off_balance_sheet_commitment_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.off_balance_sheet_commitment_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "off_balance_sheet_commitment_master",
+      "field": "currency_code",
+      "tableKey": "L1.off_balance_sheet_commitment_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.off_balance_sheet_commitment_master.product_node_id->L1.enterprise_product_taxonomy.product_node_id",
+    "source": {
+      "layer": "L1",
+      "table": "off_balance_sheet_commitment_master",
+      "field": "product_node_id",
+      "tableKey": "L1.off_balance_sheet_commitment_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_product_taxonomy",
+      "field": "product_node_id",
+      "tableKey": "L1.enterprise_product_taxonomy"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.central_bank_facility_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "central_bank_facility_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.central_bank_facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.central_bank_facility_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "central_bank_facility_master",
+      "field": "currency_code",
+      "tableKey": "L1.central_bank_facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_deduction_type_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "capital_deduction_type_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.capital_deduction_type_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_buffer_requirement_dim.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "capital_buffer_requirement_dim",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.capital_buffer_requirement_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_buffer_requirement_dim.country_code->L1.country_dim.country_code",
+    "source": {
+      "layer": "L1",
+      "table": "capital_buffer_requirement_dim",
+      "field": "country_code",
+      "tableKey": "L1.capital_buffer_requirement_dim"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "country_dim",
+      "field": "country_code",
+      "tableKey": "L1.country_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_instrument_master.instrument_id->L1.instrument_master.instrument_id",
+    "source": {
+      "layer": "L1",
+      "table": "capital_instrument_master",
+      "field": "instrument_id",
+      "tableKey": "L1.capital_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "instrument_master",
+      "field": "instrument_id",
+      "tableKey": "L1.instrument_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_instrument_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "capital_instrument_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.capital_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_instrument_master.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L1",
+      "table": "capital_instrument_master",
+      "field": "currency_code",
+      "tableKey": "L1.capital_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.capital_instrument_master.jurisdiction_code->L1.regulatory_jurisdiction.jurisdiction_code",
+    "source": {
+      "layer": "L1",
+      "table": "capital_instrument_master",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.capital_instrument_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "regulatory_jurisdiction",
+      "field": "jurisdiction_code",
+      "tableKey": "L1.regulatory_jurisdiction"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
   }
 ]

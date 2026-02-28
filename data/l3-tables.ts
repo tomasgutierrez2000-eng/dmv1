@@ -6,7 +6,7 @@
 export type L3Tier = 1 | 2 | 3 | 4;
 
 export interface L3TableDef {
-  id: string;           // T01..T49
+  id: string;           // T01..T62
   name: string;         // table name (e.g. exposure_metric_cube)
   category: string;    // from DDL comment (e.g. "Exposure & Risk Metrics")
   tier: L3Tier;        // population tier: 1 = L1+L2 only, 2 = reads T1, 3 = reads T1–2, 4 = reads all
@@ -64,6 +64,20 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T47', name: 'lob_deterioration_summary',         category: 'LoB Summary',                tier: 3 },
   { id: 'T48', name: 'lob_rating_distribution',           category: 'LoB Summary',                tier: 3 },
   { id: 'T49', name: 'lob_top_contributors',               category: 'LoB Summary',                tier: 3 },
+  // Liquidity Risk
+  { id: 'T51', name: 'lcr_summary',                       category: 'Liquidity Risk',             tier: 1 },
+  { id: 'T52', name: 'lcr_component_detail',              category: 'Liquidity Risk',             tier: 1 },
+  { id: 'T53', name: 'nsfr_summary',                      category: 'Liquidity Risk',             tier: 1 },
+  { id: 'T54', name: 'liquidity_gap_analysis',            category: 'Liquidity Risk',             tier: 2 },
+  { id: 'T55', name: 'liquidity_stress_test_result',      category: 'Liquidity Risk',             tier: 2 },
+  { id: 'T56', name: 'funding_concentration_summary',     category: 'Liquidity Risk',             tier: 1 },
+  // Capital Adequacy
+  { id: 'T57', name: 'capital_adequacy_summary',          category: 'Capital Adequacy',           tier: 1 },
+  { id: 'T58', name: 'rwa_composition_summary',           category: 'Capital Adequacy',           tier: 1 },
+  { id: 'T59', name: 'capital_planning_projection',       category: 'Capital Adequacy',           tier: 2 },
+  { id: 'T60', name: 'capital_buffer_compliance',         category: 'Capital Adequacy',           tier: 2 },
+  { id: 'T61', name: 'leverage_ratio_summary',            category: 'Capital Adequacy',           tier: 1 },
+  { id: 'T62', name: 'ccar_stress_capital_result',        category: 'Capital Adequacy',           tier: 2 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

@@ -595,3 +595,190 @@ CREATE TABLE IF NOT EXISTS l2.data_quality_score_snapshot (
   score_dimension VARCHAR(30),
   CONSTRAINT fk_data_quality_score_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
+
+CREATE TABLE IF NOT EXISTS l2.securities_position_snapshot (
+  securities_position_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  par_amount NUMERIC(18,2),
+  market_value_amt NUMERIC(18,2),
+  book_value_amt NUMERIC(18,2),
+  unrealized_gain_loss_amt NUMERIC(18,2),
+  accrued_interest_amt NUMERIC(18,2),
+  hqla_eligible_value_amt NUMERIC(18,2),
+  is_encumbered_flag CHAR(1),
+  encumbered_value_amt NUMERIC(18,2),
+  unencumbered_value_amt NUMERIC(18,2),
+  remaining_maturity_days INTEGER,
+  duration_years NUMERIC(10,4),
+  credit_spread_bps NUMERIC(10,2),
+  source_system_id BIGINT,
+  CONSTRAINT fk_securities_position_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.deposit_balance_snapshot (
+  deposit_product_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  currency_code VARCHAR(20),
+  total_balance_amt NUMERIC(18,2),
+  insured_balance_amt NUMERIC(18,2),
+  uninsured_balance_amt NUMERIC(18,2),
+  account_count INTEGER,
+  weighted_avg_maturity_days INTEGER,
+  weighted_avg_rate_pct NUMERIC(10,4),
+  lcr_outflow_amt NUMERIC(18,2),
+  nsfr_asf_amt NUMERIC(18,2),
+  concentration_top10_pct NUMERIC(10,4),
+  behavioral_maturity_days INTEGER,
+  surge_balance_amt NUMERIC(18,2),
+  core_deposit_amt NUMERIC(18,2),
+  source_system_id BIGINT,
+  CONSTRAINT fk_deposit_balance_snapshot_deposit_product_id FOREIGN KEY (deposit_product_id) REFERENCES l1.deposit_product_master(deposit_product_id),
+  CONSTRAINT fk_deposit_balance_snapshot_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_deposit_balance_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_deposit_balance_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.wholesale_funding_snapshot (
+  wholesale_funding_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  outstanding_amount NUMERIC(18,2),
+  market_value_collateral_amt NUMERIC(18,2),
+  remaining_maturity_days INTEGER,
+  rollover_assumption_pct NUMERIC(10,4),
+  lcr_outflow_amt NUMERIC(18,2),
+  nsfr_asf_amt NUMERIC(18,2),
+  cost_rate_pct NUMERIC(10,4),
+  spread_to_benchmark_bps NUMERIC(10,2),
+  currency_code VARCHAR(20),
+  source_system_id BIGINT,
+  CONSTRAINT fk_wholesale_funding_snapshot_wholesale_funding_id FOREIGN KEY (wholesale_funding_id) REFERENCES l1.wholesale_funding_instrument_master(wholesale_funding_id),
+  CONSTRAINT fk_wholesale_funding_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_wholesale_funding_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.liquidity_cash_flow_projection (
+  cash_flow_projection_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  liquidity_bucket_id BIGINT NOT NULL,
+  cash_flow_category VARCHAR(30) NOT NULL,
+  flow_type VARCHAR(50) NOT NULL,
+  flow_direction VARCHAR(10) NOT NULL,
+  currency_code VARCHAR(20),
+  gross_amount NUMERIC(18,2),
+  haircut_or_runoff_pct NUMERIC(10,4),
+  net_amount NUMERIC(18,2),
+  scenario_id BIGINT,
+  source_instrument_type VARCHAR(50),
+  source_record_id BIGINT,
+  model_id BIGINT,
+  source_system_id BIGINT,
+  CONSTRAINT fk_liquidity_cash_flow_projection_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_liquidity_cash_flow_projection_liquidity_bucket_id FOREIGN KEY (liquidity_bucket_id) REFERENCES l1.liquidity_time_bucket_dim(liquidity_bucket_id),
+  CONSTRAINT fk_liquidity_cash_flow_projection_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_liquidity_cash_flow_projection_scenario_id FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim(scenario_id),
+  CONSTRAINT fk_liquidity_cash_flow_projection_model_id FOREIGN KEY (model_id) REFERENCES l1.model_registry_dim(model_id),
+  CONSTRAINT fk_liquidity_cash_flow_projection_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.derivative_margin_snapshot (
+  netting_set_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  csa_id BIGINT,
+  counterparty_id BIGINT NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  currency_code VARCHAR(20),
+  gross_mtm_amt NUMERIC(18,2),
+  net_mtm_amt NUMERIC(18,2),
+  vm_posted_amt NUMERIC(18,2),
+  vm_received_amt NUMERIC(18,2),
+  im_posted_amt NUMERIC(18,2),
+  im_received_amt NUMERIC(18,2),
+  potential_vm_call_amt NUMERIC(18,2),
+  potential_im_call_amt NUMERIC(18,2),
+  lcr_outflow_from_margin_amt NUMERIC(18,2),
+  downgrade_trigger_notional_amt NUMERIC(18,2),
+  source_system_id BIGINT,
+  CONSTRAINT fk_derivative_margin_snapshot_netting_set_id FOREIGN KEY (netting_set_id) REFERENCES l1.netting_set(netting_set_id),
+  CONSTRAINT fk_derivative_margin_snapshot_csa_id FOREIGN KEY (csa_id) REFERENCES l1.csa_master(csa_id),
+  CONSTRAINT fk_derivative_margin_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_derivative_margin_snapshot_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_derivative_margin_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_derivative_margin_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.capital_instrument_snapshot (
+  capital_instrument_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  carrying_value_amt NUMERIC(18,2),
+  regulatory_value_amt NUMERIC(18,2),
+  accrued_interest_amt NUMERIC(18,2),
+  fair_value_amt NUMERIC(18,2),
+  amortization_remaining_amt NUMERIC(18,2),
+  transitional_adjustment_amt NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  fx_rate_to_reporting NUMERIC(18,10),
+  reporting_currency_value_amt NUMERIC(18,2),
+  source_system_id BIGINT,
+  CONSTRAINT fk_capital_instrument_snapshot_capital_instrument_id FOREIGN KEY (capital_instrument_id) REFERENCES l1.capital_instrument_master(capital_instrument_id),
+  CONSTRAINT fk_capital_instrument_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_capital_instrument_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.capital_deduction_snapshot (
+  deduction_snapshot_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  deduction_type_id BIGINT NOT NULL,
+  gross_deduction_amt NUMERIC(18,2),
+  threshold_allowance_amt NUMERIC(18,2),
+  net_deduction_amt NUMERIC(18,2),
+  deducted_from_tier VARCHAR(10),
+  transitional_adjustment_amt NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  source_system_id BIGINT,
+  CONSTRAINT fk_capital_deduction_snapshot_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_capital_deduction_snapshot_deduction_type_id FOREIGN KEY (deduction_type_id) REFERENCES l1.capital_deduction_type_dim(deduction_type_id),
+  CONSTRAINT fk_capital_deduction_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_capital_deduction_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.rwa_snapshot (
+  rwa_snapshot_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  rwa_risk_type_id BIGINT NOT NULL,
+  portfolio_id BIGINT,
+  exposure_amount NUMERIC(18,2),
+  risk_weight_pct NUMERIC(10,6),
+  rwa_amount NUMERIC(18,2),
+  capital_requirement_amt NUMERIC(18,2),
+  prior_period_rwa_amount NUMERIC(18,2),
+  rwa_density_pct NUMERIC(10,6),
+  model_id BIGINT,
+  currency_code VARCHAR(20),
+  source_system_id BIGINT,
+  CONSTRAINT fk_rwa_snapshot_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_rwa_snapshot_rwa_risk_type_id FOREIGN KEY (rwa_risk_type_id) REFERENCES l1.rwa_risk_type_dim(rwa_risk_type_id),
+  CONSTRAINT fk_rwa_snapshot_portfolio_id FOREIGN KEY (portfolio_id) REFERENCES l1.portfolio_dim(portfolio_id),
+  CONSTRAINT fk_rwa_snapshot_model_id FOREIGN KEY (model_id) REFERENCES l1.model_registry_dim(model_id),
+  CONSTRAINT fk_rwa_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_rwa_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.leverage_exposure_snapshot (
+  leverage_snapshot_id BIGINT NOT NULL PRIMARY KEY,
+  as_of_date DATE NOT NULL,
+  legal_entity_id BIGINT NOT NULL,
+  exposure_category VARCHAR(50) NOT NULL,
+  exposure_subcategory VARCHAR(50),
+  gross_exposure_amt NUMERIC(18,2),
+  adjustment_amt NUMERIC(18,2),
+  net_exposure_amt NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  source_system_id BIGINT,
+  CONSTRAINT fk_leverage_exposure_snapshot_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
+  CONSTRAINT fk_leverage_exposure_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
+  CONSTRAINT fk_leverage_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);

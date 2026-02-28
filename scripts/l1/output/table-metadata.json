@@ -5724,5 +5724,1043 @@
       "fk": null,
       "nullable": true
     }
+  },
+  "L1.hqla_classification_dim": {
+    "hqla_classification_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "hqla_level_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "hqla_level_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "asset_subtype_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "haircut_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "cap_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.nsfr_factor_dim": {
+    "nsfr_factor_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "factor_type": {
+      "type": "VARCHAR(10)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "category_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "category_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "residual_maturity_bucket": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.liquidity_time_bucket_dim": {
+    "liquidity_bucket_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "bucket_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "bucket_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "bucket_start_days": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "bucket_end_days": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_lcr_bucket_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_nsfr_bucket_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "display_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.funding_source_type_dim": {
+    "funding_source_type_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "funding_source_type_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "funding_source_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "funding_category": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_stable_funding_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "lcr_outflow_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "asf_factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.liquidity_stress_scenario_dim": {
+    "liquidity_scenario_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "scenario_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.scenario_dim(scenario_id)",
+      "nullable": false
+    },
+    "scenario_severity": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "scenario_horizon_days": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "deposit_runoff_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "wholesale_funding_rollover_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "credit_line_drawdown_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_haircut_stress_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "market_value_shock_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contingent_funding_probability_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_regulatory_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.lcr_outflow_rate_dim": {
+    "lcr_rate_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "flow_direction": {
+      "type": "VARCHAR(10)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "rate_category_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "rate_category_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "regulatory_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.deposit_product_master": {
+    "deposit_product_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_product_taxonomy(product_node_id)",
+      "nullable": true
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "deposit_category": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "deposit_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_insured_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_transactional_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_brokered_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "early_withdrawal_penalty_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "lcr_outflow_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "nsfr_asf_factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "min_balance_for_operational": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.wholesale_funding_instrument_master": {
+    "wholesale_funding_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "funding_source_type_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.funding_source_type_dim(funding_source_type_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "instrument_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "notional_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "issue_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_type": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_secured_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "collateral_asset_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.collateral_asset_master(collateral_asset_id)",
+      "nullable": true
+    },
+    "is_callable_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "call_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lcr_outflow_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "nsfr_asf_factor_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.securities_position_master": {
+    "securities_position_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "instrument_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.instrument_master(instrument_id)",
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "hqla_classification_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.hqla_classification_dim(hqla_classification_id)",
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "accounting_portfolio": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "par_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_encumbered_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "encumbrance_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "encumbrance_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "encumbrance_maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "issuer_counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "issuer_country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.country_dim(country_code)",
+      "nullable": true
+    },
+    "credit_rating_external": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "asset_class": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "remaining_maturity_days": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.off_balance_sheet_commitment_master": {
+    "obs_commitment_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_product_taxonomy(product_node_id)",
+      "nullable": true
+    },
+    "commitment_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "total_commitment_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "drawn_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "undrawn_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_unconditionally_revocable_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "lcr_drawdown_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "contractual_notice_period_days": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "historical_drawdown_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.central_bank_facility_master": {
+    "cb_facility_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "central_bank_name": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "facility_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "total_capacity_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "drawn_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "available_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "collateral_pledged_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_contingent_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "count_in_lcr_buffer_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.capital_deduction_type_dim": {
+    "deduction_type_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "deduction_type_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "deduction_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "deducted_from_tier": {
+      "type": "VARCHAR(10)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "threshold_applicable_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "threshold_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_weight_if_below_threshold": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.capital_buffer_requirement_dim": {
+    "buffer_requirement_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "buffer_type_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "buffer_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "buffer_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": true
+    },
+    "country_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.country_dim(country_code)",
+      "nullable": true
+    },
+    "effective_from_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "effective_to_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "announced_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.rwa_risk_type_dim": {
+    "rwa_risk_type_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "rwa_risk_type_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "rwa_risk_type_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_category": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "calculation_approach": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.capital_instrument_master": {
+    "capital_instrument_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "instrument_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.instrument_master(instrument_id)",
+      "nullable": true
+    },
+    "legal_entity_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.legal_entity(legal_entity_id)",
+      "nullable": false
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": false
+    },
+    "jurisdiction_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.regulatory_jurisdiction(jurisdiction_code)",
+      "nullable": true
+    },
+    "capital_tier": {
+      "type": "VARCHAR(10)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "instrument_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "par_value_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "issue_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "maturity_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "coupon_rate_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "first_call_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_grandfathered_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "amortization_start_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "conversion_trigger_pct": {
+      "type": "DECIMAL(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "loss_absorption_mechanism": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_regulatory_eligible_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
   }
 }

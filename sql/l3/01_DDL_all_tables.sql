@@ -1328,3 +1328,294 @@ CREATE TABLE IF NOT EXISTS l3.metric_value_fact (
 CREATE UNIQUE INDEX IF NOT EXISTS uq_metric_value_fact ON l3.metric_value_fact (run_version_id, as_of_date, metric_id, COALESCE(variant_id, ''), aggregation_level, COALESCE(facility_id, ''), COALESCE(counterparty_id, ''), COALESCE(desk_id, ''), COALESCE(portfolio_id, ''), COALESCE(lob_id, ''));
 CREATE INDEX IF NOT EXISTS ix_metric_value_fact_lookup ON l3.metric_value_fact (metric_id, aggregation_level, as_of_date, run_version_id);
 
+-- ============================================================
+-- Liquidity Risk Tables (T51-T56)
+-- ============================================================
+
+-- T51: lcr_summary (Liquidity Coverage Ratio)
+CREATE TABLE IF NOT EXISTS l3.lcr_summary (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    total_hqla_amt                                NUMERIC(20,4),
+    hqla_level1_amt                               NUMERIC(20,4),
+    hqla_level2a_amt                              NUMERIC(20,4),
+    hqla_level2b_amt                              NUMERIC(20,4),
+    total_gross_outflow_amt                       NUMERIC(20,4),
+    total_inflow_amt                              NUMERIC(20,4),
+    inflow_cap_amt                                NUMERIC(20,4),
+    total_net_outflow_amt                         NUMERIC(20,4),
+    lcr_ratio_pct                                 NUMERIC(10,6),
+    lcr_surplus_deficit_amt                       NUMERIC(20,4),
+    regulatory_minimum_pct                        NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id)
+);
+
+-- T52: lcr_component_detail (LCR outflow/inflow breakdown)
+CREATE TABLE IF NOT EXISTS l3.lcr_component_detail (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    component_category                            VARCHAR(50) NOT NULL,
+    component_name                                VARCHAR(200),
+    gross_amount                                  NUMERIC(20,4),
+    haircut_or_runoff_rate_pct                     NUMERIC(10,6),
+    weighted_amount                               NUMERIC(20,4),
+    base_currency_code                            VARCHAR(30),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id, component_category)
+);
+
+-- T53: nsfr_summary (Net Stable Funding Ratio)
+CREATE TABLE IF NOT EXISTS l3.nsfr_summary (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    total_asf_amt                                 NUMERIC(20,4),
+    asf_capital_amt                               NUMERIC(20,4),
+    asf_stable_retail_amt                         NUMERIC(20,4),
+    asf_less_stable_retail_amt                    NUMERIC(20,4),
+    asf_wholesale_gt1y_amt                        NUMERIC(20,4),
+    asf_wholesale_6m_1y_amt                       NUMERIC(20,4),
+    asf_wholesale_lt6m_amt                        NUMERIC(20,4),
+    total_rsf_amt                                 NUMERIC(20,4),
+    rsf_hqla_l1_amt                               NUMERIC(20,4),
+    rsf_hqla_l2_amt                               NUMERIC(20,4),
+    rsf_performing_loans_lt1y_amt                 NUMERIC(20,4),
+    rsf_performing_loans_gt1y_amt                 NUMERIC(20,4),
+    rsf_obs_commitments_amt                       NUMERIC(20,4),
+    rsf_other_assets_amt                          NUMERIC(20,4),
+    nsfr_ratio_pct                                NUMERIC(10,6),
+    nsfr_surplus_deficit_amt                      NUMERIC(20,4),
+    regulatory_minimum_pct                        NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id)
+);
+
+-- T54: liquidity_gap_analysis (Cumulative liquidity gap by time bucket)
+CREATE TABLE IF NOT EXISTS l3.liquidity_gap_analysis (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    liquidity_bucket_id                           VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    total_inflow_amt                              NUMERIC(20,4),
+    total_outflow_amt                             NUMERIC(20,4),
+    net_gap_amt                                   NUMERIC(20,4),
+    cumulative_gap_amt                            NUMERIC(20,4),
+    hqla_buffer_available_amt                     NUMERIC(20,4),
+    adjusted_gap_amt                              NUMERIC(20,4),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id, liquidity_bucket_id)
+);
+
+-- T55: liquidity_stress_test_result (Internal liquidity stress test)
+CREATE TABLE IF NOT EXISTS l3.liquidity_stress_test_result (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    survival_horizon_days                         INTEGER,
+    min_liquidity_buffer_amt                      NUMERIC(20,4),
+    min_buffer_day                                INTEGER,
+    starting_buffer_amt                           NUMERIC(20,4),
+    total_stress_outflow_amt                      NUMERIC(20,4),
+    total_stress_inflow_amt                       NUMERIC(20,4),
+    contingent_funding_used_amt                   NUMERIC(20,4),
+    asset_monetization_amt                        NUMERIC(20,4),
+    deposit_runoff_amt                            NUMERIC(20,4),
+    wholesale_funding_loss_amt                    NUMERIC(20,4),
+    commitment_drawdown_amt                       NUMERIC(20,4),
+    derivative_margin_call_amt                    NUMERIC(20,4),
+    pass_fail_flag                                CHAR(1),
+    result_status_code                            VARCHAR(30),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id)
+);
+
+-- T56: funding_concentration_summary (Concentration by counterparty, type, currency, maturity)
+CREATE TABLE IF NOT EXISTS l3.funding_concentration_summary (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    concentration_dimension                       VARCHAR(30) NOT NULL,
+    dimension_value                               VARCHAR(100) NOT NULL,
+    dimension_name                                VARCHAR(200),
+    total_funding_amt                             NUMERIC(20,4),
+    concentration_pct                             NUMERIC(10,6),
+    rank_order                                    INTEGER,
+    base_currency_code                            VARCHAR(30),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, concentration_dimension, dimension_value)
+);
+
+-- ============================================================
+-- Capital Adequacy Tables (T57-T62)
+-- ============================================================
+
+-- T57: capital_adequacy_summary (CET1, T1, Total Capital ratios)
+CREATE TABLE IF NOT EXISTS l3.capital_adequacy_summary (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    cet1_gross_amt                                NUMERIC(20,4),
+    cet1_deductions_amt                           NUMERIC(20,4),
+    cet1_net_amt                                  NUMERIC(20,4),
+    at1_instruments_amt                           NUMERIC(20,4),
+    at1_deductions_amt                            NUMERIC(20,4),
+    at1_net_amt                                   NUMERIC(20,4),
+    tier1_capital_amt                             NUMERIC(20,4),
+    t2_instruments_amt                            NUMERIC(20,4),
+    t2_deductions_amt                             NUMERIC(20,4),
+    t2_net_amt                                    NUMERIC(20,4),
+    total_capital_amt                             NUMERIC(20,4),
+    total_rwa_amt                                 NUMERIC(20,4),
+    credit_rwa_amt                                NUMERIC(20,4),
+    market_rwa_amt                                NUMERIC(20,4),
+    operational_rwa_amt                           NUMERIC(20,4),
+    cva_rwa_amt                                   NUMERIC(20,4),
+    cet1_ratio_pct                                NUMERIC(10,6),
+    tier1_ratio_pct                               NUMERIC(10,6),
+    total_capital_ratio_pct                       NUMERIC(10,6),
+    leverage_exposure_amt                         NUMERIC(20,4),
+    supplementary_leverage_ratio_pct              NUMERIC(10,6),
+    buffer_requirement_pct                        NUMERIC(10,6),
+    buffer_available_pct                          NUMERIC(10,6),
+    mda_trigger_pct                               NUMERIC(10,6),
+    is_above_mda_flag                             CHAR(1),
+    prior_period_cet1_ratio_pct                   NUMERIC(10,6),
+    cet1_ratio_change_pct                         NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id)
+);
+
+-- T58: rwa_composition_summary (RWA waterfall by risk type & portfolio)
+CREATE TABLE IF NOT EXISTS l3.rwa_composition_summary (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    rwa_risk_type_code                            VARCHAR(30) NOT NULL,
+    portfolio_id                                  VARCHAR(64),
+    lob_node_id                                   VARCHAR(64),
+    base_currency_code                            VARCHAR(30),
+    ead_amt                                       NUMERIC(20,4),
+    rwa_amt                                       NUMERIC(20,4),
+    rwa_density_pct                               NUMERIC(10,6),
+    capital_requirement_amt                       NUMERIC(20,4),
+    prior_period_rwa_amt                          NUMERIC(20,4),
+    rwa_change_amt                                NUMERIC(20,4),
+    rwa_change_pct                                NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id, rwa_risk_type_code)
+);
+
+-- T59: capital_planning_projection (Forward capital projections — CCAR/DFAST)
+CREATE TABLE IF NOT EXISTS l3.capital_planning_projection (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    projection_quarter                            DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    projected_cet1_amt                            NUMERIC(20,4),
+    projected_rwa_amt                             NUMERIC(20,4),
+    projected_cet1_ratio_pct                      NUMERIC(10,6),
+    projected_tier1_ratio_pct                     NUMERIC(10,6),
+    projected_total_capital_ratio_pct             NUMERIC(10,6),
+    projected_slr_pct                             NUMERIC(10,6),
+    ppnr_amt                                      NUMERIC(20,4),
+    provision_for_credit_losses_amt               NUMERIC(20,4),
+    net_income_amt                                NUMERIC(20,4),
+    other_comprehensive_income_amt                NUMERIC(20,4),
+    dividends_amt                                 NUMERIC(20,4),
+    share_repurchase_amt                          NUMERIC(20,4),
+    other_capital_actions_amt                     NUMERIC(20,4),
+    is_minimum_quarter_flag                       CHAR(1),
+    headroom_to_minimum_pct                       NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, projection_quarter, legal_entity_id, scenario_id)
+);
+
+-- T60: capital_buffer_compliance (Buffer composition & compliance)
+CREATE TABLE IF NOT EXISTS l3.capital_buffer_compliance (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    buffer_type_code                              VARCHAR(30) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    required_buffer_pct                           NUMERIC(10,6),
+    actual_buffer_pct                             NUMERIC(10,6),
+    surplus_deficit_pct                           NUMERIC(10,6),
+    surplus_deficit_amt                           NUMERIC(20,4),
+    mda_restriction_flag                          CHAR(1),
+    prior_period_buffer_pct                       NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, buffer_type_code)
+);
+
+-- T61: leverage_ratio_summary (SLR decomposition)
+CREATE TABLE IF NOT EXISTS l3.leverage_ratio_summary (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    tier1_capital_amt                             NUMERIC(20,4),
+    on_balance_sheet_exposure_amt                 NUMERIC(20,4),
+    derivative_exposure_amt                       NUMERIC(20,4),
+    sft_exposure_amt                              NUMERIC(20,4),
+    off_balance_sheet_exposure_amt                NUMERIC(20,4),
+    other_adjustments_amt                         NUMERIC(20,4),
+    total_leverage_exposure_amt                   NUMERIC(20,4),
+    supplementary_leverage_ratio_pct              NUMERIC(10,6),
+    eslr_buffer_pct                               NUMERIC(10,6),
+    regulatory_minimum_pct                        NUMERIC(10,6),
+    prior_period_slr_pct                          NUMERIC(10,6),
+    slr_change_pct                                NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id)
+);
+
+-- T62: ccar_stress_capital_result (CCAR/DFAST stress test capital results)
+CREATE TABLE IF NOT EXISTS l3.ccar_stress_capital_result (
+    run_version_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    legal_entity_id                               VARCHAR(64) NOT NULL,
+    scenario_id                                   VARCHAR(64) NOT NULL,
+    base_currency_code                            VARCHAR(30),
+    planning_horizon_quarters                     INTEGER,
+    starting_cet1_ratio_pct                       NUMERIC(10,6),
+    minimum_cet1_ratio_pct                        NUMERIC(10,6),
+    minimum_cet1_quarter                          DATE,
+    ending_cet1_ratio_pct                         NUMERIC(10,6),
+    starting_tier1_ratio_pct                      NUMERIC(10,6),
+    minimum_tier1_ratio_pct                       NUMERIC(10,6),
+    starting_total_capital_ratio_pct              NUMERIC(10,6),
+    minimum_total_capital_ratio_pct               NUMERIC(10,6),
+    starting_slr_pct                              NUMERIC(10,6),
+    minimum_slr_pct                               NUMERIC(10,6),
+    cumulative_ppnr_amt                           NUMERIC(20,4),
+    cumulative_credit_losses_amt                  NUMERIC(20,4),
+    cumulative_market_losses_amt                  NUMERIC(20,4),
+    cumulative_operational_losses_amt             NUMERIC(20,4),
+    cumulative_aoci_impact_amt                    NUMERIC(20,4),
+    cumulative_capital_actions_amt                NUMERIC(20,4),
+    total_capital_depletion_amt                   NUMERIC(20,4),
+    scb_implied_pct                               NUMERIC(10,6),
+    pass_fail_flag                                CHAR(1),
+    submission_cycle                              VARCHAR(20),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, scenario_id)
+);
+

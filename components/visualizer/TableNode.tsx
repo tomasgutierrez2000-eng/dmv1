@@ -139,8 +139,14 @@ export default function TableNode({
       onToggleExpand();
       return;
     }
-    onSelect();
     handleMouseDownProp(e);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (e.detail <= 1) {
+      onSelect();
+    }
   };
 
   const pkFields = table.fields.filter((f) => f.isPK);
@@ -183,7 +189,7 @@ export default function TableNode({
       <g
         transform={`translate(${position.x}, ${position.y})`}
         onMouseDown={handleMouseDown}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleClick}
         style={{ cursor: 'grab' }}
       >
         <defs>
@@ -256,7 +262,10 @@ export default function TableNode({
                 minWidth: 0,
                 minHeight: 0,
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (e.detail <= 1) onSelect();
+              }}
             >
               {showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0) ? (
                 <div
@@ -416,7 +425,7 @@ export default function TableNode({
     <g
       transform={`translate(${position.x}, ${position.y})`}
       onMouseDown={handleMouseDown}
-      onClick={(e) => e.stopPropagation()}
+      onClick={handleClick}
       style={{ cursor: 'grab' }}
     >
       <foreignObject 
@@ -439,7 +448,10 @@ export default function TableNode({
             maxHeight: TABLE_HEIGHT,
             overflow: 'hidden',
           }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (e.detail <= 1) onSelect();
+          }}
         >
           {/* Header - Dynamic sizing based on view mode */}
           <div

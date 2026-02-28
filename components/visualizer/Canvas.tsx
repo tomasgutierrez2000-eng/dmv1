@@ -25,6 +25,7 @@ export default function Canvas() {
   const DOUBLE_CLICK_ZOOM_IN_DELAY_MS = 300;
   // Triple-click now uses fit-to-view (handled in handleCanvasClick)
   const pendingDragRef = useRef<{ tableKey: string; startX: number; startY: number } | null>(null);
+  const tableDragOccurredRef = useRef(false);
   const isInteractingRef = useRef(false);
   const doubleClickZoomInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -644,6 +645,7 @@ export default function Canvas() {
     (e: React.MouseEvent) => {
       setShowHint(false);
       isInteractingRef.current = true;
+      tableDragOccurredRef.current = false;
       // Shift + left-drag: marquee zoom to region (over canvas or content)
       if (e.button === 0 && e.shiftKey) {
         const rect = containerRef.current?.getBoundingClientRect();
@@ -695,6 +697,7 @@ export default function Canvas() {
         const dx = e.clientX - pending.startX;
         const dy = e.clientY - pending.startY;
         if (Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD_PX) {
+          tableDragOccurredRef.current = true;
           setIsDraggingTable(pending.tableKey);
           setDragStart({ x: e.clientX, y: e.clientY });
           pendingDragRef.current = null;
@@ -915,9 +918,12 @@ export default function Canvas() {
           e.preventDefault();
           return;
         }
-        // First Escape: clear sample data cell selection (derivation panel). Second Escape: clear table/field/relationship.
+        // Progressive Escape: sample data cell → field → table → clear all
         if (selectedSampleDataCell) {
           setSelectedSampleDataCell(null);
+          e.preventDefault();
+        } else if (selectedField) {
+          setSelectedTable(selectedField.tableKey);
           e.preventDefault();
         } else {
           clearSelection();
@@ -926,7 +932,7 @@ export default function Canvas() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, clearSelection, setSelectedSampleDataCell, selectedSampleDataCell, marqueeStart]);
+  }, [zoom, setZoom, model, visibleTables, tablePositions, runFitToView, clearSelection, setSelectedSampleDataCell, selectedSampleDataCell, selectedField, setSelectedTable, marqueeStart]);
 
   // Auto-hide navigation hint after first interaction or 8 seconds
   useEffect(() => {
@@ -1101,7 +1107,7 @@ export default function Canvas() {
                 <g
                   key={domain}
                   style={{
-                    opacity: domainHasFocusTable ? 1 : 0.08,
+                    opacity: domainHasFocusTable ? 1 : 0.25,
                     transition: 'opacity 0.2s ease',
                   }}
                 >
@@ -1197,10 +1203,9 @@ export default function Canvas() {
               <g
                 key={table.key}
                 style={{
-                  opacity: beingDragged ? 0.85 : isFocusRelevant ? 1 : 0.08,
+                  opacity: beingDragged ? 0.85 : isFocusRelevant ? 1 : 0.25,
                   filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
                   transition: beingDragged ? 'none' : 'opacity 0.2s ease',
-                  pointerEvents: isFocusRelevant ? 'auto' : 'none',
                 }}
               >
                 <TableNode
@@ -1208,7 +1213,11 @@ export default function Canvas() {
                   position={position}
                   isSelected={selectedTable === table.key}
                   isExpanded={layoutMode === 'domain-overview' ? false : expandedTables.has(table.key)}
-                  onSelect={() => setSelectedTable(table.key)}
+                  onSelect={() => {
+                    if (!tableDragOccurredRef.current) {
+                      setSelectedTable(table.key);
+                    }
+                  }}
                   onToggleExpand={() => {
                     if (layoutMode !== 'domain-overview') {
                       toggleExpandedTable(table.key);

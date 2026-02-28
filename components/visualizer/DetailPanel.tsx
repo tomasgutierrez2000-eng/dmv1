@@ -293,9 +293,17 @@ export default function DetailPanel() {
                 <h3 className="text-sm font-semibold text-gray-900">Field details</h3>
               </div>
 
-              {/* Table context */}
-              <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 mb-3">
-                <div className="text-[12px] font-medium text-gray-400 uppercase tracking-wider mb-1">Table</div>
+              {/* Table context — clickable to navigate back to table view */}
+              <button
+                type="button"
+                onClick={() => setSelectedTable(selectedField.tableKey)}
+                className="w-full text-left bg-gray-50 rounded-lg p-3 border border-gray-100 mb-3 hover:bg-gray-100 hover:border-gray-200 transition-colors group"
+                aria-label={`Back to table ${fieldTable.name}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-[12px] font-medium text-gray-400 uppercase tracking-wider mb-1">Table</div>
+                  <span className="text-[11px] text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity font-medium">View table</span>
+                </div>
                 <div className="font-semibold text-sm text-gray-900">{fieldTable.name}</div>
                 <div className="flex items-center gap-2 mt-1.5">
                   <span className={`px-1.5 py-0.5 rounded text-[12px] font-bold ${layerColors[fieldTable.layer as keyof typeof layerColors]?.badge ?? 'bg-gray-100 text-gray-800'}`}>
@@ -303,7 +311,7 @@ export default function DetailPanel() {
                   </span>
                   <span className="text-[12px] text-gray-400">{fieldTable.category}</span>
                 </div>
-              </div>
+              </button>
 
               {/* Field info */}
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">

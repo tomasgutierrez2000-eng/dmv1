@@ -571,21 +571,25 @@ export default function Canvas() {
     if (!shouldCompact) {
       if (savedPositionsRef.current) {
         const saved = savedPositionsRef.current;
+        const savedCamera = savedCameraRef.current;
         savedPositionsRef.current = null;
+        savedCameraRef.current = null;
         focusFieldKeyRef.current = null;
-        Object.entries(saved).forEach(([key, pos]) => {
-          if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
-            setTablePosition(key, pos);
-          }
-        });
-        // Restore the camera zoom/pan that was active before focus-compact
+        // Enable transitions first, then apply position/camera changes on next
+        // frame so CSS transitions animate from current → restored positions.
         setIsAnimating(true);
-        if (savedCameraRef.current) {
-          setZoom(savedCameraRef.current.zoom);
-          setPan(savedCameraRef.current.pan);
-          savedCameraRef.current = null;
-        }
-        setTimeout(() => setIsAnimating(false), 400);
+        requestAnimationFrame(() => {
+          Object.entries(saved).forEach(([key, pos]) => {
+            if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+              setTablePosition(key, pos);
+            }
+          });
+          if (savedCamera) {
+            setZoom(savedCamera.zoom);
+            setPan(savedCamera.pan);
+          }
+          setTimeout(() => setIsAnimating(false), 400);
+        });
       }
       return;
     }
@@ -661,19 +665,21 @@ export default function Canvas() {
       compact.push({ key, x: cx + tw + hGap, y: stackY(rightKeys.length, i) })
     );
 
-    for (const { key, x, y } of compact) {
-      if (key !== anchorKey) {
-        setTablePosition(key, { x, y });
-      }
-    }
-
-    // Zoom into the cluster around the anchor table
+    // Enable transitions first, then apply position changes on next frame
+    // so CSS transitions animate from current → compacted positions.
     setIsAnimating(true);
-    runFitToView(
-      compact.map((p) => ({ x: p.x, y: p.y })),
-      compact.length
-    );
-    setTimeout(() => setIsAnimating(false), 400);
+    requestAnimationFrame(() => {
+      for (const { key, x, y } of compact) {
+        if (key !== anchorKey) {
+          setTablePosition(key, { x, y });
+        }
+      }
+      runFitToView(
+        compact.map((p) => ({ x: p.x, y: p.y })),
+        compact.length
+      );
+      setTimeout(() => setIsAnimating(false), 400);
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- visibleRelationships/focusVisibleTableKeys intentionally excluded to prevent cascade
   }, [
     focusMode, selectedField, model,
@@ -932,8 +938,8 @@ export default function Canvas() {
             });
           }
           setIsAnimating(true);
-          // Use a microtask so restored positions are committed before fit-to-view
-          queueMicrotask(() => {
+          // Wait one frame so restored positions are committed before fit-to-view
+          requestAnimationFrame(() => {
             const allPositions = visibleTables
               .map((t) => useModelStore.getState().tablePositions[t.key])
               .filter((p): p is TablePosition => !!p);
@@ -1172,14 +1178,20 @@ export default function Canvas() {
 
             const beingDragged = isDraggingTable === table.key;
             const isThisSelected = selectedTable === table.key;
+            const isFocusRelevant = !focusVisibleTableKeys || focusVisibleTableKeys.has(table.key);
+            const focusDimmed = focusVisibleTableKeys != null && !isFocusRelevant;
+
+            let tableOpacity = 1;
+            if (beingDragged) tableOpacity = 0.85;
+            else if (focusDimmed) tableOpacity = 0.12;
 
             return (
               <g
                 key={table.key}
                 style={{
-                  opacity: beingDragged ? 0.85 : 1,
+                  opacity: tableOpacity,
                   filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
-                  transition: beingDragged ? 'none' : 'opacity 0.2s ease',
+                  transition: beingDragged ? 'none' : 'opacity 0.28s ease',
                 }}
               >
                 <TableNode

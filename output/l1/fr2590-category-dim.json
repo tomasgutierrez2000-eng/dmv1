@@ -1,0 +1,22 @@
+[
+  {
+    "fr2590_category_code": "G1",
+    "category_name": "G-1 General Exposures"
+  },
+  {
+    "fr2590_category_code": "G2",
+    "category_name": "G-2 Repurchase Agreements"
+  },
+  {
+    "fr2590_category_code": "G3",
+    "category_name": "G-3 Securities Lending / Borrowing"
+  },
+  {
+    "fr2590_category_code": "G4",
+    "category_name": "G-4 Derivatives"
+  },
+  {
+    "fr2590_category_code": "G5",
+    "category_name": "G-5 Risk-Shifting Exposures"
+  }
+]

@@ -96,13 +96,34 @@ export interface FacilitySummary {
   has_external_downgrade: boolean;
   has_any_downgrade: boolean;
 
+  // Enrichment fields - Exposure & Loss
+  ead_usd: number;
+  expected_loss_usd: number;
+  expected_loss_rate_pct: number;
+
   // Enrichment fields - Financial Metrics
   dscr: number | null;
   ltv: number | null;
   fccr: number | null;
+  tangible_net_worth_usd: number | null;
 
   // Enrichment fields - Limits
   counterparty_limit_usd: number | null;
   counterparty_limit_utilized_usd: number | null;
   counterparty_limit_status: string | null;
+
+  // Enrichment fields - Operating Cost
+  operating_expense_amt: number;
+
+  // Enrichment fields - Capital Adequacy
+  capital_adequacy_ratio_pct: number | null;
+
+  // Enrichment fields - Loan Count
+  number_of_loans: number;
+
+  // Enrichment fields - Rating Migration
+  external_rating_status: string;
+  external_rating_change_steps: number;
+  internal_rating_status: string;
+  internal_rating_change_steps: number;
 }

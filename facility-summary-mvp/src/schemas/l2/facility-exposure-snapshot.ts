@@ -12,4 +12,6 @@ export interface FacilityExposureSnapshot {
   rwa_amt: number;
   internal_risk_rating_bucket_code: string;
   as_of_date: string;
+  number_of_loans: number;
+  allocated_equity_amt: number;
 }

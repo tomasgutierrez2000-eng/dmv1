@@ -88,7 +88,14 @@
     "tangible_net_worth_usd": 500,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.01,
+    "capital_adequacy_ratio_pct": 7.58,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00002",
@@ -179,7 +186,14 @@
     "tangible_net_worth_usd": 150,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.03,
+    "capital_adequacy_ratio_pct": 8.85,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00003",
@@ -270,7 +284,14 @@
     "tangible_net_worth_usd": 700,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.05,
+    "capital_adequacy_ratio_pct": 9.94,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00004",
@@ -361,7 +382,14 @@
     "tangible_net_worth_usd": 800,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.09,
+    "capital_adequacy_ratio_pct": 11.09,
+    "number_of_loans": 1,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00005",
@@ -452,7 +480,14 @@
     "tangible_net_worth_usd": 300,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.15,
+    "capital_adequacy_ratio_pct": 11.99,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00006",
@@ -543,7 +578,14 @@
     "tangible_net_worth_usd": 1000,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.06,
+    "capital_adequacy_ratio_pct": 8.11,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Upgrade",
+    "internal_rating_change_steps": 1
   },
   {
     "facility_id": "FAC-2024-00007",
@@ -634,7 +676,14 @@
     "tangible_net_worth_usd": 400,
     "counterparty_limit_usd": 2156.3,
     "counterparty_limit_utilized_usd": 1919.1,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.12,
+    "capital_adequacy_ratio_pct": 9,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00008",
@@ -725,7 +774,14 @@
     "tangible_net_worth_usd": 1200,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.17,
+    "capital_adequacy_ratio_pct": 10.01,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00009",
@@ -816,7 +872,14 @@
     "tangible_net_worth_usd": 500,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.32,
+    "capital_adequacy_ratio_pct": 11,
+    "number_of_loans": 3,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00010",
@@ -907,7 +970,14 @@
     "tangible_net_worth_usd": 110,
     "counterparty_limit_usd": 5186.9,
     "counterparty_limit_utilized_usd": 4149.5,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 1.05,
+    "capital_adequacy_ratio_pct": 12,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00011",
@@ -996,7 +1066,14 @@
     "tangible_net_worth_usd": 1500,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.16,
+    "capital_adequacy_ratio_pct": 8.03,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00012",
@@ -1085,7 +1162,14 @@
     "tangible_net_worth_usd": 650,
     "counterparty_limit_usd": 1497.7,
     "counterparty_limit_utilized_usd": 1467.7,
-    "counterparty_limit_status": "Breach"
+    "counterparty_limit_status": "Breach",
+    "operating_expense_amt": 0.27,
+    "capital_adequacy_ratio_pct": 9.03,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00013",
@@ -1174,7 +1258,14 @@
     "tangible_net_worth_usd": 1700,
     "counterparty_limit_usd": 1601.2,
     "counterparty_limit_utilized_usd": 1569.2,
-    "counterparty_limit_status": "Breach"
+    "counterparty_limit_status": "Breach",
+    "operating_expense_amt": 0.34,
+    "capital_adequacy_ratio_pct": 9.98,
+    "number_of_loans": 1,
+    "external_rating_status": "Downgrade",
+    "external_rating_change_steps": -1,
+    "internal_rating_status": "Upgrade",
+    "internal_rating_change_steps": 1
   },
   {
     "facility_id": "FAC-2024-00014",
@@ -1263,7 +1354,14 @@
     "tangible_net_worth_usd": 750,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.08,
+    "capital_adequacy_ratio_pct": 11.02,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00015",
@@ -1352,7 +1450,14 @@
     "tangible_net_worth_usd": 1900,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.04,
+    "capital_adequacy_ratio_pct": 11.98,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00016",
@@ -1441,7 +1546,14 @@
     "tangible_net_worth_usd": 100,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.08,
+    "capital_adequacy_ratio_pct": 7.98,
+    "number_of_loans": 1,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00017",
@@ -1530,7 +1642,14 @@
     "tangible_net_worth_usd": 2100,
     "counterparty_limit_usd": 1639.8,
     "counterparty_limit_utilized_usd": 1557.8,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.12,
+    "capital_adequacy_ratio_pct": 8.97,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00018",
@@ -1619,7 +1738,14 @@
     "tangible_net_worth_usd": 200,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.25,
+    "capital_adequacy_ratio_pct": 10.01,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00019",
@@ -1708,7 +1834,14 @@
     "tangible_net_worth_usd": 250,
     "counterparty_limit_usd": 2209.8,
     "counterparty_limit_utilized_usd": 2033,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.29,
+    "capital_adequacy_ratio_pct": 10.99,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00020",
@@ -1797,7 +1930,14 @@
     "tangible_net_worth_usd": 2400,
     "counterparty_limit_usd": 4892,
     "counterparty_limit_utilized_usd": 4060.4,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.43,
+    "capital_adequacy_ratio_pct": 11.99,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00021",
@@ -1886,7 +2026,14 @@
     "tangible_net_worth_usd": 350,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.15,
+    "capital_adequacy_ratio_pct": 7.96,
+    "number_of_loans": 1,
+    "external_rating_status": "Downgrade",
+    "external_rating_change_steps": -1,
+    "internal_rating_status": "Upgrade",
+    "internal_rating_change_steps": 1
   },
   {
     "facility_id": "FAC-2024-00022",
@@ -1975,7 +2122,14 @@
     "tangible_net_worth_usd": 600,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.2,
+    "capital_adequacy_ratio_pct": 8.96,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00023",
@@ -2064,7 +2218,14 @@
     "tangible_net_worth_usd": 450,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.36,
+    "capital_adequacy_ratio_pct": 10.01,
+    "number_of_loans": 2,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00024",
@@ -2153,7 +2314,14 @@
     "tangible_net_worth_usd": 50,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.48,
+    "capital_adequacy_ratio_pct": 11.01,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00025",
@@ -2242,7 +2410,14 @@
     "tangible_net_worth_usd": null,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.18,
+    "capital_adequacy_ratio_pct": 12.03,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00026",
@@ -2331,7 +2506,14 @@
     "tangible_net_worth_usd": null,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.04,
+    "capital_adequacy_ratio_pct": 8.14,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00027",
@@ -2420,7 +2602,14 @@
     "tangible_net_worth_usd": null,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.07,
+    "capital_adequacy_ratio_pct": 8.89,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00028",
@@ -2509,7 +2698,14 @@
     "tangible_net_worth_usd": null,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.13,
+    "capital_adequacy_ratio_pct": 9.98,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00029",
@@ -2598,7 +2794,14 @@
     "tangible_net_worth_usd": null,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.06,
+    "capital_adequacy_ratio_pct": 10.95,
+    "number_of_loans": 2,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00030",
@@ -2687,7 +2890,14 @@
     "tangible_net_worth_usd": null,
     "counterparty_limit_usd": 2213.1,
     "counterparty_limit_utilized_usd": 1903.3,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.72,
+    "capital_adequacy_ratio_pct": 11.99,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00031",
@@ -2776,7 +2986,14 @@
     "tangible_net_worth_usd": 500,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.15,
+    "capital_adequacy_ratio_pct": 7.99,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00032",
@@ -2865,7 +3082,14 @@
     "tangible_net_worth_usd": 150,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.24,
+    "capital_adequacy_ratio_pct": 8.99,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00033",
@@ -2954,7 +3178,14 @@
     "tangible_net_worth_usd": 700,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.3,
+    "capital_adequacy_ratio_pct": 9.99,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00034",
@@ -3043,7 +3274,14 @@
     "tangible_net_worth_usd": 800,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.14,
+    "capital_adequacy_ratio_pct": 11.01,
+    "number_of_loans": 1,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00035",
@@ -3132,7 +3370,14 @@
     "tangible_net_worth_usd": 300,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.25,
+    "capital_adequacy_ratio_pct": 11.98,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00036",
@@ -3221,7 +3466,14 @@
     "tangible_net_worth_usd": 1000,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.32,
+    "capital_adequacy_ratio_pct": 7.98,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Upgrade",
+    "internal_rating_change_steps": 1
   },
   {
     "facility_id": "FAC-2024-00037",
@@ -3310,7 +3562,14 @@
     "tangible_net_worth_usd": 400,
     "counterparty_limit_usd": 2156.3,
     "counterparty_limit_utilized_usd": 1919.1,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.49,
+    "capital_adequacy_ratio_pct": 9.02,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00038",
@@ -3399,7 +3658,14 @@
     "tangible_net_worth_usd": 1200,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.02,
+    "capital_adequacy_ratio_pct": 9.57,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00039",
@@ -3488,7 +3754,14 @@
     "tangible_net_worth_usd": 500,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.07,
+    "capital_adequacy_ratio_pct": 11.06,
+    "number_of_loans": 3,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00040",
@@ -3577,7 +3850,14 @@
     "tangible_net_worth_usd": 110,
     "counterparty_limit_usd": 5186.9,
     "counterparty_limit_utilized_usd": 4149.5,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 1.21,
+    "capital_adequacy_ratio_pct": 12,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00041",
@@ -3666,7 +3946,14 @@
     "tangible_net_worth_usd": 1500,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.11,
+    "capital_adequacy_ratio_pct": 7.97,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00042",
@@ -3755,7 +4042,14 @@
     "tangible_net_worth_usd": 650,
     "counterparty_limit_usd": 1497.7,
     "counterparty_limit_utilized_usd": 1467.7,
-    "counterparty_limit_status": "Breach"
+    "counterparty_limit_status": "Breach",
+    "operating_expense_amt": 0.18,
+    "capital_adequacy_ratio_pct": 9,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00043",
@@ -3844,7 +4138,14 @@
     "tangible_net_worth_usd": 1700,
     "counterparty_limit_usd": 1601.2,
     "counterparty_limit_utilized_usd": 1569.2,
-    "counterparty_limit_status": "Breach"
+    "counterparty_limit_status": "Breach",
+    "operating_expense_amt": 0.08,
+    "capital_adequacy_ratio_pct": 9.9,
+    "number_of_loans": 1,
+    "external_rating_status": "Downgrade",
+    "external_rating_change_steps": -1,
+    "internal_rating_status": "Upgrade",
+    "internal_rating_change_steps": 1
   },
   {
     "facility_id": "FAC-2024-00044",
@@ -3933,7 +4234,14 @@
     "tangible_net_worth_usd": 750,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.14,
+    "capital_adequacy_ratio_pct": 11,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00045",
@@ -4022,7 +4330,14 @@
     "tangible_net_worth_usd": 1900,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.2,
+    "capital_adequacy_ratio_pct": 12.02,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00046",
@@ -4111,7 +4426,14 @@
     "tangible_net_worth_usd": 100,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.29,
+    "capital_adequacy_ratio_pct": 8,
+    "number_of_loans": 1,
+    "external_rating_status": "Upgrade",
+    "external_rating_change_steps": 1,
+    "internal_rating_status": "Downgrade",
+    "internal_rating_change_steps": -1
   },
   {
     "facility_id": "FAC-2024-00047",
@@ -4200,7 +4522,14 @@
     "tangible_net_worth_usd": 2100,
     "counterparty_limit_usd": 1639.8,
     "counterparty_limit_utilized_usd": 1557.8,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.35,
+    "capital_adequacy_ratio_pct": 9.01,
+    "number_of_loans": 2,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00048",
@@ -4289,7 +4618,14 @@
     "tangible_net_worth_usd": 200,
     "counterparty_limit_usd": null,
     "counterparty_limit_utilized_usd": null,
-    "counterparty_limit_status": null
+    "counterparty_limit_status": null,
+    "operating_expense_amt": 0.22,
+    "capital_adequacy_ratio_pct": 10,
+    "number_of_loans": 3,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00049",
@@ -4378,7 +4714,14 @@
     "tangible_net_worth_usd": 250,
     "counterparty_limit_usd": 2209.8,
     "counterparty_limit_utilized_usd": 2033,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 0.29,
+    "capital_adequacy_ratio_pct": 10.99,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   },
   {
     "facility_id": "FAC-2024-00050",
@@ -4467,6 +4810,13 @@
     "tangible_net_worth_usd": 2400,
     "counterparty_limit_usd": 4892,
     "counterparty_limit_utilized_usd": 4060.4,
-    "counterparty_limit_status": "Warning"
+    "counterparty_limit_status": "Warning",
+    "operating_expense_amt": 1.01,
+    "capital_adequacy_ratio_pct": 12.01,
+    "number_of_loans": 1,
+    "external_rating_status": "Stable",
+    "external_rating_change_steps": 0,
+    "internal_rating_status": "Stable",
+    "internal_rating_change_steps": 0
   }
 ]

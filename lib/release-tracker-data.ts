@@ -33,6 +33,10 @@ export const RELEASE_ENTRIES: ReleaseEntry[] = [
   { date: '2026-02-28', layer: 'L2', table: 'financial_metric_observation', field: 'FCCR metric_code', changeType: 'Added', rationale: 'FCCR (Fixed Charge Coverage Ratio) generation added — previously defined in schema but never generated, resulting in null values' },
   { date: '2026-02-28', layer: 'L2', table: 'financial_metric_observation', field: 'TNW metric_code', changeType: 'Added', rationale: 'Tangible Net Worth added as counterparty-level financial metric observation — sourced from balance sheet, attributed to facilities via counterparty_id' },
 
+  // ── 2026-02-28: KPI enhancements — new L2 source fields ────────────
+  { date: '2026-02-28', layer: 'L2', table: 'facility_exposure_snapshot', field: 'allocated_equity_amt', changeType: 'Added', rationale: 'Allocated equity at facility level — used to derive capital adequacy ratio (CAR = equity / RWA)' },
+  { date: '2026-02-28', layer: 'L2', table: 'facility_financial_snapshot', field: 'operating_expense_amt', changeType: 'Added', rationale: 'Facility-level operating cost — surfaced from L2 profitability data for cost-to-income analysis' },
+
   // ── 2026-02-25: Atomic metrics moved L3 → L2 ──────────────────────
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_loans', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2 — L2 holds source-system values, L3 only derived' },
   { date: '2026-02-25', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_facilities', changeType: 'Added', rationale: 'Atomic observed value moved from L3 to L2' },

@@ -4,6 +4,7 @@ export interface FacilityProfitabilitySnapshot {
   as_of_date: string;
   net_interest_income_amt: number;
   total_revenue_amt: number;
+  operating_expense_amt: number;
   nim_pct: number;
   roa_pct: number;
   roe_pct: number;

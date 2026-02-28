@@ -101,4 +101,19 @@ export interface FacilitySummary {
   counterparty_limit_usd: number | null;
   counterparty_limit_utilized_usd: number | null;
   counterparty_limit_status: string | null;
+
+  // Enrichment fields - Operating Cost
+  operating_expense_amt: number;
+
+  // Enrichment fields - Capital Adequacy
+  capital_adequacy_ratio_pct: number | null;
+
+  // Enrichment fields - Loan Count
+  number_of_loans: number;
+
+  // Enrichment fields - Rating Migration
+  external_rating_status: string;
+  external_rating_change_steps: number;
+  internal_rating_status: string;
+  internal_rating_change_steps: number;
 }

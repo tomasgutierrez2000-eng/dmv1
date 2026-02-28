@@ -286,6 +286,33 @@ export const assembleFacilitySummary = (
     const outstandingForRate = latestExposure?.gross_exposure_usd ?? 0;
     const expectedLossRatePct = outstandingForRate > 0 ? expectedLossUsd / outstandingForRate : 0;
 
+    // Enrichment: Rating Migration - categorical status + step counts
+    const externalRatingScale = ["CCC", "B", "BB", "BBB", "A", "AA"];
+    const extCurrentIdx = externalRatingScale.indexOf(currentExternal);
+    const extPriorIdx = externalRatingPrior
+      ? externalRatingScale.indexOf(externalRatingPrior)
+      : -1;
+    const externalRatingChangeSteps =
+      extPriorIdx >= 0 && extCurrentIdx >= 0 ? extCurrentIdx - extPriorIdx : 0;
+    const externalRatingStatus =
+      externalRatingChangeSteps < 0
+        ? "Downgrade"
+        : externalRatingChangeSteps > 0
+        ? "Upgrade"
+        : "Stable";
+
+    const intCurrent = parseInt(currentInternal) || 0;
+    const intPrior = internalRatingPrior ? parseInt(internalRatingPrior) || 0 : 0;
+    // Internal: higher number = worse, so steps = prior - current (positive = improvement/upgrade)
+    const internalRatingChangeSteps =
+      intPrior > 0 ? intPrior - intCurrent : 0;
+    const internalRatingStatus =
+      internalRatingChangeSteps < 0
+        ? "Downgrade"
+        : internalRatingChangeSteps > 0
+        ? "Upgrade"
+        : "Stable";
+
     // Enrichment: Financial Metrics
     const metrics = metricsByFacility.get(facility.facility_id) ?? [];
     const counterpartyMetrics = metricsByCounterparty.get(facility.counterparty_id) ?? [];
@@ -428,6 +455,24 @@ export const assembleFacilitySummary = (
       counterparty_limit_usd: limitAmount,
       counterparty_limit_utilized_usd: limitUtilized,
       counterparty_limit_status: limitStatus,
+
+      // Enrichment fields - Operating Cost
+      operating_expense_amt: latestProfitability?.operating_expense_amt ?? 0,
+
+      // Enrichment fields - Capital Adequacy
+      capital_adequacy_ratio_pct:
+        latestExposure && latestExposure.rwa_amt > 0 && latestExposure.allocated_equity_amt > 0
+          ? roundTo(latestExposure.allocated_equity_amt / latestExposure.rwa_amt * 100, 2)
+          : null,
+
+      // Enrichment fields - Loan Count
+      number_of_loans: latestExposure?.number_of_loans ?? 1,
+
+      // Enrichment fields - Rating Migration
+      external_rating_status: externalRatingStatus,
+      external_rating_change_steps: externalRatingChangeSteps,
+      internal_rating_status: internalRatingStatus,
+      internal_rating_change_steps: internalRatingChangeSteps,
     };
   });
 };

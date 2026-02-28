@@ -70,6 +70,21 @@ export const generateL2Data = (l1: L1Data): L2Data => {
           ? secondaryLegalEntity
           : primaryLegalEntity;
 
+      // Number of loans: revolving facilities have 1, term loans 1-3
+      const numberOfLoans = facility.revolving_flag ? 1 : 1 + (index % 3);
+
+      // RWA: risk-weight based on counterparty rating (50-150% of EAD)
+      const counterparty = l1.counterparty.find(
+        (cp) => cp.counterparty_id === facility.counterparty_id
+      );
+      const riskRating = counterparty?.internal_risk_rating || 3;
+      const riskWeightPct = riskRating <= 2 ? 0.5 : riskRating === 3 ? 0.75 : riskRating === 4 ? 1.0 : 1.5;
+      const rwaAmt = ead * riskWeightPct;
+
+      // Allocated equity: typically 8-12% of RWA (Basel minimum is 8%)
+      const equityPct = 0.08 + (index % 5) / 100; // 8-12%
+      const allocatedEquity = rwaAmt * equityPct;
+
       facilityExposureSnapshot.push({
         facility_exposure_id: `FES-${padId(exposureSeq, 6)}`,
         facility_id: facility.facility_id,
@@ -82,6 +97,9 @@ export const generateL2Data = (l1: L1Data): L2Data => {
         currency_code: "USD",
         fr2590_category_code: PRODUCT_TO_FR2590[facility.product_id],
         as_of_date: asOfDate,
+        number_of_loans: numberOfLoans,
+        rwa_amt: roundTo(rwaAmt, 1),
+        allocated_equity_amt: roundTo(allocatedEquity, 1),
       });
       exposureSeq += 1;
     });

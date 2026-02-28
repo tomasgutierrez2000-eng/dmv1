@@ -41,7 +41,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 7.58,
+    "total_operating_expense_amt": 0.01
   },
   {
     "lob_l1_name": "Corporate Banking",
@@ -85,7 +88,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.85,
+    "total_operating_expense_amt": 0.03
   },
   {
     "lob_l1_name": "Corporate Banking",
@@ -129,7 +135,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.94,
+    "total_operating_expense_amt": 0.05
   },
   {
     "lob_l1_name": "Corporate Banking",
@@ -173,7 +182,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.09,
+    "total_operating_expense_amt": 0.09
   },
   {
     "lob_l1_name": "Corporate Banking",
@@ -217,7 +229,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.99,
+    "total_operating_expense_amt": 0.15
   },
   {
     "lob_l1_name": "Corporate Banking",
@@ -261,7 +276,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.11,
+    "total_operating_expense_amt": 0.06
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -305,7 +323,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9,
+    "total_operating_expense_amt": 0.12
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -349,7 +370,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10.01,
+    "total_operating_expense_amt": 0.17
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -393,7 +417,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11,
+    "total_operating_expense_amt": 0.32
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -437,7 +464,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 12,
+    "total_operating_expense_amt": 1.05
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -481,7 +511,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.03,
+    "total_operating_expense_amt": 0.16
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -525,7 +558,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.03,
+    "total_operating_expense_amt": 0.27
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -569,7 +605,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.98,
+    "total_operating_expense_amt": 0.34
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -613,7 +652,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.02,
+    "total_operating_expense_amt": 0.08
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -657,7 +699,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.98,
+    "total_operating_expense_amt": 0.04
   },
   {
     "lob_l1_name": "Commercial Real Estate",
@@ -701,7 +746,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 7.98,
+    "total_operating_expense_amt": 0.08
   },
   {
     "lob_l1_name": "Investment Banking",
@@ -745,7 +793,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.97,
+    "total_operating_expense_amt": 0.12
   },
   {
     "lob_l1_name": "Investment Banking",
@@ -789,7 +840,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10.01,
+    "total_operating_expense_amt": 0.25
   },
   {
     "lob_l1_name": "Investment Banking",
@@ -833,7 +887,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10.99,
+    "total_operating_expense_amt": 0.29
   },
   {
     "lob_l1_name": "Investment Banking",
@@ -877,7 +934,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.99,
+    "total_operating_expense_amt": 0.43
   },
   {
     "lob_l1_name": "Investment Banking",
@@ -921,7 +981,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 7.96,
+    "total_operating_expense_amt": 0.15
   },
   {
     "lob_l1_name": "Investment Banking",
@@ -965,7 +1028,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.96,
+    "total_operating_expense_amt": 0.2
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1009,7 +1075,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10.01,
+    "total_operating_expense_amt": 0.36
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1053,7 +1122,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.01,
+    "total_operating_expense_amt": 0.48
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1097,7 +1169,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 12.03,
+    "total_operating_expense_amt": 0.18
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1141,7 +1216,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.14,
+    "total_operating_expense_amt": 0.04
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1185,7 +1263,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.89,
+    "total_operating_expense_amt": 0.07
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1229,7 +1310,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.98,
+    "total_operating_expense_amt": 0.13
   },
   {
     "lob_l1_name": "Global Markets",
@@ -1273,7 +1357,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10.95,
+    "total_operating_expense_amt": 0.06
   },
   {
     "lob_l1_name": "Wealth Management",
@@ -1317,7 +1404,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 0
+    "doi_pct": 0,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.99,
+    "total_operating_expense_amt": 0.72
   },
   {
     "lob_l1_name": "Wealth Management",
@@ -1361,7 +1451,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 7.99,
+    "total_operating_expense_amt": 0.15
   },
   {
     "lob_l1_name": "Wealth Management",
@@ -1405,7 +1498,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8.99,
+    "total_operating_expense_amt": 0.24
   },
   {
     "lob_l1_name": "Wealth Management",
@@ -1449,7 +1545,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.99,
+    "total_operating_expense_amt": 0.3
   },
   {
     "lob_l1_name": "Wealth Management",
@@ -1493,7 +1592,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.01,
+    "total_operating_expense_amt": 0.14
   },
   {
     "lob_l1_name": "Asset Management",
@@ -1537,7 +1639,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.98,
+    "total_operating_expense_amt": 0.25
   },
   {
     "lob_l1_name": "Asset Management",
@@ -1581,7 +1686,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 7.98,
+    "total_operating_expense_amt": 0.32
   },
   {
     "lob_l1_name": "Asset Management",
@@ -1625,7 +1733,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.02,
+    "total_operating_expense_amt": 0.49
   },
   {
     "lob_l1_name": "Retail Banking",
@@ -1669,7 +1780,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.57,
+    "total_operating_expense_amt": 0.02
   },
   {
     "lob_l1_name": "Retail Banking",
@@ -1713,7 +1827,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11.06,
+    "total_operating_expense_amt": 0.07
   },
   {
     "lob_l1_name": "Retail Banking",
@@ -1757,7 +1874,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 12,
+    "total_operating_expense_amt": 1.21
   },
   {
     "lob_l1_name": "Retail Banking",
@@ -1801,7 +1921,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 7.97,
+    "total_operating_expense_amt": 0.11
   },
   {
     "lob_l1_name": "Retail Banking",
@@ -1845,7 +1968,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9,
+    "total_operating_expense_amt": 0.18
   },
   {
     "lob_l1_name": "Retail Banking",
@@ -1889,7 +2015,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.9,
+    "total_operating_expense_amt": 0.08
   },
   {
     "lob_l1_name": "Public Sector",
@@ -1933,7 +2062,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 11,
+    "total_operating_expense_amt": 0.14
   },
   {
     "lob_l1_name": "Public Sector",
@@ -1977,7 +2109,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 12.02,
+    "total_operating_expense_amt": 0.2
   },
   {
     "lob_l1_name": "Public Sector",
@@ -2021,7 +2156,10 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 8,
+    "total_operating_expense_amt": 0.29
   },
   {
     "lob_l1_name": "Public Sector",
@@ -2065,7 +2203,10 @@
     "top_region": "APAC",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 9.01,
+    "total_operating_expense_amt": 0.35
   },
   {
     "lob_l1_name": "Public Sector",
@@ -2109,7 +2250,10 @@
     "top_region": "LATAM",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10,
+    "total_operating_expense_amt": 0.22
   },
   {
     "lob_l1_name": "Other / Corporate",
@@ -2153,7 +2297,10 @@
     "top_region": "North America",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 10.99,
+    "total_operating_expense_amt": 0.29
   },
   {
     "lob_l1_name": "Other / Corporate",
@@ -2197,6 +2344,9 @@
     "top_region": "EMEA",
     "top_region_pct": 1,
     "unique_counterparty_count": 1,
-    "doi_pct": 1
+    "doi_pct": 1,
+    "exception_rate_pct": 0,
+    "avg_capital_adequacy_ratio_pct": 12.01,
+    "total_operating_expense_amt": 1.01
   }
 ]

@@ -10,4 +10,7 @@ export interface FacilityExposureSnapshot {
   currency_code: string;
   fr2590_category_code: string;
   as_of_date: string;
+  number_of_loans: number;
+  rwa_amt: number;
+  allocated_equity_amt: number;
 }

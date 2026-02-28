@@ -254,6 +254,26 @@ export const assembleRollups = (
         ? interconnectedInGroup.length / uniqueCounterparties.size
         : 0;
 
+    // Exception rate
+    const exceptionRatePct =
+      facilities.length > 0 ? exceptionCount / facilities.length : 0;
+
+    // Capital adequacy ratio (weighted average of non-null values)
+    const cars = facilities
+      .map((f) => f.capital_adequacy_ratio_pct)
+      .filter((c): c is number => c !== null);
+    const carExposures = facilities
+      .filter((f) => f.capital_adequacy_ratio_pct !== null)
+      .map((f) => f.outstanding_exposure_usd);
+    const avgCar =
+      cars.length > 0 ? weightedAverage(cars, carExposures) : null;
+
+    // Operating expense
+    const totalOperatingExpense = facilities.reduce(
+      (sum, f) => sum + f.operating_expense_amt,
+      0
+    );
+
     return {
       facility_count: facilities.length,
       total_exposure_usd: roundTo(totalExposure, 1),
@@ -293,6 +313,9 @@ export const assembleRollups = (
       top_region_pct: roundTo(topRegionPct, 4),
       unique_counterparty_count: uniqueCounterparties.size,
       doi_pct: roundTo(doiPct, 4),
+      exception_rate_pct: roundTo(exceptionRatePct, 4),
+      avg_capital_adequacy_ratio_pct: avgCar !== null ? roundTo(avgCar, 2) : null,
+      total_operating_expense_amt: roundTo(totalOperatingExpense, 2),
     };
   };
 

@@ -780,6 +780,7 @@ export function getL2SeedValue(
       if (columnName === 'position_currency') return currency(idx);
       if (columnName === 'trading_banking_book_flag') return 'B';
       if (columnName === 'ultimate_parent_id') return cid(idx);
+      if (columnName === 'product_node_id') return fid(idx);
       break;
 
     // ═══════════════════════════════════════════════════════════════════

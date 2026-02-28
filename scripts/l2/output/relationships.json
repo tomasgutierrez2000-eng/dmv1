@@ -68,6 +68,23 @@
     "relationshipType": "primary"
   },
   {
+    "id": "L2.position.product_node_id->L1.enterprise_product_taxonomy.product_node_id",
+    "source": {
+      "layer": "L2",
+      "table": "position",
+      "field": "product_node_id",
+      "tableKey": "L2.position"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_product_taxonomy",
+      "field": "product_node_id",
+      "tableKey": "L1.enterprise_product_taxonomy"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
     "id": "L2.position_detail.position_id->L2.position.position_id",
     "source": {
       "layer": "L2",

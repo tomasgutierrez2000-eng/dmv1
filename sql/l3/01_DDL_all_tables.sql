@@ -807,6 +807,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_credit_quality_summary (
     external_downgrade_count                      INTEGER,
     internal_downgrade_count                      INTEGER,
     criticized_portfolio_count                    INTEGER,
+    criticized_exposure_amt                       NUMERIC(20,4),
     deteriorated_deal_count                       INTEGER,
     doi_pct                                       NUMERIC(10,6),
     PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
@@ -1251,6 +1252,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_deterioration_summary (
     deteriorated_deal_exposure_amt                NUMERIC(20,4),
     deteriorated_deal_pct                         NUMERIC(10,6),
     criticized_portfolio_count                    INTEGER,
+    criticized_exposure_amt                       NUMERIC(20,4),
     doi_pct                                       NUMERIC(10,6),
     internal_downgrade_count                      INTEGER,
     external_downgrade_count                      INTEGER,

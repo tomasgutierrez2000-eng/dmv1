@@ -118,6 +118,8 @@ export interface DeskSummary {
   deteriorated_count: number;
   criticized_count: number;
   downgrade_count: number;
+  cross_entity_facility_count: number;
+  total_cross_entity_exposure_usd: number;
   avg_dscr: number | null;
   avg_ltv: number | null;
   avg_internal_risk_rating: number;
@@ -167,6 +169,8 @@ export interface LobL1Summary {
   deteriorated_count: number;
   criticized_count: number;
   downgrade_count: number;
+  cross_entity_facility_count: number;
+  total_cross_entity_exposure_usd: number;
   avg_dscr: number | null;
   avg_ltv: number | null;
   avg_internal_risk_rating: number;

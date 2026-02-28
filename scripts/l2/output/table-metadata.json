@@ -161,6 +161,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "product_node_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_product_taxonomy(product_node_id)",
+      "nullable": true
     }
   },
   "L2.position_detail": {

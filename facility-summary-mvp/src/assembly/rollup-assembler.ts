@@ -154,6 +154,10 @@ export const assembleRollups = (
     const deterioratedCount = facilities.filter((f) => f.is_deteriorated).length;
     const criticizedCount = facilities.filter((f) => f.is_criticized).length;
     const downgradeCount = facilities.filter((f) => f.has_any_downgrade).length;
+    const crossEntityFacilityCount = facilities.filter((f) => f.has_cross_entity_exposure).length;
+    const totalCrossEntityExposure = facilities
+      .filter((f) => f.has_cross_entity_exposure)
+      .reduce((sum, f) => sum + f.cross_entity_exposure_usd, 0);
 
     const dscrs = facilities
       .map((f) => f.dscr)
@@ -236,6 +240,8 @@ export const assembleRollups = (
       deteriorated_count: deterioratedCount,
       criticized_count: criticizedCount,
       downgrade_count: downgradeCount,
+      cross_entity_facility_count: crossEntityFacilityCount,
+      total_cross_entity_exposure_usd: roundTo(totalCrossEntityExposure, 1),
       avg_dscr: avgDscr !== null ? roundTo(avgDscr, 2) : null,
       avg_ltv: avgLtv !== null ? roundTo(avgLtv, 2) : null,
       avg_internal_risk_rating: roundTo(avgRiskRating, 2),

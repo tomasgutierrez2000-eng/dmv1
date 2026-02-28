@@ -29,7 +29,7 @@ SELECT
     p.legal_entity_id,
     COALESCE(fm.org_unit_id, p.org_unit_id)                       AS org_unit_id,
     COALESCE(fm.portfolio_id, p.portfolio_id)                      AS portfolio_id,
-    COALESCE(pd.product_node_id, fm.product_type_code)            AS product_node_id,
+    COALESCE(p.product_node_id, pd.product_node_id, fm.product_type_code) AS product_node_id,
     p.counterparty_id,
     p.facility_id,
     p.instrument_id,

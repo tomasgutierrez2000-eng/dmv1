@@ -32,10 +32,12 @@ CREATE TABLE IF NOT EXISTS l2.position (
   position_currency VARCHAR(100),
   trading_banking_book_flag CHAR(1),
   ultimate_parent_id BIGINT,
+  product_node_id BIGINT,
   CONSTRAINT fk_position_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
   CONSTRAINT fk_position_instrument_id FOREIGN KEY (instrument_id) REFERENCES l1.instrument_master(instrument_id),
   CONSTRAINT fk_position_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
-  CONSTRAINT fk_position_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+  CONSTRAINT fk_position_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id),
+  CONSTRAINT fk_position_product_node_id FOREIGN KEY (product_node_id) REFERENCES l1.enterprise_product_taxonomy(product_node_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.position_detail (

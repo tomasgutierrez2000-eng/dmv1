@@ -907,22 +907,37 @@ export default function Canvas() {
         if (doubleClickZoomInTimeoutRef.current) {
           clearTimeout(doubleClickZoomInTimeoutRef.current);
           doubleClickZoomInTimeoutRef.current = null;
-          // Triple-click: fit-to-view (zoom out to show all content, centered)
-          setIsAnimating(true);
-          const allPositions = visibleTables
-            .map((t) => useModelStore.getState().tablePositions[t.key])
-            .filter((p): p is TablePosition => !!p);
-          if (allPositions.length > 0) {
-            runFitToView(allPositions, visibleTables.length);
+          // Triple-click: full reset — restore positions, zoom out, clear everything.
+          // Must restore focus-compact positions BEFORE fit-to-view so zoom is
+          // calculated from the correct (original) layout, not compacted positions.
+          if (savedPositionsRef.current) {
+            const saved = savedPositionsRef.current;
+            savedPositionsRef.current = null;
+            savedCameraRef.current = null;
+            focusFieldKeyRef.current = null;
+            Object.entries(saved).forEach(([key, pos]) => {
+              if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+                setTablePosition(key, pos);
+              }
+            });
           }
-          setTimeout(() => setIsAnimating(false), 280);
+          setIsAnimating(true);
+          // Use a microtask so restored positions are committed before fit-to-view
+          queueMicrotask(() => {
+            const allPositions = visibleTables
+              .map((t) => useModelStore.getState().tablePositions[t.key])
+              .filter((p): p is TablePosition => !!p);
+            if (allPositions.length > 0) {
+              runFitToView(allPositions, visibleTables.length);
+            }
+            setTimeout(() => setIsAnimating(false), 280);
+          });
         }
-        // Clear all selections in a single batched Zustand update to avoid
-        // multiple re-renders and cascading effect triggers.
+        // Clear all selections in a single batched Zustand update
         clearSelection();
       }
     },
-    [visibleTables, runFitToView, clearSelection]
+    [visibleTables, runFitToView, clearSelection, setTablePosition]
   );
 
   // Keyboard shortcuts

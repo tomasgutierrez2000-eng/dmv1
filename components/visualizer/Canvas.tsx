@@ -122,6 +122,79 @@ export default function Canvas() {
     return expandedDomains;
   }, [expandedDomains, visibleTables]);
 
+  // Domain container elements for domain-overview (computed in useMemo to avoid IIFE parse issues)
+  const domainContainerElements = useMemo(() => {
+    if (layoutMode !== 'domain-overview' || !model) return null;
+    const domains = new Set(visibleTables.map((t) => t.category));
+    const domainPositions = new Map<string, { x: number; y: number; width: number; height: number }>();
+    const BASE_TABLE_WIDTH = 560;
+    const BASE_TABLE_HEIGHT = 320;
+    let tableWidth: number;
+    let tableHeight: number;
+    if (viewMode === 'compact') {
+      const compactDims = getCompactOverviewTableDimensions();
+      tableWidth = compactDims.width;
+      tableHeight = compactDims.height;
+    } else {
+      const dims = getOverviewTableDimensions(tableSize);
+      tableWidth = dims.width;
+      tableHeight = dims.height;
+    }
+    let domainPadding: number;
+    let headerOffset: number;
+    let footerOffset: number;
+    if (viewMode === 'compact') {
+      domainPadding = 8;
+      headerOffset = 28;
+      footerOffset = 8;
+    } else {
+      domainPadding = 12;
+      headerOffset = 45;
+      footerOffset = 10;
+    }
+    const collapsedHeaderHeight = viewMode === 'compact' ? 36 : 45;
+    Array.from(domains).forEach((domain) => {
+      const domainTables = visibleTables.filter((t) => t.category === domain);
+      if (domainTables.length === 0) return;
+      const positions = domainTables
+        .map((t) => tablePositions[t.key])
+        .filter((p): p is TablePosition => !!p && Number.isFinite(p.x) && Number.isFinite(p.y));
+      if (positions.length === 0) return;
+      const minX = Math.min(...positions.map((p) => p.x));
+      const maxX = Math.max(...positions.map((p) => p.x + tableWidth));
+      const minY = Math.min(...positions.map((p) => p.y));
+      const maxY = Math.max(...positions.map((p) => p.y + tableHeight));
+      const width = maxX - minX + domainPadding * 2;
+      const expandedHeight = maxY - minY + headerOffset + footerOffset;
+      const isDomainExpanded = effectiveExpandedDomains.has(domain);
+      const height = isDomainExpanded ? expandedHeight : collapsedHeaderHeight;
+      if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return;
+      domainPositions.set(domain, {
+        x: minX - domainPadding,
+        y: minY - headerOffset,
+        width: Math.max(1, width),
+        height: Math.max(1, height),
+      });
+    });
+    return Array.from(domainPositions.entries()).map(([domain, pos]) => (
+      <g key={domain}>
+        <DomainContainer
+          domain={domain}
+          tables={visibleTables.filter((t) => t.category === domain)}
+          position={pos}
+          width={pos.width}
+          height={pos.height}
+          isExpanded={effectiveExpandedDomains.has(domain)}
+          onToggle={() => {
+            toggleExpandedDomain(domain);
+            setRequestFitToDomain(domain);
+          }}
+          compactFrame={viewMode === 'compact'}
+        />
+      </g>
+    ));
+  }, [layoutMode, model, visibleTables, tablePositions, tableSize, viewMode, effectiveExpandedDomains, toggleExpandedDomain, setRequestFitToDomain]);
+
   // True when user has applied filters that narrow the visible set (category, layer, or L3 exclusion).
   const filtersNarrowing = useMemo(
     () =>
@@ -1000,89 +1073,8 @@ export default function Canvas() {
         >
           {/* Domain Containers - In domain and domain-overview layout modes.
               Hidden during focus-compact because tables are repositioned outside their domains. */}
-          {layoutMode === 'domain-overview' && model && !savedPositionsRef.current && (() => {
-            const domains = new Set(visibleTables.map(t => t.category));
-            const domainPositions = new Map<string, { x: number; y: number; width: number; height: number }>();
-            
-            // Get dynamic table dimensions based on tableSize and layout mode
-            const BASE_TABLE_WIDTH = 560;
-            const BASE_TABLE_HEIGHT = 320;
-            const SIZE_MULTIPLIERS = {
-              small: { width: 0.8, height: 0.9 },
-              medium: { width: 1.0, height: 1.0 },
-              large: { width: 1.35, height: 1.25 },
-            };
-            
-            let tableWidth: number;
-            let tableHeight: number;
-            if (viewMode === 'compact') {
-              const compactDims = getCompactOverviewTableDimensions();
-              tableWidth = compactDims.width;
-              tableHeight = compactDims.height;
-            } else {
-              const dims = getOverviewTableDimensions(tableSize);
-              tableWidth = dims.width;
-              tableHeight = dims.height;
-            }
+          {layoutMode === 'domain-overview' && model && !savedPositionsRef.current && domainContainerElements}
 
-            let domainPadding: number;
-            let headerOffset: number;
-            let footerOffset: number;
-            if (viewMode === 'compact') {
-              domainPadding = 8;
-              headerOffset = 28;
-              footerOffset = 8;
-            } else {
-              domainPadding = 12;
-              headerOffset = 45;
-              footerOffset = 10;
-            }
-
-            const collapsedHeaderHeight = viewMode === 'compact' ? 36 : 45;
-            Array.from(domains).forEach((domain) => {
-              const domainTables = visibleTables.filter(t => t.category === domain);
-              if (domainTables.length === 0) return;
-              const positions = domainTables
-                .map(t => tablePositions[t.key])
-                .filter((p): p is TablePosition => !!p && Number.isFinite(p.x) && Number.isFinite(p.y));
-              if (positions.length === 0) return;
-              const minX = Math.min(...positions.map(p => p.x));
-              const maxX = Math.max(...positions.map(p => p.x + tableWidth));
-              const minY = Math.min(...positions.map(p => p.y));
-              const maxY = Math.max(...positions.map(p => p.y + tableHeight));
-              const width = maxX - minX + domainPadding * 2;
-              const expandedHeight = maxY - minY + headerOffset + footerOffset;
-              const isDomainExpanded = effectiveExpandedDomains.has(domain);
-              const height = isDomainExpanded ? expandedHeight : collapsedHeaderHeight;
-              if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return;
-              domainPositions.set(domain, {
-                x: minX - domainPadding,
-                y: minY - headerOffset,
-                width: Math.max(1, width),
-                height: Math.max(1, height),
-              });
-            });
-            
-            return Array.from(domainPositions.entries()).map(([domain, pos]) => (
-                <g key={domain}>
-                  <DomainContainer
-                    domain={domain}
-                    tables={visibleTables.filter(t => t.category === domain)}
-                    position={pos}
-                    width={pos.width}
-                    height={pos.height}
-                    isExpanded={effectiveExpandedDomains.has(domain)}
-                    onToggle={() => {
-                      toggleExpandedDomain(domain);
-                      setRequestFitToDomain(domain);
-                    }}
-                    compactFrame={viewMode === 'compact'}
-                  />
-                </g>
-              );
-            });
-          })()}
-          
           {/* Relationship Lines - Render behind tables */}
           {visibleRelationships.map((rel) => {
             // In domain-overview, hide lines for tables in collapsed categories

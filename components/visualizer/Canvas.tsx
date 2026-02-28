@@ -42,6 +42,7 @@ export default function Canvas() {
   // Focus-compact: when a field is selected, we bring related tables closer together.
   // These refs persist across renders without causing dependency cascades.
   const savedPositionsRef = useRef<Record<string, TablePosition> | null>(null);
+  const savedCameraRef = useRef<{ zoom: number; pan: { x: number; y: number } } | null>(null);
   const focusFieldKeyRef = useRef<string | null>(null);
   const savedSearchPositionsRef = useRef<Record<string, TablePosition> | null>(null);
 
@@ -566,7 +567,7 @@ export default function Canvas() {
   useEffect(() => {
     const shouldCompact = focusMode && !!selectedField;
 
-    // ─ EXIT focus-compact: restore original positions ─
+    // ─ EXIT focus-compact: restore original positions AND camera ─
     if (!shouldCompact) {
       if (savedPositionsRef.current) {
         const saved = savedPositionsRef.current;
@@ -577,14 +578,12 @@ export default function Canvas() {
             setTablePosition(key, pos);
           }
         });
-        // Animate camera back to fit all visible tables
+        // Restore the camera zoom/pan that was active before focus-compact
         setIsAnimating(true);
-        const vt = visibleTables;
-        const allPositions = vt
-          .map((t) => saved[t.key])
-          .filter((p): p is TablePosition => !!p && typeof p.x === 'number' && typeof p.y === 'number');
-        if (allPositions.length > 0) {
-          runFitToView(allPositions, vt.length);
+        if (savedCameraRef.current) {
+          setZoom(savedCameraRef.current.zoom);
+          setPan(savedCameraRef.current.pan);
+          savedCameraRef.current = null;
         }
         setTimeout(() => setIsAnimating(false), 400);
       }
@@ -598,6 +597,8 @@ export default function Canvas() {
     // ─ ENTER / UPDATE focus-compact ─
     if (!savedPositionsRef.current) {
       savedPositionsRef.current = { ...useModelStore.getState().tablePositions };
+      const state = useModelStore.getState();
+      savedCameraRef.current = { zoom: state.zoom, pan: { ...state.pan } };
     }
     focusFieldKeyRef.current = fieldKey;
 
@@ -666,12 +667,13 @@ export default function Canvas() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- visibleRelationships/focusVisibleTableKeys intentionally excluded to prevent cascade
   }, [
     focusMode, selectedField, model,
-    visibleTables, layoutMode, tableSize, setTablePosition, runFitToView,
+    visibleTables, layoutMode, tableSize, setTablePosition, runFitToView, setZoom, setPan,
   ]);
 
   // Clear focus-compact state when layout fundamentals change (prevents stale saved positions)
   useEffect(() => {
     savedPositionsRef.current = null;
+    savedCameraRef.current = null;
     focusFieldKeyRef.current = null;
     savedSearchPositionsRef.current = null;
   }, [model, layoutMode, tableSize, visibleLayers]);

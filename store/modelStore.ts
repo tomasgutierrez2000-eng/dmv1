@@ -153,7 +153,7 @@ export const useModelStore = create<ModelStore>((set) => ({
     selectedField: null,
     selectedRelationship: null,
     selectedSampleDataCell: null, // Clear when table changes or panel closes
-    focusMode: tableKey !== null,
+    focusMode: false, // Only dim other tables when a field or relationship is selected, not on table-only click
   }),
   setSelectedRelationship: (relId) => set({ 
     selectedRelationship: relId, 

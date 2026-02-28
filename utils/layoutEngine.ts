@@ -27,9 +27,9 @@ export const OVERVIEW_CARD = {
   FIELD_OFFSET: 11, // baseline offset from content-area top to first field text
 } as const;
 
-/** Compact overview: smaller cards and tighter spacing so more tables fit on screen; header/footer same size as detailed (OVERVIEW_CARD) for consistent spacing */
+/** Compact overview: smaller cards and tighter spacing so more tables fit on screen; width allows ~20ch so field names don't truncate to garbled text */
 export function getCompactOverviewTableDimensions(): { width: number; height: number } {
-  return { width: 148, height: 90 };
+  return { width: 200, height: 90 };
 }
 
 export function calculateLayout(

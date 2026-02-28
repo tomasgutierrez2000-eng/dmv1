@@ -481,46 +481,9 @@ export default function Canvas() {
     return () => clearTimeout(t);
   }, [requestFitToDomain, model, visibleTables, tablePositions, runFitToView, setRequestFitToDomain, prefersReducedMotion]);
 
-  // When user selects a table: latch to it — zoom to that table and show details (works from any zoom level)
-  const prevSelectedTableRef = useRef<string | null>(null);
-  const fitToTable = useCallback(
-    (tableKey: string) => {
-      const pos = useModelStore.getState().tablePositions[tableKey];
-      if (!pos || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return false;
-      prevSelectedTableRef.current = tableKey;
-      setIsAnimating(true);
-      runFitToView([pos], 1);
-      const duration = prefersReducedMotion ? 0 : 280;
-      setTimeout(() => setIsAnimating(false), duration);
-      return true;
-    },
-    [runFitToView, prefersReducedMotion]
-  );
-  useEffect(() => {
-    if (!selectedTable || !layoutMode) return;
-    setShowHint(false);
-    if (layoutMode !== 'domain-overview' && layoutMode !== 'snowflake') return;
-    if (savedPositionsRef.current) return; // don't override focus-compact
-    if (prevSelectedTableRef.current === selectedTable) return;
-    // Read positions from store directly (not from dependency) to avoid re-running
-    // this effect every time ANY table position changes (e.g. focus-compact restore).
-    const pos = useModelStore.getState().tablePositions[selectedTable];
-    if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
-      fitToTable(selectedTable);
-      return;
-    }
-    // Position may not be committed yet (e.g. when very zoomed out or right after load): retry once
-    const id = setTimeout(() => {
-      if (prevSelectedTableRef.current === selectedTable) return;
-      fitToTable(selectedTable);
-    }, 80);
-    return () => clearTimeout(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- tablePositions excluded to prevent re-runs on position changes
-  }, [selectedTable, layoutMode, fitToTable]);
-
-  useEffect(() => {
-    if (!selectedTable) prevSelectedTableRef.current = null;
-  }, [selectedTable]);
+  // When user selects a table we no longer zoom the camera to it — that was causing other tables
+  // to appear to "hide" (go off-screen). Selection just opens the detail panel; view stays as-is.
+  // Fit-to-table is still used when focus-compact runs (field selected).
 
   // ── Focus-compact: bring related tables closer when a field is selected ──
   // IMPORTANT: This effect intentionally does NOT depend on visibleRelationships or
@@ -1100,17 +1063,8 @@ export default function Canvas() {
               });
             });
             
-            return Array.from(domainPositions.entries()).map(([domain, pos]) => {
-              const domainHasFocusTable = !focusVisibleTableKeys ||
-                visibleTables.some(t => t.category === domain && focusVisibleTableKeys.has(t.key));
-              return (
-                <g
-                  key={domain}
-                  style={{
-                    opacity: domainHasFocusTable ? 1 : 0.25,
-                    transition: 'opacity 0.2s ease',
-                  }}
-                >
+            return Array.from(domainPositions.entries()).map(([domain, pos]) => (
+                <g key={domain}>
                   <DomainContainer
                     domain={domain}
                     tables={visibleTables.filter(t => t.category === domain)}
@@ -1198,12 +1152,11 @@ export default function Canvas() {
             } : { incoming: 0, outgoing: 0 };
             
             const beingDragged = isDraggingTable === table.key;
-            const isFocusRelevant = !focusVisibleTableKeys || focusVisibleTableKeys.has(table.key);
             return (
               <g
                 key={table.key}
                 style={{
-                  opacity: beingDragged ? 0.85 : isFocusRelevant ? 1 : 0.25,
+                  opacity: beingDragged ? 0.85 : 1,
                   filter: beingDragged ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))' : undefined,
                   transition: beingDragged ? 'none' : 'opacity 0.2s ease',
                 }}

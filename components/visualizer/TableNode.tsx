@@ -270,7 +270,7 @@ export default function TableNode({
               {showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0) ? (
                 <div
                   data-scrollable-table-fields
-                  className="overflow-y-auto overflow-x-hidden scrollbar-thin px-1.5 py-0.5 box-border"
+                  className="overflow-y-auto overflow-x-auto scrollbar-thin px-1.5 py-0.5 box-border"
                   style={{
                     width: TABLE_WIDTH,
                     height: contentH,
@@ -280,7 +280,7 @@ export default function TableNode({
                   onMouseDown={(e) => e.stopPropagation()}
                   title="PK / FK only"
                 >
-                  <div className="space-y-0.5">
+                  <div className="min-w-min space-y-0.5">
                     {pkFields.map((field, i) => {
                       const fieldName = field.name ?? '';
                       const isThisFieldSelected = selectedField?.tableKey === table.key && selectedField?.fieldName === fieldName;
@@ -289,7 +289,7 @@ export default function TableNode({
                           key={`pk-${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
-                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[11px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
+                          className={`flex items-center gap-1 min-w-max rounded px-1 py-0.5 cursor-pointer font-mono text-[11px] ${isThisFieldSelected ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900' : 'text-amber-900 font-bold hover:bg-amber-50'}`}
                           title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
                           <span className="truncate">PK {highlightMatch(fieldName)}</span>
@@ -305,7 +305,7 @@ export default function TableNode({
                           key={`fk-${fieldName}-${i}`}
                           onMouseDown={(e) => e.stopPropagation()}
                           onClick={(e) => { e.stopPropagation(); if (onFieldSelect) onFieldSelect(table.key, fieldName); }}
-                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono text-[11px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
+                          className={`flex items-center gap-1 min-w-max rounded px-1 py-0.5 cursor-pointer font-mono text-[11px] ${isThisFieldSelected ? 'bg-blue-200 border border-blue-500 font-semibold text-blue-900' : 'text-blue-800 font-semibold hover:bg-blue-50'}`}
                           title={field.dataType ? `${fieldName} (${field.dataType})` : fieldName}
                         >
                           <span className="truncate">FK {highlightMatch(fieldName)}</span>
@@ -318,7 +318,7 @@ export default function TableNode({
               ) : !hideFieldsForCompactView && table.fields.length > 0 ? (
                 <div
                   data-scrollable-table-fields
-                  className="overflow-y-auto overflow-x-hidden scrollbar-thin px-2 py-1 box-border"
+                  className="overflow-y-auto overflow-x-auto scrollbar-thin px-2 py-1 box-border"
                   style={{
                     width: TABLE_WIDTH,
                     height: contentH,
@@ -328,7 +328,7 @@ export default function TableNode({
                   onMouseDown={(e) => e.stopPropagation()}
                   title="Scroll to see all fields"
                 >
-                  <div className="space-y-0.5">
+                  <div className="min-w-min space-y-0.5">
                     {table.fields.map((field, i) => {
                       const isPK = field.isPK;
                       const isFK = field.isFK;
@@ -345,7 +345,7 @@ export default function TableNode({
                             e.stopPropagation();
                             if (onFieldSelect) onFieldSelect(table.key, fieldName);
                           }}
-                          className={`flex items-center gap-1 min-w-0 rounded px-1 py-0.5 cursor-pointer font-mono ${
+                          className={`flex items-center gap-1 min-w-max rounded px-1 py-0.5 cursor-pointer font-mono ${
                             isThisFieldSelected
                               ? isPK
                                 ? 'bg-amber-200 border border-amber-500 font-bold text-amber-900'
@@ -503,7 +503,7 @@ export default function TableNode({
             {(showFields || (showOnlyPkFkInCompact && (pkFields.length > 0 || fkFields.length > 0))) ? (
               <div
                 data-scrollable-table-fields
-                className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden ${isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-3' : 'px-3 py-2'} scrollbar-thin`}
+                className={`flex-1 min-h-0 overflow-y-auto overflow-x-auto ${isCompact ? 'px-2 py-1' : isDetailed ? 'px-4 py-3' : 'px-3 py-2'} scrollbar-thin`}
                 style={{
                   maxHeight: isExpanded ? SCROLLABLE_AREA_HEIGHT : COLLAPSED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT,
                   minHeight: 0,
@@ -513,7 +513,7 @@ export default function TableNode({
                 }}
                 title={showOnlyPkFkInCompact ? 'PK / FK only' : 'Scroll to see all fields'}
               >
-                <div className={isCompact ? 'space-y-0.5' : isDetailed ? 'space-y-1.5' : 'space-y-1'}>
+                <div className={`min-w-min ${isCompact ? 'space-y-0.5' : isDetailed ? 'space-y-1.5' : 'space-y-1'}`}>
                   {(showOnlyPkFkInCompact ? table.fields.filter(f => f.isPK || f.isFK) : table.fields).map((field, idx) => {
                   const isPK = field.isPK;
                   const isFK = field.isFK;
@@ -528,7 +528,7 @@ export default function TableNode({
                           onFieldSelect(table.key, fieldName);
                         }
                       }}
-                      className={`group ${fieldTextSize} ${fieldPadding} rounded border transition-all hover:shadow-sm hover:scale-[1.02] cursor-pointer ${
+                      className={`group ${fieldTextSize} ${fieldPadding} rounded border transition-all hover:shadow-sm hover:scale-[1.02] cursor-pointer min-w-max ${
                         selectedField?.tableKey === table.key && selectedField?.fieldName === fieldName
                           ? isPK
                             ? 'bg-gradient-to-r from-yellow-200 to-yellow-100 border-yellow-500 shadow-md ring-2 ring-yellow-400 ring-opacity-50'
@@ -560,7 +560,7 @@ export default function TableNode({
                           {!isPK && !isFK && <div className={fieldIconSize} />}
                         </div>
                         
-                        {/* Field Name - Dynamic size with better contrast and visual hierarchy */}
+                        {/* Field Name - flex-1 min-w-0 truncate; full name in title and horizontal scroll available */}
                         <span 
                           className={`font-mono ${isPK ? 'font-bold text-yellow-900' : isFK ? 'font-semibold text-blue-700' : 'font-medium text-gray-800'} flex-1 min-w-0 truncate ${fieldTextSize}`}
                           title={field.description || fieldName}

@@ -2,20 +2,25 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Lightbulb } from 'lucide-react';
-import { DEMO_STEPS, resolveField, type VariantKey } from './demoSteps';
-import DemoFormulaAnimation from './DemoFormulaAnimation';
+import type { GenericDemoStep } from './useDemoEngine';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * DemoNarrationPanel — fixed right-side panel with narration, formulas, insights
  *
  * 340px wide, stretches from top to 72px above bottom (control bar).
  * Content fades in/out on step changes via key-driven remounting.
+ *
+ * Generic: accepts steps + resolveField so it works for any metric demo.
  * ──────────────────────────────────────────────────────────────────────────── */
 
 interface DemoNarrationPanelProps {
   currentStep: number;
-  variant: VariantKey;
+  variant: string;
   totalSteps: number;
+  steps: GenericDemoStep[];
+  resolveField: <T>(field: T | ((v: string) => T), variant: string) => T;
+  /** Optional formula animation component — receives formulaKey, variant, stepIndex */
+  FormulaAnimation?: React.ComponentType<{ formulaKey: string; variant: string; stepIndex: number }>;
 }
 
 /** Phase color mapping */
@@ -41,6 +46,9 @@ export default function DemoNarrationPanel({
   currentStep,
   variant,
   totalSteps,
+  steps,
+  resolveField,
+  FormulaAnimation,
 }: DemoNarrationPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -49,7 +57,7 @@ export default function DemoNarrationPanel({
     scrollRef.current?.scrollTo({ top: 0 });
   }, [currentStep]);
 
-  const step = DEMO_STEPS[currentStep];
+  const step = steps[currentStep];
   if (!step) return null;
 
   const title = resolveField(step.title, variant);
@@ -86,8 +94,8 @@ export default function DemoNarrationPanel({
           </div>
 
           {/* Formula animation */}
-          {step.formulaKey && (
-            <DemoFormulaAnimation
+          {step.formulaKey && FormulaAnimation && (
+            <FormulaAnimation
               formulaKey={step.formulaKey}
               variant={variant}
               stepIndex={currentStep}

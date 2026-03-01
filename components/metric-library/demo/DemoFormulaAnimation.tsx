@@ -31,7 +31,7 @@ import {
 
 interface Props {
   formulaKey: string;
-  variant: VariantKey;
+  variant: string;
   /** Increments when step changes to reset animations */
   stepIndex: number;
 }
@@ -109,29 +109,30 @@ function AnimRow({
 /* ────────────────────────────────────────────────────────────────────────── */
 
 export default function DemoFormulaAnimation({ formulaKey, variant, stepIndex }: Props) {
+  const v = variant as VariantKey;
   switch (formulaKey) {
     case 'numerator-build':
-      return <NumeratorBuild variant={variant} stepIndex={stepIndex} />;
+      return <NumeratorBuild variant={v} stepIndex={stepIndex} />;
     case 'numerator-total':
-      return <NumeratorTotal variant={variant} stepIndex={stepIndex} />;
+      return <NumeratorTotal variant={v} stepIndex={stepIndex} />;
     case 'denominator-build':
-      return <DenominatorBuild variant={variant} stepIndex={stepIndex} />;
+      return <DenominatorBuild variant={v} stepIndex={stepIndex} />;
     case 'denominator-total':
-      return <DenominatorTotal variant={variant} stepIndex={stepIndex} />;
+      return <DenominatorTotal variant={v} stepIndex={stepIndex} />;
     case 'dscr-division':
-      return <DSCRDivision variant={variant} stepIndex={stepIndex} />;
+      return <DSCRDivision variant={v} stepIndex={stepIndex} />;
     case 'foundational-rule':
       return <FoundationalRuleDemo stepIndex={stepIndex} />;
     case 'rollup-facility':
-      return <RollupFacility variant={variant} stepIndex={stepIndex} />;
+      return <RollupFacility variant={v} stepIndex={stepIndex} />;
     case 'rollup-counterparty':
-      return <RollupCounterparty variant={variant} stepIndex={stepIndex} />;
+      return <RollupCounterparty variant={v} stepIndex={stepIndex} />;
     case 'rollup-desk':
-      return <RollupDesk variant={variant} stepIndex={stepIndex} />;
+      return <RollupDesk variant={v} stepIndex={stepIndex} />;
     case 'rollup-portfolio':
-      return <RollupPortfolio variant={variant} stepIndex={stepIndex} />;
+      return <RollupPortfolio variant={v} stepIndex={stepIndex} />;
     case 'rollup-lob':
-      return <RollupLoB variant={variant} stepIndex={stepIndex} />;
+      return <RollupLoB variant={v} stepIndex={stepIndex} />;
     default:
       return null;
   }

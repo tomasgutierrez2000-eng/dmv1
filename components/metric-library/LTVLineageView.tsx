@@ -78,6 +78,46 @@ interface VariantData {
   calcTierRollup: string;
 }
 
+/* ── SOURCING & FLOW TYPES ── */
+
+type StepType = 'sourcing' | 'calculation' | 'hybrid';
+type IngredientRole = 'numerator' | 'denominator' | 'numerator-ingredient' | 'denominator-ingredient' | 'dimension-key' | 'weight' | 'filter' | 'hierarchy-traversal';
+
+interface SourceIngredient {
+  stepType: StepType;
+  layer: 'L1' | 'L2' | 'L3';
+  table: string;
+  field: string;
+  role: IngredientRole;
+  description: string;
+  sampleValue?: string;
+}
+
+interface SourcingFlowStep {
+  stepType: StepType;
+  ordinal: number;
+  label: string;
+  description: string;
+  tables: string[];
+  fields: string[];
+  outputField?: string;
+  prerequisiteLevel?: string;
+}
+
+interface InputTableInfo {
+  table: string;
+  layer: 'L1' | 'L2';
+  role: string;
+  fields: string[];
+}
+
+interface LevelSourcingData {
+  ingredients: SourceIngredient[];
+  steps: SourcingFlowStep[];
+  inputTables: InputTableInfo[];
+  dependsOn: string | null;
+}
+
 /* ────────────────────────────────────────────────────────────────────────────
  * VARIANT DATA — LTV Standard vs Stressed
  *
@@ -1005,6 +1045,7 @@ function RollupPyramid({
                     </span>
                   </div>
                   <div className="text-[10px] text-gray-500">{level.purpose}</div>
+                  <InputTableCards tables={LTV_LEVEL_SOURCING[level.key]?.inputTables ?? []} />
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1092,6 +1133,113 @@ const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
   },
 };
 
+/* ────────────────────────────────────────────────────────────────────────────
+ * LEVEL SOURCING DATA — ingredients, steps, and input tables per level
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+const LTV_LEVEL_SOURCING: Record<string, LevelSourcingData> = {
+  facility: {
+    dependsOn: null,
+    ingredients: [
+      { stepType: 'sourcing', layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', role: 'numerator', description: 'Outstanding drawn balance for this facility', sampleValue: '$120M' },
+      { stepType: 'hybrid', layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', role: 'denominator-ingredient', description: 'Per-asset collateral valuation — SUM\'d across all assets for this facility', sampleValue: '$125M + $50M' },
+      { stepType: 'sourcing', layer: 'L2', table: 'collateral_snapshot', field: 'haircut_pct', role: 'denominator-ingredient', description: 'Stress haircut % applied to collateral (stressed variant only)', sampleValue: '14.3%' },
+      { stepType: 'sourcing', layer: 'L1', table: 'facility_master', field: 'facility_id', role: 'dimension-key', description: 'Facility identity — primary key for joins', sampleValue: 'FAC-001' },
+      { stepType: 'sourcing', layer: 'L1', table: 'collateral_asset_master', field: 'collateral_asset_id', role: 'dimension-key', description: 'Collateral asset identity — links to collateral_snapshot', sampleValue: 'COL-001' },
+    ],
+    steps: [
+      { stepType: 'sourcing', ordinal: 1, label: 'Source drawn amount', description: 'Look up drawn_amount from facility_exposure_snapshot for this facility + as_of_date', tables: ['facility_exposure_snapshot'], fields: ['drawn_amount'] },
+      { stepType: 'hybrid', ordinal: 2, label: 'Source & aggregate collateral value', description: 'Look up current_valuation_usd from collateral_snapshot for all collateral assets linked to this facility, then SUM them. A single facility may have multiple collateral assets.', tables: ['collateral_snapshot', 'collateral_asset_master'], fields: ['current_valuation_usd'], outputField: 'collateral_value_usd' },
+      { stepType: 'sourcing', ordinal: 3, label: 'Source stress haircut (stressed variant)', description: 'Look up haircut_pct from collateral_snapshot — only used for Stressed LTV to compute stressed denominator = value × (1 − haircut)', tables: ['collateral_snapshot'], fields: ['haircut_pct'] },
+      { stepType: 'calculation', ordinal: 4, label: 'Calculate facility LTV', description: 'LTV = drawn_amount ÷ collateral_value × 100. For stressed variant: use collateral_value × (1 − haircut_pct). If collateral_value is 0 or NULL → LTV = NULL (unsecured).', tables: [], fields: [], outputField: 'ltv_pct' },
+    ],
+    inputTables: [
+      { table: 'facility_exposure_snapshot', layer: 'L2', role: 'Numerator source', fields: ['drawn_amount'] },
+      { table: 'collateral_snapshot', layer: 'L2', role: 'Denominator source', fields: ['current_valuation_usd', 'haircut_pct'] },
+      { table: 'facility_master', layer: 'L1', role: 'Identity / join hub', fields: ['facility_id'] },
+      { table: 'collateral_asset_master', layer: 'L1', role: 'Collateral identity', fields: ['collateral_asset_id'] },
+    ],
+  },
+  counterparty: {
+    dependsOn: 'facility',
+    ingredients: [
+      { stepType: 'calculation', layer: 'L3', table: 'metric_value_fact', field: 'ltv_pct', role: 'numerator-ingredient', description: 'Facility-level LTV from prerequisite calculation', sampleValue: '68.6%' },
+      { stepType: 'sourcing', layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', role: 'weight', description: 'Drawn amount as exposure weight for averaging', sampleValue: '$120M' },
+      { stepType: 'sourcing', layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', role: 'weight', description: 'Gross exposure in USD — alternative weighting factor', sampleValue: '$150M' },
+      { stepType: 'sourcing', layer: 'L1', table: 'facility_master', field: 'counterparty_id', role: 'dimension-key', description: 'FK to counterparty — GROUP BY key', sampleValue: 'CP-7890' },
+    ],
+    steps: [
+      { stepType: 'calculation', ordinal: 1, label: 'Calculate facility-level LTVs (prerequisite)', description: 'Each secured facility\'s LTV was computed in the facility step above. Unsecured facilities have LTV = NULL.', tables: [], fields: ['ltv_pct'], prerequisiteLevel: 'facility' },
+      { stepType: 'sourcing', ordinal: 2, label: 'Source exposure weights', description: 'Look up drawn_amount per facility from facility_exposure_snapshot as the weighting factor for averaging', tables: ['facility_exposure_snapshot'], fields: ['drawn_amount', 'gross_exposure_usd'] },
+      { stepType: 'sourcing', ordinal: 3, label: 'Group by counterparty', description: 'Join facility_master.counterparty_id to identify which facilities belong to the same borrower', tables: ['facility_master'], fields: ['counterparty_id'] },
+      { stepType: 'sourcing', ordinal: 4, label: 'Filter: secured only', description: 'Exclude facilities where LTV is NULL (unsecured). Only secured facilities participate in the weighted average.', tables: [], fields: [] },
+      { stepType: 'calculation', ordinal: 5, label: 'Exposure-weighted average LTV', description: 'Σ(LTV × drawn_amount) ÷ Σ(drawn_amount) for secured facilities only. Report alongside % unsecured exposure.', tables: [], fields: [], outputField: 'counterparty_ltv_pct' },
+    ],
+    inputTables: [
+      { table: 'facility_exposure_snapshot', layer: 'L2', role: 'Exposure weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+      { table: 'facility_master', layer: 'L1', role: 'Counterparty grouping', fields: ['counterparty_id'] },
+    ],
+  },
+  desk: {
+    dependsOn: 'counterparty',
+    ingredients: [
+      { stepType: 'calculation', layer: 'L3', table: 'metric_value_fact', field: 'counterparty_ltv_pct', role: 'numerator-ingredient', description: 'Counterparty-level LTV from prerequisite', sampleValue: '65.2%' },
+      { stepType: 'sourcing', layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', role: 'weight', description: 'Gross exposure per facility — re-weighted at desk level', sampleValue: '$150M' },
+      { stepType: 'sourcing', layer: 'L1', table: 'facility_master', field: 'lob_segment_id', role: 'dimension-key', description: 'FK to LoB taxonomy — resolves to desk', sampleValue: '301' },
+      { stepType: 'sourcing', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', role: 'hierarchy-traversal', description: 'LoB hierarchy node — maps lob_segment_id to desk name', sampleValue: '301' },
+      { stepType: 'sourcing', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'segment_name', role: 'dimension-key', description: 'Desk name from LoB hierarchy leaf node', sampleValue: 'CRE Multifamily' },
+    ],
+    steps: [
+      { stepType: 'calculation', ordinal: 1, label: 'Calculate counterparty LTVs (prerequisite)', description: 'Each counterparty\'s exposure-weighted LTV was computed in the counterparty step.', tables: [], fields: ['counterparty_ltv_pct'], prerequisiteLevel: 'counterparty' },
+      { stepType: 'sourcing', ordinal: 2, label: 'Resolve desk via LoB taxonomy', description: 'Join facility_master.lob_segment_id → enterprise_business_taxonomy.managed_segment_id to find the L3 desk (leaf node) each facility belongs to', tables: ['facility_master', 'enterprise_business_taxonomy'], fields: ['lob_segment_id', 'managed_segment_id', 'segment_name'] },
+      { stepType: 'sourcing', ordinal: 3, label: 'Group by desk', description: 'Group all secured facilities by their resolved desk name (segment_name at tree level 3)', tables: [], fields: ['lob_l3_name'] },
+      { stepType: 'calculation', ordinal: 4, label: 'Exposure-weighted average LTV per desk', description: 'Σ(LTV × exposure) ÷ Σ(secured_exposure) grouped by desk. Desks with only unsecured facilities get NULL.', tables: [], fields: [], outputField: 'desk_ltv_pct' },
+    ],
+    inputTables: [
+      { table: 'facility_exposure_snapshot', layer: 'L2', role: 'Exposure weight', fields: ['gross_exposure_usd'] },
+      { table: 'facility_master', layer: 'L1', role: 'LoB segment link', fields: ['lob_segment_id'] },
+      { table: 'enterprise_business_taxonomy', layer: 'L1', role: 'Desk resolution', fields: ['managed_segment_id', 'segment_name'] },
+    ],
+  },
+  portfolio: {
+    dependsOn: 'desk',
+    ingredients: [
+      { stepType: 'calculation', layer: 'L3', table: 'metric_value_fact', field: 'desk_ltv_pct', role: 'numerator-ingredient', description: 'Desk-level LTV from prerequisite', sampleValue: '67.3%' },
+      { stepType: 'sourcing', layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', role: 'weight', description: 'Exposure weight for portfolio averaging', sampleValue: '$150M' },
+      { stepType: 'sourcing', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', role: 'hierarchy-traversal', description: 'Navigate from desk (L3) up to portfolio (L2) via parent_segment_id', sampleValue: '30' },
+      { stepType: 'sourcing', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'segment_name', role: 'dimension-key', description: 'Portfolio name from L2 parent node', sampleValue: 'Commercial Real Estate' },
+    ],
+    steps: [
+      { stepType: 'calculation', ordinal: 1, label: 'Calculate desk LTVs (prerequisite)', description: 'Each desk\'s exposure-weighted LTV was computed in the desk step.', tables: [], fields: ['desk_ltv_pct'], prerequisiteLevel: 'desk' },
+      { stepType: 'sourcing', ordinal: 2, label: 'Traverse LoB hierarchy: desk → portfolio', description: 'Walk enterprise_business_taxonomy from leaf (L3 desk) one level up via parent_segment_id to reach the L2 portfolio node', tables: ['enterprise_business_taxonomy'], fields: ['parent_segment_id', 'segment_name'] },
+      { stepType: 'sourcing', ordinal: 3, label: 'Group by portfolio', description: 'Group all desks under their L2 portfolio parent', tables: [], fields: ['lob_l2_name'] },
+      { stepType: 'calculation', ordinal: 4, label: 'Exposure-weighted average LTV + distribution', description: 'Σ(LTV × secured_exposure) ÷ Σ(secured_exposure) by portfolio. Also compute distribution buckets: <50%, 50-65%, 65-80%, 80-100%, >100%.', tables: [], fields: [], outputField: 'portfolio_ltv_pct' },
+    ],
+    inputTables: [
+      { table: 'facility_exposure_snapshot', layer: 'L2', role: 'Exposure weight', fields: ['gross_exposure_usd'] },
+      { table: 'enterprise_business_taxonomy', layer: 'L1', role: 'Hierarchy traversal', fields: ['parent_segment_id', 'segment_name'] },
+    ],
+  },
+  lob: {
+    dependsOn: 'portfolio',
+    ingredients: [
+      { stepType: 'calculation', layer: 'L3', table: 'metric_value_fact', field: 'portfolio_ltv_pct', role: 'numerator-ingredient', description: 'Portfolio-level LTV from prerequisite', sampleValue: '65.0%' },
+      { stepType: 'sourcing', layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', role: 'weight', description: 'Re-weight by total LoB secured exposure', sampleValue: '$150M' },
+      { stepType: 'sourcing', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', role: 'hierarchy-traversal', description: 'Navigate from portfolio (L2) to LoB root (L1) where parent IS NULL', sampleValue: 'NULL' },
+      { stepType: 'sourcing', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'segment_name', role: 'dimension-key', description: 'LoB name from root node', sampleValue: 'Wholesale Banking' },
+    ],
+    steps: [
+      { stepType: 'calculation', ordinal: 1, label: 'Calculate portfolio LTVs (prerequisite)', description: 'Each portfolio\'s exposure-weighted LTV was computed in the portfolio step.', tables: [], fields: ['portfolio_ltv_pct'], prerequisiteLevel: 'portfolio' },
+      { stepType: 'sourcing', ordinal: 2, label: 'Traverse LoB hierarchy: portfolio → LoB root', description: 'Walk enterprise_business_taxonomy from L2 parent to the root node where parent_segment_id IS NULL', tables: ['enterprise_business_taxonomy'], fields: ['parent_segment_id', 'segment_name'] },
+      { stepType: 'calculation', ordinal: 3, label: 'Exposure-weighted average LTV at LoB', description: 'Σ(LTV × secured_exposure) ÷ Σ(secured_exposure) across all portfolios in this Line of Business. Directional early warning only.', tables: [], fields: [], outputField: 'lob_ltv_pct' },
+    ],
+    inputTables: [
+      { table: 'facility_exposure_snapshot', layer: 'L2', role: 'Exposure re-weight', fields: ['gross_exposure_usd'] },
+      { table: 'enterprise_business_taxonomy', layer: 'L1', role: 'Root traversal', fields: ['parent_segment_id', 'segment_name'] },
+    ],
+  },
+};
+
 function JoinChainVisual({ levelKey }: { levelKey: string }) {
   const chain = ROLLUP_JOIN_CHAINS[levelKey];
   if (!chain) return null;
@@ -1141,6 +1289,152 @@ function JoinChainVisual({ levelKey }: { levelKey: string }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
+ * SOURCING SUB-COMPONENTS
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function StepTypeBadge({ type }: { type: StepType }) {
+  const cfg = {
+    sourcing:    { bg: 'bg-sky-500/20', border: 'border-sky-500/30', text: 'text-sky-300', icon: Database, label: 'Sourcing' },
+    calculation: { bg: 'bg-purple-500/20', border: 'border-purple-500/30', text: 'text-purple-300', icon: Calculator, label: 'Calculation' },
+    hybrid:      { bg: 'bg-amber-500/20', border: 'border-amber-500/30', text: 'text-amber-300', icon: Zap, label: 'Hybrid' },
+  }[type];
+  const Icon = cfg.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${cfg.bg} ${cfg.border} ${cfg.text} border`}>
+      <Icon className="w-2.5 h-2.5" aria-hidden="true" />
+      {cfg.label}
+    </span>
+  );
+}
+
+function InputTableCards({ tables }: { tables: InputTableInfo[] }) {
+  if (!tables.length) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-2">
+      {tables.map((t) => {
+        const color = t.layer === 'L2' ? { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-300', sub: 'text-amber-400/60' } : { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-300', sub: 'text-blue-400/60' };
+        return (
+          <span key={t.table} className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg ${color.bg} border ${color.border}`}>
+            <Database className={`w-2.5 h-2.5 ${color.text}`} aria-hidden="true" />
+            <span className={`text-[9px] font-mono font-medium ${color.text}`}>{t.table}</span>
+            <span className={`text-[8px] ${color.sub} ml-0.5`}>{t.role}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+function IngredientTable({ ingredients }: { ingredients: SourceIngredient[] }) {
+  if (!ingredients.length) return null;
+  return (
+    <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/[0.03] p-3 mt-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Layers className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Source Ingredients</span>
+      </div>
+      <div className="rounded-lg border border-gray-800 overflow-hidden">
+        <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-white/[0.03] px-3 py-1.5 gap-x-3">
+          <span>Type</span><span>Table.Field</span><span>Description</span><span>Role</span><span>Sample</span>
+        </div>
+        {ingredients.map((ing, i) => {
+          const layerColor = ing.layer === 'L3' ? 'text-emerald-300' : ing.layer === 'L2' ? 'text-amber-300' : 'text-blue-300';
+          return (
+            <div key={i} className="grid grid-cols-[auto_1fr_1fr_auto_auto] px-3 py-1.5 gap-x-3 border-t border-gray-800/50 items-center text-[10px]">
+              <StepTypeBadge type={ing.stepType} />
+              <code className={`font-mono ${layerColor}`}>{ing.table}.{ing.field}</code>
+              <span className="text-gray-400">{ing.description}</span>
+              <span className="text-[9px] font-mono text-gray-500 bg-white/5 px-1.5 py-0.5 rounded">{ing.role}</span>
+              {ing.sampleValue ? <span className="text-[9px] font-mono text-gray-500">{ing.sampleValue}</span> : <span />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FlowStepRow({ step }: { step: SourcingFlowStep }) {
+  const tablePillColor = (t: string) => {
+    if (t.includes('snapshot') || t.includes('collateral_snapshot')) return { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-300' };
+    return { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-300' };
+  };
+  return (
+    <div className="flex items-start gap-3 py-2">
+      <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[9px] font-bold text-gray-400 flex-shrink-0 mt-0.5">
+        {step.ordinal}
+      </div>
+      <div className="flex-1 space-y-1">
+        <div className="flex items-center gap-2">
+          <StepTypeBadge type={step.stepType} />
+          <span className="text-[10px] font-semibold text-gray-200">{step.label}</span>
+          {step.prerequisiteLevel && (
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              prereq: {step.prerequisiteLevel}
+            </span>
+          )}
+        </div>
+        <div className="text-[10px] text-gray-400 leading-relaxed">{step.description}</div>
+        {step.tables.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {step.tables.map((t) => {
+              const c = tablePillColor(t);
+              return (
+                <span key={t} className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-mono ${c.bg} border ${c.border} ${c.text}`}>
+                  <Database className="w-2 h-2" aria-hidden="true" />{t}
+                </span>
+              );
+            })}
+          </div>
+        )}
+        {step.outputField && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <Play className="w-2.5 h-2.5 text-emerald-400" aria-hidden="true" />
+            <span className="text-[9px] font-mono text-emerald-400">→ {step.outputField}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StepByStepFlow({ steps, dependsOn, allLevelSourcing }: { steps: SourcingFlowStep[]; dependsOn: string | null; allLevelSourcing: Record<string, LevelSourcingData> }) {
+  const [showPrereqs, setShowPrereqs] = useState(false);
+  const prereqSteps = dependsOn ? allLevelSourcing[dependsOn]?.steps ?? [] : [];
+
+  return (
+    <div className="rounded-lg border border-violet-500/20 bg-violet-500/[0.03] p-3 mt-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Workflow className="w-3.5 h-3.5 text-violet-400" aria-hidden="true" />
+        <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400">Step-by-Step Flow</span>
+      </div>
+
+      {dependsOn && prereqSteps.length > 0 && (
+        <div className="mb-2">
+          <button
+            type="button"
+            className="flex items-center gap-1.5 text-[9px] font-medium text-purple-400 hover:text-purple-300 transition-colors"
+            onClick={(e) => { e.stopPropagation(); setShowPrereqs(!showPrereqs); }}
+          >
+            {showPrereqs ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {showPrereqs ? 'Hide' : 'Show'} prerequisite steps ({dependsOn})
+          </button>
+          {showPrereqs && (
+            <div className="mt-1.5 pl-3 border-l-2 border-purple-500/20 space-y-0">
+              {prereqSteps.map((s) => <FlowStepRow key={s.ordinal} step={s} />)}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="space-y-0 divide-y divide-white/5">
+        {steps.map((s) => <FlowStepRow key={s.ordinal} step={s} />)}
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
  * LEVEL-SPECIFIC DETAIL PANELS
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -1177,6 +1471,12 @@ function FacilityDetail() {
         </PlainEnglish>
       </div>
       <JoinChainVisual levelKey="facility" />
+      <IngredientTable ingredients={LTV_LEVEL_SOURCING.facility.ingredients} />
+      <StepByStepFlow
+        steps={LTV_LEVEL_SOURCING.facility.steps}
+        dependsOn={LTV_LEVEL_SOURCING.facility.dependsOn}
+        allLevelSourcing={LTV_LEVEL_SOURCING}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <div className="rounded-lg bg-teal-500/10 border border-teal-500/20 p-2.5">
@@ -1217,6 +1517,12 @@ function CounterpartyDetail() {
         Unsecured facilities are excluded from both the numerator and denominator of the weighted average.
       </div>
       <JoinChainVisual levelKey="counterparty" />
+      <IngredientTable ingredients={LTV_LEVEL_SOURCING.counterparty.ingredients} />
+      <StepByStepFlow
+        steps={LTV_LEVEL_SOURCING.counterparty.steps}
+        dependsOn={LTV_LEVEL_SOURCING.counterparty.dependsOn}
+        allLevelSourcing={LTV_LEVEL_SOURCING}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/[0.04] p-3">
@@ -1279,6 +1585,12 @@ function DeskDetail() {
         may be NULL or cover only a small fraction of the book.
       </div>
       <JoinChainVisual levelKey="desk" />
+      <IngredientTable ingredients={LTV_LEVEL_SOURCING.desk.ingredients} />
+      <StepByStepFlow
+        steps={LTV_LEVEL_SOURCING.desk.steps}
+        dependsOn={LTV_LEVEL_SOURCING.desk.dependsOn}
+        allLevelSourcing={LTV_LEVEL_SOURCING}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/[0.06] p-3">
@@ -1344,6 +1656,12 @@ function PortfolioDetail() {
   return (
     <div className="space-y-3">
       <JoinChainVisual levelKey="portfolio" />
+      <IngredientTable ingredients={LTV_LEVEL_SOURCING.portfolio.ingredients} />
+      <StepByStepFlow
+        steps={LTV_LEVEL_SOURCING.portfolio.steps}
+        dependsOn={LTV_LEVEL_SOURCING.portfolio.dependsOn}
+        allLevelSourcing={LTV_LEVEL_SOURCING}
+      />
       <div className="bg-black/30 rounded-lg p-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Exposure-Weighted Average (Secured Only)</div>
         <div className="text-sm font-mono text-emerald-400 text-center">
@@ -1411,6 +1729,12 @@ function LoBDetail() {
   return (
     <div className="space-y-3">
       <JoinChainVisual levelKey="lob" />
+      <IngredientTable ingredients={LTV_LEVEL_SOURCING.lob.ingredients} />
+      <StepByStepFlow
+        steps={LTV_LEVEL_SOURCING.lob.steps}
+        dependsOn={LTV_LEVEL_SOURCING.lob.dependsOn}
+        allLevelSourcing={LTV_LEVEL_SOURCING}
+      />
       <div className="bg-black/30 rounded-lg p-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Exposure-Weighted Average (same as Portfolio)</div>
         <div className="text-sm font-mono text-emerald-400 text-center">

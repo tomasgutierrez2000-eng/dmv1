@@ -64,12 +64,22 @@ export interface FacilitySummary {
   delinquency_bucket_code: string;
   is_delinquent: boolean;
 
+  // Enrichment fields - Pricing Exception
+  pricing_exception_flag: boolean;
+
   // Enrichment fields - Profitability
   net_interest_income_amt: number;
   total_revenue_amt: number;
   nim_pct: number;
   roa_pct: number;
   roe_pct: number;
+  total_debt_service_amt: number;
+  interest_rate_sensitivity_pct: number;
+
+  // Enrichment fields - RWA & Rating Bucket
+  rwa_amt: number;
+  internal_risk_rating_bucket_code: string;
+  return_on_rwa_pct: number;
 
   // Enrichment fields - Risk Flags
   is_deteriorated: boolean;
@@ -86,10 +96,16 @@ export interface FacilitySummary {
   has_external_downgrade: boolean;
   has_any_downgrade: boolean;
 
+  // Enrichment fields - Exposure & Loss
+  ead_usd: number;
+  expected_loss_usd: number;
+  expected_loss_rate_pct: number;
+
   // Enrichment fields - Financial Metrics
   dscr: number | null;
   ltv: number | null;
   fccr: number | null;
+  tangible_net_worth_usd: number | null;
 
   // Enrichment fields - Limits
   counterparty_limit_usd: number | null;
@@ -103,6 +119,21 @@ export interface FacilitySummary {
 
   // Enrichment fields - Bank Share
   bank_share_pct: number;
+
+  // Enrichment fields - Operating Cost
+  operating_expense_amt: number;
+
+  // Enrichment fields - Capital Adequacy
+  capital_adequacy_ratio_pct: number | null;
+
+  // Enrichment fields - Loan Count
+  number_of_loans: number;
+
+  // Enrichment fields - Rating Migration
+  external_rating_status: string;
+  external_rating_change_steps: number;
+  internal_rating_status: string;
+  internal_rating_change_steps: number;
 }
 
 export interface DeskSummary {
@@ -130,8 +161,25 @@ export interface DeskSummary {
   total_cross_entity_exposure_usd: number;
   avg_dscr: number | null;
   avg_ltv: number | null;
+  avg_fccr: number | null;
   avg_internal_risk_rating: number;
   avg_bank_share_pct: number;
+  avg_roe_pct: number;
+  total_debt_service_amt: number;
+  total_rwa_amt: number;
+  avg_ir_sensitivity_pct: number;
+  avg_return_on_rwa_pct: number;
+  pricing_exception_count: number;
+  total_ead_usd: number;
+  total_expected_loss_usd: number;
+  avg_expected_loss_rate_pct: number;
+  total_cross_entity_exposure_usd: number;
+  cross_entity_facility_count: number;
+  active_facility_count: number;
+  avg_tangible_net_worth_usd: number | null;
+  exception_rate_pct: number;
+  avg_capital_adequacy_ratio_pct: number | null;
+  total_operating_expense_amt: number;
 }
 
 export interface LobL2Summary extends DeskSummary {
@@ -182,8 +230,25 @@ export interface LobL1Summary {
   total_cross_entity_exposure_usd: number;
   avg_dscr: number | null;
   avg_ltv: number | null;
+  avg_fccr: number | null;
   avg_internal_risk_rating: number;
   avg_bank_share_pct: number;
+  avg_roe_pct: number;
+  total_debt_service_amt: number;
+  total_rwa_amt: number;
+  avg_ir_sensitivity_pct: number;
+  avg_return_on_rwa_pct: number;
+  pricing_exception_count: number;
+  total_ead_usd: number;
+  total_expected_loss_usd: number;
+  avg_expected_loss_rate_pct: number;
+  total_cross_entity_exposure_usd: number;
+  cross_entity_facility_count: number;
+  active_facility_count: number;
+  avg_tangible_net_worth_usd: number | null;
+  exception_rate_pct: number;
+  avg_capital_adequacy_ratio_pct: number | null;
+  total_operating_expense_amt: number;
   desk_count: number;
   top_desk_by_exposure: string | null;
   bottom_desk_by_exposure: string | null;

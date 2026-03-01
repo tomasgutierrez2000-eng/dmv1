@@ -165,6 +165,12 @@ export const assembleRollups = (
     const ltvs = facilities
       .map((f) => f.ltv)
       .filter((l): l is number => l !== null);
+    const fccrs = facilities
+      .map((f) => f.fccr)
+      .filter((v): v is number => v !== null);
+    const tnws = facilities
+      .map((f) => f.tangible_net_worth_usd)
+      .filter((v): v is number => v !== null);
     const avgDscr =
       dscrs.length > 0
         ? weightedAverage(dscrs, dscrs.map((_, i) => exposures[i]))
@@ -173,6 +179,35 @@ export const assembleRollups = (
       ltvs.length > 0
         ? weightedAverage(ltvs, ltvs.map((_, i) => exposures[i]))
         : null;
+    const avgFccr =
+      fccrs.length > 0
+        ? weightedAverage(fccrs, fccrs.map((_, i) => exposures[i]))
+        : null;
+    const avgTnw =
+      tnws.length > 0
+        ? weightedAverage(tnws, tnws.map((_, i) => exposures[i]))
+        : null;
+
+    // EAD & Expected Loss
+    const totalEad = facilities.reduce((sum, f) => sum + f.ead_usd, 0);
+    const totalExpectedLoss = facilities.reduce(
+      (sum, f) => sum + f.expected_loss_usd,
+      0
+    );
+    const avgExpectedLossRate =
+      totalExposure > 0 ? totalExpectedLoss / totalExposure : 0;
+
+    // Cross-entity exposure
+    const totalCrossEntityExposure = facilities.reduce(
+      (sum, f) => sum + f.cross_entity_exposure_usd,
+      0
+    );
+    const crossEntityFacilityCount = facilities.filter(
+      (f) => f.has_cross_entity_exposure
+    ).length;
+
+    // Active count
+    const activeFacilityCount = facilities.filter((f) => f.is_active).length;
 
     // Profitability
     const totalNii = facilities.reduce(
@@ -185,8 +220,26 @@ export const assembleRollups = (
     );
     const nims = facilities.map((f) => f.nim_pct);
     const roas = facilities.map((f) => f.roa_pct);
+    const roes = facilities.map((f) => f.roe_pct);
     const avgNim = weightedAverage(nims, exposures);
     const avgRoa = weightedAverage(roas, exposures);
+    const avgRoe = weightedAverage(roes, exposures);
+
+    // Debt service, RWA, IR sensitivity, pricing exceptions
+    const totalDebtService = facilities.reduce(
+      (sum, f) => sum + f.total_debt_service_amt,
+      0
+    );
+    const totalRwa = facilities.reduce(
+      (sum, f) => sum + f.rwa_amt,
+      0
+    );
+    const irSensitivities = facilities.map((f) => f.interest_rate_sensitivity_pct);
+    const avgIrSensitivity = weightedAverage(irSensitivities, exposures);
+    const avgReturnOnRwa = totalRwa > 0 ? (totalRevenue / totalRwa) * 100 : 0;
+    const pricingExceptionCount = facilities.filter(
+      (f) => f.pricing_exception_flag
+    ).length;
 
     // Concentration
     const byIndustry = new Map<string, number>();
@@ -227,6 +280,26 @@ export const assembleRollups = (
     const bankShares = facilities.map((f) => f.bank_share_pct);
     const avgBankShare = weightedAverage(bankShares, exposures);
 
+    // Exception rate
+    const exceptionRatePct =
+      facilities.length > 0 ? exceptionCount / facilities.length : 0;
+
+    // Capital adequacy ratio (weighted average of non-null values)
+    const cars = facilities
+      .map((f) => f.capital_adequacy_ratio_pct)
+      .filter((c): c is number => c !== null);
+    const carExposures = facilities
+      .filter((f) => f.capital_adequacy_ratio_pct !== null)
+      .map((f) => f.outstanding_exposure_usd);
+    const avgCar =
+      cars.length > 0 ? weightedAverage(cars, carExposures) : null;
+
+    // Operating expense
+    const totalOperatingExpense = facilities.reduce(
+      (sum, f) => sum + f.operating_expense_amt,
+      0
+    );
+
     return {
       facility_count: facilities.length,
       total_exposure_usd: roundTo(totalExposure, 1),
@@ -248,7 +321,21 @@ export const assembleRollups = (
       total_cross_entity_exposure_usd: roundTo(totalCrossEntityExposure, 1),
       avg_dscr: avgDscr !== null ? roundTo(avgDscr, 2) : null,
       avg_ltv: avgLtv !== null ? roundTo(avgLtv, 2) : null,
+      avg_fccr: avgFccr !== null ? roundTo(avgFccr, 2) : null,
       avg_internal_risk_rating: roundTo(avgRiskRating, 2),
+      avg_roe_pct: roundTo(avgRoe, 2),
+      total_debt_service_amt: roundTo(totalDebtService, 2),
+      total_rwa_amt: roundTo(totalRwa, 1),
+      avg_ir_sensitivity_pct: roundTo(avgIrSensitivity, 2),
+      avg_return_on_rwa_pct: roundTo(avgReturnOnRwa, 2),
+      pricing_exception_count: pricingExceptionCount,
+      total_ead_usd: roundTo(totalEad, 1),
+      total_expected_loss_usd: roundTo(totalExpectedLoss, 2),
+      avg_expected_loss_rate_pct: roundTo(avgExpectedLossRate, 6),
+      total_cross_entity_exposure_usd: roundTo(totalCrossEntityExposure, 1),
+      cross_entity_facility_count: crossEntityFacilityCount,
+      active_facility_count: activeFacilityCount,
+      avg_tangible_net_worth_usd: avgTnw !== null ? roundTo(avgTnw, 1) : null,
       prior_month_exposure_usd: roundTo(priorMonthExposure, 1),
       total_nii_amt: roundTo(totalNii, 2),
       total_revenue_amt: roundTo(totalRevenue, 2),
@@ -261,6 +348,9 @@ export const assembleRollups = (
       unique_counterparty_count: uniqueCounterparties.size,
       doi_pct: roundTo(doiPct, 4),
       avg_bank_share_pct: roundTo(avgBankShare, 2),
+      exception_rate_pct: roundTo(exceptionRatePct, 4),
+      avg_capital_adequacy_ratio_pct: avgCar !== null ? roundTo(avgCar, 2) : null,
+      total_operating_expense_amt: roundTo(totalOperatingExpense, 2),
     };
   };
 

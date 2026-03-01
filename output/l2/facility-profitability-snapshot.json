@@ -8,7 +8,9 @@
     "operating_expense_amt": 0.01,
     "nim_pct": 2,
     "roa_pct": 0.8,
-    "roe_pct": 8
+    "roe_pct": 8,
+    "total_debt_service_amt": 0.03,
+    "interest_rate_sensitivity_pct": 0.3
   },
   {
     "profitability_snapshot_id": "FPS-000002",
@@ -19,7 +21,9 @@
     "operating_expense_amt": 0.01,
     "nim_pct": 2,
     "roa_pct": 0.8,
-    "roe_pct": 8
+    "roe_pct": 8,
+    "total_debt_service_amt": 0.03,
+    "interest_rate_sensitivity_pct": 0.3
   },
   {
     "profitability_snapshot_id": "FPS-000003",
@@ -30,7 +34,9 @@
     "operating_expense_amt": 0.01,
     "nim_pct": 2,
     "roa_pct": 0.8,
-    "roe_pct": 8
+    "roe_pct": 8,
+    "total_debt_service_amt": 0.03,
+    "interest_rate_sensitivity_pct": 0.3
   },
   {
     "profitability_snapshot_id": "FPS-000004",
@@ -41,7 +47,9 @@
     "operating_expense_amt": 0.03,
     "nim_pct": 2.22,
     "roa_pct": 0.9,
-    "roe_pct": 9.98
+    "roe_pct": 9.98,
+    "total_debt_service_amt": 0.09,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000005",
@@ -52,7 +60,9 @@
     "operating_expense_amt": 0.03,
     "nim_pct": 2.22,
     "roa_pct": 0.9,
-    "roe_pct": 9.98
+    "roe_pct": 9.98,
+    "total_debt_service_amt": 0.09,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000006",
@@ -63,7 +73,9 @@
     "operating_expense_amt": 0.03,
     "nim_pct": 2.22,
     "roa_pct": 0.9,
-    "roe_pct": 9.98
+    "roe_pct": 9.98,
+    "total_debt_service_amt": 0.09,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000007",
@@ -74,7 +86,9 @@
     "operating_expense_amt": 0.05,
     "nim_pct": 2.02,
     "roa_pct": 0.83,
-    "roe_pct": 10.28
+    "roe_pct": 10.28,
+    "total_debt_service_amt": 0.17,
+    "interest_rate_sensitivity_pct": 0.32
   },
   {
     "profitability_snapshot_id": "FPS-000008",
@@ -85,7 +99,9 @@
     "operating_expense_amt": 0.05,
     "nim_pct": 2.02,
     "roa_pct": 0.83,
-    "roe_pct": 10.28
+    "roe_pct": 10.28,
+    "total_debt_service_amt": 0.17,
+    "interest_rate_sensitivity_pct": 0.32
   },
   {
     "profitability_snapshot_id": "FPS-000009",
@@ -96,7 +112,9 @@
     "operating_expense_amt": 0.05,
     "nim_pct": 2.02,
     "roa_pct": 0.83,
-    "roe_pct": 10.28
+    "roe_pct": 10.28,
+    "total_debt_service_amt": 0.17,
+    "interest_rate_sensitivity_pct": 0.32
   },
   {
     "profitability_snapshot_id": "FPS-000010",
@@ -107,7 +125,9 @@
     "operating_expense_amt": 0.09,
     "nim_pct": 2.03,
     "roa_pct": 0.84,
-    "roe_pct": 11.42
+    "roe_pct": 11.42,
+    "total_debt_service_amt": 0.28,
+    "interest_rate_sensitivity_pct": 0.33
   },
   {
     "profitability_snapshot_id": "FPS-000011",
@@ -118,7 +138,9 @@
     "operating_expense_amt": 0.09,
     "nim_pct": 2.03,
     "roa_pct": 0.84,
-    "roe_pct": 11.42
+    "roe_pct": 11.42,
+    "total_debt_service_amt": 0.28,
+    "interest_rate_sensitivity_pct": 0.33
   },
   {
     "profitability_snapshot_id": "FPS-000012",
@@ -129,7 +151,9 @@
     "operating_expense_amt": 0.09,
     "nim_pct": 2.03,
     "roa_pct": 0.84,
-    "roe_pct": 11.42
+    "roe_pct": 11.42,
+    "total_debt_service_amt": 0.28,
+    "interest_rate_sensitivity_pct": 0.33
   },
   {
     "profitability_snapshot_id": "FPS-000013",
@@ -140,7 +164,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.28,
     "roa_pct": 0.95,
-    "roe_pct": 13.52
+    "roe_pct": 13.52,
+    "total_debt_service_amt": 0.44,
+    "interest_rate_sensitivity_pct": 0.48
   },
   {
     "profitability_snapshot_id": "FPS-000014",
@@ -151,7 +177,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.28,
     "roa_pct": 0.95,
-    "roe_pct": 13.52
+    "roe_pct": 13.52,
+    "total_debt_service_amt": 0.44,
+    "interest_rate_sensitivity_pct": 0.48
   },
   {
     "profitability_snapshot_id": "FPS-000015",
@@ -162,7 +190,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.28,
     "roa_pct": 0.95,
-    "roe_pct": 13.52
+    "roe_pct": 13.52,
+    "total_debt_service_amt": 0.44,
+    "interest_rate_sensitivity_pct": 0.48
   },
   {
     "profitability_snapshot_id": "FPS-000016",
@@ -173,7 +203,9 @@
     "operating_expense_amt": 0.06,
     "nim_pct": 2.05,
     "roa_pct": 0.87,
-    "roe_pct": 8.7
+    "roe_pct": 8.7,
+    "total_debt_service_amt": 0.2,
+    "interest_rate_sensitivity_pct": 0.35
   },
   {
     "profitability_snapshot_id": "FPS-000017",
@@ -184,7 +216,9 @@
     "operating_expense_amt": 0.06,
     "nim_pct": 2.05,
     "roa_pct": 0.87,
-    "roe_pct": 8.7
+    "roe_pct": 8.7,
+    "total_debt_service_amt": 0.2,
+    "interest_rate_sensitivity_pct": 0.35
   },
   {
     "profitability_snapshot_id": "FPS-000018",
@@ -195,7 +229,9 @@
     "operating_expense_amt": 0.06,
     "nim_pct": 2.05,
     "roa_pct": 0.87,
-    "roe_pct": 8.7
+    "roe_pct": 8.7,
+    "total_debt_service_amt": 0.2,
+    "interest_rate_sensitivity_pct": 0.35
   },
   {
     "profitability_snapshot_id": "FPS-000019",
@@ -206,7 +242,9 @@
     "operating_expense_amt": 0.12,
     "nim_pct": 2.32,
     "roa_pct": 0.99,
-    "roe_pct": 10.88
+    "roe_pct": 10.88,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.52
   },
   {
     "profitability_snapshot_id": "FPS-000020",
@@ -217,7 +255,9 @@
     "operating_expense_amt": 0.12,
     "nim_pct": 2.32,
     "roa_pct": 0.99,
-    "roe_pct": 10.88
+    "roe_pct": 10.88,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.52
   },
   {
     "profitability_snapshot_id": "FPS-000021",
@@ -228,7 +268,9 @@
     "operating_expense_amt": 0.12,
     "nim_pct": 2.32,
     "roa_pct": 0.99,
-    "roe_pct": 10.88
+    "roe_pct": 10.88,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.52
   },
   {
     "profitability_snapshot_id": "FPS-000022",
@@ -239,7 +281,9 @@
     "operating_expense_amt": 0.17,
     "nim_pct": 2.09,
     "roa_pct": 0.91,
-    "roe_pct": 11.06
+    "roe_pct": 11.06,
+    "total_debt_service_amt": 0.48,
+    "interest_rate_sensitivity_pct": 0.38
   },
   {
     "profitability_snapshot_id": "FPS-000023",
@@ -250,7 +294,9 @@
     "operating_expense_amt": 0.17,
     "nim_pct": 2.09,
     "roa_pct": 0.91,
-    "roe_pct": 11.06
+    "roe_pct": 11.06,
+    "total_debt_service_amt": 0.48,
+    "interest_rate_sensitivity_pct": 0.38
   },
   {
     "profitability_snapshot_id": "FPS-000024",
@@ -261,7 +307,9 @@
     "operating_expense_amt": 0.17,
     "nim_pct": 2.09,
     "roa_pct": 0.91,
-    "roe_pct": 11.06
+    "roe_pct": 11.06,
+    "total_debt_service_amt": 0.48,
+    "interest_rate_sensitivity_pct": 0.38
   },
   {
     "profitability_snapshot_id": "FPS-000025",
@@ -272,7 +320,9 @@
     "operating_expense_amt": 0.32,
     "nim_pct": 2.86,
     "roa_pct": 1.22,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 0.76,
+    "interest_rate_sensitivity_pct": 0.85
   },
   {
     "profitability_snapshot_id": "FPS-000026",
@@ -283,7 +333,9 @@
     "operating_expense_amt": 0.32,
     "nim_pct": 2.86,
     "roa_pct": 1.22,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 0.76,
+    "interest_rate_sensitivity_pct": 0.85
   },
   {
     "profitability_snapshot_id": "FPS-000027",
@@ -294,7 +346,9 @@
     "operating_expense_amt": 0.32,
     "nim_pct": 2.86,
     "roa_pct": 1.22,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 0.76,
+    "interest_rate_sensitivity_pct": 0.85
   },
   {
     "profitability_snapshot_id": "FPS-000028",
@@ -305,7 +359,9 @@
     "operating_expense_amt": 1.05,
     "nim_pct": 2.88,
     "roa_pct": 1.24,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 2.41,
+    "interest_rate_sensitivity_pct": 0.86
   },
   {
     "profitability_snapshot_id": "FPS-000029",
@@ -316,7 +372,9 @@
     "operating_expense_amt": 1.05,
     "nim_pct": 2.88,
     "roa_pct": 1.24,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 2.41,
+    "interest_rate_sensitivity_pct": 0.86
   },
   {
     "profitability_snapshot_id": "FPS-000030",
@@ -327,7 +385,9 @@
     "operating_expense_amt": 1.05,
     "nim_pct": 2.88,
     "roa_pct": 1.24,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 2.41,
+    "interest_rate_sensitivity_pct": 0.86
   },
   {
     "profitability_snapshot_id": "FPS-000031",
@@ -338,7 +398,9 @@
     "operating_expense_amt": 0.16,
     "nim_pct": 2.15,
     "roa_pct": 0.86,
-    "roe_pct": 8.6
+    "roe_pct": 8.6,
+    "total_debt_service_amt": 0.42,
+    "interest_rate_sensitivity_pct": 0.33
   },
   {
     "profitability_snapshot_id": "FPS-000032",
@@ -349,7 +411,9 @@
     "operating_expense_amt": 0.16,
     "nim_pct": 2.15,
     "roa_pct": 0.86,
-    "roe_pct": 8.6
+    "roe_pct": 8.6,
+    "total_debt_service_amt": 0.42,
+    "interest_rate_sensitivity_pct": 0.33
   },
   {
     "profitability_snapshot_id": "FPS-000033",
@@ -360,7 +424,9 @@
     "operating_expense_amt": 0.16,
     "nim_pct": 2.15,
     "roa_pct": 0.86,
-    "roe_pct": 8.6
+    "roe_pct": 8.6,
+    "total_debt_service_amt": 0.42,
+    "interest_rate_sensitivity_pct": 0.33
   },
   {
     "profitability_snapshot_id": "FPS-000034",
@@ -371,7 +437,9 @@
     "operating_expense_amt": 0.27,
     "nim_pct": 2.42,
     "roa_pct": 0.98,
-    "roe_pct": 10.78
+    "roe_pct": 10.78,
+    "total_debt_service_amt": 0.65,
+    "interest_rate_sensitivity_pct": 0.5
   },
   {
     "profitability_snapshot_id": "FPS-000035",
@@ -382,7 +450,9 @@
     "operating_expense_amt": 0.27,
     "nim_pct": 2.42,
     "roa_pct": 0.98,
-    "roe_pct": 10.78
+    "roe_pct": 10.78,
+    "total_debt_service_amt": 0.65,
+    "interest_rate_sensitivity_pct": 0.5
   },
   {
     "profitability_snapshot_id": "FPS-000036",
@@ -393,7 +463,9 @@
     "operating_expense_amt": 0.27,
     "nim_pct": 2.42,
     "roa_pct": 0.98,
-    "roe_pct": 10.78
+    "roe_pct": 10.78,
+    "total_debt_service_amt": 0.65,
+    "interest_rate_sensitivity_pct": 0.5
   },
   {
     "profitability_snapshot_id": "FPS-000037",
@@ -404,7 +476,9 @@
     "operating_expense_amt": 0.34,
     "nim_pct": 2.19,
     "roa_pct": 0.9,
-    "roe_pct": 10.96
+    "roe_pct": 10.96,
+    "total_debt_service_amt": 0.86,
+    "interest_rate_sensitivity_pct": 0.36
   },
   {
     "profitability_snapshot_id": "FPS-000038",
@@ -415,7 +489,9 @@
     "operating_expense_amt": 0.34,
     "nim_pct": 2.19,
     "roa_pct": 0.9,
-    "roe_pct": 10.96
+    "roe_pct": 10.96,
+    "total_debt_service_amt": 0.86,
+    "interest_rate_sensitivity_pct": 0.36
   },
   {
     "profitability_snapshot_id": "FPS-000039",
@@ -426,7 +502,9 @@
     "operating_expense_amt": 0.34,
     "nim_pct": 2.19,
     "roa_pct": 0.9,
-    "roe_pct": 10.96
+    "roe_pct": 10.96,
+    "total_debt_service_amt": 0.86,
+    "interest_rate_sensitivity_pct": 0.36
   },
   {
     "profitability_snapshot_id": "FPS-000040",
@@ -437,7 +515,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.46,
     "roa_pct": 1.01,
-    "roe_pct": 13.14
+    "roe_pct": 13.14,
+    "total_debt_service_amt": 0.18,
+    "interest_rate_sensitivity_pct": 0.53
   },
   {
     "profitability_snapshot_id": "FPS-000041",
@@ -448,7 +528,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.46,
     "roa_pct": 1.01,
-    "roe_pct": 13.14
+    "roe_pct": 13.14,
+    "total_debt_service_amt": 0.18,
+    "interest_rate_sensitivity_pct": 0.53
   },
   {
     "profitability_snapshot_id": "FPS-000042",
@@ -459,7 +541,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.46,
     "roa_pct": 1.01,
-    "roe_pct": 13.14
+    "roe_pct": 13.14,
+    "total_debt_service_amt": 0.18,
+    "interest_rate_sensitivity_pct": 0.53
   },
   {
     "profitability_snapshot_id": "FPS-000043",
@@ -470,7 +554,9 @@
     "operating_expense_amt": 0.04,
     "nim_pct": 2.23,
     "roa_pct": 0.93,
-    "roe_pct": 13.32
+    "roe_pct": 13.32,
+    "total_debt_service_amt": 0.09,
+    "interest_rate_sensitivity_pct": 0.39
   },
   {
     "profitability_snapshot_id": "FPS-000044",
@@ -481,7 +567,9 @@
     "operating_expense_amt": 0.04,
     "nim_pct": 2.23,
     "roa_pct": 0.93,
-    "roe_pct": 13.32
+    "roe_pct": 13.32,
+    "total_debt_service_amt": 0.09,
+    "interest_rate_sensitivity_pct": 0.39
   },
   {
     "profitability_snapshot_id": "FPS-000045",
@@ -492,7 +580,9 @@
     "operating_expense_amt": 0.04,
     "nim_pct": 2.23,
     "roa_pct": 0.93,
-    "roe_pct": 13.32
+    "roe_pct": 13.32,
+    "total_debt_service_amt": 0.09,
+    "interest_rate_sensitivity_pct": 0.39
   },
   {
     "profitability_snapshot_id": "FPS-000046",
@@ -503,7 +593,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.35,
     "roa_pct": 0.99,
-    "roe_pct": 9.9
+    "roe_pct": 9.9,
+    "total_debt_service_amt": 0.18,
+    "interest_rate_sensitivity_pct": 0.56
   },
   {
     "profitability_snapshot_id": "FPS-000047",
@@ -514,7 +606,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.35,
     "roa_pct": 0.99,
-    "roe_pct": 9.9
+    "roe_pct": 9.9,
+    "total_debt_service_amt": 0.18,
+    "interest_rate_sensitivity_pct": 0.56
   },
   {
     "profitability_snapshot_id": "FPS-000048",
@@ -525,7 +619,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.35,
     "roa_pct": 0.99,
-    "roe_pct": 9.9
+    "roe_pct": 9.9,
+    "total_debt_service_amt": 0.18,
+    "interest_rate_sensitivity_pct": 0.56
   },
   {
     "profitability_snapshot_id": "FPS-000049",
@@ -536,7 +632,9 @@
     "operating_expense_amt": 0.12,
     "nim_pct": 2.12,
     "roa_pct": 0.91,
-    "roe_pct": 10.08
+    "roe_pct": 10.08,
+    "total_debt_service_amt": 0.29,
+    "interest_rate_sensitivity_pct": 0.43
   },
   {
     "profitability_snapshot_id": "FPS-000050",
@@ -547,7 +645,9 @@
     "operating_expense_amt": 0.12,
     "nim_pct": 2.12,
     "roa_pct": 0.91,
-    "roe_pct": 10.08
+    "roe_pct": 10.08,
+    "total_debt_service_amt": 0.29,
+    "interest_rate_sensitivity_pct": 0.43
   },
   {
     "profitability_snapshot_id": "FPS-000051",
@@ -558,7 +658,9 @@
     "operating_expense_amt": 0.12,
     "nim_pct": 2.12,
     "roa_pct": 0.91,
-    "roe_pct": 10.08
+    "roe_pct": 10.08,
+    "total_debt_service_amt": 0.29,
+    "interest_rate_sensitivity_pct": 0.43
   },
   {
     "profitability_snapshot_id": "FPS-000052",
@@ -569,7 +671,9 @@
     "operating_expense_amt": 0.25,
     "nim_pct": 2.89,
     "roa_pct": 1.23,
-    "roe_pct": 14.26
+    "roe_pct": 14.26,
+    "total_debt_service_amt": 0.48,
+    "interest_rate_sensitivity_pct": 0.89
   },
   {
     "profitability_snapshot_id": "FPS-000053",
@@ -580,7 +684,9 @@
     "operating_expense_amt": 0.25,
     "nim_pct": 2.89,
     "roa_pct": 1.23,
-    "roe_pct": 14.26
+    "roe_pct": 14.26,
+    "total_debt_service_amt": 0.48,
+    "interest_rate_sensitivity_pct": 0.89
   },
   {
     "profitability_snapshot_id": "FPS-000054",
@@ -591,7 +697,9 @@
     "operating_expense_amt": 0.25,
     "nim_pct": 2.89,
     "roa_pct": 1.23,
-    "roe_pct": 14.26
+    "roe_pct": 14.26,
+    "total_debt_service_amt": 0.48,
+    "interest_rate_sensitivity_pct": 0.89
   },
   {
     "profitability_snapshot_id": "FPS-000055",
@@ -602,7 +710,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.41,
     "roa_pct": 1.04,
-    "roe_pct": 13.44
+    "roe_pct": 13.44,
+    "total_debt_service_amt": 0.62,
+    "interest_rate_sensitivity_pct": 0.61
   },
   {
     "profitability_snapshot_id": "FPS-000056",
@@ -613,7 +723,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.41,
     "roa_pct": 1.04,
-    "roe_pct": 13.44
+    "roe_pct": 13.44,
+    "total_debt_service_amt": 0.62,
+    "interest_rate_sensitivity_pct": 0.61
   },
   {
     "profitability_snapshot_id": "FPS-000057",
@@ -624,7 +736,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.41,
     "roa_pct": 1.04,
-    "roe_pct": 13.44
+    "roe_pct": 13.44,
+    "total_debt_service_amt": 0.62,
+    "interest_rate_sensitivity_pct": 0.61
   },
   {
     "profitability_snapshot_id": "FPS-000058",
@@ -635,7 +749,9 @@
     "operating_expense_amt": 0.43,
     "nim_pct": 2.18,
     "roa_pct": 0.96,
-    "roe_pct": 13.62
+    "roe_pct": 13.62,
+    "total_debt_service_amt": 0.95,
+    "interest_rate_sensitivity_pct": 0.47
   },
   {
     "profitability_snapshot_id": "FPS-000059",
@@ -646,7 +762,9 @@
     "operating_expense_amt": 0.43,
     "nim_pct": 2.18,
     "roa_pct": 0.96,
-    "roe_pct": 13.62
+    "roe_pct": 13.62,
+    "total_debt_service_amt": 0.95,
+    "interest_rate_sensitivity_pct": 0.47
   },
   {
     "profitability_snapshot_id": "FPS-000060",
@@ -657,7 +775,9 @@
     "operating_expense_amt": 0.43,
     "nim_pct": 2.18,
     "roa_pct": 0.96,
-    "roe_pct": 13.62
+    "roe_pct": 13.62,
+    "total_debt_service_amt": 0.95,
+    "interest_rate_sensitivity_pct": 0.47
   },
   {
     "profitability_snapshot_id": "FPS-000061",
@@ -668,7 +788,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.45,
     "roa_pct": 0.98,
-    "roe_pct": 9.8
+    "roe_pct": 9.8,
+    "total_debt_service_amt": 0.46,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000062",
@@ -679,7 +801,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.45,
     "roa_pct": 0.98,
-    "roe_pct": 9.8
+    "roe_pct": 9.8,
+    "total_debt_service_amt": 0.46,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000063",
@@ -690,7 +814,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.45,
     "roa_pct": 0.98,
-    "roe_pct": 9.8
+    "roe_pct": 9.8,
+    "total_debt_service_amt": 0.46,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000064",
@@ -701,7 +827,9 @@
     "operating_expense_amt": 0.2,
     "nim_pct": 2.22,
     "roa_pct": 0.9,
-    "roe_pct": 9.98
+    "roe_pct": 9.98,
+    "total_debt_service_amt": 0.63,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000065",
@@ -712,7 +840,9 @@
     "operating_expense_amt": 0.2,
     "nim_pct": 2.22,
     "roa_pct": 0.9,
-    "roe_pct": 9.98
+    "roe_pct": 9.98,
+    "total_debt_service_amt": 0.63,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000066",
@@ -723,7 +853,9 @@
     "operating_expense_amt": 0.2,
     "nim_pct": 2.22,
     "roa_pct": 0.9,
-    "roe_pct": 9.98
+    "roe_pct": 9.98,
+    "total_debt_service_amt": 0.63,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000067",
@@ -734,7 +866,9 @@
     "operating_expense_amt": 0.36,
     "nim_pct": 2.99,
     "roa_pct": 1.22,
-    "roe_pct": 14.16
+    "roe_pct": 14.16,
+    "total_debt_service_amt": 0.96,
+    "interest_rate_sensitivity_pct": 0.87
   },
   {
     "profitability_snapshot_id": "FPS-000068",
@@ -745,7 +879,9 @@
     "operating_expense_amt": 0.36,
     "nim_pct": 2.99,
     "roa_pct": 1.22,
-    "roe_pct": 14.16
+    "roe_pct": 14.16,
+    "total_debt_service_amt": 0.96,
+    "interest_rate_sensitivity_pct": 0.87
   },
   {
     "profitability_snapshot_id": "FPS-000069",
@@ -756,7 +892,9 @@
     "operating_expense_amt": 0.36,
     "nim_pct": 2.99,
     "roa_pct": 1.22,
-    "roe_pct": 14.16
+    "roe_pct": 14.16,
+    "total_debt_service_amt": 0.96,
+    "interest_rate_sensitivity_pct": 0.87
   },
   {
     "profitability_snapshot_id": "FPS-000070",
@@ -767,7 +905,9 @@
     "operating_expense_amt": 0.48,
     "nim_pct": 3.01,
     "roa_pct": 1.23,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 1.24,
+    "interest_rate_sensitivity_pct": 0.89
   },
   {
     "profitability_snapshot_id": "FPS-000071",
@@ -778,7 +918,9 @@
     "operating_expense_amt": 0.48,
     "nim_pct": 3.01,
     "roa_pct": 1.23,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 1.24,
+    "interest_rate_sensitivity_pct": 0.89
   },
   {
     "profitability_snapshot_id": "FPS-000072",
@@ -789,7 +931,9 @@
     "operating_expense_amt": 0.48,
     "nim_pct": 3.01,
     "roa_pct": 1.23,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 1.24,
+    "interest_rate_sensitivity_pct": 0.89
   },
   {
     "profitability_snapshot_id": "FPS-000073",
@@ -800,7 +944,9 @@
     "operating_expense_amt": 0.18,
     "nim_pct": 2.28,
     "roa_pct": 0.95,
-    "roe_pct": 13.52
+    "roe_pct": 13.52,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 0.45
   },
   {
     "profitability_snapshot_id": "FPS-000074",
@@ -811,7 +957,9 @@
     "operating_expense_amt": 0.18,
     "nim_pct": 2.28,
     "roa_pct": 0.95,
-    "roe_pct": 13.52
+    "roe_pct": 13.52,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 0.45
   },
   {
     "profitability_snapshot_id": "FPS-000075",
@@ -822,7 +970,9 @@
     "operating_expense_amt": 0.18,
     "nim_pct": 2.28,
     "roa_pct": 0.95,
-    "roe_pct": 13.52
+    "roe_pct": 13.52,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 0.45
   },
   {
     "profitability_snapshot_id": "FPS-000076",
@@ -833,7 +983,9 @@
     "operating_expense_amt": 0.04,
     "nim_pct": 2.43,
     "roa_pct": 1.02,
-    "roe_pct": 10.2
+    "roe_pct": 10.2,
+    "total_debt_service_amt": 0.11,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000077",
@@ -844,7 +996,9 @@
     "operating_expense_amt": 0.04,
     "nim_pct": 2.43,
     "roa_pct": 1.02,
-    "roe_pct": 10.2
+    "roe_pct": 10.2,
+    "total_debt_service_amt": 0.11,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000078",
@@ -855,7 +1009,9 @@
     "operating_expense_amt": 0.04,
     "nim_pct": 2.43,
     "roa_pct": 1.02,
-    "roe_pct": 10.2
+    "roe_pct": 10.2,
+    "total_debt_service_amt": 0.11,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000079",
@@ -866,7 +1022,9 @@
     "operating_expense_amt": 0.07,
     "nim_pct": 2.19,
     "roa_pct": 0.94,
-    "roe_pct": 10.38
+    "roe_pct": 10.38,
+    "total_debt_service_amt": 0.2,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000080",
@@ -877,7 +1035,9 @@
     "operating_expense_amt": 0.07,
     "nim_pct": 2.19,
     "roa_pct": 0.94,
-    "roe_pct": 10.38
+    "roe_pct": 10.38,
+    "total_debt_service_amt": 0.2,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000081",
@@ -888,7 +1048,9 @@
     "operating_expense_amt": 0.07,
     "nim_pct": 2.19,
     "roa_pct": 0.94,
-    "roe_pct": 10.38
+    "roe_pct": 10.38,
+    "total_debt_service_amt": 0.2,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000082",
@@ -899,7 +1061,9 @@
     "operating_expense_amt": 0.13,
     "nim_pct": 2.47,
     "roa_pct": 1.06,
-    "roe_pct": 12.56
+    "roe_pct": 12.56,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.58
   },
   {
     "profitability_snapshot_id": "FPS-000083",
@@ -910,7 +1074,9 @@
     "operating_expense_amt": 0.13,
     "nim_pct": 2.47,
     "roa_pct": 1.06,
-    "roe_pct": 12.56
+    "roe_pct": 12.56,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.58
   },
   {
     "profitability_snapshot_id": "FPS-000084",
@@ -921,7 +1087,9 @@
     "operating_expense_amt": 0.13,
     "nim_pct": 2.47,
     "roa_pct": 1.06,
-    "roe_pct": 12.56
+    "roe_pct": 12.56,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.58
   },
   {
     "profitability_snapshot_id": "FPS-000085",
@@ -932,7 +1100,9 @@
     "operating_expense_amt": 0.06,
     "nim_pct": 2.24,
     "roa_pct": 0.97,
-    "roe_pct": 12.74
+    "roe_pct": 12.74,
+    "total_debt_service_amt": 0.15,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000086",
@@ -943,7 +1113,9 @@
     "operating_expense_amt": 0.06,
     "nim_pct": 2.24,
     "roa_pct": 0.97,
-    "roe_pct": 12.74
+    "roe_pct": 12.74,
+    "total_debt_service_amt": 0.15,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000087",
@@ -954,7 +1126,9 @@
     "operating_expense_amt": 0.06,
     "nim_pct": 2.24,
     "roa_pct": 0.97,
-    "roe_pct": 12.74
+    "roe_pct": 12.74,
+    "total_debt_service_amt": 0.15,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000088",
@@ -965,7 +1139,9 @@
     "operating_expense_amt": 0.72,
     "nim_pct": 3.01,
     "roa_pct": 1.29,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 1.61,
+    "interest_rate_sensitivity_pct": 0.91
   },
   {
     "profitability_snapshot_id": "FPS-000089",
@@ -976,7 +1152,9 @@
     "operating_expense_amt": 0.72,
     "nim_pct": 3.01,
     "roa_pct": 1.29,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 1.61,
+    "interest_rate_sensitivity_pct": 0.91
   },
   {
     "profitability_snapshot_id": "FPS-000090",
@@ -987,7 +1165,9 @@
     "operating_expense_amt": 0.72,
     "nim_pct": 3.01,
     "roa_pct": 1.29,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 1.61,
+    "interest_rate_sensitivity_pct": 0.91
   },
   {
     "profitability_snapshot_id": "FPS-000091",
@@ -998,7 +1178,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.13,
     "roa_pct": 0.85,
-    "roe_pct": 8.5
+    "roe_pct": 8.5,
+    "total_debt_service_amt": 0.4,
+    "interest_rate_sensitivity_pct": 0.38
   },
   {
     "profitability_snapshot_id": "FPS-000092",
@@ -1009,7 +1191,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.13,
     "roa_pct": 0.85,
-    "roe_pct": 8.5
+    "roe_pct": 8.5,
+    "total_debt_service_amt": 0.4,
+    "interest_rate_sensitivity_pct": 0.38
   },
   {
     "profitability_snapshot_id": "FPS-000093",
@@ -1020,7 +1204,9 @@
     "operating_expense_amt": 0.15,
     "nim_pct": 2.13,
     "roa_pct": 0.85,
-    "roe_pct": 8.5
+    "roe_pct": 8.5,
+    "total_debt_service_amt": 0.4,
+    "interest_rate_sensitivity_pct": 0.38
   },
   {
     "profitability_snapshot_id": "FPS-000094",
@@ -1031,7 +1217,9 @@
     "operating_expense_amt": 0.24,
     "nim_pct": 2.39,
     "roa_pct": 0.97,
-    "roe_pct": 10.68
+    "roe_pct": 10.68,
+    "total_debt_service_amt": 0.6,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000095",
@@ -1042,7 +1230,9 @@
     "operating_expense_amt": 0.24,
     "nim_pct": 2.39,
     "roa_pct": 0.97,
-    "roe_pct": 10.68
+    "roe_pct": 10.68,
+    "total_debt_service_amt": 0.6,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000096",
@@ -1053,7 +1243,9 @@
     "operating_expense_amt": 0.24,
     "nim_pct": 2.39,
     "roa_pct": 0.97,
-    "roe_pct": 10.68
+    "roe_pct": 10.68,
+    "total_debt_service_amt": 0.6,
+    "interest_rate_sensitivity_pct": 0.54
   },
   {
     "profitability_snapshot_id": "FPS-000097",
@@ -1064,7 +1256,9 @@
     "operating_expense_amt": 0.3,
     "nim_pct": 2.17,
     "roa_pct": 0.89,
-    "roe_pct": 10.86
+    "roe_pct": 10.86,
+    "total_debt_service_amt": 0.77,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000098",
@@ -1075,7 +1269,9 @@
     "operating_expense_amt": 0.3,
     "nim_pct": 2.17,
     "roa_pct": 0.89,
-    "roe_pct": 10.86
+    "roe_pct": 10.86,
+    "total_debt_service_amt": 0.77,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000099",
@@ -1086,7 +1282,9 @@
     "operating_expense_amt": 0.3,
     "nim_pct": 2.17,
     "roa_pct": 0.89,
-    "roe_pct": 10.86
+    "roe_pct": 10.86,
+    "total_debt_service_amt": 0.77,
+    "interest_rate_sensitivity_pct": 0.41
   },
   {
     "profitability_snapshot_id": "FPS-000100",
@@ -1097,7 +1295,9 @@
     "operating_expense_amt": 0.14,
     "nim_pct": 2.19,
     "roa_pct": 0.9,
-    "roe_pct": 12.04
+    "roe_pct": 12.04,
+    "total_debt_service_amt": 0.36,
+    "interest_rate_sensitivity_pct": 0.42
   },
   {
     "profitability_snapshot_id": "FPS-000101",
@@ -1108,7 +1308,9 @@
     "operating_expense_amt": 0.14,
     "nim_pct": 2.19,
     "roa_pct": 0.9,
-    "roe_pct": 12.04
+    "roe_pct": 12.04,
+    "total_debt_service_amt": 0.36,
+    "interest_rate_sensitivity_pct": 0.42
   },
   {
     "profitability_snapshot_id": "FPS-000102",
@@ -1119,7 +1321,9 @@
     "operating_expense_amt": 0.14,
     "nim_pct": 2.19,
     "roa_pct": 0.9,
-    "roe_pct": 12.04
+    "roe_pct": 12.04,
+    "total_debt_service_amt": 0.36,
+    "interest_rate_sensitivity_pct": 0.42
   },
   {
     "profitability_snapshot_id": "FPS-000103",
@@ -1130,7 +1334,9 @@
     "operating_expense_amt": 0.25,
     "nim_pct": 2.46,
     "roa_pct": 1.02,
-    "roe_pct": 14.22
+    "roe_pct": 14.22,
+    "total_debt_service_amt": 0.57,
+    "interest_rate_sensitivity_pct": 0.59
   },
   {
     "profitability_snapshot_id": "FPS-000104",
@@ -1141,7 +1347,9 @@
     "operating_expense_amt": 0.25,
     "nim_pct": 2.46,
     "roa_pct": 1.02,
-    "roe_pct": 14.22
+    "roe_pct": 14.22,
+    "total_debt_service_amt": 0.57,
+    "interest_rate_sensitivity_pct": 0.59
   },
   {
     "profitability_snapshot_id": "FPS-000105",
@@ -1152,7 +1360,9 @@
     "operating_expense_amt": 0.25,
     "nim_pct": 2.46,
     "roa_pct": 1.02,
-    "roe_pct": 14.22
+    "roe_pct": 14.22,
+    "total_debt_service_amt": 0.57,
+    "interest_rate_sensitivity_pct": 0.59
   },
   {
     "profitability_snapshot_id": "FPS-000106",
@@ -1163,7 +1373,9 @@
     "operating_expense_amt": 0.32,
     "nim_pct": 2.22,
     "roa_pct": 0.94,
-    "roe_pct": 9.4
+    "roe_pct": 9.4,
+    "total_debt_service_amt": 0.76,
+    "interest_rate_sensitivity_pct": 0.46
   },
   {
     "profitability_snapshot_id": "FPS-000107",
@@ -1174,7 +1386,9 @@
     "operating_expense_amt": 0.32,
     "nim_pct": 2.22,
     "roa_pct": 0.94,
-    "roe_pct": 9.4
+    "roe_pct": 9.4,
+    "total_debt_service_amt": 0.76,
+    "interest_rate_sensitivity_pct": 0.46
   },
   {
     "profitability_snapshot_id": "FPS-000108",
@@ -1185,7 +1399,9 @@
     "operating_expense_amt": 0.32,
     "nim_pct": 2.22,
     "roa_pct": 0.94,
-    "roe_pct": 9.4
+    "roe_pct": 9.4,
+    "total_debt_service_amt": 0.76,
+    "interest_rate_sensitivity_pct": 0.46
   },
   {
     "profitability_snapshot_id": "FPS-000109",
@@ -1196,7 +1412,9 @@
     "operating_expense_amt": 0.49,
     "nim_pct": 2.5,
     "roa_pct": 1.06,
-    "roe_pct": 11.58
+    "roe_pct": 11.58,
+    "total_debt_service_amt": 1.06,
+    "interest_rate_sensitivity_pct": 0.62
   },
   {
     "profitability_snapshot_id": "FPS-000110",
@@ -1207,7 +1425,9 @@
     "operating_expense_amt": 0.49,
     "nim_pct": 2.5,
     "roa_pct": 1.06,
-    "roe_pct": 11.58
+    "roe_pct": 11.58,
+    "total_debt_service_amt": 1.06,
+    "interest_rate_sensitivity_pct": 0.62
   },
   {
     "profitability_snapshot_id": "FPS-000111",
@@ -1218,7 +1438,9 @@
     "operating_expense_amt": 0.49,
     "nim_pct": 2.5,
     "roa_pct": 1.06,
-    "roe_pct": 11.58
+    "roe_pct": 11.58,
+    "total_debt_service_amt": 1.06,
+    "interest_rate_sensitivity_pct": 0.62
   },
   {
     "profitability_snapshot_id": "FPS-000112",
@@ -1229,7 +1451,9 @@
     "operating_expense_amt": 0.02,
     "nim_pct": 2.26,
     "roa_pct": 0.98,
-    "roe_pct": 11.76
+    "roe_pct": 11.76,
+    "total_debt_service_amt": 0.05,
+    "interest_rate_sensitivity_pct": 0.49
   },
   {
     "profitability_snapshot_id": "FPS-000113",
@@ -1240,7 +1464,9 @@
     "operating_expense_amt": 0.02,
     "nim_pct": 2.26,
     "roa_pct": 0.98,
-    "roe_pct": 11.76
+    "roe_pct": 11.76,
+    "total_debt_service_amt": 0.05,
+    "interest_rate_sensitivity_pct": 0.49
   },
   {
     "profitability_snapshot_id": "FPS-000114",
@@ -1251,7 +1477,9 @@
     "operating_expense_amt": 0.02,
     "nim_pct": 2.26,
     "roa_pct": 0.98,
-    "roe_pct": 11.76
+    "roe_pct": 11.76,
+    "total_debt_service_amt": 0.05,
+    "interest_rate_sensitivity_pct": 0.49
   },
   {
     "profitability_snapshot_id": "FPS-000115",
@@ -1262,7 +1490,9 @@
     "operating_expense_amt": 0.07,
     "nim_pct": 3.04,
     "roa_pct": 1.29,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 0.14,
+    "interest_rate_sensitivity_pct": 0.95
   },
   {
     "profitability_snapshot_id": "FPS-000116",
@@ -1273,7 +1503,9 @@
     "operating_expense_amt": 0.07,
     "nim_pct": 3.04,
     "roa_pct": 1.29,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 0.14,
+    "interest_rate_sensitivity_pct": 0.95
   },
   {
     "profitability_snapshot_id": "FPS-000117",
@@ -1284,7 +1516,9 @@
     "operating_expense_amt": 0.07,
     "nim_pct": 3.04,
     "roa_pct": 1.29,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 0.14,
+    "interest_rate_sensitivity_pct": 0.95
   },
   {
     "profitability_snapshot_id": "FPS-000118",
@@ -1295,7 +1529,9 @@
     "operating_expense_amt": 1.21,
     "nim_pct": 3.06,
     "roa_pct": 1.31,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 2.24,
+    "interest_rate_sensitivity_pct": 0.97
   },
   {
     "profitability_snapshot_id": "FPS-000119",
@@ -1306,7 +1542,9 @@
     "operating_expense_amt": 1.21,
     "nim_pct": 3.06,
     "roa_pct": 1.31,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 2.24,
+    "interest_rate_sensitivity_pct": 0.97
   },
   {
     "profitability_snapshot_id": "FPS-000120",
@@ -1317,7 +1555,9 @@
     "operating_expense_amt": 1.21,
     "nim_pct": 3.06,
     "roa_pct": 1.31,
-    "roe_pct": 15
+    "roe_pct": 15,
+    "total_debt_service_amt": 2.24,
+    "interest_rate_sensitivity_pct": 0.97
   },
   {
     "profitability_snapshot_id": "FPS-000121",
@@ -1328,7 +1568,9 @@
     "operating_expense_amt": 0.11,
     "nim_pct": 2.33,
     "roa_pct": 0.93,
-    "roe_pct": 9.3
+    "roe_pct": 9.3,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000122",
@@ -1339,7 +1581,9 @@
     "operating_expense_amt": 0.11,
     "nim_pct": 2.33,
     "roa_pct": 0.93,
-    "roe_pct": 9.3
+    "roe_pct": 9.3,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000123",
@@ -1350,7 +1594,9 @@
     "operating_expense_amt": 0.11,
     "nim_pct": 2.33,
     "roa_pct": 0.93,
-    "roe_pct": 9.3
+    "roe_pct": 9.3,
+    "total_debt_service_amt": 0.34,
+    "interest_rate_sensitivity_pct": 0.44
   },
   {
     "profitability_snapshot_id": "FPS-000124",
@@ -1361,7 +1607,9 @@
     "operating_expense_amt": 0.18,
     "nim_pct": 2.6,
     "roa_pct": 1.05,
-    "roe_pct": 11.48
+    "roe_pct": 11.48,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 0.6
   },
   {
     "profitability_snapshot_id": "FPS-000125",
@@ -1372,7 +1620,9 @@
     "operating_expense_amt": 0.18,
     "nim_pct": 2.6,
     "roa_pct": 1.05,
-    "roe_pct": 11.48
+    "roe_pct": 11.48,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 0.6
   },
   {
     "profitability_snapshot_id": "FPS-000126",
@@ -1383,7 +1633,9 @@
     "operating_expense_amt": 0.18,
     "nim_pct": 2.6,
     "roa_pct": 1.05,
-    "roe_pct": 11.48
+    "roe_pct": 11.48,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 0.6
   },
   {
     "profitability_snapshot_id": "FPS-000127",
@@ -1394,7 +1646,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.37,
     "roa_pct": 0.97,
-    "roe_pct": 11.66
+    "roe_pct": 11.66,
+    "total_debt_service_amt": 0.23,
+    "interest_rate_sensitivity_pct": 0.47
   },
   {
     "profitability_snapshot_id": "FPS-000128",
@@ -1405,7 +1659,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.37,
     "roa_pct": 0.97,
-    "roe_pct": 11.66
+    "roe_pct": 11.66,
+    "total_debt_service_amt": 0.23,
+    "interest_rate_sensitivity_pct": 0.47
   },
   {
     "profitability_snapshot_id": "FPS-000129",
@@ -1416,7 +1672,9 @@
     "operating_expense_amt": 0.08,
     "nim_pct": 2.37,
     "roa_pct": 0.97,
-    "roe_pct": 11.66
+    "roe_pct": 11.66,
+    "total_debt_service_amt": 0.23,
+    "interest_rate_sensitivity_pct": 0.47
   },
   {
     "profitability_snapshot_id": "FPS-000130",
@@ -1427,7 +1685,9 @@
     "operating_expense_amt": 0.14,
     "nim_pct": 2.64,
     "roa_pct": 1.08,
-    "roe_pct": 13.84
+    "roe_pct": 13.84,
+    "total_debt_service_amt": 0.39,
+    "interest_rate_sensitivity_pct": 0.63
   },
   {
     "profitability_snapshot_id": "FPS-000131",
@@ -1438,7 +1698,9 @@
     "operating_expense_amt": 0.14,
     "nim_pct": 2.64,
     "roa_pct": 1.08,
-    "roe_pct": 13.84
+    "roe_pct": 13.84,
+    "total_debt_service_amt": 0.39,
+    "interest_rate_sensitivity_pct": 0.63
   },
   {
     "profitability_snapshot_id": "FPS-000132",
@@ -1449,7 +1711,9 @@
     "operating_expense_amt": 0.14,
     "nim_pct": 2.64,
     "roa_pct": 1.08,
-    "roe_pct": 13.84
+    "roe_pct": 13.84,
+    "total_debt_service_amt": 0.39,
+    "interest_rate_sensitivity_pct": 0.63
   },
   {
     "profitability_snapshot_id": "FPS-000133",
@@ -1460,7 +1724,9 @@
     "operating_expense_amt": 0.2,
     "nim_pct": 2.41,
     "roa_pct": 1,
-    "roe_pct": 14.02
+    "roe_pct": 14.02,
+    "total_debt_service_amt": 0.55,
+    "interest_rate_sensitivity_pct": 0.5
   },
   {
     "profitability_snapshot_id": "FPS-000134",
@@ -1471,7 +1737,9 @@
     "operating_expense_amt": 0.2,
     "nim_pct": 2.41,
     "roa_pct": 1,
-    "roe_pct": 14.02
+    "roe_pct": 14.02,
+    "total_debt_service_amt": 0.55,
+    "interest_rate_sensitivity_pct": 0.5
   },
   {
     "profitability_snapshot_id": "FPS-000135",
@@ -1482,7 +1750,9 @@
     "operating_expense_amt": 0.2,
     "nim_pct": 2.41,
     "roa_pct": 1,
-    "roe_pct": 14.02
+    "roe_pct": 14.02,
+    "total_debt_service_amt": 0.55,
+    "interest_rate_sensitivity_pct": 0.5
   },
   {
     "profitability_snapshot_id": "FPS-000136",
@@ -1493,7 +1763,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.53,
     "roa_pct": 1.06,
-    "roe_pct": 10.6
+    "roe_pct": 10.6,
+    "total_debt_service_amt": 0.77,
+    "interest_rate_sensitivity_pct": 0.66
   },
   {
     "profitability_snapshot_id": "FPS-000137",
@@ -1504,7 +1776,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.53,
     "roa_pct": 1.06,
-    "roe_pct": 10.6
+    "roe_pct": 10.6,
+    "total_debt_service_amt": 0.77,
+    "interest_rate_sensitivity_pct": 0.66
   },
   {
     "profitability_snapshot_id": "FPS-000138",
@@ -1515,7 +1789,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.53,
     "roa_pct": 1.06,
-    "roe_pct": 10.6
+    "roe_pct": 10.6,
+    "total_debt_service_amt": 0.77,
+    "interest_rate_sensitivity_pct": 0.66
   },
   {
     "profitability_snapshot_id": "FPS-000139",
@@ -1526,7 +1802,9 @@
     "operating_expense_amt": 0.35,
     "nim_pct": 2.3,
     "roa_pct": 0.98,
-    "roe_pct": 10.78
+    "roe_pct": 10.78,
+    "total_debt_service_amt": 0.97,
+    "interest_rate_sensitivity_pct": 0.53
   },
   {
     "profitability_snapshot_id": "FPS-000140",
@@ -1537,7 +1815,9 @@
     "operating_expense_amt": 0.35,
     "nim_pct": 2.3,
     "roa_pct": 0.98,
-    "roe_pct": 10.78
+    "roe_pct": 10.78,
+    "total_debt_service_amt": 0.97,
+    "interest_rate_sensitivity_pct": 0.53
   },
   {
     "profitability_snapshot_id": "FPS-000141",
@@ -1548,7 +1828,9 @@
     "operating_expense_amt": 0.35,
     "nim_pct": 2.3,
     "roa_pct": 0.98,
-    "roe_pct": 10.78
+    "roe_pct": 10.78,
+    "total_debt_service_amt": 0.97,
+    "interest_rate_sensitivity_pct": 0.53
   },
   {
     "profitability_snapshot_id": "FPS-000142",
@@ -1559,7 +1841,9 @@
     "operating_expense_amt": 0.22,
     "nim_pct": 3.07,
     "roa_pct": 1.3,
-    "roe_pct": 14.96
+    "roe_pct": 14.96,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 1
   },
   {
     "profitability_snapshot_id": "FPS-000143",
@@ -1570,7 +1854,9 @@
     "operating_expense_amt": 0.22,
     "nim_pct": 3.07,
     "roa_pct": 1.3,
-    "roe_pct": 14.96
+    "roe_pct": 14.96,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 1
   },
   {
     "profitability_snapshot_id": "FPS-000144",
@@ -1581,7 +1867,9 @@
     "operating_expense_amt": 0.22,
     "nim_pct": 3.07,
     "roa_pct": 1.3,
-    "roe_pct": 14.96
+    "roe_pct": 14.96,
+    "total_debt_service_amt": 0.52,
+    "interest_rate_sensitivity_pct": 1
   },
   {
     "profitability_snapshot_id": "FPS-000145",
@@ -1592,7 +1880,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.58,
     "roa_pct": 1.11,
-    "roe_pct": 14.14
+    "roe_pct": 14.14,
+    "total_debt_service_amt": 0.71,
+    "interest_rate_sensitivity_pct": 0.71
   },
   {
     "profitability_snapshot_id": "FPS-000146",
@@ -1603,7 +1893,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.58,
     "roa_pct": 1.11,
-    "roe_pct": 14.14
+    "roe_pct": 14.14,
+    "total_debt_service_amt": 0.71,
+    "interest_rate_sensitivity_pct": 0.71
   },
   {
     "profitability_snapshot_id": "FPS-000147",
@@ -1614,7 +1906,9 @@
     "operating_expense_amt": 0.29,
     "nim_pct": 2.58,
     "roa_pct": 1.11,
-    "roe_pct": 14.14
+    "roe_pct": 14.14,
+    "total_debt_service_amt": 0.71,
+    "interest_rate_sensitivity_pct": 0.71
   },
   {
     "profitability_snapshot_id": "FPS-000148",
@@ -1625,7 +1919,9 @@
     "operating_expense_amt": 1.01,
     "nim_pct": 2.36,
     "roa_pct": 1.03,
-    "roe_pct": 14.32
+    "roe_pct": 14.32,
+    "total_debt_service_amt": 2.61,
+    "interest_rate_sensitivity_pct": 0.58
   },
   {
     "profitability_snapshot_id": "FPS-000149",
@@ -1636,7 +1932,9 @@
     "operating_expense_amt": 1.01,
     "nim_pct": 2.36,
     "roa_pct": 1.03,
-    "roe_pct": 14.32
+    "roe_pct": 14.32,
+    "total_debt_service_amt": 2.61,
+    "interest_rate_sensitivity_pct": 0.58
   },
   {
     "profitability_snapshot_id": "FPS-000150",
@@ -1647,6 +1945,8 @@
     "operating_expense_amt": 1.01,
     "nim_pct": 2.36,
     "roa_pct": 1.03,
-    "roe_pct": 14.32
+    "roe_pct": 14.32,
+    "total_debt_service_amt": 2.61,
+    "interest_rate_sensitivity_pct": 0.58
   }
 ]

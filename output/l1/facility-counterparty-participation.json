@@ -1,0 +1,562 @@
+[
+  {
+    "facility_participation_id": "FCP-0001",
+    "facility_id": "FAC-2024-00001",
+    "counterparty_id": "CP-00001",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0002",
+    "facility_id": "FAC-2024-00001",
+    "counterparty_id": "CP-00008",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0003",
+    "facility_id": "FAC-2024-00001",
+    "counterparty_id": "CP-00014",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0004",
+    "facility_id": "FAC-2024-00002",
+    "counterparty_id": "CP-00002",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0005",
+    "facility_id": "FAC-2024-00002",
+    "counterparty_id": "CP-00009",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0006",
+    "facility_id": "FAC-2024-00002",
+    "counterparty_id": "CP-00015",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0007",
+    "facility_id": "FAC-2024-00003",
+    "counterparty_id": "CP-00003",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0008",
+    "facility_id": "FAC-2024-00003",
+    "counterparty_id": "CP-00010",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0009",
+    "facility_id": "FAC-2024-00003",
+    "counterparty_id": "CP-00016",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0010",
+    "facility_id": "FAC-2024-00004",
+    "counterparty_id": "CP-00004",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0011",
+    "facility_id": "FAC-2024-00004",
+    "counterparty_id": "CP-00011",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0012",
+    "facility_id": "FAC-2024-00004",
+    "counterparty_id": "CP-00017",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0013",
+    "facility_id": "FAC-2024-00005",
+    "counterparty_id": "CP-00005",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0014",
+    "facility_id": "FAC-2024-00005",
+    "counterparty_id": "CP-00012",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0015",
+    "facility_id": "FAC-2024-00005",
+    "counterparty_id": "CP-00018",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0016",
+    "facility_id": "FAC-2024-00006",
+    "counterparty_id": "CP-00006",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0017",
+    "facility_id": "FAC-2024-00006",
+    "counterparty_id": "CP-00013",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0018",
+    "facility_id": "FAC-2024-00006",
+    "counterparty_id": "CP-00019",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0019",
+    "facility_id": "FAC-2024-00007",
+    "counterparty_id": "CP-00007",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0020",
+    "facility_id": "FAC-2024-00007",
+    "counterparty_id": "CP-00014",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0021",
+    "facility_id": "FAC-2024-00007",
+    "counterparty_id": "CP-00020",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0022",
+    "facility_id": "FAC-2024-00008",
+    "counterparty_id": "CP-00008",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0023",
+    "facility_id": "FAC-2024-00008",
+    "counterparty_id": "CP-00015",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0024",
+    "facility_id": "FAC-2024-00008",
+    "counterparty_id": "CP-00021",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0025",
+    "facility_id": "FAC-2024-00009",
+    "counterparty_id": "CP-00009",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0026",
+    "facility_id": "FAC-2024-00009",
+    "counterparty_id": "CP-00016",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0027",
+    "facility_id": "FAC-2024-00009",
+    "counterparty_id": "CP-00022",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0028",
+    "facility_id": "FAC-2024-00010",
+    "counterparty_id": "CP-00010",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 50,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0029",
+    "facility_id": "FAC-2024-00010",
+    "counterparty_id": "CP-00017",
+    "counterparty_role_code": "CO_LENDER",
+    "participation_pct": 30,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0030",
+    "facility_id": "FAC-2024-00010",
+    "counterparty_id": "CP-00023",
+    "counterparty_role_code": "AGENT",
+    "participation_pct": 20,
+    "is_primary_flag": false
+  },
+  {
+    "facility_participation_id": "FCP-0031",
+    "facility_id": "FAC-2024-00011",
+    "counterparty_id": "CP-00011",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0032",
+    "facility_id": "FAC-2024-00012",
+    "counterparty_id": "CP-00012",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0033",
+    "facility_id": "FAC-2024-00013",
+    "counterparty_id": "CP-00013",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0034",
+    "facility_id": "FAC-2024-00014",
+    "counterparty_id": "CP-00014",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0035",
+    "facility_id": "FAC-2024-00015",
+    "counterparty_id": "CP-00015",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0036",
+    "facility_id": "FAC-2024-00016",
+    "counterparty_id": "CP-00016",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0037",
+    "facility_id": "FAC-2024-00017",
+    "counterparty_id": "CP-00017",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0038",
+    "facility_id": "FAC-2024-00018",
+    "counterparty_id": "CP-00018",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0039",
+    "facility_id": "FAC-2024-00019",
+    "counterparty_id": "CP-00019",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0040",
+    "facility_id": "FAC-2024-00020",
+    "counterparty_id": "CP-00020",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0041",
+    "facility_id": "FAC-2024-00021",
+    "counterparty_id": "CP-00021",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0042",
+    "facility_id": "FAC-2024-00022",
+    "counterparty_id": "CP-00022",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0043",
+    "facility_id": "FAC-2024-00023",
+    "counterparty_id": "CP-00023",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0044",
+    "facility_id": "FAC-2024-00024",
+    "counterparty_id": "CP-00024",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0045",
+    "facility_id": "FAC-2024-00025",
+    "counterparty_id": "CP-00025",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0046",
+    "facility_id": "FAC-2024-00026",
+    "counterparty_id": "CP-00026",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0047",
+    "facility_id": "FAC-2024-00027",
+    "counterparty_id": "CP-00027",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0048",
+    "facility_id": "FAC-2024-00028",
+    "counterparty_id": "CP-00028",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0049",
+    "facility_id": "FAC-2024-00029",
+    "counterparty_id": "CP-00029",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0050",
+    "facility_id": "FAC-2024-00030",
+    "counterparty_id": "CP-00030",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0051",
+    "facility_id": "FAC-2024-00031",
+    "counterparty_id": "CP-00001",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0052",
+    "facility_id": "FAC-2024-00032",
+    "counterparty_id": "CP-00002",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0053",
+    "facility_id": "FAC-2024-00033",
+    "counterparty_id": "CP-00003",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0054",
+    "facility_id": "FAC-2024-00034",
+    "counterparty_id": "CP-00004",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0055",
+    "facility_id": "FAC-2024-00035",
+    "counterparty_id": "CP-00005",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0056",
+    "facility_id": "FAC-2024-00036",
+    "counterparty_id": "CP-00006",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0057",
+    "facility_id": "FAC-2024-00037",
+    "counterparty_id": "CP-00007",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0058",
+    "facility_id": "FAC-2024-00038",
+    "counterparty_id": "CP-00008",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0059",
+    "facility_id": "FAC-2024-00039",
+    "counterparty_id": "CP-00009",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0060",
+    "facility_id": "FAC-2024-00040",
+    "counterparty_id": "CP-00010",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0061",
+    "facility_id": "FAC-2024-00041",
+    "counterparty_id": "CP-00011",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0062",
+    "facility_id": "FAC-2024-00042",
+    "counterparty_id": "CP-00012",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0063",
+    "facility_id": "FAC-2024-00043",
+    "counterparty_id": "CP-00013",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0064",
+    "facility_id": "FAC-2024-00044",
+    "counterparty_id": "CP-00014",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0065",
+    "facility_id": "FAC-2024-00045",
+    "counterparty_id": "CP-00015",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0066",
+    "facility_id": "FAC-2024-00046",
+    "counterparty_id": "CP-00016",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0067",
+    "facility_id": "FAC-2024-00047",
+    "counterparty_id": "CP-00017",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0068",
+    "facility_id": "FAC-2024-00048",
+    "counterparty_id": "CP-00018",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0069",
+    "facility_id": "FAC-2024-00049",
+    "counterparty_id": "CP-00019",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  },
+  {
+    "facility_participation_id": "FCP-0070",
+    "facility_id": "FAC-2024-00050",
+    "counterparty_id": "CP-00020",
+    "counterparty_role_code": "BORROWER",
+    "participation_pct": 100,
+    "is_primary_flag": true
+  }
+]

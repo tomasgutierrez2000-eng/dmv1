@@ -10,9 +10,10 @@
     "ead_amount": 14.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 7.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 7.2,
     "allocated_equity_amt": 0.6
   },
   {
@@ -26,9 +27,10 @@
     "ead_amount": 13.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 6.9,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 6.9,
     "allocated_equity_amt": 0.6
   },
   {
@@ -42,9 +44,10 @@
     "ead_amount": 13.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 6.6,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 6.6,
     "allocated_equity_amt": 0.5
   },
   {
@@ -58,9 +61,10 @@
     "ead_amount": 37.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 28,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 28,
     "allocated_equity_amt": 2.5
   },
   {
@@ -74,9 +78,10 @@
     "ead_amount": 36.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 27.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 27.1,
     "allocated_equity_amt": 2.4
   },
   {
@@ -90,9 +95,10 @@
     "ead_amount": 34.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 26,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 26,
     "allocated_equity_amt": 2.3
   },
   {
@@ -106,9 +112,10 @@
     "ead_amount": 69.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 34.9,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 34.9,
     "allocated_equity_amt": 3.5
   },
   {
@@ -122,9 +129,10 @@
     "ead_amount": 68.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 34.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 34.2,
     "allocated_equity_amt": 3.4
   },
   {
@@ -138,9 +146,10 @@
     "ead_amount": 66.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 33.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 33.2,
     "allocated_equity_amt": 3.3
   },
   {
@@ -154,9 +163,10 @@
     "ead_amount": 111.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 55.8,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 55.8,
     "allocated_equity_amt": 6.1
   },
   {
@@ -170,9 +180,10 @@
     "ead_amount": 110.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 55.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 55.2,
     "allocated_equity_amt": 6.1
   },
   {
@@ -186,9 +197,10 @@
     "ead_amount": 108.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 54.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 54.1,
     "allocated_equity_amt": 6
   },
   {
@@ -202,9 +214,10 @@
     "ead_amount": 161.8,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 121.3,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 121.3,
     "allocated_equity_amt": 14.6
   },
   {
@@ -218,9 +231,10 @@
     "ead_amount": 161.8,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 121.3,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 121.3,
     "allocated_equity_amt": 14.6
   },
   {
@@ -234,9 +248,10 @@
     "ead_amount": 160.2,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 120.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 120.1,
     "allocated_equity_amt": 14.4
   },
   {
@@ -250,9 +265,10 @@
     "ead_amount": 73.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 36.7,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 36.7,
     "allocated_equity_amt": 2.9
   },
   {
@@ -266,9 +282,10 @@
     "ead_amount": 74.1,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 37,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 37,
     "allocated_equity_amt": 3
   },
   {
@@ -282,9 +299,10 @@
     "ead_amount": 74.1,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 37,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 37,
     "allocated_equity_amt": 3
   },
   {
@@ -298,9 +316,10 @@
     "ead_amount": 119.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 89.5,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 89.5,
     "allocated_equity_amt": 8.1
   },
   {
@@ -314,9 +333,10 @@
     "ead_amount": 121.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 91.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 91.2,
     "allocated_equity_amt": 8.2
   },
   {
@@ -330,9 +350,10 @@
     "ead_amount": 122.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 92.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 92.2,
     "allocated_equity_amt": 8.3
   },
   {
@@ -346,9 +367,10 @@
     "ead_amount": 173,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 86.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 86.5,
     "allocated_equity_amt": 8.7
   },
   {
@@ -362,9 +384,10 @@
     "ead_amount": 178.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 89.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 89.1,
     "allocated_equity_amt": 8.9
   },
   {
@@ -378,9 +401,10 @@
     "ead_amount": 181.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 90.9,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 90.9,
     "allocated_equity_amt": 9.1
   },
   {
@@ -394,9 +418,10 @@
     "ead_amount": 234.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 234.1,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 234.1,
     "allocated_equity_amt": 25.8
   },
   {
@@ -410,9 +435,10 @@
     "ead_amount": 243.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 243.5,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 243.5,
     "allocated_equity_amt": 26.8
   },
   {
@@ -426,9 +452,10 @@
     "ead_amount": 250.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 250.8,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 250.8,
     "allocated_equity_amt": 27.6
   },
   {
@@ -442,9 +469,10 @@
     "ead_amount": 791.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 1186.9,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 1186.9,
     "allocated_equity_amt": 142.4
   },
   {
@@ -458,9 +486,10 @@
     "ead_amount": 759.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 1139.4,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 1139.4,
     "allocated_equity_amt": 136.7
   },
   {
@@ -474,9 +503,10 @@
     "ead_amount": 790,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 1185,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 1185,
     "allocated_equity_amt": 142.2
   },
   {
@@ -490,9 +520,10 @@
     "ead_amount": 151.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 75.8,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 75.8,
     "allocated_equity_amt": 6.1
   },
   {
@@ -506,9 +537,10 @@
     "ead_amount": 147.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 73.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 73.5,
     "allocated_equity_amt": 5.9
   },
   {
@@ -522,9 +554,10 @@
     "ead_amount": 154.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 77.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 77.2,
     "allocated_equity_amt": 6.2
   },
   {
@@ -538,9 +571,10 @@
     "ead_amount": 221.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 166.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 166.4,
     "allocated_equity_amt": 15
   },
   {
@@ -554,9 +588,10 @@
     "ead_amount": 217.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 163.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 163.1,
     "allocated_equity_amt": 14.7
   },
   {
@@ -570,9 +605,10 @@
     "ead_amount": 230.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 172.8,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 172.8,
     "allocated_equity_amt": 15.6
   },
   {
@@ -586,9 +622,10 @@
     "ead_amount": 298.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 149.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 149.4,
     "allocated_equity_amt": 14.9
   },
   {
@@ -602,9 +639,10 @@
     "ead_amount": 295.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 147.9,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 147.9,
     "allocated_equity_amt": 14.8
   },
   {
@@ -618,9 +656,10 @@
     "ead_amount": 316.6,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 158.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 158.3,
     "allocated_equity_amt": 15.8
   },
   {
@@ -634,9 +673,10 @@
     "ead_amount": 58.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 43.7,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 43.7,
     "allocated_equity_amt": 4.8
   },
   {
@@ -650,9 +690,10 @@
     "ead_amount": 58.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 43.7,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 43.7,
     "allocated_equity_amt": 4.8
   },
   {
@@ -666,9 +707,10 @@
     "ead_amount": 63,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 47.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 47.2,
     "allocated_equity_amt": 5.2
   },
   {
@@ -682,9 +724,10 @@
     "ead_amount": 34.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 17.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 17.4,
     "allocated_equity_amt": 2.1
   },
   {
@@ -698,9 +741,10 @@
     "ead_amount": 35.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 17.6,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 17.6,
     "allocated_equity_amt": 2.1
   },
   {
@@ -714,9 +758,10 @@
     "ead_amount": 33.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 16.7,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 16.7,
     "allocated_equity_amt": 2
   },
   {
@@ -730,9 +775,10 @@
     "ead_amount": 66.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 49.9,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 49.9,
     "allocated_equity_amt": 4
   },
   {
@@ -746,9 +792,10 @@
     "ead_amount": 67.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 50.9,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 50.9,
     "allocated_equity_amt": 4.1
   },
   {
@@ -762,9 +809,10 @@
     "ead_amount": 65.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 48.9,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 48.9,
     "allocated_equity_amt": 3.9
   },
   {
@@ -778,9 +826,10 @@
     "ead_amount": 107,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 53.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 53.5,
     "allocated_equity_amt": 4.8
   },
   {
@@ -794,9 +843,10 @@
     "ead_amount": 110.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 55.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 55.1,
     "allocated_equity_amt": 5
   },
   {
@@ -810,9 +860,10 @@
     "ead_amount": 106.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 53.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 53.5,
     "allocated_equity_amt": 4.8
   },
   {
@@ -826,9 +877,10 @@
     "ead_amount": 155.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 155.8,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 155.8,
     "allocated_equity_amt": 15.6
   },
   {
@@ -842,9 +894,10 @@
     "ead_amount": 162,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 162,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 162,
     "allocated_equity_amt": 16.2
   },
   {
@@ -858,9 +911,10 @@
     "ead_amount": 158.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 158.8,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 158.8,
     "allocated_equity_amt": 15.9
   },
   {
@@ -874,9 +928,10 @@
     "ead_amount": 232.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 174.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 174.2,
     "allocated_equity_amt": 19.2
   },
   {
@@ -890,9 +945,10 @@
     "ead_amount": 223,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 167.3,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 167.3,
     "allocated_equity_amt": 18.4
   },
   {
@@ -906,9 +962,10 @@
     "ead_amount": 220.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 165.6,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 165.6,
     "allocated_equity_amt": 18.2
   },
   {
@@ -922,9 +979,10 @@
     "ead_amount": 362.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 181.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 181.4,
     "allocated_equity_amt": 21.8
   },
   {
@@ -938,9 +996,10 @@
     "ead_amount": 352,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 176,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 176,
     "allocated_equity_amt": 21.1
   },
   {
@@ -954,9 +1013,10 @@
     "ead_amount": 352,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 176,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 176,
     "allocated_equity_amt": 21.1
   },
   {
@@ -970,9 +1030,10 @@
     "ead_amount": 162.4,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 121.8,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 121.8,
     "allocated_equity_amt": 9.7
   },
   {
@@ -986,9 +1047,10 @@
     "ead_amount": 159.2,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 119.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 119.4,
     "allocated_equity_amt": 9.5
   },
   {
@@ -1002,9 +1064,10 @@
     "ead_amount": 160.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 120.6,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 120.6,
     "allocated_equity_amt": 9.6
   },
   {
@@ -1018,9 +1081,10 @@
     "ead_amount": 227.5,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 113.7,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 113.7,
     "allocated_equity_amt": 10.2
   },
   {
@@ -1034,9 +1098,10 @@
     "ead_amount": 225.2,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 112.6,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 112.6,
     "allocated_equity_amt": 10.1
   },
   {
@@ -1050,9 +1115,10 @@
     "ead_amount": 229.7,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 114.9,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 114.9,
     "allocated_equity_amt": 10.3
   },
   {
@@ -1066,9 +1132,10 @@
     "ead_amount": 299.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 299.8,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 299.8,
     "allocated_equity_amt": 30
   },
   {
@@ -1082,9 +1149,10 @@
     "ead_amount": 299.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 299.8,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 299.8,
     "allocated_equity_amt": 30
   },
   {
@@ -1098,9 +1166,10 @@
     "ead_amount": 308.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 308.8,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 308.8,
     "allocated_equity_amt": 30.9
   },
   {
@@ -1114,9 +1183,10 @@
     "ead_amount": 378.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 568.4,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 568.4,
     "allocated_equity_amt": 62.5
   },
   {
@@ -1130,9 +1200,10 @@
     "ead_amount": 382.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 574.1,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 574.1,
     "allocated_equity_amt": 63.1
   },
   {
@@ -1146,9 +1217,10 @@
     "ead_amount": 398,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 597,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 597,
     "allocated_equity_amt": 65.7
   },
   {
@@ -1162,9 +1234,10 @@
     "ead_amount": 177.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 88.6,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 88.6,
     "allocated_equity_amt": 10.6
   },
   {
@@ -1178,9 +1251,10 @@
     "ead_amount": 180.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 90.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 90.3,
     "allocated_equity_amt": 10.8
   },
   {
@@ -1194,9 +1268,10 @@
     "ead_amount": 189.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 94.8,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 94.8,
     "allocated_equity_amt": 11.4
   },
   {
@@ -1210,9 +1285,10 @@
     "ead_amount": 36.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 27.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 27.1,
     "allocated_equity_amt": 2.2
   },
   {
@@ -1226,9 +1302,10 @@
     "ead_amount": 37.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 27.9,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 27.9,
     "allocated_equity_amt": 2.2
   },
   {
@@ -1242,9 +1319,10 @@
     "ead_amount": 39.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 29.5,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 29.5,
     "allocated_equity_amt": 2.4
   },
   {
@@ -1258,9 +1336,10 @@
     "ead_amount": 66.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 33.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 33.3,
     "allocated_equity_amt": 3
   },
   {
@@ -1274,9 +1353,10 @@
     "ead_amount": 69.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 34.6,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 34.6,
     "allocated_equity_amt": 3.1
   },
   {
@@ -1290,9 +1370,10 @@
     "ead_amount": 74.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 37.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 37.1,
     "allocated_equity_amt": 3.3
   },
   {
@@ -1306,9 +1387,10 @@
     "ead_amount": 114.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 86.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 86.1,
     "allocated_equity_amt": 8.6
   },
   {
@@ -1322,9 +1404,10 @@
     "ead_amount": 110.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 82.6,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 82.6,
     "allocated_equity_amt": 8.3
   },
   {
@@ -1338,9 +1421,10 @@
     "ead_amount": 119,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 89.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 89.2,
     "allocated_equity_amt": 8.9
   },
   {
@@ -1354,9 +1438,10 @@
     "ead_amount": 61.5,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 30.7,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 30.7,
     "allocated_equity_amt": 3.4
   },
   {
@@ -1370,9 +1455,10 @@
     "ead_amount": 59.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 29.8,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 29.8,
     "allocated_equity_amt": 3.3
   },
   {
@@ -1386,9 +1472,10 @@
     "ead_amount": 56.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 28.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 28.3,
     "allocated_equity_amt": 3.1
   },
   {
@@ -1402,9 +1489,10 @@
     "ead_amount": 552,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 552,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 552,
     "allocated_equity_amt": 66.2
   },
   {
@@ -1418,9 +1506,10 @@
     "ead_amount": 541,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 541,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 541,
     "allocated_equity_amt": 64.9
   },
   {
@@ -1434,9 +1523,10 @@
     "ead_amount": 519.4,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 519.4,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 519.4,
     "allocated_equity_amt": 62.3
   },
   {
@@ -1450,9 +1540,10 @@
     "ead_amount": 156.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 78.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 78.2,
     "allocated_equity_amt": 6.3
   },
   {
@@ -1466,9 +1557,10 @@
     "ead_amount": 154.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 77.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 77.4,
     "allocated_equity_amt": 6.2
   },
   {
@@ -1482,9 +1574,10 @@
     "ead_amount": 150.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 75.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 75.1,
     "allocated_equity_amt": 6
   },
   {
@@ -1498,9 +1591,10 @@
     "ead_amount": 216.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 162.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 162.4,
     "allocated_equity_amt": 14.6
   },
   {
@@ -1514,9 +1608,10 @@
     "ead_amount": 216.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 162.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 162.4,
     "allocated_equity_amt": 14.6
   },
   {
@@ -1530,9 +1625,10 @@
     "ead_amount": 212.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 159.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 159.1,
     "allocated_equity_amt": 14.3
   },
   {
@@ -1546,9 +1642,10 @@
     "ead_amount": 284.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 142.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 142.1,
     "allocated_equity_amt": 14.2
   },
   {
@@ -1562,9 +1659,10 @@
     "ead_amount": 287.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 143.6,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 143.6,
     "allocated_equity_amt": 14.4
   },
   {
@@ -1578,9 +1676,10 @@
     "ead_amount": 284.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 142.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 142.1,
     "allocated_equity_amt": 14.2
   },
   {
@@ -1594,9 +1693,10 @@
     "ead_amount": 129.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 65,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 65,
     "allocated_equity_amt": 7.1
   },
   {
@@ -1610,9 +1710,10 @@
     "ead_amount": 132.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 66.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 66.3,
     "allocated_equity_amt": 7.3
   },
   {
@@ -1626,9 +1727,10 @@
     "ead_amount": 132.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 66.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 66.3,
     "allocated_equity_amt": 7.3
   },
   {
@@ -1642,9 +1744,10 @@
     "ead_amount": 193.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 145.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 145.2,
     "allocated_equity_amt": 17.4
   },
   {
@@ -1658,9 +1761,10 @@
     "ead_amount": 199.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 149.6,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 149.6,
     "allocated_equity_amt": 18
   },
   {
@@ -1674,9 +1778,10 @@
     "ead_amount": 201.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 151.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 151.1,
     "allocated_equity_amt": 18.1
   },
   {
@@ -1690,9 +1795,10 @@
     "ead_amount": 264.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 132.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 132.2,
     "allocated_equity_amt": 10.6
   },
   {
@@ -1706,9 +1812,10 @@
     "ead_amount": 275,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 137.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 137.5,
     "allocated_equity_amt": 11
   },
   {
@@ -1722,9 +1829,10 @@
     "ead_amount": 280.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 140.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 140.3,
     "allocated_equity_amt": 11.2
   },
   {
@@ -1738,9 +1846,10 @@
     "ead_amount": 373.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 280.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 280.4,
     "allocated_equity_amt": 25.2
   },
   {
@@ -1754,9 +1863,10 @@
     "ead_amount": 358.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 269.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 269.2,
     "allocated_equity_amt": 24.2
   },
   {
@@ -1770,9 +1880,10 @@
     "ead_amount": 369.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 277.2,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 277.2,
     "allocated_equity_amt": 25
   },
   {
@@ -1786,9 +1897,10 @@
     "ead_amount": 18.7,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 9.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 9.3,
     "allocated_equity_amt": 0.9
   },
   {
@@ -1802,9 +1914,10 @@
     "ead_amount": 18.1,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 9.1,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 9.1,
     "allocated_equity_amt": 0.9
   },
   {
@@ -1818,9 +1931,10 @@
     "ead_amount": 18.8,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 9.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 9.4,
     "allocated_equity_amt": 0.9
   },
   {
@@ -1834,9 +1948,10 @@
     "ead_amount": 42.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 42.2,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 42.2,
     "allocated_equity_amt": 4.6
   },
   {
@@ -1850,9 +1965,10 @@
     "ead_amount": 41.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 41.4,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 41.4,
     "allocated_equity_amt": 4.5
   },
   {
@@ -1866,9 +1982,10 @@
     "ead_amount": 43.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 43.4,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 43.4,
     "allocated_equity_amt": 4.8
   },
   {
@@ -1882,9 +1999,10 @@
     "ead_amount": 680.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 1020.6,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 1020.6,
     "allocated_equity_amt": 122.5
   },
   {
@@ -1898,9 +2016,10 @@
     "ead_amount": 673.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 1010.4,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 1010.4,
     "allocated_equity_amt": 121.3
   },
   {
@@ -1914,9 +2033,10 @@
     "ead_amount": 714,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 1071,
+    "internal_risk_rating_bucket_code": "CRT",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 1071,
     "allocated_equity_amt": 128.5
   },
   {
@@ -1930,9 +2050,10 @@
     "ead_amount": 114.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 57.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 57.4,
     "allocated_equity_amt": 4.6
   },
   {
@@ -1946,9 +2067,10 @@
     "ead_amount": 114.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 57.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 57.4,
     "allocated_equity_amt": 4.6
   },
   {
@@ -1962,9 +2084,10 @@
     "ead_amount": 122.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 61.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 61.5,
     "allocated_equity_amt": 4.9
   },
   {
@@ -1978,9 +2101,10 @@
     "ead_amount": 163,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 122.3,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 122.3,
     "allocated_equity_amt": 11
   },
   {
@@ -1994,9 +2118,10 @@
     "ead_amount": 164.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 123.5,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 123.5,
     "allocated_equity_amt": 11.1
   },
   {
@@ -2010,9 +2135,10 @@
     "ead_amount": 177.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 133.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 133.4,
     "allocated_equity_amt": 12
   },
   {
@@ -2026,9 +2152,10 @@
     "ead_amount": 85.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 42.7,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 42.7,
     "allocated_equity_amt": 4.3
   },
   {
@@ -2042,9 +2169,10 @@
     "ead_amount": 87.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 43.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 43.5,
     "allocated_equity_amt": 4.4
   },
   {
@@ -2058,9 +2186,10 @@
     "ead_amount": 82.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 41.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 41.4,
     "allocated_equity_amt": 4.1
   },
   {
@@ -2074,9 +2203,10 @@
     "ead_amount": 136,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 102,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 102,
     "allocated_equity_amt": 11.2
   },
   {
@@ -2090,9 +2220,10 @@
     "ead_amount": 140.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 105.1,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 105.1,
     "allocated_equity_amt": 11.6
   },
   {
@@ -2106,9 +2237,10 @@
     "ead_amount": 134.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 100.9,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 100.9,
     "allocated_equity_amt": 11.1
   },
   {
@@ -2122,9 +2254,10 @@
     "ead_amount": 194.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 97.4,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 97.4,
     "allocated_equity_amt": 11.7
   },
   {
@@ -2138,9 +2271,10 @@
     "ead_amount": 202.5,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 101.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 101.2,
     "allocated_equity_amt": 12.1
   },
   {
@@ -2154,9 +2288,10 @@
     "ead_amount": 196.4,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
+    "rwa_amt": 98.2,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 98.2,
     "allocated_equity_amt": 11.8
   },
   {
@@ -2170,9 +2305,10 @@
     "ead_amount": 285.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 214,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 214,
     "allocated_equity_amt": 17.1
   },
   {
@@ -2186,9 +2322,10 @@
     "ead_amount": 273.9,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 205.4,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 205.4,
     "allocated_equity_amt": 16.4
   },
   {
@@ -2202,9 +2339,10 @@
     "ead_amount": 268.4,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
+    "rwa_amt": 201.3,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 201.3,
     "allocated_equity_amt": 16.1
   },
   {
@@ -2218,9 +2356,10 @@
     "ead_amount": 365,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 182.5,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 2,
-    "rwa_amt": 182.5,
     "allocated_equity_amt": 16.4
   },
   {
@@ -2234,9 +2373,10 @@
     "ead_amount": 354.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 177,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 2,
-    "rwa_amt": 177,
     "allocated_equity_amt": 15.9
   },
   {
@@ -2250,9 +2390,10 @@
     "ead_amount": 350.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 175.3,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 2,
-    "rwa_amt": 175.3,
     "allocated_equity_amt": 15.8
   },
   {
@@ -2266,9 +2407,10 @@
     "ead_amount": 169.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 169.4,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2025-12-31",
     "number_of_loans": 3,
-    "rwa_amt": 169.4,
     "allocated_equity_amt": 16.9
   },
   {
@@ -2282,9 +2424,10 @@
     "ead_amount": 166,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 166,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-01-31",
     "number_of_loans": 3,
-    "rwa_amt": 166,
     "allocated_equity_amt": 16.6
   },
   {
@@ -2298,9 +2441,10 @@
     "ead_amount": 166,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 166,
+    "internal_risk_rating_bucket_code": "HGH",
     "as_of_date": "2026-02-28",
     "number_of_loans": 3,
-    "rwa_amt": 166,
     "allocated_equity_amt": 16.6
   },
   {
@@ -2314,9 +2458,10 @@
     "ead_amount": 245.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 183.8,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 183.8,
     "allocated_equity_amt": 20.2
   },
   {
@@ -2330,9 +2475,10 @@
     "ead_amount": 242.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 182,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 182,
     "allocated_equity_amt": 20
   },
   {
@@ -2346,9 +2492,10 @@
     "ead_amount": 245,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 183.8,
+    "internal_risk_rating_bucket_code": "MOD",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 183.8,
     "allocated_equity_amt": 20.2
   },
   {
@@ -2362,9 +2509,10 @@
     "ead_amount": 917.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 458.8,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2025-12-31",
     "number_of_loans": 1,
-    "rwa_amt": 458.8,
     "allocated_equity_amt": 55.1
   },
   {
@@ -2378,9 +2526,10 @@
     "ead_amount": 917.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 458.8,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-01-31",
     "number_of_loans": 1,
-    "rwa_amt": 458.8,
     "allocated_equity_amt": 55.1
   },
   {
@@ -2394,9 +2543,10 @@
     "ead_amount": 936,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
+    "rwa_amt": 468,
+    "internal_risk_rating_bucket_code": "NHR",
     "as_of_date": "2026-02-28",
     "number_of_loans": 1,
-    "rwa_amt": 468,
     "allocated_equity_amt": 56.2
   }
 ]

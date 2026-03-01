@@ -1,0 +1,362 @@
+[
+  {
+    "utilization_event_id": "LUE-000001",
+    "limit_definition_id": "LIM-001",
+    "utilized_amount_usd": 800,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000002",
+    "limit_definition_id": "LIM-001",
+    "utilized_amount_usd": 840,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000003",
+    "limit_definition_id": "LIM-001",
+    "utilized_amount_usd": 880,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000004",
+    "limit_definition_id": "LIM-002",
+    "utilized_amount_usd": 1290,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000005",
+    "limit_definition_id": "LIM-002",
+    "utilized_amount_usd": 1350,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000006",
+    "limit_definition_id": "LIM-002",
+    "utilized_amount_usd": 1410,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000007",
+    "limit_definition_id": "LIM-003",
+    "utilized_amount_usd": 1840,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000008",
+    "limit_definition_id": "LIM-003",
+    "utilized_amount_usd": 1920,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000009",
+    "limit_definition_id": "LIM-003",
+    "utilized_amount_usd": 2000,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000010",
+    "limit_definition_id": "LIM-004",
+    "utilized_amount_usd": 2450,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000011",
+    "limit_definition_id": "LIM-004",
+    "utilized_amount_usd": 2550,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000012",
+    "limit_definition_id": "LIM-004",
+    "utilized_amount_usd": 2650,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000013",
+    "limit_definition_id": "LIM-005",
+    "utilized_amount_usd": 3120,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000014",
+    "limit_definition_id": "LIM-005",
+    "utilized_amount_usd": 3240,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000015",
+    "limit_definition_id": "LIM-005",
+    "utilized_amount_usd": 3360,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000016",
+    "limit_definition_id": "LIM-006",
+    "utilized_amount_usd": 3850,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000017",
+    "limit_definition_id": "LIM-006",
+    "utilized_amount_usd": 3990,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000018",
+    "limit_definition_id": "LIM-006",
+    "utilized_amount_usd": 4130,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000019",
+    "limit_definition_id": "LIM-007",
+    "utilized_amount_usd": 1160,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000020",
+    "limit_definition_id": "LIM-007",
+    "utilized_amount_usd": 1200,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000021",
+    "limit_definition_id": "LIM-007",
+    "utilized_amount_usd": 1240,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000022",
+    "limit_definition_id": "LIM-008",
+    "utilized_amount_usd": 1830,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000023",
+    "limit_definition_id": "LIM-008",
+    "utilized_amount_usd": 1890,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000024",
+    "limit_definition_id": "LIM-008",
+    "utilized_amount_usd": 1950,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000025",
+    "limit_definition_id": "LIM-009",
+    "utilized_amount_usd": 2560,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000026",
+    "limit_definition_id": "LIM-009",
+    "utilized_amount_usd": 2640,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000027",
+    "limit_definition_id": "LIM-009",
+    "utilized_amount_usd": 2720,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000028",
+    "limit_definition_id": "LIM-010",
+    "utilized_amount_usd": 3350,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000029",
+    "limit_definition_id": "LIM-010",
+    "utilized_amount_usd": 3450,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000030",
+    "limit_definition_id": "LIM-010",
+    "utilized_amount_usd": 3550,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000031",
+    "limit_definition_id": "LIM-011",
+    "utilized_amount_usd": 4200,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000032",
+    "limit_definition_id": "LIM-011",
+    "utilized_amount_usd": 4320,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000033",
+    "limit_definition_id": "LIM-011",
+    "utilized_amount_usd": 4440,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000034",
+    "limit_definition_id": "LIM-012",
+    "utilized_amount_usd": 5110,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000035",
+    "limit_definition_id": "LIM-012",
+    "utilized_amount_usd": 5250,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000036",
+    "limit_definition_id": "LIM-012",
+    "utilized_amount_usd": 5390,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000037",
+    "limit_definition_id": "LIM-013",
+    "utilized_amount_usd": 3942,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000038",
+    "limit_definition_id": "LIM-013",
+    "utilized_amount_usd": 4045.8,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000039",
+    "limit_definition_id": "LIM-013",
+    "utilized_amount_usd": 4149.5,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000040",
+    "limit_definition_id": "LIM-014",
+    "utilized_amount_usd": 3864.7,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000041",
+    "limit_definition_id": "LIM-014",
+    "utilized_amount_usd": 3962.5,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000042",
+    "limit_definition_id": "LIM-014",
+    "utilized_amount_usd": 4060.4,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000043",
+    "limit_definition_id": "LIM-015",
+    "utilized_amount_usd": 1814.7,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000044",
+    "limit_definition_id": "LIM-015",
+    "utilized_amount_usd": 1859,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000045",
+    "limit_definition_id": "LIM-015",
+    "utilized_amount_usd": 1903.3,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000046",
+    "limit_definition_id": "LIM-016",
+    "utilized_amount_usd": 1832.9,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000047",
+    "limit_definition_id": "LIM-016",
+    "utilized_amount_usd": 1876,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000048",
+    "limit_definition_id": "LIM-016",
+    "utilized_amount_usd": 1919.1,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000049",
+    "limit_definition_id": "LIM-017",
+    "utilized_amount_usd": 1944.6,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000050",
+    "limit_definition_id": "LIM-017",
+    "utilized_amount_usd": 1988.8,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000051",
+    "limit_definition_id": "LIM-017",
+    "utilized_amount_usd": 2033,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000052",
+    "limit_definition_id": "LIM-018",
+    "utilized_amount_usd": 1492.2,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000053",
+    "limit_definition_id": "LIM-018",
+    "utilized_amount_usd": 1525,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000054",
+    "limit_definition_id": "LIM-018",
+    "utilized_amount_usd": 1557.8,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000055",
+    "limit_definition_id": "LIM-019",
+    "utilized_amount_usd": 1407.8,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000056",
+    "limit_definition_id": "LIM-019",
+    "utilized_amount_usd": 1437.8,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000057",
+    "limit_definition_id": "LIM-019",
+    "utilized_amount_usd": 1467.7,
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "utilization_event_id": "LUE-000058",
+    "limit_definition_id": "LIM-020",
+    "utilized_amount_usd": 1553.2,
+    "as_of_date": "2025-12-31"
+  },
+  {
+    "utilization_event_id": "LUE-000059",
+    "limit_definition_id": "LIM-020",
+    "utilized_amount_usd": 1569.2,
+    "as_of_date": "2026-01-31"
+  },
+  {
+    "utilization_event_id": "LUE-000060",
+    "limit_definition_id": "LIM-020",
+    "utilized_amount_usd": 1569.2,
+    "as_of_date": "2026-02-28"
+  }
+]

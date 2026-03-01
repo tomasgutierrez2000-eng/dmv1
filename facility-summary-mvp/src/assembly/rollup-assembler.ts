@@ -197,15 +197,6 @@ export const assembleRollups = (
     const avgExpectedLossRate =
       totalExposure > 0 ? totalExpectedLoss / totalExposure : 0;
 
-    // Cross-entity exposure
-    const totalCrossEntityExposure = facilities.reduce(
-      (sum, f) => sum + f.cross_entity_exposure_usd,
-      0
-    );
-    const crossEntityFacilityCount = facilities.filter(
-      (f) => f.has_cross_entity_exposure
-    ).length;
-
     // Active count
     const activeFacilityCount = facilities.filter((f) => f.is_active).length;
 
@@ -332,8 +323,6 @@ export const assembleRollups = (
       total_ead_usd: roundTo(totalEad, 1),
       total_expected_loss_usd: roundTo(totalExpectedLoss, 2),
       avg_expected_loss_rate_pct: roundTo(avgExpectedLossRate, 6),
-      total_cross_entity_exposure_usd: roundTo(totalCrossEntityExposure, 1),
-      cross_entity_facility_count: crossEntityFacilityCount,
       active_facility_count: activeFacilityCount,
       avg_tangible_net_worth_usd: avgTnw !== null ? roundTo(avgTnw, 1) : null,
       prior_month_exposure_usd: roundTo(priorMonthExposure, 1),

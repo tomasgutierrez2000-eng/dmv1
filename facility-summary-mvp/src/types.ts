@@ -173,8 +173,6 @@ export interface DeskSummary {
   total_ead_usd: number;
   total_expected_loss_usd: number;
   avg_expected_loss_rate_pct: number;
-  total_cross_entity_exposure_usd: number;
-  cross_entity_facility_count: number;
   active_facility_count: number;
   avg_tangible_net_worth_usd: number | null;
   exception_rate_pct: number;
@@ -242,8 +240,6 @@ export interface LobL1Summary {
   total_ead_usd: number;
   total_expected_loss_usd: number;
   avg_expected_loss_rate_pct: number;
-  total_cross_entity_exposure_usd: number;
-  cross_entity_facility_count: number;
   active_facility_count: number;
   avg_tangible_net_worth_usd: number | null;
   exception_rate_pct: number;

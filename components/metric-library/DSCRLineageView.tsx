@@ -3375,7 +3375,7 @@ export interface DSCRLineageViewProps {
   /** Demo-controlled rollup level override */
   demoExpandedLevel?: string | null;
   /** Demo-controlled L2 filter override */
-  demoL2Filter?: 'both' | 'CRE' | 'CI';
+  demoL2Filter?: string;
   /** Show the guided demo button */
   onStartDemo?: () => void;
 }
@@ -3392,7 +3392,7 @@ export default function DSCRLineageView({
 
   // Demo overrides local state when active
   const expandedLevel = demoExpandedLevel !== undefined ? demoExpandedLevel : expandedLevelInternal;
-  const l2Filter = demoL2Filter !== undefined ? demoL2Filter : l2FilterInternal;
+  const l2Filter = (demoL2Filter !== undefined ? demoL2Filter : l2FilterInternal) as 'both' | 'CRE' | 'CI';
   const setExpandedLevel = (k: string | null) => setExpandedLevelInternal(k);
   const setL2Filter = (f: 'both' | 'CRE' | 'CI') => setL2FilterInternal(f);
 

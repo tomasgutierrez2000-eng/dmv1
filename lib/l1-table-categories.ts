@@ -62,6 +62,7 @@ export const L1_TABLE_CATEGORIES: Record<string, string> = {
   // Facility & agreement
   credit_agreement_master: 'Facility & agreement',
   facility_master: 'Facility & agreement',
+  facility_lender_allocation: 'Facility & agreement',
   contract_master: 'Facility & agreement',
   // Netting, collateral & CRM
   netting_agreement: 'Netting, collateral & CRM',

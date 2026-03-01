@@ -25,6 +25,7 @@ export const L2_TABLE_CATEGORIES: Record<string, string> = {
   facility_delinquency_snapshot: 'Facility snapshots',
   facility_pricing_snapshot: 'Facility snapshots',
   facility_profitability_snapshot: 'Facility snapshots',
+  facility_financial_snapshot: 'Facility snapshots',
   limit_contribution_snapshot: 'Limits',
   limit_utilization_event: 'Limits',
   amendment_change_detail: 'Events & amendments',

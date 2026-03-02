@@ -106,7 +106,7 @@ export default function ModelDeepDive() {
             </div>
             <p className="text-pwc-white/80 mb-4 leading-relaxed text-sm">
               Calculated metrics, roll-ups, and enriched views from L1 and L2. Final outputs for dashboards and
-              reports: facility summaries, desk roll-ups, LoB aggregations.
+              reports: facility summaries, desk roll-ups, Business Segment aggregations.
             </p>
             <ul className="space-y-2 text-sm text-pwc-white/60">
               <li className="flex items-center gap-2">

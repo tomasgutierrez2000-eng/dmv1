@@ -108,7 +108,7 @@ export default function S01_WhatThisPlatformDoes() {
           {[
             { icon: ShieldCheck, role: 'Credit Risk Teams', desc: 'Monitor portfolio exposure, credit quality, and limit utilization through dashboards and metric deep-dives.' },
             { icon: Building2, role: 'Regulatory & Compliance', desc: 'Generate standardized reports (FR2590, stress tests) from the same governed data layer.' },
-            { icon: TrendingUp, role: 'Front Office / Desk Heads', desc: 'Track facility-level metrics, pipeline, and profitability at their desk or LoB level.' },
+            { icon: TrendingUp, role: 'Front Office / Desk Heads', desc: 'Track facility-level metrics, pipeline, and profitability at their desk or Business Segment level.' },
             { icon: Users, role: 'Data & Platform Teams', desc: 'Maintain the data model, add new metrics, extend the layer architecture as new use cases emerge.' },
           ].map(({ icon: Icon, role, desc }) => (
             <div key={role} className="flex items-start gap-3 bg-slate-900/40 border border-slate-700/40 rounded-lg p-4">

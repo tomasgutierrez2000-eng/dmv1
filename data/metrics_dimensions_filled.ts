@@ -3,7 +3,7 @@
  *
  * Primary source: metrics_dimensions_filled.xlsx (project root or data/).
  * Sheet "Definitions, KPI,Calc& Insights": col 0 = Data Element, cols 9/13/17/21/25 = Level Logic
- * for Facility, Counterparty, L3 Desk, L2 Portfolio, L1 Department/LoB.
+ * for Facility, Counterparty, L3 Desk, L2 Portfolio, L1 Department/Business Segment.
  * Metrics Engine matches by metric.id or metric.name to Data Element.
  *
  * Fallback: METRICS_DIMENSIONS_FILLED below (or add rows for metrics not in the Excel).

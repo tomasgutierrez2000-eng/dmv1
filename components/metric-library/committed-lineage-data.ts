@@ -99,6 +99,6 @@ export const SAMPLE_ROLLUP_LEVELS: RollupLevelSample[] = [
   { level: 'counterparty', label: 'Counterparty (Ultimate Parent)', committed_usd: 28_800_000, counterparty_count: 2 },
   { level: 'L3', label: 'Desk (L3)', committed_usd: 125_000_000, segment_id: 42, facility_count: 8 },
   { level: 'L2', label: 'Portfolio (L2)', committed_usd: 380_000_000, segment_id: 12, facility_count: 24 },
-  { level: 'L1', label: 'Line of Business (L1)', committed_usd: 1_200_000_000, segment_id: 1, facility_count: 95 },
+  { level: 'L1', label: 'Business Segment (L1)', committed_usd: 1_200_000_000, segment_id: 1, facility_count: 95 },
   { level: 'L0', label: 'Enterprise (L0)', committed_usd: 9_500_000_000, facility_count: 720 },
 ];

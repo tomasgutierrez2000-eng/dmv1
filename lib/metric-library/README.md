@@ -7,7 +7,7 @@ Governed catalog for metric definitions and variants. Single source of truth for
 - **One parent metric** = one business concept (e.g. DSCR, PD, LTV). One parent per concept.
 - **Many metric variants** under each parent. Each variant is a specific implementation (e.g. “CRE DSCR (NOI)”, “C&I DSCR (EBITDA)”).
 - **Rollup per variant**: Each variant defines how it aggregates across the hierarchy in `rollup_logic`:
-  - **Facility** → **Counterparty** → **Desk** → **Portfolio** → **LoB** (Line of Business).
+  - **Facility** → **Counterparty** → **Desk** → **Portfolio** → **Business Segment**.
 
 Use `ROLLUP_HIERARCHY_LEVELS` in `types.ts` as the canonical order for display and validation.
 

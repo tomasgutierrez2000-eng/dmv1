@@ -516,7 +516,7 @@ function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
   );
 }
 
-/* ── Rollup: LoB ─────────────────────────────────────────────────────────── */
+/* ── Rollup: Business Segment ─────────────────────────────────────────────── */
 
 function RollupLoB({ stepIndex }: { stepIndex: number }) {
   const revealed = useStaggerReveal(LOB_ENTRIES.length + 1, 500, stepIndex);
@@ -530,7 +530,7 @@ function RollupLoB({ stepIndex }: { stepIndex: number }) {
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Trend Indicator Across LoBs
+        Trend Indicator Across Business Segments
       </div>
 
       <div
@@ -559,7 +559,7 @@ function RollupLoB({ stepIndex }: { stepIndex: number }) {
         className="text-[10px] text-gray-500 leading-relaxed transition-all duration-500"
         style={{ opacity: revealed > LOB_ENTRIES.length ? 1 : 0 }}
       >
-        Unlike DSCR, LTV is <span className="text-gray-300 font-semibold">directly comparable</span> across LoBs
+        Unlike DSCR, LTV is <span className="text-gray-300 font-semibold">directly comparable</span> across Business Segments
         because the formula is always exposure ÷ collateral. However, the <span className="text-gray-300 font-semibold">collateral
         quality</span> differs: real estate is illiquid but stable; securities are liquid but volatile.
       </div>

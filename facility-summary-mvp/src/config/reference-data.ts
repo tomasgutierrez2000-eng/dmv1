@@ -274,7 +274,7 @@ export const RATING_TYPES = ["INTERNAL", "EXTERNAL"];
 export const LIMIT_TYPES = [
   "Single Counterparty",
   "Sector Concentration",
-  "LoB Concentration",
+  "Business Segment Concentration",
 ];
 export const LIMIT_SCOPE = ["COUNTERPARTY", "LOB_L2"];
 export const RISK_TIERS = [

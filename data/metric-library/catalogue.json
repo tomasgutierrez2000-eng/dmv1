@@ -82,7 +82,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to enterprise_business_taxonomy — desk/portfolio/lob resolution",
+        "description": "FK to enterprise_business_taxonomy — desk/portfolio/business segment resolution",
         "data_type": "BIGINT",
         "sample_value": "303"
       },
@@ -106,7 +106,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "tree_level",
-        "description": "Hierarchy depth (1=LoB, 2=Portfolio, 3=Desk)",
+        "description": "Hierarchy depth (1=Business Segment, 2=Portfolio, 3=Desk)",
         "data_type": "INT",
         "sample_value": "3"
       },
@@ -114,7 +114,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "segment_name",
-        "description": "Human-readable name of the desk/portfolio/lob",
+        "description": "Human-readable name of the desk/portfolio/business segment",
         "data_type": "VARCHAR(200)",
         "sample_value": "CRE Lending Desk"
       }
@@ -185,7 +185,7 @@
         "dashboard_display_name": "Desk LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -203,13 +203,13 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "lob_segment_id",
-            "description": "FK to LoB taxonomy — desk resolution"
+            "description": "FK to Business Segment taxonomy — desk resolution"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "LoB hierarchy node — L3 leaf segment"
+            "description": "Business Segment hierarchy node — L3 leaf segment"
           },
           {
             "layer": "L1",
@@ -230,7 +230,7 @@
         "dashboard_display_name": "Portfolio LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -248,13 +248,13 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "lob_segment_id",
-            "description": "FK to LoB taxonomy"
+            "description": "FK to Business Segment taxonomy"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "LoB hierarchy node — L2 parent segment"
+            "description": "Business Segment hierarchy node — L2 parent segment"
           },
           {
             "layer": "L1",
@@ -275,7 +275,7 @@
         "dashboard_display_name": "LTV",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -293,13 +293,13 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "lob_segment_id",
-            "description": "FK to LoB taxonomy"
+            "description": "FK to Business Segment taxonomy"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "LoB hierarchy node — L1 root segment"
+            "description": "Business Segment hierarchy node — L1 root segment"
           },
           {
             "layer": "L1",
@@ -575,7 +575,7 @@
         "dashboard_display_name": "Desk EAD ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])",
+        "level_logic": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])",
         "source_references": []
       },
       {
@@ -583,15 +583,15 @@
         "dashboard_display_name": "Portfolio EAD ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L2 LoB], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal",
+        "level_logic": "For each [L2 Business Segment], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal",
         "source_references": []
       },
       {
         "level": "lob",
-        "dashboard_display_name": "LoB Total EAD ($)",
+        "dashboard_display_name": "Business Segment Total EAD ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L1 LoB], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "level_logic": "For each [L1 Business Segment], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal",
         "source_references": []
       }
     ],
@@ -684,7 +684,7 @@
         "dashboard_display_name": "Desk Wtd DSCR",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L3 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+        "level_logic": "For each [L3 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
         "source_references": []
       },
       {
@@ -692,7 +692,7 @@
         "dashboard_display_name": "Portfolio Wtd DSCR",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L2 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+        "level_logic": "For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
         "source_references": []
       }
     ],
@@ -791,7 +791,7 @@
         "dashboard_display_name": "Desk Wtd PD (%)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L3 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+        "level_logic": "For each [L3 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
         "source_references": []
       },
       {
@@ -799,15 +799,15 @@
         "dashboard_display_name": "Portfolio Wtd PD (%)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L2 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+        "level_logic": "For each [L2 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
         "source_references": []
       },
       {
         "level": "lob",
-        "dashboard_display_name": "LoB Wtd PD (%)",
+        "dashboard_display_name": "Business Segment Wtd PD (%)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L1 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments",
+        "level_logic": "For each [L1 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments",
         "source_references": []
       }
     ],

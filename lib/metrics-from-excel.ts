@@ -3,7 +3,7 @@
  * Sheet "Definitions, KPI,Calc& Insights":
  * - Col 0: Data Element (metric id)
  * - Col 1: Definition, Col 2: Example KPI, Col 3: KPI Formula/Description
- * - Per dimension (Facility, Counterparty, L3 Desk, L2 Portfolio, L1 Department/LoB): 4 columns each
+ * - Per dimension (Facility, Counterparty, L3 Desk, L2 Portfolio, L1 Department/Business Segment): 4 columns each
  *   - In Record / Level? (Y/N), Sourcing Type, Level Logic (formula), Dashboard Display Name
  */
 

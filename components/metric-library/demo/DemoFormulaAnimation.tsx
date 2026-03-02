@@ -503,7 +503,7 @@ function RollupPortfolio({ variant, stepIndex }: { variant: VariantKey; stepInde
   );
 }
 
-/* ── Rollup: LoB ─────────────────────────────────────────────────────────── */
+/* ── Rollup: Business Segment ────────────────────────────────────────────── */
 
 function RollupLoB({ variant, stepIndex }: { variant: VariantKey; stepIndex: number }) {
   const revealed = useStaggerReveal(3, 500, stepIndex);

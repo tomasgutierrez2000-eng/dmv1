@@ -227,14 +227,14 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
       'Beware of "Simpson\'s Paradox": a healthy portfolio-level LTV can hide pockets of severely under-collateralized loans. The distribution buckets — especially the "underwater" bucket — reveal what a single aggregate number conceals.',
   },
 
-  /* ── Step 15: LoB Level ─────────────────────────────────────────────────── */
+  /* ── Step 15: Business Segment Level ──────────────────────────────────── */
   {
     id: 'rollup-lob',
     phase: 5,
     phaseLabel: 'Rollup Hierarchy',
-    title: 'Level 5: Line of Business',
+    title: 'Level 5: Business Segment',
     narration:
-      'At the Line of Business (LoB) level — the highest view — LTV serves as a collateral coverage trend indicator.\n\nUnlike DSCR, LTV comparisons across LoBs are more meaningful because the formula is consistent. However, interpretation differs:\n\n• CRE LoB — LTV is the primary risk metric (property value drives everything)\n• Corporate LoB — LTV is secondary to DSCR (cash flow matters more than collateral)\n• Securities LoB — LTV changes daily with market prices\n\nThe Chief Risk Officer uses LoB-level LTV to monitor portfolio-wide collateral trends and detect systemic exposure to property market declines. If CRE LTV is trending upward quarter over quarter, it may signal a weakening real estate market.',
+      'At the Business Segment level — the highest view — LTV serves as a collateral coverage trend indicator.\n\nUnlike DSCR, LTV comparisons across Business Segments are more meaningful because the formula is consistent. However, interpretation differs:\n\n• CRE Business Segment — LTV is the primary risk metric (property value drives everything)\n• Corporate Business Segment — LTV is secondary to DSCR (cash flow matters more than collateral)\n• Securities Business Segment — LTV changes daily with market prices\n\nThe Chief Risk Officer uses Business Segment-level LTV to monitor portfolio-wide collateral trends and detect systemic exposure to property market declines. If CRE LTV is trending upward quarter over quarter, it may signal a weakening real estate market.',
     targetSelector: '[data-demo="rollup-lob"]',
     onEnter: { expandLevel: 'lob' },
     formulaKey: 'rollup-lob',

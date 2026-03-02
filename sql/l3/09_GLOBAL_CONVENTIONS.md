@@ -42,9 +42,9 @@ Every table with `prior_period_*` or `*_change_pct` fields:
 - Prior: `WHERE as_of_date = @prior_as_of_date` (= `@as_of_date - INTERVAL '1 month'`)
 - Change %: `(current - prior) / NULLIF(prior, 0) * 100.0`
 
-## LoB Attribution Pattern
+## Business Segment Attribution Pattern
 
-Facilities map to LoBs via `l2.facility_lob_attribution`:
+Facilities map to Business Segments via `l2.facility_lob_attribution`:
 - Join: `ON facility_id = fla.facility_id AND fla.as_of_date = @as_of_date`
 - Fields: `fla.lob_node_id`, `fla.hierarchy_id`, `fla.attribution_pct`
 - When attribution_pct < 100: multiply measures by `attribution_pct / 100.0`
@@ -67,7 +67,7 @@ SUM(pd_pct * ead_amt) / NULLIF(SUM(ead_amt), 0) AS avg_pd_pct
 | `country_dim` → `region_dim` | `ON country_code` → `ON region_code` | Geography hierarchy |
 | `industry_dim` | `ON industry_code` | Sector name |
 | `rating_grade_dim` | `ON rating_grade_id` | Rating label, rank |
-| `enterprise_business_taxonomy` | `ON business_node_id = lob_node_id` | LoB hierarchy |
+| `enterprise_business_taxonomy` | `ON business_node_id = lob_node_id` | Business Segment hierarchy |
 | `enterprise_product_taxonomy` | `ON product_node_id` | Product hierarchy |
 | `scenario_dim` | `ON scenario_id` | Scenario name, type |
 | `fx_rate` | `ON from/to_currency + as_of_date` | Currency conversion |

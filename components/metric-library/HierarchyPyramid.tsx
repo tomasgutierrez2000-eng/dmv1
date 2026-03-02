@@ -35,7 +35,7 @@ const LEVEL_STYLE: Record<LevelKey, {
   bg: string; border: string; text: string; svgColor: string; label: string;
   activeBorder: string; activeBg: string;
 }> = {
-  lob:          { bg: 'bg-pink-950/60',    border: 'border-pink-500/30',    text: 'text-pink-300',    svgColor: '#ec4899', label: 'LoB',          activeBorder: 'border-pink-500/70',    activeBg: 'bg-pink-950/80' },
+  lob:          { bg: 'bg-pink-950/60',    border: 'border-pink-500/30',    text: 'text-pink-300',    svgColor: '#ec4899', label: 'Business Segment',          activeBorder: 'border-pink-500/70',    activeBg: 'bg-pink-950/80' },
   portfolio:    { bg: 'bg-emerald-950/60', border: 'border-emerald-500/30', text: 'text-emerald-300', svgColor: '#10b981', label: 'Portfolio',    activeBorder: 'border-emerald-500/70', activeBg: 'bg-emerald-950/80' },
   desk:         { bg: 'bg-amber-950/60',   border: 'border-amber-500/30',   text: 'text-amber-300',   svgColor: '#f59e0b', label: 'Desk',         activeBorder: 'border-amber-500/70',   activeBg: 'bg-amber-950/80' },
   counterparty: { bg: 'bg-purple-950/60',  border: 'border-purple-500/30',  text: 'text-purple-300',  svgColor: '#a855f7', label: 'Counterparty', activeBorder: 'border-purple-500/70',  activeBg: 'bg-purple-950/80' },
@@ -43,7 +43,7 @@ const LEVEL_STYLE: Record<LevelKey, {
   position:     { bg: 'bg-cyan-950/60',    border: 'border-cyan-500/30',    text: 'text-cyan-300',    svgColor: '#06b6d4', label: 'Position',     activeBorder: 'border-cyan-500/70',    activeBg: 'bg-cyan-950/80' },
 };
 
-/* Level ordering: top (LoB) → bottom (positions) */
+/* Level ordering: top (Business Segment) → bottom (positions) */
 const LEVEL_ORDER: LevelKey[] = ['lob', 'portfolio', 'desk', 'counterparty', 'facility', 'position'];
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -94,8 +94,8 @@ function buildGraph(facilities: DemoFacility[]): { nodes: PyramidNode[]; edges: 
     if (to && !to.parentIds.includes(fromId)) to.parentIds.push(fromId);
   };
 
-  // LoB level — all facilities share the same lob_name in demo
-  const lobName = facilities[0]?.lob_name ?? 'LoB';
+  // Business Segment level — all facilities share the same lob_name in demo
+  const lobName = facilities[0]?.lob_name ?? 'Business Segment';
   const lobId = 'lob-' + lobName.replace(/\s/g, '-');
   const lobTotalC = facilities.reduce((s, f) => s + f.committed_amt, 0);
   const lobTotalV = facilities.reduce((s, f) => s + f.collateral_value, 0);
@@ -397,7 +397,7 @@ export default function HierarchyPyramid({ item, activeTab, onTabChange }: Hiera
 
       {/* SVG Pyramid — desktop */}
       <div className="hidden md:block overflow-x-auto">
-        <div style={{ minWidth: width, minHeight: height }} className="relative mx-auto" role="img" aria-label="Hierarchy pyramid showing metric rollup from positions to LoB">
+        <div style={{ minWidth: width, minHeight: height }} className="relative mx-auto" role="img" aria-label="Hierarchy pyramid showing metric rollup from positions to Business Segment">
           <svg width={width} height={height} className="absolute inset-0 pointer-events-none">
             {/* Bezier edges */}
             {edges.map((edge, i) => {
@@ -496,7 +496,7 @@ export default function HierarchyPyramid({ item, activeTab, onTabChange }: Hiera
 
           {/* Row labels on the left */}
           {[
-            { label: 'LoB (L1)', y: PY },
+            { label: 'Business Segment (L1)', y: PY },
             { label: 'Portfolio (L2)', y: PY + (NH + RG) },
             { label: 'Desk / Counterparty', y: PY + 2 * (NH + RG) },
             { label: 'Facility', y: PY + 3 * (NH + RG) },

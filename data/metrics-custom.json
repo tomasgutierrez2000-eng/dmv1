@@ -269,7 +269,7 @@
           "layer": "L1",
           "table": "limit_rule",
           "field": "limit_scope",
-          "description": "Limit scope (COUNTERPARTY/LOB)",
+          "description": "Limit scope (COUNTERPARTY/BUSINESS_SEGMENT)",
           "sampleValue": "COUNTERPARTY"
         },
         {
@@ -2404,7 +2404,7 @@
       "metricType": "Count",
       "formula": "COUNT(DISTINCT portfolio_id)",
       "formulaSQL": "SELECT COUNT(DISTINCT pd.portfolio_id) FROM L1.portfolio_dim pd\nWHERE pd.lob_segment_id = :lob_segment_id AND pd.active_flag = 'Y'",
-      "description": "Number of active portfolios in the department/LoB.",
+      "description": "Number of active portfolios in the department/Business Segment.",
       "displayFormat": "#,##0",
       "sampleValue": "8",
       "sourceFields": [
@@ -2419,7 +2419,7 @@
           "layer": "L1",
           "table": "portfolio_dim",
           "field": "lob_segment_id",
-          "description": "FK to LoB",
+          "description": "FK to Business Segment",
           "sampleValue": "1001"
         }
       ],
@@ -2442,7 +2442,7 @@
       "metricType": "Count",
       "formula": "COUNT(DISTINCT org_unit_id) WHERE type = 'DESK'",
       "formulaSQL": "SELECT COUNT(DISTINCT oud.org_unit_id) FROM L1.org_unit_dim oud\nWHERE oud.lob_segment_id = :lob_segment_id AND oud.org_unit_type = 'DESK' AND oud.is_current = 'Y'",
-      "description": "Number of desks in the department/LoB.",
+      "description": "Number of desks in the department/Business Segment.",
       "displayFormat": "#,##0",
       "sampleValue": "4",
       "sourceFields": [
@@ -2480,7 +2480,7 @@
       "metricType": "Aggregate",
       "formula": "SUM(limit_amount_usd) WHERE limit_scope = LOB",
       "formulaSQL": "SELECT SUM(lr.limit_amount_usd) FROM L1.limit_rule lr\nWHERE lr.limit_scope = 'LOB' AND lr.lob_segment_id = :lob_segment_id AND lr.effective_to_date IS NULL",
-      "description": "Total approved exposure limit for the department/LoB.",
+      "description": "Total approved exposure limit for the department/Business Segment.",
       "displayFormat": "$#,##0.0M",
       "sampleValue": "$500.0M",
       "sourceFields": [
@@ -2495,7 +2495,7 @@
           "layer": "L1",
           "table": "limit_rule",
           "field": "limit_scope",
-          "description": "LOB scope",
+          "description": "Business Segment scope",
           "sampleValue": "LOB"
         }
       ],

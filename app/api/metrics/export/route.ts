@@ -35,7 +35,7 @@ async function buildWorkbook(metrics: L3Metric[]) {
     ['Calculation dimensions (formula_* columns)'],
     ['formula_facility', 'Facility'],
     ['formula_counterparty', 'Counterparty'],
-    ['formula_L1', 'L1 (Reference / Department/LoB)'],
+    ['formula_L1', 'L1 (Reference / Department/Business Segment)'],
     ['formula_L2', 'L2 (Snapshot / Portfolio)'],
     ['formula_L3', 'L3 (Derived / Desk)'],
     [],

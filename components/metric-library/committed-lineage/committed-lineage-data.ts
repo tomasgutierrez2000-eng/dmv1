@@ -344,7 +344,7 @@ export const ROLLUP_LEVELS: RollupLevel[] = [
   },
   {
     key: 'lob',
-    label: 'L1 Line of Business',
+    label: 'L1 Business Segment',
     icon: FolderTree,
     method: 'Summation',
     tier: 'T3',
@@ -453,7 +453,7 @@ export const FK_RELATIONSHIPS: FKRelationship[] = [
     from: 'facility_master',
     to: 'enterprise_business_taxonomy',
     joinKey: 'lob_segment_id → managed_segment_id',
-    why: 'Maps each facility to a business unit (L3 desk → L2 portfolio → L1 LoB) for hierarchical rollup of committed amounts.',
+    why: 'Maps each facility to a business unit (L3 desk → L2 portfolio → L1 Business Segment) for hierarchical rollup of committed amounts.',
     cardinality: '1:1 — one taxonomy node per facility',
   },
   {
@@ -473,7 +473,7 @@ export const L1_TABLES: L1TableDef[] = [
   {
     tableName: 'facility_master',
     scd: 'SCD-2',
-    role: 'Central hub — identifies the deal, its currency, and LoB hierarchy linkage. Every metric calculation starts here.',
+    role: 'Central hub — identifies the deal, its currency, and Business Segment hierarchy linkage. Every metric calculation starts here.',
     columns: [
       { name: 'facility_id', type: 'BIGINT', pk: true },
       { name: 'credit_agreement_id', type: 'BIGINT', fk: 'credit_agreement_master' },
@@ -544,7 +544,7 @@ export const L1_TABLES: L1TableDef[] = [
   {
     tableName: 'enterprise_business_taxonomy',
     scd: 'SCD-1',
-    role: 'LoB hierarchy — defines the Desk (L3) → Portfolio (L2) → LoB (L1) → Enterprise (L0) tree for rollup aggregation.',
+    role: 'Business Segment hierarchy — defines the Desk (L3) → Portfolio (L2) → Business Segment (L1) → Enterprise (L0) tree for rollup aggregation.',
     columns: [
       { name: 'managed_segment_id', type: 'BIGINT', pk: true },
       { name: 'segment_code', type: 'VARCHAR(50)' },
@@ -792,7 +792,7 @@ export const AUDIT_RUN: AuditRunContext = {
 
 /* ────────────────────────────────────────────────────────────────────────────
  * AUDIT TRAIL TREE — full recursive structure
- * Dashboard → LoB → Counterparty → Facility → L2 Source
+ * Dashboard → Business Segment → Counterparty → Facility → L2 Source
  * ──────────────────────────────────────────────────────────────────────────── */
 
 export const AUDIT_TRAIL: AuditTrailNode = {

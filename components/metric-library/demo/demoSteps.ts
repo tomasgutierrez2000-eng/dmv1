@@ -150,7 +150,7 @@ export const DEMO_STEPS: DemoStep[] = [
     phaseLabel: 'Data Sources',
     title: 'Where the Data Lives: Reference Tables',
     narration:
-      'Before the formula can run, the system needs to know the basics: Who is the borrower? What type of loan is this? Which business unit owns it?\n\nThis information lives in "L1 Reference Tables" \u2014 think of them as the master address book for the bank. They store relatively permanent facts like:\n\n\u2022 Loan (facility) details \u2014 type, amount, maturity date\n\u2022 Borrower identity \u2014 legal name, credit rating, industry\n\u2022 Organizational structure \u2014 which desk, portfolio, and line of business this loan belongs to\n\nThese tables rarely change and serve as the backbone that connects everything together.',
+      'Before the formula can run, the system needs to know the basics: Who is the borrower? What type of loan is this? Which business unit owns it?\n\nThis information lives in "L1 Reference Tables" \u2014 think of them as the master address book for the bank. They store relatively permanent facts like:\n\n\u2022 Loan (facility) details \u2014 type, amount, maturity date\n\u2022 Borrower identity \u2014 legal name, credit rating, industry\n\u2022 Organizational structure \u2014 which desk, portfolio, and business segment this loan belongs to\n\nThese tables rarely change and serve as the backbone that connects everything together.',
     targetSelector: '[data-demo="step2"]',
     insight:
       'These reference tables are shared across every metric in the system \u2014 not just DSCR. The same organizational hierarchy that groups DSCR also groups exposure, LTV, and every other risk metric.',
@@ -270,14 +270,14 @@ export const DEMO_STEPS: DemoStep[] = [
       'Beware of "Simpson\u2019s Paradox": a healthy average can hide a group of struggling borrowers. For example, a portfolio DSCR of 1.45x might mask 15% of loans below 1.0x. The distribution buckets reveal what the average conceals.',
   },
 
-  /* ── Step 16: LoB Level ────────────────────────────────────────────────── */
+  /* ── Step 16: Business Segment Level ─────────────────────────────────── */
   {
     id: 'rollup-lob',
     phase: 5,
     phaseLabel: 'Rollup Hierarchy',
-    title: 'Level 5: Line of Business',
+    title: 'Level 5: Business Segment',
     narration:
-      'At the Line of Business (LoB) level \u2014 the highest view \u2014 DSCR serves a completely different purpose. It\u2019s no longer a precise measure of individual loan health. Instead, it\u2019s a trend indicator.\n\nThe Chief Risk Officer uses LoB-level DSCR to ask one question: "Is our overall borrower quality getting better or worse over time?"\n\nHard limits at this level are set on total lending and concentration, NOT on DSCR. Comparing DSCR across different business lines (CRE vs Corporate vs Leveraged Finance) requires caution because the underlying formulas differ.',
+      'At the Business Segment level \u2014 the highest view \u2014 DSCR serves a completely different purpose. It\u2019s no longer a precise measure of individual loan health. Instead, it\u2019s a trend indicator.\n\nThe Chief Risk Officer uses Business Segment-level DSCR to ask one question: "Is our overall borrower quality getting better or worse over time?"\n\nHard limits at this level are set on total lending and concentration, NOT on DSCR. Comparing DSCR across different business lines (CRE vs Corporate vs Leveraged Finance) requires caution because the underlying formulas differ.',
     targetSelector: '[data-demo="rollup-lob"]',
     onEnter: { expandLevel: 'lob' },
     formulaKey: 'rollup-lob',

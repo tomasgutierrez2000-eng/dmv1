@@ -121,7 +121,7 @@ export const PORTFOLIO_BUCKETS: LTVBucket[] = [
   { range: '> 100%',    label: 'Underwater',   count: 4,  exposure: 180_000_000, color: 'text-red-400',     bg: 'bg-red-500/10' },
 ];
 
-/* ── LoB-level trend data ────────────────────────────────────────────────── */
+/* ── Business Segment-level trend data ───────────────────────────────────── */
 
 export interface LoBEntry {
   label: string;

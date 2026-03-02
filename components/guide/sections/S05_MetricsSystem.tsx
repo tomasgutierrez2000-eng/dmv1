@@ -197,7 +197,7 @@ export default function S05_MetricsSystem() {
           Every metric can be viewed at different levels. A DSCR ratio exists at the facility
           level, but the CRO wants to see it at the portfolio level. The rollup hierarchy
           defines how a metric aggregates from the finest grain (facility) up to the broadest
-          view (Line of Business).
+          view (Business Segment).
         </P>
 
         <DiagramBox title="The 5-Level Rollup Hierarchy" caption="Each variant defines how it aggregates at each level.">
@@ -207,7 +207,7 @@ export default function S05_MetricsSystem() {
               { level: 'Counterparty', desc: 'All loans to one borrower', color: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' },
               { level: 'Desk', desc: 'A trading/lending desk', color: 'bg-purple-500/15 border-purple-500/30 text-purple-300' },
               { level: 'Portfolio', desc: 'A portfolio of desks', color: 'bg-amber-500/15 border-amber-500/30 text-amber-300' },
-              { level: 'LoB', desc: 'Line of Business', color: 'bg-red-500/15 border-red-500/30 text-red-300' },
+              { level: 'BS', desc: 'Business Segment', color: 'bg-red-500/15 border-red-500/30 text-red-300' },
             ].map((l, i) => (
               <div key={l.level} className="flex items-center gap-2">
                 <div className={`${l.color} border rounded-lg px-4 py-3 text-center min-w-[90px]`}>

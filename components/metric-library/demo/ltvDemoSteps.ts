@@ -109,7 +109,7 @@ export const LTV_DEMO_STEPS: GenericDemoStep<LTVVariantKey>[] = [
       'Before the formula can run, the system needs to know the basics: Which loan is this? Who is the borrower? What collateral secures it? Which business unit owns the loan?\n\nThis information lives in "L1 Reference Tables" — the master address book for the bank:\n\n\u2022 facility_master — loan details: type, amount, maturity date\n\u2022 counterparty — borrower identity: legal name, credit rating, industry\n\u2022 collateral_asset_master — collateral identity: what type of asset, lien priority, regulatory eligibility\n\u2022 enterprise_business_taxonomy — organizational hierarchy: which desk, portfolio, and line of business owns this loan\n\nThese tables rarely change and serve as the backbone connecting everything together.',
     targetSelector: '[data-demo="step2"]',
     insight:
-      'The enterprise_business_taxonomy table is especially important for LTV — it defines the self-referencing hierarchy (desk \u2192 portfolio \u2192 LoB) that determines how LTV rolls up through the organization.',
+      'The enterprise_business_taxonomy table is especially important for LTV — it defines the self-referencing hierarchy (desk \u2192 portfolio \u2192 Business Segment) that determines how LTV rolls up through the organization.',
   },
 
   /* ── Step 6: L2 Snapshot Tables ────────────────────────────────────────── */
@@ -184,12 +184,12 @@ export const LTV_DEMO_STEPS: GenericDemoStep<LTVVariantKey>[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 3: Trading Desk',
     narration:
-      'A trading desk manages a collection of loans. Desk-level LTV uses the same weighted-by-committed-facility-amount formula, grouping all secured facilities assigned to that desk.\n\nThe desk assignment comes from enterprise_business_taxonomy — each facility\u2019s lob_segment_id in facility_master links to a leaf node (tree_level = 3) in the LoB hierarchy tree.\n\nLTV is primarily meaningful for desks that manage collateralized lending (CRE, asset-backed). For desks focused on unsecured corporate lending, the desk-level LTV may be NULL or cover only a small subset of their book.',
+      'A trading desk manages a collection of loans. Desk-level LTV uses the same weighted-by-committed-facility-amount formula, grouping all secured facilities assigned to that desk.\n\nThe desk assignment comes from enterprise_business_taxonomy — each facility\u2019s lob_segment_id in facility_master links to a leaf node (tree_level = 3) in the Business Segment hierarchy tree.\n\nLTV is primarily meaningful for desks that manage collateralized lending (CRE, asset-backed). For desks focused on unsecured corporate lending, the desk-level LTV may be NULL or cover only a small subset of their book.',
     targetSelector: '[data-demo="rollup-desk"]',
     onEnter: { expandLevel: 'desk' },
     formulaKey: 'rollup-desk',
     insight:
-      'The enterprise_business_taxonomy table\u2019s self-referencing hierarchy (managed_segment_id \u2192 parent_segment_id) is walked via three LEFT JOINs: desk (leaf) \u2192 portfolio (parent) \u2192 LoB (root).',
+      'The enterprise_business_taxonomy table\u2019s self-referencing hierarchy (managed_segment_id \u2192 parent_segment_id) is walked via three LEFT JOINs: desk (leaf) \u2192 portfolio (parent) \u2192 Business Segment (root).',
   },
 
   /* ── Step 12: Portfolio Level ───────────────────────────────────────────── */
@@ -214,7 +214,7 @@ export const LTV_DEMO_STEPS: GenericDemoStep<LTVVariantKey>[] = [
     phaseLabel: 'Dashboard Consumption',
     title: 'The Finish Line: Dashboard',
     narration:
-      'Everything we\u2019ve walked through — formula definition, data sources, calculation, unsecured handling, and rollup — comes together here on the dashboard.\n\nA user simply selects:\n\u2022 Which LTV variant they want (Standard or Stressed)\n\u2022 What level they want to see (individual loan, borrower, desk, portfolio, or LoB)\n\nThe platform handles all the joins, calculations, and aggregations behind the scenes. Every number traces back to the raw data through the complete lineage chain we just walked through.\n\nStandard and Stressed LTV sit side by side, letting risk managers instantly see how resilient their portfolios are to collateral value declines.',
+      'Everything we\u2019ve walked through — formula definition, data sources, calculation, unsecured handling, and rollup — comes together here on the dashboard.\n\nA user simply selects:\n\u2022 Which LTV variant they want (Standard or Stressed)\n\u2022 What level they want to see (individual loan, borrower, desk, portfolio, or Business Segment)\n\nThe platform handles all the joins, calculations, and aggregations behind the scenes. Every number traces back to the raw data through the complete lineage chain we just walked through.\n\nStandard and Stressed LTV sit side by side, letting risk managers instantly see how resilient their portfolios are to collateral value declines.',
     targetSelector: '[data-demo="step6"]',
     insight:
       'This is the power of end-to-end lineage: every LTV value on the dashboard can be traced backwards through the rollup hierarchy, through the calculation engine, through the snapshot tables, all the way back to the original collateral appraisals. Full auditability.',

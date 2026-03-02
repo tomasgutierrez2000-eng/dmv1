@@ -70,7 +70,7 @@ function parseSourceFields(value: unknown): SourceField[] | undefined {
  * GET — Return formulas per metric and dimension.
  * Reads metrics_dimensions_filled.xlsx (project root or data/) with sheet "Definitions, KPI,Calc& Insights":
  * - Col 0: Data Element (metric key)
- * - Cols 9,13,17,21,25: Level Logic for Facility, Counterparty, L3 Desk, L2 Portfolio, L1 Department/LoB
+ * - Cols 9,13,17,21,25: Level Logic for Facility, Counterparty, L3 Desk, L2 Portfolio, L1 Department/Business Segment
  * Metrics engine matches formulas by metric.id or metric.name to Data Element.
  */
 export async function GET() {

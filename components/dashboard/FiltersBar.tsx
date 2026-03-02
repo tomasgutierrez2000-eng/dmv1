@@ -106,7 +106,7 @@ export default function FiltersBar({ filters, setFilters, data }: FiltersBarProp
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Line of Business
+            Business Segment
           </label>
           <select
             value={filters.lobL1}

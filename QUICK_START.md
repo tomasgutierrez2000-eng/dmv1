@@ -115,7 +115,7 @@ Once running, the dashboard includes:
 
 2. **Filters** - Search and filter by:
    - Facility ID, Counterparty Name
-   - Status, Product, Line of Business
+   - Status, Product, Business Segment
    - Region, Risk Rating
    - Amendments, Syndication
 

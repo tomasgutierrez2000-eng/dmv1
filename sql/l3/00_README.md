@@ -38,5 +38,5 @@ l3.*  — 49 reporting/analytics tables (WRITE TARGET)
 @as_of_date          -- Reporting date (e.g., '2026-02-17')
 @prior_as_of_date    -- Prior period date (typically as_of_date - 1 month)
 @base_currency_code  -- Base currency (e.g., 'USD')
-@default_hierarchy_id-- Default LoB hierarchy ID
+@default_hierarchy_id-- Default Business Segment hierarchy ID
 ```

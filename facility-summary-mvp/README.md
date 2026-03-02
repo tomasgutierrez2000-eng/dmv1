@@ -23,7 +23,7 @@ Or navigate from the main Next.js app.
 ## Dashboard Features
 
 - **Summary Cards**: Key metrics including total facilities, committed amounts, outstanding exposure, utilization rates, and more
-- **Interactive Filters**: Filter by status, product, line of business, region, risk rating, amendments, and syndication
+- **Interactive Filters**: Filter by status, product, business segment, region, risk rating, amendments, and syndication
 - **Data Visualizations**: Bar charts showing exposure distribution by product, region, and risk rating
 - **Sortable Table**: Full facility details with sorting, pagination, and trend indicators
 - **Real-time Search**: Search by facility ID, counterparty name, or credit agreement ID

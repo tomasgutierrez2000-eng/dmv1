@@ -11,7 +11,7 @@ import type { L3Metric, LineageNode, LineageEdge, SourceField } from '@/data/l3-
  *   L2.position_detail → rate_index (benchmark rate), total_commitment (weight base)
  *   L1.facility_lender_allocation → bank_share_pct (GSIB syndication adjustment)
  *   L1.facility_master → facility_id (central hub), counterparty_id, lob_segment_id
- *   L1.enterprise_business_taxonomy → tree_level, managed_segment_id (LoB hierarchy)
+ *   L1.enterprise_business_taxonomy → tree_level, managed_segment_id (Business Segment hierarchy)
  */
 
 /** Build sourceFields for WABR: each mapped to one L2 atomic element (table.column). */
@@ -83,7 +83,7 @@ export function wabrLineage(): { nodes: LineageNode[]; edges: LineageEdge[] } {
     field: 'Weighted Average Base Rate (%)',
     sampleValue: '5.275%',
     formula: 'Σ(rate_index × adjusted_weight)',
-    description: 'WABR stored per aggregation level (facility, counterparty, desk, portfolio, LoB)',
+    description: 'WABR stored per aggregation level (facility, counterparty, desk, portfolio, Business Segment)',
   });
 
   // Edges

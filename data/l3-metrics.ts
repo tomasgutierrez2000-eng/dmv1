@@ -32,11 +32,11 @@ export type CalculationDimension = 'counterparty' | 'facility' | 'L1' | 'L2' | '
 
 export const CALCULATION_DIMENSIONS: CalculationDimension[] = ['counterparty', 'facility', 'L1', 'L2', 'L3'];
 
-/** Business-facing labels for aggregation levels (Facility, Counterparty, Desk, Portfolio, LOB). */
+/** Business-facing labels for aggregation levels (Facility, Counterparty, Desk, Portfolio, Business Segment). */
 export const CALCULATION_DIMENSION_LABELS: Record<CalculationDimension, string> = {
   counterparty: 'Counterparty',
   facility: 'Facility',
-  L1: 'LOB',
+  L1: 'Business Segment',
   L2: 'Portfolio',
   L3: 'Desk',
 };
@@ -184,9 +184,9 @@ export const TOGGLES: ToggleDef[] = [
   },
   {
     id: 'lob_vs_le',
-    name: 'LoB vs LE Toggle',
-    values: ['Line of Business', 'Legal Entity'],
-    defaultValue: 'Line of Business',
+    name: 'Business Segment vs LE Toggle',
+    values: ['Business Segment', 'Legal Entity'],
+    defaultValue: 'Business Segment',
     affectedMetrics: ['M059'],
     impactDescription: 'Switches dimension_type between LOB and LEGAL_ENTITY in data_quality_score_summary.',
     pages: ['P4'],
@@ -210,7 +210,7 @@ export const DIMENSION_LABELS: Record<string, string> = {
   as_of_date: 'As-of Date',
   counterparty_id: 'Counterparty',
   legal_entity_id: 'Legal Entity',
-  lob_segment_id: 'Line of Business',
+  lob_segment_id: 'Business Segment',
   product_node_id: 'Product',
   facility_id: 'Facility',
   scenario_id: 'Scenario',

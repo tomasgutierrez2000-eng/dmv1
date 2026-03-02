@@ -52,7 +52,7 @@ export const assembleRollups = (
     byDesk.set(key, list);
   });
 
-  // Group by L2 LoB (l1 + l2)
+  // Group by L2 Business Segment (l1 + l2)
   const byL2Lob = new Map<string, FacilitySummary[]>();
   facilitySummaries.forEach((facility) => {
     const key = `${facility.lob_l1_name}|${facility.lob_l2_name}`;
@@ -61,7 +61,7 @@ export const assembleRollups = (
     byL2Lob.set(key, list);
   });
 
-  // Group by L1 LoB
+  // Group by L1 Business Segment
   const byL1Lob = new Map<string, FacilitySummary[]>();
   facilitySummaries.forEach((facility) => {
     const list = byL1Lob.get(facility.lob_l1_name) ?? [];
@@ -69,7 +69,7 @@ export const assembleRollups = (
     byL1Lob.set(facility.lob_l1_name, list);
   });
 
-  // Limit definitions by L2 LoB
+  // Limit definitions by L2 Business Segment
   const limitByL2Lob = new Map<string, typeof l2Enrichment.limitDefinition[number]>();
   l2Enrichment.limitDefinition.forEach((limit) => {
     if (limit.limit_scope === "LOB_L2" && limit.lob_l2_name) {
@@ -86,7 +86,7 @@ export const assembleRollups = (
     }
   });
 
-  // Calculate DOI: counterparties appearing in 2+ L2 LoBs
+  // Calculate DOI: counterparties appearing in 2+ L2 Business Segments
   const counterpartyByL2Lob = new Map<string, Set<string>>();
   facilitySummaries.forEach((facility) => {
     const key = `${facility.lob_l1_name}|${facility.lob_l2_name}`;
@@ -381,7 +381,7 @@ export const assembleRollups = (
     }
   );
 
-  // L2 LoB summaries
+  // L2 Business Segment summaries
   const lobL2Summary: LobL2Summary[] = Array.from(byL2Lob.entries()).map(
     ([key, facilities]) => {
       const [l1, l2] = key.split("|");
@@ -467,7 +467,7 @@ export const assembleRollups = (
     }
   );
 
-  // L1 LoB summaries
+  // L1 Business Segment summaries
   const lobL1Summary: LobL1Summary[] = Array.from(byL1Lob.entries()).map(
     ([l1, facilities]) => {
       const agg = aggregateFacilities(facilities, true);

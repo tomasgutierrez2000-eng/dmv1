@@ -130,7 +130,7 @@ const ROLLUP_LEVELS = [
     key: 'desk',
     label: 'Desk (L3)',
     icon: Briefcase,
-    desc: 'Commitment-weighted average across all positions in the L3 LoB segment',
+    desc: 'Commitment-weighted average across all positions in the L3 Business Segment',
     method: 'Weighted Average',
     purpose: 'Desk book pricing monitoring',
     tier: 'T3',
@@ -139,16 +139,16 @@ const ROLLUP_LEVELS = [
     key: 'portfolio',
     label: 'Portfolio (L2)',
     icon: FolderTree,
-    desc: 'Commitment-weighted average across all positions in the L2 LoB segment',
+    desc: 'Commitment-weighted average across all positions in the L2 Business Segment',
     method: 'Weighted Average',
     purpose: 'Portfolio rate risk trending',
     tier: 'T3',
   },
   {
     key: 'lob',
-    label: 'Line of Business (L1)',
+    label: 'Business Segment (L1)',
     icon: PieChart,
-    desc: 'Commitment-weighted average across all positions in the L1 LoB segment',
+    desc: 'Commitment-weighted average across all positions in the L1 Business Segment',
     method: 'Weighted Average',
     purpose: 'Enterprise rate environment monitoring',
     tier: 'T3',
@@ -355,7 +355,7 @@ const L1_TABLES = [
     scd: 'SCD-2',
     desc: 'Master record for each credit facility',
     fields: ['facility_id (PK)', 'counterparty_id (FK)', 'lob_segment_id (FK)', 'committed_facility_amt', 'facility_type', 'maturity_date'],
-    wabrRole: 'Central hub — joins positions to counterparty identity and LoB hierarchy. The facility_id FK from position table anchors the entire join chain.',
+    wabrRole: 'Central hub — joins positions to counterparty identity and Business Segment hierarchy. The facility_id FK from position table anchors the entire join chain.',
     sampleRow: 'F-5001 | Sunrise Properties | CRE Desk | $100M | TERM_LOAN',
     fks: ['counterparty_id → counterparty', 'lob_segment_id → enterprise_business_taxonomy'],
     isCore: true,
@@ -383,9 +383,9 @@ const L1_TABLES = [
   {
     name: 'enterprise_business_taxonomy',
     scd: 'SCD-0',
-    desc: 'LoB hierarchy — self-referencing tree for desk → portfolio → LoB rollup',
+    desc: 'Business Segment hierarchy — self-referencing tree for desk → portfolio → Business Segment rollup',
     fields: ['managed_segment_id (PK)', 'parent_segment_id (FK-self)', 'tree_level', 'description'],
-    wabrRole: 'Rollup hierarchy — walks facility → desk (L3) → portfolio (L2) → LoB (L1) for aggregation. tree_level column determines the aggregation grain.',
+    wabrRole: 'Rollup hierarchy — walks facility → desk (L3) → portfolio (L2) → Business Segment (L1) for aggregation. tree_level column determines the aggregation grain.',
     sampleRow: 'SEG-100 | SEG-010 | L3 | CRE Origination Desk',
     fks: ['parent_segment_id → enterprise_business_taxonomy (self-referencing)'],
     isCore: true,
@@ -480,7 +480,7 @@ function L1Tables() {
 
 const L2_FIELDS = [
   { table: 'position', field: 'position_id', type: 'BIGINT (PK)', desc: 'Unique position identifier', role: 'Join key to position_detail' },
-  { table: 'position', field: 'facility_id', type: 'BIGINT (FK)', desc: 'Links position to facility', role: 'Join to facility_master → counterparty & LoB' },
+  { table: 'position', field: 'facility_id', type: 'BIGINT (FK)', desc: 'Links position to facility', role: 'Join to facility_master → counterparty & Business Segment' },
   { table: 'position', field: 'as_of_date', type: 'DATE', desc: 'Reporting snapshot date', role: 'Temporal filter for point-in-time reporting' },
   { table: 'position_detail', field: 'rate_index', type: 'NUMERIC(10,4)', desc: 'Benchmark interest rate (SOFR, Prime, etc.)', role: 'Numerator component — the rate being weighted' },
   { table: 'position_detail', field: 'total_commitment', type: 'NUMERIC(18,2)', desc: 'Full facility commitment for this position', role: 'Weight base — adjusted by bank_share_pct for GSIB' },
@@ -490,7 +490,7 @@ const L2_FIELDS = [
 /** Column-level metadata for X-Ray mode */
 const COLUMN_META: Record<string, { type: string; desc: string; filter?: string; fk?: string }> = {
   'position.position_id': { type: 'BIGINT', desc: 'Unique position identifier — PK for the position table', fk: 'position_detail.position_id' },
-  'position.facility_id': { type: 'BIGINT', desc: 'Links to facility master for borrower identity and LoB hierarchy', fk: 'facility_master.facility_id' },
+  'position.facility_id': { type: 'BIGINT', desc: 'Links to facility master for borrower identity and Business Segment hierarchy', fk: 'facility_master.facility_id' },
   'position_detail.rate_index': { type: 'NUMERIC(10,4)', desc: 'Reference benchmark rate (e.g., SOFR 5.25%). This is the INDEX rate, not the contractual rate.' },
   'position_detail.total_commitment': { type: 'NUMERIC(18,2)', desc: 'Total commitment amount for this position detail row. Must be adjusted by bank_share_pct for syndicated facilities.' },
   'position_detail.interest_rate': { type: 'NUMERIC(8,6)', desc: 'Contractual interest rate — NOT used in WABR. Common mistake: confusing interest_rate with rate_index.' },
@@ -677,7 +677,7 @@ const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
   },
   desk: {
     hops: [
-      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'lob_segment_id WHERE tree_level=L3', note: 'L3 LoB → Facilities' },
+      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'lob_segment_id WHERE tree_level=L3', note: 'L3 Business Segment → Facilities' },
       { from: 'position', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Position → Facility' },
       { from: 'position', fromLayer: 'L2', to: 'position_detail', toLayer: 'L2', joinKey: 'position_id', note: 'Position → rate_index, total_commitment' },
       { from: 'facility_master', fromLayer: 'L1', to: 'facility_lender_allocation', toLayer: 'L1', joinKey: 'facility_id', note: 'Facility → bank_share_pct' },
@@ -687,7 +687,7 @@ const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
   },
   portfolio: {
     hops: [
-      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'lob_segment_id WHERE tree_level=L2', note: 'L2 LoB → Facilities' },
+      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'lob_segment_id WHERE tree_level=L2', note: 'L2 Business Segment → Facilities' },
       { from: 'position', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Position → Facility' },
       { from: 'position', fromLayer: 'L2', to: 'position_detail', toLayer: 'L2', joinKey: 'position_id', note: 'Position → rate_index, total_commitment' },
       { from: 'facility_master', fromLayer: 'L1', to: 'facility_lender_allocation', toLayer: 'L1', joinKey: 'facility_id', note: 'Facility → bank_share_pct' },
@@ -697,13 +697,13 @@ const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
   },
   lob: {
     hops: [
-      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'lob_segment_id WHERE tree_level=L1', note: 'L1 LoB → Facilities' },
+      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'lob_segment_id WHERE tree_level=L1', note: 'L1 Business Segment → Facilities' },
       { from: 'position', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Position → Facility' },
       { from: 'position', fromLayer: 'L2', to: 'position_detail', toLayer: 'L2', joinKey: 'position_id', note: 'Position → rate_index, total_commitment' },
       { from: 'facility_master', fromLayer: 'L1', to: 'facility_lender_allocation', toLayer: 'L1', joinKey: 'facility_id', note: 'Facility → bank_share_pct' },
     ],
     aggregation: 'Denominator widens: Σ(adjusted_commitment) across ALL positions for ALL facilities in this L1 segment',
-    result: 'One weighted average base rate per Line of Business — enterprise rate environment indicator',
+    result: 'One weighted average base rate per Business Segment — enterprise rate environment indicator',
   },
 };
 
@@ -822,7 +822,7 @@ function DeskDetail() {
   return (
     <div className="space-y-3">
       <div className="text-xs text-gray-400 leading-relaxed">
-        At the desk level, the L3 LoB segment determines which facilities are included.
+        At the desk level, the L3 Business Segment determines which facilities are included.
         The <code className="text-blue-300">enterprise_business_taxonomy</code> lookup with <code className="text-emerald-300">tree_level=&quot;L3&quot;</code> scopes
         the universe of facilities, then all positions across those facilities contribute to a single weighted average.
       </div>
@@ -875,9 +875,9 @@ function LoBDetail() {
           WABR = {'Σ'}(rate_index {'×'} adjusted_weight) across all positions in L1 segment
         </div>
         <PlainEnglish>
-          At the Line of Business level, WABR shows the blended benchmark rate environment
-          for the entire LoB. This is a monitoring metric — it tells you how interest rate
-          movements are flowing through your book. A rising WABR across LoBs signals
+          At the Business Segment level, WABR shows the blended benchmark rate environment
+          for the entire Business Segment. This is a monitoring metric — it tells you how interest rate
+          movements are flowing through your book. A rising WABR across Business Segments signals
           rate transmission is working; a flat WABR despite Fed hikes signals repricing lag.
         </PlainEnglish>
       </div>
@@ -989,7 +989,7 @@ const JOIN_MAP_EDGES: JoinMapEdge[] = [
   { from: 'facility_master', to: 'position', joinKey: 'facility_id', label: 'Facility → Positions' },
   { from: 'position', to: 'position_detail', joinKey: 'position_id', label: 'Position → Detail' },
   { from: 'counterparty', to: 'facility_master', joinKey: 'counterparty_id', label: 'Borrower → Loans' },
-  { from: 'ebt', to: 'facility_master', joinKey: 'lob_segment_id', label: 'LoB hierarchy' },
+  { from: 'ebt', to: 'facility_master', joinKey: 'lob_segment_id', label: 'Business Segment hierarchy' },
   { from: 'fla', to: 'facility_master', joinKey: 'facility_id', label: 'Bank share' },
   { from: 'position_detail', to: 'wabr_calc', joinKey: 'rate_index, total_commitment', label: 'Rate + Commitment' },
   { from: 'fla', to: 'wabr_calc', joinKey: 'bank_share_pct', label: 'Syndication share' },
@@ -1421,7 +1421,7 @@ function DenominatorScopeComparison() {
           { level: 'Counterparty', scope: 'All positions across ALL facilities for that counterparty', sum: '1.0 across counterparty', correct: true },
           { level: 'L3 Desk', scope: 'All positions across ALL facilities in that L3 segment', sum: '1.0 across L3 segment', correct: true },
           { level: 'L2 Portfolio', scope: 'All positions across ALL facilities in that L2 segment', sum: '1.0 across L2 segment', correct: true },
-          { level: 'L1 LoB', scope: 'All positions across ALL facilities in that L1 segment', sum: '1.0 across L1 segment', correct: true },
+          { level: 'L1 Business Segment', scope: 'All positions across ALL facilities in that L1 segment', sum: '1.0 across L1 segment', correct: true },
         ].map((row) => (
           <div key={row.level} className="grid grid-cols-3 text-[10px] px-3 py-2 border-t border-gray-800/30">
             <span className="text-gray-300 font-medium">{row.level}</span>
@@ -1737,7 +1737,7 @@ export default function WABRLineageView() {
               step="Step 2 — L1 Reference Data"
               layerColor="bg-blue-600"
               title="Dimensional Anchors"
-              subtitle="Reference tables that identify facility identity, bank ownership share, and LoB hierarchy"
+              subtitle="Reference tables that identify facility identity, bank ownership share, and Business Segment hierarchy"
             />
             <L1Tables />
             <InsightCallout>
@@ -1865,13 +1865,13 @@ export default function WABRLineageView() {
             <div className="mb-2">
               <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
                 <Link2 className="w-3 h-3" aria-hidden="true" />
-                Rollup Hierarchy — Facility {'\u2192'} Counterparty {'\u2192'} Desk {'\u2192'} Portfolio {'\u2192'} LoB — click to expand
+                Rollup Hierarchy — Facility {'\u2192'} Counterparty {'\u2192'} Desk {'\u2192'} Portfolio {'\u2192'} Business Segment — click to expand
               </div>
             </div>
             <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
             <InsightCallout>
               <strong>The formula never changes — only the scope widens.</strong> At every level above facility, the denominator
-              expands to include all positions in the broader aggregation scope. The join path changes (adding LoB hierarchy lookups),
+              expands to include all positions in the broader aggregation scope. The join path changes (adding Business Segment hierarchy lookups),
               but the math remains: <code className="text-teal-300">{'Σ'}(rate_index {'×'} adjusted_weight)</code>.
               The key insight: WABR is <strong>recomputed from raw position data</strong> at each level, not rolled up from the level below.
             </InsightCallout>

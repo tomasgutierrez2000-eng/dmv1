@@ -156,7 +156,7 @@ export default function OverviewContent() {
             <p className="text-slate-300 mb-4 leading-relaxed text-sm">
               <strong className="text-white">&quot;Here&apos;s what we derived for business decisions&quot;</strong> — Calculated
               metrics, roll-ups, and enriched views assembled from L1 and L2. These are the final outputs used
-              by dashboards and reports: facility summaries, desk roll-ups, LoB aggregations.
+              by dashboards and reports: facility summaries, desk roll-ups, Business Segment aggregations.
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-slate-400">

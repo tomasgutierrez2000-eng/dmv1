@@ -100,7 +100,7 @@ const TABLES: Record<string, TableDef> = {
   },
   wagg: {
     id: 'wagg',
-    name: 'Aggregate Ratio',
+    name: 'Weighted Average',
     layer: 'CALC',
     shortName: 'Aggregate',
     fields: [],
@@ -111,7 +111,7 @@ const TABLES: Record<string, TableDef> = {
  * DATA: Traversal steps per dimension
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-type StepKind = 'source' | 'join' | 'aggregate' | 'input_calc';
+type StepKind = 'source' | 'join' | 'aggregate' | 'result';
 
 interface TraversalStep {
   kind: StepKind;
@@ -122,7 +122,6 @@ interface TraversalStep {
   fieldsToShow: string[];
   narration: string;
   sampleResult?: string;
-  formula?: string;
 }
 
 interface DimensionDemo {
@@ -145,9 +144,9 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'committed_amount', 'as_of_date'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'as_of_date'],
         narration:
-          'We start at the exposure snapshot table. Think of this as a daily photo of every loan the bank has. For facility 12345, the "committed amount" tells us the bank has committed $150 million to this borrower.',
+          'We start at the exposure snapshot table. Think of this as a daily photo of every loan the bank has. For facility 12345, the "drawn amount" tells us the borrower has taken out $120 million.',
       },
       {
         kind: 'join',
@@ -170,15 +169,14 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'We also look up the loan\'s master record in facility_master. This gives us the loan\'s identity: it\'s a "CRE Multifamily" loan (Commercial Real Estate). This table also holds the foreign keys we\'ll need for higher-level rollups.',
       },
       {
-        kind: 'input_calc',
+        kind: 'result',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
-          'Now we have everything we need. The LTV formula divides the committed facility amount by the collateral value: $150M / $50M = 300%. This means the loan is significantly "underwater" -- the commitment far exceeds the collateral backing it.',
-        formula: 'LTV = committed_amount / SUM(collateral_value) × 100',
-        sampleResult: '$150M / $50M = 300%',
+          'Now we have everything we need. The LTV formula divides the drawn amount by the collateral value: $120M / $50M = 240%. This means the loan is significantly "underwater" -- the borrower owes more than the collateral is worth.',
+        sampleResult: '$120M / $50M = 240%',
       },
     ],
   },
@@ -186,15 +184,15 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    description: 'Aggregate LTV across a borrower\'s loans',
+    description: 'Weighted average across a borrower\'s loans',
     tables: ['fes', 'cs', 'fm', 'cp', 'calc', 'wagg'],
     steps: [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'committed_amount', 'as_of_date'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'We start the same way -- at the exposure snapshot. But this time we pull data for ALL facilities belonging to one borrower. Each facility\'s committed_amount is used in its individual LTV calculation.',
+          'We start the same way -- at the exposure snapshot. But this time we pull data for ALL facilities belonging to one borrower. We also grab committed_amount (committed facility amount), which will be our weighting factor later.',
       },
       {
         kind: 'join',
@@ -204,17 +202,16 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         joinKey: 'facility_id + as_of_date',
         fieldsToShow: ['facility_id', 'current_valuation_usd'],
         narration:
-          'For each facility, we look up its collateral value. Some facilities may be unsecured (no collateral at all). Those get LTV = NULL and are excluded from the average.',
+          'For each facility, we look up its collateral value. Some facilities may be unsecured (no collateral at all). Those get LTV = NULL and are excluded from the weighted average.',
       },
       {
-        kind: 'input_calc',
+        kind: 'result',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
-          'First, we calculate individual LTV for each facility (committed_amount / collateral_value). This is the same facility-level calculation we just saw. Each secured facility now has its own LTV percentage.',
-        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
+          'First, we calculate individual LTV for each facility (drawn_amount / collateral_value). This is the same facility-level calculation we just saw. Each secured facility now has its own LTV percentage.',
         sampleResult: 'Per facility: 240%, 60.7%, NULL',
       },
       {
@@ -244,9 +241,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Finally, we compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. This pools all exposure and collateral across the borrower\'s facilities, so larger loans naturally weigh more. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
-        formula: 'Counterparty LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
-        sampleResult: 'Aggregate LTV = 185%',
+          'Finally, we compute a weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount). Facilities with larger commitments count more. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
+        sampleResult: 'Weighted Avg LTV = 185%',
       },
     ],
   },
@@ -254,15 +250,15 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'desk',
     label: 'Desk',
     icon: Briefcase,
-    description: 'Aggregate LTV for a trading desk',
+    description: 'Weighted average for a trading desk',
     tables: ['fes', 'cs', 'fm', 'ebt', 'calc', 'wagg'],
     steps: [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'committed_amount', 'as_of_date'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'Same starting point -- exposure snapshot gives us committed facility amounts for every facility. The desk-level view will group per-facility LTVs by which trading desk manages them.',
+          'Same starting point -- exposure snapshot gives us drawn amounts and committed facility amount for every facility. We use committed_amount as the weighting factor. The desk-level view will group these by which trading desk manages them.',
       },
       {
         kind: 'join',
@@ -275,14 +271,13 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Look up collateral values for each facility. Same join as before -- facility_id + as_of_date links the exposure to its collateral.',
       },
       {
-        kind: 'input_calc',
+        kind: 'result',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
           'Calculate per-facility LTV first. Every rollup level above facility depends on having these individual ratios computed.',
-        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility LTVs computed',
       },
       {
@@ -312,9 +307,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group all secured facilities by desk name, then compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. Larger facilities dominate the result. Result: one LTV number for the entire CRE Lending Desk.',
-        formula: 'Desk LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
-        sampleResult: 'Desk LTV = 172%',
+          'Group all secured facilities by desk name, then compute weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount). Result: one LTV number for the entire CRE Lending Desk.',
+        sampleResult: 'Desk WAvg LTV = 172%',
       },
     ],
   },
@@ -322,15 +316,15 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'portfolio',
     label: 'Portfolio',
     icon: FolderTree,
-    description: 'Aggregate LTV for a portfolio (group of desks)',
+    description: 'Weighted average for a portfolio (group of desks)',
     tables: ['fes', 'cs', 'fm', 'ebt', 'calc', 'wagg'],
     steps: [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'committed_amount', 'as_of_date'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'Starting from exposure data again. For portfolio-level LTV, we need to aggregate per-facility LTVs across all desks that roll up to the same portfolio.',
+          'Starting from exposure data again. We use committed facility amount as the weight. For portfolio-level LTV, we need to aggregate across all desks that roll up to the same portfolio.',
       },
       {
         kind: 'join',
@@ -343,14 +337,13 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Collateral lookup -- same as every other level. Each facility\'s collateral is summed to get one value.',
       },
       {
-        kind: 'input_calc',
+        kind: 'result',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
           'Compute per-facility LTV ratios first. This is always the prerequisite step.',
-        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility LTVs computed',
       },
       {
@@ -390,25 +383,24 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. Larger facilities weigh more. Result: one LTV for the entire Commercial Real Estate portfolio.',
-        formula: 'Portfolio LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
-        sampleResult: 'Portfolio LTV = 168%',
+          'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then weighted average by committed facility amount. Result: one LTV for the entire Commercial Real Estate portfolio.',
+        sampleResult: 'Portfolio WAvg LTV = 168%',
       },
     ],
   },
   {
     key: 'lob',
-    label: 'Line of Business',
+    label: 'Business Segment',
     icon: PieChart,
-    description: 'Aggregate LTV at the department level',
+    description: 'Weighted average at the department level',
     tables: ['fes', 'cs', 'fm', 'ebt', 'calc', 'wagg'],
     steps: [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'committed_amount', 'as_of_date'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'For the highest rollup -- Line of Business (department) -- we start from the same exposure data. The aggregation will span an entire division of the bank.',
+          'For the highest rollup -- Business Segment (department) -- we start from the same exposure data and use committed facility amount as the weight. The aggregation will span an entire division of the bank.',
       },
       {
         kind: 'join',
@@ -421,14 +413,13 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Collateral values are looked up per facility, as always.',
       },
       {
-        kind: 'input_calc',
+        kind: 'result',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
           'Compute per-facility LTV ratios -- the foundation for all aggregation.',
-        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility LTVs computed',
       },
       {
@@ -459,7 +450,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         joinKey: 'recursive parent_segment_id until parent IS NULL',
         fieldsToShow: ['managed_segment_id', 'parent_segment_id', 'lob_l1_name'],
         narration:
-          'RECURSIVE self-join: we follow parent_segment_id repeatedly. Desk (301) -> Portfolio (30) -> Department (3, where parent IS NULL). The root node is the Line of Business: "Lending Division." This is like climbing a family tree to find the great-grandparent.',
+          'RECURSIVE self-join: we follow parent_segment_id repeatedly. Desk (301) -> Portfolio (30) -> Department (3, where parent IS NULL). The root node is the Business Segment: "Lending Division." This is like climbing a family tree to find the great-grandparent.',
       },
       {
         kind: 'aggregate',
@@ -468,9 +459,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group ALL facilities in the bank whose taxonomy path traces to the same root department. The aggregate ratio — SUM(committed_amount) / SUM(collateral_value) — gives a single board-level LTV for the entire Lending Division.',
-        formula: 'LoB LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
-        sampleResult: 'LoB LTV = 155%',
+          'Group ALL facilities in the bank whose taxonomy path traces to the same root department. Weighted average by committed facility amount gives a single board-level LTV for the entire Lending Division.',
+        sampleResult: 'Business Segment WAvg LTV = 155%',
       },
     ],
   },
@@ -480,16 +470,16 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
  * LAYOUT: compute card positions for the visual diagram
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const CARD_W = 200;
+const CARD_W = 176;
 const CARD_GAP = 24;
 const CARD_H_BASE = 52;
 const FIELD_H = 20;
 const ROW_HEIGHT = 172;
-const SVG_PAD = 24;
+const SVG_PAD = 16;
 /** Max characters for field name (left side of row; truncate so value fits on right) */
-const NAME_MAX_CHARS = 18;
+const NAME_MAX_CHARS = 12;
 /** Max characters for field value (right side of row; truncate to fit in card) */
-const VALUE_MAX_CHARS = 14;
+const VALUE_MAX_CHARS = 12;
 
 const PLAYBACK_BASE_MS = 5000;
 const SPEED_OPTIONS = [
@@ -522,14 +512,7 @@ const KIND_COLORS: Record<StepKind, string> = {
   source: '#f59e0b',
   join: '#3b82f6',
   aggregate: '#a855f7',
-  input_calc: '#10b981',
-};
-
-const KIND_LABELS: Record<StepKind, string> = {
-  source: 'SOURCE',
-  join: 'JOIN',
-  aggregate: 'AGGREGATE',
-  input_calc: 'INPUT CALC',
+  result: '#10b981',
 };
 
 function TableCard({
@@ -638,14 +621,14 @@ function TableCard({
           return (
             <g key={field.name}>
               {isHighlighted && (
-                <rect x={x + 3} y={fy - 2} width={w - 6} height={FIELD_H - 2} rx={4} fill="rgba(245,158,11,0.1)" />
+                <rect x={x + 4} y={fy - 2} width={w - 8} height={FIELD_H - 2} rx={4} fill="rgba(245,158,11,0.1)" />
               )}
-              <text x={x + 8} y={fy + 13} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
+              <text x={x + 12} y={fy + 13} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
                 <title>{field.name}</title>
                 {nameDisplay}
               </text>
               {isHighlighted && (
-                <text x={x + w - 8} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
+                <text x={x + w - 12} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
                   <title>{field.sampleValue}</title>
                   {valueDisplay}
                 </text>
@@ -659,7 +642,7 @@ function TableCard({
 }
 
 const ARROW_DRAW_LENGTH = 500;
-const LABEL_Y_IN_GAP = 164;
+const LABEL_Y_IN_GAP = 160;
 
 function AnimatedArrow({
   fromPos,
@@ -711,9 +694,9 @@ function AnimatedArrow({
     if (sameRow) {
       const goingRight = toPos.x > fromPos.x;
       x1 = goingRight ? fromPos.x + fromW : fromPos.x;
-      y1 = fromPos.y + CARD_H_BASE - 6;
+      y1 = fromPos.y + fromH / 2;
       x2 = goingRight ? toPos.x : toPos.x + fromW;
-      y2 = toPos.y + CARD_H_BASE - 6;
+      y2 = toPos.y + toH / 2;
     } else {
       x1 = fromPos.x + fromW / 2;
       y1 = toPos.y < fromPos.y ? fromPos.y : fromPos.y + fromH;
@@ -803,14 +786,13 @@ export default function TableTraversalDemo() {
   const positions = getCardPositions(demo.tables);
 
   const totalSteps = demo.steps.length;
-  const clampedStep = activeStep >= totalSteps ? totalSteps - 1 : activeStep;
-  const step = clampedStep >= 0 ? demo.steps[clampedStep] : null;
+  const step = activeStep >= 0 ? demo.steps[activeStep] : null;
   const stepDelayMs = Math.round(PLAYBACK_BASE_MS / playbackSpeed);
 
   const visitedTables = new Set<string>();
   const visitedArrows = new Set<string>();
-  if (clampedStep >= 0) {
-    for (let i = 0; i <= clampedStep; i++) {
+  if (activeStep >= 0) {
+    for (let i = 0; i <= activeStep; i++) {
       visitedTables.add(demo.steps[i].highlightTable);
       if (demo.steps[i].arrowFrom && demo.steps[i].arrowTo) {
         visitedArrows.add(`${demo.steps[i].arrowFrom}->${demo.steps[i].arrowTo}`);
@@ -853,8 +835,7 @@ export default function TableTraversalDemo() {
   const reset = () => { pause(); setActiveStep(-1); };
 
   const svgW = demo.tables.length * (CARD_W + CARD_GAP) + SVG_PAD * 2;
-  const maxBottom = Math.max(...Object.values(positions).map((p) => p.y + p.h));
-  const svgH = maxBottom + SVG_PAD + 8;
+  const svgH = ROW_HEIGHT + 120;
 
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
@@ -917,11 +898,11 @@ export default function TableTraversalDemo() {
         <div className="h-0.5 bg-gray-800 rounded-full mb-3">
           <div
             className="h-full bg-gradient-to-r from-amber-500 via-blue-500 to-purple-500 transition-all duration-700 ease-out rounded-full"
-            style={{ width: clampedStep >= 0 ? `${((clampedStep + 1) / totalSteps) * 100}%` : '0%' }}
+            style={{ width: activeStep >= 0 ? `${((activeStep + 1) / totalSteps) * 100}%` : '0%' }}
           />
         </div>
 
-        {clampedStep === -1 ? (
+        {activeStep === -1 ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-gray-400">
               Press <strong className="text-white">Play</strong> to watch how the <strong className="text-purple-300">{demo.label}</strong> dimension
@@ -952,11 +933,11 @@ export default function TableTraversalDemo() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-            <div key={`narration-${selectedDim}-${clampedStep}`} className="flex-1 min-w-[280px] max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div key={`narration-${selectedDim}-${activeStep}`} className="flex-1 min-w-0 max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
-                  Step {clampedStep + 1} of {totalSteps}
+                  Step {activeStep + 1} of {totalSteps}
                 </span>
                 <span
                   className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
@@ -966,19 +947,14 @@ export default function TableTraversalDemo() {
                     backgroundColor: KIND_COLORS[step!.kind] + '15',
                   }}
                 >
-                  {KIND_LABELS[step!.kind]}
+                  {step!.kind.toUpperCase()}
                 </span>
                 {step!.joinKey && (
-                  <code className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 max-w-[200px] truncate inline-block align-middle" title={`ON ${step!.joinKey}`}>
+                  <code className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
                     ON {step!.joinKey}
                   </code>
                 )}
               </div>
-              {step!.formula && (
-                <div className="my-2 px-3 py-2 rounded-lg bg-black/40 border border-gray-700 font-mono text-sm text-emerald-400 text-center">
-                  {step!.formula}
-                </div>
-              )}
               <p className="text-[13px] text-gray-300 leading-relaxed">{step!.narration}</p>
               {step!.sampleResult && (
                 <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
@@ -992,7 +968,7 @@ export default function TableTraversalDemo() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={prev}
-                  disabled={clampedStep <= 0}
+                  disabled={activeStep <= 0}
                   className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Previous step"
                 >
@@ -1017,7 +993,7 @@ export default function TableTraversalDemo() {
                 )}
                 <button
                   onClick={next}
-                  disabled={clampedStep >= totalSteps - 1}
+                  disabled={activeStep >= totalSteps - 1}
                   className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Next step"
                 >
@@ -1061,7 +1037,7 @@ export default function TableTraversalDemo() {
             {joinSteps.map((s, i) => {
               const fromName = s.arrowFrom && TABLES[s.arrowFrom] ? TABLES[s.arrowFrom].shortName : s.arrowFrom ?? '?';
               const toName = s.arrowTo && TABLES[s.arrowTo] ? TABLES[s.arrowTo].shortName : s.arrowTo ?? '?';
-              const isCurrent = step && demo.steps[clampedStep] === s;
+              const isCurrent = step && demo.steps[activeStep] === s;
               return (
                 <div
                   key={i}
@@ -1098,9 +1074,9 @@ export default function TableTraversalDemo() {
             </marker>
           </defs>
 
-          {/* Row labels — positioned above cards */}
-          <text x={8} y={SVG_PAD - 6} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
-          <text x={8} y={ROW_HEIGHT - 6} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L1 Reference</text>
+          {/* Row labels */}
+          <text x={8} y={SVG_PAD + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
+          <text x={8} y={ROW_HEIGHT + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L1 Reference</text>
 
           {/* Arrows */}
           {demo.steps.map((s, i) => {
@@ -1109,8 +1085,8 @@ export default function TableTraversalDemo() {
             const to = positions[s.arrowTo];
             if (!from || !to) return null;
             const arrowKey = `${s.arrowFrom}->${s.arrowTo}`;
-            const isArrowActive = i === clampedStep;
-            const isArrowVisited = visitedArrows.has(arrowKey) && i < clampedStep;
+            const isArrowActive = i === activeStep;
+            const isArrowVisited = visitedArrows.has(arrowKey) && i < activeStep;
             return (
               <AnimatedArrow
                 key={`arrow-${selectedDim}-${i}`}

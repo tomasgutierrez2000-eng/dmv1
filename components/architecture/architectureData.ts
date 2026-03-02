@@ -542,11 +542,11 @@ const outputs: ArchStage = {
       accentColor: '#2dd4bf',
       detail: {
         description:
-          'Computed metric values at every rollup level: facility, counterparty, desk, portfolio, and line of business. Weighted averages using committed facility amount.',
+          'Computed metric values at every rollup level: facility, counterparty, desk, portfolio, and business segment. Weighted averages using committed facility amount.',
         items: [
           { name: 'Facility-level metrics' },
           { name: 'Counterparty rollup' },
-          { name: 'Desk / Portfolio / LoB rollup' },
+          { name: 'Desk / Portfolio / Business Segment rollup' },
           { name: 'Distribution buckets' },
         ],
         stats: [

@@ -9,9 +9,9 @@
     "rollup_logic": {
       "facility": "For each DISTINCT(facility_id) THEN COALESCE(stressed_pd_pct, counterparty_rating_observation.pd_pct) WHERE rating_source_id = 'INTERNAL'. Basel floor: MAX(pd, 0.0003)",
       "counterparty": "For each [counterparty_id] THEN SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
-      "desk": "For each [L3 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
-      "portfolio": "For each [L2 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
-      "lob": "For each [L1 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments"
+      "desk": "For each [L3 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+      "lob": "For each [L1 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments"
     },
     "weighting_basis": "BY_EAD",
     "source_table": "counterparty",
@@ -45,9 +45,9 @@
     "rollup_logic": {
       "facility": "For each DISTINCT(facility_id) THEN [drawn_amount] + [ccf] * ([committed_facility_amt] - [drawn_amount])",
       "counterparty": "For each [counterparty_id] THEN SUM(facility.ead) WHERE IS([counterparty_id])",
-      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])",
-      "portfolio": "For each [L2 LoB], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal",
-      "lob": "For each [L1 LoB], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal"
+      "desk": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 Business Segment], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal",
+      "lob": "For each [L1 Business Segment], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal"
     },
     "source_table": "position",
     "source_field": "ead_amt"
@@ -336,8 +336,8 @@
     "rollup_logic": {
       "facility": "For each DISTINCT(facility_id) THEN [noi] / [debt_service] from facility_financial_snapshot",
       "counterparty": "For each [counterparty_id] THEN SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
-      "desk": "For each [L3 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
-      "portfolio": "For each [L2 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments"
+      "desk": "For each [L3 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments"
     },
     "weighting_basis": "BY_EAD"
   },
@@ -351,9 +351,9 @@
     "rollup_logic": {
       "facility": "For each DISTINCT(facility_id) THEN [committed_facility_amt] / [collateral_value] x 100",
       "counterparty": "For each [counterparty_id] THEN lookup [facility_id] WHERE IS([counterparty_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
-      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
-      "portfolio": "For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
-      "lob": "For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100"
+      "desk": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+      "portfolio": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+      "lob": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100"
     },
     "weighting_basis": "BY_EAD"
   },
@@ -750,7 +750,7 @@
       "counterparty": "Counterparty Exposure / Total Portfolio Exposure * 100",
       "desk": "Counterparty Exposure / Desk Total Exposure * 100",
       "portfolio": "Counterparty Exposure / Portfolio Total Exposure * 100",
-      "lob": "Counterparty Exposure / LoB Total Exposure * 100"
+      "lob": "Counterparty Exposure / Business Segment Total Exposure * 100"
     }
   },
   {

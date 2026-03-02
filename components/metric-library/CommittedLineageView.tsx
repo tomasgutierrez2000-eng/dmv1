@@ -277,12 +277,12 @@ function CounterpartyPathCard() {
  * ──────────────────────────────────────────────────────────────────────────── */
 
 const L1_TABLES = [
-  { table: 'facility_master', role: 'Facility identity, currency_code, facility_status, is_current_flag, lob_segment_id (→ LoB desk)' },
+  { table: 'facility_master', role: 'Facility identity, currency_code, facility_status, is_current_flag, lob_segment_id (→ Business Segment desk)' },
   { table: 'fx_rate', role: 'FX conversion to USD (from_currency_code, to_currency_code = USD, rate_type = SPOT, as_of_date)' },
   { table: 'facility_lender_allocation', role: 'Bank share of the deal (bank_share_pct); is_current_flag' },
   { table: 'counterparty_role_dim', role: 'Risk-bearing filter (is_risk_bearing_flag = Y for BORROWER, GUARANTOR, etc.)' },
   { table: 'counterparty_hierarchy', role: 'Ultimate parent obligor (ultimate_parent_id) for counterparty rollup' },
-  { table: 'enterprise_business_taxonomy', role: 'LoB hierarchy (parent_segment_id, tree_level 0/1/2/3) for L3/L2/L1/L0 rollup' },
+  { table: 'enterprise_business_taxonomy', role: 'Business Segment hierarchy (parent_segment_id, tree_level 0/1/2/3) for L3/L2/L1/L0 rollup' },
 ];
 
 function L1ReferenceSection() {
@@ -343,7 +343,7 @@ const ROLLUP_LEVELS = [
   { key: 'counterparty', label: 'Counterparty', icon: Users, desc: 'SUM(attributed_exposure_usd) by ultimate_parent_id', method: 'Counterparty path' },
   { key: 'L3', label: 'Desk (L3)', icon: Briefcase, desc: 'facility_master.lob_segment_id = managed_segment_id (tree_level=3); SUM over distinct facility_ids in that L3', method: 'SUM across DISTINCT facility_ids' },
   { key: 'L2', label: 'Portfolio (L2)', icon: FolderTree, desc: 'L2 → L3 children via parent_segment_id; facilities in those L3s; same SUM', method: 'One level hierarchy traversal' },
-  { key: 'L1', label: 'Line of Business (L1)', icon: PieChart, desc: 'L1 → L2 → L3 traversal; SUM over distinct facility_ids in all descendants', method: 'Two levels traversal' },
+  { key: 'L1', label: 'Business Segment (L1)', icon: PieChart, desc: 'L1 → L2 → L3 traversal; SUM over distinct facility_ids in all descendants', method: 'Two levels traversal' },
   { key: 'L0', label: 'Enterprise (L0)', icon: Building2, desc: 'managed_segment_id = 249 (tree_level=0); full hierarchy; sum of all L1s', method: 'Recursive CTE, 3 levels' },
 ];
 
@@ -404,8 +404,8 @@ const QUICK_REF_ROWS = [
   { component: 'Counterparty split %', table: 'l2.exposure_counterparty_attribution', column: 'attribution_pct' },
   { component: 'Risk-bearing filter', table: 'l1.counterparty_role_dim', column: 'is_risk_bearing_flag' },
   { component: 'Ultimate parent obligor', table: 'l1.counterparty_hierarchy', column: 'ultimate_parent_id' },
-  { component: 'Facility → LoB desk mapping', table: 'l1.facility_master', column: 'lob_segment_id' },
-  { component: 'LoB hierarchy traversal', table: 'l1.enterprise_business_taxonomy', column: 'parent_segment_id' },
+  { component: 'Facility → Business Segment desk mapping', table: 'l1.facility_master', column: 'lob_segment_id' },
+  { component: 'Business Segment hierarchy traversal', table: 'l1.enterprise_business_taxonomy', column: 'parent_segment_id' },
   { component: 'Hierarchy level', table: 'l1.enterprise_business_taxonomy', column: 'tree_level (0/1/2/3)' },
   { component: 'Snapshot date filter', table: 'l2.position', column: 'as_of_date' },
   { component: 'Active facility filter', table: 'l1.facility_master', column: 'facility_status = ACTIVE' },
@@ -446,7 +446,7 @@ function DashboardConsumptionSection() {
       </div>
       <ul className="text-xs text-gray-400 space-y-2">
         <li>
-          <code className="font-mono text-amber-300">metric_value_fact</code> — Generic metric storage; committed at every aggregation level (facility, counterparty, desk, portfolio, LoB, enterprise).
+          <code className="font-mono text-amber-300">metric_value_fact</code> — Generic metric storage; committed at every aggregation level (facility, counterparty, desk, portfolio, Business Segment, enterprise).
         </li>
         <li>
           <code className="font-mono text-amber-300">facility_detail_snapshot</code> — Facility-level analytics; committed_amt for drawer pop-ups and facility drill-downs.
@@ -532,7 +532,7 @@ export default function CommittedLineageView() {
             step="Step 3 — L1 Reference Data"
             layerColor="bg-blue-600"
             title="Reference Tables"
-            subtitle="Facility, FX, bank share, counterparty hierarchy, LoB taxonomy"
+            subtitle="Facility, FX, bank share, counterparty hierarchy, Business Segment taxonomy"
           />
           <L1ReferenceSection />
         </section>

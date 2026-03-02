@@ -4,7 +4,7 @@
  * ARCHITECTURE:
  * - One CATALOGUE ITEM = one business concept (metric or raw data element).
  * - Each item has per-level definitions showing how it rolls up across the hierarchy.
- * - Rollup hierarchy: Facility → Counterparty → Desk → Portfolio → LoB.
+ * - Rollup hierarchy: Facility → Counterparty → Desk → Portfolio → Business Segment.
  * - Flat structure: easy to map to DB rows or Python dicts.
  */
 
@@ -18,7 +18,7 @@ export const ROLLUP_LEVEL_LABELS: Record<RollupLevelKey, string> = {
   counterparty: 'Counterparty',
   desk: 'Desk (L3)',
   portfolio: 'Portfolio (L2)',
-  lob: 'Department / LoB (L1)',
+  lob: 'Department / Business Segment (L1)',
 };
 
 export type MetricClass = 'SOURCED' | 'CALCULATED' | 'HYBRID';

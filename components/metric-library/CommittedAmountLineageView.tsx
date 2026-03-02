@@ -303,7 +303,7 @@ export default function CommittedAmountLineageView() {
             step="Step 5 — Rollup Hierarchy"
             layerColor="bg-emerald-600"
             title="6-Level Aggregation"
-            subtitle="Committed amounts sum from facility through counterparty, desk, portfolio, LoB to enterprise — click any level to expand"
+            subtitle="Committed amounts sum from facility through counterparty, desk, portfolio, Business Segment to enterprise — click any level to expand"
           />
           <RollupPyramid
             expandedLevel={expandedLevel}
@@ -331,7 +331,7 @@ export default function CommittedAmountLineageView() {
           <LineageAuditTrail />
           <InsightCallout>
             <strong>This is what examiners need.</strong> When a regulator points to &ldquo;Enterprise Committed = $1.26B&rdquo; on
-            your dashboard and asks &ldquo;prove it,&rdquo; this audit trail provides the complete chain of custody: which LoB segments
+            your dashboard and asks &ldquo;prove it,&rdquo; this audit trail provides the complete chain of custody: which Business Segments
             contributed, how counterparty attribution splits a syndicated facility across co-borrowers, which L2 tables were queried,
             what WHERE filters were applied, and the exact formula execution with intermediate values at every step.
             Notice F-3 Pacific Ridge appears under <strong className="text-teal-300">two counterparties</strong> — CP-3 (60%) and

@@ -5248,7 +5248,7 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "LoB-level collateral portfolio reporting.",
+          "description": "Business Segment-level collateral portfolio reporting.",
           "category": "Portfolio",
           "pk_fk": {
             "is_pk": false,
@@ -6583,7 +6583,7 @@
           "name": "lob_segment_id",
           "description": "FK to enterprise_business_taxonomy",
           "category": "General Ledger",
-          "why_required": "LoB-level recon",
+          "why_required": "Business Segment-level recon",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -9656,12 +9656,12 @@
     {
       "name": "facility_lob_attribution",
       "layer": "L2",
-      "category": "LoB Attribution",
+      "category": "Business Segment Attribution",
       "fields": [
         {
           "name": "attribution_id",
           "description": "PK — unique attribution record",
-          "category": "LoB Attribution",
+          "category": "Business Segment Attribution",
           "why_required": "Primary key",
           "simplification_note": "L2 review new table",
           "pk_fk": {
@@ -9672,7 +9672,7 @@
         {
           "name": "facility_id",
           "description": "FK to facility_master",
-          "category": "LoB Attribution",
+          "category": "Business Segment Attribution",
           "why_required": "Facility link",
           "simplification_note": "L2 review new table",
           "pk_fk": {
@@ -9688,8 +9688,8 @@
         {
           "name": "lob_segment_id",
           "description": "FK to enterprise_business_taxonomy",
-          "category": "LoB Attribution",
-          "why_required": "LoB target",
+          "category": "Business Segment Attribution",
+          "why_required": "Business Segment target",
           "simplification_note": "L2 review new table",
           "pk_fk": {
             "is_pk": false,
@@ -9704,28 +9704,28 @@
         {
           "name": "attribution_pct",
           "description": "% of facility exposure to this LoB (must sum to 100%)",
-          "category": "LoB Attribution",
+          "category": "Business Segment Attribution",
           "why_required": "Split attribution",
           "simplification_note": "L2 review new table"
         },
         {
           "name": "attribution_amount_usd",
           "description": "Dollar amount attributed (USD)",
-          "category": "LoB Attribution",
+          "category": "Business Segment Attribution",
           "why_required": "Direct summation",
           "simplification_note": "L2 review new table"
         },
         {
           "name": "attribution_type",
           "description": "PRIMARY or SECONDARY",
-          "category": "LoB Attribution",
+          "category": "Business Segment Attribution",
           "why_required": "Default reporting flag",
           "simplification_note": "L2 review new table"
         },
         {
           "name": "as_of_date",
           "description": "Snapshot date",
-          "category": "LoB Attribution",
+          "category": "Business Segment Attribution",
           "why_required": "Point-in-time",
           "simplification_note": "L2 review new table",
           "pk_fk": {
@@ -11466,7 +11466,7 @@
           "name": "lob_segment_id",
           "description": "FK to enterprise_business_taxonomy — LoB node for pipeline deal (replaces inline lob_l1/l2)",
           "category": "Deal Pipeline",
-          "why_required": "LoB grouping",
+          "why_required": "Business Segment grouping",
           "simplification_note": "CHANGED: lob_l1_name → lob_segment_id FK",
           "pk_fk": {
             "is_pk": false,
@@ -17043,12 +17043,12 @@
     {
       "name": "lob_exposure_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17063,13 +17063,13 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17084,7 +17084,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17099,7 +17099,7 @@
         {
           "name": "scenario_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17114,7 +17114,7 @@
         {
           "name": "legal_entity_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17129,7 +17129,7 @@
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -17144,139 +17144,139 @@
         {
           "name": "facility_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "counterparty_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "gross_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "net_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "drawn_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "undrawn_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "ead_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "expected_loss_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "rwa_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "avg_pd_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "avg_lgd_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "limit_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "utilization_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "breach_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "npl_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "npl_ratio_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "prior_period_gross_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "exposure_change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "result_status_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)"
         },
         {
           "name": "scenario_scope_desc",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TEXT"
         },
         {
           "name": "coverage_ratio_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "total_crm_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         }
       ]
@@ -17284,12 +17284,12 @@
     {
       "name": "lob_profitability_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17304,7 +17304,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -17319,7 +17319,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17334,7 +17334,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17349,7 +17349,7 @@
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -17364,7 +17364,7 @@
         {
           "name": "period_start_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -17379,7 +17379,7 @@
         {
           "name": "period_end_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -17394,97 +17394,97 @@
         {
           "name": "periodicity_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)"
         },
         {
           "name": "total_revenue_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "net_income_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "net_interest_income_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "avg_earning_assets_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "avg_total_assets_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "allocated_equity_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "nim_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "roa_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "roe_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "prior_period_total_revenue_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "revenue_change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "prior_period_net_income_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "net_income_change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -17492,12 +17492,12 @@
     {
       "name": "lob_pricing_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17512,7 +17512,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -17527,7 +17527,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17542,7 +17542,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17557,7 +17557,7 @@
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -17572,73 +17572,73 @@
         {
           "name": "avg_spread_bps",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "avg_base_rate_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "avg_all_in_rate_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "internal_spread_threshold_bps",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "spread_vs_threshold_bps",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "below_threshold_facility_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "documented_exception_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "prior_period_avg_spread_bps",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "avg_spread_change_bps",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "weighted_avg_fee_rate_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -17646,12 +17646,12 @@
     {
       "name": "lob_delinquency_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17666,7 +17666,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -17681,7 +17681,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17696,7 +17696,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17711,7 +17711,7 @@
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -17726,91 +17726,91 @@
         {
           "name": "total_overdue_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "delinquent_facility_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "delinquent_counterparty_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "total_outstanding_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "delinquency_rate_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "prior_period_total_overdue_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "overdue_change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "prior_period_delinquency_rate_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "delinquency_rate_change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "delinquent_loan_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "overdue_amt_0_30",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "overdue_amt_31_60",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "overdue_amt_61_90_plus",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -17818,12 +17818,12 @@
     {
       "name": "lob_profitability_allocation_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17838,7 +17838,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -17853,7 +17853,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17868,7 +17868,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17883,13 +17883,13 @@
         {
           "name": "allocation_dim_type",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "allocation_dim_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17904,61 +17904,61 @@
         {
           "name": "allocation_dim_name",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(500)"
         },
         {
           "name": "allocation_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "total_revenue_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "net_income_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "roe_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "roa_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "nim_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -17966,12 +17966,12 @@
     {
       "name": "deal_pipeline_stage_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -17986,7 +17986,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -18001,7 +18001,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18016,7 +18016,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18031,7 +18031,7 @@
         {
           "name": "pipeline_stage_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -18046,43 +18046,43 @@
         {
           "name": "deal_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "expected_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "expected_collateral_value_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "avg_expected_spread_bps",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "avg_expected_coverage_ratio",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -18090,12 +18090,12 @@
     {
       "name": "lob_credit_quality_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18110,7 +18110,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -18125,7 +18125,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18140,7 +18140,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18155,91 +18155,91 @@
         {
           "name": "avg_internal_risk_rating",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "prior_period_avg_internal_risk_rating",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "avg_internal_risk_rating_change",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "dscr_value",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "dcsr_value",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "rwa_density_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "rating_downgrade_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         },
         {
           "name": "external_downgrade_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "internal_downgrade_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "criticized_portfolio_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "criticized_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "deteriorated_deal_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "doi_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         }
       ]
@@ -18247,12 +18247,12 @@
     {
       "name": "kpi_period_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "kpi_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -18267,7 +18267,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -18282,7 +18282,7 @@
         {
           "name": "prior_as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -18297,7 +18297,7 @@
         {
           "name": "scenario_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18312,7 +18312,7 @@
         {
           "name": "legal_entity_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18327,37 +18327,37 @@
         {
           "name": "current_value",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "prior_value",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "change_value",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "unit_of_measure",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -18372,7 +18372,7 @@
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -18387,7 +18387,7 @@
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -20475,12 +20475,12 @@
     {
       "name": "lob_risk_ratio_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20495,7 +20495,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -20510,7 +20510,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20525,7 +20525,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20540,43 +20540,43 @@
         {
           "name": "fccr_value",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "lcr_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "capital_adequacy_ratio_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "tangible_net_worth_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "cash_interest_expense_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "exception_rate_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -20591,7 +20591,7 @@
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -20599,12 +20599,12 @@
     {
       "name": "lob_deterioration_summary",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20619,7 +20619,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -20634,7 +20634,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20649,7 +20649,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20664,73 +20664,73 @@
         {
           "name": "deteriorated_deal_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "deteriorated_deal_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "deteriorated_deal_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "criticized_portfolio_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "criticized_exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "doi_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "internal_downgrade_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "external_downgrade_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "total_rating_change_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "prior_period_deteriorated_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "deterioration_change_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "base_currency_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
@@ -20745,7 +20745,7 @@
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -20753,12 +20753,12 @@
     {
       "name": "lob_rating_distribution",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20773,7 +20773,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -20788,7 +20788,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20803,7 +20803,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20818,37 +20818,37 @@
         {
           "name": "rating_bucket_code",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(30)"
         },
         {
           "name": "rating_bucket_name",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(500)"
         },
         {
           "name": "counterparty_count",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "bucket_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -20856,12 +20856,12 @@
     {
       "name": "lob_top_contributors",
       "layer": "L3",
-      "category": "LoB Summary",
+      "category": "Business Segment Summary",
       "fields": [
         {
           "name": "run_version_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20876,7 +20876,7 @@
         {
           "name": "as_of_date",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": false,
@@ -20891,7 +20891,7 @@
         {
           "name": "hierarchy_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20906,7 +20906,7 @@
         {
           "name": "lob_node_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20921,19 +20921,19 @@
         {
           "name": "rank_order",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "INTEGER"
         },
         {
           "name": "contributor_type",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(255)"
         },
         {
           "name": "counterparty_id",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(64)",
           "pk_fk": {
             "is_pk": false,
@@ -20948,31 +20948,31 @@
         {
           "name": "counterparty_name",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "VARCHAR(500)"
         },
         {
           "name": "exposure_amt",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "utilization_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "contribution_pct",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "category": "LoB Summary",
+          "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
         }
       ]

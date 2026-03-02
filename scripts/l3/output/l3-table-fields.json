@@ -2417,7 +2417,7 @@
     ]
   },
   "lob_exposure_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -2578,7 +2578,7 @@
     ]
   },
   "lob_profitability_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -2717,7 +2717,7 @@
     ]
   },
   "lob_pricing_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -2820,7 +2820,7 @@
     ]
   },
   "lob_delinquency_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -2935,7 +2935,7 @@
     ]
   },
   "lob_profitability_allocation_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -3034,7 +3034,7 @@
     ]
   },
   "deal_pipeline_stage_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -3117,7 +3117,7 @@
     ]
   },
   "lob_credit_quality_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -3218,7 +3218,7 @@
     ]
   },
   "kpi_period_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "kpi_code",
@@ -4689,7 +4689,7 @@
     ]
   },
   "lob_risk_ratio_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -4772,7 +4772,7 @@
     ]
   },
   "lob_deterioration_summary": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -4871,7 +4871,7 @@
     ]
   },
   "lob_rating_distribution": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",
@@ -4940,7 +4940,7 @@
     ]
   },
   "lob_top_contributors": {
-    "category": "LoB Summary",
+    "category": "Business Segment Summary",
     "fields": [
       {
         "name": "run_version_id",

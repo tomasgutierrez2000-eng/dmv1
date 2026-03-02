@@ -47,7 +47,7 @@ const instructions: unknown[][] = [
   ['  display_format      – Excel/dashboard format string (e.g., 0.00%, $#,##0.0M, 0.00x)'],
   [],
   ['PER-DIMENSION BLOCKS (5 dimensions x 4 columns each):'],
-  ['  Dimensions: Facility → Counterparty → Desk (L3) → Portfolio (L2) → LoB (L1)'],
+  ['  Dimensions: Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)'],
   ['  For each dimension, fill in these 4 columns:'],
   ['    {dim}_in_record      – Y or N  (is this metric available at this aggregation level?)'],
   ['    {dim}_sourcing_type  – Raw | Calc | Agg | Avg'],
@@ -145,7 +145,7 @@ const metricsHeaders = [
   'portfolio_sourcing_type',
   'portfolio_level_logic',
   'portfolio_display_name',
-  // LoB (L1) dimension
+  // Business Segment (L1) dimension
   'lob_in_record',
   'lob_sourcing_type',
   'lob_level_logic',
@@ -180,17 +180,17 @@ const metricsExamples: unknown[][] = [
     // Desk
     'Y',
     'Calc',
-    'For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L3\' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
+    'For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L3\' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'Desk LTV (%)',
     // Portfolio
     'Y',
     'Calc',
-    'For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L2\' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
+    'For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L2\' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'Portfolio LTV (%)',
-    // LoB
+    // Business Segment
     'Y',
     'Calc',
-    'For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L1\' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
+    'For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L1\' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'LTV',
   ],
 
@@ -221,21 +221,21 @@ const metricsExamples: unknown[][] = [
     // Desk
     'Y',
     'Agg',
-    'For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L3\'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])',
+    'For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L3\'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])',
     'Desk EAD ($)',
     // Portfolio
     'Y',
     'Agg',
-    'For each [L2 LoB], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal',
+    'For each [L2 Business Segment], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal',
     'Portfolio EAD ($)',
-    // LoB
+    // Business Segment
     'Y',
     'Agg',
-    'For each [L1 LoB], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal',
-    'LoB Total EAD ($)',
+    'For each [L1 Business Segment], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal',
+    'Business Segment Total EAD ($)',
   ],
 
-  // ── DSCR (weighted avg rollup, N/A at LoB) ──
+  // ── DSCR (weighted avg rollup, N/A at Business Segment) ──
   [
     'DSCR',
     'Debt Service Coverage Ratio',
@@ -262,14 +262,14 @@ const metricsExamples: unknown[][] = [
     // Desk
     'Y',
     'Avg',
-    'For each [L3 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])',
+    'For each [L3 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])',
     'Desk Wtd DSCR',
     // Portfolio
     'Y',
     'Avg',
-    'For each [L2 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments',
+    'For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments',
     'Portfolio Wtd DSCR',
-    // LoB
+    // Business Segment
     'N',
     '',
     '',
@@ -303,18 +303,18 @@ const metricsExamples: unknown[][] = [
     // Desk
     'Y',
     'Avg',
-    'For each [L3 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])',
+    'For each [L3 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])',
     'Desk Wtd PD (%)',
     // Portfolio
     'Y',
     'Avg',
-    'For each [L2 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments',
+    'For each [L2 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments',
     'Portfolio Wtd PD (%)',
-    // LoB
+    // Business Segment
     'Y',
     'Avg',
-    'For each [L1 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments',
-    'LoB Wtd PD (%)',
+    'For each [L1 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments',
+    'Business Segment Wtd PD (%)',
   ],
 
   // ── Empty rows for user to fill ──
@@ -343,11 +343,11 @@ const ingredientExamples: unknown[][] = [
   ['LTV', 5, 'L1', 'facility_master', 'committed_facility_amt', 'DECIMAL(18,2)', 'Total authorized credit line — the committed limit', '50000000.00'],
   ['LTV', 6, 'L2', 'collateral_snapshot', 'valuation_amount', 'DECIMAL(18,2)', 'Raw collateral value (pre-haircut) as of the snapshot date', '75000000.00'],
   ['LTV', 7, 'L1', 'facility_master', 'counterparty_id', 'BIGINT', 'FK to counterparty — grouping key for counterparty-level rollup', '67890'],
-  ['LTV', 8, 'L1', 'facility_master', 'lob_segment_id', 'BIGINT', 'FK to enterprise_business_taxonomy — desk/portfolio/lob resolution', '303'],
+  ['LTV', 8, 'L1', 'facility_master', 'lob_segment_id', 'BIGINT', 'FK to enterprise_business_taxonomy — desk/portfolio/business segment resolution', '303'],
   ['LTV', 9, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'BIGINT', 'Hierarchy node ID — links facility to organizational segment', '303'],
   ['LTV', 10, 'L1', 'enterprise_business_taxonomy', 'parent_segment_id', 'BIGINT', 'Self-referential FK — traverses L3->L2->L1 hierarchy', '302'],
-  ['LTV', 11, 'L1', 'enterprise_business_taxonomy', 'tree_level', 'INT', 'Hierarchy depth (1=LoB, 2=Portfolio, 3=Desk)', '3'],
-  ['LTV', 12, 'L1', 'enterprise_business_taxonomy', 'segment_name', 'VARCHAR(200)', 'Human-readable name of the desk/portfolio/lob', 'CRE Lending Desk'],
+  ['LTV', 11, 'L1', 'enterprise_business_taxonomy', 'tree_level', 'INT', 'Hierarchy depth (1=Business Segment, 2=Portfolio, 3=Desk)', '3'],
+  ['LTV', 12, 'L1', 'enterprise_business_taxonomy', 'segment_name', 'VARCHAR(200)', 'Human-readable name of the desk/portfolio/business segment', 'CRE Lending Desk'],
 
   // EAD ingredient fields
   ['EAD', 1, 'L2', 'facility_exposure_snapshot', 'drawn_amount', 'DECIMAL(18,2)', 'Current drawn balance', '5000000.00'],
@@ -400,24 +400,24 @@ const dimSrcExamples: unknown[][] = [
   // LTV — desk level
   ['LTV', 'desk', 1, 'L1', 'facility_master', 'committed_facility_amt', 'Committed limit'],
   ['LTV', 'desk', 2, 'L2', 'collateral_snapshot', 'valuation_amount', 'Collateral value'],
-  ['LTV', 'desk', 3, 'L1', 'facility_master', 'lob_segment_id', 'FK to LoB taxonomy — desk resolution'],
-  ['LTV', 'desk', 4, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'LoB hierarchy node — L3 leaf segment'],
+  ['LTV', 'desk', 3, 'L1', 'facility_master', 'lob_segment_id', 'FK to Business Segment taxonomy — desk resolution'],
+  ['LTV', 'desk', 4, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'Business Segment hierarchy node — L3 leaf segment'],
   ['LTV', 'desk', 5, 'L1', 'enterprise_business_taxonomy', 'tree_level', 'Hierarchy depth — filter for L3'],
   ['LTV', 'desk', 6, 'L1', 'enterprise_business_taxonomy', 'segment_name', 'Desk name at L3 level'],
 
   // LTV — portfolio level
   ['LTV', 'portfolio', 1, 'L1', 'facility_master', 'committed_facility_amt', 'Committed limit'],
   ['LTV', 'portfolio', 2, 'L2', 'collateral_snapshot', 'valuation_amount', 'Collateral value'],
-  ['LTV', 'portfolio', 3, 'L1', 'facility_master', 'lob_segment_id', 'FK to LoB taxonomy'],
-  ['LTV', 'portfolio', 4, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'LoB hierarchy node — L2 parent segment'],
+  ['LTV', 'portfolio', 3, 'L1', 'facility_master', 'lob_segment_id', 'FK to Business Segment taxonomy'],
+  ['LTV', 'portfolio', 4, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'Business Segment hierarchy node — L2 parent segment'],
   ['LTV', 'portfolio', 5, 'L1', 'enterprise_business_taxonomy', 'parent_segment_id', 'Self-referential FK — traverse up from L3 to L2'],
   ['LTV', 'portfolio', 6, 'L1', 'enterprise_business_taxonomy', 'tree_level', 'Hierarchy depth — filter for L2'],
 
   // LTV — lob level
   ['LTV', 'lob', 1, 'L1', 'facility_master', 'committed_facility_amt', 'Committed limit'],
   ['LTV', 'lob', 2, 'L2', 'collateral_snapshot', 'valuation_amount', 'Collateral value'],
-  ['LTV', 'lob', 3, 'L1', 'facility_master', 'lob_segment_id', 'FK to LoB taxonomy'],
-  ['LTV', 'lob', 4, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'LoB hierarchy node — L1 root segment'],
+  ['LTV', 'lob', 3, 'L1', 'facility_master', 'lob_segment_id', 'FK to Business Segment taxonomy'],
+  ['LTV', 'lob', 4, 'L1', 'enterprise_business_taxonomy', 'managed_segment_id', 'Business Segment hierarchy node — L1 root segment'],
   ['LTV', 'lob', 5, 'L1', 'enterprise_business_taxonomy', 'parent_segment_id', 'Self-referential FK — recursive traversal to collect all descendants'],
   ['LTV', 'lob', 6, 'L1', 'enterprise_business_taxonomy', 'tree_level', 'Hierarchy depth — filter for L1'],
 ];

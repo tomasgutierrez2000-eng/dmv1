@@ -21,7 +21,7 @@ const CONFIG = {
       icon: "📋",
       color: "#3B82F6",
       description:
-        "L1 reference table (34 fields). Core facility terms — type, committed amount, maturity, interest rate structure, amortization, LoB assignment (via lob_segment_id → enterprise_business_taxonomy), product classification (via product_node_id → enterprise_product_taxonomy), and the link to its credit agreement. Now carries rate terms and GL booking (ledger_account_id).",
+        "L1 reference table (34 fields). Core facility terms — type, committed amount, maturity, interest rate structure, amortization, Business Segment assignment (via lob_segment_id → enterprise_business_taxonomy), product classification (via product_node_id → enterprise_product_taxonomy), and the link to its credit agreement. Now carries rate terms and GL booking (ledger_account_id).",
       fields: [
         { name: "facility_id", value: "FAC-2024-00847" },
         { name: "facility_type", value: "REVOLVING_CREDIT" },
@@ -38,7 +38,7 @@ const CONFIG = {
         { name: "portfolio_id", value: "IG-CORP → portfolio_dim" },
       ],
       annotation:
-        "L1 reference — the foundational facility record. Now 34 fields including full rate structure (interest_rate_type, spread_bps, rate_cap/floor, payment_frequency), amortization_type, and ledger_account_id for GL booking. Links to credit_agreement_master, enterprise_business_taxonomy (LoB), enterprise_product_taxonomy (product), portfolio_dim, interest_rate_index_dim, and counterparty.",
+        "L1 reference — the foundational facility record. Now 34 fields including full rate structure (interest_rate_type, spread_bps, rate_cap/floor, payment_frequency), amortization_type, and ledger_account_id for GL booking. Links to credit_agreement_master, enterprise_business_taxonomy (Business Segment), enterprise_product_taxonomy (product), portfolio_dim, interest_rate_index_dim, and counterparty.",
     },
     {
       id: "counterparty",
@@ -163,7 +163,7 @@ const CONFIG = {
       icon: "🏷️",
       color: "#14B8A6",
       description:
-        "L2 snapshot (7 fields). NEW TABLE. Handles split-LoB exposure attribution — one row per (facility, lob_segment) with attribution_pct, attribution_amount_usd, and attribution_type (PRIMARY/SECONDARY). Replaces old pattern of LoB splits via counterparty participation.",
+        "L2 snapshot (7 fields). NEW TABLE. Handles split-Business Segment exposure attribution — one row per (facility, lob_segment) with attribution_pct, attribution_amount_usd, and attribution_type (PRIMARY/SECONDARY). Replaces old pattern of Business Segment splits via counterparty participation.",
       fields: [
         { name: "lob_segment_id", value: "SEG-TMT-003 → enterprise_business_taxonomy" },
         { name: "attribution_pct", value: "100%" },
@@ -171,7 +171,7 @@ const CONFIG = {
         { name: "attribution_type", value: "PRIMARY" },
       ],
       annotation:
-        "L2 snapshot — NEW dedicated LoB attribution table. For Meridian's facility, 100% to TMT. For split-exposure facilities like Silverline, two rows: TMT 60% ($91.7M) + Infrastructure 40% ($61.1M). attribution_pct must sum to 100%. Replaces reliance on facility_counterparty_participation for LoB splits.",
+        "L2 snapshot — NEW dedicated Business Segment attribution table. For Meridian's facility, 100% to TMT. For split-exposure facilities like Silverline, two rows: TMT 60% ($91.7M) + Infrastructure 40% ($61.1M). attribution_pct must sum to 100%. Replaces reliance on facility_counterparty_participation for Business Segment splits.",
     },
   ],
 
@@ -365,7 +365,7 @@ const CONFIG = {
         ],
       },
       {
-        title: "L1/L2 — Participation & LoB Attribution",
+        title: "L1/L2 — Participation & Business Segment Attribution",
         fields: [
           { name: "counterparty_role_code", value: "BORROWER", source: "facility_counterparty_participation", type: "direct" },
           { name: "participation_pct", value: "100%", source: "facility_counterparty_participation", type: "direct" },

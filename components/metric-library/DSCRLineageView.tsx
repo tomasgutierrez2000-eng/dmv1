@@ -192,7 +192,7 @@ const ROLLUP_LEVELS = [
   },
   {
     key: 'lob',
-    label: 'Line of Business',
+    label: 'Business Segment',
     icon: PieChart,
     desc: 'Weighted by committed facility amount — directional early warning only',
     method: 'Committed-Facility-Amount-Weighted Average',
@@ -216,19 +216,19 @@ const L2_FIELDS_FFS = [
 const L3_OUTPUT_TABLES = [
   {
     table: 'metric_value_fact',
-    desc: 'Generic metric storage — all DSCR variants at every aggregation level (facility, counterparty, desk, portfolio, LoB)',
+    desc: 'Generic metric storage — all DSCR variants at every aggregation level (facility, counterparty, desk, portfolio, Business Segment)',
     fields: ['metric_id = DSCR', 'variant_id', 'aggregation_level', 'facility_id | counterparty_id | lob_id', 'value', 'unit = x', 'display_format = 0.00x'],
     primary: true,
   },
   {
     table: 'lob_credit_quality_summary',
-    desc: 'LoB-level credit quality — includes dscr_value for LoB roll-ups',
+    desc: 'Business Segment-level credit quality — includes dscr_value for Business Segment roll-ups',
     fields: ['lob_node_id', 'dscr_value', 'avg_internal_risk_rating'],
     primary: false,
   },
   {
     table: 'lob_risk_ratio_summary',
-    desc: 'LoB-level risk ratios — DSCR alongside FCCR, LTV, capital adequacy',
+    desc: 'Business Segment-level risk ratios — DSCR alongside FCCR, LTV, capital adequacy',
     fields: ['lob_node_id', 'dscr_value', 'fccr_value', 'ltv_pct', 'capital_adequacy_ratio_pct'],
     primary: false,
   },
@@ -602,9 +602,9 @@ function L1Tables() {
     {
       name: 'facility_master',
       scd: 'SCD-2',
-      desc: 'Facility identity — links to LoB, product, counterparty, and credit agreement',
+      desc: 'Facility identity — links to Business Segment, product, counterparty, and credit agreement',
       fields: ['facility_id (PK)', 'facility_name', 'facility_type', 'counterparty_id (FK)', 'credit_agreement_id (FK)', 'lob_segment_id (FK)', 'product_node_id (FK)', 'portfolio_id (FK)', 'currency_code (FK)'],
-      dscrRole: 'Central hub — joins L2 financial data to borrower identity and LoB hierarchy',
+      dscrRole: 'Central hub — joins L2 financial data to borrower identity and Business Segment hierarchy',
       fks: [
         { col: 'counterparty_id', target: 'counterparty(counterparty_id)' },
         { col: 'lob_segment_id', target: 'enterprise_business_taxonomy(managed_segment_id)' },
@@ -642,9 +642,9 @@ function L1Tables() {
     {
       name: 'enterprise_business_taxonomy',
       scd: 'SCD-1',
-      desc: 'Line of Business hierarchy — self-referencing tree for LoB rollup',
+      desc: 'Business Segment hierarchy — self-referencing tree for Business Segment rollup',
       fields: ['managed_segment_id (PK)', 'segment_code', 'segment_name', 'parent_segment_id', 'tree_level'],
-      dscrRole: 'Rollup hierarchy — walks facility → desk → portfolio → LoB for aggregation',
+      dscrRole: 'Rollup hierarchy — walks facility → desk → portfolio → Business Segment for aggregation',
       sampleRow: { managed_segment_id: '100', segment_code: 'CRE_DESK', segment_name: 'CRE Lending Desk', parent_segment_id: '10', tree_level: '3' },
     },
     {
@@ -1042,7 +1042,7 @@ const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
     hops: [
       { from: 'facility_financial_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Financial data → loan' },
       { from: 'facility_master', fromLayer: 'L1', to: 'counterparty', toLayer: 'L1', joinKey: 'counterparty_id', note: 'Loan → borrower' },
-      { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id → managed_segment_id', note: 'Loan → desk (via LoB tree)' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id → managed_segment_id', note: 'Loan → desk (via Business Segment tree)' },
     ],
     aggregation: 'Segment by product type (CRE vs C&I), then pool within each segment',
     result: 'Separate pooled DSCR per product type per desk',
@@ -1057,11 +1057,11 @@ const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
   },
   lob: {
     hops: [
-      { from: 'portfolio (weighted DSCR)', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'parent_segment_id', note: 'Walk tree: portfolio → LoB root' },
-      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Re-weight by total LoB exposure' },
+      { from: 'portfolio (weighted DSCR)', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'parent_segment_id', note: 'Walk tree: portfolio → Business Segment root' },
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Re-weight by total Business Segment exposure' },
     ],
-    aggregation: 'Exposure-weighted average across all portfolios in LoB (directional only)',
-    result: 'One trend DSCR per Line of Business — monitoring, not a limit',
+    aggregation: 'Exposure-weighted average across all portfolios in Business Segment (directional only)',
+    result: 'One trend DSCR per Business Segment — monitoring, not a limit',
   },
 };
 
@@ -1418,7 +1418,7 @@ function LoBDetail() {
         </div>
         <PlainEnglish>
           This is a health thermometer, not a speed limit. It tells you which direction
-          the Line of Business is moving &mdash; toward or away from covenant thresholds.
+          the Business Segment is moving &mdash; toward or away from covenant thresholds.
         </PlainEnglish>
       </div>
 
@@ -1429,9 +1429,9 @@ function LoBDetail() {
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div>
-              <div className="text-xs font-bold text-amber-300 mb-1">Definitional Inconsistency Across LoBs</div>
+              <div className="text-xs font-bold text-amber-300 mb-1">Definitional Inconsistency Across Business Segments</div>
               <p className="text-xs text-gray-400 leading-relaxed mb-2">
-                When a CRO asks for enterprise-wide DSCR across all LoBs, the metric is <strong className="text-gray-300">not
+                When a CRO asks for enterprise-wide DSCR across all Business Segments, the metric is <strong className="text-gray-300">not
                 directly comparable</strong> across segments:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -1449,7 +1449,7 @@ function LoBDetail() {
                 </div>
               </div>
               <p className="text-[10px] text-gray-500 mt-2">
-                Most GSIBs report LoB-segmented DSCR values side by side, or add a disclaimer that LoB-level
+                Most GSIBs report Business Segment-segmented DSCR values side by side, or add a disclaimer that Business Segment-level
                 DSCRs are computed on non-comparable bases.
               </p>
             </div>
@@ -1463,12 +1463,12 @@ function LoBDetail() {
             <div>
               <div className="text-xs font-bold text-blue-300 mb-1">Monitoring Metric, Not a Limit Metric</div>
               <p className="text-xs text-gray-400 leading-relaxed">
-                LoB-level limits are set on <strong className="text-gray-300">exposure, concentration, and capital</strong> &mdash; not
+                Business Segment-level limits are set on <strong className="text-gray-300">exposure, concentration, and capital</strong> &mdash; not
                 DSCR. At this level, DSCR is used to identify trend deterioration, benchmark against prior periods,
                 and flag whether overall borrower quality is improving or declining.
               </p>
               <p className="text-[10px] text-gray-500 mt-1.5">
-                On the dashboard, LoB DSCR should appear in the <strong className="text-gray-400">Risk Profile</strong> group as a trend
+                On the dashboard, Business Segment DSCR should appear in the <strong className="text-gray-400">Risk Profile</strong> group as a trend
                 indicator, not in the Exposure Details group with a limit and breach status.
               </p>
             </div>
@@ -1784,11 +1784,11 @@ const JOIN_MAP_EDGES: JoinMapEdge[] = [
   { from: 'cash_flow', to: 'dscr_calc', joinKey: 'SUM(amount)', variant: 'both', label: 'Debt service' },
   { from: 'fes', to: 'rollup_calc', joinKey: 'drawn_amount', variant: 'both', label: 'Exposure weights' },
   // L1 → Transform (rollup hierarchy)
-  { from: 'ebt', to: 'rollup_calc', joinKey: 'parent_segment_id → tree_level', variant: 'both', label: 'LoB hierarchy' },
+  { from: 'ebt', to: 'rollup_calc', joinKey: 'parent_segment_id → tree_level', variant: 'both', label: 'Business Segment hierarchy' },
   // Transform → L3
   { from: 'dscr_calc', to: 'metric_value_fact', joinKey: 'DSCR value', variant: 'both' },
   { from: 'rollup_calc', to: 'metric_value_fact', joinKey: 'Aggregated values', variant: 'both' },
-  { from: 'rollup_calc', to: 'risk_appetite', joinKey: 'LoB-level DSCR', variant: 'both' },
+  { from: 'rollup_calc', to: 'risk_appetite', joinKey: 'Business Segment-level DSCR', variant: 'both' },
 ];
 
 const LAYER_COLORS: Record<string, { bg: string; border: string; text: string; badge: string }> = {
@@ -2458,7 +2458,7 @@ const FK_RELATIONSHIPS: {
     from: 'facility_master',
     to: 'enterprise_business_taxonomy',
     joinKey: 'lob_segment_id → managed_segment_id',
-    why: 'Places each loan into the organizational hierarchy (desk → portfolio → LoB). This is the join that enables the entire rollup chain from facility to Line of Business.',
+    why: 'Places each loan into the organizational hierarchy (desk → portfolio → Business Segment). This is the join that enables the entire rollup chain from facility to Business Segment.',
     cardinality: 'Many facilities → One segment node (tree)',
     pattern: 'Master (L1) joined to Hierarchy (L1, self-referencing)',
   },
@@ -2474,7 +2474,7 @@ const FK_RELATIONSHIPS: {
     from: 'facility_exposure_snapshot',
     to: 'facility_master',
     joinKey: 'facility_id',
-    why: 'Provides exposure amounts (drawn, committed) needed for committed-facility-amount-weighted rollups at portfolio and LoB levels. DSCR × committed_amount = the weight in the weighted average.',
+    why: 'Provides exposure amounts (drawn, committed) needed for committed-facility-amount-weighted rollups at portfolio and Business Segment levels. DSCR × committed_amount = the weight in the weighted average.',
     cardinality: 'Many snapshots → One facility',
     pattern: 'Snapshot (L2) joined to Master (L1)',
   },
@@ -3353,7 +3353,7 @@ function FooterLegend() {
               { level: 'Counterparty', method: 'Pooled ratio' },
               { level: 'Desk', method: 'Segmented pooled' },
               { level: 'Portfolio', method: 'Wtd avg + buckets' },
-              { level: 'LoB', method: 'Wtd avg (monitoring)' },
+              { level: 'Business Segment', method: 'Wtd avg (monitoring)' },
             ].map((r) => (
               <div key={r.level} className="flex justify-between text-[10px]">
                 <span className="text-gray-500">{r.level}</span>
@@ -3503,8 +3503,8 @@ export default function DSCRLineageView({
           <L1Tables />
           <InsightCallout>
             <strong>9 dimensional tables anchor every DSCR calculation.</strong> <code className="text-blue-300">facility_master</code> links
-            to LoB (<code className="text-blue-300">enterprise_business_taxonomy</code>), product (<code className="text-blue-300">enterprise_product_taxonomy</code>),
-            and counterparty via FK chains. These hierarchies enable the rollup from facility to LoB. Stress scenarios come from{' '}
+            to Business Segment (<code className="text-blue-300">enterprise_business_taxonomy</code>), product (<code className="text-blue-300">enterprise_product_taxonomy</code>),
+            and counterparty via FK chains. These hierarchies enable the rollup from facility to Business Segment. Stress scenarios come from{' '}
             <code className="text-blue-300">scenario_dim</code>; all amounts are normalized through <code className="text-blue-300">currency_dim</code>.
           </InsightCallout>
         </section>
@@ -3643,7 +3643,7 @@ export default function DSCRLineageView({
           <div className="mb-2">
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
               <Link2 className="w-3 h-3" aria-hidden="true" />
-              Rollup Hierarchy — Facility {'→'} Counterparty {'→'} Desk {'→'} Portfolio {'→'} LoB — click to expand
+              Rollup Hierarchy — Facility {'→'} Counterparty {'→'} Desk {'→'} Portfolio {'→'} Business Segment — click to expand
             </div>
           </div>
           <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />

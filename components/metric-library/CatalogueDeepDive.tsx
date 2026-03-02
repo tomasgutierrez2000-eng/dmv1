@@ -49,7 +49,7 @@ const TABS: TabDef[] = [
   { key: 'counterparty', label: 'Counterparty', icon: Users,      color: 'purple',  activeBg: 'bg-purple-500',  activeText: 'text-white' },
   { key: 'desk',         label: 'Desk',         icon: Briefcase,  color: 'amber',   activeBg: 'bg-amber-500',   activeText: 'text-white' },
   { key: 'portfolio',    label: 'Portfolio',     icon: FolderTree, color: 'emerald', activeBg: 'bg-emerald-500', activeText: 'text-white' },
-  { key: 'lob',          label: 'LoB',          icon: PieChart,   color: 'pink',    activeBg: 'bg-pink-500',    activeText: 'text-white' },
+  { key: 'lob',          label: 'Business Segment', icon: PieChart,   color: 'pink',    activeBg: 'bg-pink-500',    activeText: 'text-white' },
 ];
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -259,7 +259,7 @@ function buildPortfolioSteps(facilities: DemoFacility[], formula: string): FlowS
 }
 
 function buildLobSteps(facilities: DemoFacility[], formula: string): FlowStep[] {
-  const lobName = facilities[0]?.lob_name ?? 'LoB';
+  const lobName = facilities[0]?.lob_name ?? 'Business Segment';
   const totalC = facilities.reduce((s, f) => s + f.committed_amt, 0);
   const totalV = facilities.reduce((s, f) => s + f.collateral_value, 0);
   const ltv = totalV > 0 ? (totalC / totalV) * 100 : 0;
@@ -269,7 +269,7 @@ function buildLobSteps(facilities: DemoFacility[], formula: string): FlowStep[] 
 
   return [
     {
-      layer: 'Scope', table: 'enterprise_business_taxonomy', action: `Pick LoB "${lobName}"`,
+      layer: 'Scope', table: 'enterprise_business_taxonomy', action: `Pick Business Segment "${lobName}"`,
       value: `segment_name = '${lobName}' AND tree_level = 1`,
       detail: `Resolve organizational unit at L1 (department) level — defines facility scope`,
       color: 'blue',
@@ -301,7 +301,7 @@ function buildLobSteps(facilities: DemoFacility[], formula: string): FlowStep[] 
     {
       layer: 'Calc', table: formula, action: 'Apply formula (same at every level)',
       value: `${fmt(totalC)} / ${fmt(totalV)} × 100 = ${pct(ltv)}`,
-      detail: `Formula: ${formula} — scope: ${facilities.length} facilities (LoB ${lobName})`,
+      detail: `Formula: ${formula} — scope: ${facilities.length} facilities (Business Segment ${lobName})`,
       color: 'emerald',
     },
   ];
@@ -493,7 +493,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
           <div className="space-y-4">
             <LevelStepWalkthrough
               steps={buildLobSteps(facilities, formula)}
-              title="LoB-Level LTV (L1)"
+              title="Business Segment-Level LTV (L1)"
               subtitle={`${facilities[0]?.lob_name} — recursive hierarchy traversal`}
             />
             <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">

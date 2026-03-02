@@ -111,7 +111,7 @@ const TABLES: Record<string, TableDef> = {
  * DATA: Traversal steps per dimension
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-type StepKind = 'source' | 'join' | 'aggregate' | 'result';
+type StepKind = 'source' | 'join' | 'aggregate' | 'input_calc';
 
 interface TraversalStep {
   kind: StepKind;
@@ -169,7 +169,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'We also look up the loan\'s master record in facility_master. This gives us the loan\'s identity: it\'s a "CRE Multifamily" loan (Commercial Real Estate). This table also holds the foreign keys we\'ll need for higher-level rollups.',
       },
       {
-        kind: 'result',
+        kind: 'input_calc',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
@@ -205,7 +205,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'For each facility, we look up its collateral value. Some facilities may be unsecured (no collateral at all). Those get LTV = NULL and are excluded from the weighted average.',
       },
       {
-        kind: 'result',
+        kind: 'input_calc',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
@@ -271,7 +271,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Look up collateral values for each facility. Same join as before -- facility_id + as_of_date links the exposure to its collateral.',
       },
       {
-        kind: 'result',
+        kind: 'input_calc',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
@@ -337,7 +337,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Collateral lookup -- same as every other level. Each facility\'s collateral is summed to get one value.',
       },
       {
-        kind: 'result',
+        kind: 'input_calc',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
@@ -413,7 +413,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Collateral values are looked up per facility, as always.',
       },
       {
-        kind: 'result',
+        kind: 'input_calc',
         highlightTable: 'calc',
         arrowFrom: 'fes',
         arrowTo: 'calc',
@@ -470,16 +470,16 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
  * LAYOUT: compute card positions for the visual diagram
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const CARD_W = 176;
+const CARD_W = 200;
 const CARD_GAP = 24;
 const CARD_H_BASE = 52;
 const FIELD_H = 20;
 const ROW_HEIGHT = 172;
-const SVG_PAD = 16;
+const SVG_PAD = 24;
 /** Max characters for field name (left side of row; truncate so value fits on right) */
-const NAME_MAX_CHARS = 12;
+const NAME_MAX_CHARS = 18;
 /** Max characters for field value (right side of row; truncate to fit in card) */
-const VALUE_MAX_CHARS = 12;
+const VALUE_MAX_CHARS = 14;
 
 const PLAYBACK_BASE_MS = 5000;
 const SPEED_OPTIONS = [
@@ -512,7 +512,14 @@ const KIND_COLORS: Record<StepKind, string> = {
   source: '#f59e0b',
   join: '#3b82f6',
   aggregate: '#a855f7',
-  result: '#10b981',
+  input_calc: '#10b981',
+};
+
+const KIND_LABELS: Record<StepKind, string> = {
+  source: 'SOURCE',
+  join: 'JOIN',
+  aggregate: 'AGGREGATE',
+  input_calc: 'INPUT CALC',
 };
 
 function TableCard({
@@ -621,14 +628,14 @@ function TableCard({
           return (
             <g key={field.name}>
               {isHighlighted && (
-                <rect x={x + 4} y={fy - 2} width={w - 8} height={FIELD_H - 2} rx={4} fill="rgba(245,158,11,0.1)" />
+                <rect x={x + 3} y={fy - 2} width={w - 6} height={FIELD_H - 2} rx={4} fill="rgba(245,158,11,0.1)" />
               )}
-              <text x={x + 12} y={fy + 13} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
+              <text x={x + 8} y={fy + 13} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
                 <title>{field.name}</title>
                 {nameDisplay}
               </text>
               {isHighlighted && (
-                <text x={x + w - 12} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
+                <text x={x + w - 8} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
                   <title>{field.sampleValue}</title>
                   {valueDisplay}
                 </text>
@@ -642,7 +649,7 @@ function TableCard({
 }
 
 const ARROW_DRAW_LENGTH = 500;
-const LABEL_Y_IN_GAP = 160;
+const LABEL_Y_IN_GAP = 164;
 
 function AnimatedArrow({
   fromPos,
@@ -694,9 +701,9 @@ function AnimatedArrow({
     if (sameRow) {
       const goingRight = toPos.x > fromPos.x;
       x1 = goingRight ? fromPos.x + fromW : fromPos.x;
-      y1 = fromPos.y + fromH / 2;
+      y1 = fromPos.y + CARD_H_BASE - 6;
       x2 = goingRight ? toPos.x : toPos.x + fromW;
-      y2 = toPos.y + toH / 2;
+      y2 = toPos.y + CARD_H_BASE - 6;
     } else {
       x1 = fromPos.x + fromW / 2;
       y1 = toPos.y < fromPos.y ? fromPos.y : fromPos.y + fromH;
@@ -835,7 +842,8 @@ export default function TableTraversalDemo() {
   const reset = () => { pause(); setActiveStep(-1); };
 
   const svgW = demo.tables.length * (CARD_W + CARD_GAP) + SVG_PAD * 2;
-  const svgH = ROW_HEIGHT + 120;
+  const maxBottom = Math.max(...Object.values(positions).map((p) => p.y + p.h));
+  const svgH = maxBottom + SVG_PAD + 8;
 
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
@@ -933,8 +941,8 @@ export default function TableTraversalDemo() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div key={`narration-${selectedDim}-${activeStep}`} className="flex-1 min-w-0 max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
+          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <div key={`narration-${selectedDim}-${activeStep}`} className="flex-1 min-w-[280px] max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
                   Step {activeStep + 1} of {totalSteps}
@@ -947,10 +955,10 @@ export default function TableTraversalDemo() {
                     backgroundColor: KIND_COLORS[step!.kind] + '15',
                   }}
                 >
-                  {step!.kind.toUpperCase()}
+                  {KIND_LABELS[step!.kind]}
                 </span>
                 {step!.joinKey && (
-                  <code className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  <code className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 max-w-[200px] truncate inline-block align-middle" title={`ON ${step!.joinKey}`}>
                     ON {step!.joinKey}
                   </code>
                 )}
@@ -1074,9 +1082,9 @@ export default function TableTraversalDemo() {
             </marker>
           </defs>
 
-          {/* Row labels */}
-          <text x={8} y={SVG_PAD + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
-          <text x={8} y={ROW_HEIGHT + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L1 Reference</text>
+          {/* Row labels — positioned above cards */}
+          <text x={8} y={SVG_PAD - 6} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
+          <text x={8} y={ROW_HEIGHT - 6} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L1 Reference</text>
 
           {/* Arrows */}
           {demo.steps.map((s, i) => {

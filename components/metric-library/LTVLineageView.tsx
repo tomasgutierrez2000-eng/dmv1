@@ -635,7 +635,7 @@ function JoinChainVisual({ levelKey }: { levelKey: string }) {
       <div className="mt-1.5 flex items-start gap-2 text-[10px]">
         <Sparkles className="w-3 h-3 text-emerald-400 flex-shrink-0 mt-0.5" />
         <div>
-          <span className="text-gray-500 font-medium">Result: </span>
+          <span className="text-gray-500 font-medium">Output: </span>
           <span className="text-emerald-300">{chain.result}</span>
         </div>
       </div>

@@ -36,6 +36,8 @@ function N(): number { return FACILITY_COUNT * 5; }
 // ───────────── deterministic helpers ─────────────
 /** Facility id: cycles 1..FACILITY_COUNT */
 function fid(idx: number): number { return (idx % FACILITY_COUNT) + 1; }
+/** Index into 10-element lookup arrays, cycling 0..9 regardless of FACILITY_COUNT */
+function fidx10(idx: number): number { return (fid(idx) - 1) % 10; }
 function cid(idx: number): number {
   const facId = fid(idx);
   if (FACILITY_COUNT <= 10) return facId;
@@ -1634,14 +1636,14 @@ export function getL2SeedValue(
       const rateIndexes = ['SOFR', 'NONE', 'SOFR', 'NONE', 'PRIME', 'SOFR', 'SOFR', 'NONE', 'PRIME', 'NONE'];
       const lcrCategories = ['CREDIT_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY', 'CREDIT_FACILITY', 'CREDIT_FACILITY', 'LIQUIDITY_FACILITY'];
       if (columnName === 'loan_position_detail_id') return i;
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       if (columnName === 'as_of_date') return AS_OF;
-      if (columnName === 'loan_type') return loanTypes[fid(idx) - 1];
-      if (columnName === 'amortization_type') return amortTypes[fid(idx) - 1];
-      if (columnName === 'payment_frequency') return payFreqs[fid(idx) - 1];
-      if (columnName === 'interest_rate_type') return rateTypes[fid(idx) - 1];
+      if (columnName === 'loan_type') return loanTypes[fidx10(idx)];
+      if (columnName === 'amortization_type') return amortTypes[fidx10(idx)];
+      if (columnName === 'payment_frequency') return payFreqs[fidx10(idx)];
+      if (columnName === 'interest_rate_type') return rateTypes[fidx10(idx)];
       if (columnName === 'current_rate_pct') return allInRate(idx) / 100;
-      if (columnName === 'rate_index_code') return rateIndexes[fid(idx) - 1];
+      if (columnName === 'rate_index_code') return rateIndexes[fidx10(idx)];
       if (columnName === 'spread_bps') return spread(idx);
       if (columnName === 'original_balance_amt') return committed(idx);
       if (columnName === 'current_balance_amt') return drawn(idx);
@@ -1654,8 +1656,8 @@ export function getL2SeedValue(
       if (columnName === 'collateral_coverage_pct') return Math.round(100 + (fid(idx) * 7) % 60);
       if (columnName === 'covenant_compliance_flag') return dpd(idx) > 30 ? 'N' : 'Y';
       if (columnName === 'hqla_eligible_flag') return 'N';
-      if (columnName === 'lcr_outflow_category') return lcrCategories[fid(idx) - 1];
-      if (columnName === 'nsfr_factor_pct') return [85, 100, 50, 100, 50, 85, 50, 100, 85, 50][fid(idx) - 1];
+      if (columnName === 'lcr_outflow_category') return lcrCategories[fidx10(idx)];
+      if (columnName === 'nsfr_factor_pct') return [85, 100, 50, 100, 50, 85, 50, 100, 85, 50][fidx10(idx)];
       if (columnName === 'capital_risk_weight_pct') return riskWeight(idx);
       break;
     }
@@ -1672,11 +1674,11 @@ export function getL2SeedValue(
       const settlementTypes = ['CASH', 'PHYSICAL', 'CASH', 'CASH', 'CASH', 'PHYSICAL', 'CASH', 'CASH', 'CASH', 'PHYSICAL'];
       const mtm = (i2: number) => Math.round(drawn(i2) * (0.03 + (fid(i2) * 0.007) % 0.05) * (fid(i2) % 2 === 0 ? 1 : -1));
       if (columnName === 'derivative_position_detail_id') return i;
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       if (columnName === 'as_of_date') return AS_OF;
-      if (columnName === 'derivative_type') return derivTypes[fid(idx) - 1];
-      if (columnName === 'derivative_subtype') return derivSubtypes[fid(idx) - 1];
-      if (columnName === 'underlying_asset_class') return underlyingClasses[fid(idx) - 1];
+      if (columnName === 'derivative_type') return derivTypes[fidx10(idx)];
+      if (columnName === 'derivative_subtype') return derivSubtypes[fidx10(idx)];
+      if (columnName === 'underlying_asset_class') return underlyingClasses[fidx10(idx)];
       if (columnName === 'notional_amount') return committed(idx);
       if (columnName === 'mark_to_market_amt') return mtm(idx);
       if (columnName === 'replacement_cost_amt') return Math.abs(mtm(idx));
@@ -1688,14 +1690,14 @@ export function getL2SeedValue(
       if (columnName === 'collateral_received_amt') return Math.round(Math.abs(mtm(idx)) * 0.5);
       if (columnName === 'initial_margin_amt') return Math.round(committed(idx) * 0.03);
       if (columnName === 'variation_margin_amt') return Math.abs(mtm(idx));
-      if (columnName === 'settlement_type') return settlementTypes[fid(idx) - 1];
-      if (columnName === 'clearing_method') return clearingMethods[fid(idx) - 1];
-      if (columnName === 'is_centrally_cleared_flag') return clearingMethods[fid(idx) - 1] === 'CCP' ? 'Y' : 'N';
+      if (columnName === 'settlement_type') return settlementTypes[fidx10(idx)];
+      if (columnName === 'clearing_method') return clearingMethods[fidx10(idx)];
+      if (columnName === 'is_centrally_cleared_flag') return clearingMethods[fidx10(idx)] === 'CCP' ? 'Y' : 'N';
       if (columnName === 'trade_date') return originationDate(idx);
       if (columnName === 'effective_date') return originationDate(idx);
       if (columnName === 'maturity_date') return maturityDate(idx);
       if (columnName === 'sa_ccr_exposure_amt') return Math.abs(mtm(idx)) + Math.round(committed(idx) * 0.04);
-      if (columnName === 'capital_risk_weight_pct') return clearingMethods[fid(idx) - 1] === 'CCP' ? 2.0 : 20.0;
+      if (columnName === 'capital_risk_weight_pct') return clearingMethods[fidx10(idx)] === 'CCP' ? 2.0 : 20.0;
       if (columnName === 'lcr_outflow_category') return 'DERIVATIVE_EXPOSURE';
       break;
     }
@@ -1711,26 +1713,26 @@ export function getL2SeedValue(
       const secCountries = ['US', 'US', 'JP', 'DE', 'US', 'GB', 'US', 'US', 'US', 'CA'];
       const marginFreqs = ['DAILY', 'DAILY', 'WEEKLY', 'DAILY', 'DAILY', 'DAILY', 'DAILY', 'WEEKLY', 'DAILY', 'DAILY'];
       if (columnName === 'sft_position_detail_id') return i;
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       if (columnName === 'as_of_date') return AS_OF;
-      if (columnName === 'sft_type') return sftTypes[fid(idx) - 1];
-      if (columnName === 'sft_subtype') return sftSubtypes[fid(idx) - 1];
+      if (columnName === 'sft_type') return sftTypes[fidx10(idx)];
+      if (columnName === 'sft_subtype') return sftSubtypes[fidx10(idx)];
       if (columnName === 'cash_leg_amt') return drawn(idx);
       if (columnName === 'security_leg_amt') return Math.round(drawn(idx) * 1.02);
       if (columnName === 'collateral_value_amt') return Math.round(drawn(idx) * (1 + haircut(idx) / 100));
       if (columnName === 'haircut_applied_pct') return haircut(idx);
-      if (columnName === 'margin_call_frequency') return marginFreqs[fid(idx) - 1];
+      if (columnName === 'margin_call_frequency') return marginFreqs[fidx10(idx)];
       if (columnName === 'repo_rate_pct') return Math.round(baseRate(idx) * 0.8) / 100;
       if (columnName === 'netting_set_id') return fid(idx);
       if (columnName === 'settlement_date') return originationDate(idx);
-      if (columnName === 'maturity_date') return sftSubtypes[fid(idx) - 1] === 'OPEN' ? undefined : maturityDate(idx);
-      if (columnName === 'is_open_maturity_flag') return sftSubtypes[fid(idx) - 1] === 'OPEN' ? 'Y' : 'N';
-      if (columnName === 'security_type') return secTypes[fid(idx) - 1];
-      if (columnName === 'security_issuer_country') return secCountries[fid(idx) - 1];
-      if (columnName === 'hqla_eligible_flag') return secTypes[fid(idx) - 1] === 'GOVT_BOND' ? 'Y' : 'N';
-      if (columnName === 'lcr_inflow_category') return sftTypes[fid(idx) - 1].startsWith('REVERSE') ? 'SFT_INFLOW' : 'SFT_OUTFLOW';
-      if (columnName === 'nsfr_factor_pct') return sftSubtypes[fid(idx) - 1] === 'OVERNIGHT' ? 0 : 50;
-      if (columnName === 'capital_risk_weight_pct') return secTypes[fid(idx) - 1] === 'GOVT_BOND' ? 0 : 20;
+      if (columnName === 'maturity_date') return sftSubtypes[fidx10(idx)] === 'OPEN' ? undefined : maturityDate(idx);
+      if (columnName === 'is_open_maturity_flag') return sftSubtypes[fidx10(idx)] === 'OPEN' ? 'Y' : 'N';
+      if (columnName === 'security_type') return secTypes[fidx10(idx)];
+      if (columnName === 'security_issuer_country') return secCountries[fidx10(idx)];
+      if (columnName === 'hqla_eligible_flag') return secTypes[fidx10(idx)] === 'GOVT_BOND' ? 'Y' : 'N';
+      if (columnName === 'lcr_inflow_category') return sftTypes[fidx10(idx)].startsWith('REVERSE') ? 'SFT_INFLOW' : 'SFT_OUTFLOW';
+      if (columnName === 'nsfr_factor_pct') return sftSubtypes[fidx10(idx)] === 'OVERNIGHT' ? 0 : 50;
+      if (columnName === 'capital_risk_weight_pct') return secTypes[fidx10(idx)] === 'GOVT_BOND' ? 0 : 20;
       break;
     }
 
@@ -1744,22 +1746,22 @@ export function getL2SeedValue(
       const lcTypes = [undefined, 'STANDBY', 'IMPORT', undefined, 'STANDBY', undefined, 'EXPORT', undefined, 'STANDBY', 'IMPORT'];
       const ccfs = [1.0, 1.0, 0.2, 1.0, 1.0, 0.5, 0.2, 1.0, 1.0, 0.2];
       if (columnName === 'guarantee_lc_detail_id') return i;
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       if (columnName === 'as_of_date') return AS_OF;
-      if (columnName === 'instrument_type') return instTypes[fid(idx) - 1];
-      if (columnName === 'guarantee_type') return guarTypes[fid(idx) - 1];
-      if (columnName === 'lc_type') return lcTypes[fid(idx) - 1];
+      if (columnName === 'instrument_type') return instTypes[fidx10(idx)];
+      if (columnName === 'guarantee_type') return guarTypes[fidx10(idx)];
+      if (columnName === 'lc_type') return lcTypes[fidx10(idx)];
       if (columnName === 'issued_amount') return committed(idx);
       if (columnName === 'outstanding_amount') return committed(idx);
       if (columnName === 'utilized_amount') return Math.round(committed(idx) * 0.3);
-      if (columnName === 'credit_conversion_factor') return ccfs[fid(idx) - 1];
+      if (columnName === 'credit_conversion_factor') return ccfs[fidx10(idx)];
       if (columnName === 'beneficiary_counterparty_id') return ((cid(idx) % 10) + 1);
       if (columnName === 'expiry_date') return maturityDate(idx);
       if (columnName === 'is_irrevocable_flag') return fid(idx) % 2 === 0 ? 'Y' : 'N';
-      if (columnName === 'is_financial_standby_flag') return instTypes[fid(idx) - 1] === 'STANDBY_LC' ? 'Y' : 'N';
-      if (columnName === 'fee_rate_bps') return [75, 100, 50, 125, 80, 60, 45, 110, 90, 55][fid(idx) - 1];
-      if (columnName === 'lcr_outflow_category') return instTypes[fid(idx) - 1].includes('LC') ? 'TRADE_FINANCE' : 'CONTINGENT_FUNDING';
-      if (columnName === 'capital_risk_weight_pct') return Math.round(ccfs[fid(idx) - 1] * 100);
+      if (columnName === 'is_financial_standby_flag') return instTypes[fidx10(idx)] === 'STANDBY_LC' ? 'Y' : 'N';
+      if (columnName === 'fee_rate_bps') return [75, 100, 50, 125, 80, 60, 45, 110, 90, 55][fidx10(idx)];
+      if (columnName === 'lcr_outflow_category') return instTypes[fidx10(idx)].includes('LC') ? 'TRADE_FINANCE' : 'CONTINGENT_FUNDING';
+      if (columnName === 'capital_risk_weight_pct') return Math.round(ccfs[fidx10(idx)] * 100);
       break;
     }
 
@@ -1776,10 +1778,10 @@ export function getL2SeedValue(
       const nsfrFactors = [5, 50, 15, 15, 50, 85, 5, 85, 50, 15];
       const riskWeights = [0, 100, 20, 10, 20, 100, 0, 100, 100, 20];
       if (columnName === 'bond_security_detail_id') return i;
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       if (columnName === 'as_of_date') return AS_OF;
-      if (columnName === 'security_type') return secTypes[fid(idx) - 1];
-      if (columnName === 'security_subtype') return secSubtypes[fid(idx) - 1];
+      if (columnName === 'security_type') return secTypes[fidx10(idx)];
+      if (columnName === 'security_subtype') return secSubtypes[fidx10(idx)];
       if (columnName === 'isin') return `US${String(fid(idx)).padStart(10, '0')}`;
       if (columnName === 'cusip') return `${String(fid(idx)).padStart(6, '0')}AA${cycle(idx)}`;
       if (columnName === 'face_value_amt') return committed(idx);
@@ -1787,17 +1789,17 @@ export function getL2SeedValue(
       if (columnName === 'book_value_amt') return committed(idx);
       if (columnName === 'accrued_interest_amt') return Math.round(committed(idx) * 0.01);
       if (columnName === 'unrealized_gain_loss_amt') return Math.round(committed(idx) * (0.95 + fid(idx) * 0.01)) - committed(idx);
-      if (columnName === 'coupon_rate_pct') return [2.5, 4.75, 3.25, 2.0, 3.5, 6.0, 1.75, 5.5, 4.25, 3.0][fid(idx) - 1] / 100;
+      if (columnName === 'coupon_rate_pct') return [2.5, 4.75, 3.25, 2.0, 3.5, 6.0, 1.75, 5.5, 4.25, 3.0][fidx10(idx)] / 100;
       if (columnName === 'coupon_frequency') return fid(idx) % 2 === 0 ? 'SEMI_ANNUAL' : 'QUARTERLY';
       if (columnName === 'maturity_date') return maturityDate(idx);
       if (columnName === 'issuer_counterparty_id') return cid(idx);
-      if (columnName === 'issuer_country_code') return ['US', 'US', 'US', 'DE', 'US', 'GB', 'US', 'US', 'CA', 'US'][fid(idx) - 1];
-      if (columnName === 'accounting_classification') return acctClasses[fid(idx) - 1];
-      if (columnName === 'hqla_level') return hqlaLevels[fid(idx) - 1];
-      if (columnName === 'hqla_eligible_flag') return hqlaLevels[fid(idx) - 1] !== 'NONE' ? 'Y' : 'N';
-      if (columnName === 'lcr_haircut_pct') return lcrHaircuts[fid(idx) - 1];
-      if (columnName === 'nsfr_factor_pct') return nsfrFactors[fid(idx) - 1];
-      if (columnName === 'capital_risk_weight_pct') return riskWeights[fid(idx) - 1];
+      if (columnName === 'issuer_country_code') return ['US', 'US', 'US', 'DE', 'US', 'GB', 'US', 'US', 'CA', 'US'][fidx10(idx)];
+      if (columnName === 'accounting_classification') return acctClasses[fidx10(idx)];
+      if (columnName === 'hqla_level') return hqlaLevels[fidx10(idx)];
+      if (columnName === 'hqla_eligible_flag') return hqlaLevels[fidx10(idx)] !== 'NONE' ? 'Y' : 'N';
+      if (columnName === 'lcr_haircut_pct') return lcrHaircuts[fidx10(idx)];
+      if (columnName === 'nsfr_factor_pct') return nsfrFactors[fidx10(idx)];
+      if (columnName === 'capital_risk_weight_pct') return riskWeights[fidx10(idx)];
       break;
     }
 
@@ -1809,15 +1811,15 @@ export function getL2SeedValue(
     case 'counterparty_financial_snapshot': {
       const baseRevenue = [5000, 8200, 3100, 12500, 6700, 9800, 4500, 15000, 7200, 11000];
       const revenueMultiplier = [1.0, 0.92, 0.85, 0.95, 1.02][cycle(idx)];
-      const rev = Math.round(baseRevenue[fid(idx) - 1] * revenueMultiplier * 1000000);
-      const opex = Math.round(rev * [0.72, 0.68, 0.75, 0.65, 0.70, 0.73, 0.71, 0.66, 0.69, 0.74][fid(idx) - 1]);
+      const rev = Math.round(baseRevenue[fidx10(idx)] * revenueMultiplier * 1000000);
+      const opex = Math.round(rev * [0.72, 0.68, 0.75, 0.65, 0.70, 0.73, 0.71, 0.66, 0.69, 0.74][fidx10(idx)]);
       const intExp = Math.round(rev * 0.08);
       const taxExp = Math.round((rev - opex - intExp) * 0.21);
       const depr = Math.round(rev * 0.04);
       const amort = Math.round(rev * 0.02);
       const netIncome = rev - opex - intExp - taxExp;
-      const totalAssets = Math.round(rev * [3.2, 2.8, 4.1, 2.5, 3.0, 3.5, 2.9, 2.3, 3.3, 2.7][fid(idx) - 1]);
-      const totalLiabilities = Math.round(totalAssets * [0.65, 0.58, 0.72, 0.55, 0.62, 0.68, 0.60, 0.52, 0.66, 0.59][fid(idx) - 1]);
+      const totalAssets = Math.round(rev * [3.2, 2.8, 4.1, 2.5, 3.0, 3.5, 2.9, 2.3, 3.3, 2.7][fidx10(idx)]);
+      const totalLiabilities = Math.round(totalAssets * [0.65, 0.58, 0.72, 0.55, 0.62, 0.68, 0.60, 0.52, 0.66, 0.59][fidx10(idx)]);
       const equity = totalAssets - totalLiabilities;
       const ebitda = netIncome + intExp + taxExp + depr + amort;
       const noi = rev - opex;

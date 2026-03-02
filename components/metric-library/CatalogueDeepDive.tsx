@@ -15,6 +15,7 @@ import LevelStepWalkthrough from './LevelStepWalkthrough';
 import type { FlowStep } from './LevelStepWalkthrough';
 import { PositionTable, FacilityTable } from './WorkedExampleTable';
 import HierarchyPyramid from './HierarchyPyramid';
+import TableTraversalDemo from './TableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -357,6 +358,9 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
           The formula never changes — only the <strong className="text-purple-200">scope of facilities</strong> varies by level. Every rollup resolves back to &quot;which facilities are in scope?&quot; then applies the same calculation.
         </p>
       </div>
+
+      {/* Table Traversal Demo — animated walkthrough of how tables connect per dimension */}
+      {item.abbreviation === 'LTV' && <TableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}
       <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />

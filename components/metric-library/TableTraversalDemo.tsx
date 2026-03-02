@@ -38,6 +38,7 @@ const TABLES: Record<string, TableDef> = {
     fields: [
       { name: 'facility_id', sampleValue: '12345' },
       { name: 'drawn_amount', sampleValue: '$120,000,000' },
+      { name: 'committed_amount', sampleValue: '$150,000,000' },
       { name: 'gross_exposure_usd', sampleValue: '$150,000,000' },
       { name: 'as_of_date', sampleValue: '2024-12-31' },
     ],
@@ -189,9 +190,9 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'drawn_amount', 'gross_exposure_usd'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'We start the same way -- at the exposure snapshot. But this time we pull data for ALL facilities belonging to one borrower. We also grab gross_exposure_usd, which will be our weighting factor later.',
+          'We start the same way -- at the exposure snapshot. But this time we pull data for ALL facilities belonging to one borrower. We also grab committed_amount (committed facility amount), which will be our weighting factor later.',
       },
       {
         kind: 'join',
@@ -240,7 +241,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Finally, we compute an exposure-weighted average: SUM(facility_ltv x gross_exposure) / SUM(gross_exposure). Larger loans count more. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
+          'Finally, we compute a weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount). Facilities with larger commitments count more. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
         sampleResult: 'Weighted Avg LTV = 185%',
       },
     ],
@@ -255,9 +256,9 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'drawn_amount', 'gross_exposure_usd'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'Same starting point -- exposure snapshot gives us drawn amounts and exposure weights for every facility. The desk-level view will group these by which trading desk manages them.',
+          'Same starting point -- exposure snapshot gives us drawn amounts and committed facility amount for every facility. We use committed_amount as the weighting factor. The desk-level view will group these by which trading desk manages them.',
       },
       {
         kind: 'join',
@@ -306,7 +307,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group all secured facilities by desk name, then compute exposure-weighted average LTV. Result: one LTV number for the entire CRE Lending Desk.',
+          'Group all secured facilities by desk name, then compute weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount). Result: one LTV number for the entire CRE Lending Desk.',
         sampleResult: 'Desk WAvg LTV = 172%',
       },
     ],
@@ -321,9 +322,9 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'drawn_amount', 'gross_exposure_usd'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'Starting from exposure data again. For portfolio-level LTV, we need to aggregate across all desks that roll up to the same portfolio.',
+          'Starting from exposure data again. We use committed facility amount as the weight. For portfolio-level LTV, we need to aggregate across all desks that roll up to the same portfolio.',
       },
       {
         kind: 'join',
@@ -382,7 +383,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then exposure-weighted average. Result: one LTV for the entire Commercial Real Estate portfolio.',
+          'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then weighted average by committed facility amount. Result: one LTV for the entire Commercial Real Estate portfolio.',
         sampleResult: 'Portfolio WAvg LTV = 168%',
       },
     ],
@@ -397,9 +398,9 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
       {
         kind: 'source',
         highlightTable: 'fes',
-        fieldsToShow: ['facility_id', 'drawn_amount', 'gross_exposure_usd'],
+        fieldsToShow: ['facility_id', 'drawn_amount', 'committed_amount'],
         narration:
-          'For the highest rollup -- Line of Business (department) -- we start from the same exposure data. The aggregation will span an entire division of the bank.',
+          'For the highest rollup -- Line of Business (department) -- we start from the same exposure data and use committed facility amount as the weight. The aggregation will span an entire division of the bank.',
       },
       {
         kind: 'join',
@@ -458,7 +459,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group ALL facilities in the bank whose taxonomy path traces to the same root department. Exposure-weighted average gives a single board-level LTV for the entire Lending Division.',
+          'Group ALL facilities in the bank whose taxonomy path traces to the same root department. Weighted average by committed facility amount gives a single board-level LTV for the entire Lending Division.',
         sampleResult: 'LoB WAvg LTV = 155%',
       },
     ],

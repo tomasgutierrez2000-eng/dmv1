@@ -1,8 +1,8 @@
 /* ────────────────────────────────────────────────────────────────────────────
  * LTV Lineage Demo — Sample Rollup Data
  *
- * Pre-verified math for the LTV rollup walkthrough. All exposure-weighted
- * averages can be re-derived from the facility rows.
+ * Pre-verified math for the LTV rollup walkthrough. All weighted-by-committed-
+ * facility-amount averages can be re-derived from the facility rows.
  *
  * Standard LTV  = drawn_amount / collateral_value * 100
  * Stressed LTV  = drawn_amount / stressed_collateral_value * 100
@@ -30,7 +30,7 @@ export interface LTVFacilityRow {
   haircutPct: number;
   standardLtv: number;   // drawn / collateral * 100
   stressedLtv: number;   // drawn / stressedCollateral * 100
-  exposure: number;       // gross_exposure_usd (= drawnAmount for simplicity)
+  exposure: number;       // committed_amount (weight for rollup; same scale as drawn for demo)
   isSecured: boolean;
 }
 
@@ -82,7 +82,7 @@ export const LTV_FACILITIES: LTVFacilityRow[] = [
   },
 ];
 
-/* ── Counterparty-level (exposure-weighted average of secured facilities) ── */
+/* ── Counterparty-level (weighted by committed facility amount, secured only) ── */
 
 /**
  * Counterparty Standard LTV:

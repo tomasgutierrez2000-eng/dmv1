@@ -185,8 +185,8 @@ const ROLLUP_LEVELS = [
     key: 'portfolio',
     label: 'Portfolio',
     icon: FolderTree,
-    desc: 'Exposure-Weighted Average + Distribution buckets',
-    method: 'Exposure-Weighted Average + Distribution',
+    desc: 'Weighted by committed facility amount + Distribution buckets',
+    method: 'Committed-Facility-Amount-Weighted Average + Distribution',
     purpose: 'Portfolio health trending',
     tier: 'T3',
   },
@@ -194,8 +194,8 @@ const ROLLUP_LEVELS = [
     key: 'lob',
     label: 'Line of Business',
     icon: PieChart,
-    desc: 'Exposure-Weighted Average — directional early warning only',
-    method: 'Exposure-Weighted Average',
+    desc: 'Weighted by committed facility amount — directional early warning only',
+    method: 'Committed-Facility-Amount-Weighted Average',
     purpose: 'Directional early warning',
     tier: 'T3',
   },
@@ -1247,7 +1247,7 @@ function CounterpartyDetail() {
             <p className="text-xs text-gray-400 leading-relaxed">
               When a facility has multiple counterparties (borrower, guarantor, co-obligor), DSCR cannot be
               assigned at full value to each. The <strong className="text-gray-300">primary obligor carries the full facility DSCR</strong>.
-              Guarantors carry a pro-rata or exposure-weighted share depending on the guarantee structure.
+              Guarantors carry a pro-rata or committed-amount-weighted share depending on the guarantee structure.
               This attribution must be resolved before rolling up to the desk level.
             </p>
           </div>
@@ -1341,7 +1341,7 @@ function PortfolioDetail() {
       <JoinChainVisual levelKey="portfolio" />
       {/* Formula */}
       <div className="bg-black/30 rounded-lg p-3">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Exposure-Weighted Average</div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Weighted by Committed Facility Amount</div>
         <div className="text-sm font-mono text-emerald-400 text-center">
           {'Σ'}(Counterparty DSCR {'×'} Counterparty Exposure) / {'Σ'}(Counterparty Exposure)
         </div>
@@ -1412,7 +1412,7 @@ function LoBDetail() {
       <JoinChainVisual levelKey="lob" />
       {/* Formula */}
       <div className="bg-black/30 rounded-lg p-3">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Exposure-Weighted Average (same as Portfolio)</div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Weighted by Committed Facility Amount (same as Portfolio)</div>
         <div className="text-sm font-mono text-emerald-400 text-center">
           {'Σ'}(Counterparty DSCR {'×'} Exposure) / {'Σ'}(Exposure)
         </div>
@@ -2474,7 +2474,7 @@ const FK_RELATIONSHIPS: {
     from: 'facility_exposure_snapshot',
     to: 'facility_master',
     joinKey: 'facility_id',
-    why: 'Provides exposure amounts (drawn, committed) needed for exposure-weighted rollups at portfolio and LoB levels. DSCR × exposure = the weight in the weighted average.',
+    why: 'Provides exposure amounts (drawn, committed) needed for committed-facility-amount-weighted rollups at portfolio and LoB levels. DSCR × committed_amount = the weight in the weighted average.',
     cardinality: 'Many snapshots → One facility',
     pattern: 'Snapshot (L2) joined to Master (L1)',
   },
@@ -2628,7 +2628,7 @@ const AUDIT_TRAIL: AuditTrailNode = {
   dscr: 1.45,
   displayValue: '1.45x',
   method: 'weighted_avg',
-  methodLabel: 'Exposure-Weighted Average',
+  methodLabel: 'Committed-Facility-Amount-Weighted Average',
   formula: 'Σ(counterparty DSCR × exposure) ÷ Σ(exposure)',
   tier: 'T3',
   layerColor: 'pink',
@@ -3627,7 +3627,7 @@ export default function DSCRLineageView({
             step="Step 5 — L3 Output & Rollup Hierarchy"
             layerColor="bg-emerald-600"
             title="Storage & Aggregation"
-            subtitle="Different aggregation at each level — from pooled ratio to exposure-weighted average"
+            subtitle="Different aggregation at each level — from pooled ratio to weighted average by committed facility amount"
           />
 
           <div className="mb-4">

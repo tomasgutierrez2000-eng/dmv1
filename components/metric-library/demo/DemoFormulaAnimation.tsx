@@ -25,7 +25,7 @@ import {
  *   - rollup-facility: table of 3 facility DSCRs
  *   - rollup-counterparty: pooled ratio build-up
  *   - rollup-desk: product-segmented side-by-side
- *   - rollup-portfolio: exposure-weighted average
+ *   - rollup-portfolio: committed-facility-amount-weighted average
  *   - rollup-lob: trend indicator summary
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -470,7 +470,7 @@ function RollupPortfolio({ variant, stepIndex }: { variant: VariantKey; stepInde
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Exposure-Weighted Average
+        Weighted by Committed Facility Amount
       </div>
 
       {cps.map((cp, i) => (

@@ -38,7 +38,7 @@ export const CI_FACILITIES: FacilityRow[] = [
   { name: 'Facility C (LOC)',         numerator: 1_800_000, denominator: 1_600_000, dscr: 1.13, exposure: 15_000_000 },
 ];
 
-/* ── Portfolio-level counterparties (for exposure-weighted avg demo) ────── */
+/* ── Portfolio-level counterparties (for committed-facility-amount-weighted avg demo) ────── */
 
 export const CRE_COUNTERPARTIES: CounterpartyRow[] = [
   { name: 'Counterparty A', dscr: 1.29, exposure: 50_000_000 },

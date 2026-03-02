@@ -25,7 +25,7 @@ import {
  *   - ltv-division: exposure ÷ collateral × 100 = result
  *   - foundational-rule-ltv: wrong (simple avg) vs correct (weighted avg)
  *   - rollup-facility: table of 3 facility LTVs
- *   - rollup-counterparty: exposure-weighted LTV build-up
+ *   - rollup-counterparty: committed-facility-amount-weighted LTV build-up
  *   - rollup-desk: collateral-type segmented view
  *   - rollup-portfolio: EWA + distribution buckets
  *   - rollup-lob: trend indicator summary
@@ -102,7 +102,7 @@ function NumeratorExposure({ stepIndex }: { stepIndex: number }) {
         className="flex items-center justify-between text-sm font-bold transition-all duration-500"
         style={{ opacity: revealed > 1 ? 1 : 0, transform: revealed > 1 ? 'scale(1)' : 'scale(0.9)' }}
       >
-        <span className="text-emerald-400">gross_exposure_usd</span>
+        <span className="text-emerald-400">drawn_amount</span>
         <span className="text-white font-mono">$15,000,000</span>
       </div>
     </div>
@@ -283,7 +283,7 @@ function FoundationalRuleDemo({ stepIndex }: { stepIndex: number }) {
         style={{ opacity: revealed > 2 ? 1 : 0, transform: revealed > 2 ? 'translateY(0)' : 'translateY(8px)' }}
       >
         <div className="text-[9px] font-bold uppercase tracking-widest text-emerald-400 mb-2">
-          Correct: Exposure-Weighted Average
+          Correct: Weighted by Committed Facility Amount
         </div>
         <div className="space-y-1 text-xs font-mono">
           <div className="flex justify-between text-gray-400">
@@ -297,7 +297,7 @@ function FoundationalRuleDemo({ stepIndex }: { stepIndex: number }) {
           className="mt-2 pt-2 border-t border-emerald-500/20 text-xs font-mono text-center transition-all duration-500"
           style={{ opacity: revealed > 3 ? 1 : 0 }}
         >
-          Σ / Σ Exposure = <span className="text-emerald-400 font-bold">93.7%</span>
+          Σ(LTV × CFA) / Σ(CFA) = <span className="text-emerald-400 font-bold">93.7%</span>
           <span className="text-[9px] text-emerald-400/70 ml-1">(accurate)</span>
         </div>
       </div>
@@ -355,7 +355,7 @@ function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Exposure-Weighted Average
+        Weighted by Committed Facility Amount
       </div>
 
       {facilities.map((f, i) => (
@@ -378,7 +378,7 @@ function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
         style={{ opacity: revealed > facilities.length ? 1 : 0, transform: revealed > facilities.length ? 'scale(1)' : 'scale(0.85)' }}
       >
         <div className="text-[10px] text-gray-500 mb-1">
-          Σ(LTV × Exposure) ÷ Σ(Exposure)
+          Σ(LTV × committed_amount) ÷ Σ(committed_amount)
         </div>
         <div className={`text-xl font-black tabular-nums ${ltvBandColor(weightedLTV)}`}>
           {fmtPct(weightedLTV)}
@@ -409,7 +409,7 @@ function RollupDesk({ stepIndex }: { stepIndex: number }) {
             <span>{seg.collateralType}</span>
             <span className={`font-bold ${seg.color}`}>{fmtPct(seg.ltv)}</span>
           </div>
-          <div className="text-[9px] text-gray-600 mt-0.5">{fmtM(seg.exposure)} exposure</div>
+          <div className="text-[9px] text-gray-600 mt-0.5">{fmtM(seg.exposure)} committed</div>
         </div>
       ))}
     </div>
@@ -427,7 +427,7 @@ function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-3">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Exposure-Weighted Average + Distribution
+        Weighted by Committed Facility Amount + Distribution
       </div>
 
       {/* Counterparty weighted */}

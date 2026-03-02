@@ -23,7 +23,7 @@ import {
  *   - ltv-division: show the final division
  *   - unsecured-rule: wrong vs correct approach
  *   - rollup-facility: table of 3 facility LTVs
- *   - rollup-counterparty: exposure-weighted average
+ *   - rollup-counterparty: committed-facility-amount-weighted average
  *   - rollup-desk: single desk result
  *   - rollup-portfolio: distribution buckets
  * ──────────────────────────────────────────────────────────────────────────── */

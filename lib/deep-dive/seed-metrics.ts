@@ -152,14 +152,14 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     page: 'P4',
     section: 'Deep Dive',
     metricType: 'Ratio',
-    formula: 'SUM(ltv_pct * outstanding_exposure) / SUM(outstanding_exposure)',
-    description: 'Exposure-weighted LTV across hierarchy levels.',
+    formula: 'SUM(ltv_pct * committed_amount) / SUM(committed_amount)',
+    description: 'Weighted average LTV by committed facility amount across hierarchy levels.',
     displayFormat: '0.00%',
     sampleValue: '—',
     sourceFields: [
       { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount' },
       { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd' },
-      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd' },
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'committed_amount' },
     ],
     dimensions: [
       { dimension: 'as_of_date', interaction: 'FILTER' },
@@ -168,8 +168,8 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     ],
     allowedDimensions: ALL_DIMS,
     formulasByDimension: buildGroupedFormula(
-      'SUM((drawn_amount / NULLIF(collateral_value, 0)) * outstanding_exposure) / NULLIF(SUM(CASE WHEN collateral_value > 0 THEN outstanding_exposure ELSE 0 END), 0)',
-      'SUM((fes.drawn_amount / NULLIF(cs.collateral_value_usd, 0)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN cs.collateral_value_usd > 0 THEN fes.gross_exposure_usd ELSE 0 END), 0)',
+      'SUM((drawn_amount / NULLIF(collateral_value, 0)) * committed_amount) / NULLIF(SUM(CASE WHEN collateral_value > 0 THEN committed_amount ELSE 0 END), 0)',
+      'SUM((fes.drawn_amount / NULLIF(cs.collateral_value_usd, 0)) * fes.committed_amount) / NULLIF(SUM(CASE WHEN cs.collateral_value_usd > 0 THEN fes.committed_amount ELSE 0 END), 0)',
       "FROM L2.facility_exposure_snapshot fes LEFT JOIN (SELECT facility_id, as_of_date, SUM(current_valuation_usd) AS collateral_value_usd FROM L2.collateral_snapshot GROUP BY facility_id, as_of_date) cs ON cs.facility_id = fes.facility_id AND cs.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
       'WHERE fes.as_of_date = :as_of_date'
     ),

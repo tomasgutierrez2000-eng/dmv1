@@ -169,12 +169,12 @@ export const LTV_DEMO_STEPS: GenericDemoStep<LTVVariantKey>[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 2: Borrower (Counterparty)',
     narration:
-      'A single borrower may have multiple loans. To see the borrower\u2019s overall LTV, we use an exposure-weighted average — but only across secured facilities:\n\n1. For each secured facility: multiply its LTV by its exposure\n2. Sum those weighted LTVs\n3. Divide by the total secured exposure\n\nThe unsecured Facility C ($45M) is excluded entirely from the calculation. Its exposure does not appear in either the numerator or denominator of the weighted average.',
+      'A single borrower may have multiple loans. To see the borrower\u2019s overall LTV, we use a weighted average by committed facility amount — but only across secured facilities:\n\n1. For each secured facility: multiply its LTV by its committed_amount\n2. Sum those weighted LTVs\n3. Divide by the total secured committed amount\n\nThe unsecured Facility C ($45M) is excluded entirely from the calculation. Its committed amount does not appear in either the numerator or denominator of the weighted average.',
     targetSelector: '[data-demo="rollup-counterparty"]',
     onEnter: { expandLevel: 'counterparty' },
     formulaKey: 'rollup-counterparty',
     insight:
-      'Notice the counterparty LTV (65.2%) is weighted toward the larger Facility A ($120M exposure at 68.6%) vs. the smaller Facility B ($85M at 60.7%). Size matters — a simple average would give 64.7%, but the exposure-weighted result correctly reflects where most of the money is.',
+      'Notice the counterparty LTV (65.2%) is weighted toward the larger Facility A ($120M committed at 68.6%) vs. the smaller Facility B ($85M at 60.7%). Size matters — a simple average would give 64.7%, but the committed-facility-amount-weighted result correctly reflects where most of the commitment is.',
   },
 
   /* ── Step 11: Desk Level ───────────────────────────────────────────────── */
@@ -184,7 +184,7 @@ export const LTV_DEMO_STEPS: GenericDemoStep<LTVVariantKey>[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 3: Trading Desk',
     narration:
-      'A trading desk manages a collection of loans. Desk-level LTV uses the same exposure-weighted formula, grouping all secured facilities assigned to that desk.\n\nThe desk assignment comes from enterprise_business_taxonomy — each facility\u2019s lob_segment_id in facility_master links to a leaf node (tree_level = 3) in the LoB hierarchy tree.\n\nLTV is primarily meaningful for desks that manage collateralized lending (CRE, asset-backed). For desks focused on unsecured corporate lending, the desk-level LTV may be NULL or cover only a small subset of their book.',
+      'A trading desk manages a collection of loans. Desk-level LTV uses the same weighted-by-committed-facility-amount formula, grouping all secured facilities assigned to that desk.\n\nThe desk assignment comes from enterprise_business_taxonomy — each facility\u2019s lob_segment_id in facility_master links to a leaf node (tree_level = 3) in the LoB hierarchy tree.\n\nLTV is primarily meaningful for desks that manage collateralized lending (CRE, asset-backed). For desks focused on unsecured corporate lending, the desk-level LTV may be NULL or cover only a small subset of their book.',
     targetSelector: '[data-demo="rollup-desk"]',
     onEnter: { expandLevel: 'desk' },
     formulaKey: 'rollup-desk',

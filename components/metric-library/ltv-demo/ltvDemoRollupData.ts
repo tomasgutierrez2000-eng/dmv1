@@ -152,11 +152,11 @@ export function fmtPct(n: number): string {
   return n.toFixed(1) + '%';
 }
 
-/** Exposure-weighted average LTV */
+/** Weighted average LTV by committed facility amount (weight = exposure/committed_amount) */
 export function exposureWeightedLTV(rows: LTVCounterpartyRow[]): number {
-  const totalExposure = rows.reduce((s, r) => s + r.exposure, 0);
+  const totalWeight = rows.reduce((s, r) => s + r.exposure, 0);
   const weighted = rows.reduce((s, r) => s + r.ltv * r.exposure, 0);
-  return weighted / totalExposure;
+  return weighted / totalWeight;
 }
 
 /** Sum of all collateral values */

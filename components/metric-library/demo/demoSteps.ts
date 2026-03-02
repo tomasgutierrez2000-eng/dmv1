@@ -262,7 +262,7 @@ export const DEMO_STEPS: DemoStep[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 4: Portfolio',
     narration:
-      'A portfolio spans dozens of industries and borrower types. At this scale, the approach shifts to an "exposure-weighted average" \u2014 each borrower\u2019s DSCR is weighted by how much money the bank has lent them.\n\nA borrower with a $50M loan has 5x more influence on the portfolio DSCR than a borrower with a $10M loan.\n\nBut one number can be deceiving! That\u2019s why the platform also shows distribution buckets (< 1.0x, 1.0\u20131.25x, 1.25\u20131.5x, etc.) to reveal hidden pockets of weakness.',
+      'A portfolio spans dozens of industries and borrower types. At this scale, the approach shifts to a weighted average by committed facility amount \u2014 each borrower\u2019s DSCR is weighted by the bank\u2019s commitment to them.\n\nA borrower with a $50M commitment has 5x more influence on the portfolio DSCR than a borrower with a $10M commitment.\n\nBut one number can be deceiving! That\u2019s why the platform also shows distribution buckets (< 1.0x, 1.0\u20131.25x, 1.25\u20131.5x, etc.) to reveal hidden pockets of weakness.',
     targetSelector: '[data-demo="rollup-portfolio"]',
     onEnter: { expandLevel: 'portfolio' },
     formulaKey: 'rollup-portfolio',

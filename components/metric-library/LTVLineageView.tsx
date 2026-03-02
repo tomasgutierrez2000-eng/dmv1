@@ -81,52 +81,52 @@ const ROLLUP_LEVELS = [
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    desc: 'Exposure-weighted average — blend facility LTVs by gross_exposure_usd',
-    method: 'Exposure-Weighted Average',
+    desc: 'Weighted average by committed facility amount — blend facility LTVs by committed_amount',
+    method: 'Committed-Facility-Amount-Weighted Average',
     purpose: 'Obligor-level collateral adequacy',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
     dashboardName: 'Counterparty WAvg LTV (%)',
-    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
-    formulaDetail: 'For each facility under this counterparty, compute facility LTV, weight by gross_exposure_usd. Unsecured facilities excluded.',
+    formula: 'SUM(ltv × committed_amount) / SUM(committed_amount)',
+    formulaDetail: 'For each facility under this counterparty, compute facility LTV, weight by committed_amount (committed facility amount). Unsecured facilities excluded.',
   },
   {
     key: 'desk',
     label: 'Desk',
     icon: Briefcase,
-    desc: 'Exposure-weighted average across all secured facilities assigned to this L3 desk',
-    method: 'Exposure-Weighted Average',
+    desc: 'Weighted average by committed facility amount across all secured facilities assigned to this L3 desk',
+    method: 'Committed-Facility-Amount-Weighted Average',
     purpose: 'Book-level collateral monitoring',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
     dashboardName: 'Desk WAvg LTV (%)',
-    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formula: 'SUM(ltv × committed_amount) / SUM(committed_amount)',
     formulaDetail: 'Same weighted average as counterparty, but grouping by L3 desk resolved via enterprise_business_taxonomy.',
   },
   {
     key: 'portfolio',
     label: 'Portfolio',
     icon: FolderTree,
-    desc: 'Exposure-weighted average for all secured facilities within an L2 portfolio',
-    method: 'Exposure-Weighted Average',
+    desc: 'Weighted average by committed facility amount for all secured facilities within an L2 portfolio',
+    method: 'Committed-Facility-Amount-Weighted Average',
     purpose: 'ALCO collateral adequacy reporting',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
     dashboardName: 'Portfolio WAvg LTV (%)',
-    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formula: 'SUM(ltv × committed_amount) / SUM(committed_amount)',
     formulaDetail: 'Same weighted average, grouped by L2 portfolio via parent_segment_id traversal in enterprise_business_taxonomy.',
   },
   {
     key: 'lob',
     label: 'Line of Business',
     icon: PieChart,
-    desc: 'Exposure-weighted average at L1 department level — board-level collateral coverage',
-    method: 'Exposure-Weighted Average',
+    desc: 'Weighted average by committed facility amount at L1 department level — board-level collateral coverage',
+    method: 'Committed-Facility-Amount-Weighted Average',
     purpose: 'Enterprise risk appetite monitoring',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
     dashboardName: 'Department WAvg LTV (%)',
-    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formula: 'SUM(ltv × committed_amount) / SUM(committed_amount)',
     formulaDetail: 'Same weighted average at the highest organizational level. Traverse enterprise_business_taxonomy to root (parent IS NULL).',
   },
 ] as const;
@@ -152,20 +152,20 @@ const INGREDIENT_FIELDS: Record<string, IngredientField[]> = {
   counterparty: [
     { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
     { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
-    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure in USD (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'committed_amount', description: 'Committed facility amount (weight)', role: 'weight', sampleValue: '$150,000,000' },
     { layer: 'L1', table: 'facility_master', field: 'counterparty_id', description: 'FK to counterparty for grouping', role: 'grouping_fk', sampleValue: '7890' },
   ],
   desk: [
     { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
     { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
-    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'committed_amount', description: 'Committed facility amount (weight)', role: 'weight', sampleValue: '$150,000,000' },
     { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to LoB taxonomy', role: 'grouping_fk', sampleValue: '301' },
     { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'Resolve leaf node as lob_l3_name (Desk)', role: 'hierarchy', sampleValue: '301' },
   ],
   portfolio: [
     { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
     { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
-    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'committed_amount', description: 'Committed facility amount (weight)', role: 'weight', sampleValue: '$150,000,000' },
     { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to LoB taxonomy', role: 'grouping_fk', sampleValue: '301' },
     { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'LoB hierarchy entry point', role: 'hierarchy', sampleValue: '301' },
     { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', description: 'Traverse one level up to L2 (Portfolio)', role: 'hierarchy', sampleValue: '30' },
@@ -173,7 +173,7 @@ const INGREDIENT_FIELDS: Record<string, IngredientField[]> = {
   lob: [
     { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
     { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
-    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'committed_amount', description: 'Committed facility amount (weight)', role: 'weight', sampleValue: '$150,000,000' },
     { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to LoB taxonomy', role: 'grouping_fk', sampleValue: '301' },
     { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'LoB hierarchy entry point', role: 'hierarchy', sampleValue: '301' },
     { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', description: 'Traverse to root (parent IS NULL) = L1 Department', role: 'hierarchy', sampleValue: 'NULL' },
@@ -217,7 +217,7 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get counterparty_id from facility master', stepType: 'SOURCING' },
       { from: 'facility_master', fromLayer: 'L1', to: 'counterparty', toLayer: 'L1', joinKey: 'counterparty_id', note: 'Resolve counterparty identity for grouping', stepType: 'SOURCING' },
     ],
-    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by counterparty_id',
+    aggregation: 'Weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount) grouped by counterparty_id',
     result: 'One weighted-average LTV per counterparty (unsecured excluded)',
     dependsOn: 'Requires facility-level LTV calculation first',
   },
@@ -227,7 +227,7 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get lob_segment_id — this FK determines which desk the facility belongs to', stepType: 'SOURCING' },
       { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'The leaf node in the taxonomy IS the L3 desk — all facilities sharing the same lob_segment_id belong to this desk', stepType: 'SOURCING' },
     ],
-    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by lob_l3_name',
+    aggregation: 'Weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount) grouped by lob_l3_name',
     result: 'One weighted-average LTV per desk — groups all facilities whose lob_segment_id maps to the same taxonomy leaf',
     dependsOn: 'Requires facility-level LTV calculation first',
   },
@@ -238,7 +238,7 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'Enter LoB hierarchy at leaf', stepType: 'SOURCING' },
       { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'parent_segment_id = managed_segment_id', note: 'Walk tree one level up: Desk → Portfolio (L2)', stepType: 'SOURCING' },
     ],
-    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by L2 portfolio',
+    aggregation: 'Weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount) grouped by L2 portfolio',
     result: 'One weighted-average LTV per portfolio',
     dependsOn: 'Requires facility-level LTV calculation first',
   },
@@ -249,7 +249,7 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'Enter LoB hierarchy at leaf', stepType: 'SOURCING' },
       { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'enterprise_business_taxonomy (root)', toLayer: 'L1', joinKey: 'recursive parent_segment_id until parent IS NULL', note: 'Walk tree to root = L1 Department', stepType: 'SOURCING' },
     ],
-    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by L1 department',
+    aggregation: 'Weighted average by committed facility amount: SUM(facility_ltv × committed_amount) / SUM(committed_amount) grouped by L1 department',
     result: 'One weighted-average LTV per Line of Business',
     dependsOn: 'Requires facility-level LTV calculation first',
   },
@@ -269,28 +269,28 @@ interface InputTable {
 
 const INPUT_TABLES: Record<string, InputTable[]> = {
   facility: [
-    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator source', fields: ['drawn_amount', 'gross_exposure_usd', 'facility_id', 'as_of_date'] },
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator source', fields: ['drawn_amount', 'committed_amount', 'facility_id', 'as_of_date'] },
     { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd', 'facility_id', 'as_of_date', 'collateral_asset_id'] },
   ],
   counterparty: [
-    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'committed_amount'] },
     { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
     { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'counterparty_id'] },
   ],
   desk: [
-    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'committed_amount'] },
     { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
     { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'lob_segment_id'] },
     { layer: 'L1', table: 'enterprise_business_taxonomy', role: 'Hierarchy resolution', fields: ['managed_segment_id', 'lob_l3_name'] },
   ],
   portfolio: [
-    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'committed_amount'] },
     { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
     { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'lob_segment_id'] },
     { layer: 'L1', table: 'enterprise_business_taxonomy', role: 'Hierarchy (leaf + parent)', fields: ['managed_segment_id', 'parent_segment_id', 'lob_l2_name'] },
   ],
   lob: [
-    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'committed_amount'] },
     { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
     { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'lob_segment_id'] },
     { layer: 'L1', table: 'enterprise_business_taxonomy', role: 'Hierarchy (root traversal)', fields: ['managed_segment_id', 'parent_segment_id', 'lob_l1_name'] },
@@ -410,11 +410,11 @@ function MetricDefinition() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
           <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Rollup Philosophy</div>
-          <div className="text-sm text-white font-medium">Exposure-Weighted Average</div>
+          <div className="text-sm text-white font-medium">Committed-Facility-Amount-Weighted Average</div>
         </div>
         <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
           <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Weighting Basis</div>
-          <div className="text-sm text-white font-medium">By EAD (gross_exposure_usd)</div>
+          <div className="text-sm text-white font-medium">By committed facility amount (committed_amount)</div>
         </div>
         <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
           <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Domains</div>
@@ -438,8 +438,8 @@ function MetricDefinition() {
 function SourceTablesOverview() {
   const tables = [
     {
-      layer: 'L2', name: 'facility_exposure_snapshot', role: 'Numerator + exposure weight',
-      fields: ['drawn_amount', 'gross_exposure_usd', 'facility_id', 'as_of_date', 'counterparty_id', 'lob_segment_id'],
+      layer: 'L2', name: 'facility_exposure_snapshot', role: 'Numerator + weight (committed_amount)',
+      fields: ['drawn_amount', 'committed_amount', 'facility_id', 'as_of_date', 'counterparty_id', 'lob_segment_id'],
       desc: 'Point-in-time exposure data per facility — the "how much is lent" side of the ratio.',
       color: 'amber',
     },
@@ -791,7 +791,7 @@ function RollupPyramid({ expandedLevel, onToggle }: { expandedLevel: string | nu
                     <GitBranch className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden />
                     <div className="text-[10px] text-amber-300">
                       <strong>Cross-tier dependency:</strong> This level depends on facility-level LTV calculation.
-                      Each facility&apos;s LTV (drawn_amount / collateral_value) must be computed first, then weighted by exposure and grouped at the {level.label} level.
+                      Each facility&apos;s LTV (drawn_amount / collateral_value) must be computed first, then weighted by committed facility amount and grouped at the {level.label} level.
                     </div>
                   </div>
                 )}

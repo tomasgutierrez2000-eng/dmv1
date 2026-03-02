@@ -74,14 +74,11 @@ export interface LTVCounterpartyRow {
 }
 
 /*
- * Counterparty A — weighted LTV from 3 facilities above:
- *   (59.5 × 15 + 66.7 × 8 + 113.6 × 25) / (15 + 8 + 25)
- *   = (892.5 + 533.6 + 2840) / 48
- *   = 4266.1 / 48
- *   = 88.9%
+ * Counterparty A — simple average LTV from 3 facilities above:
+ *   (59.5 + 66.7 + 113.6) / 3 = 79.9%
  */
 export const LTV_COUNTERPARTIES: LTVCounterpartyRow[] = [
-  { name: 'Counterparty A', ltv: 88.9, exposure: 48_000_000 },
+  { name: 'Counterparty A', ltv: 79.9, exposure: 48_000_000 },
   { name: 'Counterparty B', ltv: 55.0, exposure: 35_000_000 },
   { name: 'Counterparty C', ltv: 72.3, exposure: 22_000_000 },
 ];

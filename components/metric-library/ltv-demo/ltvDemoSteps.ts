@@ -127,7 +127,7 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Data Sources',
     title: 'Where the Numbers Come From: Snapshot Tables',
     narration:
-      'The actual financial numbers that feed the LTV formula live in "L2 Snapshot Tables" — periodic readings of financial data, like taking a photo of the loan\'s collateral position at a point in time:\n\n• facility_exposure_snapshot — the loan amount (LTV numerator):\n  gross_exposure_usd, drawn_amount, ead_amount\n\n• collateral_snapshot — the collateral values (LTV denominator):\n  current_valuation_usd, haircut_pct, eligible_value_usd, allocated_amount_usd, mitigant_group_code, mitigant_subtype\n\nThe fields highlighted on the page are the specific ones used by the LTV formula. The non-highlighted fields serve other metrics (like EAD for Expected Loss calculations) or other reporting needs.',
+      'The actual financial numbers that feed the LTV formula live in "L2 Snapshot Tables" — periodic readings of financial data, like taking a photo of the loan\'s collateral position at a point in time:\n\n• facility_exposure_snapshot — the loan amount (LTV numerator):\n  committed_amount, gross_exposure_usd, ead_amount\n\n• collateral_snapshot — the collateral values (LTV denominator):\n  current_valuation_usd, haircut_pct, eligible_value_usd, allocated_amount_usd, mitigant_group_code, mitigant_subtype\n\nThe fields highlighted on the page are the specific ones used by the LTV formula. The non-highlighted fields serve other metrics (like EAD for Expected Loss calculations) or other reporting needs.',
     targetSelector: '[data-demo="step3"]',
   },
 
@@ -160,12 +160,12 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     id: 'foundational-rule',
     phase: 5,
     phaseLabel: 'Rollup Hierarchy',
-    title: 'The Golden Rule of LTV Rollups',
+    title: 'How LTV Rolls Up: Simple Average',
     narration:
-      'Before we walk through how LTV combines across multiple loans, one critical rule:\n\nNEVER take the simple average of individual LTVs.\n\nWhy? Because averaging ignores loan size. Imagine:\n\n• A $50M loan at 95% LTV (nearly underwater)\n• A $1M loan at 30% LTV (very safe)\n\nSimple average gives 62.5% — looks fine! But 98% of the money is in the high-LTV loan. The correct approach: exposure-weighted average. Each facility\'s LTV is weighted by its exposure amount.\n\nWeighted LTV = (95% × $50M + 30% × $1M) / ($50M + $1M) = 93.7%\n\nThat\'s a much more accurate — and alarming — picture.',
+      'Before we walk through how LTV combines across multiple loans, one key rule:\n\nRollup LTV uses a simple average of individual facility LTVs — AVG(facility_ltv).\n\nEach facility\'s LTV counts equally, regardless of loan size. For example:\n\n• Facility A: LTV = 95%\n• Facility B: LTV = 30%\n\nBorrower LTV = (95% + 30%) / 2 = 62.5%\n\nThis treats every secured facility as an equal data point. Unsecured facilities (no collateral) are excluded entirely — they get LTV = NULL.',
     targetSelector: '[data-demo="foundational-rule"]',
     insight:
-      'This is the same principle as DSCR rollups. Rating agencies and regulators use exposure-weighted LTV for the same reason: it correctly reflects where the risk concentration actually is.',
+      'The simple average gives equal weight to each facility regardless of size. This is the defined rollup method for LTV across all levels — counterparty, desk, portfolio, and LoB.',
     formulaKey: 'foundational-rule-ltv',
   },
 
@@ -189,12 +189,12 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 2: Borrower (Counterparty)',
     narration:
-      'A single borrower (called a "counterparty" in banking) may have multiple loans, each with different collateral packages. To see the borrower\'s overall collateral coverage:\n\nBorrower LTV = Σ(LTV_i × Exposure_i) ÷ Σ(Exposure_i)\n\nThis is the exposure-weighted average — each loan\'s LTV is weighted by how big that loan is. A $25M loan at 113.6% LTV pulls the average up much more than an $8M loan at 66.7%.',
+      'A single borrower (called a "counterparty" in banking) may have multiple loans, each with different collateral packages. To see the borrower\'s overall collateral coverage:\n\nBorrower LTV = AVG(facility_ltv)\n\nThis is a simple average — each secured facility\'s LTV counts equally. Unsecured facilities (no collateral) are excluded from the average entirely.',
     targetSelector: '[data-demo="rollup-counterparty"]',
     onEnter: { expandLevel: 'counterparty' },
     formulaKey: 'rollup-counterparty',
     insight:
-      'Notice the weighted result differs significantly from a simple average. For Counterparty A: simple average of 59.5%, 66.7%, 113.6% = 79.9%. But the exposure-weighted result is 88.9% — because the largest loan ($25M) also has the highest LTV. The weighted method correctly captures this concentration risk.',
+      'The simple average treats each facility as an equal data point. For Counterparty A with three secured facilities at 59.5%, 66.7%, and 113.6%: the borrower-level LTV = (59.5 + 66.7 + 113.6) / 3 = 79.9%.',
   },
 
   /* ── Step 13: Desk Level ────────────────────────────────────────────────── */
@@ -219,12 +219,12 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 4: Portfolio',
     narration:
-      'At the portfolio level, LTV uses exposure-weighted average — identical to DSCR.\n\nBut the distribution buckets tell the real story:\n\n• < 60%: Low Risk — 12 facilities, $350M exposure\n• 60–80%: Moderate — 18 facilities, $680M exposure\n• 80–100%: High Risk — 8 facilities, $420M exposure\n• > 100%: Underwater — 4 facilities, $180M exposure\n\nThe "underwater" bucket (LTV > 100%) is unique to LTV and is the most watched metric in CRE portfolios. It means the loan exceeds collateral value — if the borrower defaults, the bank cannot fully recover.\n\nA portfolio LTV of 72% might look healthy, but if $180M of exposure is underwater, that demands immediate attention.',
+      'At the portfolio level, LTV uses a simple average of facility LTVs — AVG(facility_ltv) for all secured facilities in the portfolio.\n\nBut the distribution buckets tell the real story:\n\n• < 60%: Low Risk — 12 facilities, $350M exposure\n• 60–80%: Moderate — 18 facilities, $680M exposure\n• 80–100%: High Risk — 8 facilities, $420M exposure\n• > 100%: Underwater — 4 facilities, $180M exposure\n\nThe "underwater" bucket (LTV > 100%) is unique to LTV and is the most watched metric in CRE portfolios. It means the loan exceeds collateral value — if the borrower defaults, the bank cannot fully recover.\n\nA portfolio LTV of 72% might look healthy, but if $180M of exposure is underwater, that demands immediate attention.',
     targetSelector: '[data-demo="rollup-portfolio"]',
     onEnter: { expandLevel: 'portfolio' },
     formulaKey: 'rollup-portfolio',
     insight:
-      'Beware of "Simpson\'s Paradox": a healthy portfolio-level LTV can hide pockets of severely under-collateralized loans. The distribution buckets — especially the "underwater" bucket — reveal what the weighted average conceals.',
+      'Beware of "Simpson\'s Paradox": a healthy portfolio-level LTV can hide pockets of severely under-collateralized loans. The distribution buckets — especially the "underwater" bucket — reveal what a single average number conceals.',
   },
 
   /* ── Step 15: LoB Level ─────────────────────────────────────────────────── */

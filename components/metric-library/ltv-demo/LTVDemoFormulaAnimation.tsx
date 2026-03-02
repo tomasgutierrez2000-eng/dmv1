@@ -8,7 +8,6 @@ import {
   DESK_SEGMENTS,
   PORTFOLIO_BUCKETS,
   LOB_ENTRIES,
-  exposureWeightedLTV,
   fmt,
   fmtM,
   fmtPct,
@@ -23,11 +22,11 @@ import {
  *   - collateral-waterfall: collateral items staggering in
  *   - haircut-waterfall: raw → haircut → eligible value per item
  *   - ltv-division: exposure ÷ collateral × 100 = result
- *   - foundational-rule-ltv: wrong (simple avg) vs correct (weighted avg)
+ *   - foundational-rule-ltv: simple average of facility LTVs
  *   - rollup-facility: table of 3 facility LTVs
- *   - rollup-counterparty: committed-facility-amount-weighted LTV build-up
+ *   - rollup-counterparty: simple average LTV build-up
  *   - rollup-desk: collateral-type segmented view
- *   - rollup-portfolio: EWA + distribution buckets
+ *   - rollup-portfolio: simple average + distribution buckets
  *   - rollup-lob: trend indicator summary
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -102,7 +101,7 @@ function NumeratorExposure({ stepIndex }: { stepIndex: number }) {
         className="flex items-center justify-between text-sm font-bold transition-all duration-500"
         style={{ opacity: revealed > 1 ? 1 : 0, transform: revealed > 1 ? 'scale(1)' : 'scale(0.9)' }}
       >
-        <span className="text-emerald-400">drawn_amount</span>
+        <span className="text-emerald-400">committed_amount</span>
         <span className="text-white font-mono">$15,000,000</span>
       </div>
     </div>
@@ -249,56 +248,41 @@ function LTVDivision({ stepIndex }: { stepIndex: number }) {
 /* ── Foundational Rule — wrong vs right way ──────────────────────────────── */
 
 function FoundationalRuleDemo({ stepIndex }: { stepIndex: number }) {
-  const revealed = useStaggerReveal(4, 500, stepIndex);
+  const revealed = useStaggerReveal(3, 500, stepIndex);
   return (
     <div className="space-y-3">
-      {/* Wrong way */}
+      {/* Facility LTVs */}
       <div
-        className="rounded-lg border border-red-500/30 bg-red-500/5 p-3 transition-all duration-500"
+        className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-3 transition-all duration-500"
         style={{ opacity: revealed > 0 ? 1 : 0, transform: revealed > 0 ? 'translateY(0)' : 'translateY(8px)' }}
       >
-        <div className="text-[9px] font-bold uppercase tracking-widest text-red-400 mb-2">
-          Wrong: Simple Average
+        <div className="text-[9px] font-bold uppercase tracking-widest text-cyan-400 mb-2">
+          Individual Facility LTVs
         </div>
         <div className="space-y-1 text-xs font-mono">
           <div className="flex justify-between text-gray-400">
-            <span>$50M loan</span><span>LTV = 95.0%</span>
+            <span>Facility A</span><span>LTV = 95.0%</span>
           </div>
           <div className="flex justify-between text-gray-400">
-            <span>$1M loan</span><span>LTV = 30.0%</span>
+            <span>Facility B</span><span>LTV = 30.0%</span>
           </div>
-        </div>
-        <div
-          className="mt-2 pt-2 border-t border-red-500/20 text-xs font-mono text-center transition-all duration-500"
-          style={{ opacity: revealed > 1 ? 1 : 0 }}
-        >
-          Average = <span className="text-red-400 font-bold">62.5%</span>
-          <span className="text-[9px] text-red-400/70 ml-1">(misleading!)</span>
         </div>
       </div>
 
-      {/* Right way */}
+      {/* Simple average */}
       <div
         className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 transition-all duration-500"
-        style={{ opacity: revealed > 2 ? 1 : 0, transform: revealed > 2 ? 'translateY(0)' : 'translateY(8px)' }}
+        style={{ opacity: revealed > 1 ? 1 : 0, transform: revealed > 1 ? 'translateY(0)' : 'translateY(8px)' }}
       >
         <div className="text-[9px] font-bold uppercase tracking-widest text-emerald-400 mb-2">
-          Correct: Weighted by Committed Facility Amount
-        </div>
-        <div className="space-y-1 text-xs font-mono">
-          <div className="flex justify-between text-gray-400">
-            <span>95% × $50M</span><span className="text-amber-400">= $47.5M</span>
-          </div>
-          <div className="flex justify-between text-gray-400">
-            <span>30% × $1M</span><span className="text-amber-400">= $0.3M</span>
-          </div>
+          Rollup: Simple Average
         </div>
         <div
-          className="mt-2 pt-2 border-t border-emerald-500/20 text-xs font-mono text-center transition-all duration-500"
-          style={{ opacity: revealed > 3 ? 1 : 0 }}
+          className="text-xs font-mono text-center transition-all duration-500"
+          style={{ opacity: revealed > 2 ? 1 : 0 }}
         >
-          Σ(LTV × CFA) / Σ(CFA) = <span className="text-emerald-400 font-bold">93.7%</span>
-          <span className="text-[9px] text-emerald-400/70 ml-1">(accurate)</span>
+          AVG(facility_ltv) = (95% + 30%) / 2 = <span className="text-emerald-400 font-bold">62.5%</span>
+          <div className="text-[9px] text-gray-500 mt-1">Each facility counts equally · Unsecured excluded</div>
         </div>
       </div>
     </div>
@@ -347,15 +331,13 @@ function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
   const totalLines = facilities.length + 1; // rows + result
   const revealed = useStaggerReveal(totalLines, 400, stepIndex);
 
-  // Weighted LTV for these 3 facilities
-  const totalExp = facilities.reduce((s, f) => s + f.exposure, 0);
-  const weightedSum = facilities.reduce((s, f) => s + f.ltv * f.exposure, 0);
-  const weightedLTV = weightedSum / totalExp;
+  // Simple average LTV for these facilities
+  const avgLTV = facilities.reduce((s, f) => s + f.ltv, 0) / facilities.length;
 
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Weighted by Committed Facility Amount
+        Simple Average of Facility LTVs
       </div>
 
       {facilities.map((f, i) => (
@@ -365,11 +347,7 @@ function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
           style={{ opacity: revealed > i ? 1 : 0, transform: revealed > i ? 'translateX(0)' : 'translateX(12px)' }}
         >
           <span className="text-gray-400">{f.name.split('(')[0].trim()}</span>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className={ltvBandColor(f.ltv)}>{fmtPct(f.ltv)}</span>
-            <span className="text-gray-600">×</span>
-            <span className="text-amber-400">{fmtM(f.exposure)}</span>
-          </div>
+          <span className={`font-bold flex-shrink-0 ml-2 ${ltvBandColor(f.ltv)}`}>{fmtPct(f.ltv)}</span>
         </div>
       ))}
 
@@ -378,10 +356,10 @@ function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
         style={{ opacity: revealed > facilities.length ? 1 : 0, transform: revealed > facilities.length ? 'scale(1)' : 'scale(0.85)' }}
       >
         <div className="text-[10px] text-gray-500 mb-1">
-          Σ(LTV × committed_amount) ÷ Σ(committed_amount)
+          AVG(facility_ltv)
         </div>
-        <div className={`text-xl font-black tabular-nums ${ltvBandColor(weightedLTV)}`}>
-          {fmtPct(weightedLTV)}
+        <div className={`text-xl font-black tabular-nums ${ltvBandColor(avgLTV)}`}>
+          {fmtPct(avgLTV)}
         </div>
       </div>
     </div>
@@ -422,15 +400,16 @@ function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
   const cps = LTV_COUNTERPARTIES;
   const totalLines = cps.length + 1 + PORTFOLIO_BUCKETS.length; // counterparties + result + buckets
   const revealed = useStaggerReveal(totalLines, 350, stepIndex);
-  const wtdAvg = exposureWeightedLTV(cps);
+  // Simple average of facility LTVs across all counterparties in portfolio
+  const avgLTV = cps.reduce((s, cp) => s + cp.ltv, 0) / cps.length;
 
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-3">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Weighted by Committed Facility Amount + Distribution
+        Simple Average + Distribution
       </div>
 
-      {/* Counterparty weighted */}
+      {/* Facility LTVs by counterparty */}
       {cps.map((cp, i) => (
         <div
           key={cp.name}
@@ -438,21 +417,17 @@ function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
           style={{ opacity: revealed > i ? 1 : 0, transform: revealed > i ? 'translateX(0)' : 'translateX(12px)' }}
         >
           <span className="text-gray-400">{cp.name}</span>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className={ltvBandColor(cp.ltv)}>{fmtPct(cp.ltv)}</span>
-            <span className="text-gray-600">×</span>
-            <span className="text-amber-400">{fmtM(cp.exposure)}</span>
-          </div>
+          <span className={`font-bold flex-shrink-0 ml-2 ${ltvBandColor(cp.ltv)}`}>{fmtPct(cp.ltv)}</span>
         </div>
       ))}
 
-      {/* Weighted result */}
+      {/* Average result */}
       <div
         className="text-center pt-2 border-t border-gray-700 transition-all duration-500"
         style={{ opacity: revealed > cps.length ? 1 : 0, transform: revealed > cps.length ? 'scale(1)' : 'scale(0.85)' }}
       >
-        <div className={`text-lg font-black tabular-nums ${ltvBandColor(wtdAvg)}`}>
-          Portfolio LTV: {fmtPct(wtdAvg)}
+        <div className={`text-lg font-black tabular-nums ${ltvBandColor(avgLTV)}`}>
+          Portfolio LTV: {fmtPct(avgLTV)}
         </div>
       </div>
 

@@ -69,7 +69,7 @@ export default function S01_WhatThisPlatformDoes() {
             data (L1), time-series snapshots (L2), and derived analytics (L3). Each layer has a
             clear purpose and feeds the next.
           </Card>
-          <Card title="Governs the metrics" subtitle="Metric Library" accent="bg-emerald-500">
+          <Card title="Governs the metrics" subtitle="Data Catalogue" accent="bg-emerald-500">
             Every metric — from simple exposure totals to complex DSCR ratios — is defined once
             in a central library with clear ownership, formulas, and rollup rules. No more
             shadow spreadsheets.

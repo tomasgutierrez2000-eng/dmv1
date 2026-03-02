@@ -28,7 +28,7 @@ export default function OverviewContent() {
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               >
                 <Library className="w-4 h-4" />
-                Metric Library
+                Data Catalogue
               </Link>
               <Link
                 href="/agent"
@@ -268,7 +268,7 @@ export default function OverviewContent() {
                   <Library className="w-6 h-6 text-slate-300" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1 text-white">Metric Library</h4>
+                  <h4 className="font-semibold text-lg mb-1 text-white">Data Catalogue</h4>
                   <p className="text-sm text-slate-400">Browse all metrics &amp; variants</p>
                 </div>
               </div>
@@ -277,7 +277,7 @@ export default function OverviewContent() {
               </p>
               <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
                 <Play className="w-4 h-4" />
-                <span>Open Metric Library</span>
+                <span>Open Data Catalogue</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </Link>
@@ -316,7 +316,7 @@ export default function OverviewContent() {
               className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"
             >
               <BarChart3 className="w-8 h-8 mx-auto mb-3 text-slate-300" />
-              <h4 className="font-semibold mb-2 text-white">Metric Library</h4>
+              <h4 className="font-semibold mb-2 text-white">Data Catalogue</h4>
               <p className="text-sm text-slate-400">Browse all metrics with lineage, formulas, and variant governance</p>
             </Link>
             <Link

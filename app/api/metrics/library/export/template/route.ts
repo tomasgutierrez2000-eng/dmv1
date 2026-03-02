@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { LIBRARY_SHEET_NAMES } from '@/lib/metric-library/excel-template';
 
-/** GET: download Metric Library Excel template with headers and example rows. */
+/** GET: download Data Catalogue Excel template with headers and example rows. */
 export async function GET() {
   const XLSX = await import('xlsx');
 
   const instructionsData = [
-    ['Metric Library — Bulk Import Template'],
+    ['Data Catalogue — Bulk Import Template'],
     [],
     ['Sheets: Domains, ParentMetrics, Variants. Process order: Domains first, then ParentMetrics, then Variants.'],
     ['parent_metric_id in Variants must match a metric_id in ParentMetrics (or in the same file).'],

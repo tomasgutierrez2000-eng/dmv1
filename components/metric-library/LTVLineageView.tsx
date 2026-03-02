@@ -65,7 +65,7 @@ export default function LTVLineageView() {
                 className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-400 transition-colors mb-1 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
               >
                 <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
-                Metric Library
+                Data Catalogue
               </Link>
               <h1 className="text-xl font-bold text-white">LTV (Loan-to-Value %) — End-to-End Lineage</h1>
               <p className="text-xs text-gray-500 mt-0.5">

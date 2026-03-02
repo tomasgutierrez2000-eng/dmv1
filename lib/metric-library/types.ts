@@ -1,5 +1,5 @@
 /**
- * Metric Library — simplified types for Domain, Parent Metric, and Metric Variant.
+ * Data Catalogue — simplified types for Domain, Parent Metric, and Metric Variant.
  *
  * ARCHITECTURE:
  * - One PARENT METRIC = one business concept (e.g. DSCR, PD, LTV).
@@ -70,4 +70,5 @@ export interface MetricVariant {
   source_table?: string;
   source_field?: string;
   executable_metric_id?: string | null;
+  lineage_route?: string | null;
 }

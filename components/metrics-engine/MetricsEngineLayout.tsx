@@ -237,7 +237,7 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               <header className="mb-6">
                 <h2 className="text-lg font-bold text-white">Calculator engine</h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  Use <strong className="text-purple-300">DSCR</strong> in the sidebar to build variants. Saved metrics are added to the Metric Library.
+                  Use <strong className="text-purple-300">DSCR</strong> in the sidebar to build variants. Saved metrics are added to the Data Catalogue.
                 </p>
               </header>
 

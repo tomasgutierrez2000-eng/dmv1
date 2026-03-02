@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Also add to the Metric Library as a variant under the DSCR parent metric.
+  // Also add to the Data Catalogue as a variant under the DSCR parent metric.
   try {
     const DSCR_PARENT_ID = 'DSCR';
     if (!getParentMetric(DSCR_PARENT_ID)) {

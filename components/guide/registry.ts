@@ -78,7 +78,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     badge: 'Metrics',
     subsections: [
       { id: 'metrics-overview', title: 'Three Layers of Metrics' },
-      { id: 'metric-library', title: 'The Metric Library' },
+      { id: 'metric-library', title: 'The Data Catalogue' },
       { id: 'domains-explained', title: 'Domains' },
       { id: 'parents-and-variants', title: 'Parents & Variants' },
       { id: 'rollup-hierarchy', title: 'The Rollup Hierarchy' },
@@ -112,7 +112,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       { id: 'page-map', title: 'Page Map' },
       { id: 'dashboard-overview', title: 'Facility Dashboard' },
       { id: 'visualizer-overview', title: 'Data Model Visualizer' },
-      { id: 'library-overview', title: 'Metric Library UI' },
+      { id: 'library-overview', title: 'Data Catalogue UI' },
     ],
   },
   {

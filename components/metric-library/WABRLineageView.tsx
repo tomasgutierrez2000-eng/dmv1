@@ -1664,7 +1664,7 @@ export default function WABRLineageView() {
                 className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-teal-400 transition-colors mb-0.5 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded"
               >
                 <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
-                Metric Library
+                Data Catalogue
               </Link>
               <h1 className="text-lg font-bold text-white">Weighted Average Base Rate — End-to-End Lineage</h1>
             </div>

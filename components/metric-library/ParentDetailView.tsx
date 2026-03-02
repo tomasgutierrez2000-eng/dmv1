@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { MetricDomain } from '@/lib/metric-library/types';
 import { TypeBadge, StatusBadge } from './badges';
 import { DomainIcon } from './domain-icons';
@@ -30,6 +30,7 @@ interface VariantSummary {
   executable_metric_id?: string | null;
   source_table?: string;
   source_field?: string;
+  lineage_route?: string | null;
 }
 
 const TABS = [
@@ -90,7 +91,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
         <ol className="flex items-center gap-2 text-sm text-gray-500">
           <li>
             <Link href="/metrics/library" className="hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded">
-              Metric Library
+              Data Catalogue
             </Link>
           </li>
           <li aria-hidden>/</li>
@@ -142,6 +143,21 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
             <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Rollup Philosophy</div>
             <div className="text-sm text-gray-700">{(m.rollup_philosophy ?? '').split('.')[0] || '—'}</div>
           </div>
+          {m.variants?.some((v) => v.lineage_route) && (() => {
+            const lineageVariant = m.variants.find((v) => v.lineage_route);
+            return lineageVariant?.lineage_route ? (
+              <Link
+                href={lineageVariant.lineage_route}
+                className="bg-white rounded-lg border border-teal-200 p-4 shadow-sm transition-shadow hover:shadow-md hover:border-teal-400 block no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+              >
+                <div className="text-xs text-teal-600 uppercase font-bold tracking-wide mb-1 flex items-center gap-1.5">
+                  <ExternalLink className="w-3 h-3" aria-hidden />
+                  Data Lineage
+                </div>
+                <div className="text-sm text-gray-700">View end-to-end pipeline</div>
+              </Link>
+            ) : null;
+          })()}
         </div>
 
         <div
@@ -199,6 +215,9 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
                         )}
                         {v.executable_metric_id && (
                           <span className="font-medium text-green-600">Runnable in Engine</span>
+                        )}
+                        {v.lineage_route && (
+                          <span className="font-medium text-teal-600">Has Lineage View</span>
                         )}
                       </div>
                     </div>

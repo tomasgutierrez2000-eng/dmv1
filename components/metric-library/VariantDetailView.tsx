@@ -65,7 +65,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
         <ol className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
           <li>
             <Link href="/metrics/library" className="hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded">
-              Metric Library
+              Data Catalogue
             </Link>
           </li>
           <li aria-hidden>/</li>
@@ -281,6 +281,23 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
               >
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden />
                 Open in Metrics Engine
+              </Link>
+            </div>
+          )}
+
+          {/* Lineage link */}
+          {v.lineage_route && (
+            <div className="p-4 bg-teal-50 border border-teal-200 rounded-lg">
+              <h3 className="text-xs font-bold text-teal-800 uppercase mb-1">Data Lineage</h3>
+              <p className="text-sm text-teal-700 mb-3">
+                Trace the complete data pipeline from source tables through calculation to dashboard — with SOURCING, CALCULATION, and HYBRID step classification.
+              </p>
+              <Link
+                href={v.lineage_route}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden />
+                View End-to-End Lineage
               </Link>
             </div>
           )}

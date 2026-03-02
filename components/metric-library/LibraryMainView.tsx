@@ -171,9 +171,12 @@ export default function LibraryMainView() {
     };
   }, [searchQuery]);
 
+  /* Only show metrics that have been fully catalogued with lineage views */
+  const CATALOGUED_METRICS = new Set(['LTV']);
+  const catalogued = parents.filter((p) => CATALOGUED_METRICS.has(p.metric_id));
   const filtered = selectedDomain
-    ? parents.filter((p) => p.domain_ids?.includes(selectedDomain))
-    : parents;
+    ? catalogued.filter((p) => p.domain_ids?.includes(selectedDomain))
+    : catalogued;
   const searched = searchQuery.trim()
     ? filtered.filter(
         (p) =>
@@ -183,7 +186,7 @@ export default function LibraryMainView() {
       )
     : filtered;
 
-  const totalVariants = parents.reduce((s, p) => s + (p.variant_count ?? 0), 0);
+  const totalVariants = catalogued.reduce((s, p) => s + (p.variant_count ?? 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -197,11 +200,11 @@ export default function LibraryMainView() {
               <ChevronLeft className="w-4 h-4 flex-shrink-0" aria-hidden />
               Overview
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Metric Library</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Data Catalogue</h1>
           </div>
           {!loading && !error && (
             <p className="text-sm text-gray-500 mt-1">
-              {parents.length} Parent Metrics · {totalVariants} Variants
+              {catalogued.length} Parent Metrics · {totalVariants} Variants
             </p>
           )}
           <p className="mt-4 text-xs text-gray-500">

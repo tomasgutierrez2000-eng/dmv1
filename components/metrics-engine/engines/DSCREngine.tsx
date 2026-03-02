@@ -726,7 +726,7 @@ Sources: ${[
               Save as metric
             </h3>
             <p className="text-sm text-gray-400 mb-3">
-              Save this DSCR variant and add it to the Metric Library as a draft. It will appear under the DSCR parent metric with full lineage.
+              Save this DSCR variant and add it to the Data Catalogue as a draft. It will appear under the DSCR parent metric with full lineage.
             </p>
             <div className="flex flex-wrap items-end gap-3">
               <label className="flex-1 min-w-[200px]">
@@ -762,7 +762,7 @@ Sources: ${[
             <div className="p-4 rounded-lg border border-emerald-500/40 bg-emerald-950/30 mb-4" role="status">
               <div className="text-sm font-semibold text-emerald-400 mb-1">Metric saved</div>
               <p className="text-xs text-emerald-300/90 leading-relaxed">
-                Variant <strong>{saveName.trim() || variantCode}</strong> has been saved and added to the Metric Library as a draft variant under DSCR.
+                Variant <strong>{saveName.trim() || variantCode}</strong> has been saved and added to the Data Catalogue as a draft variant under DSCR.
               </p>
             </div>
           )}

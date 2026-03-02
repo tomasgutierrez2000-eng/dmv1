@@ -1,5 +1,5 @@
 /**
- * Metric Library — file-based store for domains, parent metrics, and variants.
+ * Data Catalogue — file-based store for domains, parent metrics, and variants.
  * Path: data/metric-library/*.json. DB-ready: swap this module for a DB client later.
  */
 

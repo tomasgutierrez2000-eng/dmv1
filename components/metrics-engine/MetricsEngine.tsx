@@ -7,7 +7,7 @@ import type { L3Metric } from '@/data/l3-metrics';
 type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 type MetricPayload = Partial<L3Metric>;
 
-/** Only the DSCR calculator lives in the engine. All metrics are browsed in the Metric Library. */
+/** Only the DSCR calculator lives in the engine. All metrics are browsed in the Data Catalogue. */
 const DSCR_ENGINE_ID = `${ENGINE_PREFIX}dscr`;
 
 export default function MetricsEngine() {

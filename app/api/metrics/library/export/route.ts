@@ -3,12 +3,12 @@ import { LIBRARY_SHEET_NAMES } from '@/lib/metric-library/excel-template';
 import { getDomains, getParentMetrics, getVariants } from '@/lib/metric-library/store';
 import type { MetricDomain, ParentMetric, MetricVariant } from '@/lib/metric-library/types';
 
-/** GET: export current Metric Library to Excel. */
+/** GET: export current Data Catalogue to Excel. */
 export async function GET() {
   const XLSX = await import('xlsx');
 
   const instructionsData = [
-    ['Metric Library — Exported data. Edit and re-import via Import from Excel.'],
+    ['Data Catalogue — Exported data. Edit and re-import via Import from Excel.'],
     [],
     ['Sheets: Domains, ParentMetrics, Variants. Required columns must be present.'],
   ];

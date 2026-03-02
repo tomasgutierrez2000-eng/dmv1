@@ -89,7 +89,7 @@ export default function S02_TheBigPicture() {
             {/* Row 2: Supporting systems */}
             <div className="flex items-center justify-center gap-6 border-t border-slate-800 pt-4">
               {[
-                { label: 'Metric Library', desc: 'Governs definitions' },
+                { label: 'Data Catalogue', desc: 'Governs definitions' },
                 { label: 'Calculation Engine', desc: 'Runs formulas' },
                 { label: 'API Layer', desc: 'Serves data' },
                 { label: 'UI / Dashboards', desc: 'Visualizes results' },
@@ -117,7 +117,7 @@ export default function S02_TheBigPicture() {
             { step: '2', title: 'L1 tables are populated', desc: 'Reference/master tables are filled with entity data — who are the counterparties, what facilities exist, what products, what currencies.' },
             { step: '3', title: 'L2 snapshots are created', desc: 'Monthly snapshots capture the state of each facility: exposure amounts, collateral values, ratings, pricing. Events like defaults or amendments are recorded.' },
             { step: '4', title: 'L3 analytics are derived', desc: 'The system joins L1 + L2 data to calculate cubes, summaries, and aggregated views. This happens in 4 tiers — each tier can read from the ones before it.' },
-            { step: '5', title: 'Metrics are calculated', desc: 'The Metric Library defines what to calculate (e.g., DSCR = NOI / Debt Service). The Calculation Engine runs the formula against the right tables and returns results.' },
+            { step: '5', title: 'Metrics are calculated', desc: 'The Data Catalogue defines what to calculate (e.g., DSCR = NOI / Debt Service). The Calculation Engine runs the formula against the right tables and returns results.' },
             { step: '6', title: 'Dashboards display results', desc: 'The UI pulls metric values through APIs and renders them as KPI cards, charts, tables, and drill-down views.' },
           ].map(s => (
             <div key={s.step} className="flex gap-3 items-start">

@@ -1,7 +1,7 @@
 import ParentDetailView from '@/components/metric-library/ParentDetailView';
 
 export const metadata = {
-  title: 'Parent Metric — Metric Library',
+  title: 'Parent Metric — Data Catalogue',
   description: 'Parent metric detail and variants',
 };
 

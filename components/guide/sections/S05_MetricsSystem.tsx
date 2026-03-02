@@ -28,7 +28,7 @@ export default function S05_MetricsSystem() {
           <div className="flex flex-col sm:flex-row items-stretch gap-4">
             <div className="flex-1 bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
               <div className="text-xs font-mono text-emerald-400 mb-2">LAYER 1</div>
-              <div className="text-sm font-semibold text-emerald-300 mb-2">Metric Library</div>
+              <div className="text-sm font-semibold text-emerald-300 mb-2">Data Catalogue</div>
               <p className="text-xs text-slate-400 leading-relaxed">
                 <strong className="text-slate-300">The recipe book.</strong> Business definitions,
                 ownership, formulas in plain English, rollup rules, governance status.
@@ -63,11 +63,11 @@ export default function S05_MetricsSystem() {
         </DiagramBox>
       </SubSection>
 
-      {/* ── The Metric Library ───────────────────────────────────── */}
+      {/* ── The Data Catalogue ───────────────────────────────────── */}
       <SubSection id="metric-library">
-        <SubTitle>The Metric Library</SubTitle>
+        <SubTitle>The Data Catalogue</SubTitle>
         <P>
-          The Metric Library is the single source of truth for what every metric means. It answers:
+          The Data Catalogue is the single source of truth for what every metric means. It answers:
           What is this metric? Who owns it? How is it calculated? How does it roll up from
           facility level to portfolio level?
         </P>
@@ -75,7 +75,7 @@ export default function S05_MetricsSystem() {
           The library is organized in a hierarchy: <strong>Domains → Parent Metrics → Variants</strong>.
         </P>
 
-        <DiagramBox title="Metric Library Hierarchy">
+        <DiagramBox title="Data Catalogue Hierarchy">
           <div className="space-y-4">
             {/* Domain level */}
             <div className="flex items-center gap-3">

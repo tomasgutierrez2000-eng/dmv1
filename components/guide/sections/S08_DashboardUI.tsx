@@ -47,7 +47,7 @@ export default function S08_DashboardUI() {
             ],
             [
               '/metrics/library',
-              'Metric Library',
+              'Data Catalogue',
               'Browse domains, parent metrics, and variants. View governance and rollup logic.',
               <FilePath key="f3">components/metric-library/</FilePath>,
             ],
@@ -190,9 +190,9 @@ export default function S08_DashboardUI() {
 
       {/* ── Library Overview ─────────────────────────────────────── */}
       <SubSection id="library-overview">
-        <SubTitle>Metric Library UI</SubTitle>
+        <SubTitle>Data Catalogue UI</SubTitle>
         <P>
-          The Metric Library UI (<FilePath>components/metric-library/</FilePath>) is how you
+          The Data Catalogue UI (<FilePath>components/metric-library/</FilePath>) is how you
           browse and manage metric definitions. It has three views:
         </P>
 

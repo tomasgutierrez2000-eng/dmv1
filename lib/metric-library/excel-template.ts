@@ -1,5 +1,5 @@
 /**
- * Metric Library Excel template: sheet names, column mapping, required fields.
+ * Data Catalogue Excel template: sheet names, column mapping, required fields.
  * Used by export/template, export (current library), and import API.
  */
 

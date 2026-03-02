@@ -213,7 +213,8 @@
       "lob": "SUM across portfolios"
     },
     "source_table": "facility_master",
-    "source_field": "committed_facility_amt"
+    "source_field": "committed_facility_amt",
+    "lineage_route": "/metrics/committed-lineage"
   },
   {
     "variant_id": "UNDRAWN",
@@ -340,7 +341,8 @@
       "portfolio": "SUM(dscr * desk_exposure) / SUM(desk_exposure)",
       "lob": "SUM(dscr * portfolio_exposure) / SUM(portfolio_exposure)"
     },
-    "weighting_basis": "BY_EAD"
+    "weighting_basis": "BY_EAD",
+    "lineage_route": "/metrics/dscr-lineage"
   },
   {
     "variant_id": "LTV",
@@ -348,15 +350,19 @@
     "parent_metric_id": "LTV",
     "variant_type": "CALCULATED",
     "status": "ACTIVE",
-    "formula_display": "Exposure / Collateral Value * 100",
+    "formula_display": "SUM(drawn_amount / NULLIF(SUM(collateral_value), 0) * gross_exposure) / SUM(gross_exposure)",
     "rollup_logic": {
-      "facility": "Raw sourced value",
+      "facility": "drawn_amount / SUM(collateral_value) — HYBRID collateral aggregation before division",
       "counterparty": "SUM(ltv * facility_exposure) / SUM(facility_exposure)",
       "desk": "SUM(ltv * cpty_exposure) / SUM(cpty_exposure)",
       "portfolio": "SUM(ltv * desk_exposure) / SUM(desk_exposure)",
       "lob": "SUM(ltv * portfolio_exposure) / SUM(portfolio_exposure)"
     },
-    "weighting_basis": "BY_EAD"
+    "weighting_basis": "BY_EAD",
+    "source_table": "facility_exposure_snapshot",
+    "source_field": "drawn_amount",
+    "executable_metric_id": "C104",
+    "lineage_route": "/metrics/ltv-lineage"
   },
   {
     "variant_id": "ROE",

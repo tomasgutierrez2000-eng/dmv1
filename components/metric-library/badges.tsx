@@ -1,6 +1,6 @@
 'use client';
 
-/** Reusable badges for Metric Library. */
+/** Reusable badges for Data Catalogue. */
 
 const TYPE_COLORS: Record<string, string> = {
   SOURCED: 'bg-sky-100 text-sky-800 border border-sky-200',

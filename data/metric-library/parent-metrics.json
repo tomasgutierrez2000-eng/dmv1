@@ -378,12 +378,12 @@
   {
     "metric_id": "LTV",
     "metric_name": "Loan-to-Value Ratio",
-    "definition": "Exposure divided by Collateral Value. Leverage KPI providing insight into collateral coverage and downside protection.",
-    "generic_formula": "Exposure / Collateral Value \u00d7 100",
+    "definition": "Drawn exposure divided by aggregated collateral value with HYBRID sourcing for multi-collateral facilities. Measures credit risk coverage and downside protection. At the facility level, collateral items from collateral_snapshot are SUMmed before dividing into drawn_amount from facility_exposure_snapshot. Higher tiers use exposure-weighted averages.",
+    "generic_formula": "Drawn Amount / SUM(Collateral Value) \u00d7 100",
     "metric_class": "CALCULATED",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
-    "rollup_philosophy": "Exposure-weighted average",
+    "rollup_philosophy": "Exposure-weighted average. Pre-computed LTVs must NEVER be simple-averaged \u2014 this creates misleading risk indicators. Each tier uses SUM(LTV_i \u00d7 exposure_i) / SUM(exposure_i). The facility level requires HYBRID collateral aggregation: multiple collateral items per facility are SUMmed before division.",
     "domain_ids": [
       "FP",
       "CM"

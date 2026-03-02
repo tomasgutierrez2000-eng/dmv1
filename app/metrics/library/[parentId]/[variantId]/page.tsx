@@ -1,7 +1,7 @@
 import VariantDetailView from '@/components/metric-library/VariantDetailView';
 
 export const metadata = {
-  title: 'Variant — Metric Library',
+  title: 'Variant — Data Catalogue',
   description: 'Metric variant definition, lineage, and governance',
 };
 

@@ -155,7 +155,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     formula: 'SUM(ltv_pct * outstanding_exposure) / SUM(outstanding_exposure)',
     description: 'Exposure-weighted LTV across hierarchy levels.',
     displayFormat: '0.00%',
-    sampleValue: '—',
+    sampleValue: '76.48%',
     sourceFields: [
       { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount' },
       { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd' },

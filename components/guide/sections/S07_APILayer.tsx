@@ -115,9 +115,9 @@ export default function S07_APILayer() {
           />
         </div>
 
-        {/* Metric Library APIs */}
+        {/* Data Catalogue APIs */}
         <div className="mb-8">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Metric Library</p>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Data Catalogue</p>
           <DataTable
             headers={['Method', 'Endpoint', 'What It Does']}
             rows={[

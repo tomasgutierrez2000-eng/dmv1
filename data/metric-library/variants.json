@@ -5,13 +5,13 @@
     "parent_metric_id": "PD",
     "variant_type": "SOURCED",
     "status": "ACTIVE",
-    "formula_display": "PD model output per obligor",
+    "formula_display": "Model-assigned PD from rating scorecard",
     "rollup_logic": {
-      "facility": "Raw sourced value",
-      "counterparty": "SUM(pd * facility_ead) / SUM(facility_ead)",
-      "desk": "SUM(pd * cpty_ead) / SUM(cpty_ead)",
-      "portfolio": "SUM(pd * desk_ead) / SUM(desk_ead)",
-      "lob": "SUM(pd * portfolio_ead) / SUM(portfolio_ead)"
+      "facility": "For each DISTINCT(facility_id) THEN COALESCE(stressed_pd_pct, counterparty_rating_observation.pd_pct) WHERE rating_source_id = 'INTERNAL'. Basel floor: MAX(pd, 0.0003)",
+      "counterparty": "For each [counterparty_id] THEN SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
+      "desk": "For each [L3 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+      "lob": "For each [L1 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments"
     },
     "weighting_basis": "BY_EAD",
     "source_table": "counterparty",
@@ -39,15 +39,15 @@
     "variant_id": "EAD",
     "variant_name": "Exposure at Default",
     "parent_metric_id": "EAD",
-    "variant_type": "HYBRID",
+    "variant_type": "CALCULATED",
     "status": "ACTIVE",
-    "formula_display": "Outstanding + CCF * Undrawn",
+    "formula_display": "drawn_amount + ccf * (committed_amount - drawn_amount)",
     "rollup_logic": {
-      "facility": "Raw sourced value",
-      "counterparty": "SUM across facilities",
-      "desk": "SUM across counterparties",
-      "portfolio": "SUM across desks",
-      "lob": "SUM across portfolios"
+      "facility": "For each DISTINCT(facility_id) THEN [drawn_amount] + [ccf] * ([committed_facility_amt] - [drawn_amount])",
+      "counterparty": "For each [counterparty_id] THEN SUM(facility.ead) WHERE IS([counterparty_id])",
+      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 LoB], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal",
+      "lob": "For each [L1 LoB], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal"
     },
     "source_table": "position",
     "source_field": "ead_amt"
@@ -334,11 +334,10 @@
     "status": "ACTIVE",
     "formula_display": "Cashflow / Total Debt Service",
     "rollup_logic": {
-      "facility": "Raw sourced value",
-      "counterparty": "SUM(dscr * facility_exposure) / SUM(facility_exposure)",
-      "desk": "SUM(dscr * cpty_exposure) / SUM(cpty_exposure)",
-      "portfolio": "SUM(dscr * desk_exposure) / SUM(desk_exposure)",
-      "lob": "SUM(dscr * portfolio_exposure) / SUM(portfolio_exposure)"
+      "facility": "For each DISTINCT(facility_id) THEN [noi] / [debt_service] from facility_financial_snapshot",
+      "counterparty": "For each [counterparty_id] THEN SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
+      "desk": "For each [L3 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments"
     },
     "weighting_basis": "BY_EAD"
   },
@@ -348,13 +347,13 @@
     "parent_metric_id": "LTV",
     "variant_type": "CALCULATED",
     "status": "ACTIVE",
-    "formula_display": "Exposure / Collateral Value * 100",
+    "formula_display": "Committed_Facility_Amt / Collateral_Value x 100",
     "rollup_logic": {
-      "facility": "Raw sourced value",
-      "counterparty": "SUM(ltv * facility_exposure) / SUM(facility_exposure)",
-      "desk": "SUM(ltv * cpty_exposure) / SUM(cpty_exposure)",
-      "portfolio": "SUM(ltv * desk_exposure) / SUM(desk_exposure)",
-      "lob": "SUM(ltv * portfolio_exposure) / SUM(portfolio_exposure)"
+      "facility": "For each DISTINCT(facility_id) THEN [committed_facility_amt] / [collateral_value] x 100",
+      "counterparty": "For each [counterparty_id] THEN lookup [facility_id] WHERE IS([counterparty_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+      "portfolio": "For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+      "lob": "For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100"
     },
     "weighting_basis": "BY_EAD"
   },

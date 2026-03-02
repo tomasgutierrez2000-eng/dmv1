@@ -476,8 +476,10 @@ const CARD_H_BASE = 52;
 const FIELD_H = 20;
 const ROW_HEIGHT = 172;
 const SVG_PAD = 16;
-const NAME_MAX_CHARS = 22;
-const VALUE_MAX_CHARS = 14;
+/** Max characters for field name (left side of row; truncate so value fits on right) */
+const NAME_MAX_CHARS = 12;
+/** Max characters for field value (right side of row; truncate to fit in card) */
+const VALUE_MAX_CHARS = 12;
 
 const PLAYBACK_BASE_MS = 5000;
 const SPEED_OPTIONS = [
@@ -599,8 +601,16 @@ function TableCard({
 
       {/* Fields or result */}
       {isCalc && sampleResult && isActive ? (
-        <text x={x + w / 2} y={y + 58} textAnchor="middle" fill="#6ee7b7" fontSize={10} fontWeight={700} fontFamily="monospace">
-          {sampleResult}
+        <text
+          x={x + w / 2}
+          y={y + 58}
+          textAnchor="middle"
+          fill="#6ee7b7"
+          fontSize={10}
+          fontWeight={700}
+          fontFamily="monospace"
+        >
+          {sampleResult.length > 28 ? sampleResult.slice(0, 26) + '\u2026' : sampleResult}
         </text>
       ) : (
         tableDef.fields.slice(0, 4).map((field, i) => {
@@ -614,10 +624,12 @@ function TableCard({
                 <rect x={x + 4} y={fy - 2} width={w - 8} height={FIELD_H - 2} rx={4} fill="rgba(245,158,11,0.1)" />
               )}
               <text x={x + 12} y={fy + 13} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
+                <title>{field.name}</title>
                 {nameDisplay}
               </text>
               {isHighlighted && (
-                <text x={x + w - 10} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
+                <text x={x + w - 12} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
+                  <title>{field.sampleValue}</title>
                   {valueDisplay}
                 </text>
               )}
@@ -958,7 +970,7 @@ export default function TableTraversalDemo() {
                   onClick={prev}
                   disabled={activeStep <= 0}
                   className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Previous step"
+                  aria-label="Previous step"
                 >
                   <SkipBack className="w-3.5 h-3.5" />
                 </button>
@@ -983,7 +995,7 @@ export default function TableTraversalDemo() {
                   onClick={next}
                   disabled={activeStep >= totalSteps - 1}
                   className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Next step"
+                  aria-label="Next step"
                 >
                   <SkipForward className="w-3.5 h-3.5" />
                 </button>
@@ -1046,8 +1058,8 @@ export default function TableTraversalDemo() {
         </div>
       )}
 
-      {/* SVG Diagram — compact, fit in single view */}
-      <div className="px-2 py-3 overflow-x-auto overflow-y-hidden">
+      {/* SVG Diagram — compact, fit in single view; mt-6 keeps step-control tooltips from overlapping cards */}
+      <div className="px-2 pt-6 pb-3 overflow-x-auto overflow-y-hidden">
         <svg
           width={svgW}
           height={svgH}

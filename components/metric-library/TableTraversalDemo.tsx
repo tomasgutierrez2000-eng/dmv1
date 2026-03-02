@@ -803,13 +803,14 @@ export default function TableTraversalDemo() {
   const positions = getCardPositions(demo.tables);
 
   const totalSteps = demo.steps.length;
-  const step = activeStep >= 0 ? demo.steps[activeStep] : null;
+  const clampedStep = activeStep >= totalSteps ? totalSteps - 1 : activeStep;
+  const step = clampedStep >= 0 ? demo.steps[clampedStep] : null;
   const stepDelayMs = Math.round(PLAYBACK_BASE_MS / playbackSpeed);
 
   const visitedTables = new Set<string>();
   const visitedArrows = new Set<string>();
-  if (activeStep >= 0) {
-    for (let i = 0; i <= activeStep; i++) {
+  if (clampedStep >= 0) {
+    for (let i = 0; i <= clampedStep; i++) {
       visitedTables.add(demo.steps[i].highlightTable);
       if (demo.steps[i].arrowFrom && demo.steps[i].arrowTo) {
         visitedArrows.add(`${demo.steps[i].arrowFrom}->${demo.steps[i].arrowTo}`);
@@ -916,11 +917,11 @@ export default function TableTraversalDemo() {
         <div className="h-0.5 bg-gray-800 rounded-full mb-3">
           <div
             className="h-full bg-gradient-to-r from-amber-500 via-blue-500 to-purple-500 transition-all duration-700 ease-out rounded-full"
-            style={{ width: activeStep >= 0 ? `${((activeStep + 1) / totalSteps) * 100}%` : '0%' }}
+            style={{ width: clampedStep >= 0 ? `${((clampedStep + 1) / totalSteps) * 100}%` : '0%' }}
           />
         </div>
 
-        {activeStep === -1 ? (
+        {clampedStep === -1 ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-gray-400">
               Press <strong className="text-white">Play</strong> to watch how the <strong className="text-purple-300">{demo.label}</strong> dimension
@@ -952,10 +953,10 @@ export default function TableTraversalDemo() {
           </div>
         ) : (
           <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-            <div key={`narration-${selectedDim}-${activeStep}`} className="flex-1 min-w-[280px] max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
+            <div key={`narration-${selectedDim}-${clampedStep}`} className="flex-1 min-w-[280px] max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
-                  Step {activeStep + 1} of {totalSteps}
+                  Step {clampedStep + 1} of {totalSteps}
                 </span>
                 <span
                   className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
@@ -991,7 +992,7 @@ export default function TableTraversalDemo() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={prev}
-                  disabled={activeStep <= 0}
+                  disabled={clampedStep <= 0}
                   className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Previous step"
                 >
@@ -1016,7 +1017,7 @@ export default function TableTraversalDemo() {
                 )}
                 <button
                   onClick={next}
-                  disabled={activeStep >= totalSteps - 1}
+                  disabled={clampedStep >= totalSteps - 1}
                   className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   aria-label="Next step"
                 >
@@ -1060,7 +1061,7 @@ export default function TableTraversalDemo() {
             {joinSteps.map((s, i) => {
               const fromName = s.arrowFrom && TABLES[s.arrowFrom] ? TABLES[s.arrowFrom].shortName : s.arrowFrom ?? '?';
               const toName = s.arrowTo && TABLES[s.arrowTo] ? TABLES[s.arrowTo].shortName : s.arrowTo ?? '?';
-              const isCurrent = step && demo.steps[activeStep] === s;
+              const isCurrent = step && demo.steps[clampedStep] === s;
               return (
                 <div
                   key={i}
@@ -1108,8 +1109,8 @@ export default function TableTraversalDemo() {
             const to = positions[s.arrowTo];
             if (!from || !to) return null;
             const arrowKey = `${s.arrowFrom}->${s.arrowTo}`;
-            const isArrowActive = i === activeStep;
-            const isArrowVisited = visitedArrows.has(arrowKey) && i < activeStep;
+            const isArrowActive = i === clampedStep;
+            const isArrowVisited = visitedArrows.has(arrowKey) && i < clampedStep;
             return (
               <AnimatedArrow
                 key={`arrow-${selectedDim}-${i}`}

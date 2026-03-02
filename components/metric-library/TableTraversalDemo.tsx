@@ -469,12 +469,14 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
  * LAYOUT: compute card positions for the visual diagram
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const CARD_W = 148;
-const CARD_GAP = 20;
-const CARD_H_BASE = 48;
-const FIELD_H = 18;
-const ROW_HEIGHT = 160;
+const CARD_W = 176;
+const CARD_GAP = 24;
+const CARD_H_BASE = 52;
+const FIELD_H = 20;
+const ROW_HEIGHT = 172;
 const SVG_PAD = 16;
+const NAME_MAX_CHARS = 22;
+const VALUE_MAX_CHARS = 14;
 
 const PLAYBACK_BASE_MS = 5000;
 const SPEED_OPTIONS = [
@@ -590,30 +592,32 @@ function TableCard({
         {tableDef.shortName}
       </text>
       {/* Full name */}
-      <text x={x + 8} y={y + 38} fill="#6b7280" fontSize={8} fontFamily="monospace">
-        {isCalc ? tableDef.name : tableDef.name.length > 28 ? tableDef.name.slice(0, 26) + '...' : tableDef.name}
+      <text x={x + 8} y={y + 40} fill="#6b7280" fontSize={8} fontFamily="monospace">
+        {isCalc ? tableDef.name : tableDef.name.length > 30 ? tableDef.name.slice(0, 28) + '\u2026' : tableDef.name}
       </text>
 
       {/* Fields or result */}
       {isCalc && sampleResult && isActive ? (
-        <text x={x + w / 2} y={y + 52} textAnchor="middle" fill="#6ee7b7" fontSize={10} fontWeight={700} fontFamily="monospace">
+        <text x={x + w / 2} y={y + 58} textAnchor="middle" fill="#6ee7b7" fontSize={10} fontWeight={700} fontFamily="monospace">
           {sampleResult}
         </text>
       ) : (
         tableDef.fields.slice(0, 4).map((field, i) => {
           const isHighlighted = isActive && fieldsToShow.includes(field.name);
           const fy = y + CARD_H_BASE + i * FIELD_H;
+          const nameDisplay = field.name.length > NAME_MAX_CHARS ? field.name.slice(0, NAME_MAX_CHARS - 1) + '\u2026' : field.name;
+          const valueDisplay = field.sampleValue.length > VALUE_MAX_CHARS ? field.sampleValue.slice(0, VALUE_MAX_CHARS - 1) + '\u2026' : field.sampleValue;
           return (
             <g key={field.name}>
               {isHighlighted && (
                 <rect x={x + 4} y={fy - 2} width={w - 8} height={FIELD_H - 2} rx={4} fill="rgba(245,158,11,0.1)" />
               )}
-              <text x={x + 12} y={fy + 12} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
-                {field.name}
+              <text x={x + 12} y={fy + 13} fill={isHighlighted ? '#fcd34d' : '#6b7280'} fontSize={9} fontFamily="monospace" fontWeight={isHighlighted ? 600 : 400}>
+                {nameDisplay}
               </text>
               {isHighlighted && (
-                <text x={x + w - 8} y={fy + 12} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
-                  {field.sampleValue.length > 12 ? field.sampleValue.slice(0, 11) + '\u2026' : field.sampleValue}
+                <text x={x + w - 10} y={fy + 13} textAnchor="end" fill="#d1d5db" fontSize={9} fontFamily="monospace" fontWeight={600}>
+                  {valueDisplay}
                 </text>
               )}
             </g>
@@ -625,6 +629,7 @@ function TableCard({
 }
 
 const ARROW_DRAW_LENGTH = 500;
+const LABEL_Y_IN_GAP = 160;
 
 function AnimatedArrow({
   fromPos,
@@ -693,7 +698,7 @@ function AnimatedArrow({
 
     pathD = `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`;
     labelX = (x1 + x2) / 2;
-    labelY = (y1 + y2) / 2 - 8;
+    labelY = sameRow ? LABEL_Y_IN_GAP : (y1 + y2) / 2 - 8;
   }
 
   const drawStyle: React.CSSProperties = isActive

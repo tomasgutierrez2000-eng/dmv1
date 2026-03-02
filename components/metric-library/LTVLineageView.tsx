@@ -33,6 +33,7 @@ import {
   ArrowRight,
   FileText,
 } from 'lucide-react';
+import TableTraversalDemo from './TableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * STEP TYPE — every step is labeled SOURCING, CALCULATION, or HYBRID
@@ -296,62 +297,6 @@ const INPUT_TABLES: Record<string, InputTable[]> = {
   ],
 };
 
-/* ────────────────────────────────────────────────────────────────────────────
- * STEP-BY-STEP FLOW — end-to-end data flow with step types
- * (enhancement #3 + #5: cross-tier dependencies shown inline)
- * ──────────────────────────────────────────────────────────────────────────── */
-
-interface FlowStep {
-  stepType: StepType;
-  tier: string;
-  layer: string;
-  table: string;
-  action: string;
-  value: string;
-  detail: string;
-  color: string;
-  isCrossTierDep?: boolean;
-}
-
-const FLOW_STEPS_BY_LEVEL: Record<string, FlowStep[]> = {
-  facility: [
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot', action: 'Look up drawn balance', value: 'drawn_amount = $120,000,000', detail: 'SELECT drawn_amount FROM L2.facility_exposure_snapshot WHERE facility_id = 12345 AND as_of_date = 2024-12-31', color: 'amber' },
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'collateral_snapshot', action: 'Look up collateral value', value: 'SUM(current_valuation_usd) = $50,000,000', detail: 'SELECT SUM(current_valuation_usd) FROM L2.collateral_snapshot WHERE facility_id = 12345 AND as_of_date = 2024-12-31 — aggregates multiple collateral items', color: 'amber' },
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L1', table: 'facility_master', action: 'Resolve facility identity', value: 'facility_id = 12345 → CRE Multifamily Loan', detail: 'JOIN L1.facility_master ON facility_id to get product_type, counterparty_id, lob_segment_id', color: 'blue' },
-    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV', value: '$120,000,000 / $50,000,000 = 240%', detail: 'LTV = drawn_amount / collateral_value. Null guard: if collateral_value ≤ 0, LTV = NULL (excluded from weighted averages)', color: 'emerald' },
-  ],
-  counterparty: [
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot', action: 'Look up drawn balance (per facility)', value: 'drawn_amount per facility', detail: 'Facility-level sourcing feeds into counterparty aggregation', color: 'amber', isCrossTierDep: true },
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'collateral_snapshot', action: 'Look up collateral value (per facility)', value: 'SUM(current_valuation_usd) per facility', detail: 'Collateral summed per facility, same as facility-level step', color: 'amber', isCrossTierDep: true },
-    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Each facility LTV must be computed before counterparty aggregation', color: 'emerald', isCrossTierDep: true },
-    { stepType: 'SOURCING', tier: 'Counterparty', layer: 'L2', table: 'facility_exposure_snapshot', action: 'Look up exposure weight', value: 'gross_exposure_usd per facility', detail: 'SELECT gross_exposure_usd FROM facility_exposure_snapshot — used as weight in weighted average', color: 'amber' },
-    { stepType: 'SOURCING', tier: 'Counterparty', layer: 'L1', table: 'facility_master → counterparty', action: 'Resolve counterparty grouping', value: 'facility_id → counterparty_id = 7890', detail: 'JOIN facility_master ON facility_id, then JOIN counterparty ON counterparty_id — groups facilities by borrower', color: 'blue' },
-    { stepType: 'HYBRID', tier: 'Counterparty', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted average LTV', value: 'SUM(ltv × exposure) / SUM(exposure) = 185%', detail: 'Aggregates facility LTVs by counterparty, weighted by gross_exposure_usd. Unsecured facilities (null LTV) excluded.', color: 'purple' },
-  ],
-  desk: [
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot + collateral_snapshot', action: 'Source facility data (prerequisite)', value: 'drawn_amount + collateral_value per facility', detail: 'Same facility-level sourcing as above', color: 'amber', isCrossTierDep: true },
-    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Facility LTV required before desk aggregation', color: 'emerald', isCrossTierDep: true },
-    { stepType: 'SOURCING', tier: 'Desk', layer: 'L1', table: 'facility_master', action: 'Get LoB segment FK for each facility', value: 'lob_segment_id = 301', detail: 'JOIN facility_master ON facility_id → retrieves lob_segment_id which determines which desk this facility belongs to', color: 'blue' },
-    { stepType: 'SOURCING', tier: 'Desk', layer: 'L1', table: 'enterprise_business_taxonomy', action: 'Resolve desk name from taxonomy leaf', value: 'managed_segment_id = 301 → lob_l3_name = "CRE Lending Desk"', detail: 'JOIN enterprise_business_taxonomy ON lob_segment_id = managed_segment_id — the leaf node IS the desk. All facilities with lob_segment_id = 301 belong to "CRE Lending Desk"', color: 'blue' },
-    { stepType: 'HYBRID', tier: 'Desk', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted LTV by desk', value: 'SUM(ltv × exposure) / SUM(exposure) = 172%', detail: 'Groups all secured facilities sharing the same taxonomy leaf (desk), weights by gross_exposure_usd', color: 'purple' },
-  ],
-  portfolio: [
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot + collateral_snapshot', action: 'Source facility data (prerequisite)', value: 'drawn_amount + collateral_value per facility', detail: 'Same facility-level sourcing', color: 'amber', isCrossTierDep: true },
-    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Facility LTV required before portfolio aggregation', color: 'emerald', isCrossTierDep: true },
-    { stepType: 'SOURCING', tier: 'Portfolio', layer: 'L1', table: 'facility_master', action: 'Get LoB segment FK for each facility', value: 'lob_segment_id = 301', detail: 'JOIN facility_master ON facility_id → retrieves lob_segment_id (same FK used at desk level)', color: 'blue' },
-    { stepType: 'SOURCING', tier: 'Portfolio', layer: 'L1', table: 'enterprise_business_taxonomy', action: 'Enter hierarchy at leaf (desk level)', value: 'managed_segment_id = 301 → "CRE Lending Desk"', detail: 'JOIN on lob_segment_id = managed_segment_id — same leaf node as desk level, but we continue walking up', color: 'blue' },
-    { stepType: 'SOURCING', tier: 'Portfolio', layer: 'L1', table: 'enterprise_business_taxonomy (self-join)', action: 'Walk tree one level up: Desk → Portfolio', value: 'parent_segment_id = 30 → lob_l2_name = "Commercial Real Estate"', detail: 'Self-join: desk.parent_segment_id = portfolio.managed_segment_id — the parent of the desk node is the L2 portfolio. All desks under this parent share the same portfolio.', color: 'blue' },
-    { stepType: 'HYBRID', tier: 'Portfolio', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted LTV by portfolio', value: 'SUM(ltv × exposure) / SUM(exposure) = 168%', detail: 'Groups all facilities whose taxonomy leaf rolls up to the same L2 portfolio, weights by gross_exposure_usd', color: 'purple' },
-  ],
-  lob: [
-    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot + collateral_snapshot', action: 'Source facility data (prerequisite)', value: 'drawn_amount + collateral_value per facility', detail: 'Same facility-level sourcing', color: 'amber', isCrossTierDep: true },
-    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Facility LTV required before LoB aggregation', color: 'emerald', isCrossTierDep: true },
-    { stepType: 'SOURCING', tier: 'LoB', layer: 'L1', table: 'facility_master', action: 'Get LoB segment FK for each facility', value: 'lob_segment_id = 301', detail: 'JOIN facility_master ON facility_id → same FK, now used to trace all the way up to department', color: 'blue' },
-    { stepType: 'SOURCING', tier: 'LoB', layer: 'L1', table: 'enterprise_business_taxonomy', action: 'Enter hierarchy at leaf (desk level)', value: 'managed_segment_id = 301 → "CRE Lending Desk"', detail: 'JOIN on lob_segment_id = managed_segment_id — start at the leaf, then walk up', color: 'blue' },
-    { stepType: 'SOURCING', tier: 'LoB', layer: 'L1', table: 'enterprise_business_taxonomy (recursive)', action: 'Walk tree to root: Desk → Portfolio → Department', value: '301 → parent 30 ("CRE Portfolio") → parent 3 ("Lending Division") where parent IS NULL', detail: 'Recursive self-join: follow parent_segment_id chain until parent IS NULL. The root node is the L1 Department (Line of Business). All facilities whose leaf nodes trace to the same root belong to this LoB.', color: 'blue' },
-    { stepType: 'HYBRID', tier: 'LoB', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted LTV by department', value: 'SUM(ltv × exposure) / SUM(exposure) = 155%', detail: 'Groups all facilities whose taxonomy leaf traces to the same root department, weights by gross_exposure_usd. Board-level metric.', color: 'purple' },
-  ],
-};
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPER COMPONENTS
@@ -860,136 +805,6 @@ function RollupPyramid({ expandedLevel, onToggle }: { expandedLevel: string | nu
   );
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
- * SECTION: STEP-BY-STEP WALKTHROUGH per dimension
- * ──────────────────────────────────────────────────────────────────────────── */
-
-function StepByStepFlow({ selectedLevel }: { selectedLevel: string }) {
-  const steps = FLOW_STEPS_BY_LEVEL[selectedLevel] || [];
-  const [activeStep, setActiveStep] = useState(-1);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const play = () => { setIsPlaying(true); setActiveStep(0); };
-  const stop = () => { setIsPlaying(false); if (timerRef.current) clearTimeout(timerRef.current); };
-  const reset = () => { stop(); setActiveStep(-1); };
-
-  React.useEffect(() => {
-    if (isPlaying && activeStep >= 0 && activeStep < steps.length - 1) {
-      timerRef.current = setTimeout(() => setActiveStep((s) => s + 1), 2200);
-      return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-    } else if (activeStep >= steps.length - 1) {
-      setIsPlaying(false);
-    }
-  }, [isPlaying, activeStep, steps.length]);
-
-  React.useEffect(() => {
-    setActiveStep(-1);
-    setIsPlaying(false);
-  }, [selectedLevel]);
-
-  const flowColors: Record<string, { dot: string; border: string; bg: string; text: string }> = {
-    blue:    { dot: 'bg-blue-500',    border: 'border-blue-500/40',    bg: 'bg-blue-500/10',    text: 'text-blue-300' },
-    amber:   { dot: 'bg-amber-500',   border: 'border-amber-500/40',   bg: 'bg-amber-500/10',   text: 'text-amber-300' },
-    purple:  { dot: 'bg-purple-500',  border: 'border-purple-500/40',  bg: 'bg-purple-500/10',  text: 'text-purple-300' },
-    emerald: { dot: 'bg-emerald-500', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-300' },
-    pink:    { dot: 'bg-pink-500',    border: 'border-pink-500/40',    bg: 'bg-pink-500/10',    text: 'text-pink-300' },
-  };
-
-  return (
-    <div className="rounded-xl border border-gray-800 bg-black/30 p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-400" aria-hidden />
-          <span className="text-xs font-bold text-white">Step-by-Step: {ROLLUP_LEVELS.find((l) => l.key === selectedLevel)?.label} LTV</span>
-          <span className="text-[9px] text-gray-600">End-to-end data flow with cross-tier dependencies</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {activeStep === -1 ? (
-            <button onClick={play} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors">
-              <Play className="w-3 h-3" /> Play
-            </button>
-          ) : (
-            <>
-              {isPlaying ? (
-                <button onClick={stop} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors">Pause</button>
-              ) : (
-                <button onClick={() => setIsPlaying(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors">
-                  <Play className="w-3 h-3" /> Resume
-                </button>
-              )}
-              <button onClick={reset} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10 transition-colors">
-                <RefreshCw className="w-3 h-3" /> Reset
-              </button>
-            </>
-          )}
-          <span className="text-[9px] text-gray-600 font-mono">{activeStep >= 0 ? `${activeStep + 1}/${steps.length}` : '\u2014'}</span>
-        </div>
-      </div>
-
-      <div className="h-1 rounded-full bg-gray-800 mb-4 overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-blue-500 via-amber-500 via-purple-500 to-emerald-500 rounded-full transition-all duration-500"
-          style={{ width: activeStep >= 0 ? `${((activeStep + 1) / steps.length) * 100}%` : '0%' }}
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        {steps.map((step, i) => {
-          const isActive = i === activeStep;
-          const isPast = i < activeStep;
-          const fc = flowColors[step.color];
-
-          return (
-            <button
-              key={i}
-              onClick={() => { setActiveStep(i); setIsPlaying(false); }}
-              className={`w-full text-left rounded-lg border p-2.5 transition-all duration-500 ${
-                isActive
-                  ? `${fc.border} ${fc.bg} scale-[1.01] shadow-lg`
-                  : isPast
-                    ? 'border-gray-800/50 bg-white/[0.01] opacity-60'
-                    : 'border-gray-800/30 bg-transparent opacity-30'
-              } ${step.isCrossTierDep ? 'ml-2 border-l-2 border-l-amber-500/40' : ''}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
-                  isActive ? `${fc.dot} text-white` : isPast ? 'bg-gray-700 text-gray-400' : 'bg-gray-800/50 text-gray-700'
-                }`}>
-                  {isPast ? <CheckCircle2 className="w-3.5 h-3.5" /> : <span className="text-[9px] font-bold">{i + 1}</span>}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                      isActive ? `${fc.bg} ${fc.text}` : 'bg-white/5 text-gray-600'
-                    }`}>{step.layer}</span>
-                    <code className={`text-[10px] font-mono ${isActive ? fc.text : 'text-gray-500'}`}>{step.table}</code>
-                    <StepTypeBadge type={step.stepType} />
-                    {step.isCrossTierDep && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                        Prerequisite ({step.tier})
-                      </span>
-                    )}
-                    <span className="text-[9px] text-gray-600">&mdash; {step.action}</span>
-                  </div>
-                  {(isActive || isPast) && (
-                    <div className="mt-1">
-                      <code className={`text-[10px] font-mono font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>{step.value}</code>
-                      {isActive && <div className="text-[9px] text-gray-500 mt-0.5">{step.detail}</div>}
-                    </div>
-                  )}
-                </div>
-
-                {isActive && <div className={`w-2 h-2 rounded-full ${fc.dot} animate-pulse flex-shrink-0`} />}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 /* ────────────────────────────────────────────────────────────────────────────
  * SECTION: FACILITY CALCULATION EXAMPLE
@@ -1132,7 +947,7 @@ function FooterLegend() {
 
 export default function LTVLineageView() {
   const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
-  const [selectedStepLevel, setSelectedStepLevel] = useState('facility');
+
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
@@ -1231,50 +1046,19 @@ export default function LTVLineageView() {
             </div>
           </div>
           <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
-        </section>
 
-        <FlowArrow label="Walk through the data flow step by step" />
+          <FlowArrow label="Watch how the tables connect for each dimension" />
 
-        {/* STEP 6: STEP-BY-STEP WALKTHROUGH */}
-        <section>
-          <SectionHeading
-            icon={Sparkles}
-            step="Step 6 — Step-by-Step Calculation Walkthrough"
-            layerColor="bg-purple-600"
-            title="End-to-End Data Flow"
-            subtitle="Select a dimension to see every sourcing, calculation, and hybrid step — including prerequisite cross-tier dependencies"
-          />
-
-          <div className="flex items-center gap-2 mb-4 flex-wrap" role="group" aria-label="Select dimension for step-by-step flow">
-            {ROLLUP_LEVELS.map((level) => {
-              const Icon = level.icon;
-              const active = selectedStepLevel === level.key;
-              return (
-                <button
-                  key={level.key}
-                  onClick={() => setSelectedStepLevel(level.key)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                    active
-                      ? 'bg-purple-500/15 border border-purple-500/40 text-purple-300'
-                      : 'bg-white/[0.02] border border-gray-800 text-gray-400 hover:border-gray-700'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" aria-hidden />
-                  {level.label}
-                </button>
-              );
-            })}
-          </div>
-          <StepByStepFlow selectedLevel={selectedStepLevel} />
+          <TableTraversalDemo />
         </section>
 
         <FlowArrow label="Dashboard builder selects dimension" />
 
-        {/* STEP 7: DASHBOARD */}
+        {/* STEP 6: DASHBOARD */}
         <section>
           <SectionHeading
             icon={LayoutDashboard}
-            step="Step 7 — Dashboard Consumption"
+            step="Step 6 — Dashboard Consumption"
             layerColor="bg-pink-600"
             title="Self-Service Connection"
             subtitle="Pick the dimension, build — no SQL needed"

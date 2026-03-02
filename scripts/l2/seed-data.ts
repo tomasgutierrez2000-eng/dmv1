@@ -1,8 +1,10 @@
 /**
- * L2 seed data: 50 rows per table, GSIB-realistic, aligned to L1 IDs (1..10).
- * facility_id, counterparty_id, credit_agreement_id, etc. cycle 1–10.
+ * L2 seed data: GSIB-realistic, aligned to L1 IDs.
  *
- * 5 "cycles" per facility (rows 0-9, 10-19, 20-29, 30-39, 40-49) tell a story:
+ * Default mode: 50 rows per table (5 cycles × 10 facilities).
+ * MVP mode: FACILITY_COUNT × 5 cycles per table.
+ *
+ * 5 "cycles" per facility tell a story:
  *   Cycle 0: Base positions — mostly PERFORMING
  *   Cycle 1: Secondary views — a couple moving to WATCH
  *   Cycle 2: Stress/events — more WATCH, covenant breaches
@@ -13,15 +15,34 @@
  * All as_of_date values are 2025-01-31 per SEED_CONVENTIONS.md.
  */
 
-const N = 50; // rows per table
+import { getCounterpartyStoryArc } from '../l1/mvp-counterparties';
+import { getFacilityCounterpartyId, getFacilityAgreementId, getFacilityCommittedAmount } from '../l1/mvp-agreements-facilities';
+import {
+  STORY_PD_MULTIPLIERS, STORY_UTILIZATION, STORY_SPREAD_MULTIPLIERS,
+  STORY_CREDIT_STATUS, STORY_DPD, RATING_TIER_MAP,
+} from '../shared/mvp-config';
+import type { StoryArc, RatingTier } from '../shared/mvp-config';
+import { getCounterpartyRatingTier } from '../l1/mvp-counterparties';
+
+let FACILITY_COUNT = 10;
 const AS_OF = '2025-01-31';
 
+/** Called by generate.ts to set the facility count for MVP profile. */
+export function setL2FacilityCount(count: number): void { FACILITY_COUNT = count; }
+
+/** Total rows per table (facility count × 5 cycles). Used where the old `const N = 50` was. */
+function N(): number { return FACILITY_COUNT * 5; }
+
 // ───────────── deterministic helpers ─────────────
-/** Facility/counterparty id: cycles 1..10 */
-function fid(idx: number): number { return (idx % 10) + 1; }
-function cid(idx: number): number { return (idx % 10) + 1; }
+/** Facility id: cycles 1..FACILITY_COUNT */
+function fid(idx: number): number { return (idx % FACILITY_COUNT) + 1; }
+function cid(idx: number): number {
+  const facId = fid(idx);
+  if (FACILITY_COUNT <= 10) return facId;
+  return getFacilityCounterpartyId(facId);
+}
 /** Which cycle (0-4) for the given row index */
-function cycle(idx: number): number { return Math.floor(idx / 10); }
+function cycle(idx: number): number { return Math.floor(idx / FACILITY_COUNT); }
 
 // ── mulberry32 PRNG for deterministic variation ──
 function mulberry32(seed: number): () => number {
@@ -43,9 +64,67 @@ function vary(base: number, idx: number, pct: number = 0.15): number {
   // Each cycle shifts the amount slightly
   const shifts = [0, 0.05, -0.08, 0.12, -0.03];
   const facShifts = [0, 0.02, -0.01, 0.03, -0.02, 0.01, -0.03, 0.02, 0.01, -0.01];
-  const shift = (shifts[c] ?? 0) + (facShifts[fac - 1] ?? 0);
+  const shift = (shifts[c] ?? 0) + (facShifts[(fac - 1) % facShifts.length] ?? 0);
   return Math.round(base * (1 + shift * (pct / 0.15)));
 }
+
+// ───────────── MVP helpers ─────────────
+/** Story arc for a facility via its counterparty */
+function arcOf(idx: number): StoryArc {
+  return getCounterpartyStoryArc(cid(idx) - 1);
+}
+/** Rating tier for a facility via its counterparty */
+function tierOf(idx: number): RatingTier {
+  return getCounterpartyRatingTier(cid(idx) - 1);
+}
+
+/** Base spread from rating tier (bps) */
+const TIER_BASE_SPREADS: Record<RatingTier, number> = {
+  IG_HIGH: 125, IG_MID: 175, IG_LOW: 250,
+  HY_HIGH: 325, HY_MID: 425, HY_LOW: 550,
+};
+
+/** Base risk weight from rating tier */
+const TIER_BASE_RW: Record<RatingTier, number> = {
+  IG_HIGH: 50, IG_MID: 75, IG_LOW: 100,
+  HY_HIGH: 100, HY_MID: 125, HY_LOW: 150,
+};
+
+/** Base rate by currency */
+const CURRENCY_BASE_RATES: Record<string, number> = {
+  USD: 4.75, EUR: 3.50, GBP: 4.25, JPY: 0.50, CHF: 1.50,
+};
+
+/** Internal rating labels per tier, cycling by arc cycle position */
+const TIER_INT_RATINGS: Record<RatingTier, string[]> = {
+  IG_HIGH: ['AA-', 'AA', 'A+', 'AA-', 'AA'],
+  IG_MID:  ['A', 'A-', 'A+', 'A', 'A-'],
+  IG_LOW:  ['BBB+', 'BBB', 'BBB+', 'BBB-', 'BBB'],
+  HY_HIGH: ['BB+', 'BB', 'BB+', 'BBB-', 'BB+'],
+  HY_MID:  ['BB', 'BB-', 'B+', 'BB-', 'BB'],
+  HY_LOW:  ['B+', 'B', 'B-', 'B', 'B+'],
+};
+
+/** External (Moody's) rating labels per tier, cycling by arc cycle position */
+const TIER_EXT_RATINGS: Record<RatingTier, string[]> = {
+  IG_HIGH: ['Aa3', 'Aa2', 'A1', 'Aa3', 'Aa2'],
+  IG_MID:  ['A2', 'A3', 'A1', 'A2', 'A3'],
+  IG_LOW:  ['Baa1', 'Baa2', 'Baa1', 'Baa3', 'Baa2'],
+  HY_HIGH: ['Ba1', 'Ba2', 'Ba1', 'Baa3', 'Ba1'],
+  HY_MID:  ['Ba2', 'Ba3', 'B1', 'Ba3', 'Ba2'],
+  HY_LOW:  ['B1', 'B2', 'B3', 'B2', 'B1'],
+};
+
+/** Rating migration offsets for deteriorating / recovering / stressed arcs */
+const RATING_MIGRATION: Record<StoryArc, number[]> = {
+  STABLE_IG:        [0, 0, 0, 0, 0],
+  GROWING:          [0, 0, 0, 1, 1],     // improve (index moves toward better)
+  STEADY_HY:        [0, 0, 0, 0, 0],
+  DETERIORATING:    [0, 0, 1, 2, 2],     // worsen (index moves toward worse)
+  RECOVERING:       [2, 1, 0, 0, 0],     // started worse, improving
+  STRESSED_SECTOR:  [0, 0, 1, 1, 0],     // temporary worsening
+  NEW_RELATIONSHIP: [0, 0, 0, 0, 0],
+};
 
 // ───────────── SHARED REFERENCE ARRAYS (base per facility 1-10) ─────────────
 
@@ -59,37 +138,68 @@ const DRAWN_BY_CYCLE: number[][] = [
   [110_000_000, 430_000_000, 750_000_000, 0, 400_000_000, 1_150_000_000, 0, 85_000_000, 560_000_000, 2_000_000_000], // c3 amend
   [115_000_000, 445_000_000, 790_000_000, 0, 350_000_000, 1_190_000_000, 0, 80_000_000, 590_000_000, 2_080_000_000], // c4 current
 ];
-function drawn(idx: number): number { return DRAWN_BY_CYCLE[cycle(idx)][fid(idx) - 1]; }
+function drawn(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return DRAWN_BY_CYCLE[cycle(idx)][f];
+  const commitAmt = getFacilityCommittedAmount(fid(idx));
+  const arc = arcOf(idx);
+  return Math.round(commitAmt * STORY_UTILIZATION[arc][cycle(idx)]);
+}
 
 const COMMITTED = [250_000_000, 500_000_000, 1_000_000_000, 2_500_000_000, 750_000_000, 1_500_000_000, 3_000_000_000, 400_000_000, 600_000_000, 5_000_000_000];
-function committed(idx: number): number { return COMMITTED[fid(idx) - 1]; }
+function committed(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return COMMITTED[f];
+  return getFacilityCommittedAmount(fid(idx));
+}
 
 const BASE_CURRENCIES = ['USD', 'EUR', 'USD', 'GBP', 'USD', 'USD', 'EUR', 'USD', 'GBP', 'USD'];
-function currency(idx: number): string { return BASE_CURRENCIES[fid(idx) - 1]; }
+function currency(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return BASE_CURRENCIES[f];
+  return pick(BASE_CURRENCIES, f);
+}
 
 const POS_TYPES_BASE = ['LOAN', 'REV', 'COMMIT', 'LOAN', 'REV', 'LOAN', 'COMMIT', 'REV', 'LOAN', 'REV'];
 const POS_TYPES_ALT = ['REV', 'LOAN', 'LOAN', 'COMMIT', 'LOAN', 'REV', 'LOAN', 'COMMIT', 'REV', 'LOAN'];
-function posType(idx: number): string { return cycle(idx) % 2 === 0 ? POS_TYPES_BASE[fid(idx) - 1] : POS_TYPES_ALT[fid(idx) - 1]; }
+function posType(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return cycle(idx) % 2 === 0 ? POS_TYPES_BASE[f] : POS_TYPES_ALT[f];
+  const types = ['LOAN', 'REV', 'COMMIT'];
+  return types[(f + cycle(idx)) % types.length];
+}
 
 const BASE_SPREADS = [175, 250, 325, 200, 400, 150, 275, 225, 300, 125];
 function spread(idx: number): number {
   const c = cycle(idx);
   const f = fid(idx) - 1;
-  // Atlas (5) and Westlake (8) spreads widen under stress
-  if (f === 4) return [400, 425, 475, 450, 440][c]; // Atlas widens
-  if (f === 7) return [225, 240, 280, 260, 250][c]; // Westlake widens
-  return BASE_SPREADS[f] + (c - 2) * 5; // slight variation
+  if (f < 10) {
+    // Atlas (5) and Westlake (8) spreads widen under stress
+    if (f === 4) return [400, 425, 475, 450, 440][c]; // Atlas widens
+    if (f === 7) return [225, 240, 280, 260, 250][c]; // Westlake widens
+    return BASE_SPREADS[f] + (c - 2) * 5; // slight variation
+  }
+  const tier = tierOf(idx);
+  const arc = arcOf(idx);
+  const base = TIER_BASE_SPREADS[tier];
+  // Add small deterministic jitter per facility (±15 bps)
+  const jitter = ((f * 7) % 31) - 15;
+  return Math.round((base + jitter) * STORY_SPREAD_MULTIPLIERS[arc][c]);
 }
 
 const BASE_ALL_IN = [6.25, 7.50, 8.25, 6.75, 9.00, 5.75, 7.25, 6.95, 8.00, 5.50];
 function allInRate(idx: number): number {
   const s = spread(idx);
-  const baseRate = [4.50, 5.00, 4.95, 4.75, 5.00, 4.25, 4.50, 4.70, 5.00, 4.25][fid(idx) - 1];
-  return Math.round((baseRate + s / 100) * 100) / 100;
+  const br = baseRate(idx);
+  return Math.round((br + s / 100) * 100) / 100;
 }
 
+const BASE_RATES_ARRAY = [4.50, 5.00, 4.95, 4.75, 5.00, 4.25, 4.50, 4.70, 5.00, 4.25];
 function baseRate(idx: number): number {
-  return [4.50, 5.00, 4.95, 4.75, 5.00, 4.25, 4.50, 4.70, 5.00, 4.25][fid(idx) - 1];
+  const f = fid(idx) - 1;
+  if (f < 10) return BASE_RATES_ARRAY[f];
+  const ccy = currency(idx);
+  return CURRENCY_BASE_RATES[ccy] ?? 4.75;
 }
 
 // PD with credit migration story
@@ -100,21 +210,45 @@ const PD_BY_CYCLE: number[][] = [
   [0.0043, 0.0195, 0.0027, 0.0085, 0.0480, 0.0016, 0.0290, 0.0085, 0.0200, 0.0009], // c3 partial recovery
   [0.0041, 0.0188, 0.0026, 0.0087, 0.0450, 0.0014, 0.0285, 0.0078, 0.0195, 0.0009], // c4 current
 ];
-function pd(idx: number): number { return PD_BY_CYCLE[cycle(idx)][fid(idx) - 1]; }
+function pd(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return PD_BY_CYCLE[cycle(idx)][f];
+  const tier = tierOf(idx);
+  const arc = arcOf(idx);
+  const tierData = RATING_TIER_MAP[tier];
+  const basePd = (tierData.pdLow + tierData.pdHigh) / 2;
+  // Add small deterministic jitter per facility (±10% of range)
+  const range = tierData.pdHigh - tierData.pdLow;
+  const jitter = (((f * 13) % 21) - 10) / 10 * range * 0.5;
+  const rawPd = (basePd + jitter) * STORY_PD_MULTIPLIERS[arc][cycle(idx)];
+  return Math.round(rawPd * 10000) / 10000; // 4 decimal places
+}
 
 const BASE_LGD = [0.45, 0.40, 0.35, 0.50, 0.45, 0.40, 0.55, 0.38, 0.42, 0.48];
 function lgd(idx: number): number {
+  const f = fid(idx) - 1;
   const c = cycle(idx);
-  return Math.round((BASE_LGD[fid(idx) - 1] + (c - 2) * 0.01) * 100) / 100;
+  if (f < 10) return Math.round((BASE_LGD[f] + (c - 2) * 0.01) * 100) / 100;
+  const tier = tierOf(idx);
+  const baseLgd = RATING_TIER_MAP[tier].lgd;
+  return Math.round((baseLgd + (c - 2) * 0.01) * 100) / 100;
 }
 
 const BASE_RW = [100, 75, 50, 150, 100, 75, 125, 50, 100, 100];
 function riskWeight(idx: number): number {
   const f = fid(idx) - 1;
   const c = cycle(idx);
-  if (f === 4 && c >= 2) return 150; // Atlas upgrades to 150% RW
-  if (f === 7 && c >= 2) return 75; // Westlake stays
-  return BASE_RW[f];
+  if (f < 10) {
+    if (f === 4 && c >= 2) return 150; // Atlas upgrades to 150% RW
+    if (f === 7 && c >= 2) return 75; // Westlake stays
+    return BASE_RW[f];
+  }
+  const tier = tierOf(idx);
+  const arc = arcOf(idx);
+  let rw = TIER_BASE_RW[tier];
+  // Elevate RW for deteriorating/stressed names in stress cycles
+  if ((arc === 'DETERIORATING' || arc === 'STRESSED_SECTOR') && c >= 2) rw = Math.min(rw + 50, 250);
+  return rw;
 }
 
 // Credit status story
@@ -125,7 +259,11 @@ const STATUS_BY_CYCLE: string[][] = [
   ['PERFORMING', 'PERFORMING', 'PERFORMING', 'PERFORMING', 'SPECIAL_MENTION', 'PERFORMING', 'PERFORMING', 'WATCH', 'PERFORMING', 'PERFORMING'],
   ['PERFORMING', 'PERFORMING', 'PERFORMING', 'PERFORMING', 'WATCH', 'PERFORMING', 'PERFORMING', 'PERFORMING', 'PERFORMING', 'PERFORMING'],
 ];
-function creditStatus(idx: number): string { return STATUS_BY_CYCLE[cycle(idx)][fid(idx) - 1]; }
+function creditStatus(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return STATUS_BY_CYCLE[cycle(idx)][f];
+  return STORY_CREDIT_STATUS[arcOf(idx)][cycle(idx)];
+}
 function creditStatusId(idx: number): number {
   const s = creditStatus(idx);
   if (s === 'PERFORMING') return 1;
@@ -142,7 +280,11 @@ const DPD_BY_CYCLE: number[][] = [
   [0, 0, 0, 0, 45, 0, 0, 8, 0, 0],
   [0, 0, 0, 0, 18, 0, 0, 0, 0, 0],
 ];
-function dpd(idx: number): number { return DPD_BY_CYCLE[cycle(idx)][fid(idx) - 1]; }
+function dpd(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return DPD_BY_CYCLE[cycle(idx)][f];
+  return STORY_DPD[arcOf(idx)][cycle(idx)];
+}
 
 // Internal ratings with migration
 const INT_RATINGS_BY_CYCLE: string[][] = [
@@ -152,7 +294,18 @@ const INT_RATINGS_BY_CYCLE: string[][] = [
   ['A+', 'BBB+', 'AA-', 'BB+', 'B', 'AA', 'B-', 'BBB-', 'BB+', 'AAA'],
   ['A+', 'BBB+', 'AA-', 'BB', 'B+', 'AA', 'B-', 'BBB', 'BB+', 'AAA'],
 ];
-function intRating(idx: number): string { return INT_RATINGS_BY_CYCLE[cycle(idx)][fid(idx) - 1]; }
+function intRating(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return INT_RATINGS_BY_CYCLE[cycle(idx)][f];
+  const tier = tierOf(idx);
+  const arc = arcOf(idx);
+  const c = cycle(idx);
+  const ratings = TIER_INT_RATINGS[tier];
+  const migration = RATING_MIGRATION[arc][c];
+  // migration > 0 means worse → pick a higher index (worse rating)
+  const ratingIdx = Math.min(c + migration, ratings.length - 1);
+  return ratings[ratingIdx];
+}
 
 const EXT_RATINGS_BY_CYCLE: string[][] = [
   ['A1', 'Baa1', 'Aa3', 'Ba2', 'B1', 'Aa2', 'B3', 'Baa2', 'Ba1', 'Aaa'],
@@ -161,26 +314,63 @@ const EXT_RATINGS_BY_CYCLE: string[][] = [
   ['A1', 'Baa1', 'Aa3', 'Ba1', 'B2', 'Aa2', 'B3', 'Baa3', 'Ba1', 'Aaa'],
   ['A1', 'Baa1', 'Aa3', 'Ba2', 'B1', 'Aa2', 'B3', 'Baa2', 'Ba1', 'Aaa'],
 ];
-function extRating(idx: number): string { return EXT_RATINGS_BY_CYCLE[cycle(idx)][fid(idx) - 1]; }
+function extRating(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return EXT_RATINGS_BY_CYCLE[cycle(idx)][f];
+  const tier = tierOf(idx);
+  const arc = arcOf(idx);
+  const c = cycle(idx);
+  const ratings = TIER_EXT_RATINGS[tier];
+  const migration = RATING_MIGRATION[arc][c];
+  const ratingIdx = Math.min(c + migration, ratings.length - 1);
+  return ratings[ratingIdx];
+}
 
 const BASE_MATURITY_DATES = ['2027-06-30', '2028-03-15', '2026-12-20', '2029-09-30', '2027-01-15', '2030-06-30', '2026-04-30', '2028-11-15', '2027-08-30', '2031-12-31'];
-function maturityDate(idx: number): string { return BASE_MATURITY_DATES[fid(idx) - 1]; }
+function maturityDate(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return BASE_MATURITY_DATES[f];
+  const year = 2026 + (f % 6);
+  const month = ((f * 7) % 12) + 1;
+  const day = ((f * 3) % 28) + 1;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
 
 const BASE_ORIGINATION_DATES = ['2022-06-15', '2021-11-20', '2023-01-10', '2020-09-01', '2022-03-25', '2019-06-15', '2023-07-01', '2022-01-10', '2021-08-15', '2018-12-01'];
-function originationDate(idx: number): string { return BASE_ORIGINATION_DATES[fid(idx) - 1]; }
+function originationDate(idx: number): string {
+  const f = fid(idx) - 1;
+  if (f < 10) return BASE_ORIGINATION_DATES[f];
+  const year = 2018 + (f % 6);
+  const month = ((f * 5) % 12) + 1;
+  const day = ((f * 11) % 28) + 1;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
 
 const BASE_VALUATIONS = [50_000_000, 120_000_000, 85_000_000, 200_000_000, 30_000_000, 450_000_000, 75_000_000, 95_000_000, 110_000_000, 320_000_000];
-function valuation(idx: number): number { return vary(BASE_VALUATIONS[fid(idx) - 1], idx, 0.10); }
+function valuation(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return vary(BASE_VALUATIONS[f], idx, 0.10);
+  return vary(Math.round(committed(idx) * 0.2), idx, 0.10);
+}
 
 const BASE_HAIRCUTS = [0, 2.5, 4, 15, 25, 0, 5, 8, 12, 20];
-function haircut(idx: number): number { return BASE_HAIRCUTS[fid(idx) - 1]; }
+function haircut(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return BASE_HAIRCUTS[f];
+  const haircuts = [0, 2.5, 4, 8, 12, 15, 20, 25];
+  return haircuts[f % haircuts.length];
+}
 
 const CRM_TYPES_BASE = ['CASH', 'REAL_ESTATE', 'RECEIVABLES', 'EQUIPMENT', 'INVENTORY', 'CASH', 'SECURITIES', 'REAL_ESTATE', 'RECEIVABLES', 'SECURITIES'];
 const MITIGANT_GROUPS_BASE = ['FINANCIAL', 'PHYSICAL', 'RECEIVABLE', 'PHYSICAL', 'PHYSICAL', 'FINANCIAL', 'FINANCIAL', 'PHYSICAL', 'RECEIVABLE', 'FINANCIAL'];
 const MITIGANT_SUBTYPES_BASE = ['CASH_DEPOSIT', 'CRE', 'AR_POOL', 'MACHINERY', 'RAW_MATERIAL', 'CASH_DEPOSIT', 'GOVT_BOND', 'INDUSTRIAL', 'AR_POOL', 'EQUITY'];
 
 const BASE_LIMITS = [500_000_000, 1_000_000_000, 750_000_000, 2_000_000_000, 400_000_000, 1_500_000_000, 600_000_000, 350_000_000, 900_000_000, 3_000_000_000];
-function limitAmt(idx: number): number { return BASE_LIMITS[fid(idx) - 1]; }
+function limitAmt(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return BASE_LIMITS[f];
+  return Math.round(committed(idx) * 1.2);
+}
 function utilized(idx: number): number { return drawn(idx); }
 
 const AMEND_TYPES_ALL = ['INCREASE', 'EXTENSION', 'PRICING', 'COVENANT', 'PARTY', 'FACILITY', 'SECURITY', 'RESTATEMENT', 'WAIVER', 'DECREASE'];
@@ -193,11 +383,14 @@ function amendType(idx: number): string {
 const AMEND_STATUSES_ALL = ['EFFECTIVE', 'COMPLETED', 'APPROVED', 'EFFECTIVE', 'PENDING', 'COMPLETED', 'EFFECTIVE', 'APPROVED', 'COMPLETED', 'EFFECTIVE'];
 function amendStatus(idx: number): string { return AMEND_STATUSES_ALL[(fid(idx) - 1 + cycle(idx)) % AMEND_STATUSES_ALL.length]; }
 
+const AMEND_MONTHS = [11, 12, 1, 10, 2, 9, 1, 8, 12, 1];
+const AMEND_DAYS = [1, 15, 1, 20, 1, 1, 15, 1, 1, 10];
 function amendEffDate(idx: number): string {
   const c = cycle(idx);
-  const month = [11, 12, 1, 10, 2, 9, 1, 8, 12, 1][fid(idx) - 1];
+  const f = fid(idx) - 1;
+  const month = pick(AMEND_MONTHS, f);
   const year = c <= 1 ? 2024 : 2025;
-  const day = [1, 15, 1, 20, 1, 1, 15, 1, 1, 10][fid(idx) - 1];
+  const day = pick(AMEND_DAYS, f);
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
@@ -212,7 +405,11 @@ const PIPELINE_STAGES_ALL = ['PITCH', 'TERM_SHEET', 'DOCS', 'CLOSING', 'WON', 'P
 function pipelineStage(idx: number): string { return PIPELINE_STAGES_ALL[(fid(idx) - 1 + cycle(idx)) % PIPELINE_STAGES_ALL.length]; }
 
 const BASE_PROPOSED = [100_000_000, 250_000_000, 500_000_000, 75_000_000, 300_000_000, 150_000_000, 400_000_000, 80_000_000, 200_000_000, 600_000_000];
-function proposedAmt(idx: number): number { return vary(BASE_PROPOSED[fid(idx) - 1], idx, 0.20); }
+function proposedAmt(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return vary(BASE_PROPOSED[f], idx, 0.20);
+  return vary(Math.round(committed(idx) * 0.3), idx, 0.20);
+}
 
 const METRIC_CODES_ALL = ['PD', 'LGD', 'EL', 'RWA', 'CAPITAL_REQ', 'DSCR', 'LTV', 'UTIL', 'ROE', 'NCO_RATE'];
 const METRIC_NAMES_ALL = ['Probability of Default', 'Loss Given Default', 'Expected Loss', 'Risk-Weighted Assets', 'Capital Requirement', 'Debt Service Coverage', 'Loan-to-Value', 'Utilization Rate', 'Return on Equity', 'Net Charge-Off Rate'];
@@ -223,28 +420,53 @@ function metricCat(idx: number): string { return METRIC_CATS_ALL[(fid(idx) - 1 +
 
 const BASE_METRIC_VALS = [0.42, 1.85, 2.10, 0.95, 3.20, 1.50, 2.75, 0.60, 1.90, 4.00];
 function metricVal(idx: number): number {
-  const base = BASE_METRIC_VALS[fid(idx) - 1];
+  const base = pick(BASE_METRIC_VALS, fid(idx) - 1);
   return Math.round((base + cycle(idx) * 0.15) * 100) / 100;
 }
 function metricUsdVal(idx: number): number { return Math.round(metricVal(idx) * 1_000_000); }
 
 // Netting set data
 const BASE_GROSS_EXP = [45_000_000, 80_000_000, 22_000_000, 60_000_000, 120_000_000, 35_000_000, 90_000_000, 18_000_000, 70_000_000, 150_000_000];
-function grossExp(idx: number): number { return vary(BASE_GROSS_EXP[fid(idx) - 1], idx); }
-function nettedExp(idx: number): number { return Math.round(grossExp(idx) * [0.22, 0.31, 0, 0.25, 0.33, 0.14, 0.33, 0, 0.29, 0.33][fid(idx) - 1]); }
+function grossExp(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return vary(BASE_GROSS_EXP[f], idx);
+  return vary(Math.round(drawn(idx) * 0.15), idx);
+}
+const NETTING_RATIOS = [0.22, 0.31, 0, 0.25, 0.33, 0.14, 0.33, 0, 0.29, 0.33];
+function nettedExp(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return Math.round(grossExp(idx) * NETTING_RATIOS[f]);
+  const ratio = 0.15 + ((f * 11) % 21) / 100; // 0.15 - 0.35
+  return Math.round(grossExp(idx) * ratio);
+}
 function nettingBenefit(idx: number): number { return grossExp(idx) - nettedExp(idx); }
 const BASE_COLL_HELD = [5_000_000, 12_000_000, 8_000_000, 20_000_000, 15_000_000, 3_000_000, 25_000_000, 6_000_000, 10_000_000, 30_000_000];
-function collHeld(idx: number): number { return vary(BASE_COLL_HELD[fid(idx) - 1], idx); }
+function collHeld(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return vary(BASE_COLL_HELD[f], idx);
+  return vary(Math.round(valuation(idx) * 0.15), idx);
+}
 function grossMtm(idx: number): number { return Math.round(grossExp(idx) * 0.92); }
 function pfeUsd(idx: number): number { return Math.round(grossExp(idx) * 0.18); }
 
 // Stress test data
 const BASE_STRESS_LOSS = [10_000_000, 25_000_000, 5_000_000, 50_000_000, 15_000_000, 30_000_000, 8_000_000, 40_000_000, 12_000_000, 60_000_000];
-function stressLoss(idx: number): number { return vary(BASE_STRESS_LOSS[fid(idx) - 1], idx, 0.25); }
+function stressLoss(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f < 10) return vary(BASE_STRESS_LOSS[f], idx, 0.25);
+  // stress loss = drawn × lgd × stress factor (higher for deteriorating/stressed arcs)
+  const arc = arcOf(idx);
+  const stressFactors: Record<StoryArc, number> = {
+    STABLE_IG: 0.02, GROWING: 0.02, STEADY_HY: 0.04,
+    DETERIORATING: 0.08, RECOVERING: 0.05, STRESSED_SECTOR: 0.10,
+    NEW_RELATIONSHIP: 0.03,
+  };
+  return vary(Math.round(drawn(idx) * lgd(idx) * (stressFactors[arc] ?? 0.04)), idx, 0.25);
+}
 function breachAmt(idx: number): number {
   const c = cycle(idx);
   const f = fid(idx) - 1;
-  // More breaches in stress cycles
+  // More breaches in stress cycles — safe for any f value (uses modular arithmetic)
   if (c === 2 || c === 3) return f % 3 === 0 ? Math.round(stressLoss(idx) * 0.4) : 0;
   return f % 5 === 0 ? Math.round(stressLoss(idx) * 0.2) : 0;
 }
@@ -275,12 +497,21 @@ function ceEventStatus(idx: number): string {
 function ceLoss(idx: number): number {
   const c = cycle(idx);
   const f = fid(idx) - 1;
-  // Losses concentrated on troubled names in stress cycles
-  if ((f === 4 || f === 7) && c >= 2) return Math.round(drawn(idx) * 0.02);
-  if (f === 0 && c === 2) return 2_400_000;
-  if (f === 2 && c === 2) return 8_000_000;
-  if (f === 8 && c === 2) return 6_000_000;
-  if (f === 9 && c === 2) return 21_000_000;
+  if (f < 10) {
+    // Losses concentrated on troubled names in stress cycles
+    if ((f === 4 || f === 7) && c >= 2) return Math.round(drawn(idx) * 0.02);
+    if (f === 0 && c === 2) return 2_400_000;
+    if (f === 2 && c === 2) return 8_000_000;
+    if (f === 8 && c === 2) return 6_000_000;
+    if (f === 9 && c === 2) return 21_000_000;
+    return 0;
+  }
+  // MVP: losses for deteriorating/stressed arcs in stress cycles
+  const arc = arcOf(idx);
+  if (c >= 2 && (arc === 'DETERIORATING' || arc === 'STRESSED_SECTOR')) {
+    return Math.round(drawn(idx) * 0.02);
+  }
+  if (c === 2 && f % 10 === 0) return Math.round(drawn(idx) * 0.005); // occasional losses
   return 0;
 }
 function ceRecovery(idx: number): number { return Math.round(ceLoss(idx) * 0.4); }
@@ -354,8 +585,15 @@ function expectedCloseDate(idx: number): string {
   return `2025-${String(monthOffset).padStart(2, '0')}-${[15, 28, 30, 15, 28, 30][(fid(idx) - 1) % 6]}`;
 }
 function expectedSpread(idx: number): number { return spread(idx) - 25; }
-function expectedTenor(idx: number): string { return ['60', '84', '48', '36', '60', '84', '72', '36', '60', '120'][fid(idx) - 1]; }
-function expectedGrade(idx: number): string { return ['BBB+', 'A-', 'BBB', 'A+', 'BB+', 'A', 'BBB-', 'A+', 'BBB', 'AA-'][fid(idx) - 1]; }
+const EXPECTED_TENORS = ['60', '84', '48', '36', '60', '84', '72', '36', '60', '120'];
+function expectedTenor(idx: number): string { return pick(EXPECTED_TENORS, fid(idx) - 1); }
+function expectedGrade(idx: number): string {
+  const f = fid(idx) - 1;
+  const grades = ['BBB+', 'A-', 'BBB', 'A+', 'BB+', 'A', 'BBB-', 'A+', 'BBB', 'AA-'];
+  if (f < 10) return grades[f];
+  // MVP: use rating tier's S&P rating
+  return RATING_TIER_MAP[tierOf(idx)].spRatings[0];
+}
 function pipelineStatus(idx: number): string {
   const stage = pipelineStage(idx);
   if (stage === 'CLOSING' || stage === 'WON') return 'CLOSING';
@@ -457,10 +695,11 @@ function remediationPlan(idx: number): string { return REMED_PLANS_POOL[idx % RE
 
 // Risk flag data
 function flagType(idx: number): string {
-  return cycle(idx) % 2 === 0 ? RISK_FLAG_TYPES[fid(idx) - 1] : RISK_FLAG_TYPES_ALT[fid(idx) - 1];
+  const f = fid(idx) - 1;
+  return cycle(idx) % 2 === 0 ? pick(RISK_FLAG_TYPES, f) : pick(RISK_FLAG_TYPES_ALT, f);
 }
 const FLAG_CODES_BASE = ['CONC', 'WL', 'COV', 'MAT', 'CONC', 'WL', 'SEC', 'CTY', 'CONC', 'WL'];
-function flagCode(idx: number): string { return `${FLAG_CODES_BASE[fid(idx) - 1]}_${String(idx + 1).padStart(2, '0')}`; }
+function flagCode(idx: number): string { return `${pick(FLAG_CODES_BASE, fid(idx) - 1)}_${String(idx + 1).padStart(2, '0')}`; }
 
 const FLAG_DESCS_POOL = [
   'Single-name concentration exceeds 5% of Tier 1 capital',
@@ -517,40 +756,54 @@ const FLAG_DESCS_POOL = [
 function flagDesc(idx: number): string { return FLAG_DESCS_POOL[idx % FLAG_DESCS_POOL.length]; }
 
 const FLAG_SCOPES_BASE = ['COUNTERPARTY', 'COUNTERPARTY', 'FACILITY', 'FACILITY', 'PORTFOLIO', 'COUNTERPARTY', 'PORTFOLIO', 'PORTFOLIO', 'COUNTERPARTY', 'COUNTERPARTY'];
-function flagScope(idx: number): string { return FLAG_SCOPES_BASE[fid(idx) - 1]; }
+function flagScope(idx: number): string { return pick(FLAG_SCOPES_BASE, fid(idx) - 1); }
 
 function flagSeverity(idx: number): string {
   const f = fid(idx) - 1;
   const c = cycle(idx);
-  if ((f === 4 || f === 7) && c >= 2) return 'HIGH'; // troubled names
-  return ['HIGH', 'MEDIUM', 'HIGH', 'MEDIUM', 'HIGH', 'LOW', 'MEDIUM', 'LOW', 'HIGH', 'HIGH'][f];
+  if (f < 10) {
+    if ((f === 4 || f === 7) && c >= 2) return 'HIGH'; // troubled names
+    return ['HIGH', 'MEDIUM', 'HIGH', 'MEDIUM', 'HIGH', 'LOW', 'MEDIUM', 'LOW', 'HIGH', 'HIGH'][f];
+  }
+  const arc = arcOf(idx);
+  if ((arc === 'DETERIORATING' || arc === 'STRESSED_SECTOR') && c >= 2) return 'HIGH';
+  const sevs = ['HIGH', 'MEDIUM', 'LOW', 'MEDIUM', 'HIGH'];
+  return sevs[f % sevs.length];
 }
 
 function flagTrigger(idx: number): number {
-  return [5.2, 0, 6.2, 11, 16.3, 0, 12.1, 0, 8.4, 0][fid(idx) - 1] + cycle(idx) * 0.5;
+  const f = fid(idx) - 1;
+  const triggers = [5.2, 0, 6.2, 11, 16.3, 0, 12.1, 0, 8.4, 0];
+  return pick(triggers, f) + cycle(idx) * 0.5;
 }
 
 // DQ score data
 const DQ_DIMS_BASE = ['COMPLETENESS', 'VALIDITY', 'TIMELINESS', 'COMPLETENESS', 'VALIDITY', 'TIMELINESS', 'COMPLETENESS', 'VALIDITY', 'COMPLETENESS', 'VALIDITY'];
-function dqDim(idx: number): string { return DQ_DIMS_BASE[fid(idx) - 1]; }
+function dqDim(idx: number): string { return pick(DQ_DIMS_BASE, fid(idx) - 1); }
 const DQ_TABLES = ['facility_master', 'counterparty', 'collateral_asset', 'position', 'credit_event', 'amendment_event', 'netting_set', 'limit_rule', 'instrument_master', 'exposure_snapshot'];
 function dqTable(idx: number): string { return DQ_TABLES[(fid(idx) - 1 + cycle(idx)) % DQ_TABLES.length]; }
 
+const DQ_COMPLETENESS_BASE = [98.5, 99.2, 97.8, 99.0, 98.0, 99.5, 97.0, 98.8, 99.1, 96.5];
 function dqCompleteness(idx: number): number {
-  const base = [98.5, 99.2, 97.8, 99.0, 98.0, 99.5, 97.0, 98.8, 99.1, 96.5][fid(idx) - 1];
+  const base = pick(DQ_COMPLETENESS_BASE, fid(idx) - 1);
   return Math.round((base + cycle(idx) * 0.2) * 10) / 10;
 }
+const DQ_VALIDITY_BASE = [99.0, 98.5, 99.2, 97.8, 99.0, 98.0, 99.5, 97.0, 98.8, 99.1];
 function dqValidity(idx: number): number {
-  const base = [99.0, 98.5, 99.2, 97.8, 99.0, 98.0, 99.5, 97.0, 98.8, 99.1][fid(idx) - 1];
+  const base = pick(DQ_VALIDITY_BASE, fid(idx) - 1);
   return Math.round((base + cycle(idx) * 0.1) * 10) / 10;
 }
 function dqOverall(idx: number): number {
   return Math.round((dqCompleteness(idx) * 0.5 + dqValidity(idx) * 0.5) * 10) / 10;
 }
-function dqImpactPct(idx: number): number { return [2.1, 1.5, 3.2, 1.0, 2.5, 0.8, 4.0, 3.5, 1.2, 5.0][fid(idx) - 1]; }
-function dqReportCodes(idx: number): string { return ['FR_Y14Q', 'FR_Y14Q,CCAR', 'FR_Y14Q', 'DFAST', 'FR_Y14Q', 'CCAR', 'FR_Y14Q,DFAST', 'CCAR', 'FR_Y14Q', 'CCAR,DFAST'][fid(idx) - 1]; }
-function dqIssueCount(idx: number): number { return Math.max(0, [3, 7, 12, 2, 5, 1, 15, 8, 4, 18][fid(idx) - 1] - cycle(idx)); }
-function dqReconBreaks(idx: number): number { return Math.max(0, [0, 2, 4, 0, 1, 0, 5, 3, 1, 8][fid(idx) - 1] - cycle(idx)); }
+const DQ_IMPACT_BASE = [2.1, 1.5, 3.2, 1.0, 2.5, 0.8, 4.0, 3.5, 1.2, 5.0];
+function dqImpactPct(idx: number): number { return pick(DQ_IMPACT_BASE, fid(idx) - 1); }
+const DQ_REPORT_CODES_BASE = ['FR_Y14Q', 'FR_Y14Q,CCAR', 'FR_Y14Q', 'DFAST', 'FR_Y14Q', 'CCAR', 'FR_Y14Q,DFAST', 'CCAR', 'FR_Y14Q', 'CCAR,DFAST'];
+function dqReportCodes(idx: number): string { return pick(DQ_REPORT_CODES_BASE, fid(idx) - 1); }
+const DQ_ISSUE_BASE = [3, 7, 12, 2, 5, 1, 15, 8, 4, 18];
+function dqIssueCount(idx: number): number { return Math.max(0, pick(DQ_ISSUE_BASE, fid(idx) - 1) - cycle(idx)); }
+const DQ_RECON_BASE = [0, 2, 4, 0, 1, 0, 5, 3, 1, 8];
+function dqReconBreaks(idx: number): number { return Math.max(0, pick(DQ_RECON_BASE, fid(idx) - 1) - cycle(idx)); }
 
 // ───────────── raised/cleared timestamps ─────────────
 function raisedTs(idx: number): string {
@@ -706,16 +959,21 @@ function ratingAgency(idx: number): string { return RATING_AGENCIES[(fid(idx) - 
 function ratingType(idx: number): string { return RATING_TYPES[(fid(idx) - 1 + cycle(idx)) % RATING_TYPES.length]; }
 function isInternal(idx: number): boolean { return ratingAgency(idx) === 'INTERNAL'; }
 function priorRating(idx: number): string {
+  const f = fid(idx) - 1;
   // Prior is one notch above current
   const priors = ['A', 'Baa2', 'AA-', 'Ba1', 'BB+', 'Aa3', 'B', 'Baa1', 'BB+', 'Aaa'];
-  return priors[fid(idx) - 1];
+  if (f < 10) return priors[f];
+  // For MVP, prior rating is the cycle 0 rating for this tier
+  const tier = tierOf(idx);
+  return TIER_INT_RATINGS[tier][0];
 }
 
 // Metric threshold helpers
 const THRESH_TYPES = ['MIN', 'MAX'];
 function threshType(idx: number): string { return THRESH_TYPES[(fid(idx) - 1 + cycle(idx)) % 2]; }
+const THRESH_VALS_BASE = [0.5, 2.0, 1.0, 3.0, 0.25, 1.5, 0.75, 2.5, 0.1, 4.0];
 function threshVal(idx: number): number {
-  const base = [0.5, 2.0, 1.0, 3.0, 0.25, 1.5, 0.75, 2.5, 0.1, 4.0][fid(idx) - 1];
+  const base = pick(THRESH_VALS_BASE, fid(idx) - 1);
   return Math.round((base + cycle(idx) * 0.1) * 100) / 100;
 }
 const THRESH_NAMES_POOL = ['PD Floor', 'LGD Ceiling', 'EL Floor', 'RWA Ceiling', 'Capital Floor', 'PD Ceiling', 'LGD Floor', 'EL Ceiling', 'RWA Floor', 'Capital Ceiling'];
@@ -745,7 +1003,7 @@ export function getL2SeedValue(
   columnName: string,
   rowIndex: number
 ): string | number | null | undefined {
-  const idx = rowIndex % N;
+  const idx = rowIndex % N();
   const i = rowIndex + 1;
 
   switch (tableName) {
@@ -768,7 +1026,7 @@ export function getL2SeedValue(
       if (columnName === 'credit_agreement_id') return fid(idx);
       if (columnName === 'credit_status_code') return creditStatus(idx);
       if (columnName === 'effective_date') return originationDate(idx);
-      if (columnName === 'exposure_type_code') return EXPOSURE_TYPES_BASE[fid(idx) - 1];
+      if (columnName === 'exposure_type_code') return pick(EXPOSURE_TYPES_BASE, fid(idx) - 1);
       if (columnName === 'external_risk_rating') return extRating(idx);
       if (columnName === 'internal_risk_rating') return intRating(idx);
       if (columnName === 'legal_entity_id') return 1;
@@ -790,7 +1048,7 @@ export function getL2SeedValue(
       const detailTypes = ['PRINCIPAL', 'INTEREST', 'FEE'];
       const dt = detailTypes[(fid(idx) - 1 + cycle(idx)) % detailTypes.length];
       if (columnName === 'position_detail_id') return i;
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       if (columnName === 'as_of_date') return AS_OF;
       if (columnName === 'detail_type') return dt;
       if (columnName === 'amount') return dt === 'PRINCIPAL' ? drawn(idx) : dt === 'INTEREST' ? Math.round(drawn(idx) * allInRate(idx) / 100 / 12) : Math.round(committed(idx) * 0.001);
@@ -865,7 +1123,7 @@ export function getL2SeedValue(
       if (columnName === 'currency_code') return currency(idx);
       if (columnName === 'exposure_amount_local') return d;
       if (columnName === 'facility_exposure_id') return i;
-      if (columnName === 'fr2590_category_code') return FR2590_CATS_BASE[fid(idx) - 1];
+      if (columnName === 'fr2590_category_code') return pick(FR2590_CATS_BASE, fid(idx) - 1);
       if (columnName === 'gross_exposure_usd') return c;
       if (columnName === 'legal_entity_id') return 1;
       if (columnName === 'lob_segment_id') return fid(idx);
@@ -926,11 +1184,11 @@ export function getL2SeedValue(
       if (columnName === 'allocated_amount_usd') return eligible;
       if (columnName === 'collateral_snapshot_id') return i;
       if (columnName === 'counterparty_id') return cid(idx);
-      if (columnName === 'crm_type_code') return CRM_TYPES_BASE[fid(idx) - 1];
+      if (columnName === 'crm_type_code') return pick(CRM_TYPES_BASE, fid(idx) - 1);
       if (columnName === 'current_valuation_usd') return val;
       if (columnName === 'facility_id') return fid(idx);
-      if (columnName === 'mitigant_group_code') return MITIGANT_GROUPS_BASE[fid(idx) - 1];
-      if (columnName === 'mitigant_subtype') return MITIGANT_SUBTYPES_BASE[fid(idx) - 1];
+      if (columnName === 'mitigant_group_code') return pick(MITIGANT_GROUPS_BASE, fid(idx) - 1);
+      if (columnName === 'mitigant_subtype') return pick(MITIGANT_SUBTYPES_BASE, fid(idx) - 1);
       if (columnName === 'original_valuation_usd') return Math.round(val * 1.05);
       if (columnName === 'risk_shifting_flag') return 'N';
       break;
@@ -957,7 +1215,7 @@ export function getL2SeedValue(
       if (columnName === 'flow_id') return i;
       if (columnName === 'flow_type') return cft;
       if (columnName === 'maturity_bucket_id') return Math.min(10, Math.floor(idx / 5) + 1);
-      if (columnName === 'position_id') return (idx % N) + 1;
+      if (columnName === 'position_id') return (idx % N()) + 1;
       break;
     }
 
@@ -1012,15 +1270,15 @@ export function getL2SeedValue(
       if (columnName === 'spread_bps') return spread(idx);
       if (columnName === 'rate_index_id') return fid(idx);
       if (columnName === 'all_in_rate_pct') return allInRate(idx);
-      if (columnName === 'floor_pct') return [0, 0, 0.25, 0, 0.50, 0, 0.25, 0, 0, 0][fid(idx) - 1];
+      if (columnName === 'floor_pct') return pick([0, 0, 0.25, 0, 0.50, 0, 0.25, 0, 0, 0], fid(idx) - 1);
       if (columnName === 'base_rate_pct') return baseRate(idx);
       if (columnName === 'currency_code') return currency(idx);
       if (columnName === 'facility_pricing_id') return i;
-      if (columnName === 'min_spread_threshold_bps') return [100, 125, 150, 100, 200, 75, 125, 100, 150, 75][fid(idx) - 1];
+      if (columnName === 'min_spread_threshold_bps') return pick([100, 125, 150, 100, 200, 75, 125, 100, 150, 75], fid(idx) - 1);
       if (columnName === 'payment_frequency') return fid(idx) % 2 === 0 ? 'MONTHLY' : 'QUARTERLY';
       if (columnName === 'prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
-      if (columnName === 'rate_cap_pct') return [12.00, 10.00, 12.00, 10.00, 14.00, 9.00, 12.00, 10.00, 12.00, 8.00][fid(idx) - 1];
-      if (columnName === 'rate_index_code') return ['SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR', 'SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR'][fid(idx) - 1];
+      if (columnName === 'rate_cap_pct') return pick([12.00, 10.00, 12.00, 10.00, 14.00, 9.00, 12.00, 10.00, 12.00, 8.00], fid(idx) - 1);
+      if (columnName === 'rate_index_code') return pick(['SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR', 'SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR'], fid(idx) - 1);
       break;
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1079,11 +1337,11 @@ export function getL2SeedValue(
     // ═══════════════════════════════════════════════════════════════════
     case 'amendment_change_detail':
       if (columnName === 'change_detail_id') return i;
-      if (columnName === 'amendment_id') return (idx % N) + 1;
+      if (columnName === 'amendment_id') return (idx % N()) + 1;
       if (columnName === 'change_type') return changeType(idx);
       if (columnName === 'old_value') return oldVal(idx);
       if (columnName === 'new_value') return newVal(idx);
-      if (columnName === 'amendment_event_id') return (idx % N) + 1;
+      if (columnName === 'amendment_event_id') return (idx % N()) + 1;
       if (columnName === 'change_currency_code') return changeCurrency(idx);
       if (columnName === 'change_field_name') return changeField(idx);
       if (columnName === 'change_seq') return cycle(idx) + 1;
@@ -1137,7 +1395,7 @@ export function getL2SeedValue(
       const ead = drawn(idx);
       const estLoss = ceLoss(idx);
       if (columnName === 'link_id') return i;
-      if (columnName === 'credit_event_id') return (idx % N) + 1;
+      if (columnName === 'credit_event_id') return (idx % N()) + 1;
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'exposure_at_default') return ead;
       if (columnName === 'as_of_date') return AS_OF;
@@ -1163,7 +1421,7 @@ export function getL2SeedValue(
       if (columnName === 'control_owner') return controlOwner(idx);
       if (columnName === 'failure_description') return ba > 0 ? 'Stressed exposure exceeds approved limit' : 'Within limit under stress';
       if (columnName === 'lob_segment_id') return fid(idx);
-      if (columnName === 'stress_test_result_id') return (idx % N) + 1;
+      if (columnName === 'stress_test_result_id') return (idx % N()) + 1;
       break;
     }
 
@@ -1205,7 +1463,7 @@ export function getL2SeedValue(
       if (columnName === 'expected_all_in_rate_pct') return allInRate(idx) - 0.25;
       if (columnName === 'expected_close_date') return expectedCloseDate(idx);
       if (columnName === 'expected_committed_amt') return proposed;
-      if (columnName === 'expected_coverage_ratio') return [120, 150, 100, 200, 80, 175, 100, 180, 110, 250][fid(idx) - 1];
+      if (columnName === 'expected_coverage_ratio') return pick([120, 150, 100, 200, 80, 175, 100, 180, 110, 250], fid(idx) - 1);
       if (columnName === 'expected_exposure_amt') return Math.round(proposed * 0.7);
       if (columnName === 'expected_internal_risk_grade') return expectedGrade(idx);
       if (columnName === 'expected_spread_bps') return expectedSpread(idx);
@@ -1271,12 +1529,12 @@ export function getL2SeedValue(
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return undefined;
       if (columnName === 'active_flag') return 'Y';
-      if (columnName === 'inner_threshold_pct') return [80, 85, 75, 90, 80, 85, 75, 90, 80, 85][fid(idx) - 1];
+      if (columnName === 'inner_threshold_pct') return pick([80, 85, 75, 90, 80, 85, 75, 90, 80, 85], fid(idx) - 1);
       if (columnName === 'last_threshold_updated_date') return '2024-12-15';
       if (columnName === 'limit_type') return tt === 'MIN' ? 'FLOOR' : 'CEILING';
       if (columnName === 'limit_value') return threshVal(idx);
-      if (columnName === 'lod1_sponsor') return LOD1_SPONSORS[fid(idx) - 1];
-      if (columnName === 'lod2_sponsor') return LOD2_SPONSORS[fid(idx) - 1];
+      if (columnName === 'lod1_sponsor') return pick(LOD1_SPONSORS, fid(idx) - 1);
+      if (columnName === 'lod2_sponsor') return pick(LOD2_SPONSORS, fid(idx) - 1);
       if (columnName === 'metric_category') return metricCat(idx);
       if (columnName === 'metric_code') return metricCode(idx);
       if (columnName === 'metric_description') return threshDesc(idx);
@@ -1284,7 +1542,7 @@ export function getL2SeedValue(
       if (columnName === 'metric_name') return threshName(idx);
       if (columnName === 'metric_owner') return METRIC_OWNERS[(fid(idx) - 1 + cycle(idx)) % METRIC_OWNERS.length];
       if (columnName === 'metric_threshold_id') return i;
-      if (columnName === 'outer_threshold_pct') return [95, 95, 90, 95, 95, 95, 90, 95, 95, 95][fid(idx) - 1];
+      if (columnName === 'outer_threshold_pct') return pick([95, 95, 90, 95, 95, 95, 90, 95, 95, 95], fid(idx) - 1);
       if (columnName === 'report_deadline') return fid(idx) % 3 === 0 ? 'T+10' : fid(idx) % 5 === 0 ? 'T+15' : 'T+5';
       if (columnName === 'report_frequency') return fid(idx) % 3 === 0 ? 'QUARTERLY' : 'MONTHLY';
       break;

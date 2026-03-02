@@ -18,7 +18,8 @@
     "test:calc-engine": "tsx scripts/test-calculation-engine.ts",
     "release-tracker:sync": "tsx scripts/release-tracker-sync.ts",
     "release-tracker:init": "tsx scripts/release-tracker-sync.ts --init",
-    "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit"
+    "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit",
+    "db:export": "bash scripts/export-mvp-sql.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

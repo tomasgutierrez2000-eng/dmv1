@@ -1,18 +1,32 @@
 /**
  * Generates L2 DDL, sample-data.json, seed.sql, and relationships.json for the demo model.
  * Run: npx tsx scripts/l2/generate.ts
+ *      npx tsx scripts/l2/generate.ts --profile=mvp
  * Outputs: scripts/l2/output/ddl.sql, seed.sql, sample-data.json, relationships.json
- * L2 data aligns to L1 IDs (facility_id, counterparty_id, etc. 1..10).
+ * L2 data aligns to L1 IDs (facility_id, counterparty_id, etc. 1..10 or 1..N for MVP).
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import type { L2TableDef, L2ColumnDef } from './types';
 import { L2_TABLES } from './l2-definitions';
-import { getL2SeedValue } from './seed-data';
+import { getL2SeedValue, setL2FacilityCount } from './seed-data';
+import { MVP_ROW_COUNTS, MVP_L2_CYCLES } from '../shared/mvp-config';
 
 const OUT_DIR = path.join(__dirname, 'output');
-const ROWS_PER_TABLE = 50; // 5 cycles × 10 facilities
 const SEED_AS_OF_DATE = '2025-01-31';
+
+function parseProfile(): string | undefined {
+  const arg = process.argv.find(a => a.startsWith('--profile='));
+  return arg ? arg.split('=')[1] : undefined;
+}
+
+const PROFILE = parseProfile();
+const FACILITY_COUNT = PROFILE === 'mvp' ? (MVP_ROW_COUNTS.facility_master ?? 405) : 10;
+const CYCLES = PROFILE === 'mvp' ? MVP_L2_CYCLES : 5;
+const ROWS_PER_TABLE = FACILITY_COUNT * CYCLES;
+
+// Configure L2 seed-data module with the facility count
+setL2FacilityCount(FACILITY_COUNT);
 
 function mapTypeToPg(type: string): string {
   if (type.startsWith('VARCHAR') || type.startsWith('CHAR')) return type;
@@ -80,7 +94,10 @@ function seedValue(col: L2ColumnDef, rowIndex: number, tableName: string): unkno
     const match = col.fk.match(/l[12]\.\w+\((\w+)\)/);
     if (match) {
       const refCol = match[1];
-      if (refCol === 'facility_id' || refCol === 'counterparty_id' || refCol === 'credit_agreement_id' || refCol === 'collateral_asset_id' || refCol === 'amendment_id' || refCol === 'limit_rule_id' || refCol === 'position_id' || refCol === 'credit_event_id' || refCol === 'scenario_id')
+      if (refCol === 'facility_id') return (rowIndex % FACILITY_COUNT) + 1;
+      if (refCol === 'counterparty_id' || refCol === 'credit_agreement_id')
+        return (rowIndex % Math.min(FACILITY_COUNT, 100)) + 1;
+      if (refCol === 'collateral_asset_id' || refCol === 'amendment_id' || refCol === 'limit_rule_id' || refCol === 'position_id' || refCol === 'credit_event_id' || refCol === 'scenario_id')
         return (rowIndex % 10) + 1;
       if (refCol === 'currency_code') return 'USD';
       if (refCol === 'country_code') return 'US';
@@ -188,8 +205,8 @@ function buildTableMetadata(): Record<string, Record<string, { type: string; pk:
 
 function buildSeedSql(): string {
   const parts: string[] = [
-    '-- L2 Seed Data (generated from scripts/l2/generate.ts)',
-    '-- Run after L1 seed and L2 DDL. Uses facility_id/counterparty_id 1..10, as_of_date 2025-01-31.',
+    `-- L2 Seed Data (generated, profile=${PROFILE ?? 'default'}, ${ROWS_PER_TABLE} rows/table)`,
+    `-- Run after L1 seed and L2 DDL. Uses facility_id 1..${FACILITY_COUNT}, as_of_date 2025-01-31.`,
     'SET search_path TO l1, l2, public;',
     '',
   ];
@@ -237,6 +254,7 @@ function main() {
   fs.writeFileSync(path.join(OUT_DIR, 'table-metadata.json'), JSON.stringify(tableMetadata, null, 2), 'utf-8');
 
   console.log(`Generated: ${OUT_DIR}/ddl.sql, ${OUT_DIR}/seed.sql, sample-data.json, relationships.json, table-metadata.json`);
+  console.log(`Profile: ${PROFILE ?? 'default'}, Facilities: ${FACILITY_COUNT}, Cycles: ${CYCLES}, Rows/table: ${ROWS_PER_TABLE}`);
   console.log(`L2 Tables: ${L2_TABLES.length}, Relationships: ${relationships.length}`);
 }
 

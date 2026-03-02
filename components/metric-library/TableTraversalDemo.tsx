@@ -469,12 +469,19 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
  * LAYOUT: compute card positions for the visual diagram
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const CARD_W = 180;
-const CARD_GAP = 32;
-const CARD_H_BASE = 56;
-const FIELD_H = 22;
-const ROW_HEIGHT = 200;
-const SVG_PAD = 24;
+const CARD_W = 148;
+const CARD_GAP = 20;
+const CARD_H_BASE = 48;
+const FIELD_H = 18;
+const ROW_HEIGHT = 160;
+const SVG_PAD = 16;
+
+const PLAYBACK_BASE_MS = 5000;
+const SPEED_OPTIONS = [
+  { value: 0.5, label: '0.5×' },
+  { value: 1, label: '1×' },
+  { value: 1.5, label: '1.5×' },
+] as const;
 
 function getCardPositions(tableIds: string[]): Record<string, { x: number; y: number; h: number }> {
   const positions: Record<string, { x: number; y: number; h: number }> = {};
@@ -589,7 +596,7 @@ function TableCard({
 
       {/* Fields or result */}
       {isCalc && sampleResult && isActive ? (
-        <text x={x + w / 2} y={y + 60} textAnchor="middle" fill="#6ee7b7" fontSize={12} fontWeight={700} fontFamily="monospace">
+        <text x={x + w / 2} y={y + 52} textAnchor="middle" fill="#6ee7b7" fontSize={10} fontWeight={700} fontFamily="monospace">
           {sampleResult}
         </text>
       ) : (
@@ -754,6 +761,7 @@ export default function TableTraversalDemo() {
   const [selectedDim, setSelectedDim] = useState<string>('facility');
   const [activeStep, setActiveStep] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(0.5);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const demo = DIMENSION_DEMOS.find((d) => d.key === selectedDim)!;
@@ -761,6 +769,7 @@ export default function TableTraversalDemo() {
 
   const totalSteps = demo.steps.length;
   const step = activeStep >= 0 ? demo.steps[activeStep] : null;
+  const stepDelayMs = Math.round(PLAYBACK_BASE_MS / playbackSpeed);
 
   const visitedTables = new Set<string>();
   const visitedArrows = new Set<string>();
@@ -773,6 +782,7 @@ export default function TableTraversalDemo() {
     }
   }
 
+  const joinSteps = demo.steps.filter((s) => s.joinKey);
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -782,13 +792,13 @@ export default function TableTraversalDemo() {
 
   useEffect(() => {
     if (isPlaying && activeStep >= 0 && activeStep < totalSteps - 1) {
-      timerRef.current = setTimeout(() => setActiveStep((s) => s + 1), 3500);
+      timerRef.current = setTimeout(() => setActiveStep((s) => s + 1), stepDelayMs);
       return clearTimer;
     }
     if (activeStep >= totalSteps - 1) {
       setIsPlaying(false);
     }
-  }, [isPlaying, activeStep, totalSteps, clearTimer]);
+  }, [isPlaying, activeStep, totalSteps, stepDelayMs, clearTimer]);
 
   useEffect(() => {
     setActiveStep(-1);
@@ -807,7 +817,7 @@ export default function TableTraversalDemo() {
   const reset = () => { pause(); setActiveStep(-1); };
 
   const svgW = demo.tables.length * (CARD_W + CARD_GAP) + SVG_PAD * 2;
-  const svgH = ROW_HEIGHT + 160;
+  const svgH = ROW_HEIGHT + 120;
 
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
@@ -864,14 +874,181 @@ export default function TableTraversalDemo() {
         <p className="text-[11px] text-gray-500">{demo.description}</p>
       </div>
 
-      {/* SVG Diagram */}
-      <div className="overflow-x-auto px-2">
+      {/* Steps + controls ABOVE the flow */}
+      <div className="px-5 py-4 border-b border-white/5 bg-black/20">
+        {/* Progress bar */}
+        <div className="h-0.5 bg-gray-800 rounded-full mb-3">
+          <div
+            className="h-full bg-gradient-to-r from-amber-500 via-blue-500 to-purple-500 transition-all duration-700 ease-out rounded-full"
+            style={{ width: activeStep >= 0 ? `${((activeStep + 1) / totalSteps) * 100}%` : '0%' }}
+          />
+        </div>
+
+        {activeStep === -1 ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-gray-400">
+              Press <strong className="text-white">Play</strong> to watch how the <strong className="text-purple-300">{demo.label}</strong> dimension
+              traverses {demo.tables.filter((t) => TABLES[t]?.layer !== 'CALC').length} database tables step by step.
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">Speed:</span>
+              {SPEED_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setPlaybackSpeed(opt.value)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+                    playbackSpeed === opt.value
+                      ? 'bg-purple-500/25 border border-purple-500/40 text-purple-300'
+                      : 'bg-white/[0.04] border border-gray-800 text-gray-500 hover:text-gray-300'
+                  }`}
+                  title={`Playback at ${opt.label}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+              <button
+                onClick={play}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold text-sm hover:bg-purple-500/25 transition-colors"
+              >
+                <Play className="w-4 h-4" /> Start Demo
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div key={`narration-${selectedDim}-${activeStep}`} className="flex-1 min-w-0 max-w-2xl" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
+                  Step {activeStep + 1} of {totalSteps}
+                </span>
+                <span
+                  className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
+                  style={{
+                    color: KIND_COLORS[step!.kind],
+                    borderColor: KIND_COLORS[step!.kind] + '40',
+                    backgroundColor: KIND_COLORS[step!.kind] + '15',
+                  }}
+                >
+                  {step!.kind.toUpperCase()}
+                </span>
+                {step!.joinKey && (
+                  <code className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                    ON {step!.joinKey}
+                  </code>
+                )}
+              </div>
+              <p className="text-[13px] text-gray-300 leading-relaxed">{step!.narration}</p>
+              {step!.sampleResult && (
+                <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <Calculator className="w-3.5 h-3.5 text-emerald-400" />
+                  <code className="text-sm font-mono font-bold text-emerald-300">{step!.sampleResult}</code>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={prev}
+                  disabled={activeStep <= 0}
+                  className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Previous step"
+                >
+                  <SkipBack className="w-3.5 h-3.5" />
+                </button>
+                {isPlaying ? (
+                  <button
+                    onClick={pause}
+                    className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-300 hover:bg-amber-500/25 transition-colors"
+                    title="Pause"
+                  >
+                    <Pause className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={play}
+                    className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/25 transition-colors"
+                    title="Play"
+                  >
+                    <Play className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={next}
+                  disabled={activeStep >= totalSteps - 1}
+                  className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Next step"
+                >
+                  <SkipForward className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">Speed:</span>
+                {SPEED_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setPlaybackSpeed(opt.value)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
+                      playbackSpeed === opt.value
+                        ? 'bg-purple-500/25 border border-purple-500/40 text-purple-300'
+                        : 'bg-white/[0.04] border border-gray-800 text-gray-500 hover:text-gray-300'
+                    }`}
+                    title={`${opt.label} playback`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={reset}
+                className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+                title="Reset"
+              >
+                <RotateCcw className="w-3 h-3" /> Reset
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Join conditions — single view, no scroll */}
+      {joinSteps.length > 0 && (
+        <div className="px-5 py-3 border-b border-white/5 bg-gray-900/30">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-2">Join conditions (all steps)</div>
+          <div className="flex flex-wrap gap-2">
+            {joinSteps.map((s, i) => {
+              const fromName = s.arrowFrom && TABLES[s.arrowFrom] ? TABLES[s.arrowFrom].shortName : s.arrowFrom ?? '?';
+              const toName = s.arrowTo && TABLES[s.arrowTo] ? TABLES[s.arrowTo].shortName : s.arrowTo ?? '?';
+              const isCurrent = step && demo.steps[activeStep] === s;
+              return (
+                <div
+                  key={i}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-mono ${
+                    isCurrent
+                      ? 'bg-blue-500/15 border-blue-500/40 text-blue-200'
+                      : 'bg-white/[0.03] border-gray-800 text-gray-400'
+                  }`}
+                >
+                  <span className="text-gray-500">{fromName}</span>
+                  <span className="text-gray-600">→</span>
+                  <span>{toName}</span>
+                  <span className="text-emerald-400/90">ON {s.joinKey}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* SVG Diagram — compact, fit in single view */}
+      <div className="px-2 py-3 overflow-x-auto overflow-y-hidden">
         <svg
           width={svgW}
           height={svgH}
           viewBox={`0 0 ${svgW} ${svgH}`}
           className="block mx-auto"
-          style={{ minWidth: Math.min(svgW, 700) }}
+          style={{ minWidth: '100%', maxWidth: Math.min(svgW, 900) }}
+          preserveAspectRatio="xMidYMid meet"
         >
           <defs>
             <marker id="arrow-active" markerWidth={8} markerHeight={8} refX={7} refY={4} orient="auto">
@@ -880,8 +1057,8 @@ export default function TableTraversalDemo() {
           </defs>
 
           {/* Row labels */}
-          <text x={8} y={SVG_PAD + 10} fill="#4b5563" fontSize={9} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
-          <text x={8} y={ROW_HEIGHT + 10} fill="#4b5563" fontSize={9} fontWeight={700} fontFamily="monospace">L1 Reference</text>
+          <text x={8} y={SVG_PAD + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
+          <text x={8} y={ROW_HEIGHT + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L1 Reference</text>
 
           {/* Arrows */}
           {demo.steps.map((s, i) => {
@@ -934,113 +1111,6 @@ export default function TableTraversalDemo() {
             );
           })}
         </svg>
-      </div>
-
-      {/* Narration panel */}
-      <div className="border-t border-white/5">
-        {/* Progress bar */}
-        <div className="h-1 bg-gray-800">
-          <div
-            className="h-full bg-gradient-to-r from-amber-500 via-blue-500 to-purple-500 transition-all duration-700 ease-out"
-            style={{ width: activeStep >= 0 ? `${((activeStep + 1) / totalSteps) * 100}%` : '0%' }}
-          />
-        </div>
-
-        <div className="px-5 py-4">
-          {activeStep === -1 ? (
-            <div className="text-center py-4">
-              <p className="text-sm text-gray-400 mb-3">
-                Press <strong className="text-white">Play</strong> to watch how the <strong className="text-purple-300">{demo.label}</strong> dimension
-                traverses {demo.tables.filter((t) => TABLES[t]?.layer !== 'CALC').length} database tables step by step.
-              </p>
-              <button
-                onClick={play}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 font-bold text-sm hover:bg-purple-500/25 transition-colors"
-              >
-                <Play className="w-4 h-4" /> Start Demo
-              </button>
-            </div>
-          ) : (
-            <div className="flex gap-4">
-              {/* Narration text */}
-              <div key={`narration-${selectedDim}-${activeStep}`} className="flex-1 min-w-0" style={{ animation: 'ttd-slideUp 0.4s ease-out' }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
-                    Step {activeStep + 1} of {totalSteps}
-                  </span>
-                  <span
-                    className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
-                    style={{
-                      color: KIND_COLORS[step!.kind],
-                      borderColor: KIND_COLORS[step!.kind] + '40',
-                      backgroundColor: KIND_COLORS[step!.kind] + '15',
-                    }}
-                  >
-                    {step!.kind.toUpperCase()}
-                  </span>
-                  {step!.joinKey && (
-                    <code className="text-[9px] font-mono text-gray-500 bg-white/5 px-1.5 py-0.5 rounded">
-                      ON {step!.joinKey.length > 35 ? step!.joinKey.slice(0, 33) + '\u2026' : step!.joinKey}
-                    </code>
-                  )}
-                </div>
-                <p className="text-[13px] text-gray-300 leading-relaxed">{step!.narration}</p>
-                {step!.sampleResult && (
-                  <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                    <Calculator className="w-3.5 h-3.5 text-emerald-400" />
-                    <code className="text-sm font-mono font-bold text-emerald-300">{step!.sampleResult}</code>
-                  </div>
-                )}
-              </div>
-
-              {/* Controls */}
-              <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={prev}
-                    disabled={activeStep <= 0}
-                    className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Previous step"
-                  >
-                    <SkipBack className="w-3.5 h-3.5" />
-                  </button>
-                  {isPlaying ? (
-                    <button
-                      onClick={pause}
-                      className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-300 hover:bg-amber-500/25 transition-colors"
-                      title="Pause"
-                    >
-                      <Pause className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={play}
-                      className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 hover:bg-purple-500/25 transition-colors"
-                      title="Play"
-                    >
-                      <Play className="w-4 h-4" />
-                    </button>
-                  )}
-                  <button
-                    onClick={next}
-                    disabled={activeStep >= totalSteps - 1}
-                    className="w-8 h-8 rounded-lg bg-white/5 border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Next step"
-                  >
-                    <SkipForward className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <button
-                  onClick={reset}
-                  className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
-                  title="Reset"
-                >
-                  <RotateCcw className="w-3 h-3" /> Reset
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

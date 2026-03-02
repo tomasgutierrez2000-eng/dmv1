@@ -539,42 +539,45 @@ function JoinMapVisual() {
     L1: { border: 'border-blue-500/40',  bg: 'bg-blue-500/10',  text: 'text-blue-300' },
   };
 
+  const fromLabel = (id: string) => nodes.find((n) => n.id === id)?.label ?? id;
   return (
-    <div className="rounded-xl border border-gray-800 bg-black/30 p-5">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="rounded-xl border border-gray-800 bg-black/30 p-4">
+      <div className="flex items-center gap-2 mb-3">
         <Network className="w-4 h-4 text-cyan-400" aria-hidden />
         <span className="text-sm font-bold text-white">Table Traversal Map</span>
-        <span className="text-[9px] text-gray-600">How each table connects via FK joins</span>
+        <span className="text-[9px] text-gray-600">Join conditions in one view</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-        {nodes.map((n) => {
-          const s = layerStyle[n.layer];
-          return (
-            <div key={n.id} className={`rounded-lg border ${s.border} ${s.bg} p-3`}>
-              <div className="flex items-center gap-1.5 mb-1">
-                <Database className={`w-3 h-3 ${s.text}`} aria-hidden />
-                <span className={`text-[9px] font-bold uppercase ${s.text}`}>{n.layer}</span>
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Tables — compact row */}
+        <div className="flex flex-wrap gap-2">
+          {nodes.map((n) => {
+            const s = layerStyle[n.layer];
+            return (
+              <div key={n.id} className={`rounded-lg border ${s.border} ${s.bg} px-2.5 py-1.5 flex items-center gap-1.5`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${n.layer === 'L2' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+                <code className={`text-[10px] font-mono font-semibold ${s.text}`}>{n.label}</code>
               </div>
-              <code className={`text-xs font-mono font-semibold ${s.text}`}>{n.label}</code>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      <div className="space-y-1.5">
-        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Join Edges</div>
-        {edges.map((e, i) => (
-          <div key={i} className="flex items-center gap-2 text-[10px]">
-            <span className="w-4 h-4 rounded-full bg-white/5 flex items-center justify-center text-[8px] font-bold text-gray-500 flex-shrink-0">{i + 1}</span>
-            <code className="font-mono text-amber-300">{e.from === 'fes' ? 'facility_exposure_snapshot' : e.from === 'cs' ? 'collateral_snapshot' : e.from === 'fm' ? 'facility_master' : e.from === 'cp' ? 'counterparty' : 'enterprise_business_taxonomy'}</code>
-            <ArrowRight className="w-3 h-3 text-gray-600 flex-shrink-0" />
-            <code className="font-mono text-blue-300">{e.to === 'fes' ? 'facility_exposure_snapshot' : e.to === 'cs' ? 'collateral_snapshot' : e.to === 'fm' ? 'facility_master' : e.to === 'cp' ? 'counterparty' : 'enterprise_business_taxonomy'}</code>
-            <span className="text-gray-700">ON</span>
-            <code className="font-mono text-emerald-400">{e.key}</code>
-            <span className="text-gray-600 italic ml-1">({e.label})</span>
+        {/* Join conditions — single view, no scroll */}
+        <div className="flex-1 min-w-0">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Join conditions</div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[10px]">
+            {edges.map((e, i) => (
+              <div key={i} className="inline-flex items-center gap-1.5 flex-wrap">
+                <code className="font-mono text-amber-300/90">{fromLabel(e.from)}</code>
+                <ArrowRight className="w-3 h-3 text-gray-600 flex-shrink-0" />
+                <code className="font-mono text-blue-300/90">{fromLabel(e.to)}</code>
+                <span className="text-gray-600">ON</span>
+                <code className="font-mono text-emerald-400">{e.key}</code>
+                <span className="text-gray-600 italic">({e.label})</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
@@ -945,15 +948,23 @@ function FooterLegend() {
  * MAIN EXPORT
  * ──────────────────────────────────────────────────────────────────────────── */
 
+const PAGE_STEPS = [
+  { id: 'step1', label: 'Metric Definition', short: 'Definition' },
+  { id: 'step2', label: 'Source & Reference Tables', short: 'Tables' },
+  { id: 'step3', label: 'Table Traversal Map', short: 'Joins' },
+  { id: 'step4', label: 'Facility Calculation', short: 'Calculate' },
+  { id: 'step5', label: 'Hierarchy & Rollup', short: 'Rollup' },
+  { id: 'step6', label: 'Dashboard', short: 'Dashboard' },
+];
+
 export default function LTVLineageView() {
   const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
-
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-0">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex items-center gap-2 mb-1">
             <FileText className="w-5 h-5 text-blue-400" aria-hidden />
             <h2 className="text-xl font-bold text-white">Deep-Dive: How LTV Rolls Up</h2>
@@ -964,8 +975,26 @@ export default function LTVLineageView() {
           </p>
         </div>
 
+        {/* Steps overview — above the flow */}
+        <div className="mb-6 rounded-xl border border-gray-800 bg-white/[0.02] p-3">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-2">Steps</div>
+          <div className="flex flex-wrap gap-2">
+            {PAGE_STEPS.map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-700 bg-white/[0.03] text-xs font-medium text-gray-300 hover:border-gray-600 hover:text-white hover:bg-white/[0.06] transition-colors"
+              >
+                <span className="text-gray-500 font-mono flex-shrink-0">{s.id.replace('step', '')}</span>
+                <span className="hidden sm:inline">{s.label}</span>
+                <span className="sm:hidden">{s.short}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* STEP 1: METRIC DEFINITION */}
-        <section>
+        <section id="step1" className="scroll-mt-6">
           <SectionHeading
             icon={Calculator}
             step="Step 1 — Metric Definition"
@@ -979,7 +1008,7 @@ export default function LTVLineageView() {
         <FlowArrow label="Which tables provide the data?" />
 
         {/* STEP 2: SOURCE & REFERENCE TABLES */}
-        <section>
+        <section id="step2" className="scroll-mt-6">
           <SectionHeading
             icon={Database}
             step="Step 2 — Source & Reference Tables"
@@ -993,7 +1022,7 @@ export default function LTVLineageView() {
         <FlowArrow label="How are the tables connected?" />
 
         {/* STEP 3: JOIN MAP */}
-        <section>
+        <section id="step3" className="scroll-mt-6">
           <SectionHeading
             icon={Network}
             step="Step 3 — Table Traversal Map"
@@ -1016,7 +1045,7 @@ export default function LTVLineageView() {
         <FlowArrow label="How is LTV calculated at the facility level?" />
 
         {/* STEP 4: CALCULATION */}
-        <section>
+        <section id="step4" className="scroll-mt-6">
           <SectionHeading
             icon={Zap}
             step="Step 4 — Facility-Level Calculation"
@@ -1030,7 +1059,7 @@ export default function LTVLineageView() {
         <FlowArrow label="How does it aggregate up the hierarchy?" />
 
         {/* STEP 5: HIERARCHY OVERVIEW */}
-        <section>
+        <section id="step5" className="scroll-mt-6">
           <SectionHeading
             icon={GitBranch}
             step="Step 5 — Hierarchy Overview & Rollup"
@@ -1055,7 +1084,7 @@ export default function LTVLineageView() {
         <FlowArrow label="Dashboard builder selects dimension" />
 
         {/* STEP 6: DASHBOARD */}
-        <section>
+        <section id="step6" className="scroll-mt-6">
           <SectionHeading
             icon={LayoutDashboard}
             step="Step 6 — Dashboard Consumption"

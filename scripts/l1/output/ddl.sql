@@ -636,6 +636,7 @@ CREATE TABLE IF NOT EXISTS l1.facility_master (
   rate_floor_pct DECIMAL(10,4),
   region_code VARCHAR(20),
   revolving_flag CHAR(1),
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
   effective_start_date DATE NOT NULL,
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',

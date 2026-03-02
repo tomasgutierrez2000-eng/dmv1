@@ -2535,6 +2535,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'region_code') return COUNTRY_REGION_CODES[idx];
       if (columnName === 'revolving_flag') return REVOLVING_FLAGS[idx];
       if (columnName === 'industry_code') return INDUSTRY_CODES[idx];
+      if (columnName === 'active_flag') return FACILITY_STATUSES[idx] === 'ACTIVE' ? 'Y' : 'N';
       break;
 
     /* ──────────── contract_master ──────────── */

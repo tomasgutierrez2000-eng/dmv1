@@ -250,6 +250,7 @@ export const generateL1Data = (): L1Data => {
       lob_l3_name: lobL3,
       region_code: pick(REGIONS, i),
       industry_code: pick(INDUSTRIES, i + 3).id,
+      active_flag: isActive ? 'Y' : 'N',
     });
   }
 

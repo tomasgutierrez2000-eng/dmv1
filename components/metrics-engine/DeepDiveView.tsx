@@ -1,15 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Copy, ChevronDown, ChevronUp, Code, Zap } from 'lucide-react';
 import {
   CALCULATION_DIMENSIONS,
   CALCULATION_DIMENSION_LABELS,
   type CalculationDimension,
+  type SourceField,
 } from '@/data/l3-metrics';
 import { resolveFormulaForDimension } from '@/lib/metrics-calculation/formula-resolver';
 import { getFormulaForDimension } from '@/data/metrics_dimensions_filled';
+import { resolveCrossTierDependencies, type DimensionData } from '@/lib/deep-dive/cross-tier-resolver';
+import HierarchyOverview from './deep-dive/HierarchyOverview';
+import CalculationWalkthrough from './deep-dive/CalculationWalkthrough';
 import type { L3Metric } from '@/data/l3-metrics';
 
 interface DeepDiveViewProps {
@@ -25,6 +29,8 @@ interface MetricDimensionFormulaApiRow {
   definition?: string;
   dashboardDisplayName?: string;
   laymanFormula?: string;
+  lineageNarrative?: string;
+  sourceFields?: SourceField[];
 }
 
 function normalizeMatchKey(value: string): string {
@@ -71,6 +77,32 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
   useEffect(() => {
     if (!allowedDimensions.includes(dimension)) setDimension(allowedDimensions[0]);
   }, [allowedDimensions, dimension]);
+
+  /* ── Build dimension data map for hierarchy/walkthrough components ── */
+  const dimensionDataMap = useMemo(() => {
+    const map = new Map<CalculationDimension, DimensionData>();
+    if (!formulasFromApi) return map;
+    const rows = formulasFromApi.filter((r) =>
+      matchKeys.some((k) => k === normalizeMatchKey(String(r.metricId)))
+    );
+    for (const row of rows) {
+      map.set(row.dimension, {
+        lineageNarrative: row.lineageNarrative,
+        sourceFields: row.sourceFields,
+        formula: row.formula,
+        formulaSQL: row.formulaSQL,
+        definition: row.definition,
+        laymanFormula: row.laymanFormula,
+        dashboardDisplayName: row.dashboardDisplayName,
+      });
+    }
+    return map;
+  }, [formulasFromApi, matchKeys]);
+
+  const crossTierResolution = useMemo(
+    () => resolveCrossTierDependencies(metric.id, dimension, dimensionDataMap),
+    [metric.id, dimension, dimensionDataMap]
+  );
 
   const handleCopySql = () => {
     const sql = displayFormulaSQL;
@@ -178,6 +210,22 @@ export default function DeepDiveView({ metric, onBack }: DeepDiveViewProps) {
             </div>
           )}
         </section>
+      )}
+
+      {/* Deep-dive: How this metric rolls up */}
+      {dimensionDataMap.size > 0 && (
+        <>
+          <HierarchyOverview
+            metricName={displayName}
+            currentDimension={dimension}
+            allDimensionData={dimensionDataMap}
+          />
+          <CalculationWalkthrough
+            metricId={metric.id}
+            currentDimension={dimension}
+            crossTierResolution={crossTierResolution}
+          />
+        </>
       )}
     </div>
   );

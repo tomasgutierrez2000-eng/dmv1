@@ -10,7 +10,10 @@
     "ead_amount": 14.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 7.2,
+    "allocated_equity_amt": 0.6
   },
   {
     "facility_exposure_id": "FES-000002",
@@ -23,7 +26,10 @@
     "ead_amount": 13.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 6.9,
+    "allocated_equity_amt": 0.6
   },
   {
     "facility_exposure_id": "FES-000003",
@@ -36,7 +42,10 @@
     "ead_amount": 13.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 6.6,
+    "allocated_equity_amt": 0.5
   },
   {
     "facility_exposure_id": "FES-000004",
@@ -49,7 +58,10 @@
     "ead_amount": 37.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 28,
+    "allocated_equity_amt": 2.5
   },
   {
     "facility_exposure_id": "FES-000005",
@@ -62,7 +74,10 @@
     "ead_amount": 36.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 27.1,
+    "allocated_equity_amt": 2.4
   },
   {
     "facility_exposure_id": "FES-000006",
@@ -75,7 +90,10 @@
     "ead_amount": 34.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 26,
+    "allocated_equity_amt": 2.3
   },
   {
     "facility_exposure_id": "FES-000007",
@@ -88,7 +106,10 @@
     "ead_amount": 69.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 34.9,
+    "allocated_equity_amt": 3.5
   },
   {
     "facility_exposure_id": "FES-000008",
@@ -101,7 +122,10 @@
     "ead_amount": 68.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 34.2,
+    "allocated_equity_amt": 3.4
   },
   {
     "facility_exposure_id": "FES-000009",
@@ -114,7 +138,10 @@
     "ead_amount": 66.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 33.2,
+    "allocated_equity_amt": 3.3
   },
   {
     "facility_exposure_id": "FES-000010",
@@ -127,7 +154,10 @@
     "ead_amount": 111.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 55.8,
+    "allocated_equity_amt": 6.1
   },
   {
     "facility_exposure_id": "FES-000011",
@@ -140,7 +170,10 @@
     "ead_amount": 110.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 55.2,
+    "allocated_equity_amt": 6.1
   },
   {
     "facility_exposure_id": "FES-000012",
@@ -153,7 +186,10 @@
     "ead_amount": 108.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 54.1,
+    "allocated_equity_amt": 6
   },
   {
     "facility_exposure_id": "FES-000013",
@@ -166,7 +202,10 @@
     "ead_amount": 161.8,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 121.3,
+    "allocated_equity_amt": 14.6
   },
   {
     "facility_exposure_id": "FES-000014",
@@ -179,7 +218,10 @@
     "ead_amount": 161.8,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 121.3,
+    "allocated_equity_amt": 14.6
   },
   {
     "facility_exposure_id": "FES-000015",
@@ -192,7 +234,10 @@
     "ead_amount": 160.2,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 120.1,
+    "allocated_equity_amt": 14.4
   },
   {
     "facility_exposure_id": "FES-000016",
@@ -205,7 +250,10 @@
     "ead_amount": 73.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 36.7,
+    "allocated_equity_amt": 2.9
   },
   {
     "facility_exposure_id": "FES-000017",
@@ -218,7 +266,10 @@
     "ead_amount": 74.1,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 37,
+    "allocated_equity_amt": 3
   },
   {
     "facility_exposure_id": "FES-000018",
@@ -231,7 +282,10 @@
     "ead_amount": 74.1,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 37,
+    "allocated_equity_amt": 3
   },
   {
     "facility_exposure_id": "FES-000019",
@@ -244,7 +298,10 @@
     "ead_amount": 119.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 89.5,
+    "allocated_equity_amt": 8.1
   },
   {
     "facility_exposure_id": "FES-000020",
@@ -257,7 +314,10 @@
     "ead_amount": 121.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 91.2,
+    "allocated_equity_amt": 8.2
   },
   {
     "facility_exposure_id": "FES-000021",
@@ -270,7 +330,10 @@
     "ead_amount": 122.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 92.2,
+    "allocated_equity_amt": 8.3
   },
   {
     "facility_exposure_id": "FES-000022",
@@ -283,7 +346,10 @@
     "ead_amount": 173,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 86.5,
+    "allocated_equity_amt": 8.7
   },
   {
     "facility_exposure_id": "FES-000023",
@@ -296,7 +362,10 @@
     "ead_amount": 178.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 89.1,
+    "allocated_equity_amt": 8.9
   },
   {
     "facility_exposure_id": "FES-000024",
@@ -309,7 +378,10 @@
     "ead_amount": 181.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 90.9,
+    "allocated_equity_amt": 9.1
   },
   {
     "facility_exposure_id": "FES-000025",
@@ -322,7 +394,10 @@
     "ead_amount": 234.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 234.1,
+    "allocated_equity_amt": 25.8
   },
   {
     "facility_exposure_id": "FES-000026",
@@ -335,7 +410,10 @@
     "ead_amount": 243.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 243.5,
+    "allocated_equity_amt": 26.8
   },
   {
     "facility_exposure_id": "FES-000027",
@@ -348,7 +426,10 @@
     "ead_amount": 250.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 250.8,
+    "allocated_equity_amt": 27.6
   },
   {
     "facility_exposure_id": "FES-000028",
@@ -361,7 +442,10 @@
     "ead_amount": 791.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 1186.9,
+    "allocated_equity_amt": 142.4
   },
   {
     "facility_exposure_id": "FES-000029",
@@ -374,7 +458,10 @@
     "ead_amount": 759.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 1139.4,
+    "allocated_equity_amt": 136.7
   },
   {
     "facility_exposure_id": "FES-000030",
@@ -387,7 +474,10 @@
     "ead_amount": 790,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 1185,
+    "allocated_equity_amt": 142.2
   },
   {
     "facility_exposure_id": "FES-000031",
@@ -400,7 +490,10 @@
     "ead_amount": 151.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 75.8,
+    "allocated_equity_amt": 6.1
   },
   {
     "facility_exposure_id": "FES-000032",
@@ -413,7 +506,10 @@
     "ead_amount": 147.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 73.5,
+    "allocated_equity_amt": 5.9
   },
   {
     "facility_exposure_id": "FES-000033",
@@ -426,7 +522,10 @@
     "ead_amount": 154.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 77.2,
+    "allocated_equity_amt": 6.2
   },
   {
     "facility_exposure_id": "FES-000034",
@@ -439,7 +538,10 @@
     "ead_amount": 221.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 166.4,
+    "allocated_equity_amt": 15
   },
   {
     "facility_exposure_id": "FES-000035",
@@ -452,7 +554,10 @@
     "ead_amount": 217.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 163.1,
+    "allocated_equity_amt": 14.7
   },
   {
     "facility_exposure_id": "FES-000036",
@@ -465,7 +570,10 @@
     "ead_amount": 230.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 172.8,
+    "allocated_equity_amt": 15.6
   },
   {
     "facility_exposure_id": "FES-000037",
@@ -478,7 +586,10 @@
     "ead_amount": 298.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 149.4,
+    "allocated_equity_amt": 14.9
   },
   {
     "facility_exposure_id": "FES-000038",
@@ -491,7 +602,10 @@
     "ead_amount": 295.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 147.9,
+    "allocated_equity_amt": 14.8
   },
   {
     "facility_exposure_id": "FES-000039",
@@ -504,7 +618,10 @@
     "ead_amount": 316.6,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 158.3,
+    "allocated_equity_amt": 15.8
   },
   {
     "facility_exposure_id": "FES-000040",
@@ -517,7 +634,10 @@
     "ead_amount": 58.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 43.7,
+    "allocated_equity_amt": 4.8
   },
   {
     "facility_exposure_id": "FES-000041",
@@ -530,7 +650,10 @@
     "ead_amount": 58.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 43.7,
+    "allocated_equity_amt": 4.8
   },
   {
     "facility_exposure_id": "FES-000042",
@@ -543,7 +666,10 @@
     "ead_amount": 63,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 47.2,
+    "allocated_equity_amt": 5.2
   },
   {
     "facility_exposure_id": "FES-000043",
@@ -556,7 +682,10 @@
     "ead_amount": 34.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 17.4,
+    "allocated_equity_amt": 2.1
   },
   {
     "facility_exposure_id": "FES-000044",
@@ -569,7 +698,10 @@
     "ead_amount": 35.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 17.6,
+    "allocated_equity_amt": 2.1
   },
   {
     "facility_exposure_id": "FES-000045",
@@ -582,7 +714,10 @@
     "ead_amount": 33.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 16.7,
+    "allocated_equity_amt": 2
   },
   {
     "facility_exposure_id": "FES-000046",
@@ -595,7 +730,10 @@
     "ead_amount": 66.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 49.9,
+    "allocated_equity_amt": 4
   },
   {
     "facility_exposure_id": "FES-000047",
@@ -608,7 +746,10 @@
     "ead_amount": 67.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 50.9,
+    "allocated_equity_amt": 4.1
   },
   {
     "facility_exposure_id": "FES-000048",
@@ -621,7 +762,10 @@
     "ead_amount": 65.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 48.9,
+    "allocated_equity_amt": 3.9
   },
   {
     "facility_exposure_id": "FES-000049",
@@ -634,7 +778,10 @@
     "ead_amount": 107,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 53.5,
+    "allocated_equity_amt": 4.8
   },
   {
     "facility_exposure_id": "FES-000050",
@@ -647,7 +794,10 @@
     "ead_amount": 110.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 55.1,
+    "allocated_equity_amt": 5
   },
   {
     "facility_exposure_id": "FES-000051",
@@ -660,7 +810,10 @@
     "ead_amount": 106.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 53.5,
+    "allocated_equity_amt": 4.8
   },
   {
     "facility_exposure_id": "FES-000052",
@@ -673,7 +826,10 @@
     "ead_amount": 155.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 155.8,
+    "allocated_equity_amt": 15.6
   },
   {
     "facility_exposure_id": "FES-000053",
@@ -686,7 +842,10 @@
     "ead_amount": 162,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 162,
+    "allocated_equity_amt": 16.2
   },
   {
     "facility_exposure_id": "FES-000054",
@@ -699,7 +858,10 @@
     "ead_amount": 158.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 158.8,
+    "allocated_equity_amt": 15.9
   },
   {
     "facility_exposure_id": "FES-000055",
@@ -712,7 +874,10 @@
     "ead_amount": 232.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 174.2,
+    "allocated_equity_amt": 19.2
   },
   {
     "facility_exposure_id": "FES-000056",
@@ -725,7 +890,10 @@
     "ead_amount": 223,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 167.3,
+    "allocated_equity_amt": 18.4
   },
   {
     "facility_exposure_id": "FES-000057",
@@ -738,7 +906,10 @@
     "ead_amount": 220.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 165.6,
+    "allocated_equity_amt": 18.2
   },
   {
     "facility_exposure_id": "FES-000058",
@@ -751,7 +922,10 @@
     "ead_amount": 362.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 181.4,
+    "allocated_equity_amt": 21.8
   },
   {
     "facility_exposure_id": "FES-000059",
@@ -764,7 +938,10 @@
     "ead_amount": 352,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 176,
+    "allocated_equity_amt": 21.1
   },
   {
     "facility_exposure_id": "FES-000060",
@@ -777,7 +954,10 @@
     "ead_amount": 352,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 176,
+    "allocated_equity_amt": 21.1
   },
   {
     "facility_exposure_id": "FES-000061",
@@ -790,7 +970,10 @@
     "ead_amount": 162.4,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 121.8,
+    "allocated_equity_amt": 9.7
   },
   {
     "facility_exposure_id": "FES-000062",
@@ -803,7 +986,10 @@
     "ead_amount": 159.2,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 119.4,
+    "allocated_equity_amt": 9.5
   },
   {
     "facility_exposure_id": "FES-000063",
@@ -816,7 +1002,10 @@
     "ead_amount": 160.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 120.6,
+    "allocated_equity_amt": 9.6
   },
   {
     "facility_exposure_id": "FES-000064",
@@ -829,7 +1018,10 @@
     "ead_amount": 227.5,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 113.7,
+    "allocated_equity_amt": 10.2
   },
   {
     "facility_exposure_id": "FES-000065",
@@ -842,7 +1034,10 @@
     "ead_amount": 225.2,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 112.6,
+    "allocated_equity_amt": 10.1
   },
   {
     "facility_exposure_id": "FES-000066",
@@ -855,7 +1050,10 @@
     "ead_amount": 229.7,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 114.9,
+    "allocated_equity_amt": 10.3
   },
   {
     "facility_exposure_id": "FES-000067",
@@ -868,7 +1066,10 @@
     "ead_amount": 299.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 299.8,
+    "allocated_equity_amt": 30
   },
   {
     "facility_exposure_id": "FES-000068",
@@ -881,7 +1082,10 @@
     "ead_amount": 299.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 299.8,
+    "allocated_equity_amt": 30
   },
   {
     "facility_exposure_id": "FES-000069",
@@ -894,7 +1098,10 @@
     "ead_amount": 308.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 308.8,
+    "allocated_equity_amt": 30.9
   },
   {
     "facility_exposure_id": "FES-000070",
@@ -907,7 +1114,10 @@
     "ead_amount": 378.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 568.4,
+    "allocated_equity_amt": 62.5
   },
   {
     "facility_exposure_id": "FES-000071",
@@ -920,7 +1130,10 @@
     "ead_amount": 382.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 574.1,
+    "allocated_equity_amt": 63.1
   },
   {
     "facility_exposure_id": "FES-000072",
@@ -933,7 +1146,10 @@
     "ead_amount": 398,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 597,
+    "allocated_equity_amt": 65.7
   },
   {
     "facility_exposure_id": "FES-000073",
@@ -946,7 +1162,10 @@
     "ead_amount": 177.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 88.6,
+    "allocated_equity_amt": 10.6
   },
   {
     "facility_exposure_id": "FES-000074",
@@ -959,7 +1178,10 @@
     "ead_amount": 180.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 90.3,
+    "allocated_equity_amt": 10.8
   },
   {
     "facility_exposure_id": "FES-000075",
@@ -972,7 +1194,10 @@
     "ead_amount": 189.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 94.8,
+    "allocated_equity_amt": 11.4
   },
   {
     "facility_exposure_id": "FES-000076",
@@ -985,7 +1210,10 @@
     "ead_amount": 36.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 27.1,
+    "allocated_equity_amt": 2.2
   },
   {
     "facility_exposure_id": "FES-000077",
@@ -998,7 +1226,10 @@
     "ead_amount": 37.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 27.9,
+    "allocated_equity_amt": 2.2
   },
   {
     "facility_exposure_id": "FES-000078",
@@ -1011,7 +1242,10 @@
     "ead_amount": 39.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 29.5,
+    "allocated_equity_amt": 2.4
   },
   {
     "facility_exposure_id": "FES-000079",
@@ -1024,7 +1258,10 @@
     "ead_amount": 66.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 33.3,
+    "allocated_equity_amt": 3
   },
   {
     "facility_exposure_id": "FES-000080",
@@ -1037,7 +1274,10 @@
     "ead_amount": 69.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 34.6,
+    "allocated_equity_amt": 3.1
   },
   {
     "facility_exposure_id": "FES-000081",
@@ -1050,7 +1290,10 @@
     "ead_amount": 74.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 37.1,
+    "allocated_equity_amt": 3.3
   },
   {
     "facility_exposure_id": "FES-000082",
@@ -1063,7 +1306,10 @@
     "ead_amount": 114.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 86.1,
+    "allocated_equity_amt": 8.6
   },
   {
     "facility_exposure_id": "FES-000083",
@@ -1076,7 +1322,10 @@
     "ead_amount": 110.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 82.6,
+    "allocated_equity_amt": 8.3
   },
   {
     "facility_exposure_id": "FES-000084",
@@ -1089,7 +1338,10 @@
     "ead_amount": 119,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 89.2,
+    "allocated_equity_amt": 8.9
   },
   {
     "facility_exposure_id": "FES-000085",
@@ -1102,7 +1354,10 @@
     "ead_amount": 61.5,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 30.7,
+    "allocated_equity_amt": 3.4
   },
   {
     "facility_exposure_id": "FES-000086",
@@ -1115,7 +1370,10 @@
     "ead_amount": 59.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 29.8,
+    "allocated_equity_amt": 3.3
   },
   {
     "facility_exposure_id": "FES-000087",
@@ -1128,7 +1386,10 @@
     "ead_amount": 56.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 28.3,
+    "allocated_equity_amt": 3.1
   },
   {
     "facility_exposure_id": "FES-000088",
@@ -1141,7 +1402,10 @@
     "ead_amount": 552,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 552,
+    "allocated_equity_amt": 66.2
   },
   {
     "facility_exposure_id": "FES-000089",
@@ -1154,7 +1418,10 @@
     "ead_amount": 541,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 541,
+    "allocated_equity_amt": 64.9
   },
   {
     "facility_exposure_id": "FES-000090",
@@ -1167,7 +1434,10 @@
     "ead_amount": 519.4,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 519.4,
+    "allocated_equity_amt": 62.3
   },
   {
     "facility_exposure_id": "FES-000091",
@@ -1180,7 +1450,10 @@
     "ead_amount": 156.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 78.2,
+    "allocated_equity_amt": 6.3
   },
   {
     "facility_exposure_id": "FES-000092",
@@ -1193,7 +1466,10 @@
     "ead_amount": 154.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 77.4,
+    "allocated_equity_amt": 6.2
   },
   {
     "facility_exposure_id": "FES-000093",
@@ -1206,7 +1482,10 @@
     "ead_amount": 150.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 75.1,
+    "allocated_equity_amt": 6
   },
   {
     "facility_exposure_id": "FES-000094",
@@ -1219,7 +1498,10 @@
     "ead_amount": 216.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 162.4,
+    "allocated_equity_amt": 14.6
   },
   {
     "facility_exposure_id": "FES-000095",
@@ -1232,7 +1514,10 @@
     "ead_amount": 216.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 162.4,
+    "allocated_equity_amt": 14.6
   },
   {
     "facility_exposure_id": "FES-000096",
@@ -1245,7 +1530,10 @@
     "ead_amount": 212.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 159.1,
+    "allocated_equity_amt": 14.3
   },
   {
     "facility_exposure_id": "FES-000097",
@@ -1258,7 +1546,10 @@
     "ead_amount": 284.3,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 142.1,
+    "allocated_equity_amt": 14.2
   },
   {
     "facility_exposure_id": "FES-000098",
@@ -1271,7 +1562,10 @@
     "ead_amount": 287.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 143.6,
+    "allocated_equity_amt": 14.4
   },
   {
     "facility_exposure_id": "FES-000099",
@@ -1284,7 +1578,10 @@
     "ead_amount": 284.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 142.1,
+    "allocated_equity_amt": 14.2
   },
   {
     "facility_exposure_id": "FES-000100",
@@ -1297,7 +1594,10 @@
     "ead_amount": 129.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 65,
+    "allocated_equity_amt": 7.1
   },
   {
     "facility_exposure_id": "FES-000101",
@@ -1310,7 +1610,10 @@
     "ead_amount": 132.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 66.3,
+    "allocated_equity_amt": 7.3
   },
   {
     "facility_exposure_id": "FES-000102",
@@ -1323,7 +1626,10 @@
     "ead_amount": 132.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 66.3,
+    "allocated_equity_amt": 7.3
   },
   {
     "facility_exposure_id": "FES-000103",
@@ -1336,7 +1642,10 @@
     "ead_amount": 193.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 145.2,
+    "allocated_equity_amt": 17.4
   },
   {
     "facility_exposure_id": "FES-000104",
@@ -1349,7 +1658,10 @@
     "ead_amount": 199.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 149.6,
+    "allocated_equity_amt": 18
   },
   {
     "facility_exposure_id": "FES-000105",
@@ -1362,7 +1674,10 @@
     "ead_amount": 201.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 151.1,
+    "allocated_equity_amt": 18.1
   },
   {
     "facility_exposure_id": "FES-000106",
@@ -1375,7 +1690,10 @@
     "ead_amount": 264.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 132.2,
+    "allocated_equity_amt": 10.6
   },
   {
     "facility_exposure_id": "FES-000107",
@@ -1388,7 +1706,10 @@
     "ead_amount": 275,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 137.5,
+    "allocated_equity_amt": 11
   },
   {
     "facility_exposure_id": "FES-000108",
@@ -1401,7 +1722,10 @@
     "ead_amount": 280.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 140.3,
+    "allocated_equity_amt": 11.2
   },
   {
     "facility_exposure_id": "FES-000109",
@@ -1414,7 +1738,10 @@
     "ead_amount": 373.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 280.4,
+    "allocated_equity_amt": 25.2
   },
   {
     "facility_exposure_id": "FES-000110",
@@ -1427,7 +1754,10 @@
     "ead_amount": 358.9,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 269.2,
+    "allocated_equity_amt": 24.2
   },
   {
     "facility_exposure_id": "FES-000111",
@@ -1440,7 +1770,10 @@
     "ead_amount": 369.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 277.2,
+    "allocated_equity_amt": 25
   },
   {
     "facility_exposure_id": "FES-000112",
@@ -1453,7 +1786,10 @@
     "ead_amount": 18.7,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 9.3,
+    "allocated_equity_amt": 0.9
   },
   {
     "facility_exposure_id": "FES-000113",
@@ -1466,7 +1802,10 @@
     "ead_amount": 18.1,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 9.1,
+    "allocated_equity_amt": 0.9
   },
   {
     "facility_exposure_id": "FES-000114",
@@ -1479,7 +1818,10 @@
     "ead_amount": 18.8,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 9.4,
+    "allocated_equity_amt": 0.9
   },
   {
     "facility_exposure_id": "FES-000115",
@@ -1492,7 +1834,10 @@
     "ead_amount": 42.2,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 42.2,
+    "allocated_equity_amt": 4.6
   },
   {
     "facility_exposure_id": "FES-000116",
@@ -1505,7 +1850,10 @@
     "ead_amount": 41.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 41.4,
+    "allocated_equity_amt": 4.5
   },
   {
     "facility_exposure_id": "FES-000117",
@@ -1518,7 +1866,10 @@
     "ead_amount": 43.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 43.4,
+    "allocated_equity_amt": 4.8
   },
   {
     "facility_exposure_id": "FES-000118",
@@ -1531,7 +1882,10 @@
     "ead_amount": 680.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 1020.6,
+    "allocated_equity_amt": 122.5
   },
   {
     "facility_exposure_id": "FES-000119",
@@ -1544,7 +1898,10 @@
     "ead_amount": 673.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 1010.4,
+    "allocated_equity_amt": 121.3
   },
   {
     "facility_exposure_id": "FES-000120",
@@ -1557,7 +1914,10 @@
     "ead_amount": 714,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 1071,
+    "allocated_equity_amt": 128.5
   },
   {
     "facility_exposure_id": "FES-000121",
@@ -1570,7 +1930,10 @@
     "ead_amount": 114.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 57.4,
+    "allocated_equity_amt": 4.6
   },
   {
     "facility_exposure_id": "FES-000122",
@@ -1583,7 +1946,10 @@
     "ead_amount": 114.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 57.4,
+    "allocated_equity_amt": 4.6
   },
   {
     "facility_exposure_id": "FES-000123",
@@ -1596,7 +1962,10 @@
     "ead_amount": 122.9,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 61.5,
+    "allocated_equity_amt": 4.9
   },
   {
     "facility_exposure_id": "FES-000124",
@@ -1609,7 +1978,10 @@
     "ead_amount": 163,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 122.3,
+    "allocated_equity_amt": 11
   },
   {
     "facility_exposure_id": "FES-000125",
@@ -1622,7 +1994,10 @@
     "ead_amount": 164.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 123.5,
+    "allocated_equity_amt": 11.1
   },
   {
     "facility_exposure_id": "FES-000126",
@@ -1635,7 +2010,10 @@
     "ead_amount": 177.8,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 133.4,
+    "allocated_equity_amt": 12
   },
   {
     "facility_exposure_id": "FES-000127",
@@ -1648,7 +2026,10 @@
     "ead_amount": 85.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 42.7,
+    "allocated_equity_amt": 4.3
   },
   {
     "facility_exposure_id": "FES-000128",
@@ -1661,7 +2042,10 @@
     "ead_amount": 87.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 43.5,
+    "allocated_equity_amt": 4.4
   },
   {
     "facility_exposure_id": "FES-000129",
@@ -1674,7 +2058,10 @@
     "ead_amount": 82.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 41.4,
+    "allocated_equity_amt": 4.1
   },
   {
     "facility_exposure_id": "FES-000130",
@@ -1687,7 +2074,10 @@
     "ead_amount": 136,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 102,
+    "allocated_equity_amt": 11.2
   },
   {
     "facility_exposure_id": "FES-000131",
@@ -1700,7 +2090,10 @@
     "ead_amount": 140.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 105.1,
+    "allocated_equity_amt": 11.6
   },
   {
     "facility_exposure_id": "FES-000132",
@@ -1713,7 +2106,10 @@
     "ead_amount": 134.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 100.9,
+    "allocated_equity_amt": 11.1
   },
   {
     "facility_exposure_id": "FES-000133",
@@ -1726,7 +2122,10 @@
     "ead_amount": 194.7,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 97.4,
+    "allocated_equity_amt": 11.7
   },
   {
     "facility_exposure_id": "FES-000134",
@@ -1739,7 +2138,10 @@
     "ead_amount": 202.5,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 101.2,
+    "allocated_equity_amt": 12.1
   },
   {
     "facility_exposure_id": "FES-000135",
@@ -1752,7 +2154,10 @@
     "ead_amount": 196.4,
     "currency_code": "USD",
     "fr2590_category_code": "G4",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 98.2,
+    "allocated_equity_amt": 11.8
   },
   {
     "facility_exposure_id": "FES-000136",
@@ -1765,7 +2170,10 @@
     "ead_amount": 285.3,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 214,
+    "allocated_equity_amt": 17.1
   },
   {
     "facility_exposure_id": "FES-000137",
@@ -1778,7 +2186,10 @@
     "ead_amount": 273.9,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 205.4,
+    "allocated_equity_amt": 16.4
   },
   {
     "facility_exposure_id": "FES-000138",
@@ -1791,7 +2202,10 @@
     "ead_amount": 268.4,
     "currency_code": "USD",
     "fr2590_category_code": "G2",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 201.3,
+    "allocated_equity_amt": 16.1
   },
   {
     "facility_exposure_id": "FES-000139",
@@ -1804,7 +2218,10 @@
     "ead_amount": 365,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 2,
+    "rwa_amt": 182.5,
+    "allocated_equity_amt": 16.4
   },
   {
     "facility_exposure_id": "FES-000140",
@@ -1817,7 +2234,10 @@
     "ead_amount": 354.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 2,
+    "rwa_amt": 177,
+    "allocated_equity_amt": 15.9
   },
   {
     "facility_exposure_id": "FES-000141",
@@ -1830,7 +2250,10 @@
     "ead_amount": 350.5,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 2,
+    "rwa_amt": 175.3,
+    "allocated_equity_amt": 15.8
   },
   {
     "facility_exposure_id": "FES-000142",
@@ -1843,7 +2266,10 @@
     "ead_amount": 169.4,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 3,
+    "rwa_amt": 169.4,
+    "allocated_equity_amt": 16.9
   },
   {
     "facility_exposure_id": "FES-000143",
@@ -1856,7 +2282,10 @@
     "ead_amount": 166,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 3,
+    "rwa_amt": 166,
+    "allocated_equity_amt": 16.6
   },
   {
     "facility_exposure_id": "FES-000144",
@@ -1869,7 +2298,10 @@
     "ead_amount": 166,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 3,
+    "rwa_amt": 166,
+    "allocated_equity_amt": 16.6
   },
   {
     "facility_exposure_id": "FES-000145",
@@ -1882,7 +2314,10 @@
     "ead_amount": 245.1,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 183.8,
+    "allocated_equity_amt": 20.2
   },
   {
     "facility_exposure_id": "FES-000146",
@@ -1895,7 +2330,10 @@
     "ead_amount": 242.6,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 182,
+    "allocated_equity_amt": 20
   },
   {
     "facility_exposure_id": "FES-000147",
@@ -1908,7 +2346,10 @@
     "ead_amount": 245,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 183.8,
+    "allocated_equity_amt": 20.2
   },
   {
     "facility_exposure_id": "FES-000148",
@@ -1921,7 +2362,10 @@
     "ead_amount": 917.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2025-12-31"
+    "as_of_date": "2025-12-31",
+    "number_of_loans": 1,
+    "rwa_amt": 458.8,
+    "allocated_equity_amt": 55.1
   },
   {
     "facility_exposure_id": "FES-000149",
@@ -1934,7 +2378,10 @@
     "ead_amount": 917.7,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-01-31"
+    "as_of_date": "2026-01-31",
+    "number_of_loans": 1,
+    "rwa_amt": 458.8,
+    "allocated_equity_amt": 55.1
   },
   {
     "facility_exposure_id": "FES-000150",
@@ -1947,6 +2394,9 @@
     "ead_amount": 936,
     "currency_code": "USD",
     "fr2590_category_code": "G1",
-    "as_of_date": "2026-02-28"
+    "as_of_date": "2026-02-28",
+    "number_of_loans": 1,
+    "rwa_amt": 468,
+    "allocated_equity_amt": 56.2
   }
 ]

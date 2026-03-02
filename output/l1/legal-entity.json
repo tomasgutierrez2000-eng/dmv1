@@ -1,0 +1,50 @@
+[
+  {
+    "legal_entity_id": "LE-001",
+    "legal_name": "Global Bank Holdings, Inc.",
+    "short_name": "Bank Holding Co",
+    "entity_type_code": "BHC",
+    "country_code": "US",
+    "active_flag": true
+  },
+  {
+    "legal_entity_id": "LE-002",
+    "legal_name": "Global Commercial Bank, N.A.",
+    "short_name": "Commercial Bank Sub",
+    "entity_type_code": "BANK",
+    "country_code": "GB",
+    "active_flag": true
+  },
+  {
+    "legal_entity_id": "LE-003",
+    "legal_name": "Global Investment Bank, LLC",
+    "short_name": "Investment Bank Sub",
+    "entity_type_code": "BROKER_DEALER",
+    "country_code": "US",
+    "active_flag": true
+  },
+  {
+    "legal_entity_id": "LE-004",
+    "legal_name": "Global Treasury Services, LLC",
+    "short_name": "Treasury Services LLC",
+    "entity_type_code": "BANK",
+    "country_code": "GB",
+    "active_flag": true
+  },
+  {
+    "legal_entity_id": "LE-005",
+    "legal_name": "Global Wealth Management, LLC",
+    "short_name": "Wealth Management LLC",
+    "entity_type_code": "BANK",
+    "country_code": "US",
+    "active_flag": true
+  },
+  {
+    "legal_entity_id": "LE-006",
+    "legal_name": "Global Asset Management Co.",
+    "short_name": "Asset Management Co",
+    "entity_type_code": "BANK",
+    "country_code": "GB",
+    "active_flag": true
+  }
+]

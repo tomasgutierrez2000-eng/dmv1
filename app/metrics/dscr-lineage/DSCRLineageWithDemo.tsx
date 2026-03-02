@@ -15,7 +15,7 @@ import type { DemoSideEffects } from '@/components/metric-library/demo/useDemoEn
 export default function DSCRLineageWithDemo() {
   const [demoActive, setDemoActive] = useState(false);
   const [demoExpandedLevel, setDemoExpandedLevel] = useState<string | null | undefined>(undefined);
-  const [demoL2Filter, setDemoL2Filter] = useState<'both' | 'CRE' | 'CI' | undefined>(undefined);
+  const [demoL2Filter, setDemoL2Filter] = useState<string | undefined>(undefined);
 
   const handleStartDemo = useCallback(() => {
     setDemoActive(true);

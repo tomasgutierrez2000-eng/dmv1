@@ -2797,6 +2797,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
     }
   },
   "L1.contract_master": {

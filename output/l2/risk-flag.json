@@ -1,0 +1,252 @@
+[
+  {
+    "risk_flag_id": "RF-000001",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00001",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "HIGH",
+    "flag_description": "DETERIORATED flag: Revolving Credit Facility showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000002",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00002",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "MEDIUM",
+    "flag_description": "DETERIORATED flag: Bilateral Term Loan showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000003",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00003",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "HIGH",
+    "flag_description": "DETERIORATED flag: Syndicated Term Loan showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000004",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00004",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "MEDIUM",
+    "flag_description": "DETERIORATED flag: Letter of Credit Facility showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000005",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00005",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "HIGH",
+    "flag_description": "DETERIORATED flag: Bridge Loan showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000006",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00006",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "MEDIUM",
+    "flag_description": "DETERIORATED flag: ISDA Master Agreement showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000007",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00007",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "HIGH",
+    "flag_description": "DETERIORATED flag: Master Netting Agreement showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000008",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00008",
+    "counterparty_id": null,
+    "flag_code": "DETERIORATED",
+    "flag_severity": "MEDIUM",
+    "flag_description": "DETERIORATED flag: Securities Lending Agreement showing signs of deteriorated.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000009",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00009",
+    "counterparty_id": null,
+    "flag_code": "CRITICIZED",
+    "flag_severity": "CRITICAL",
+    "flag_description": "CRITICIZED flag: Asset-Based Lending showing signs of criticized.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000010",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00010",
+    "counterparty_id": null,
+    "flag_code": "CRITICIZED",
+    "flag_severity": "CRITICAL",
+    "flag_description": "CRITICIZED flag: Trade Finance Facility showing signs of criticized.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000011",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00011",
+    "counterparty_id": null,
+    "flag_code": "CRITICIZED",
+    "flag_severity": "CRITICAL",
+    "flag_description": "CRITICIZED flag: Revolving Credit Facility showing signs of criticized.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000012",
+    "flag_scope": "FACILITY",
+    "facility_id": "FAC-2024-00012",
+    "counterparty_id": null,
+    "flag_code": "CRITICIZED",
+    "flag_severity": "CRITICAL",
+    "flag_description": "CRITICIZED flag: Bilateral Term Loan showing signs of criticized.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000013",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00001",
+    "flag_code": "CRITICIZED",
+    "flag_severity": "CRITICAL",
+    "flag_description": "CRITICIZED flag: Meridian Holdings Holdings LLC showing signs of criticized.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000014",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00002",
+    "flag_code": "CRITICIZED",
+    "flag_severity": "CRITICAL",
+    "flag_description": "CRITICIZED flag: Northbridge Energy Holdings Ltd. showing signs of criticized.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000015",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00003",
+    "flag_code": "WATCH_LIST",
+    "flag_severity": "MEDIUM",
+    "flag_description": "WATCH_LIST flag: Blue Harbor Logistics Holdings PLC showing signs of watch_list.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000016",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00004",
+    "flag_code": "WATCH_LIST",
+    "flag_severity": "LOW",
+    "flag_description": "WATCH_LIST flag: Summit Healthcare Holdings Group showing signs of watch_list.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000017",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00005",
+    "flag_code": "WATCH_LIST",
+    "flag_severity": "MEDIUM",
+    "flag_description": "WATCH_LIST flag: Apex Technology Holdings Corp. showing signs of watch_list.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000018",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00006",
+    "flag_code": "WATCH_LIST",
+    "flag_severity": "LOW",
+    "flag_description": "WATCH_LIST flag: Crescent Manufacturing Holdings Inc. showing signs of watch_list.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000019",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00007",
+    "flag_code": "WATCH_LIST",
+    "flag_severity": "MEDIUM",
+    "flag_description": "WATCH_LIST flag: Pinnacle Infrastructure Holdings LLC showing signs of watch_list.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000020",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00008",
+    "flag_code": "COVENANT_BREACH",
+    "flag_severity": "LOW",
+    "flag_description": "COVENANT_BREACH flag: Silvergate Financial Holdings Ltd. showing signs of covenant_breach.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000021",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00009",
+    "flag_code": "COVENANT_BREACH",
+    "flag_severity": "MEDIUM",
+    "flag_description": "COVENANT_BREACH flag: Redwood Consumer Holdings PLC showing signs of covenant_breach.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000022",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00010",
+    "flag_code": "COVENANT_BREACH",
+    "flag_severity": "LOW",
+    "flag_description": "COVENANT_BREACH flag: Evergreen Partners Holdings Group showing signs of covenant_breach.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000023",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00011",
+    "flag_code": "COVENANT_BREACH",
+    "flag_severity": "MEDIUM",
+    "flag_description": "COVENANT_BREACH flag: Stonebrook Resources Corp. showing signs of covenant_breach.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000024",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00012",
+    "flag_code": "BELOW_THRESHOLD_SPREAD",
+    "flag_severity": "LOW",
+    "flag_description": "BELOW_THRESHOLD_SPREAD flag: Ironwood Ventures Inc. showing signs of below_threshold_spread.",
+    "as_of_date": "2026-02-28"
+  },
+  {
+    "risk_flag_id": "RF-000025",
+    "flag_scope": "COUNTERPARTY",
+    "facility_id": null,
+    "counterparty_id": "CP-00013",
+    "flag_code": "BELOW_THRESHOLD_SPREAD",
+    "flag_severity": "MEDIUM",
+    "flag_description": "BELOW_THRESHOLD_SPREAD flag: Windridge Industrial LLC showing signs of below_threshold_spread.",
+    "as_of_date": "2026-02-28"
+  }
+]

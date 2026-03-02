@@ -234,6 +234,36 @@ SELECT
     fes.has_amendment_flag,
     (SELECT COUNT(*) FROM l2.amendment_event ae WHERE ae.facility_id = fes.facility_id),
 
+    -- FACILITY ACTIVE FLAG (derived from L1 active_flag)
+    COALESCE(fm.active_flag, 'N'),
+
+    -- MATURITY DATE BUCKET (standard GSIB remaining-maturity bands)
+    CASE WHEN (fm.maturity_date - p_as_of_date) <= 0       THEN 'Expired'
+         WHEN (fm.maturity_date - p_as_of_date) <= 365     THEN '0-1Y'
+         WHEN (fm.maturity_date - p_as_of_date) <= 1095    THEN '1-3Y'
+         WHEN (fm.maturity_date - p_as_of_date) <= 1825    THEN '3-5Y'
+         WHEN (fm.maturity_date - p_as_of_date) <= 3650    THEN '5-10Y'
+         ELSE '10Y+' END,
+
+    -- ORIGINATION DATE BUCKET (vintage since origination)
+    CASE WHEN (p_as_of_date - fm.effective_date) <= 0      THEN 'New'
+         WHEN (p_as_of_date - fm.effective_date) <= 365    THEN '0-1Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1095   THEN '1-3Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1825   THEN '3-5Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 2555   THEN '5-7Y'
+         ELSE '7Y+' END,
+
+    -- EFFECTIVE DATE BUCKET (same logic as origination — effective_date = origination_date)
+    CASE WHEN (p_as_of_date - fm.effective_date) <= 0      THEN 'New'
+         WHEN (p_as_of_date - fm.effective_date) <= 365    THEN '0-1Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1095   THEN '1-3Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 1825   THEN '3-5Y'
+         WHEN (p_as_of_date - fm.effective_date) <= 2555   THEN '5-7Y'
+         ELSE '7Y+' END,
+
+    -- BANK SHARE % from lender allocation (lead allocation)
+    COALESCE(fla.bank_share_pct, 100.0),
+
     fes.base_currency_code, CURRENT_TIMESTAMP
 
 FROM l3.facility_exposure_summary fes
@@ -250,6 +280,11 @@ LEFT JOIN (
     FROM l3.crm_allocation_summary WHERE run_version_id = p_run_version_id AND allocation_target_level = 'FACILITY'
     GROUP BY facility_id
 ) crm ON fes.facility_id = crm.facility_id
+LEFT JOIN (
+    SELECT facility_id, MAX(bank_share_pct) AS bank_share_pct
+    FROM l1.facility_lender_allocation
+    GROUP BY facility_id
+) fla ON fes.facility_id = fla.facility_id
 WHERE fes.run_version_id = p_run_version_id AND fes.scenario_id = 'BASE';
 $$;
 
@@ -313,6 +348,80 @@ JOIN l2.metric_threshold mt ON md.metric_code = mt.metric_code AND mt.as_of_date
 LEFT JOIN l2.metric_threshold prior30 ON md.metric_code = prior30.metric_code AND prior30.as_of_date = p_as_of_date - INTERVAL '30 days'
 LEFT JOIN l2.metric_threshold prior90 ON md.metric_code = prior90.metric_code AND prior90.as_of_date = p_as_of_date - INTERVAL '90 days'
 WHERE md.is_risk_appetite_metric = TRUE;
+$$;
+
+
+-- ============================================================
+-- T28: lob_credit_quality_summary (partial — criticized fields)
+-- Reads: L2.risk_flag, T1 (exposure_metric_cube), L2.facility_lob_attribution
+-- Key formulas:
+--   criticized_portfolio_count = COUNT(DISTINCT facilities with CRITICIZED flag)
+--   criticized_exposure_amt = SUM(gross_exposure for criticized facilities)
+-- ============================================================
+CREATE OR REPLACE PROCEDURE l3.populate_lob_credit_quality_criticized(
+    p_run_version_id VARCHAR, p_as_of_date DATE
+)
+LANGUAGE SQL AS $$
+
+-- Update criticized fields in existing lob_credit_quality_summary rows
+UPDATE l3.lob_credit_quality_summary cqs
+SET
+    criticized_portfolio_count = crit.criticized_count,
+    criticized_exposure_amt = crit.criticized_exposure
+FROM (
+    SELECT
+        fla.lob_node_id,
+        COUNT(DISTINCT rf.facility_id) AS criticized_count,
+        COALESCE(SUM(DISTINCT emc.gross_exposure_amt), 0) AS criticized_exposure
+    FROM l2.risk_flag rf
+    JOIN l2.facility_lob_attribution fla
+        ON rf.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
+    LEFT JOIN l3.exposure_metric_cube emc
+        ON rf.facility_id = emc.facility_id
+        AND emc.run_version_id = p_run_version_id
+        AND emc.scenario_id = 'BASE'
+    WHERE rf.flag_code = 'CRITICIZED'
+      AND rf.as_of_date = p_as_of_date
+      AND rf.cleared_ts IS NULL
+    GROUP BY fla.lob_node_id
+) crit
+WHERE cqs.lob_node_id = crit.lob_node_id
+  AND cqs.run_version_id = p_run_version_id;
+$$;
+
+
+-- ============================================================
+-- T47: lob_deterioration_summary (partial — criticized fields)
+-- Same source logic as T28 but targets lob_deterioration_summary
+-- ============================================================
+CREATE OR REPLACE PROCEDURE l3.populate_lob_deterioration_criticized(
+    p_run_version_id VARCHAR, p_as_of_date DATE
+)
+LANGUAGE SQL AS $$
+
+UPDATE l3.lob_deterioration_summary ds
+SET
+    criticized_portfolio_count = crit.criticized_count,
+    criticized_exposure_amt = crit.criticized_exposure
+FROM (
+    SELECT
+        fla.lob_node_id,
+        COUNT(DISTINCT rf.facility_id) AS criticized_count,
+        COALESCE(SUM(DISTINCT emc.gross_exposure_amt), 0) AS criticized_exposure
+    FROM l2.risk_flag rf
+    JOIN l2.facility_lob_attribution fla
+        ON rf.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
+    LEFT JOIN l3.exposure_metric_cube emc
+        ON rf.facility_id = emc.facility_id
+        AND emc.run_version_id = p_run_version_id
+        AND emc.scenario_id = 'BASE'
+    WHERE rf.flag_code = 'CRITICIZED'
+      AND rf.as_of_date = p_as_of_date
+      AND rf.cleared_ts IS NULL
+    GROUP BY fla.lob_node_id
+) crit
+WHERE ds.lob_node_id = crit.lob_node_id
+  AND ds.run_version_id = p_run_version_id;
 $$;
 
 

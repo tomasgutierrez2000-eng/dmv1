@@ -1,22 +1,42 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { DEMO_STEPS, resolveSelector, type VariantKey } from './demoSteps';
 
 /* ────────────────────────────────────────────────────────────────────────────
- * useDemoEngine — state management & scroll/measure logic for the DSCR demo
+ * useDemoEngine — generic state management & scroll/measure logic for
+ * lineage demos (DSCR, LTV, etc.)
+ *
+ * Accepts steps + resolveSelector as parameters so the same engine can
+ * drive any metric's demo.
  * ──────────────────────────────────────────────────────────────────────────── */
 
-export interface DemoEngineState {
+/** Generic step shape — variant-aware fields use string union V */
+export interface GenericDemoStep<V extends string = string> {
+  id: string;
+  phase: number;
+  phaseLabel: string;
+  title: string | ((v: V) => string);
+  narration: string | ((v: V) => string);
+  targetSelector: string;
+  highlightSelector?: string;
+  insight?: string | ((v: V) => string);
+  formulaKey?: string;
+  onEnter?: {
+    expandLevel?: string | null;
+    l2Filter?: string;
+  };
+}
+
+export interface DemoEngineState<V extends string = string> {
   currentStep: number;
-  selectedVariant: VariantKey | null;
+  selectedVariant: V | null;
   targetRect: DOMRect | null;
   isTransitioning: boolean;
   totalSteps: number;
 }
 
-export interface DemoEngineActions {
-  selectVariant: (v: VariantKey) => void;
+export interface DemoEngineActions<V extends string = string> {
+  selectVariant: (v: V) => void;
   goNext: () => void;
   goPrev: () => void;
   goToStep: (n: number) => void;
@@ -26,35 +46,49 @@ export interface DemoEngineActions {
 
 export interface DemoSideEffects {
   expandLevel: string | null;
-  l2Filter: 'both' | 'CRE' | 'CI';
+  l2Filter: string;
 }
 
-interface UseDemoEngineProps {
+interface UseDemoEngineProps<V extends string = string> {
+  steps: GenericDemoStep<V>[];
+  resolveSelector: (selector: string, variant: V) => string;
   onClose: () => void;
   onSideEffect: (fx: Partial<DemoSideEffects>) => void;
+  /** Default l2Filter value used on restart/close (default: 'both') */
+  defaultL2Filter?: string;
+  /** Map variant-specific l2Filter overrides when onEnter.l2Filter is set.
+   *  If not provided, the raw onEnter.l2Filter value is used as-is. */
+  resolveL2Filter?: (enterFilter: string, variant: V) => string;
 }
 
-export function useDemoEngine({ onClose, onSideEffect }: UseDemoEngineProps): DemoEngineState & DemoEngineActions {
+export function useDemoEngine<V extends string = string>({
+  steps,
+  resolveSelector: resolveSel,
+  onClose,
+  onSideEffect,
+  defaultL2Filter = 'both',
+  resolveL2Filter,
+}: UseDemoEngineProps<V>): DemoEngineState<V> & DemoEngineActions<V> {
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<VariantKey | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<V | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const measureTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number>(0);
 
-  const totalSteps = DEMO_STEPS.length;
+  const totalSteps = steps.length;
 
   /* ── measure target rect ───────────────────────────────────────────────── */
 
   const measureTarget = useCallback(
-    (stepIndex: number, variant: VariantKey | null) => {
-      const step = DEMO_STEPS[stepIndex];
+    (stepIndex: number, variant: V | null) => {
+      const step = steps[stepIndex];
       if (!step || !variant) {
         setTargetRect(null);
         return;
       }
 
-      const selector = resolveSelector(step.targetSelector, variant);
+      const selector = resolveSel(step.targetSelector, variant);
       const el = document.querySelector(selector);
       if (!el) {
         setTargetRect(null);
@@ -68,15 +102,15 @@ export function useDemoEngine({ onClose, onSideEffect }: UseDemoEngineProps): De
         setIsTransitioning(false);
       });
     },
-    [],
+    [steps, resolveSel],
   );
 
   /* ── scroll to target & measure ────────────────────────────────────────── */
 
   const scrollAndMeasure = useCallback(
-    (stepIndex: number, variant: VariantKey | null) => {
+    (stepIndex: number, variant: V | null) => {
       setIsTransitioning(true);
-      const step = DEMO_STEPS[stepIndex];
+      const step = steps[stepIndex];
       if (!step || !variant) {
         setIsTransitioning(false);
         return;
@@ -87,8 +121,9 @@ export function useDemoEngine({ onClose, onSideEffect }: UseDemoEngineProps): De
         const fx: Partial<DemoSideEffects> = {};
         if (step.onEnter.expandLevel !== undefined) fx.expandLevel = step.onEnter.expandLevel;
         if (step.onEnter.l2Filter !== undefined) {
-          // Override with variant-specific filter for L2 step
-          fx.l2Filter = step.onEnter.l2Filter === 'CRE' ? (variant === 'CRE' ? 'CRE' : 'CI') : step.onEnter.l2Filter;
+          fx.l2Filter = resolveL2Filter
+            ? resolveL2Filter(step.onEnter.l2Filter, variant)
+            : step.onEnter.l2Filter;
         }
         onSideEffect(fx);
       }
@@ -96,7 +131,7 @@ export function useDemoEngine({ onClose, onSideEffect }: UseDemoEngineProps): De
       // Small delay to let React re-render side effects (e.g., expand level)
       if (measureTimerRef.current) clearTimeout(measureTimerRef.current);
       measureTimerRef.current = setTimeout(() => {
-        const selector = resolveSelector(step.targetSelector, variant);
+        const selector = resolveSel(step.targetSelector, variant);
         const el = document.querySelector(selector);
         if (el) {
           // Temporarily allow scroll for programmatic scrollIntoView
@@ -114,13 +149,13 @@ export function useDemoEngine({ onClose, onSideEffect }: UseDemoEngineProps): De
         }, 600);
       }, 120);
     },
-    [measureTarget, onSideEffect],
+    [steps, resolveSel, measureTarget, onSideEffect, resolveL2Filter],
   );
 
   /* ── actions ───────────────────────────────────────────────────────────── */
 
   const selectVariant = useCallback(
-    (v: VariantKey) => {
+    (v: V) => {
       setSelectedVariant(v);
       setCurrentStep(1);
       scrollAndMeasure(1, v);
@@ -157,14 +192,14 @@ export function useDemoEngine({ onClose, onSideEffect }: UseDemoEngineProps): De
     setCurrentStep(0);
     setSelectedVariant(null);
     setTargetRect(null);
-    onSideEffect({ expandLevel: null, l2Filter: 'both' });
+    onSideEffect({ expandLevel: null, l2Filter: defaultL2Filter });
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [onSideEffect]);
+  }, [onSideEffect, defaultL2Filter]);
 
   const closeDemo = useCallback(() => {
-    onSideEffect({ expandLevel: null, l2Filter: 'both' });
+    onSideEffect({ expandLevel: null, l2Filter: defaultL2Filter });
     onClose();
-  }, [onClose, onSideEffect]);
+  }, [onClose, onSideEffect, defaultL2Filter]);
 
   /* ── re-measure on scroll/resize ───────────────────────────────────────── */
 

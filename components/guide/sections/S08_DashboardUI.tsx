@@ -118,7 +118,7 @@ export default function S08_DashboardUI() {
             <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3">
               <p className="text-[10px] text-slate-500 font-mono uppercase mb-2">Filters Bar</p>
               <div className="flex flex-wrap gap-2">
-                {['Search', 'Status', 'Product', 'LoB', 'Region', 'Risk Rating', 'Amendments', 'Syndication'].map(f => (
+                {['Search', 'Status', 'Product', 'Business Segment', 'Region', 'Risk Rating', 'Amendments', 'Syndication'].map(f => (
                   <div key={f} className="bg-slate-900/60 border border-slate-600/40 rounded px-2 py-1 text-[10px] text-slate-400">
                     {f}
                   </div>

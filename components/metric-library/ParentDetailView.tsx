@@ -134,7 +134,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
           </div>
         </div>
         <p className="text-sm text-gray-500 mb-6">
-          One parent metric, multiple variants. Each variant defines how it rolls up across Facility → Counterparty → Desk → Portfolio → LoB.
+          One parent metric, multiple variants. Each variant defines how it rolls up across Facility → Counterparty → Desk → Portfolio → Business Segment.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

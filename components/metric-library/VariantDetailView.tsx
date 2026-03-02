@@ -239,7 +239,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
           {/* Rollup */}
           <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
             <h2 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">Rollup</h2>
-            <p className="text-xs text-gray-500 mb-4">Facility → Counterparty → Desk → Portfolio → LoB.</p>
+            <p className="text-xs text-gray-500 mb-4">Facility → Counterparty → Desk → Portfolio → Business Segment.</p>
             {levels.length > 0 ? (
               <div className="space-y-0">
                 {levels.map((level, i) => (

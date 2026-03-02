@@ -1,0 +1,15 @@
+---
+description: Data dictionary is the source for the visualizer; DDL sync scripts and where to add missing tables/fields
+globs: "**/data-dictionary/**","**/visualizer/**","scripts/compare-ddl*.mjs","scripts/augment-datadict*.mjs","**/01_DDL*.sql"
+alwaysApply: false
+---
+
+# Data Dictionary and Visualizer
+
+The visualizer displays only what is in the **data dictionary** (`facility-summary-mvp/output/data-dictionary/data-dictionary.json`). Tables/fields that exist in DDL but not in this file will not appear.
+
+- **Compare (report):** `node scripts/compare-ddl-to-datadict.mjs` — L1/L2/L3 DDL vs data dictionary; lists missing tables/columns.
+- **Sync (add missing):** `node scripts/augment-datadict-from-ddl.mjs` — adds missing tables/columns from DDL into the data dictionary.
+- DDL sources: L1 `scripts/l1/output/ddl.sql`, L2 `scripts/l2/output/ddl.sql`, L3 `sql/l3/01_DDL_all_tables.sql`.
+
+See `docs/DATA_DICTIONARY_VISUALIZER.md` for full notes.

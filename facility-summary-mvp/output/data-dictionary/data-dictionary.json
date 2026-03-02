@@ -64,6 +64,12 @@
           "why_required": "Historical grouping and reporting"
         },
         {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Counterparty",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "effective_start_date",
           "description": "Relationship start date",
           "category": "Counterparty",
@@ -381,6 +387,24 @@
           "description": "Y-14 obligor type",
           "category": "Counterparty",
           "why_required": "For Y-14 classification"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Counterparty",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Counterparty",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Counterparty",
+          "data_type": "CHAR(1)"
         }
       ]
     },
@@ -513,6 +537,12 @@
           "description": "Relationship end date",
           "category": "Counterparty",
           "why_required": "Historical grouping and reporting"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Counterparty",
+          "data_type": "CHAR(1)"
         },
         {
           "name": "effective_start_date",
@@ -728,8 +758,26 @@
         },
         {
           "name": "role_priority_rank",
-          "description": "Deterministic \u201cprimary\u201d selection.",
+          "description": "Deterministic “primary” selection.",
           "category": "Counterparty Participation"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Counterparty Participation",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Counterparty Participation",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Counterparty Participation",
+          "data_type": "CHAR(1)"
         },
         {
           "name": "is_primary_flag",
@@ -811,7 +859,7 @@
         },
         {
           "name": "role_priority_rank",
-          "description": "Deterministic \u201cprimary\u201d selection.",
+          "description": "Deterministic “primary” selection.",
           "category": "Counterparty Participation"
         },
         {
@@ -823,6 +871,24 @@
           "name": "source_record_id",
           "description": "Traceability.",
           "category": "Counterparty Participation"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Counterparty Participation",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Counterparty Participation",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Counterparty Participation",
+          "data_type": "CHAR(1)"
         },
         {
           "name": "created_ts",
@@ -1070,6 +1136,30 @@
           "why_required": "Operational reconciliation to source systems"
         },
         {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Facility",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Facility",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Facility",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Facility",
+          "data_type": "TIMESTAMP"
+        },
+        {
           "name": "agreement_type",
           "description": "Loan agreement type",
           "category": "Facility",
@@ -1292,6 +1382,30 @@
           "why_required": "Behavioral treatment"
         },
         {
+          "name": "active_flag",
+          "description": "",
+          "category": "Facility",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Facility",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Facility",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Facility",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "updated_ts",
           "description": "Record update timestamp",
           "category": "Facility",
@@ -1320,9 +1434,9 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 resolves the LoB hierarchy node for this facility (replaces inline lob_l1/l2/l3)",
+          "description": "FK to enterprise_business_taxonomy — resolves the LoB hierarchy node for this facility (replaces inline lob_l1/l2/l3)",
           "category": "Facility",
-          "why_required": "Single FK replaces 3 inline LoB fields; enables full L1\u2013L8+ hierarchy traversal",
+          "why_required": "Single FK replaces 3 inline LoB fields; enables full L1–L8+ hierarchy traversal",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -1335,7 +1449,7 @@
         },
         {
           "name": "product_node_id",
-          "description": "FK to enterprise_product_taxonomy \u2014 resolves the product hierarchy node (replaces plain product_id)",
+          "description": "FK to enterprise_product_taxonomy — resolves the product hierarchy node (replaces plain product_id)",
           "category": "Facility",
           "why_required": "Single FK enables product hierarchy traversal and FR 2590 mapping",
           "pk_fk": {
@@ -1350,7 +1464,7 @@
         },
         {
           "name": "portfolio_id",
-          "description": "FK to portfolio_dim \u2014 portfolio assignment for this facility",
+          "description": "FK to portfolio_dim — portfolio assignment for this facility",
           "category": "Facility",
           "why_required": "Supports Portfolio global filter in Header Bar; enables portfolio-level segmentation across all pages",
           "pk_fk": {
@@ -1365,7 +1479,7 @@
         },
         {
           "name": "rate_index_id",
-          "description": "FK to interest_rate_index_dim \u2014 benchmark rate for this facility",
+          "description": "FK to interest_rate_index_dim — benchmark rate for this facility",
           "category": "Facility",
           "why_required": "Resolves orphaned interest_rate_reference",
           "pk_fk": {
@@ -1422,7 +1536,7 @@
         },
         {
           "name": "prepayment_penalty_flag",
-          "description": "Y/N \u2014 early repayment penalty",
+          "description": "Y/N — early repayment penalty",
           "category": "Facility",
           "why_required": "Prepayment risk"
         },
@@ -1440,7 +1554,7 @@
         },
         {
           "name": "ledger_account_id",
-          "description": "FK to ledger_account_dim \u2014 GL booking account",
+          "description": "FK to ledger_account_dim — GL booking account",
           "category": "Facility",
           "why_required": "Risk-to-finance recon",
           "pk_fk": {
@@ -1537,6 +1651,30 @@
           "category": "Facility",
           "why_required": "Traceability to source system",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Facility",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Facility",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Facility",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Facility",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -1573,6 +1711,12 @@
           "name": "effective_end_date",
           "description": "Historical reproducibility.",
           "category": "Contract Identity"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Contract Identity",
+          "data_type": "CHAR(1)"
         },
         {
           "name": "facility_id",
@@ -1682,6 +1826,12 @@
           "description": "Created timestamp",
           "category": "Instrument",
           "why_required": "Audit trail"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "category": "Instrument",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "effective_end_date",
@@ -1890,6 +2040,24 @@
           "description": "Updated timestamp",
           "category": "Instrument",
           "why_required": "Audit trail"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Instrument",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Instrument",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Instrument",
+          "data_type": "CHAR(1)"
         }
       ]
     },
@@ -2047,6 +2215,24 @@
           "why_required": "Age-related models"
         },
         {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "collateral_status",
           "description": "Lifecycle: PLEDGED, RELEASED, SUBSTITUTED, IN_PERFECTION, EXPIRED",
           "category": "Collateral & CRM",
@@ -2087,7 +2273,7 @@
         },
         {
           "name": "insurance_flag",
-          "description": "Y/N \u2014 collateral insured",
+          "description": "Y/N — collateral insured",
           "category": "Collateral & CRM",
           "why_required": "Recovery assumptions"
         },
@@ -2099,7 +2285,7 @@
         },
         {
           "name": "regulatory_eligible_flag",
-          "description": "Y/N \u2014 Basel-eligible at asset instance level",
+          "description": "Y/N — Basel-eligible at asset instance level",
           "category": "Collateral & CRM",
           "why_required": "Distinct from type-level"
         },
@@ -2170,6 +2356,18 @@
           "description": "STANDARD/SUPERVISORY/INTERNAL",
           "category": "Collateral & CRM",
           "why_required": "Determines haircut source"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "jurisdiction_code",
@@ -2301,6 +2499,18 @@
           "description": "Volatility adjustment percentage",
           "category": "Collateral & CRM",
           "why_required": "Comprehensive approach support"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -2357,6 +2567,12 @@
           "description": "Link end date",
           "category": "Collateral & CRM",
           "why_required": "Historical lookback"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "CHAR(1)"
         },
         {
           "name": "effective_start_date",
@@ -2557,6 +2773,18 @@
           "why_required": "Stores logic-as-data for auditability"
         },
         {
+          "name": "created_ts",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "TIMESTAMP"
+        },
+        {
           "name": "eligible_flag",
           "description": "Whether eligible under the regime",
           "category": "Collateral & CRM",
@@ -2740,6 +2968,24 @@
           "description": "Updated timestamp",
           "category": "Collateral & CRM",
           "why_required": "Audit trail"
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "CHAR(1)"
         }
       ]
     },
@@ -2864,6 +3110,12 @@
           "why_required": "Historical lookback"
         },
         {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "effective_start_date",
           "description": "Link start date",
           "category": "Collateral & CRM",
@@ -2973,6 +3225,12 @@
           "name": "effective_end_date",
           "description": "Historical reproducibility.",
           "category": "Collateral & CRM"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "CHAR(1)"
         },
         {
           "name": "created_ts",
@@ -3135,6 +3393,24 @@
           "category": "Collateral & CRM"
         },
         {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Collateral & CRM",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "counterparty_id",
           "description": "",
           "category": "Netting, collateral & CRM",
@@ -3267,6 +3543,18 @@
           "description": "CSA end date",
           "category": "Netting & Margin",
           "why_required": "Historical lookback"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "effective_start_date",
@@ -3457,6 +3745,30 @@
           "why_required": "Margin requirement metric"
         },
         {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "TIMESTAMP"
+        },
+        {
           "name": "counterparty_id",
           "description": "",
           "category": "Netting, collateral & CRM",
@@ -3498,6 +3810,18 @@
           "description": "Agreement end date",
           "category": "Netting & Margin",
           "why_required": "Validity period"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "effective_start_date",
@@ -3603,7 +3927,7 @@
           "name": "netting_set_id",
           "description": "Unique netting set identifier",
           "category": "Netting & Margin",
-          "why_required": "PK \u2014 anchor for netting membership, CSA linkage, and L2 netting exposure snapshots",
+          "why_required": "PK — anchor for netting membership, CSA linkage, and L2 netting exposure snapshots",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -3670,6 +3994,12 @@
           "why_required": "Lifecycle tracking"
         },
         {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "master_agreement_reference",
           "description": "Master agreement reference (e.g., ISDA Master Agreement number)",
           "category": "Netting & Margin",
@@ -3732,6 +4062,18 @@
           "description": "Link end date",
           "category": "Netting & Margin",
           "why_required": "Historical consistency"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Netting & Margin",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "effective_start_date",
@@ -3803,7 +4145,7 @@
       "fields": [
         {
           "name": "limit_rule_id",
-          "description": "PK \u2014 surrogate identifier for the approved limit rule",
+          "description": "PK — surrogate identifier for the approved limit rule",
           "category": "Limits & Thresholds",
           "why_required": "Unique key for FK references from limit_utilization_event and limit_threshold",
           "pk_fk": {
@@ -3863,7 +4205,7 @@
           "name": "limit_amount_usd",
           "description": "Approved limit amount in USD",
           "category": "Limits & Thresholds",
-          "why_required": "The limit value \u2014 set by credit policy; used as denominator for utilization %"
+          "why_required": "The limit value — set by credit policy; used as denominator for utilization %"
         },
         {
           "name": "inner_threshold_pct",
@@ -3881,19 +4223,19 @@
           "name": "effective_from_date",
           "description": "Date the limit became effective",
           "category": "Limits & Thresholds",
-          "why_required": "Limit lifecycle \u2014 determines when limit applies"
+          "why_required": "Limit lifecycle — determines when limit applies"
         },
         {
           "name": "effective_to_date",
           "description": "Date the limit expires (NULL = currently active)",
           "category": "Limits & Thresholds",
-          "why_required": "Limit lifecycle \u2014 determines when limit no longer applies"
+          "why_required": "Limit lifecycle — determines when limit no longer applies"
         },
         {
           "name": "as_of_date",
           "description": "Snapshot date for the limit definition",
           "category": "Limits & Thresholds",
-          "why_required": "Temporal partitioning \u2014 supports historical limit analysis",
+          "why_required": "Temporal partitioning — supports historical limit analysis",
           "pk_fk": {
             "is_pk": true,
             "is_composite": true
@@ -3932,7 +4274,7 @@
       "fields": [
         {
           "name": "limit_threshold_id",
-          "description": "PK \u2014 unique threshold boundary record",
+          "description": "PK — unique threshold boundary record",
           "category": "Limits & Thresholds",
           "why_required": "Unique identifier for each threshold band definition",
           "pk_fk": {
@@ -3942,7 +4284,7 @@
         },
         {
           "name": "limit_rule_id",
-          "description": "FK to limit_rule \u2014 links threshold bands to a specific limit",
+          "description": "FK to limit_rule — links threshold bands to a specific limit",
           "category": "Limits & Thresholds",
           "why_required": "Associates threshold boundaries with approved limits",
           "pk_fk": {
@@ -3987,7 +4329,7 @@
         },
         {
           "name": "direction",
-          "description": "CEILING or FLOOR \u2014 indicates if limit is a cap or a minimum",
+          "description": "CEILING or FLOOR — indicates if limit is a cap or a minimum",
           "category": "Limits & Thresholds",
           "why_required": "Determines whether inner/outer thresholds are above or below limit"
         },
@@ -4011,7 +4353,7 @@
         },
         {
           "name": "active_flag",
-          "description": "Y/N \u2014 whether this threshold is currently in effect",
+          "description": "Y/N — whether this threshold is currently in effect",
           "category": "Limits & Thresholds",
           "why_required": "Filters to current active thresholds"
         },
@@ -4162,6 +4504,24 @@
           "why_required": "Audit trail"
         },
         {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "CHAR(1)"
+        },
+        {
           "name": "legal_entity_name",
           "description": "",
           "category": "Entity masters",
@@ -4257,6 +4617,30 @@
               "field": "legal_entity_id"
             }
           }
+        },
+        {
+          "name": "effective_start_date",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_end_date",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Legal Entity",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "hierarchy_id",
@@ -4526,7 +4910,7 @@
       "fields": [
         {
           "name": "managed_segment_id",
-          "description": "PK \u2014 unique identifier for the managed segment node",
+          "description": "PK — unique identifier for the managed segment node",
           "category": "Business Taxonomy",
           "why_required": "Unique node identifier for LoB hierarchy resolution",
           "pk_fk": {
@@ -4565,7 +4949,7 @@
           "name": "tree_level",
           "description": "Numeric level in hierarchy (1=Top/Org, 2=L1 LoB, 3=L2 LoB, etc.)",
           "category": "Business Taxonomy",
-          "why_required": "Drives aggregation level for dashboards (L1\u2013L8+)"
+          "why_required": "Drives aggregation level for dashboards (L1–L8+)"
         },
         {
           "name": "effective_date",
@@ -4660,7 +5044,7 @@
       "fields": [
         {
           "name": "product_node_id",
-          "description": "PK \u2014 unique identifier for the product taxonomy node",
+          "description": "PK — unique identifier for the product taxonomy node",
           "category": "Product Taxonomy",
           "why_required": "Unique node identifier for product hierarchy resolution",
           "pk_fk": {
@@ -4885,7 +5269,7 @@
       "fields": [
         {
           "name": "portfolio_id",
-          "description": "PK \u2014 unique portfolio identifier",
+          "description": "PK — unique portfolio identifier",
           "category": "Portfolio",
           "why_required": "Unique key for FK references from facility_master",
           "pk_fk": {
@@ -4913,7 +5297,7 @@
         },
         {
           "name": "parent_portfolio_id",
-          "description": "FK to parent portfolio (nullable \u2014 for hierarchical portfolio structures)",
+          "description": "FK to parent portfolio (nullable — for hierarchical portfolio structures)",
           "category": "Portfolio",
           "why_required": "Supports portfolio hierarchy if sub-portfolios exist",
           "pk_fk": {
@@ -4928,7 +5312,7 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 LoB alignment for this portfolio",
+          "description": "FK to enterprise_business_taxonomy — LoB alignment for this portfolio",
           "category": "Portfolio",
           "why_required": "Links portfolio to LoB hierarchy for cross-dimensional analysis",
           "pk_fk": {
@@ -4943,7 +5327,7 @@
         },
         {
           "name": "active_flag",
-          "description": "Y/N \u2014 whether this portfolio is currently active",
+          "description": "Y/N — whether this portfolio is currently active",
           "category": "Portfolio",
           "why_required": "Filters to active portfolios for current reporting"
         },
@@ -5312,7 +5696,7 @@
       "fields": [
         {
           "name": "rating_grade_id",
-          "description": "PK \u2014 unique identifier for each rating grade entry",
+          "description": "PK — unique identifier for each rating grade entry",
           "category": "Ratings",
           "why_required": "Unique key for FK references from counterparty_rating_observation",
           "pk_fk": {
@@ -5336,7 +5720,7 @@
           "name": "rating_notch",
           "description": "Standardized numeric notch across all scales (1 = best, N = worst). Internal and external ratings are mapped to the same notch scale to enable direct comparison",
           "category": "Ratings",
-          "why_required": "Core crosswalk field \u2014 JOIN on rating_notch across scale_types to compare internal vs external ratings; drives the Risk Rating Toggle, migration analysis, and upgrade/downgrade counts"
+          "why_required": "Core crosswalk field — JOIN on rating_notch across scale_types to compare internal vs external ratings; drives the Risk Rating Toggle, migration analysis, and upgrade/downgrade counts"
         },
         {
           "name": "pd_implied",
@@ -5346,13 +5730,13 @@
         },
         {
           "name": "default_flag",
-          "description": "Y/N \u2014 whether this grade represents a default state (e.g., D, C, internal 5)",
+          "description": "Y/N — whether this grade represents a default state (e.g., D, C, internal 5)",
           "category": "Ratings",
           "why_required": "Identifies default-grade counterparties for default counts, NPL analysis, and credit event triggers"
         },
         {
           "name": "investment_grade_flag",
-          "description": "Y/N \u2014 whether this grade is considered investment grade",
+          "description": "Y/N — whether this grade is considered investment grade",
           "category": "Ratings",
           "why_required": "Supports IG vs non-IG segmentation for portfolio analysis (Page 7) and deterioration flags"
         },
@@ -5364,7 +5748,7 @@
         },
         {
           "name": "active_flag",
-          "description": "Y/N \u2014 whether this rating grade is currently in use",
+          "description": "Y/N — whether this rating grade is currently in use",
           "category": "Ratings",
           "why_required": "Filters to active grades for current reporting"
         },
@@ -6020,7 +6404,7 @@
       "fields": [
         {
           "name": "rate_index_id",
-          "description": "PK \u2014 rate index identifier",
+          "description": "PK — rate index identifier",
           "category": "Market Data",
           "why_required": "Primary key",
           "pk_fk": {
@@ -6095,7 +6479,7 @@
           "name": "fallback_to_index_id",
           "description": "FK to replacement rate index",
           "category": "Market Data",
-          "why_required": "Legacy \u2192 fallback mapping"
+          "why_required": "Legacy → fallback mapping"
         },
         {
           "name": "fallback_spread_bps",
@@ -6142,7 +6526,7 @@
       "fields": [
         {
           "name": "ledger_account_id",
-          "description": "PK \u2014 GL account identifier",
+          "description": "PK — GL account identifier",
           "category": "General Ledger",
           "why_required": "Primary key",
           "pk_fk": {
@@ -6227,7 +6611,7 @@
         },
         {
           "name": "is_reconciliation_account",
-          "description": "Y/N \u2014 subject to risk-to-finance recon",
+          "description": "Y/N — subject to risk-to-finance recon",
           "category": "General Ledger",
           "why_required": "Scope recon checks"
         },
@@ -6235,7 +6619,7 @@
           "name": "regulatory_report_code",
           "description": "Mapping to regulatory report line items",
           "category": "General Ledger",
-          "why_required": "GL \u2192 reg report mapping"
+          "why_required": "GL → reg report mapping"
         },
         {
           "name": "active_flag",
@@ -6876,6 +7260,18 @@
           "description": "Active flag",
           "category": "Industry",
           "why_required": "Operational gating"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Industry",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "category": "Industry",
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "industry_code",
@@ -8053,6 +8449,18 @@
           "description": "Surrogate validation check identifier (alias for check_id)",
           "category": "Run Control & Lineage",
           "why_required": "Matches naming expectations in downstream control tooling"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "category": "Run Control & Lineage",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "category": "Run Control & Lineage",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -8096,7 +8504,7 @@
           "name": "calculation_rule_id",
           "description": "Links definition to executable logic when applicable.",
           "category": "Uncategorized",
-          "why_required": "FK \u2192 L1.rule_registry.rule_id"
+          "why_required": "FK → L1.rule_registry.rule_id"
         },
         {
           "name": "definition_text",
@@ -8127,7 +8535,7 @@
           "name": "source_system_id",
           "description": "Lineage.",
           "category": "Uncategorized",
-          "why_required": "FK \u2192 L1.source_system_registry.source_system_id"
+          "why_required": "FK → L1.source_system_registry.source_system_id"
         },
         {
           "name": "created_ts",
@@ -8154,7 +8562,7 @@
           "description": "Surrogate unique position identifier",
           "category": "Position Core",
           "why_required": "Core PK for all position-level facts",
-          "simplification_note": "Simplified from 41\u219228 fields. Removed refs to non-existent L1 tables. All fields are source-system attributes.",
+          "simplification_note": "Simplified from 41→28 fields. Removed refs to non-existent L1 tables. All fields are source-system attributes.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -8227,6 +8635,12 @@
           }
         },
         {
+          "name": "product_node_id",
+          "description": "",
+          "category": "Position Core",
+          "data_type": "BIGINT"
+        },
+        {
           "name": "legal_entity_id",
           "description": "Reporting/booking legal entity",
           "category": "Position Core",
@@ -8258,7 +8672,7 @@
         },
         {
           "name": "netting_set_id",
-          "description": "Netting set identifier (nullable \u2014 derivatives/SFT only)",
+          "description": "Netting set identifier (nullable — derivatives/SFT only)",
           "category": "Position Core",
           "why_required": "Links position to netting set for close-out netting",
           "pk_fk": {
@@ -8374,14 +8788,14 @@
           "name": "pd_estimate",
           "description": "Point-in-time PD estimate (source-system output)",
           "category": "Position Core",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 PIT Probability of Default from credit risk model (e.g., Moody's RiskCalc, internal IRB model). Cannot be re-derived without underlying obligor financials, market data, and model calibration.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — PIT Probability of Default from credit risk model (e.g., Moody's RiskCalc, internal IRB model). Cannot be re-derived without underlying obligor financials, market data, and model calibration.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
           "name": "lgd_estimate",
           "description": "LGD estimate (source-system output)",
           "category": "Position Core",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Loss Given Default from credit risk model (e.g., downturn LGD model). Requires collateral recovery assumptions, seniority, jurisdiction-specific recovery data not available in this data model.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Loss Given Default from credit risk model (e.g., downturn LGD model). Requires collateral recovery assumptions, seniority, jurisdiction-specific recovery data not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
@@ -8522,7 +8936,7 @@
           "name": "ccf",
           "description": "Credit conversion factor",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Credit Conversion Factor from regulatory/internal model. Basel-prescribed or model-based CCF for off-balance sheet items. Mapped by exposure type and regulatory approach (SA vs IRB).",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Credit Conversion Factor from regulatory/internal model. Basel-prescribed or model-based CCF for off-balance sheet items. Mapped by exposure type and regulatory approach (SA vs IRB).",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
@@ -8541,14 +8955,14 @@
           "name": "replacement_cost",
           "description": "Replacement cost",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 SA-CCR replacement cost from risk engine. Requires trade-level Greeks, market data curves, and close-out netting logic not available in this data model.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — SA-CCR replacement cost from risk engine. Requires trade-level Greeks, market data curves, and close-out netting logic not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
           "name": "pfe",
           "description": "Potential future exposure",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 SA-CCR Potential Future Exposure from risk engine. Requires supervisory factors, hedging set decomposition, delta adjustments not available in this data model.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — SA-CCR Potential Future Exposure from risk engine. Requires supervisory factors, hedging set decomposition, delta adjustments not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
@@ -8567,7 +8981,7 @@
           "name": "haircut_applied_pct",
           "description": "Haircut applied percentage",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Supervisory or model-based haircut from collateral management system. Depends on asset type, holding period, and volatility assumptions.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Supervisory or model-based haircut from collateral management system. Depends on asset type, holding period, and volatility assumptions.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
@@ -8697,7 +9111,7 @@
       "fields": [
         {
           "name": "attribution_id",
-          "description": "PK \u2014 unique counterparty exposure attribution",
+          "description": "PK — unique counterparty exposure attribution",
           "category": "Exposure",
           "why_required": "Primary key",
           "simplification_note": "L2 review new table",
@@ -8724,7 +9138,7 @@
         },
         {
           "name": "counterparty_id",
-          "description": "FK to counterparty \u2014 party receiving exposure",
+          "description": "FK to counterparty — party receiving exposure",
           "category": "Exposure",
           "why_required": "SCCL target",
           "simplification_note": "L2 review new table",
@@ -8740,7 +9154,7 @@
         },
         {
           "name": "counterparty_role_code",
-          "description": "FK to counterparty_role_dim \u2014 role",
+          "description": "FK to counterparty_role_dim — role",
           "category": "Exposure",
           "why_required": "Role-based rules",
           "simplification_note": "L2 review new table",
@@ -8850,7 +9264,7 @@
           "description": "Surrogate identifier",
           "category": "Exposure",
           "why_required": "Unique row identity",
-          "simplification_note": "Facility-level gross/net exposure snapshot. Atomic: 1 facility \u00d7 1 date. CRM-adjusted net_exposure_usd computed here. | Atomic gross exposure. Net exposure and coverage ratios computed in L3 by joining collateral_snapshot.",
+          "simplification_note": "Facility-level gross/net exposure snapshot. Atomic: 1 facility × 1 date. CRM-adjusted net_exposure_usd computed here. | Atomic gross exposure. Net exposure and coverage ratios computed in L3 by joining collateral_snapshot.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -8983,7 +9397,7 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 primary LoB",
+          "description": "FK to enterprise_business_taxonomy — primary LoB",
           "category": "Exposure",
           "why_required": "Page 7 LoB breakdown",
           "simplification_note": "L2 review addition",
@@ -9122,7 +9536,7 @@
           "description": "Surrogate identifier",
           "category": "Exposure",
           "why_required": "Unique row identity",
-          "simplification_note": "Netting-set-level exposure for derivatives/SFT. Atomic: 1 netting_set \u00d7 1 date. Separate from facility exposure. | RE-ADDED. Atomic netting set exposure record from the CCR/SA-CCR engine. Now anchored to L1.netting_set. Each row = 1 netting set \u00d7 1 date. Records gross/net MTM, PFE, EAD, and collateral held per netting set.",
+          "simplification_note": "Netting-set-level exposure for derivatives/SFT. Atomic: 1 netting_set × 1 date. Separate from facility exposure. | RE-ADDED. Atomic netting set exposure record from the CCR/SA-CCR engine. Now anchored to L1.netting_set. Each row = 1 netting set × 1 date. Records gross/net MTM, PFE, EAD, and collateral held per netting set.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -9177,21 +9591,21 @@
           "name": "gross_mtm_usd",
           "description": "Gross mark-to-market (USD) before netting",
           "category": "Exposure",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Gross MTM from front-office/risk engine. Sum of position-level MTMs within netting set before netting benefit.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Gross MTM from front-office/risk engine. Sum of position-level MTMs within netting set before netting benefit.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
           "name": "pfe_usd",
           "description": "Potential future exposure (USD)",
           "category": "Exposure",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 PFE from SA-CCR/IMM engine. Requires add-on calculations with supervisory factors, hedging set decomposition per BCBS standards.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — PFE from SA-CCR/IMM engine. Requires add-on calculations with supervisory factors, hedging set decomposition per BCBS standards.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
           "name": "collateral_held_usd",
           "description": "Collateral held against netting set (USD)",
           "category": "Exposure",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Collateral held per netting set from margin/collateral management system. Reflects CSA terms, margin calls, and collateral eligibility.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Collateral held per netting set from margin/collateral management system. Reflects CSA terms, margin calls, and collateral eligibility.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
@@ -9246,7 +9660,7 @@
       "fields": [
         {
           "name": "attribution_id",
-          "description": "PK \u2014 unique attribution record",
+          "description": "PK — unique attribution record",
           "category": "LoB Attribution",
           "why_required": "Primary key",
           "simplification_note": "L2 review new table",
@@ -9431,7 +9845,7 @@
           "name": "original_valuation_usd",
           "description": "Original valuation amount (USD)",
           "category": "CRM",
-          "why_required": "Facility drawer \u2014 original vs current comparison"
+          "why_required": "Facility drawer — original vs current comparison"
         },
         {
           "name": "current_valuation_usd",
@@ -9506,7 +9920,7 @@
           "description": "Unique cash flow identifier",
           "category": "Cash Flows",
           "why_required": "PK",
-          "simplification_note": "RE-ADDED. Atomic cash flow record per position/facility per flow date. Required for Counterparty Details Drawer (Page 2 \u2014 Cashflows) and liquidity/maturity profiling. Simplified from original 16\u219212 fields \u2014 removed dangling FKs (run_control, source_system_registry, lob_node).",
+          "simplification_note": "RE-ADDED. Atomic cash flow record per position/facility per flow date. Required for Counterparty Details Drawer (Page 2 — Cashflows) and liquidity/maturity profiling. Simplified from original 16→12 fields — removed dangling FKs (run_control, source_system_registry, lob_node).",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -9577,7 +9991,7 @@
         },
         {
           "name": "flow_direction",
-          "description": "Inflow (+) or Outflow (\u2212)",
+          "description": "Inflow (+) or Outflow (−)",
           "category": "Cash Flows",
           "why_required": "Net cash flow calculation"
         },
@@ -10084,10 +10498,10 @@
       "fields": [
         {
           "name": "contribution_id",
-          "description": "PK \u2014 unique contribution record",
+          "description": "PK — unique contribution record",
           "category": "Limits",
           "why_required": "Primary key",
-          "simplification_note": "Line-item breakdown of what contributes to a limit's utilization. Child of limit_utilization_event \u2014 decomposes the total into per-facility/counterparty amounts. | L2 review new table",
+          "simplification_note": "Line-item breakdown of what contributes to a limit's utilization. Child of limit_utilization_event — decomposes the total into per-facility/counterparty amounts. | L2 review new table",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -10210,7 +10624,7 @@
           "description": "Limit definition identifier",
           "category": "Limits",
           "why_required": "Links to limit being monitored",
-          "simplification_note": "FK renamed: limit_definition \u2192 limit_rule",
+          "simplification_note": "FK renamed: limit_definition → limit_rule",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -10656,7 +11070,7 @@
           "description": "Credit event identifier",
           "category": "Credit Events",
           "why_required": "Links to credit event",
-          "simplification_note": "Atomic junction: 1 event \u00d7 1 facility.",
+          "simplification_note": "Atomic junction: 1 event × 1 facility.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": true
@@ -10724,7 +11138,7 @@
       "fields": [
         {
           "name": "breach_id",
-          "description": "PK \u2014 breach within stress test",
+          "description": "PK — breach within stress test",
           "category": "Stress Testing",
           "why_required": "Primary key",
           "simplification_note": "Individual breach details within a stress test execution. Child of stress_test_result. | L2 review new table",
@@ -10871,10 +11285,10 @@
       "fields": [
         {
           "name": "stress_test_result_id",
-          "description": "PK \u2014 scenario execution result",
+          "description": "PK — scenario execution result",
           "category": "Stress Testing",
           "why_required": "Primary key",
-          "simplification_note": "Stress test scenario execution results. Links L1 scenario_dim to outcomes. 1 row = 1 scenario \u00d7 1 execution date. | L2 review new table",
+          "simplification_note": "Stress test scenario execution results. Links L1 scenario_dim to outcomes. 1 row = 1 scenario × 1 execution date. | L2 review new table",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -11050,10 +11464,10 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 LoB node for pipeline deal (replaces inline lob_l1/l2)",
+          "description": "FK to enterprise_business_taxonomy — LoB node for pipeline deal (replaces inline lob_l1/l2)",
           "category": "Deal Pipeline",
           "why_required": "LoB grouping",
-          "simplification_note": "CHANGED: lob_l1_name \u2192 lob_segment_id FK",
+          "simplification_note": "CHANGED: lob_l1_name → lob_segment_id FK",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -11212,7 +11626,7 @@
         },
         {
           "name": "rating_type",
-          "description": "INTERNAL or EXTERNAL \u2014 high-level classification of rating source",
+          "description": "INTERNAL or EXTERNAL — high-level classification of rating source",
           "category": "Ratings",
           "why_required": "Drives Risk Rating Toggle; can also be derived from rating_scale_dim.scale_type but kept for direct filtering",
           "simplification_note": "UPDATED: Retained for convenience filtering alongside rating_grade_id FK."
@@ -11225,7 +11639,7 @@
         },
         {
           "name": "rating_value",
-          "description": "Rating value label (e.g., \"AA\", \"3\") \u2014 RETAINED for source-system traceability but rating_grade_id FK is the governed reference",
+          "description": "Rating value label (e.g., \"AA\", \"3\") — RETAINED for source-system traceability but rating_grade_id FK is the governed reference",
           "category": "Ratings",
           "why_required": "Source-system rating value as ingested; use rating_grade_id for standardized analytics",
           "simplification_note": "UPDATED: Supplementary to rating_grade_id FK. Use FK for joins/analytics."
@@ -11240,14 +11654,14 @@
           "name": "prior_rating_value",
           "description": "Previous rating value (source-system look-back)",
           "category": "Ratings",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Previous rating value stamped by rating observation system at time of rating action. Source system lookback, not a cross-row derivation.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Previous rating value stamped by rating observation system at time of rating action. Source system lookback, not a cross-row derivation.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
           "name": "pd_implied",
           "description": "PD implied by rating (if available)",
           "category": "Ratings",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 PD implied by external rating from rating agency mapping tables (e.g., S&P transition matrices). Requires agency-specific calibration.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — PD implied by external rating from rating agency mapping tables (e.g., S&P transition matrices). Requires agency-specific calibration.",
           "simplification_note": "SOURCE SYSTEM REQUIRED."
         },
         {
@@ -11262,7 +11676,7 @@
         },
         {
           "name": "rating_grade_id",
-          "description": "FK to rating_scale_dim \u2014 maps this observation to the canonical rating grade with standardized rating_notch for cross-scale comparison",
+          "description": "FK to rating_scale_dim — maps this observation to the canonical rating grade with standardized rating_notch for cross-scale comparison",
           "category": "Ratings",
           "why_required": "Core linkage for standardized rating analytics: crosswalk between internal and external scales, migration tracking via rating_notch delta, color coding, IG/non-IG segmentation",
           "simplification_note": "NEW: Enables standardized rating comparison via rating_notch join.",
@@ -11626,7 +12040,7 @@
       "fields": [
         {
           "name": "exception_id",
-          "description": "PK \u2014 unique exception record",
+          "description": "PK — unique exception record",
           "category": "Exceptions",
           "why_required": "Core PK for exception tracking",
           "simplification_note": "L2 exception lifecycle events (breaches, waivers, overrides). Different from L1 exception_rule which defines standing exception rules. This is the EVENT record when an exception occurs. | NEW table. Mirrors limit structure with severity, lifecycle, and governance attributes.",
@@ -11652,7 +12066,7 @@
           "description": "FK to limit_rule if exception relates to a limit breach",
           "category": "Exceptions",
           "why_required": "Links exception to the breached limit",
-          "simplification_note": "FK renamed: limit_definition \u2192 limit_rule",
+          "simplification_note": "FK renamed: limit_definition → limit_rule",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -11680,7 +12094,7 @@
         },
         {
           "name": "facility_id",
-          "description": "FK to facility_master \u2014 the facility involved in the exception",
+          "description": "FK to facility_master — the facility involved in the exception",
           "category": "Exceptions",
           "why_required": "Links exception to impacted facility",
           "pk_fk": {
@@ -11695,7 +12109,7 @@
         },
         {
           "name": "counterparty_id",
-          "description": "FK to counterparty \u2014 the counterparty involved",
+          "description": "FK to counterparty — the counterparty involved",
           "category": "Exceptions",
           "why_required": "Links exception to impacted counterparty",
           "pk_fk": {
@@ -11710,7 +12124,7 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 LoB segment where exception occurred",
+          "description": "FK to enterprise_business_taxonomy — LoB segment where exception occurred",
           "category": "Exceptions",
           "why_required": "Links exception to business hierarchy",
           "pk_fk": {
@@ -11841,7 +12255,7 @@
           "description": "Surrogate identifier",
           "category": "Risk Monitoring",
           "why_required": "PK",
-          "simplification_note": "Consolidated flag observations (DETERIORATED, WATCH_LIST, COVENANT_BREACH, etc.). 1 row = 1 flag \u00d7 1 entity \u00d7 1 date. | CONSOLIDATED from 2 flag tables. Each row = 1 flag observation for 1 entity.",
+          "simplification_note": "Consolidated flag observations (DETERIORATED, WATCH_LIST, COVENANT_BREACH, etc.). 1 row = 1 flag × 1 entity × 1 date. | CONSOLIDATED from 2 flag tables. Each row = 1 flag observation for 1 entity.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -11950,7 +12364,7 @@
       "fields": [
         {
           "name": "dq_score_id",
-          "description": "PK \u2014 DQ score observation",
+          "description": "PK — DQ score observation",
           "category": "Data Quality",
           "why_required": "Primary key",
           "simplification_note": "L2 review new table",
@@ -12196,6 +12610,816 @@
           "description": "",
           "category": "L2",
           "data_type": "DECIMAL(10,6)"
+        }
+      ]
+    },
+    {
+      "name": "loan_position_detail",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "loan_position_detail_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "loan_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "amortization_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "payment_frequency",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "interest_rate_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "current_rate_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(8,6)"
+        },
+        {
+          "name": "rate_index_code",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "spread_bps",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(8,2)"
+        },
+        {
+          "name": "original_balance_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "current_balance_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "funded_amount",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "unfunded_commitment_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "days_past_due",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "accrual_status",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "next_payment_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "prepayment_penalty_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "collateral_coverage_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "covenant_compliance_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "hqla_eligible_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "lcr_outflow_category",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "nsfr_factor_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "capital_risk_weight_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        }
+      ]
+    },
+    {
+      "name": "derivative_position_detail",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "derivative_position_detail_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "derivative_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "derivative_subtype",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "underlying_asset_class",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "notional_amount",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "mark_to_market_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "replacement_cost_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "potential_future_exposure_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "exposure_at_default_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "cva_charge_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "netting_set_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "collateral_posted_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "collateral_received_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "initial_margin_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "variation_margin_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "settlement_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "clearing_method",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "is_centrally_cleared_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "trade_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "maturity_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "sa_ccr_exposure_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "capital_risk_weight_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "lcr_outflow_category",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        }
+      ]
+    },
+    {
+      "name": "sft_position_detail",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "sft_position_detail_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "sft_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "sft_subtype",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "cash_leg_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "security_leg_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "collateral_value_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "haircut_applied_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "margin_call_frequency",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "repo_rate_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(8,6)"
+        },
+        {
+          "name": "netting_set_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "settlement_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "maturity_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_open_maturity_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "security_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "security_issuer_country",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "hqla_eligible_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "lcr_inflow_category",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "nsfr_factor_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "capital_risk_weight_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        }
+      ]
+    },
+    {
+      "name": "guarantee_lc_position_detail",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "guarantee_lc_detail_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "instrument_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "guarantee_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "lc_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "issued_amount",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "outstanding_amount",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "utilized_amount",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "credit_conversion_factor",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "beneficiary_counterparty_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "expiry_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_irrevocable_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "is_financial_standby_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "fee_rate_bps",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(8,2)"
+        },
+        {
+          "name": "lcr_outflow_category",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "capital_risk_weight_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        }
+      ]
+    },
+    {
+      "name": "bond_security_position_detail",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "bond_security_detail_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "security_type",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "security_subtype",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "isin",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(12)"
+        },
+        {
+          "name": "cusip",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(9)"
+        },
+        {
+          "name": "face_value_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "market_value_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "book_value_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "accrued_interest_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "unrealized_gain_loss_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "coupon_rate_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(8,6)"
+        },
+        {
+          "name": "coupon_frequency",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "maturity_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "issuer_counterparty_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "issuer_country_code",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "accounting_classification",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "hqla_level",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(10)"
+        },
+        {
+          "name": "hqla_eligible_flag",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "lcr_haircut_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "nsfr_factor_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "capital_risk_weight_pct",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(10,4)"
+        }
+      ]
+    },
+    {
+      "name": "counterparty_financial_snapshot",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "financial_snapshot_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "DATE"
+        },
+        {
+          "name": "reporting_period",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "revenue_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "operating_expense_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "tax_expense_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "depreciation_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "amortization_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "total_liabilities_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "shareholders_equity_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "ebitda_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "noi_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     }
@@ -17001,6 +18225,12 @@
           "data_type": "INTEGER"
         },
         {
+          "name": "criticized_exposure_amt",
+          "description": "",
+          "category": "LoB Summary",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
           "name": "deteriorated_deal_count",
           "description": "",
           "category": "LoB Summary",
@@ -19190,6 +20420,36 @@
           "data_type": "INTEGER"
         },
         {
+          "name": "facility_active_flag",
+          "description": "Propagates L1 facility_master.active_flag for snapshot-level filtering (Y/N)",
+          "category": "Facility Analytics",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "maturity_date_bucket",
+          "description": "",
+          "category": "Facility Analytics",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "origination_date_bucket",
+          "description": "",
+          "category": "Facility Analytics",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "effective_date_bucket",
+          "description": "Derived effective-date bucket for reporting",
+          "category": "Facility Analytics",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "bank_share_pct",
+          "description": "",
+          "category": "Facility Analytics",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
           "name": "base_currency_code",
           "description": "",
           "category": "Facility Analytics",
@@ -19424,6 +20684,12 @@
           "description": "",
           "category": "LoB Summary",
           "data_type": "INTEGER"
+        },
+        {
+          "name": "criticized_exposure_amt",
+          "description": "",
+          "category": "LoB Summary",
+          "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "doi_pct",

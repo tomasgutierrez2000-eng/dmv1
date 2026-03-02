@@ -100,7 +100,7 @@ const TABLES: Record<string, TableDef> = {
   },
   wagg: {
     id: 'wagg',
-    name: 'Simple Average',
+    name: 'Aggregate Ratio',
     layer: 'CALC',
     shortName: 'Aggregate',
     fields: [],
@@ -184,7 +184,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    description: 'Average LTV across a borrower\'s loans',
+    description: 'Aggregate LTV across a borrower\'s loans',
     tables: ['fes', 'cs', 'fm', 'cp', 'calc', 'wagg'],
     steps: [
       {
@@ -241,8 +241,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Finally, we compute a simple average of the individual facility LTVs: AVG(facility_ltv). Each secured facility counts equally. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
-        sampleResult: 'Avg LTV = 185%',
+          'Finally, we compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. This pools all exposure and collateral across the borrower\'s facilities, so larger loans naturally weigh more. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
+        sampleResult: 'Aggregate LTV = 185%',
       },
     ],
   },
@@ -250,7 +250,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'desk',
     label: 'Desk',
     icon: Briefcase,
-    description: 'Average LTV for a trading desk',
+    description: 'Aggregate LTV for a trading desk',
     tables: ['fes', 'cs', 'fm', 'ebt', 'calc', 'wagg'],
     steps: [
       {
@@ -307,8 +307,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group all secured facilities by desk name, then compute a simple average: AVG(facility_ltv). Each facility counts equally. Result: one LTV number for the entire CRE Lending Desk.',
-        sampleResult: 'Desk Avg LTV = 172%',
+          'Group all secured facilities by desk name, then compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. Larger facilities dominate the result. Result: one LTV number for the entire CRE Lending Desk.',
+        sampleResult: 'Desk LTV = 172%',
       },
     ],
   },
@@ -316,7 +316,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'portfolio',
     label: 'Portfolio',
     icon: FolderTree,
-    description: 'Average LTV for a portfolio (group of desks)',
+    description: 'Aggregate LTV for a portfolio (group of desks)',
     tables: ['fes', 'cs', 'fm', 'ebt', 'calc', 'wagg'],
     steps: [
       {
@@ -383,8 +383,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then take a simple average: AVG(facility_ltv). Each facility counts equally. Result: one LTV for the entire Commercial Real Estate portfolio.',
-        sampleResult: 'Portfolio Avg LTV = 168%',
+          'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. Larger facilities weigh more. Result: one LTV for the entire Commercial Real Estate portfolio.',
+        sampleResult: 'Portfolio LTV = 168%',
       },
     ],
   },
@@ -392,7 +392,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'lob',
     label: 'Line of Business',
     icon: PieChart,
-    description: 'Average LTV at the department level',
+    description: 'Aggregate LTV at the department level',
     tables: ['fes', 'cs', 'fm', 'ebt', 'calc', 'wagg'],
     steps: [
       {
@@ -459,8 +459,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'wagg',
         fieldsToShow: [],
         narration:
-          'Group ALL facilities in the bank whose taxonomy path traces to the same root department. A simple average of facility LTVs gives a single board-level LTV for the entire Lending Division.',
-        sampleResult: 'LoB Avg LTV = 155%',
+          'Group ALL facilities in the bank whose taxonomy path traces to the same root department. The aggregate ratio — SUM(committed_amount) / SUM(collateral_value) — gives a single board-level LTV for the entire Lending Division.',
+        sampleResult: 'LoB LTV = 155%',
       },
     ],
   },

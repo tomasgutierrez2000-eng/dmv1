@@ -81,53 +81,53 @@ const ROLLUP_LEVELS = [
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    desc: 'Simple average of facility LTVs — AVG(facility_ltv) grouped by counterparty',
-    method: 'Simple Average',
+    desc: 'Aggregate ratio — SUM(committed_amount) / SUM(collateral_value) grouped by counterparty',
+    method: 'Aggregate Ratio',
     purpose: 'Obligor-level collateral adequacy',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
-    dashboardName: 'Counterparty Avg LTV (%)',
-    formula: 'AVG(facility_ltv)',
-    formulaDetail: 'For each facility under this counterparty, compute facility LTV (committed_amount / collateral_value), then take the simple average. Unsecured facilities excluded.',
+    dashboardName: 'Counterparty LTV (%)',
+    formula: 'SUM(committed_amount) / SUM(collateral_value) × 100',
+    formulaDetail: 'Sum committed_amount and collateral_value across all secured facilities under this counterparty, then divide. Unsecured facilities excluded.',
   },
   {
     key: 'desk',
     label: 'Desk',
     icon: Briefcase,
-    desc: 'Simple average of facility LTVs across all secured facilities assigned to this L3 desk',
-    method: 'Simple Average',
+    desc: 'Aggregate ratio — SUM(committed_amount) / SUM(collateral_value) across all secured facilities on this L3 desk',
+    method: 'Aggregate Ratio',
     purpose: 'Book-level collateral monitoring',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
-    dashboardName: 'Desk Avg LTV (%)',
-    formula: 'AVG(facility_ltv)',
-    formulaDetail: 'Same simple average as counterparty, but grouping by L3 desk resolved via enterprise_business_taxonomy.',
+    dashboardName: 'Desk LTV (%)',
+    formula: 'SUM(committed_amount) / SUM(collateral_value) × 100',
+    formulaDetail: 'Same aggregate ratio as counterparty, grouping by L3 desk resolved via enterprise_business_taxonomy.',
   },
   {
     key: 'portfolio',
     label: 'Portfolio',
     icon: FolderTree,
-    desc: 'Simple average of facility LTVs for all secured facilities within an L2 portfolio',
-    method: 'Simple Average',
+    desc: 'Aggregate ratio — SUM(committed_amount) / SUM(collateral_value) for all secured facilities within an L2 portfolio',
+    method: 'Aggregate Ratio',
     purpose: 'ALCO collateral adequacy reporting',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
-    dashboardName: 'Portfolio Avg LTV (%)',
-    formula: 'AVG(facility_ltv)',
-    formulaDetail: 'Same simple average, grouped by L2 portfolio via parent_segment_id traversal in enterprise_business_taxonomy.',
+    dashboardName: 'Portfolio LTV (%)',
+    formula: 'SUM(committed_amount) / SUM(collateral_value) × 100',
+    formulaDetail: 'Same aggregate ratio, grouped by L2 portfolio via parent_segment_id traversal in enterprise_business_taxonomy.',
   },
   {
     key: 'lob',
     label: 'Line of Business',
     icon: PieChart,
-    desc: 'Simple average of facility LTVs at L1 department level — board-level collateral coverage',
-    method: 'Simple Average',
+    desc: 'Aggregate ratio — SUM(committed_amount) / SUM(collateral_value) at L1 department level — board-level collateral coverage',
+    method: 'Aggregate Ratio',
     purpose: 'Enterprise risk appetite monitoring',
     tier: 'T3',
     stepType: 'HYBRID' as StepType,
-    dashboardName: 'Department Avg LTV (%)',
-    formula: 'AVG(facility_ltv)',
-    formulaDetail: 'Same simple average at the highest organizational level. Traverse enterprise_business_taxonomy to root (parent IS NULL).',
+    dashboardName: 'Department LTV (%)',
+    formula: 'SUM(committed_amount) / SUM(collateral_value) × 100',
+    formulaDetail: 'Same aggregate ratio at the highest organizational level. Traverse enterprise_business_taxonomy to root (parent IS NULL).',
   },
 ] as const;
 
@@ -213,9 +213,9 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get counterparty_id from facility master', stepType: 'SOURCING' },
       { from: 'facility_master', fromLayer: 'L1', to: 'counterparty', toLayer: 'L1', joinKey: 'counterparty_id', note: 'Resolve counterparty identity for grouping', stepType: 'SOURCING' },
     ],
-    aggregation: 'Simple average: AVG(facility_ltv) grouped by counterparty_id',
-    result: 'One average LTV per counterparty (unsecured excluded)',
-    dependsOn: 'Requires facility-level LTV calculation first',
+    aggregation: 'Aggregate ratio: SUM(committed_amount) / SUM(collateral_value) grouped by counterparty_id',
+    result: 'One aggregate LTV per counterparty (unsecured excluded)',
+    dependsOn: 'Uses per-facility committed_amount and collateral_value as inputs',
   },
   desk: {
     hops: [
@@ -223,9 +223,9 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get lob_segment_id — this FK determines which desk the facility belongs to', stepType: 'SOURCING' },
       { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'The leaf node in the taxonomy IS the L3 desk — all facilities sharing the same lob_segment_id belong to this desk', stepType: 'SOURCING' },
     ],
-    aggregation: 'Simple average: AVG(facility_ltv) grouped by lob_l3_name',
-    result: 'One average LTV per desk — groups all facilities whose lob_segment_id maps to the same taxonomy leaf',
-    dependsOn: 'Requires facility-level LTV calculation first',
+    aggregation: 'Aggregate ratio: SUM(committed_amount) / SUM(collateral_value) grouped by lob_l3_name',
+    result: 'One aggregate LTV per desk — groups all facilities whose lob_segment_id maps to the same taxonomy leaf',
+    dependsOn: 'Uses per-facility committed_amount and collateral_value as inputs',
   },
   portfolio: {
     hops: [
@@ -234,9 +234,9 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'Enter LoB hierarchy at leaf', stepType: 'SOURCING' },
       { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'parent_segment_id = managed_segment_id', note: 'Walk tree one level up: Desk → Portfolio (L2)', stepType: 'SOURCING' },
     ],
-    aggregation: 'Simple average: AVG(facility_ltv) grouped by L2 portfolio',
-    result: 'One average LTV per portfolio',
-    dependsOn: 'Requires facility-level LTV calculation first',
+    aggregation: 'Aggregate ratio: SUM(committed_amount) / SUM(collateral_value) grouped by L2 portfolio',
+    result: 'One aggregate LTV per portfolio',
+    dependsOn: 'Uses per-facility committed_amount and collateral_value as inputs',
   },
   lob: {
     hops: [
@@ -245,9 +245,9 @@ const JOIN_CHAINS: Record<string, JoinChainData> = {
       { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'Enter LoB hierarchy at leaf', stepType: 'SOURCING' },
       { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'enterprise_business_taxonomy (root)', toLayer: 'L1', joinKey: 'recursive parent_segment_id until parent IS NULL', note: 'Walk tree to root = L1 Department', stepType: 'SOURCING' },
     ],
-    aggregation: 'Simple average: AVG(facility_ltv) grouped by L1 department',
-    result: 'One average LTV per Line of Business',
-    dependsOn: 'Requires facility-level LTV calculation first',
+    aggregation: 'Aggregate ratio: SUM(committed_amount) / SUM(collateral_value) grouped by L1 department',
+    result: 'One aggregate LTV per Line of Business',
+    dependsOn: 'Uses per-facility committed_amount and collateral_value as inputs',
   },
 };
 
@@ -406,11 +406,11 @@ function MetricDefinition() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
           <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Rollup Philosophy</div>
-          <div className="text-sm text-white font-medium">Simple Average</div>
+          <div className="text-sm text-white font-medium">Aggregate Ratio</div>
         </div>
         <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
           <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Aggregation</div>
-          <div className="text-sm text-white font-medium">AVG(facility_ltv) — equal weight per facility</div>
+          <div className="text-sm text-white font-medium">SUM(committed_amt) / SUM(collateral_value) — larger facilities weigh more</div>
         </div>
         <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
           <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Domains</div>
@@ -786,8 +786,8 @@ function RollupPyramid({ expandedLevel, onToggle }: { expandedLevel: string | nu
                   <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.03] p-2.5 mb-3 flex items-start gap-2">
                     <GitBranch className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden />
                     <div className="text-[10px] text-amber-300">
-                      <strong>Cross-tier dependency:</strong> This level depends on facility-level LTV calculation.
-                      Each facility&apos;s LTV (committed_amount / collateral_value) must be computed first, then simply averaged at the {level.label} level.
+                      <strong>Cross-tier dependency:</strong> This level uses facility-level exposure and collateral data.
+                      Committed amounts and collateral values from each facility are summed at the {level.label} level, then divided to produce the aggregate ratio.
                     </div>
                   </div>
                 )}

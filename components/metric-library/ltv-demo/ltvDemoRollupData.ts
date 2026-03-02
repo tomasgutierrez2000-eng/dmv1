@@ -71,16 +71,19 @@ export interface LTVCounterpartyRow {
   name: string;
   ltv: number;
   exposure: number;
+  collateral: number;
 }
 
 /*
- * Counterparty A — simple average LTV from 3 facilities above:
- *   (59.5 + 66.7 + 113.6) / 3 = 79.9%
+ * Counterparty A — aggregate ratio from 3 facilities above:
+ *   SUM(committed) / SUM(collateral) = $48M / $59.2M = 81.1%
+ * Counterparty B: $35M / $63.6M = 55.0%
+ * Counterparty C: $22M / $30.4M = 72.4%
  */
 export const LTV_COUNTERPARTIES: LTVCounterpartyRow[] = [
-  { name: 'Counterparty A', ltv: 79.9, exposure: 48_000_000 },
-  { name: 'Counterparty B', ltv: 55.0, exposure: 35_000_000 },
-  { name: 'Counterparty C', ltv: 72.3, exposure: 22_000_000 },
+  { name: 'Counterparty A', ltv: 81.1, exposure: 48_000_000, collateral: 59_200_000 },
+  { name: 'Counterparty B', ltv: 55.0, exposure: 35_000_000, collateral: 63_600_000 },
+  { name: 'Counterparty C', ltv: 72.4, exposure: 22_000_000, collateral: 30_400_000 },
 ];
 
 /* ── Desk-level data (by collateral type) ────────────────────────────────── */

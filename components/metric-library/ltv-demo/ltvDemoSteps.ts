@@ -64,7 +64,7 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Define the Metric',
     title: 'Numerator: Gross Exposure',
     narration:
-      'The top of the LTV formula is the gross exposure — the total amount the bank has lent to this borrower for this facility.\n\nThis comes from a single field in one table:\n\nfacility_exposure_snapshot.gross_exposure_usd = $15,000,000\n\nUnlike DSCR where the numerator requires assembling 4+ components (rents, expenses, depreciation), LTV\'s numerator is a single snapshot value. The simplicity is deceptive — getting this number right requires handling currency conversion, commitment vs. drawn amounts, and multi-tranche facilities.\n\nWatch as the exposure value appears in the animation below.',
+      'The top of the LTV formula is the committed facility amount — the total commitment the bank has made to this borrower for this facility.\n\nThis comes from a single field in one table:\n\nfacility_exposure_snapshot.committed_amount = $15,000,000\n\nUnlike DSCR where the numerator requires assembling 4+ components (rents, expenses, depreciation), LTV\'s numerator is a single snapshot value. The simplicity is deceptive — getting this number right requires handling currency conversion, commitment vs. drawn amounts, and multi-tranche facilities.\n\nWatch as the exposure value appears in the animation below.',
     targetSelector: '[data-demo="num-section"]',
     formulaKey: 'numerator-exposure',
   },
@@ -138,7 +138,7 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Calculation',
     title: 'The Math in Action: LTV Calculation',
     narration:
-      'The calculation engine follows these steps for each facility:\n\n1. Pull gross_exposure_usd from facility_exposure_snapshot\n   → $15,000,000\n\n2. JOIN collateral_snapshot to get ALL collateral items pledged to this facility\n   → 3 items: Building ($20M), Cash ($3M), Receivables ($2.2M)\n\n3. SUM current_valuation_usd across all collateral items\n   → $25,200,000\n\n4. DIVIDE: exposure ÷ total collateral value × 100\n   → $15,000,000 ÷ $25,200,000 × 100 = 59.5%\n\nThe JOIN in step 2 is where LTV\'s data model differs from DSCR. DSCR joins to financial snapshot tables; LTV joins to collateral snapshot tables. The collateral join is one-to-many: one facility can have many collateral items.',
+      'The calculation engine follows these steps for each facility:\n\n1. Pull committed_amount from facility_exposure_snapshot\n   → $15,000,000\n\n2. JOIN collateral_snapshot to get ALL collateral items pledged to this facility\n   → 3 items: Building ($20M), Cash ($3M), Receivables ($2.2M)\n\n3. SUM current_valuation_usd across all collateral items\n   → $25,200,000\n\n4. DIVIDE: exposure ÷ total collateral value × 100\n   → $15,000,000 ÷ $25,200,000 × 100 = 59.5%\n\nThe JOIN in step 2 is where LTV\'s data model differs from DSCR. DSCR joins to financial snapshot tables; LTV joins to collateral snapshot tables. The collateral join is one-to-many: one facility can have many collateral items.',
     targetSelector: '[data-demo="step4"]',
   },
 
@@ -160,12 +160,12 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     id: 'foundational-rule',
     phase: 5,
     phaseLabel: 'Rollup Hierarchy',
-    title: 'How LTV Rolls Up: Simple Average',
+    title: 'How LTV Rolls Up: Aggregate Ratio',
     narration:
-      'Before we walk through how LTV combines across multiple loans, one key rule:\n\nRollup LTV uses a simple average of individual facility LTVs — AVG(facility_ltv).\n\nEach facility\'s LTV counts equally, regardless of loan size. For example:\n\n• Facility A: LTV = 95%\n• Facility B: LTV = 30%\n\nBorrower LTV = (95% + 30%) / 2 = 62.5%\n\nThis treats every secured facility as an equal data point. Unsecured facilities (no collateral) are excluded entirely — they get LTV = NULL.',
+      'Before we walk through how LTV combines across multiple loans, one key rule:\n\nRollup LTV uses the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100.\n\nThis sums the numerators and denominators across all facilities, then divides. Larger facilities naturally carry more weight. For example:\n\n• Facility A: $50M committed / $52.6M collateral → 95%\n• Facility B: $3M committed / $10M collateral → 30%\n\nBorrower LTV = ($50M + $3M) / ($52.6M + $10M) = $53M / $62.6M = 84.7%\n\nNotice this is NOT (95% + 30%) / 2 = 62.5%. The $50M facility dominates because it represents the vast majority of exposure. Unsecured facilities (no collateral) are excluded entirely.',
     targetSelector: '[data-demo="foundational-rule"]',
     insight:
-      'The simple average gives equal weight to each facility regardless of size. This is the defined rollup method for LTV across all levels — counterparty, desk, portfolio, and LoB.',
+      'The aggregate ratio naturally weights larger facilities more heavily. A $500M underwater facility cannot be hidden by averaging it with small low-LTV facilities. This is the standard G-SIB approach for LTV rollup across all levels.',
     formulaKey: 'foundational-rule-ltv',
   },
 
@@ -189,12 +189,12 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 2: Borrower (Counterparty)',
     narration:
-      'A single borrower (called a "counterparty" in banking) may have multiple loans, each with different collateral packages. To see the borrower\'s overall collateral coverage:\n\nBorrower LTV = AVG(facility_ltv)\n\nThis is a simple average — each secured facility\'s LTV counts equally. Unsecured facilities (no collateral) are excluded from the average entirely.',
+      'A single borrower (called a "counterparty" in banking) may have multiple loans, each with different collateral packages. To see the borrower\'s overall collateral coverage:\n\nBorrower LTV = SUM(committed_amount) / SUM(collateral_value) × 100\n\nThis is an aggregate ratio — pool all exposure and all collateral, then divide. Larger facilities naturally dominate the result. Unsecured facilities (no collateral) are excluded entirely.',
     targetSelector: '[data-demo="rollup-counterparty"]',
     onEnter: { expandLevel: 'counterparty' },
     formulaKey: 'rollup-counterparty',
     insight:
-      'The simple average treats each facility as an equal data point. For Counterparty A with three secured facilities at 59.5%, 66.7%, and 113.6%: the borrower-level LTV = (59.5 + 66.7 + 113.6) / 3 = 79.9%.',
+      'For Counterparty A with three secured facilities: SUM(committed) = $15M + $8M + $25M = $48M, SUM(collateral) = $25.2M + $12M + $22M = $59.2M. Borrower LTV = $48M / $59.2M = 81.1%. The $25M underwater facility pulls the ratio up significantly.',
   },
 
   /* ── Step 13: Desk Level ────────────────────────────────────────────────── */
@@ -219,12 +219,12 @@ export const LTV_DEMO_STEPS: LTVDemoStep[] = [
     phaseLabel: 'Rollup Hierarchy',
     title: 'Level 4: Portfolio',
     narration:
-      'At the portfolio level, LTV uses a simple average of facility LTVs — AVG(facility_ltv) for all secured facilities in the portfolio.\n\nBut the distribution buckets tell the real story:\n\n• < 60%: Low Risk — 12 facilities, $350M exposure\n• 60–80%: Moderate — 18 facilities, $680M exposure\n• 80–100%: High Risk — 8 facilities, $420M exposure\n• > 100%: Underwater — 4 facilities, $180M exposure\n\nThe "underwater" bucket (LTV > 100%) is unique to LTV and is the most watched metric in CRE portfolios. It means the loan exceeds collateral value — if the borrower defaults, the bank cannot fully recover.\n\nA portfolio LTV of 72% might look healthy, but if $180M of exposure is underwater, that demands immediate attention.',
+      'At the portfolio level, LTV uses the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) for all secured facilities in the portfolio.\n\nBut the distribution buckets tell the real story:\n\n• < 60%: Low Risk — 12 facilities, $350M exposure\n• 60–80%: Moderate — 18 facilities, $680M exposure\n• 80–100%: High Risk — 8 facilities, $420M exposure\n• > 100%: Underwater — 4 facilities, $180M exposure\n\nThe "underwater" bucket (LTV > 100%) is unique to LTV and is the most watched metric in CRE portfolios. It means the loan exceeds collateral value — if the borrower defaults, the bank cannot fully recover.\n\nA portfolio LTV of 72% might look healthy, but if $180M of exposure is underwater, that demands immediate attention.',
     targetSelector: '[data-demo="rollup-portfolio"]',
     onEnter: { expandLevel: 'portfolio' },
     formulaKey: 'rollup-portfolio',
     insight:
-      'Beware of "Simpson\'s Paradox": a healthy portfolio-level LTV can hide pockets of severely under-collateralized loans. The distribution buckets — especially the "underwater" bucket — reveal what a single average number conceals.',
+      'Beware of "Simpson\'s Paradox": a healthy portfolio-level LTV can hide pockets of severely under-collateralized loans. The distribution buckets — especially the "underwater" bucket — reveal what a single aggregate number conceals.',
   },
 
   /* ── Step 15: LoB Level ─────────────────────────────────────────────────── */

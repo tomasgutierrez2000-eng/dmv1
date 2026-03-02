@@ -22,11 +22,11 @@ import {
  *   - collateral-waterfall: collateral items staggering in
  *   - haircut-waterfall: raw → haircut → eligible value per item
  *   - ltv-division: exposure ÷ collateral × 100 = result
- *   - foundational-rule-ltv: simple average of facility LTVs
+ *   - foundational-rule-ltv: aggregate ratio (SUM/SUM) across facilities
  *   - rollup-facility: table of 3 facility LTVs
- *   - rollup-counterparty: simple average LTV build-up
+ *   - rollup-counterparty: aggregate ratio LTV build-up
  *   - rollup-desk: collateral-type segmented view
- *   - rollup-portfolio: simple average + distribution buckets
+ *   - rollup-portfolio: aggregate ratio + distribution buckets
  *   - rollup-lob: trend indicator summary
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -248,41 +248,59 @@ function LTVDivision({ stepIndex }: { stepIndex: number }) {
 /* ── Foundational Rule — wrong vs right way ──────────────────────────────── */
 
 function FoundationalRuleDemo({ stepIndex }: { stepIndex: number }) {
-  const revealed = useStaggerReveal(3, 500, stepIndex);
+  const revealed = useStaggerReveal(4, 500, stepIndex);
   return (
     <div className="space-y-3">
-      {/* Facility LTVs */}
+      {/* Individual facilities with amounts */}
       <div
         className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-3 transition-all duration-500"
         style={{ opacity: revealed > 0 ? 1 : 0, transform: revealed > 0 ? 'translateY(0)' : 'translateY(8px)' }}
       >
         <div className="text-[9px] font-bold uppercase tracking-widest text-cyan-400 mb-2">
-          Individual Facility LTVs
+          Individual Facilities
         </div>
         <div className="space-y-1 text-xs font-mono">
           <div className="flex justify-between text-gray-400">
-            <span>Facility A</span><span>LTV = 95.0%</span>
+            <span>Facility A</span><span><span className="text-emerald-400">$50M</span> / <span className="text-amber-400">$52.6M</span> = 95.0%</span>
           </div>
           <div className="flex justify-between text-gray-400">
-            <span>Facility B</span><span>LTV = 30.0%</span>
+            <span>Facility B</span><span><span className="text-emerald-400">$3M</span> / <span className="text-amber-400">$10M</span> = 30.0%</span>
           </div>
         </div>
       </div>
 
-      {/* Simple average */}
+      {/* Aggregate sums */}
       <div
-        className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 transition-all duration-500"
+        className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 transition-all duration-500"
         style={{ opacity: revealed > 1 ? 1 : 0, transform: revealed > 1 ? 'translateY(0)' : 'translateY(8px)' }}
       >
+        <div className="text-[9px] font-bold uppercase tracking-widest text-amber-400 mb-2">
+          Sum Across Facilities
+        </div>
+        <div className="space-y-1 text-xs font-mono text-center">
+          <div className="text-gray-400">
+            SUM(committed) = <span className="text-emerald-400">$50M + $3M = $53M</span>
+          </div>
+          <div className="text-gray-400">
+            SUM(collateral) = <span className="text-amber-400">$52.6M + $10M = $62.6M</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Aggregate ratio result */}
+      <div
+        className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 transition-all duration-500"
+        style={{ opacity: revealed > 2 ? 1 : 0, transform: revealed > 2 ? 'translateY(0)' : 'translateY(8px)' }}
+      >
         <div className="text-[9px] font-bold uppercase tracking-widest text-emerald-400 mb-2">
-          Rollup: Simple Average
+          Rollup: Aggregate Ratio
         </div>
         <div
           className="text-xs font-mono text-center transition-all duration-500"
-          style={{ opacity: revealed > 2 ? 1 : 0 }}
+          style={{ opacity: revealed > 3 ? 1 : 0 }}
         >
-          AVG(facility_ltv) = (95% + 30%) / 2 = <span className="text-emerald-400 font-bold">62.5%</span>
-          <div className="text-[9px] text-gray-500 mt-1">Each facility counts equally · Unsecured excluded</div>
+          $53M / $62.6M × 100 = <span className="text-emerald-400 font-bold">84.7%</span>
+          <div className="text-[9px] text-gray-500 mt-1">Larger facilities weigh more · Unsecured excluded</div>
         </div>
       </div>
     </div>
@@ -328,16 +346,18 @@ function RollupFacility({ stepIndex }: { stepIndex: number }) {
 
 function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
   const facilities = LTV_FACILITIES;
-  const totalLines = facilities.length + 1; // rows + result
+  const totalLines = facilities.length + 2; // rows + sums + result
   const revealed = useStaggerReveal(totalLines, 400, stepIndex);
 
-  // Simple average LTV for these facilities
-  const avgLTV = facilities.reduce((s, f) => s + f.ltv, 0) / facilities.length;
+  // Aggregate ratio: SUM(committed) / SUM(collateral)
+  const totalExposure = facilities.reduce((s, f) => s + f.exposure, 0);
+  const totalCollateral = facilities.reduce((s, f) => s + f.collateralValue, 0);
+  const aggLTV = (totalExposure / totalCollateral) * 100;
 
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Simple Average of Facility LTVs
+        Aggregate Ratio: SUM / SUM
       </div>
 
       {facilities.map((f, i) => (
@@ -347,19 +367,36 @@ function RollupCounterparty({ stepIndex }: { stepIndex: number }) {
           style={{ opacity: revealed > i ? 1 : 0, transform: revealed > i ? 'translateX(0)' : 'translateX(12px)' }}
         >
           <span className="text-gray-400">{f.name.split('(')[0].trim()}</span>
-          <span className={`font-bold flex-shrink-0 ml-2 ${ltvBandColor(f.ltv)}`}>{fmtPct(f.ltv)}</span>
+          <span className="flex-shrink-0 ml-2">
+            <span className="text-emerald-400">{fmtM(f.exposure)}</span>
+            <span className="text-gray-600"> / </span>
+            <span className="text-amber-400">{fmtM(f.collateralValue)}</span>
+          </span>
         </div>
       ))}
 
+      {/* Sums */}
+      <div
+        className="flex items-center justify-between text-xs font-mono pt-1 border-t border-gray-700 transition-all duration-500"
+        style={{ opacity: revealed > facilities.length ? 1 : 0, transform: revealed > facilities.length ? 'translateX(0)' : 'translateX(12px)' }}
+      >
+        <span className="text-gray-500">Totals</span>
+        <span className="flex-shrink-0 ml-2">
+          <span className="text-emerald-400 font-bold">{fmtM(totalExposure)}</span>
+          <span className="text-gray-600"> / </span>
+          <span className="text-amber-400 font-bold">{fmtM(totalCollateral)}</span>
+        </span>
+      </div>
+
       <div
         className="text-center pt-2 border-t border-gray-700 transition-all duration-700"
-        style={{ opacity: revealed > facilities.length ? 1 : 0, transform: revealed > facilities.length ? 'scale(1)' : 'scale(0.85)' }}
+        style={{ opacity: revealed > facilities.length + 1 ? 1 : 0, transform: revealed > facilities.length + 1 ? 'scale(1)' : 'scale(0.85)' }}
       >
         <div className="text-[10px] text-gray-500 mb-1">
-          AVG(facility_ltv)
+          SUM(committed) / SUM(collateral) × 100
         </div>
-        <div className={`text-xl font-black tabular-nums ${ltvBandColor(avgLTV)}`}>
-          {fmtPct(avgLTV)}
+        <div className={`text-xl font-black tabular-nums ${ltvBandColor(aggLTV)}`}>
+          {fmtPct(aggLTV)}
         </div>
       </div>
     </div>
@@ -398,18 +435,20 @@ function RollupDesk({ stepIndex }: { stepIndex: number }) {
 
 function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
   const cps = LTV_COUNTERPARTIES;
-  const totalLines = cps.length + 1 + PORTFOLIO_BUCKETS.length; // counterparties + result + buckets
+  const totalLines = cps.length + 2 + PORTFOLIO_BUCKETS.length; // counterparties + sums + result + buckets
   const revealed = useStaggerReveal(totalLines, 350, stepIndex);
-  // Simple average of facility LTVs across all counterparties in portfolio
-  const avgLTV = cps.reduce((s, cp) => s + cp.ltv, 0) / cps.length;
+  // Aggregate ratio: SUM(committed) / SUM(collateral)
+  const totalExposure = cps.reduce((s, cp) => s + cp.exposure, 0);
+  const totalCollateral = cps.reduce((s, cp) => s + cp.collateral, 0);
+  const aggLTV = (totalExposure / totalCollateral) * 100;
 
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-3">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-        Simple Average + Distribution
+        Aggregate Ratio + Distribution
       </div>
 
-      {/* Facility LTVs by counterparty */}
+      {/* Counterparty exposure / collateral */}
       {cps.map((cp, i) => (
         <div
           key={cp.name}
@@ -417,17 +456,34 @@ function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
           style={{ opacity: revealed > i ? 1 : 0, transform: revealed > i ? 'translateX(0)' : 'translateX(12px)' }}
         >
           <span className="text-gray-400">{cp.name}</span>
-          <span className={`font-bold flex-shrink-0 ml-2 ${ltvBandColor(cp.ltv)}`}>{fmtPct(cp.ltv)}</span>
+          <span className="flex-shrink-0 ml-2">
+            <span className="text-emerald-400">{fmtM(cp.exposure)}</span>
+            <span className="text-gray-600"> / </span>
+            <span className="text-amber-400">{fmtM(cp.collateral)}</span>
+          </span>
         </div>
       ))}
 
-      {/* Average result */}
+      {/* Sums */}
+      <div
+        className="flex items-center justify-between text-xs font-mono pt-1 border-t border-gray-700 transition-all duration-500"
+        style={{ opacity: revealed > cps.length ? 1 : 0, transform: revealed > cps.length ? 'translateX(0)' : 'translateX(12px)' }}
+      >
+        <span className="text-gray-500">Totals</span>
+        <span className="flex-shrink-0 ml-2">
+          <span className="text-emerald-400 font-bold">{fmtM(totalExposure)}</span>
+          <span className="text-gray-600"> / </span>
+          <span className="text-amber-400 font-bold">{fmtM(totalCollateral)}</span>
+        </span>
+      </div>
+
+      {/* Aggregate ratio result */}
       <div
         className="text-center pt-2 border-t border-gray-700 transition-all duration-500"
-        style={{ opacity: revealed > cps.length ? 1 : 0, transform: revealed > cps.length ? 'scale(1)' : 'scale(0.85)' }}
+        style={{ opacity: revealed > cps.length + 1 ? 1 : 0, transform: revealed > cps.length + 1 ? 'scale(1)' : 'scale(0.85)' }}
       >
-        <div className={`text-lg font-black tabular-nums ${ltvBandColor(avgLTV)}`}>
-          Portfolio LTV: {fmtPct(avgLTV)}
+        <div className={`text-lg font-black tabular-nums ${ltvBandColor(aggLTV)}`}>
+          Portfolio LTV: {fmtPct(aggLTV)}
         </div>
       </div>
 
@@ -437,7 +493,7 @@ function RollupPortfolio({ stepIndex }: { stepIndex: number }) {
           Distribution Buckets
         </div>
         {PORTFOLIO_BUCKETS.map((b, i) => {
-          const idx = cps.length + 1 + i;
+          const idx = cps.length + 2 + i;
           return (
             <div
               key={b.range}

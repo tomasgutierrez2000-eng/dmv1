@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import {
-  ChevronLeft,
   Database,
   Calculator,
   LayoutDashboard,
   Briefcase,
   ArrowDown,
+  CheckCircle2,
   ShieldCheck,
+  Zap,
   Eye,
+  GitBranch,
   ChevronDown,
   ChevronUp,
   Table2,
@@ -20,168 +21,343 @@ import {
   Info,
   Layers,
   Link2,
-  Scale,
+  AlertTriangle,
   Building2,
   Play,
-  Shield,
-  TrendingDown,
+  Network,
+  Workflow,
+  Sparkles,
+  RefreshCw,
+  Search,
+  Package,
+  ArrowRight,
+  FileText,
 } from 'lucide-react';
-import {
-  LTV_FACILITIES,
-  LTV_COUNTERPARTIES,
-  FACILITY_A_COLLATERAL,
-  DESK_SEGMENTS,
-  PORTFOLIO_BUCKETS,
-  LOB_ENTRIES,
-  fmt,
-  fmtM,
-  fmtPct,
-  ltvBandColor,
-  ltvBandLabel,
-  exposureWeightedLTV,
-  type CollateralItem,
-} from './ltv-demo/ltvDemoRollupData';
 
 /* ────────────────────────────────────────────────────────────────────────────
- * TYPES & DATA
+ * STEP TYPE — every step is labeled SOURCING, CALCULATION, or HYBRID
  * ──────────────────────────────────────────────────────────────────────────── */
 
-/** L2 fields in facility_exposure_snapshot */
-const L2_FIELDS_FES = [
-  { field: 'gross_exposure_usd', desc: 'Total facility exposure (LTV numerator)', used: true },
-  { field: 'drawn_amount', desc: 'Currently drawn portion of commitment', used: true },
-  { field: 'undrawn_amount', desc: 'Committed but undrawn (off-balance sheet)', used: false },
-  { field: 'ead_amount', desc: 'Exposure at Default (regulatory EAD)', used: false },
-  { field: 'currency_code', desc: 'Reporting currency (ISO)', used: false },
-  { field: 'as_of_date', desc: 'Snapshot date', used: true },
-];
+type StepType = 'SOURCING' | 'CALCULATION' | 'HYBRID';
 
-/** L2 fields in collateral_snapshot */
-const L2_FIELDS_CS = [
-  { field: 'current_valuation_usd', desc: 'Current mark-to-market or appraisal value', used: true },
-  { field: 'original_valuation_usd', desc: 'Original appraisal value at loan origination', used: false },
-  { field: 'haircut_pct', desc: 'Regulatory haircut percentage applied to collateral', used: true },
-  { field: 'eligible_value_usd', desc: 'Value after haircut — recognized for CRM', used: true },
-  { field: 'allocated_amount_usd', desc: 'Portion allocated to this specific facility', used: true },
-  { field: 'mitigant_group_code', desc: 'M1 = Eligible for CRM, M2 = Ineligible', used: true },
-  { field: 'mitigant_subtype', desc: 'Collateral type: Cash, Real Estate, Securities, Receivables', used: true },
-  { field: 'as_of_date', desc: 'Snapshot date', used: true },
-];
+const STEP_TYPE_STYLES: Record<StepType, { bg: string; text: string; border: string; label: string }> = {
+  SOURCING:    { bg: 'bg-cyan-500/15',   text: 'text-cyan-300',    border: 'border-cyan-500/30',    label: 'Sourcing' },
+  CALCULATION: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30', label: 'Calculation' },
+  HYBRID:      { bg: 'bg-amber-500/15',  text: 'text-amber-300',   border: 'border-amber-500/30',   label: 'Hybrid (Source + Aggregate)' },
+};
 
-/** L1 reference tables */
-const L1_TABLES = [
-  {
-    table: 'facility_master',
-    layer: 'L1',
-    desc: 'Master record for every loan facility — type, committed amount, maturity, product classification',
-    fields: ['facility_id', 'facility_type_code', 'committed_amount', 'maturity_date', 'origination_date', 'counterparty_id', 'lob_node_id'],
-    ltvRole: 'Links exposure to borrower and business hierarchy via foreign keys',
-  },
-  {
-    table: 'counterparty',
-    layer: 'L1',
-    desc: 'Borrower identity — legal entity, credit rating, industry, domicile',
-    fields: ['counterparty_id', 'legal_name', 'pd_annual', 'internal_risk_rating', 'industry_code', 'country_code'],
-    ltvRole: 'Identifies who the borrower is; enables counterparty-level rollup',
-  },
-  {
-    table: 'collateral_asset_master',
-    layer: 'L1',
-    desc: 'Collateral identity — asset type, property location, appraisal method, last appraisal date',
-    fields: ['collateral_id', 'asset_type_code', 'property_address', 'appraisal_method', 'last_appraisal_date'],
-    ltvRole: 'Defines WHAT the collateral is — unique to LTV; not needed by DSCR',
-  },
-  {
-    table: 'enterprise_business_taxonomy',
-    layer: 'L1',
-    desc: 'Organizational hierarchy — Line of Business → Portfolio → Desk mapping',
-    fields: ['lob_node_id', 'lob_name', 'portfolio_name', 'desk_name', 'hierarchy_level'],
-    ltvRole: 'Provides the rollup path: Desk → Portfolio → LoB',
-  },
-];
+function StepTypeBadge({ type }: { type: StepType }) {
+  const s = STEP_TYPE_STYLES[type];
+  return (
+    <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${s.bg} ${s.text} ${s.border}`}>
+      {type === 'SOURCING' && <Database className="w-2.5 h-2.5" aria-hidden />}
+      {type === 'CALCULATION' && <Calculator className="w-2.5 h-2.5" aria-hidden />}
+      {type === 'HYBRID' && <RefreshCw className="w-2.5 h-2.5" aria-hidden />}
+      {s.label}
+    </span>
+  );
+}
 
-/** L3 output tables */
-const L3_OUTPUT_TABLES = [
-  {
-    table: 'metric_value_fact',
-    desc: 'Generic metric storage — LTV values at every aggregation level',
-    fields: ['metric_id = LTV', 'variant_id', 'aggregation_level', 'facility_id | counterparty_id | lob_id', 'value', 'unit = %', 'display_format = 0.0%'],
-    primary: true,
-  },
-  {
-    table: 'lob_risk_ratio_summary',
-    desc: 'LoB-level risk ratios — LTV alongside DSCR, FCCR, capital adequacy',
-    fields: ['lob_node_id', 'ltv_pct', 'dscr_value', 'fccr_value', 'capital_adequacy_ratio_pct'],
-    primary: false,
-  },
-  {
-    table: 'risk_appetite_metric_state',
-    desc: 'Executive dashboard — LTV vs. risk appetite limits with RAG status & velocity',
-    fields: ['metric_id = LTV', 'current_value', 'limit_value', 'inner_threshold_value', 'status_code', 'velocity_30d_pct'],
-    primary: false,
-  },
-  {
-    table: 'facility_detail_snapshot',
-    desc: 'Facility-level analytics — ltv_pct for drawer pop-ups and drill-down',
-    fields: ['facility_id', 'ltv_pct', 'committed_amt', 'collateral_value', 'counterparty_id'],
-    primary: false,
-  },
-];
+/* ────────────────────────────────────────────────────────────────────────────
+ * ROLLUP LEVELS — Facility → Counterparty → Desk → Portfolio → LoB
+ * ──────────────────────────────────────────────────────────────────────────── */
 
-/** Rollup levels */
 const ROLLUP_LEVELS = [
   {
     key: 'facility',
     label: 'Facility',
     icon: Table2,
-    desc: 'Direct Calculation — exposure / SUM(collateral) for one loan',
-    method: 'Direct Calculation',
-    purpose: 'Underwriting, collateral monitoring',
+    desc: 'Direct Calculation — LTV = drawn_amount / collateral_value for one facility',
+    method: 'Direct Ratio',
+    purpose: 'Collateral coverage per loan',
     tier: 'T2',
+    stepType: 'CALCULATION' as StepType,
+    dashboardName: 'Facility LTV (%)',
+    formula: 'LTV = drawn_amount / collateral_value',
+    formulaDetail: 'drawn_amount from facility_exposure_snapshot, collateral_value = SUM(current_valuation_usd) from collateral_snapshot for same facility_id and as_of_date',
   },
   {
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    desc: 'Exposure-Weighted Average across all facilities for this borrower',
+    desc: 'Exposure-weighted average — blend facility LTVs by gross_exposure_usd',
     method: 'Exposure-Weighted Average',
-    purpose: 'Obligor-level collateral assessment',
+    purpose: 'Obligor-level collateral adequacy',
     tier: 'T3',
+    stepType: 'HYBRID' as StepType,
+    dashboardName: 'Counterparty WAvg LTV (%)',
+    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formulaDetail: 'For each facility under this counterparty, compute facility LTV, weight by gross_exposure_usd. Unsecured facilities excluded.',
   },
   {
     key: 'desk',
     label: 'Desk',
     icon: Briefcase,
-    desc: 'EWA + Collateral Type Segmentation — split by RE, Cash, Securities',
-    method: 'EWA + Collateral Segmentation',
-    purpose: 'Book quality & collateral mix',
+    desc: 'Exposure-weighted average across all secured facilities assigned to this L3 desk',
+    method: 'Exposure-Weighted Average',
+    purpose: 'Book-level collateral monitoring',
     tier: 'T3',
+    stepType: 'HYBRID' as StepType,
+    dashboardName: 'Desk WAvg LTV (%)',
+    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formulaDetail: 'Same weighted average as counterparty, but grouping by L3 desk resolved via enterprise_business_taxonomy.',
   },
   {
     key: 'portfolio',
     label: 'Portfolio',
     icon: FolderTree,
-    desc: 'Exposure-Weighted Average + Distribution buckets (< 60%, 60–80%, 80–100%, > 100%)',
-    method: 'EWA + Distribution',
-    purpose: 'Portfolio risk trending',
+    desc: 'Exposure-weighted average for all secured facilities within an L2 portfolio',
+    method: 'Exposure-Weighted Average',
+    purpose: 'ALCO collateral adequacy reporting',
     tier: 'T3',
+    stepType: 'HYBRID' as StepType,
+    dashboardName: 'Portfolio WAvg LTV (%)',
+    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formulaDetail: 'Same weighted average, grouped by L2 portfolio via parent_segment_id traversal in enterprise_business_taxonomy.',
   },
   {
     key: 'lob',
     label: 'Line of Business',
     icon: PieChart,
-    desc: 'Exposure-Weighted Average — collateral coverage trend indicator',
+    desc: 'Exposure-weighted average at L1 department level — board-level collateral coverage',
     method: 'Exposure-Weighted Average',
-    purpose: 'Systemic collateral monitoring',
+    purpose: 'Enterprise risk appetite monitoring',
     tier: 'T3',
+    stepType: 'HYBRID' as StepType,
+    dashboardName: 'Department WAvg LTV (%)',
+    formula: 'SUM(ltv × gross_exposure) / SUM(gross_exposure)',
+    formulaDetail: 'Same weighted average at the highest organizational level. Traverse enterprise_business_taxonomy to root (parent IS NULL).',
   },
 ] as const;
 
 /* ────────────────────────────────────────────────────────────────────────────
- * HELPERS
+ * SOURCE / REFERENCE TABLES per level — "ingredient fields"
  * ──────────────────────────────────────────────────────────────────────────── */
 
-function TierBadge({ tier, className = '' }: { tier: string; className?: string }) {
+interface IngredientField {
+  layer: 'L1' | 'L2';
+  table: string;
+  field: string;
+  description: string;
+  role: 'numerator' | 'denominator' | 'weight' | 'grouping_fk' | 'hierarchy';
+  sampleValue: string;
+}
+
+const INGREDIENT_FIELDS: Record<string, IngredientField[]> = {
+  facility: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
+    { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD (summed by facility/date)', role: 'denominator', sampleValue: '$50,000,000' },
+  ],
+  counterparty: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
+    { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure in USD (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L1', table: 'facility_master', field: 'counterparty_id', description: 'FK to counterparty for grouping', role: 'grouping_fk', sampleValue: '7890' },
+  ],
+  desk: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
+    { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to LoB taxonomy', role: 'grouping_fk', sampleValue: '301' },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'Resolve leaf node as lob_l3_name (Desk)', role: 'hierarchy', sampleValue: '301' },
+  ],
+  portfolio: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
+    { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to LoB taxonomy', role: 'grouping_fk', sampleValue: '301' },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'LoB hierarchy entry point', role: 'hierarchy', sampleValue: '301' },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', description: 'Traverse one level up to L2 (Portfolio)', role: 'hierarchy', sampleValue: '30' },
+  ],
+  lob: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount', description: 'Outstanding drawn balance', role: 'numerator', sampleValue: '$120,000,000' },
+    { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd', description: 'Collateral valuation in USD', role: 'denominator', sampleValue: '$50,000,000' },
+    { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd', description: 'Gross exposure (weight)', role: 'weight', sampleValue: '$150,000,000' },
+    { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to LoB taxonomy', role: 'grouping_fk', sampleValue: '301' },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'LoB hierarchy entry point', role: 'hierarchy', sampleValue: '301' },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', description: 'Traverse to root (parent IS NULL) = L1 Department', role: 'hierarchy', sampleValue: 'NULL' },
+  ],
+};
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * JOIN CHAINS — FK traversal paths per level (how tables are traversed)
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+interface JoinHop {
+  from: string;
+  fromLayer: 'L1' | 'L2';
+  to: string;
+  toLayer: 'L1' | 'L2';
+  joinKey: string;
+  note: string;
+  stepType: StepType;
+}
+
+interface JoinChainData {
+  hops: JoinHop[];
+  aggregation: string;
+  result: string;
+  dependsOn?: string;
+}
+
+const JOIN_CHAINS: Record<string, JoinChainData> = {
+  facility: {
+    hops: [
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'collateral_snapshot', toLayer: 'L2', joinKey: 'facility_id + as_of_date', note: 'Look up collateral pledged against this facility', stepType: 'SOURCING' },
+      { from: 'collateral_snapshot', fromLayer: 'L2', to: '(subquery: SUM by facility)', toLayer: 'L2', joinKey: 'GROUP BY facility_id, as_of_date', note: 'Aggregate multiple collateral items into one value', stepType: 'HYBRID' },
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Resolve facility identity and product type', stepType: 'SOURCING' },
+    ],
+    aggregation: 'Direct division: drawn_amount / collateral_value',
+    result: 'One LTV ratio per facility (no cross-facility aggregation)',
+  },
+  counterparty: {
+    hops: [
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'collateral_snapshot', toLayer: 'L2', joinKey: 'facility_id + as_of_date', note: 'Collateral for each facility', stepType: 'SOURCING' },
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get counterparty_id from facility master', stepType: 'SOURCING' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'counterparty', toLayer: 'L1', joinKey: 'counterparty_id', note: 'Resolve counterparty identity for grouping', stepType: 'SOURCING' },
+    ],
+    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by counterparty_id',
+    result: 'One weighted-average LTV per counterparty (unsecured excluded)',
+    dependsOn: 'Requires facility-level LTV calculation first',
+  },
+  desk: {
+    hops: [
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'collateral_snapshot', toLayer: 'L2', joinKey: 'facility_id + as_of_date', note: 'Collateral for each facility', stepType: 'SOURCING' },
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get lob_segment_id — this FK determines which desk the facility belongs to', stepType: 'SOURCING' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'The leaf node in the taxonomy IS the L3 desk — all facilities sharing the same lob_segment_id belong to this desk', stepType: 'SOURCING' },
+    ],
+    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by lob_l3_name',
+    result: 'One weighted-average LTV per desk — groups all facilities whose lob_segment_id maps to the same taxonomy leaf',
+    dependsOn: 'Requires facility-level LTV calculation first',
+  },
+  portfolio: {
+    hops: [
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'collateral_snapshot', toLayer: 'L2', joinKey: 'facility_id + as_of_date', note: 'Collateral for each facility', stepType: 'SOURCING' },
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get lob_segment_id FK', stepType: 'SOURCING' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'Enter LoB hierarchy at leaf', stepType: 'SOURCING' },
+      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'parent_segment_id = managed_segment_id', note: 'Walk tree one level up: Desk → Portfolio (L2)', stepType: 'SOURCING' },
+    ],
+    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by L2 portfolio',
+    result: 'One weighted-average LTV per portfolio',
+    dependsOn: 'Requires facility-level LTV calculation first',
+  },
+  lob: {
+    hops: [
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'collateral_snapshot', toLayer: 'L2', joinKey: 'facility_id + as_of_date', note: 'Collateral for each facility', stepType: 'SOURCING' },
+      { from: 'facility_exposure_snapshot', fromLayer: 'L2', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get lob_segment_id FK', stepType: 'SOURCING' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'enterprise_business_taxonomy', toLayer: 'L1', joinKey: 'lob_segment_id = managed_segment_id', note: 'Enter LoB hierarchy at leaf', stepType: 'SOURCING' },
+      { from: 'enterprise_business_taxonomy', fromLayer: 'L1', to: 'enterprise_business_taxonomy (root)', toLayer: 'L1', joinKey: 'recursive parent_segment_id until parent IS NULL', note: 'Walk tree to root = L1 Department', stepType: 'SOURCING' },
+    ],
+    aggregation: 'Exposure-weighted average: SUM(facility_ltv × gross_exposure) / SUM(gross_exposure) grouped by L1 department',
+    result: 'One weighted-average LTV per Line of Business',
+    dependsOn: 'Requires facility-level LTV calculation first',
+  },
+};
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * INPUT TABLES per level — distinct from calculation dimensions
+ * Shown alongside the hierarchy pyramid (enhancement #4)
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+interface InputTable {
+  layer: 'L1' | 'L2';
+  table: string;
+  role: string;
+  fields: string[];
+}
+
+const INPUT_TABLES: Record<string, InputTable[]> = {
+  facility: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator source', fields: ['drawn_amount', 'gross_exposure_usd', 'facility_id', 'as_of_date'] },
+    { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd', 'facility_id', 'as_of_date', 'collateral_asset_id'] },
+  ],
+  counterparty: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
+    { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'counterparty_id'] },
+  ],
+  desk: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
+    { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'lob_segment_id'] },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', role: 'Hierarchy resolution', fields: ['managed_segment_id', 'lob_l3_name'] },
+  ],
+  portfolio: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
+    { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'lob_segment_id'] },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', role: 'Hierarchy (leaf + parent)', fields: ['managed_segment_id', 'parent_segment_id', 'lob_l2_name'] },
+  ],
+  lob: [
+    { layer: 'L2', table: 'facility_exposure_snapshot', role: 'Numerator + weight', fields: ['drawn_amount', 'gross_exposure_usd'] },
+    { layer: 'L2', table: 'collateral_snapshot', role: 'Denominator source', fields: ['current_valuation_usd'] },
+    { layer: 'L1', table: 'facility_master', role: 'Grouping FK', fields: ['facility_id', 'lob_segment_id'] },
+    { layer: 'L1', table: 'enterprise_business_taxonomy', role: 'Hierarchy (root traversal)', fields: ['managed_segment_id', 'parent_segment_id', 'lob_l1_name'] },
+  ],
+};
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * STEP-BY-STEP FLOW — end-to-end data flow with step types
+ * (enhancement #3 + #5: cross-tier dependencies shown inline)
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+interface FlowStep {
+  stepType: StepType;
+  tier: string;
+  layer: string;
+  table: string;
+  action: string;
+  value: string;
+  detail: string;
+  color: string;
+  isCrossTierDep?: boolean;
+}
+
+const FLOW_STEPS_BY_LEVEL: Record<string, FlowStep[]> = {
+  facility: [
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot', action: 'Look up drawn balance', value: 'drawn_amount = $120,000,000', detail: 'SELECT drawn_amount FROM L2.facility_exposure_snapshot WHERE facility_id = 12345 AND as_of_date = 2024-12-31', color: 'amber' },
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'collateral_snapshot', action: 'Look up collateral value', value: 'SUM(current_valuation_usd) = $50,000,000', detail: 'SELECT SUM(current_valuation_usd) FROM L2.collateral_snapshot WHERE facility_id = 12345 AND as_of_date = 2024-12-31 — aggregates multiple collateral items', color: 'amber' },
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L1', table: 'facility_master', action: 'Resolve facility identity', value: 'facility_id = 12345 → CRE Multifamily Loan', detail: 'JOIN L1.facility_master ON facility_id to get product_type, counterparty_id, lob_segment_id', color: 'blue' },
+    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV', value: '$120,000,000 / $50,000,000 = 240%', detail: 'LTV = drawn_amount / collateral_value. Null guard: if collateral_value ≤ 0, LTV = NULL (excluded from weighted averages)', color: 'emerald' },
+  ],
+  counterparty: [
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot', action: 'Look up drawn balance (per facility)', value: 'drawn_amount per facility', detail: 'Facility-level sourcing feeds into counterparty aggregation', color: 'amber', isCrossTierDep: true },
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'collateral_snapshot', action: 'Look up collateral value (per facility)', value: 'SUM(current_valuation_usd) per facility', detail: 'Collateral summed per facility, same as facility-level step', color: 'amber', isCrossTierDep: true },
+    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Each facility LTV must be computed before counterparty aggregation', color: 'emerald', isCrossTierDep: true },
+    { stepType: 'SOURCING', tier: 'Counterparty', layer: 'L2', table: 'facility_exposure_snapshot', action: 'Look up exposure weight', value: 'gross_exposure_usd per facility', detail: 'SELECT gross_exposure_usd FROM facility_exposure_snapshot — used as weight in weighted average', color: 'amber' },
+    { stepType: 'SOURCING', tier: 'Counterparty', layer: 'L1', table: 'facility_master → counterparty', action: 'Resolve counterparty grouping', value: 'facility_id → counterparty_id = 7890', detail: 'JOIN facility_master ON facility_id, then JOIN counterparty ON counterparty_id — groups facilities by borrower', color: 'blue' },
+    { stepType: 'HYBRID', tier: 'Counterparty', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted average LTV', value: 'SUM(ltv × exposure) / SUM(exposure) = 185%', detail: 'Aggregates facility LTVs by counterparty, weighted by gross_exposure_usd. Unsecured facilities (null LTV) excluded.', color: 'purple' },
+  ],
+  desk: [
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot + collateral_snapshot', action: 'Source facility data (prerequisite)', value: 'drawn_amount + collateral_value per facility', detail: 'Same facility-level sourcing as above', color: 'amber', isCrossTierDep: true },
+    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Facility LTV required before desk aggregation', color: 'emerald', isCrossTierDep: true },
+    { stepType: 'SOURCING', tier: 'Desk', layer: 'L1', table: 'facility_master', action: 'Get LoB segment FK for each facility', value: 'lob_segment_id = 301', detail: 'JOIN facility_master ON facility_id → retrieves lob_segment_id which determines which desk this facility belongs to', color: 'blue' },
+    { stepType: 'SOURCING', tier: 'Desk', layer: 'L1', table: 'enterprise_business_taxonomy', action: 'Resolve desk name from taxonomy leaf', value: 'managed_segment_id = 301 → lob_l3_name = "CRE Lending Desk"', detail: 'JOIN enterprise_business_taxonomy ON lob_segment_id = managed_segment_id — the leaf node IS the desk. All facilities with lob_segment_id = 301 belong to "CRE Lending Desk"', color: 'blue' },
+    { stepType: 'HYBRID', tier: 'Desk', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted LTV by desk', value: 'SUM(ltv × exposure) / SUM(exposure) = 172%', detail: 'Groups all secured facilities sharing the same taxonomy leaf (desk), weights by gross_exposure_usd', color: 'purple' },
+  ],
+  portfolio: [
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot + collateral_snapshot', action: 'Source facility data (prerequisite)', value: 'drawn_amount + collateral_value per facility', detail: 'Same facility-level sourcing', color: 'amber', isCrossTierDep: true },
+    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Facility LTV required before portfolio aggregation', color: 'emerald', isCrossTierDep: true },
+    { stepType: 'SOURCING', tier: 'Portfolio', layer: 'L1', table: 'facility_master', action: 'Get LoB segment FK for each facility', value: 'lob_segment_id = 301', detail: 'JOIN facility_master ON facility_id → retrieves lob_segment_id (same FK used at desk level)', color: 'blue' },
+    { stepType: 'SOURCING', tier: 'Portfolio', layer: 'L1', table: 'enterprise_business_taxonomy', action: 'Enter hierarchy at leaf (desk level)', value: 'managed_segment_id = 301 → "CRE Lending Desk"', detail: 'JOIN on lob_segment_id = managed_segment_id — same leaf node as desk level, but we continue walking up', color: 'blue' },
+    { stepType: 'SOURCING', tier: 'Portfolio', layer: 'L1', table: 'enterprise_business_taxonomy (self-join)', action: 'Walk tree one level up: Desk → Portfolio', value: 'parent_segment_id = 30 → lob_l2_name = "Commercial Real Estate"', detail: 'Self-join: desk.parent_segment_id = portfolio.managed_segment_id — the parent of the desk node is the L2 portfolio. All desks under this parent share the same portfolio.', color: 'blue' },
+    { stepType: 'HYBRID', tier: 'Portfolio', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted LTV by portfolio', value: 'SUM(ltv × exposure) / SUM(exposure) = 168%', detail: 'Groups all facilities whose taxonomy leaf rolls up to the same L2 portfolio, weights by gross_exposure_usd', color: 'purple' },
+  ],
+  lob: [
+    { stepType: 'SOURCING', tier: 'Facility', layer: 'L2', table: 'facility_exposure_snapshot + collateral_snapshot', action: 'Source facility data (prerequisite)', value: 'drawn_amount + collateral_value per facility', detail: 'Same facility-level sourcing', color: 'amber', isCrossTierDep: true },
+    { stepType: 'CALCULATION', tier: 'Facility', layer: 'Calc', table: 'LTV Formula', action: 'Compute facility LTV (prerequisite)', value: 'LTV per facility', detail: 'Facility LTV required before LoB aggregation', color: 'emerald', isCrossTierDep: true },
+    { stepType: 'SOURCING', tier: 'LoB', layer: 'L1', table: 'facility_master', action: 'Get LoB segment FK for each facility', value: 'lob_segment_id = 301', detail: 'JOIN facility_master ON facility_id → same FK, now used to trace all the way up to department', color: 'blue' },
+    { stepType: 'SOURCING', tier: 'LoB', layer: 'L1', table: 'enterprise_business_taxonomy', action: 'Enter hierarchy at leaf (desk level)', value: 'managed_segment_id = 301 → "CRE Lending Desk"', detail: 'JOIN on lob_segment_id = managed_segment_id — start at the leaf, then walk up', color: 'blue' },
+    { stepType: 'SOURCING', tier: 'LoB', layer: 'L1', table: 'enterprise_business_taxonomy (recursive)', action: 'Walk tree to root: Desk → Portfolio → Department', value: '301 → parent 30 ("CRE Portfolio") → parent 3 ("Lending Division") where parent IS NULL', detail: 'Recursive self-join: follow parent_segment_id chain until parent IS NULL. The root node is the L1 Department (Line of Business). All facilities whose leaf nodes trace to the same root belong to this LoB.', color: 'blue' },
+    { stepType: 'HYBRID', tier: 'LoB', layer: 'Calc', table: 'Weighted Average', action: 'Exposure-weighted LTV by department', value: 'SUM(ltv × exposure) / SUM(exposure) = 155%', detail: 'Groups all facilities whose taxonomy leaf traces to the same root department, weights by gross_exposure_usd. Board-level metric.', color: 'purple' },
+  ],
+};
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * HELPER COMPONENTS
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function TierBadge({ tier }: { tier: string }) {
   const colors: Record<string, string> = {
     T1: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
     T2: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
@@ -193,20 +369,24 @@ function TierBadge({ tier, className = '' }: { tier: string; className?: string 
     T3: 'T3 — Always Calculate',
   };
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${colors[tier] || ''} ${className}`} title={labels[tier]}>
-      <ShieldCheck className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${colors[tier] || ''}`} title={labels[tier]}>
+      <ShieldCheck className="w-3 h-3 flex-shrink-0" aria-hidden />
       {labels[tier] || tier}
     </span>
   );
 }
 
-function SectionHeading({ id, icon: Icon, step, layerColor, title, subtitle }: {
-  id: string; icon: React.ElementType; step: string; layerColor: string; title: string; subtitle: string;
+function SectionHeading({ icon: Icon, step, layerColor, title, subtitle }: {
+  icon: React.ElementType;
+  step: string;
+  layerColor: string;
+  title: string;
+  subtitle: string;
 }) {
   return (
-    <div className="flex items-center gap-3 mb-4" id={id}>
+    <div className="flex items-center gap-3 mb-4">
       <div className={`w-10 h-10 rounded-xl ${layerColor} flex items-center justify-center flex-shrink-0`}>
-        <Icon className="w-5 h-5 text-white" aria-hidden="true" />
+        <Icon className="w-5 h-5 text-white" aria-hidden />
       </div>
       <div className="min-w-0">
         <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{step}</span>
@@ -219,10 +399,12 @@ function SectionHeading({ id, icon: Icon, step, layerColor, title, subtitle }: {
 
 function FlowArrow({ label }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 py-3" aria-hidden="true">
+    <div className="flex flex-col items-center gap-1 py-3" aria-hidden>
       <div className="w-px h-6 bg-gradient-to-b from-gray-700 to-gray-600" />
       {label && (
-        <span className="text-[9px] font-medium text-gray-500 bg-gray-900/80 px-2 py-0.5 rounded-full border border-gray-800">{label}</span>
+        <span className="text-[9px] font-medium text-gray-500 bg-gray-900/80 px-2 py-0.5 rounded-full border border-gray-800">
+          {label}
+        </span>
       )}
       <ArrowDown className="w-4 h-4 text-gray-600" />
     </div>
@@ -231,52 +413,282 @@ function FlowArrow({ label }: { label?: string }) {
 
 function InsightCallout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-pwc-orange/30 bg-pwc-orange/5 px-4 py-3 flex items-start gap-3 mt-4">
-      <div className="w-6 h-6 rounded-lg bg-pwc-orange/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Eye className="w-3.5 h-3.5 text-pwc-orange" aria-hidden="true" />
+    <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 px-4 py-3 flex items-start gap-3 mt-4">
+      <div className="w-6 h-6 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Eye className="w-3.5 h-3.5 text-orange-400" aria-hidden />
       </div>
       <div className="text-xs text-gray-300 leading-relaxed">{children}</div>
     </div>
   );
 }
 
-function PlainEnglish({ children }: { children: React.ReactNode }) {
+const ROLE_COLORS: Record<string, { bg: string; text: string }> = {
+  numerator:   { bg: 'bg-rose-500/10',    text: 'text-rose-300' },
+  denominator: { bg: 'bg-violet-500/10',  text: 'text-violet-300' },
+  weight:      { bg: 'bg-amber-500/10',   text: 'text-amber-300' },
+  grouping_fk: { bg: 'bg-blue-500/10',    text: 'text-blue-300' },
+  hierarchy:   { bg: 'bg-purple-500/10',  text: 'text-purple-300' },
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  numerator: 'Numerator',
+  denominator: 'Denominator',
+  weight: 'Weight',
+  grouping_fk: 'Grouping FK',
+  hierarchy: 'Hierarchy',
+};
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: METRIC DEFINITION
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function MetricDefinition() {
   return (
-    <div className="rounded-lg border border-blue-500/20 bg-blue-500/[0.04] px-3 py-2 text-xs text-gray-400 leading-relaxed mt-2">
-      <span className="text-blue-400 font-bold text-[10px]">Plain English:</span>{' '}
-      {children}
+    <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+          <Calculator className="w-5 h-5 text-white" aria-hidden />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-white">Loan-to-Value Ratio (LTV)</h3>
+          <p className="text-xs text-gray-500">Metric ID: C104 | Class: CALCULATED | Direction: Lower Better</p>
+        </div>
+      </div>
+
+      <div className="bg-black/40 rounded-lg p-4 mb-4 font-mono text-center">
+        <div className="text-xs text-gray-500 mb-1">Generic Formula</div>
+        <div className="text-lg text-emerald-400 font-bold">
+          LTV = Exposure / Collateral Value &times; 100
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+        <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
+          <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Rollup Philosophy</div>
+          <div className="text-sm text-white font-medium">Exposure-Weighted Average</div>
+        </div>
+        <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
+          <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Weighting Basis</div>
+          <div className="text-sm text-white font-medium">By EAD (gross_exposure_usd)</div>
+        </div>
+        <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3">
+          <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-1">Domains</div>
+          <div className="text-sm text-white font-medium">Financial Performance, Collateral Mgmt</div>
+        </div>
+      </div>
+
+      <div className="text-xs text-gray-400 leading-relaxed">
+        Exposure divided by Collateral Value. Provides insight into collateral coverage and downside protection.
+        For unsecured facilities (or missing collateral valuation), LTV is null and excluded from weighted aggregates.
+        Primarily relevant for CRE desks. A 20% property value decline pushes an 80% LTV facility into negative equity territory.
+      </div>
     </div>
   );
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * COLLATERAL DETAIL CARD
+ * SECTION: SOURCE & REFERENCE TABLES
  * ──────────────────────────────────────────────────────────────────────────── */
 
-const COLL_ICONS: Record<string, string> = { 'Real Estate': '🏢', Cash: '💵', Receivables: '📄' };
+function SourceTablesOverview() {
+  const tables = [
+    {
+      layer: 'L2', name: 'facility_exposure_snapshot', role: 'Numerator + exposure weight',
+      fields: ['drawn_amount', 'gross_exposure_usd', 'facility_id', 'as_of_date', 'counterparty_id', 'lob_segment_id'],
+      desc: 'Point-in-time exposure data per facility — the "how much is lent" side of the ratio.',
+      color: 'amber',
+    },
+    {
+      layer: 'L2', name: 'collateral_snapshot', role: 'Denominator',
+      fields: ['current_valuation_usd', 'facility_id', 'as_of_date', 'collateral_asset_id', 'valuation_amount'],
+      desc: 'Collateral pledged against facilities — the "how much secures it" side. Multiple collateral items per facility are summed.',
+      color: 'amber',
+    },
+    {
+      layer: 'L1', name: 'facility_master', role: 'Dimensional anchor + FK chain',
+      fields: ['facility_id', 'counterparty_id', 'lob_segment_id', 'product_type'],
+      desc: 'Master reference for every loan — provides the FK links to counterparty and LoB taxonomy needed for rollups.',
+      color: 'blue',
+    },
+    {
+      layer: 'L1', name: 'enterprise_business_taxonomy', role: 'LoB hierarchy traversal',
+      fields: ['managed_segment_id', 'parent_segment_id', 'lob_l3_name', 'lob_l2_name', 'lob_l1_name'],
+      desc: 'Organizational tree: Desk (L3) → Portfolio (L2) → Department (L1). Self-join on parent_segment_id to walk up the hierarchy.',
+      color: 'blue',
+    },
+    {
+      layer: 'L1', name: 'counterparty', role: 'Borrower identity',
+      fields: ['counterparty_id', 'counterparty_name', 'risk_rating'],
+      desc: 'Counterparty master data — provides identity for counterparty-level grouping.',
+      color: 'blue',
+    },
+  ];
 
-function CollateralCard({ item }: { item: CollateralItem }) {
+  const layerColors: Record<string, { dot: string; label: string; border: string; bg: string }> = {
+    amber: { dot: 'bg-amber-500', label: 'text-amber-300', border: 'border-amber-500/30', bg: 'bg-amber-500/5' },
+    blue:  { dot: 'bg-blue-500',  label: 'text-blue-300',  border: 'border-blue-500/30',  bg: 'bg-blue-500/5' },
+  };
+
   return (
-    <div className="rounded-lg border border-gray-800 bg-white/[0.02] p-3">
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">Legend:</span>
+        <span className="flex items-center gap-1 text-[9px] text-amber-300"><span className="w-2 h-2 rounded-full bg-amber-500" />L2 — Snapshot (time-series)</span>
+        <span className="flex items-center gap-1 text-[9px] text-blue-300"><span className="w-2 h-2 rounded-full bg-blue-500" />L1 — Reference (master data)</span>
+      </div>
+      {tables.map((t) => {
+        const c = layerColors[t.color];
+        return (
+          <div key={t.name} className={`rounded-xl border ${c.border} ${c.bg} p-4`}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`w-2 h-2 rounded-full ${c.dot}`} />
+              <code className={`text-sm font-bold font-mono ${c.label}`}>{t.layer}.{t.name}</code>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-gray-800">{t.role}</span>
+            </div>
+            <p className="text-[10px] text-gray-500 mb-2">{t.desc}</p>
+            <div className="flex flex-wrap gap-1">
+              {t.fields.map((f) => (
+                <code key={f} className="text-[9px] font-mono text-gray-400 px-1.5 py-0.5 rounded bg-white/[0.04] border border-gray-800/50">
+                  {f}
+                </code>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      <InsightCallout>
+        <strong>Two snapshot tables, three reference tables.</strong> The LTV calculation itself only needs{' '}
+        <code className="text-amber-300">facility_exposure_snapshot</code> and <code className="text-amber-300">collateral_snapshot</code>.
+        The reference tables (<code className="text-blue-300">facility_master</code>, <code className="text-blue-300">counterparty</code>,{' '}
+        <code className="text-blue-300">enterprise_business_taxonomy</code>) provide the FK chains needed to group and roll up
+        from facility to counterparty, desk, portfolio, and LoB.
+      </InsightCallout>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: JOIN MAP — "How the Tables Are Traversed"
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function JoinMapVisual() {
+  const nodes = [
+    { id: 'fes', label: 'facility_exposure_snapshot', layer: 'L2', x: 0, y: 0 },
+    { id: 'cs',  label: 'collateral_snapshot',         layer: 'L2', x: 0, y: 1 },
+    { id: 'fm',  label: 'facility_master',             layer: 'L1', x: 1, y: 0 },
+    { id: 'cp',  label: 'counterparty',               layer: 'L1', x: 2, y: 0 },
+    { id: 'ebt', label: 'enterprise_business_taxonomy', layer: 'L1', x: 1, y: 1 },
+  ];
+
+  const edges = [
+    { from: 'fes', to: 'cs',  key: 'facility_id + as_of_date', label: 'Collateral lookup' },
+    { from: 'fes', to: 'fm',  key: 'facility_id',               label: 'Master data' },
+    { from: 'fm',  to: 'cp',  key: 'counterparty_id',          label: 'Borrower identity' },
+    { from: 'fm',  to: 'ebt', key: 'lob_segment_id = managed_segment_id', label: 'LoB hierarchy entry' },
+    { from: 'ebt', to: 'ebt', key: 'parent_segment_id (self-join)', label: 'Walk tree upward' },
+  ];
+
+  const layerStyle: Record<string, { border: string; bg: string; text: string }> = {
+    L2: { border: 'border-amber-500/40', bg: 'bg-amber-500/10', text: 'text-amber-300' },
+    L1: { border: 'border-blue-500/40',  bg: 'bg-blue-500/10',  text: 'text-blue-300' },
+  };
+
+  return (
+    <div className="rounded-xl border border-gray-800 bg-black/30 p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <Network className="w-4 h-4 text-cyan-400" aria-hidden />
+        <span className="text-sm font-bold text-white">Table Traversal Map</span>
+        <span className="text-[9px] text-gray-600">How each table connects via FK joins</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        {nodes.map((n) => {
+          const s = layerStyle[n.layer];
+          return (
+            <div key={n.id} className={`rounded-lg border ${s.border} ${s.bg} p-3`}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <Database className={`w-3 h-3 ${s.text}`} aria-hidden />
+                <span className={`text-[9px] font-bold uppercase ${s.text}`}>{n.layer}</span>
+              </div>
+              <code className={`text-xs font-mono font-semibold ${s.text}`}>{n.label}</code>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="space-y-1.5">
+        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Join Edges</div>
+        {edges.map((e, i) => (
+          <div key={i} className="flex items-center gap-2 text-[10px]">
+            <span className="w-4 h-4 rounded-full bg-white/5 flex items-center justify-center text-[8px] font-bold text-gray-500 flex-shrink-0">{i + 1}</span>
+            <code className="font-mono text-amber-300">{e.from === 'fes' ? 'facility_exposure_snapshot' : e.from === 'cs' ? 'collateral_snapshot' : e.from === 'fm' ? 'facility_master' : e.from === 'cp' ? 'counterparty' : 'enterprise_business_taxonomy'}</code>
+            <ArrowRight className="w-3 h-3 text-gray-600 flex-shrink-0" />
+            <code className="font-mono text-blue-300">{e.to === 'fes' ? 'facility_exposure_snapshot' : e.to === 'cs' ? 'collateral_snapshot' : e.to === 'fm' ? 'facility_master' : e.to === 'cp' ? 'counterparty' : 'enterprise_business_taxonomy'}</code>
+            <span className="text-gray-700">ON</span>
+            <code className="font-mono text-emerald-400">{e.key}</code>
+            <span className="text-gray-600 italic ml-1">({e.label})</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: JOIN CHAIN VISUAL per level
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function JoinChainVisual({ levelKey }: { levelKey: string }) {
+  const chain = JOIN_CHAINS[levelKey];
+  if (!chain) return null;
+
+  return (
+    <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/[0.03] p-3 mt-3">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">{COLL_ICONS[item.type] || '📦'}</span>
+        <Workflow className="w-3.5 h-3.5 text-cyan-400" aria-hidden />
+        <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Join Path — Table Traversal</span>
+      </div>
+
+      <div className="space-y-1.5">
+        {chain.hops.map((hop, i) => {
+          const fromColor = hop.fromLayer === 'L2' ? 'text-amber-300' : 'text-blue-300';
+          const toColor = hop.toLayer === 'L2' ? 'text-amber-300' : 'text-blue-300';
+          return (
+            <div key={i} className="flex items-center gap-2 text-[10px] flex-wrap">
+              <span className="w-4 h-4 rounded-full bg-white/5 flex items-center justify-center text-[8px] font-bold text-gray-500 flex-shrink-0">{i + 1}</span>
+              <code className={`font-mono ${fromColor}`}>{hop.from}</code>
+              <span className="text-gray-600">&rarr;</span>
+              <code className={`font-mono ${toColor}`}>{hop.to}</code>
+              <span className="text-gray-700">ON</span>
+              <code className="font-mono text-emerald-400">{hop.joinKey}</code>
+              <StepTypeBadge type={hop.stepType} />
+              {hop.note && <span className="text-gray-600 italic">({hop.note})</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {chain.dependsOn && (
+        <div className="mt-2 pt-2 border-t border-white/5 flex items-start gap-2 text-[10px]">
+          <AlertTriangle className="w-3 h-3 text-amber-400 flex-shrink-0 mt-0.5" />
+          <span className="text-amber-300 font-medium">{chain.dependsOn}</span>
+        </div>
+      )}
+
+      <div className="mt-2 pt-2 border-t border-white/5 flex items-start gap-2 text-[10px]">
+        <RefreshCw className="w-3 h-3 text-purple-400 flex-shrink-0 mt-0.5" />
         <div>
-          <div className="text-xs font-bold text-gray-200">{item.name}</div>
-          <div className="text-[9px] text-gray-600">{item.type} · {item.mitigantGroup === 'M1' ? 'Eligible (M1)' : 'Ineligible (M2)'}</div>
+          <span className="text-gray-500 font-medium">Aggregation: </span>
+          <span className="text-purple-300">{chain.aggregation}</span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2 text-[10px]">
+
+      <div className="mt-1.5 flex items-start gap-2 text-[10px]">
+        <Sparkles className="w-3 h-3 text-emerald-400 flex-shrink-0 mt-0.5" />
         <div>
-          <div className="text-gray-600">Current Value</div>
-          <div className="text-amber-400 font-mono font-bold">{fmt(item.currentValue)}</div>
-        </div>
-        <div>
-          <div className="text-gray-600">Haircut</div>
-          <div className="text-red-400 font-mono font-bold">{item.haircutPct}%</div>
-        </div>
-        <div>
-          <div className="text-gray-600">Eligible Value</div>
-          <div className="text-emerald-400 font-mono font-bold">{fmt(item.eligibleValue)}</div>
+          <span className="text-gray-500 font-medium">Result: </span>
+          <span className="text-emerald-300">{chain.result}</span>
         </div>
       </div>
     </div>
@@ -284,848 +696,594 @@ function CollateralCard({ item }: { item: CollateralItem }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * MAIN COMPONENT
+ * SECTION: INGREDIENT FIELDS TABLE per level
  * ──────────────────────────────────────────────────────────────────────────── */
 
-interface LTVLineageViewProps {
-  onStartDemo?: () => void;
-  demoExpandedLevel?: string | null;
-}
-
-export default function LTVLineageView({ onStartDemo, demoExpandedLevel }: LTVLineageViewProps) {
-  /* ── state ──────────────────────────────────────────────────────────────── */
-  const [expandedLevelInternal, setExpandedLevelInternal] = useState<string | null>(null);
-
-  // Demo can override expanded level
-  const expandedLevel = demoExpandedLevel !== undefined ? demoExpandedLevel : expandedLevelInternal;
-
-  const toggleLevel = useCallback((key: string) => {
-    if (demoExpandedLevel !== undefined) return; // demo is controlling
-    setExpandedLevelInternal((prev) => (prev === key ? null : key));
-  }, [demoExpandedLevel]);
-
-  /* ── active section tracking for breadcrumb ────────────────────────────── */
-  const [activeSection, setActiveSection] = useState('step1');
-  useEffect(() => {
-    const anchors = ['step1', 'join-map', 'step2', 'step3', 'query-plan', 'step4', 'data-flow', 'step5', 'step6'];
-    const handleScroll = () => {
-      for (let i = anchors.length - 1; i >= 0; i--) {
-        const el = document.getElementById(anchors[i]);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 160) {
-            setActiveSection(anchors[i]);
-            return;
-          }
-        }
-      }
-      setActiveSection(anchors[0]);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  /* ── render ─────────────────────────────────────────────────────────────── */
+function IngredientFieldsTable({ levelKey }: { levelKey: string }) {
+  const fields = INGREDIENT_FIELDS[levelKey];
+  if (!fields) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-200">
-      {/* ── Header ── */}
-      <header data-demo="header" className="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link href="/metrics/library" className="p-1.5 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-colors flex-shrink-0">
-              <ChevronLeft className="w-5 h-5" />
-            </Link>
-            <div className="min-w-0">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Metric Lineage</div>
-              <h1 className="text-lg font-bold text-white truncate">LTV End-to-End Lineage</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* LTV color legend */}
-            <div className="hidden sm:flex items-center gap-3 text-[10px]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-gray-500">Exposure</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="text-gray-500">Collateral</span>
-              </span>
-            </div>
-            {onStartDemo && (
-              <button onClick={onStartDemo} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-pwc-orange hover:bg-pwc-orange-light text-white transition-colors">
-                <Play className="w-3.5 h-3.5" /> Guided Demo
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Breadcrumb */}
-        <div className="max-w-5xl mx-auto px-6 pb-2 flex items-center gap-1 overflow-x-auto scrollbar-none">
-          {[
-            { id: 'step1', label: 'Definition', color: 'purple' },
-            { id: 'join-map', label: 'Join Map', color: 'cyan' },
-            { id: 'step2', label: 'L1 Reference', color: 'blue' },
-            { id: 'step3', label: 'L2 Snapshot', color: 'amber' },
-            { id: 'query-plan', label: 'Query Plan', color: 'purple' },
-            { id: 'step4', label: 'Calculation', color: 'emerald' },
-            { id: 'data-flow', label: 'Data Flow', color: 'amber' },
-            { id: 'step5', label: 'Rollup & L3', color: 'emerald' },
-            { id: 'step6', label: 'Dashboard', color: 'pink' },
-          ].map((crumb) => {
-            const isActive = activeSection === crumb.id;
-            return (
-              <button
-                key={crumb.id}
-                onClick={() => document.getElementById(crumb.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                className={`flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
-                  isActive
-                    ? `text-${crumb.color}-400 bg-${crumb.color}-500/10`
-                    : 'text-gray-600 hover:text-gray-400 hover:bg-white/5'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? `bg-${crumb.color}-400` : 'bg-gray-700'}`} />
-                {crumb.label}
-              </button>
-            );
-          })}
-        </div>
-      </header>
-
-      {/* ── Main Content ── */}
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-0">
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * STEP 1 — METRIC DEFINITION
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="step1" className="pb-8">
-          <SectionHeading
-            id="step1"
-            icon={Scale}
-            step="Step 1 — Metric Definition"
-            layerColor="bg-purple-600"
-            title="LTV: Exposure ÷ Collateral Value × 100"
-            subtitle="A single formula measuring how much of the loan is covered by pledged assets"
-          />
-
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="text-sm font-bold text-emerald-400">Loan-to-Value Ratio</span>
-              <TierBadge tier="T2" className="ml-auto" />
-            </div>
-
-            {/* Config */}
-            <div className="grid grid-cols-3 gap-3 text-xs mb-4">
-              <div><span className="text-gray-500">Unit</span><div className="text-gray-300 font-medium">Percentage (%)</div></div>
-              <div><span className="text-gray-500">Direction</span><div className="text-gray-300 font-medium">Lower is Better</div></div>
-              <div><span className="text-gray-500">Weighting</span><div className="text-gray-300 font-medium">By Exposure (EAD)</div></div>
-            </div>
-
-            {/* Numerator */}
-            <div data-demo="num-section" className="pt-3 border-t border-white/5">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
-                Numerator — Exposure
-              </div>
-              <div className="flex items-center justify-between text-xs px-1 py-1 rounded bg-white/[0.02]">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-emerald-400 flex-shrink-0 font-mono">→</span>
-                  <span className="text-gray-300">gross_exposure_usd</span>
-                  <code className="text-[9px] text-gray-600 font-mono">facility_exposure_snapshot</code>
-                </div>
-                <span className="text-white font-mono font-bold">$15,000,000</span>
-              </div>
-              <PlainEnglish>
-                The total amount the bank has lent for this facility — a single value from one table.
-              </PlainEnglish>
-            </div>
-
-            {/* Denominator — Collateral */}
-            <div data-demo="den-section" className="mt-4 pt-3 border-t border-white/5">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
-                Denominator — Collateral Value
-              </div>
-              <div className="space-y-2">
-                {FACILITY_A_COLLATERAL.map((c) => (
-                  <CollateralCard key={c.name} item={c} />
-                ))}
-              </div>
-              <div data-demo="den-total" className="flex items-center justify-between mt-3 pt-2 border-t border-white/5 text-xs font-bold">
-                <span className="text-amber-400">Total Collateral Value</span>
-                <span className="text-white font-mono">$25,200,000</span>
-              </div>
-              <div className="flex items-center justify-between mt-1 text-xs">
-                <span className="text-gray-500">Total Eligible (after haircuts)</span>
-                <span className="text-emerald-400 font-mono">$22,650,000</span>
-              </div>
-              <PlainEnglish>
-                Three different collateral items secure this loan. Each has a different risk profile and haircut. Real estate is stable but slow to liquidate; cash is instant; receivables are uncertain.
-              </PlainEnglish>
-            </div>
-
-            {/* Result */}
-            <div data-demo="result" className="mt-4 pt-3 border-t border-white/10">
-              <div className="flex items-center justify-between">
-                <code className="text-xs text-gray-400 font-mono">$15,000,000 ÷ $25,200,000 × 100</code>
-                <div className="text-2xl font-black text-emerald-400 tabular-nums">59.5%</div>
-              </div>
-              <div className="text-[10px] text-emerald-400/70 text-right mt-1">Low Risk (below 60%)</div>
-
-              {/* Threshold bands */}
-              <div className="mt-4 grid grid-cols-4 gap-1">
-                {[
-                  { range: '< 60%', label: 'Low Risk', color: 'emerald', active: true },
-                  { range: '60–80%', label: 'Moderate', color: 'yellow', active: false },
-                  { range: '80–100%', label: 'High Risk', color: 'amber', active: false },
-                  { range: '> 100%', label: 'Underwater', color: 'red', active: false },
-                ].map((band) => (
-                  <div
-                    key={band.range}
-                    className={`rounded-lg border p-2 text-center text-[10px] ${
-                      band.active
-                        ? `border-${band.color}-500/40 bg-${band.color}-500/10 text-${band.color}-400 font-bold`
-                        : 'border-gray-800 bg-gray-800/30 text-gray-600'
-                    }`}
-                  >
-                    <div>{band.range}</div>
-                    <div className="text-[8px]">{band.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <InsightCallout>
-            Unlike DSCR where the numerator is complex (NOI or EBITDA with 4+ components), LTV has a simple numerator (just exposure) but a complex denominator (multiple collateral pieces with different haircuts and eligibility rules).
-            The collateral waterfall — from raw value through haircuts to eligible value — is where the real complexity lives.
-          </InsightCallout>
-        </section>
-
-        <FlowArrow label="data plumbing" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * JOIN MAP
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="join-map" className="pb-8">
-          <SectionHeading
-            id="join-map"
-            icon={Link2}
-            step="Data Plumbing"
-            layerColor="bg-cyan-600"
-            title="How Tables Connect for LTV"
-            subtitle="Foreign key relationships that the calculation engine traverses"
-          />
-
-          <div className="rounded-xl border border-gray-800 bg-white/[0.01] p-5">
-            <div className="text-xs text-gray-500 mb-4">4 layers · 6 core tables · 8 join relationships</div>
-            <div className="space-y-3">
-              {[
-                { from: 'facility_master', to: 'facility_exposure_snapshot', key: 'facility_id', label: '1:N — each facility has periodic exposure snapshots' },
-                { from: 'facility_master', to: 'collateral_snapshot', key: 'facility_id', label: '1:N — each facility can have multiple collateral items, each snapshotted' },
-                { from: 'counterparty', to: 'facility_master', key: 'counterparty_id', label: '1:N — one borrower can have multiple facilities' },
-                { from: 'enterprise_business_taxonomy', to: 'facility_master', key: 'lob_node_id', label: '1:N — org hierarchy groups facilities into desks/portfolios/LoBs' },
-                { from: 'collateral_asset_master', to: 'collateral_snapshot', key: 'collateral_id', label: '1:N — one collateral asset has periodic valuation snapshots' },
-              ].map((join) => (
-                <div key={join.key + join.from} className="flex items-start gap-3 text-xs">
-                  <div className="flex items-center gap-1 flex-shrink-0 min-w-[180px]">
-                    <code className="text-blue-300 font-mono text-[10px]">{join.from}</code>
-                    <span className="text-gray-600">→</span>
-                    <code className="text-amber-300 font-mono text-[10px]">{join.to}</code>
-                  </div>
-                  <div>
-                    <code className="text-purple-300 font-mono text-[10px]">ON {join.key}</code>
-                    <div className="text-gray-600 text-[10px] mt-0.5">{join.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <InsightCallout>
-            The critical difference vs DSCR: LTV requires a JOIN to <code className="text-amber-300">collateral_snapshot</code> which is a one-to-many relationship (one facility → many collateral items).
-            DSCR joins to <code className="text-amber-300">facility_financial_snapshot</code> which is typically one-to-one per period. This makes LTV&apos;s denominator aggregation more complex.
-          </InsightCallout>
-        </section>
-
-        <FlowArrow label="reference data" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * STEP 2 — L1 REFERENCE DATA
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="step2" className="pb-8">
-          <SectionHeading
-            id="step2"
-            icon={Database}
-            step="Step 2 — L1 Reference Data"
-            layerColor="bg-blue-600"
-            title="Where the Data Lives: Reference Tables"
-            subtitle="Slowly-changing dimensional data — the 'address book' of the bank"
-          />
-
-          <div className="space-y-3">
-            {L1_TABLES.map((t) => (
-              <div key={t.table} className="rounded-xl border border-blue-500/20 bg-blue-500/[0.03] p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    {t.layer}
-                  </span>
-                  <code className="text-xs font-mono text-blue-200 font-bold">{t.table}</code>
-                  {t.table === 'collateral_asset_master' && (
-                    <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      LTV-Unique
+    <div className="rounded-lg border border-gray-800 bg-black/20 p-3 mt-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Package className="w-3.5 h-3.5 text-gray-400" aria-hidden />
+        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Ingredient Fields Required</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[10px]">
+          <thead>
+            <tr className="text-gray-600 border-b border-gray-800">
+              <th className="text-left py-1 pr-3 font-bold">Layer</th>
+              <th className="text-left py-1 pr-3 font-bold">Table</th>
+              <th className="text-left py-1 pr-3 font-bold">Field</th>
+              <th className="text-left py-1 pr-3 font-bold">Role</th>
+              <th className="text-left py-1 font-bold">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fields.map((f, i) => {
+              const rc = ROLE_COLORS[f.role];
+              return (
+                <tr key={i} className="border-b border-gray-800/50">
+                  <td className="py-1.5 pr-3">
+                    <span className={`font-bold ${f.layer === 'L2' ? 'text-amber-300' : 'text-blue-300'}`}>{f.layer}</span>
+                  </td>
+                  <td className="py-1.5 pr-3">
+                    <code className="font-mono text-gray-300">{f.table}</code>
+                  </td>
+                  <td className="py-1.5 pr-3">
+                    <code className="font-mono text-white font-semibold">{f.field}</code>
+                  </td>
+                  <td className="py-1.5 pr-3">
+                    <span className={`px-1.5 py-0.5 rounded ${rc.bg} ${rc.text} font-bold`}>
+                      {ROLE_LABELS[f.role]}
                     </span>
-                  )}
-                </div>
-                <p className="text-xs text-gray-400 mb-2">{t.desc}</p>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {t.fields.map((f) => (
-                    <code key={f} className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700">
-                      {f}
-                    </code>
-                  ))}
-                </div>
-                <div className="text-[10px] text-emerald-400/80 flex items-center gap-1">
-                  <Scale className="w-3 h-3" />
-                  <span className="text-gray-500">LTV role:</span> {t.ltvRole}
-                </div>
-              </div>
-            ))}
-          </div>
+                  </td>
+                  <td className="py-1.5 text-gray-500">{f.description}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
-          <InsightCallout>
-            LTV uses the same core L1 tables as DSCR (facility_master, counterparty, enterprise_business_taxonomy) <strong>plus</strong> collateral_asset_master.
-            This shared reference layer is what enables cross-metric consistency — the same organizational hierarchy groups LTV, DSCR, and every other risk metric.
-          </InsightCallout>
-        </section>
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: INPUT TABLE SIDE PANEL (enhancement #4)
+ * ──────────────────────────────────────────────────────────────────────────── */
 
-        <FlowArrow label="snapshot data" />
+function InputTablePanel({ levelKey }: { levelKey: string }) {
+  const tables = INPUT_TABLES[levelKey];
+  if (!tables) return null;
 
-        {/* ════════════════════════════════════════════════════════════════════
-         * STEP 3 — L2 SNAPSHOT DATA
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="step3" className="pb-8">
-          <SectionHeading
-            id="step3"
-            icon={Layers}
-            step="Step 3 — L2 Snapshot Data"
-            layerColor="bg-amber-600"
-            title="Where the Numbers Come From"
-            subtitle="Point-in-time financial readings — the 'photos' of the loan's collateral position"
-          />
-
-          {/* facility_exposure_snapshot */}
-          <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.03] p-4 mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">L2</span>
-              <code className="text-xs font-mono text-amber-200 font-bold">facility_exposure_snapshot</code>
-              <span className="text-[9px] text-emerald-400 ml-auto">← LTV Numerator</span>
+  return (
+    <div className="rounded-lg border border-dashed border-gray-700 bg-gray-900/50 p-3 mt-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Database className="w-3.5 h-3.5 text-gray-400" aria-hidden />
+        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Input Tables (Data Sources)</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {tables.map((t, i) => (
+          <div key={i} className={`rounded-lg border p-2.5 ${t.layer === 'L2' ? 'border-amber-500/20 bg-amber-500/[0.03]' : 'border-blue-500/20 bg-blue-500/[0.03]'}`}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className={`w-1.5 h-1.5 rounded-full ${t.layer === 'L2' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+              <code className={`text-[10px] font-mono font-bold ${t.layer === 'L2' ? 'text-amber-300' : 'text-blue-300'}`}>
+                {t.layer}.{t.table}
+              </code>
             </div>
-            <div className="space-y-1">
-              {L2_FIELDS_FES.map((f) => (
-                <div key={f.field} className={`flex items-center justify-between text-xs px-2 py-1 rounded ${f.used ? 'bg-emerald-500/5 border border-emerald-500/20' : 'opacity-50'}`}>
-                  <div className="flex items-center gap-2">
-                    <code className={`font-mono text-[10px] ${f.used ? 'text-emerald-300' : 'text-gray-500'}`}>{f.field}</code>
-                    {f.used && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
-                  </div>
-                  <span className="text-gray-500 text-[10px]">{f.desc}</span>
-                </div>
+            <div className="text-[9px] text-gray-500 mb-1">{t.role}</div>
+            <div className="flex flex-wrap gap-1">
+              {t.fields.map((f) => (
+                <code key={f} className="text-[8px] font-mono text-gray-500 px-1 py-0.5 rounded bg-white/[0.03]">{f}</code>
               ))}
             </div>
           </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-          {/* collateral_snapshot */}
-          <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.03] p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">L2</span>
-              <code className="text-xs font-mono text-amber-200 font-bold">collateral_snapshot</code>
-              <span className="text-[9px] text-amber-400 ml-auto">← LTV Denominator</span>
-            </div>
-            <div className="space-y-1">
-              {L2_FIELDS_CS.map((f) => (
-                <div key={f.field} className={`flex items-center justify-between text-xs px-2 py-1 rounded ${f.used ? 'bg-amber-500/5 border border-amber-500/20' : 'opacity-50'}`}>
-                  <div className="flex items-center gap-2">
-                    <code className={`font-mono text-[10px] ${f.used ? 'text-amber-300' : 'text-gray-500'}`}>{f.field}</code>
-                    {f.used && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
-                  </div>
-                  <span className="text-gray-500 text-[10px]">{f.desc}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: ROLLUP PYRAMID — Hierarchy Overview (enhanced)
+ * ──────────────────────────────────────────────────────────────────────────── */
 
-          <PlainEnglish>
-            The numerator (exposure) comes from one table. The denominator (collateral) comes from a different table and may have multiple rows per facility — one for each collateral item. The highlighted fields are the ones LTV actually reads.
-          </PlainEnglish>
-        </section>
-
-        <FlowArrow label="query plan" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * QUERY PLAN
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="query-plan" className="pb-8">
-          <SectionHeading
-            id="query-plan"
-            icon={Info}
-            step="Under the Hood"
-            layerColor="bg-purple-600"
-            title="Logical Query Plan for LTV"
-            subtitle="The sequence of operations the calculation engine performs"
-          />
-
-          <div className="rounded-xl border border-gray-800 bg-white/[0.01] p-5 space-y-3">
-            {[
-              { step: 1, sql: 'SELECT gross_exposure_usd FROM facility_exposure_snapshot WHERE facility_id = ? AND as_of_date = ?', desc: 'Fetch the exposure for this facility at the reporting date' },
-              { step: 2, sql: 'SELECT current_valuation_usd, haircut_pct, mitigant_group_code FROM collateral_snapshot WHERE facility_id = ? AND as_of_date = ?', desc: 'Fetch ALL collateral items pledged against this facility' },
-              { step: 3, sql: 'SUM(current_valuation_usd) AS total_collateral_value', desc: 'Aggregate across multiple collateral pieces (1:N join)' },
-              { step: 4, sql: 'gross_exposure_usd / total_collateral_value * 100 AS ltv_pct', desc: 'Divide exposure by total collateral, multiply by 100' },
-              { step: 5, sql: 'INSERT INTO metric_value_fact (metric_id, value, aggregation_level, ...)', desc: 'Persist facility-level LTV to the output fact table' },
-            ].map((s) => (
-              <div key={s.step} className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-[10px] font-bold text-purple-300">{s.step}</span>
+function RollupPyramid({ expandedLevel, onToggle }: { expandedLevel: string | null; onToggle: (k: string) => void }) {
+  return (
+    <div className="space-y-2">
+      {ROLLUP_LEVELS.map((level, i) => {
+        const expanded = expandedLevel === level.key;
+        const Icon = level.icon;
+        return (
+          <button
+            key={level.key}
+            onClick={() => onToggle(level.key)}
+            aria-expanded={expanded}
+            className={`w-full rounded-xl border p-3 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
+              expanded
+                ? 'border-emerald-500/40 bg-emerald-500/10'
+                : 'border-gray-800 bg-white/[0.02] hover:bg-white/[0.04] hover:border-gray-700'
+            }`}
+            style={{ marginLeft: `${i * 4}px`, marginRight: `${i * 4}px` }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${expanded ? 'bg-emerald-500/20' : 'bg-white/5'}`}>
+                  <Icon className={`w-4 h-4 ${expanded ? 'text-emerald-400' : 'text-gray-500'}`} aria-hidden />
                 </div>
                 <div>
-                  <code className="text-[10px] font-mono text-purple-200 leading-relaxed block">{s.sql}</code>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <FlowArrow label="calculation" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * STEP 4 — CALCULATION ENGINE
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="step4" className="pb-8">
-          <SectionHeading
-            id="step4"
-            icon={Calculator}
-            step="Step 4 — Calculation Engine"
-            layerColor="bg-emerald-600"
-            title="The Math in Action"
-            subtitle="Per-facility LTV calculation with T2 authority validation"
-          />
-
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
-            <div className="text-xs text-gray-400 mb-4">
-              For each facility, the engine:
-            </div>
-            <div className="space-y-3">
-              {/* Step visualization */}
-              <div className="grid grid-cols-[1fr_auto_1fr_auto_auto] items-center gap-2">
-                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2 text-center">
-                  <div className="text-[9px] text-gray-500">EXPOSURE</div>
-                  <div className="text-sm font-mono font-bold text-emerald-400">$15M</div>
-                </div>
-                <span className="text-gray-600 text-lg">÷</span>
-                <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2 text-center">
-                  <div className="text-[9px] text-gray-500">COLLATERAL</div>
-                  <div className="text-sm font-mono font-bold text-amber-400">$25.2M</div>
-                  <div className="text-[8px] text-gray-600">3 items summed</div>
-                </div>
-                <span className="text-gray-600 text-lg">× 100</span>
-                <div className="rounded-lg bg-white/5 border border-gray-700 p-2 text-center">
-                  <div className="text-[9px] text-gray-500">LTV</div>
-                  <div className="text-sm font-mono font-bold text-emerald-400">59.5%</div>
-                </div>
-              </div>
-            </div>
-
-            {/* T2 Authority */}
-            <div className="mt-4 pt-3 border-t border-white/5">
-              <div className="flex items-center gap-2 mb-2">
-                <TierBadge tier="T2" />
-                <span className="text-xs text-gray-400">Source + Validate</span>
-              </div>
-              <div className="text-xs text-gray-400 leading-relaxed">
-                At the facility level, the bank provides their LTV calculation. The platform independently recalculates from the raw collateral snapshot.
-                Differences trigger reconciliation — especially important because collateral appraisals can be subjective.
-              </div>
-            </div>
-          </div>
-
-          <InsightCallout>
-            Collateral valuation is the most disputed data point in credit risk. Property values depend on appraisal methodology, comparable sales, and market conditions.
-            The dual-calculation approach catches both data errors and methodological differences.
-          </InsightCallout>
-        </section>
-
-        <FlowArrow label="data flow" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * ANIMATED DATA FLOW
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="data-flow" className="pb-8">
-          <SectionHeading
-            id="data-flow"
-            icon={TrendingDown}
-            step="End-to-End Trace"
-            layerColor="bg-amber-600"
-            title="Following One Facility Through the Pipeline"
-            subtitle="Facility A (Multifamily) — $15M exposure, $25.2M collateral → 59.5% LTV"
-          />
-
-          <div className="rounded-xl border border-gray-800 bg-white/[0.01] p-5">
-            <div className="flex flex-col items-center gap-0">
-              {[
-                { label: 'L1: facility_master', detail: 'facility_id = FAC-2024-00847', color: 'blue' },
-                { label: 'L2: facility_exposure_snapshot', detail: 'gross_exposure_usd = $15,000,000', color: 'amber' },
-                { label: 'L2: collateral_snapshot (3 rows)', detail: 'SUM(current_valuation_usd) = $25,200,000', color: 'amber' },
-                { label: 'Transform: LTV Calculation', detail: '$15M ÷ $25.2M × 100 = 59.5%', color: 'emerald' },
-                { label: 'L3: metric_value_fact', detail: 'metric_id=LTV, value=59.5, unit=%', color: 'emerald' },
-                { label: 'Rollup Engine', detail: 'Weighted into counterparty, desk, portfolio, LoB', color: 'red' },
-                { label: 'Dashboard', detail: 'LTV = 59.5% · Low Risk · Band: < 60%', color: 'pink' },
-              ].map((node, i, arr) => (
-                <React.Fragment key={node.label}>
-                  <div className={`w-full rounded-lg border border-${node.color}-500/20 bg-${node.color}-500/5 px-4 py-2 flex items-center justify-between`}>
-                    <span className={`text-xs font-bold text-${node.color}-400`}>{node.label}</span>
-                    <span className="text-[10px] text-gray-400 font-mono">{node.detail}</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-semibold text-white">{level.label}</span>
+                    <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-white/5 text-gray-400 border border-gray-800">
+                      {level.method}
+                    </span>
+                    <StepTypeBadge type={level.stepType} />
                   </div>
-                  {i < arr.length - 1 && (
-                    <div className="w-px h-4 bg-gray-700" />
+                  <div className="text-[10px] text-gray-500">{level.purpose}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <TierBadge tier={level.tier} />
+                {expanded ? <ChevronUp className="w-4 h-4 text-gray-500" aria-hidden /> : <ChevronDown className="w-4 h-4 text-gray-500" aria-hidden />}
+              </div>
+            </div>
+
+            {expanded && (
+              <div className="mt-3 pt-3 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+                <div className="bg-black/30 rounded-lg p-3 mb-3">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Formula</div>
+                  <div className="text-sm font-mono text-emerald-400 text-center">{level.formula}</div>
+                  <div className="text-[10px] text-gray-500 mt-2 text-center">{level.formulaDetail}</div>
+                </div>
+
+                {level.key !== 'facility' && (
+                  <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.03] p-2.5 mb-3 flex items-start gap-2">
+                    <GitBranch className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden />
+                    <div className="text-[10px] text-amber-300">
+                      <strong>Cross-tier dependency:</strong> This level depends on facility-level LTV calculation.
+                      Each facility&apos;s LTV (drawn_amount / collateral_value) must be computed first, then weighted by exposure and grouped at the {level.label} level.
+                    </div>
+                  </div>
+                )}
+
+                <InputTablePanel levelKey={level.key} />
+                <JoinChainVisual levelKey={level.key} />
+                <IngredientFieldsTable levelKey={level.key} />
+              </div>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: STEP-BY-STEP WALKTHROUGH per dimension
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function StepByStepFlow({ selectedLevel }: { selectedLevel: string }) {
+  const steps = FLOW_STEPS_BY_LEVEL[selectedLevel] || [];
+  const [activeStep, setActiveStep] = useState(-1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const play = () => { setIsPlaying(true); setActiveStep(0); };
+  const stop = () => { setIsPlaying(false); if (timerRef.current) clearTimeout(timerRef.current); };
+  const reset = () => { stop(); setActiveStep(-1); };
+
+  React.useEffect(() => {
+    if (isPlaying && activeStep >= 0 && activeStep < steps.length - 1) {
+      timerRef.current = setTimeout(() => setActiveStep((s) => s + 1), 2200);
+      return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    } else if (activeStep >= steps.length - 1) {
+      setIsPlaying(false);
+    }
+  }, [isPlaying, activeStep, steps.length]);
+
+  React.useEffect(() => {
+    setActiveStep(-1);
+    setIsPlaying(false);
+  }, [selectedLevel]);
+
+  const flowColors: Record<string, { dot: string; border: string; bg: string; text: string }> = {
+    blue:    { dot: 'bg-blue-500',    border: 'border-blue-500/40',    bg: 'bg-blue-500/10',    text: 'text-blue-300' },
+    amber:   { dot: 'bg-amber-500',   border: 'border-amber-500/40',   bg: 'bg-amber-500/10',   text: 'text-amber-300' },
+    purple:  { dot: 'bg-purple-500',  border: 'border-purple-500/40',  bg: 'bg-purple-500/10',  text: 'text-purple-300' },
+    emerald: { dot: 'bg-emerald-500', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-300' },
+    pink:    { dot: 'bg-pink-500',    border: 'border-pink-500/40',    bg: 'bg-pink-500/10',    text: 'text-pink-300' },
+  };
+
+  return (
+    <div className="rounded-xl border border-gray-800 bg-black/30 p-4">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-amber-400" aria-hidden />
+          <span className="text-xs font-bold text-white">Step-by-Step: {ROLLUP_LEVELS.find((l) => l.key === selectedLevel)?.label} LTV</span>
+          <span className="text-[9px] text-gray-600">End-to-end data flow with cross-tier dependencies</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {activeStep === -1 ? (
+            <button onClick={play} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors">
+              <Play className="w-3 h-3" /> Play
+            </button>
+          ) : (
+            <>
+              {isPlaying ? (
+                <button onClick={stop} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors">Pause</button>
+              ) : (
+                <button onClick={() => setIsPlaying(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors">
+                  <Play className="w-3 h-3" /> Resume
+                </button>
+              )}
+              <button onClick={reset} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10 transition-colors">
+                <RefreshCw className="w-3 h-3" /> Reset
+              </button>
+            </>
+          )}
+          <span className="text-[9px] text-gray-600 font-mono">{activeStep >= 0 ? `${activeStep + 1}/${steps.length}` : '\u2014'}</span>
+        </div>
+      </div>
+
+      <div className="h-1 rounded-full bg-gray-800 mb-4 overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 via-amber-500 via-purple-500 to-emerald-500 rounded-full transition-all duration-500"
+          style={{ width: activeStep >= 0 ? `${((activeStep + 1) / steps.length) * 100}%` : '0%' }}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        {steps.map((step, i) => {
+          const isActive = i === activeStep;
+          const isPast = i < activeStep;
+          const fc = flowColors[step.color];
+
+          return (
+            <button
+              key={i}
+              onClick={() => { setActiveStep(i); setIsPlaying(false); }}
+              className={`w-full text-left rounded-lg border p-2.5 transition-all duration-500 ${
+                isActive
+                  ? `${fc.border} ${fc.bg} scale-[1.01] shadow-lg`
+                  : isPast
+                    ? 'border-gray-800/50 bg-white/[0.01] opacity-60'
+                    : 'border-gray-800/30 bg-transparent opacity-30'
+              } ${step.isCrossTierDep ? 'ml-2 border-l-2 border-l-amber-500/40' : ''}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
+                  isActive ? `${fc.dot} text-white` : isPast ? 'bg-gray-700 text-gray-400' : 'bg-gray-800/50 text-gray-700'
+                }`}>
+                  {isPast ? <CheckCircle2 className="w-3.5 h-3.5" /> : <span className="text-[9px] font-bold">{i + 1}</span>}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                      isActive ? `${fc.bg} ${fc.text}` : 'bg-white/5 text-gray-600'
+                    }`}>{step.layer}</span>
+                    <code className={`text-[10px] font-mono ${isActive ? fc.text : 'text-gray-500'}`}>{step.table}</code>
+                    <StepTypeBadge type={step.stepType} />
+                    {step.isCrossTierDep && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        Prerequisite ({step.tier})
+                      </span>
+                    )}
+                    <span className="text-[9px] text-gray-600">&mdash; {step.action}</span>
+                  </div>
+                  {(isActive || isPast) && (
+                    <div className="mt-1">
+                      <code className={`text-[10px] font-mono font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>{step.value}</code>
+                      {isActive && <div className="text-[9px] text-gray-500 mt-0.5">{step.detail}</div>}
+                    </div>
                   )}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <FlowArrow label="rollup & output" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * STEP 5 — L3 OUTPUT & ROLLUP HIERARCHY
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="step5" className="pb-8">
-          <SectionHeading
-            id="step5"
-            icon={Building2}
-            step="Step 5 — L3 Output & Rollup Hierarchy"
-            layerColor="bg-emerald-600"
-            title="How LTV Flows Up the Organization"
-            subtitle="From individual loan to Line of Business — the aggregation chain"
-          />
-
-          {/* L3 Output Tables */}
-          <div className="mb-6">
-            <h4 className="text-sm font-bold text-gray-400 mb-3">L3 Output Tables</h4>
-            <div className="space-y-2">
-              {L3_OUTPUT_TABLES.map((t) => (
-                <div key={t.table} className={`rounded-lg border p-3 ${t.primary ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-gray-800 bg-white/[0.01]'}`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">L3</span>
-                    <code className="text-xs font-mono text-emerald-200 font-bold">{t.table}</code>
-                    {t.primary && <span className="text-[8px] font-bold text-emerald-400 ml-auto">PRIMARY</span>}
-                  </div>
-                  <p className="text-[10px] text-gray-400 mb-1">{t.desc}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {t.fields.map((f) => (
-                      <code key={f} className="text-[9px] font-mono px-1 py-0.5 rounded bg-gray-800 text-gray-500">{f}</code>
-                    ))}
-                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Foundational Rule */}
-          <div data-demo="foundational-rule" className="rounded-xl border border-red-500/20 bg-red-500/5 p-5 mb-6">
-            <h4 className="text-sm font-bold text-red-400 mb-2 flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              The Golden Rule of LTV Rollups
-            </h4>
-            <p className="text-xs text-gray-300 leading-relaxed mb-3">
-              <strong className="text-red-300">NEVER</strong> take the simple average of individual LTVs. A simple average ignores loan size and masks concentration risk.
-              Always use <strong className="text-emerald-300">exposure-weighted average</strong>: Σ(LTV_i × Exposure_i) ÷ Σ(Exposure_i)
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-center">
-                <div className="text-[9px] font-bold text-red-400 mb-1">WRONG: Simple Average</div>
-                <div className="text-xs font-mono text-gray-400">(95% + 30%) ÷ 2</div>
-                <div className="text-lg font-black text-red-400 tabular-nums">62.5%</div>
-                <div className="text-[9px] text-red-400/70">misleading!</div>
+                {isActive && <div className={`w-2 h-2 rounded-full ${fc.dot} animate-pulse flex-shrink-0`} />}
               </div>
-              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-center">
-                <div className="text-[9px] font-bold text-emerald-400 mb-1">CORRECT: Exposure-Weighted</div>
-                <div className="text-xs font-mono text-gray-400">(95%×$50M + 30%×$1M) ÷ $51M</div>
-                <div className="text-lg font-black text-emerald-400 tabular-nums">93.7%</div>
-                <div className="text-[9px] text-emerald-400/70">accurate</div>
-              </div>
-            </div>
-          </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-          {/* Rollup Pyramid */}
-          <div className="space-y-2">
-            <h4 className="text-sm font-bold text-gray-400 mb-3">Rollup Hierarchy</h4>
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: FACILITY CALCULATION EXAMPLE
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function FacilityCalcExample() {
+  return (
+    <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5">
+      <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-3">Live Calculation Example — Facility Level</div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+          <StepTypeBadge type="SOURCING" />
+          <div className="mt-2">
+            <div className="text-[9px] text-gray-500">FROM L2.facility_exposure_snapshot</div>
+            <div className="text-xs text-gray-300 mt-1">drawn_amount</div>
+            <div className="text-lg font-bold text-amber-300 font-mono mt-1">$120,000,000</div>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-violet-500/30 bg-violet-500/5 p-3">
+          <StepTypeBadge type="SOURCING" />
+          <div className="mt-2">
+            <div className="text-[9px] text-gray-500">FROM L2.collateral_snapshot (SUM)</div>
+            <div className="text-xs text-gray-300 mt-1">current_valuation_usd</div>
+            <div className="text-lg font-bold text-violet-300 font-mono mt-1">$50,000,000</div>
+            <div className="text-[9px] text-gray-600 mt-0.5">3 collateral items summed via GROUP BY facility_id, as_of_date</div>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+          <StepTypeBadge type="CALCULATION" />
+          <div className="mt-2">
+            <div className="text-[9px] text-gray-500">LTV = drawn_amount / collateral_value</div>
+            <div className="text-xs text-gray-300 mt-1">$120M / $50M</div>
+            <div className="text-2xl font-bold text-red-400 font-mono mt-1">240%</div>
+            <div className="text-[9px] text-red-400/80 mt-0.5">Above 100% = negative equity territory</div>
+          </div>
+        </div>
+      </div>
+
+      <InsightCallout>
+        <strong>Collateral summing is a hidden aggregation.</strong> Even at the facility level, collateral_snapshot may contain
+        multiple rows per facility (e.g., 3 properties pledged). The engine runs <code className="text-amber-300">SUM(current_valuation_usd)
+        GROUP BY facility_id, as_of_date</code> before dividing. This makes facility-level LTV technically a HYBRID step (source + aggregate),
+        though the primary operation is the ratio calculation.
+      </InsightCallout>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * SECTION: DASHBOARD CONSUMPTION
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+function DashboardConsumption() {
+  const [selectedLevel, setSelectedLevel] = useState('portfolio');
+
+  return (
+    <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2.5 flex items-center gap-1.5">
+            <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-gray-300">1</span>
+            Select Dimension
+          </div>
+          <div className="space-y-1">
             {ROLLUP_LEVELS.map((level) => {
-              const isExpanded = expandedLevel === level.key;
               const Icon = level.icon;
+              const active = selectedLevel === level.key;
               return (
-                <div key={level.key}>
-                  <button
-                    data-demo={`rollup-${level.key}`}
-                    onClick={() => toggleLevel(level.key)}
-                    className={`w-full rounded-xl border p-4 flex items-center justify-between text-left transition-colors ${
-                      isExpanded ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-gray-800 bg-white/[0.01] hover:bg-white/[0.03]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isExpanded ? 'bg-emerald-500/20' : 'bg-gray-800'}`}>
-                        <Icon className={`w-4 h-4 ${isExpanded ? 'text-emerald-400' : 'text-gray-500'}`} />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-white flex items-center gap-2">
-                          {level.label}
-                          <TierBadge tier={level.tier} />
-                        </div>
-                        <div className="text-[10px] text-gray-500 mt-0.5">{level.desc}</div>
-                      </div>
-                    </div>
-                    {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
-                  </button>
-
-                  {/* Expanded detail */}
-                  {isExpanded && (
-                    <div className="mt-2 ml-4 rounded-xl border border-gray-800 bg-white/[0.01] p-4 space-y-3">
-                      <LevelDetail levelKey={level.key} />
-                    </div>
-                  )}
-                </div>
+                <button
+                  key={level.key}
+                  onClick={() => setSelectedLevel(level.key)}
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                    active
+                      ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-300'
+                      : 'bg-white/[0.02] border border-gray-800 text-gray-400 hover:border-gray-700'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" aria-hidden />
+                  {level.label}
+                </button>
               );
             })}
           </div>
-        </section>
+        </div>
 
-        <FlowArrow label="dashboard" />
-
-        {/* ════════════════════════════════════════════════════════════════════
-         * STEP 6 — DASHBOARD CONSUMPTION
-         * ════════════════════════════════════════════════════════════════════ */}
-        <section data-demo="step6" className="pb-16">
-          <SectionHeading
-            id="step6"
-            icon={LayoutDashboard}
-            step="Step 6 — Dashboard Consumption"
-            layerColor="bg-pink-600"
-            title="The Finish Line"
-            subtitle="Every LTV value on the dashboard traces back through the complete lineage chain"
-          />
-
-          <div className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-5">
-            <div className="text-xs text-gray-400 mb-4">
-              A dashboard user selects their aggregation level and time period. The platform handles all collateral joins, haircut applications, exposure-weighted calculations, and distribution bucketing behind the scenes.
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2.5 flex items-center gap-1.5">
+            <span className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-gray-300">2</span>
+            Dashboard Output
+          </div>
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <LayoutDashboard className="w-4 h-4 text-emerald-400" aria-hidden />
+              <span className="text-xs font-bold text-white">Ready to Connect</span>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Level selector mock */}
-              <div className="rounded-lg border border-gray-800 bg-white/[0.02] p-3">
-                <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600 mb-2">Aggregation Level</div>
-                <div className="space-y-1">
-                  {['Facility', 'Counterparty', 'Desk', 'Portfolio', 'LoB'].map((l) => (
-                    <div key={l} className="text-xs text-gray-400 px-2 py-1 rounded hover:bg-white/5 cursor-default">{l}</div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Dashboard output mock */}
-              <div className="rounded-lg border border-gray-800 bg-white/[0.02] p-3">
-                <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600 mb-2">Dashboard Output</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">Portfolio LTV</span>
-                    <span className="text-yellow-400 font-mono font-bold">72.8%</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">Risk Band</span>
-                    <span className="text-yellow-400">Moderate (60–80%)</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">Underwater Exposure</span>
-                    <span className="text-red-400 font-mono font-bold">{fmtM(180_000_000)}</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">Facilities Tracked</span>
-                    <span className="text-gray-300">42</span>
-                  </div>
-                </div>
-              </div>
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between"><span className="text-gray-500">Metric</span><span className="text-white font-medium">LTV (%)</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Level</span><span className="text-white font-medium">{ROLLUP_LEVELS.find((l) => l.key === selectedLevel)?.label}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Display Name</span><span className="text-white font-medium">{ROLLUP_LEVELS.find((l) => l.key === selectedLevel)?.dashboardName}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">L3 Table</span><span className="font-mono text-emerald-300">metric_value_fact</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">SQL Required</span><span className="text-emerald-400 font-bold">None</span></div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-white/5 flex items-center gap-1.5 text-[10px] text-emerald-400">
+              <Zap className="w-3 h-3 flex-shrink-0" aria-hidden />
+              <span>Platform handles the join &mdash; no SQL, no guesswork</span>
             </div>
           </div>
-
-          <InsightCallout>
-            This is the power of end-to-end lineage: every LTV value on the dashboard can be traced backwards through the rollup hierarchy, through the calculation engine, through the collateral and exposure snapshots, all the way back to the original reference data. Full auditability.
-          </InsightCallout>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * LEVEL DETAIL — expanded content for each rollup level
+ * FOOTER LEGEND
  * ──────────────────────────────────────────────────────────────────────────── */
 
-function LevelDetail({ levelKey }: { levelKey: string }) {
-  switch (levelKey) {
-    case 'facility':
-      return <FacilityDetail />;
-    case 'counterparty':
-      return <CounterpartyDetail />;
-    case 'desk':
-      return <DeskDetail />;
-    case 'portfolio':
-      return <PortfolioDetail />;
-    case 'lob':
-      return <LoBDetail />;
-    default:
-      return null;
-  }
-}
-
-function FacilityDetail() {
+function FooterLegend() {
   return (
-    <>
-      <div className="text-xs text-gray-400 leading-relaxed">
-        At the individual loan level, LTV is calculated directly: <strong className="text-white">Exposure ÷ SUM(Collateral Value) × 100</strong>. The key complexity: one facility may have multiple collateral items.
+    <div className="rounded-xl border border-gray-800 bg-white/[0.01] p-4 mt-6">
+      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-600 mb-3">Legend</div>
+      <div className="flex flex-wrap gap-4">
+        <span className="flex items-center gap-1.5 text-[10px] text-amber-300"><span className="w-2 h-2 rounded-full bg-amber-500" />L2 Snapshot (time-series data)</span>
+        <span className="flex items-center gap-1.5 text-[10px] text-blue-300"><span className="w-2 h-2 rounded-full bg-blue-500" />L1 Reference (master data)</span>
+        <span className="flex items-center gap-1.5 text-[10px] text-emerald-300"><span className="w-2 h-2 rounded-full bg-emerald-500" />L3 Output (calculated)</span>
+        <StepTypeBadge type="SOURCING" />
+        <StepTypeBadge type="CALCULATION" />
+        <StepTypeBadge type="HYBRID" />
       </div>
-      <div className="space-y-1.5">
-        {LTV_FACILITIES.map((f) => (
-          <div key={f.name} className="flex items-center justify-between px-2 py-1.5 rounded bg-white/[0.02] text-xs">
-            <span className="text-gray-400">{f.name}</span>
-            <div className="flex items-center gap-2 font-mono">
-              <span className="text-emerald-400 text-[10px]">{fmtM(f.exposure)}</span>
-              <span className="text-gray-600">/</span>
-              <span className="text-amber-400 text-[10px]">{fmtM(f.collateralValue)}</span>
-              <span className="text-gray-600">=</span>
-              <span className={`font-bold ${ltvBandColor(f.ltv)}`}>{fmtPct(f.ltv)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <PlainEnglish>
-        Facility C (Retail) has LTV of 113.6% — it&apos;s &quot;underwater.&quot; The loan exceeds the collateral value by $3M. If the borrower defaults, the bank cannot fully recover.
-      </PlainEnglish>
-    </>
+    </div>
   );
 }
 
-function CounterpartyDetail() {
-  const totalExp = LTV_FACILITIES.reduce((s, f) => s + f.exposure, 0);
-  const weightedSum = LTV_FACILITIES.reduce((s, f) => s + f.ltv * f.exposure, 0);
-  const weightedLTV = weightedSum / totalExp;
-  const simpleAvg = LTV_FACILITIES.reduce((s, f) => s + f.ltv, 0) / LTV_FACILITIES.length;
+/* ────────────────────────────────────────────────────────────────────────────
+ * MAIN EXPORT
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+export default function LTVLineageView() {
+  const [expandedLevel, setExpandedLevel] = useState<string | null>(null);
+  const [selectedStepLevel, setSelectedStepLevel] = useState('facility');
 
   return (
-    <>
-      <div className="text-xs text-gray-400 leading-relaxed">
-        Borrower-level LTV uses exposure-weighted average: <strong className="text-white">Σ(LTV_i × Exposure_i) ÷ Σ(Exposure_i)</strong>
-      </div>
-      <div className="space-y-1.5">
-        {LTV_FACILITIES.map((f) => (
-          <div key={f.name} className="flex items-center justify-between text-xs font-mono px-2 py-1 rounded bg-white/[0.02]">
-            <span className="text-gray-400">{f.name.split('(')[0].trim()}</span>
-            <div className="flex items-center gap-2">
-              <span className={ltvBandColor(f.ltv)}>{fmtPct(f.ltv)}</span>
-              <span className="text-gray-600">×</span>
-              <span className="text-amber-400">{fmtM(f.exposure)}</span>
-            </div>
+    <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-0">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <FileText className="w-5 h-5 text-blue-400" aria-hidden />
+            <h2 className="text-xl font-bold text-white">Deep-Dive: How LTV Rolls Up</h2>
           </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-between pt-2 border-t border-gray-800 text-xs font-bold">
-        <span className="text-gray-300">Weighted LTV</span>
-        <span className={`font-mono ${ltvBandColor(weightedLTV)}`}>{fmtPct(weightedLTV)}</span>
-      </div>
-      <PlainEnglish>
-        Simple average would be {fmtPct(simpleAvg)} — the weighted result ({fmtPct(weightedLTV)}) is much higher because the $25M underwater loan dominates the calculation.
-      </PlainEnglish>
-    </>
-  );
-}
+          <p className="text-sm text-gray-500">
+            End-to-end data sourcing, table traversal, calculation, and rollup from Facility to Line of Business.
+            Every step shows <em>where</em> the data comes from, <em>how</em> tables are joined, and <em>what type</em> of operation is performed.
+          </p>
+        </div>
 
-function DeskDetail() {
-  return (
-    <>
-      <div className="text-xs text-gray-400 leading-relaxed">
-        LTV at the desk level adds collateral type segmentation — showing how much of the coverage is backed by real estate vs cash vs other assets.
-      </div>
-      <div className="space-y-2">
-        {DESK_SEGMENTS.map((seg) => (
-          <div key={seg.label} className={`rounded-lg border p-3 ${seg.colorBg}`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className={`text-xs font-bold ${seg.color}`}>{seg.label}</div>
-                <div className="text-[10px] text-gray-500">{seg.collateralType} · {fmtM(seg.exposure)} exposure</div>
-              </div>
-              <span className={`text-lg font-bold font-mono ${seg.color}`}>{fmtPct(seg.ltv)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <PlainEnglish>
-        A CRE desk with 74.2% LTV backed by real estate is qualitatively different from a corporate desk at 58.1% backed by receivables — even though the corporate desk looks &quot;safer,&quot; receivables are harder to liquidate.
-      </PlainEnglish>
-    </>
-  );
-}
+        {/* STEP 1: METRIC DEFINITION */}
+        <section>
+          <SectionHeading
+            icon={Calculator}
+            step="Step 1 — Metric Definition"
+            layerColor="bg-blue-600"
+            title="Loan-to-Value Ratio (LTV)"
+            subtitle="Exposure / Collateral Value — lower is better"
+          />
+          <MetricDefinition />
+        </section>
 
-function PortfolioDetail() {
-  const wtdAvg = exposureWeightedLTV(LTV_COUNTERPARTIES);
-  return (
-    <>
-      <div className="text-xs text-gray-400 leading-relaxed">
-        Portfolio LTV uses exposure-weighted average plus distribution buckets to reveal hidden pockets of risk.
-      </div>
-      <div className="flex items-center justify-between mb-3 p-2 rounded-lg bg-white/[0.02]">
-        <span className="text-xs text-gray-400">Portfolio-Weighted LTV</span>
-        <span className={`text-lg font-black font-mono ${ltvBandColor(wtdAvg)}`}>{fmtPct(wtdAvg)}</span>
-      </div>
-      <div className="space-y-1.5">
-        {PORTFOLIO_BUCKETS.map((b) => (
-          <div key={b.range} className={`flex items-center justify-between text-xs font-mono rounded px-2 py-1.5 ${b.bg}`}>
-            <div className="flex items-center gap-2">
-              <span className={`font-bold ${b.color}`}>{b.range}</span>
-              <span className="text-gray-600 text-[10px]">{b.label}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-gray-500">{b.count} facilities</span>
-              <span className="text-gray-400">{fmtM(b.exposure)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <PlainEnglish>
-        The &quot;underwater&quot; bucket (&gt; 100%) shows 4 facilities with {fmtM(180_000_000)} exposure where loans exceed collateral value. This is the most watched metric in CRE portfolios.
-      </PlainEnglish>
-    </>
-  );
-}
+        <FlowArrow label="Which tables provide the data?" />
 
-function LoBDetail() {
-  const TREND_ARROWS: Record<string, string> = { up: '↑', down: '↓', flat: '→' };
-  return (
-    <>
-      <div className="text-xs text-gray-400 leading-relaxed">
-        At the LoB level, LTV serves as a collateral coverage trend indicator. Unlike DSCR, LTV is directly comparable across LoBs because the formula is consistent.
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {LOB_ENTRIES.map((lob) => (
-          <div key={lob.label} className={`rounded-lg border p-3 text-center ${lob.bg}`}>
-            <div className={`text-[10px] font-bold ${lob.color}`}>{lob.label}</div>
-            <div className={`text-lg font-mono font-bold ${lob.color}`}>
-              {fmtPct(lob.ltv)} {TREND_ARROWS[lob.trend]}
+        {/* STEP 2: SOURCE & REFERENCE TABLES */}
+        <section>
+          <SectionHeading
+            icon={Database}
+            step="Step 2 — Source & Reference Tables"
+            layerColor="bg-amber-600"
+            title="Data Tables Required"
+            subtitle="Snapshot tables for values, reference tables for dimensional anchoring and hierarchy traversal"
+          />
+          <SourceTablesOverview />
+        </section>
+
+        <FlowArrow label="How are the tables connected?" />
+
+        {/* STEP 3: JOIN MAP */}
+        <section>
+          <SectionHeading
+            icon={Network}
+            step="Step 3 — Table Traversal Map"
+            layerColor="bg-cyan-600"
+            title="How Tables Are Joined"
+            subtitle="FK chain from exposure data through collateral, facility master, and LoB hierarchy"
+          />
+          <JoinMapVisual />
+          <InsightCallout>
+            <strong>Five tables, five join edges.</strong> The core LTV join starts from{' '}
+            <code className="text-amber-300">facility_exposure_snapshot</code> and branches two ways:
+            left to <code className="text-amber-300">collateral_snapshot</code> (for the denominator),
+            and right through <code className="text-blue-300">facility_master</code> to{' '}
+            <code className="text-blue-300">counterparty</code> and{' '}
+            <code className="text-blue-300">enterprise_business_taxonomy</code> (for rollup grouping).
+            The taxonomy table self-joins to walk from desk to portfolio to LoB.
+          </InsightCallout>
+        </section>
+
+        <FlowArrow label="How is LTV calculated at the facility level?" />
+
+        {/* STEP 4: CALCULATION */}
+        <section>
+          <SectionHeading
+            icon={Zap}
+            step="Step 4 — Facility-Level Calculation"
+            layerColor="bg-emerald-600"
+            title="LTV Calculation"
+            subtitle="Direct ratio at facility level — T2 authority (source + validate)"
+          />
+          <FacilityCalcExample />
+        </section>
+
+        <FlowArrow label="How does it aggregate up the hierarchy?" />
+
+        {/* STEP 5: HIERARCHY OVERVIEW */}
+        <section>
+          <SectionHeading
+            icon={GitBranch}
+            step="Step 5 — Hierarchy Overview & Rollup"
+            layerColor="bg-emerald-600"
+            title="Rollup Pyramid"
+            subtitle="Click any level to see join paths, input tables, ingredient fields, and cross-tier dependencies"
+          />
+
+          <div className="mb-2">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
+              <Link2 className="w-3 h-3" aria-hidden />
+              Facility &rarr; Counterparty &rarr; Desk &rarr; Portfolio &rarr; LoB &mdash; click to expand
             </div>
-            <div className="text-[8px] text-gray-600">{lob.note}</div>
           </div>
-        ))}
-      </div>
-      <PlainEnglish>
-        CRE LTV trending upward (↑) may signal a weakening real estate market. The CRO monitors this to detect systemic exposure to property value declines before they become losses.
-      </PlainEnglish>
-    </>
+          <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
+        </section>
+
+        <FlowArrow label="Walk through the data flow step by step" />
+
+        {/* STEP 6: STEP-BY-STEP WALKTHROUGH */}
+        <section>
+          <SectionHeading
+            icon={Sparkles}
+            step="Step 6 — Step-by-Step Calculation Walkthrough"
+            layerColor="bg-purple-600"
+            title="End-to-End Data Flow"
+            subtitle="Select a dimension to see every sourcing, calculation, and hybrid step — including prerequisite cross-tier dependencies"
+          />
+
+          <div className="flex items-center gap-2 mb-4 flex-wrap" role="group" aria-label="Select dimension for step-by-step flow">
+            {ROLLUP_LEVELS.map((level) => {
+              const Icon = level.icon;
+              const active = selectedStepLevel === level.key;
+              return (
+                <button
+                  key={level.key}
+                  onClick={() => setSelectedStepLevel(level.key)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                    active
+                      ? 'bg-purple-500/15 border border-purple-500/40 text-purple-300'
+                      : 'bg-white/[0.02] border border-gray-800 text-gray-400 hover:border-gray-700'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" aria-hidden />
+                  {level.label}
+                </button>
+              );
+            })}
+          </div>
+          <StepByStepFlow selectedLevel={selectedStepLevel} />
+        </section>
+
+        <FlowArrow label="Dashboard builder selects dimension" />
+
+        {/* STEP 7: DASHBOARD */}
+        <section>
+          <SectionHeading
+            icon={LayoutDashboard}
+            step="Step 7 — Dashboard Consumption"
+            layerColor="bg-pink-600"
+            title="Self-Service Connection"
+            subtitle="Pick the dimension, build — no SQL needed"
+          />
+          <DashboardConsumption />
+        </section>
+
+        <FooterLegend />
+      </main>
+    </div>
   );
 }

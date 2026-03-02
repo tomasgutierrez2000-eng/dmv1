@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import type { MetricDomain } from '@/lib/metric-library/types';
 import { TypeBadge, StatusBadge } from './badges';
 import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
+
+const LTVLineageView = dynamic(() => import('./LTVLineageView'), { ssr: false });
 
 interface ParentDetail {
   metric_id: string;
@@ -32,18 +35,23 @@ interface VariantSummary {
   source_field?: string;
 }
 
-const TABS = [
-  { id: 'variants' as const, label: 'Variants' },
-  { id: 'rollup' as const, label: 'Rollup Philosophy' },
-  { id: 'domains' as const, label: 'Domains' },
-];
+const METRICS_WITH_DEEP_DIVE = new Set(['LTV']);
+
+function getTabs(metricId: string) {
+  const hasDeepDive = METRICS_WITH_DEEP_DIVE.has(metricId);
+  return [
+    { id: 'variants' as const, label: 'Variants' },
+    { id: 'rollup' as const, label: hasDeepDive ? 'Deep-Dive: How This Metric Rolls Up' : 'Rollup Philosophy' },
+    { id: 'domains' as const, label: 'Domains' },
+  ];
+}
 
 export default function ParentDetailView({ parentId }: { parentId: string }) {
   const [data, setData] = useState<ParentDetail | null>(null);
   const [domains, setDomains] = useState<MetricDomain[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('variants');
+  const [tab, setTab] = useState<'variants' | 'rollup' | 'domains'>('variants');
 
   const fetchData = useCallback(() => {
     setError(null);
@@ -149,7 +157,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
           aria-label="Parent metric sections"
           className="flex gap-1 border-b border-gray-200 mb-6"
         >
-          {TABS.map((t) => (
+          {getTabs(parentId).map((t) => (
             <button
               key={t.id}
               type="button"
@@ -218,15 +226,26 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
         )}
 
         {tab === 'rollup' && (
-          <section
-            id="parent-tab-rollup"
-            role="tabpanel"
-            aria-labelledby="parent-tab-rollup-btn"
-            className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
-          >
-            <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Rollup Philosophy</h2>
-            <p className="text-sm text-gray-700">{m.rollup_philosophy || 'Not specified.'}</p>
-          </section>
+          METRICS_WITH_DEEP_DIVE.has(parentId) ? (
+            <section
+              id="parent-tab-rollup"
+              role="tabpanel"
+              aria-labelledby="parent-tab-rollup-btn"
+              className="rounded-lg overflow-hidden"
+            >
+              {parentId === 'LTV' && <LTVLineageView />}
+            </section>
+          ) : (
+            <section
+              id="parent-tab-rollup"
+              role="tabpanel"
+              aria-labelledby="parent-tab-rollup-btn"
+              className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm"
+            >
+              <h2 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Rollup Philosophy</h2>
+              <p className="text-sm text-gray-700">{m.rollup_philosophy || 'Not specified.'}</p>
+            </section>
+          )
         )}
 
         {tab === 'domains' && (

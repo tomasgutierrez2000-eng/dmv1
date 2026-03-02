@@ -1,18 +1,26 @@
 [
   {
     "item_id": "LTV",
-    "item_name": "Loan to Value Ratio (%)",
+    "item_name": "Loan-to-Value Ratio",
     "abbreviation": "LTV",
     "kind": "METRIC",
-    "definition": "Committed facility amount divided by collateral value, expressed as a percentage. Measures the degree of leverage on a secured facility — how much of the collateral value is consumed by the loan commitment. A key underwriting and ongoing monitoring KPI for secured lending, required in FR Y-14Q CRE Schedule and OCC Comptroller's Handbook for real estate lending. Higher LTV indicates greater loss severity risk if the borrower defaults and collateral must be liquidated.",
-    "generic_formula": "Committed_Facility_Amt / Collateral_Value × 100",
+    "definition": "Committed facility amount divided by collateral value, expressed as a percentage. Measures the degree of leverage on a secured facility. A key underwriting and ongoing monitoring KPI for secured lending, required in FR Y-14Q CRE Schedule and OCC Comptroller's Handbook. Higher LTV indicates greater loss severity risk if the borrower defaults and collateral must be liquidated.",
+    "generic_formula": "Committed_Facility_Amt / Collateral_Value x 100",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
     "metric_class": "CALCULATED",
-    "domain_ids": ["CM", "CR"],
-    "regulatory_references": ["FR Y-14Q", "CCAR", "CRE underwriting", "OCC Comptroller's Handbook"],
-    "insight": "Loan risk concentration relative to collateral",
+    "domain_ids": [
+      "CM",
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q",
+      "CCAR",
+      "CRE underwriting",
+      "OCC Comptroller's Handbook"
+    ],
+    "insight": "Committed facility amount divided by collateral value, expressed as a percentage",
     "ingredient_fields": [
       {
         "layer": "L2",
@@ -39,14 +47,6 @@
         "sample_value": "35000000.00"
       },
       {
-        "layer": "L2",
-        "table": "position",
-        "field": "position_type",
-        "description": "Exposure type: LOAN, DERIVATIVE, SECURITY, DEPOSIT, SFT, COMMITMENT",
-        "data_type": "VARCHAR(50)",
-        "sample_value": "LOAN"
-      },
-      {
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
@@ -58,7 +58,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "committed_facility_amt",
-        "description": "Total authorized credit line — the committed limit for this facility",
+        "description": "Total authorized credit line — the committed limit",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "50000000.00"
       },
@@ -98,7 +98,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent_segment_id",
-        "description": "Self-referential FK — traverses L3→L2→L1 hierarchy",
+        "description": "Self-referential FK — traverses L3->L2->L1 hierarchy",
         "data_type": "BIGINT",
         "sample_value": "302"
       },
@@ -125,11 +125,26 @@
         "dashboard_display_name": "Facility LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id) THEN [committed_facility_amt] / [collateral_value] × 100",
+        "level_logic": "For each DISTINCT(facility_id) THEN [committed_facility_amt] / [collateral_value] x 100",
         "source_references": [
-          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
-          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
-          { "layer": "L1", "table": "facility_master", "field": "facility_id", "description": "Primary key — grain of calculation" }
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Committed limit"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "valuation_amount",
+            "description": "Collateral value"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — grain of calculation"
+          }
         ]
       },
       {
@@ -137,12 +152,32 @@
         "dashboard_display_name": "Counterparty LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] WHERE IS([counterparty_id]). For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] WHERE IS([counterparty_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
-          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
-          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
-          { "layer": "L1", "table": "facility_master", "field": "counterparty_id", "description": "FK to counterparty — grouping key" },
-          { "layer": "L1", "table": "facility_master", "field": "facility_id", "description": "Facility identifier for join" }
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Committed limit"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "valuation_amount",
+            "description": "Collateral value"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — grouping key"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Facility identifier for join"
+          }
         ]
       },
       {
@@ -150,14 +185,44 @@
         "dashboard_display_name": "Desk LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
-          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
-          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
-          { "layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to LoB taxonomy — desk resolution" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "LoB hierarchy node — L3 leaf segment" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L3" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "segment_name", "description": "Desk name at L3 level" }
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Committed limit"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "valuation_amount",
+            "description": "Collateral value"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to LoB taxonomy — desk resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "LoB hierarchy node — L3 leaf segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L3"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "segment_name",
+            "description": "Desk name at L3 level"
+          }
         ]
       },
       {
@@ -165,14 +230,44 @@
         "dashboard_display_name": "Portfolio LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "level_logic": "For each [L2 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
-          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
-          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
-          { "layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to LoB taxonomy" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "LoB hierarchy node — L2 parent segment" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "parent_segment_id", "description": "Self-referential FK — traverse up from L3 to L2" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L2" }
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Committed limit"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "valuation_amount",
+            "description": "Collateral value"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to LoB taxonomy"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "LoB hierarchy node — L2 parent segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Self-referential FK — traverse up from L3 to L2"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L2"
+          }
         ]
       },
       {
@@ -180,14 +275,44 @@
         "dashboard_display_name": "LTV",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: Σ(committed_facility_amt) / Σ(collateral_value) × 100",
+        "level_logic": "For each [L1 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
-          { "layer": "L1", "table": "facility_master", "field": "committed_facility_amt", "description": "Committed limit" },
-          { "layer": "L2", "table": "collateral_snapshot", "field": "valuation_amount", "description": "Collateral value" },
-          { "layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to LoB taxonomy" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "LoB hierarchy node — L1 root segment" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "parent_segment_id", "description": "Self-referential FK — recursive traversal to collect all descendants" },
-          { "layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L1" }
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Committed limit"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "valuation_amount",
+            "description": "Collateral value"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to LoB taxonomy"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "LoB hierarchy node — L1 root segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Self-referential FK — recursive traversal to collect all descendants"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L1"
+          }
         ]
       }
     ],
@@ -209,9 +334,27 @@
           "collateral_value": 75000000,
           "ltv_pct": 66.7,
           "positions": [
-            { "position_id": "P-001", "facility_id": "F-001", "position_type": "LOAN", "balance_amount": 35000000, "description": "Term Loan Tranche A" },
-            { "position_id": "P-002", "facility_id": "F-001", "position_type": "LOAN", "balance_amount": 10000000, "description": "Term Loan Tranche B" },
-            { "position_id": "P-003", "facility_id": "F-001", "position_type": "COMMITMENT", "balance_amount": 5000000, "description": "Undrawn Commitment" }
+            {
+              "position_id": "P-001",
+              "facility_id": "F-001",
+              "position_type": "LOAN",
+              "balance_amount": 35000000,
+              "description": "Term Loan Tranche A"
+            },
+            {
+              "position_id": "P-002",
+              "facility_id": "F-001",
+              "position_type": "LOAN",
+              "balance_amount": 10000000,
+              "description": "Term Loan Tranche B"
+            },
+            {
+              "position_id": "P-003",
+              "facility_id": "F-001",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Undrawn Commitment"
+            }
           ]
         },
         {
@@ -225,10 +368,22 @@
           "lob_name": "Commercial Banking",
           "committed_amt": 30000000,
           "collateral_value": 40000000,
-          "ltv_pct": 75.0,
+          "ltv_pct": 75,
           "positions": [
-            { "position_id": "P-004", "facility_id": "F-002", "position_type": "LOAN", "balance_amount": 22000000, "description": "Senior Secured Loan" },
-            { "position_id": "P-005", "facility_id": "F-002", "position_type": "COMMITMENT", "balance_amount": 8000000, "description": "Revolver Undrawn" }
+            {
+              "position_id": "P-004",
+              "facility_id": "F-002",
+              "position_type": "LOAN",
+              "balance_amount": 22000000,
+              "description": "Senior Secured Loan"
+            },
+            {
+              "position_id": "P-005",
+              "facility_id": "F-002",
+              "position_type": "COMMITMENT",
+              "balance_amount": 8000000,
+              "description": "Revolver Undrawn"
+            }
           ]
         },
         {
@@ -242,11 +397,29 @@
           "lob_name": "Commercial Banking",
           "committed_amt": 80000000,
           "collateral_value": 100000000,
-          "ltv_pct": 80.0,
+          "ltv_pct": 80,
           "positions": [
-            { "position_id": "P-006", "facility_id": "F-003", "position_type": "LOAN", "balance_amount": 55000000, "description": "Term Loan A" },
-            { "position_id": "P-007", "facility_id": "F-003", "position_type": "LOAN", "balance_amount": 20000000, "description": "Term Loan B" },
-            { "position_id": "P-008", "facility_id": "F-003", "position_type": "COMMITMENT", "balance_amount": 5000000, "description": "Delayed Draw" }
+            {
+              "position_id": "P-006",
+              "facility_id": "F-003",
+              "position_type": "LOAN",
+              "balance_amount": 55000000,
+              "description": "Term Loan A"
+            },
+            {
+              "position_id": "P-007",
+              "facility_id": "F-003",
+              "position_type": "LOAN",
+              "balance_amount": 20000000,
+              "description": "Term Loan B"
+            },
+            {
+              "position_id": "P-008",
+              "facility_id": "F-003",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Delayed Draw"
+            }
           ]
         },
         {
@@ -260,10 +433,22 @@
           "lob_name": "Commercial Banking",
           "committed_amt": 25000000,
           "collateral_value": 20000000,
-          "ltv_pct": 125.0,
+          "ltv_pct": 125,
           "positions": [
-            { "position_id": "P-009", "facility_id": "F-004", "position_type": "LOAN", "balance_amount": 18000000, "description": "Warehouse Drawdown" },
-            { "position_id": "P-010", "facility_id": "F-004", "position_type": "COMMITMENT", "balance_amount": 7000000, "description": "Undrawn Portion" }
+            {
+              "position_id": "P-009",
+              "facility_id": "F-004",
+              "position_type": "LOAN",
+              "balance_amount": 18000000,
+              "description": "Warehouse Drawdown"
+            },
+            {
+              "position_id": "P-010",
+              "facility_id": "F-004",
+              "position_type": "COMMITMENT",
+              "balance_amount": 7000000,
+              "description": "Undrawn Portion"
+            }
           ]
         },
         {
@@ -277,13 +462,357 @@
           "lob_name": "Commercial Banking",
           "committed_amt": 15000000,
           "collateral_value": 25000000,
-          "ltv_pct": 60.0,
+          "ltv_pct": 60,
           "positions": [
-            { "position_id": "P-011", "facility_id": "F-005", "position_type": "LOAN", "balance_amount": 9000000, "description": "Drawn Revolver" },
-            { "position_id": "P-012", "facility_id": "F-005", "position_type": "COMMITMENT", "balance_amount": 6000000, "description": "Undrawn Revolver" }
+            {
+              "position_id": "P-011",
+              "facility_id": "F-005",
+              "position_type": "LOAN",
+              "balance_amount": 9000000,
+              "description": "Drawn Revolver"
+            },
+            {
+              "position_id": "P-012",
+              "facility_id": "F-005",
+              "position_type": "COMMITMENT",
+              "balance_amount": 6000000,
+              "description": "Undrawn Revolver"
+            }
           ]
         }
       ]
     }
+  },
+  {
+    "item_id": "EAD",
+    "item_name": "Exposure at Default",
+    "abbreviation": "EAD",
+    "kind": "METRIC",
+    "definition": "Estimated credit exposure if the counterparty defaults. For drawn facilities: outstanding balance. For undrawn: drawn + CCF * (committed - drawn). Fundamental input to Expected Loss (EL = PD x LGD x EAD) and regulatory capital calculations under Basel III IRB.",
+    "generic_formula": "drawn_amount + ccf * (committed_amount - drawn_amount)",
+    "data_type": "Decimal",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "metric_class": "HYBRID",
+    "domain_ids": [
+      "EL",
+      "CR"
+    ],
+    "regulatory_references": [
+      "Basel III IRB",
+      "FR Y-14Q"
+    ],
+    "insight": "Estimated credit exposure if the counterparty defaults",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "drawn_amount",
+        "description": "Current drawn balance",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "5000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "undrawn_amount",
+        "description": "Undrawn commitment amount",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "2000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "committed_facility_amt",
+        "description": "Total authorized credit line",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "7000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_risk_snapshot",
+        "field": "ccf",
+        "description": "Credit conversion factor for undrawn exposure",
+        "data_type": "DECIMAL(6,4)",
+        "sample_value": "0.45"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK to counterparty",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to enterprise_business_taxonomy",
+        "data_type": "BIGINT",
+        "sample_value": "303"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility EAD ($)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id) THEN [drawn_amount] + [ccf] * ([committed_facility_amt] - [drawn_amount])",
+        "source_references": []
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty EAD ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [counterparty_id] THEN SUM(facility.ead) WHERE IS([counterparty_id])",
+        "source_references": []
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk EAD ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio EAD ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L2 LoB], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "LoB Total EAD ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L1 LoB], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
+  },
+  {
+    "item_id": "DSCR",
+    "item_name": "Debt Service Coverage Ratio",
+    "abbreviation": "DSCR",
+    "kind": "METRIC",
+    "definition": "Net Operating Income (NOI) or EBITDA divided by total debt service obligations. Measures borrower's ability to service debt from operating cash flow. Core CRE underwriting KPI — values below 1.0x indicate insufficient cash flow. Required in FR Y-14Q and CCAR stress testing.",
+    "generic_formula": "Cashflow / Total Debt Service",
+    "data_type": "Decimal",
+    "unit_type": "RATIO",
+    "direction": "HIGHER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": [
+      "FP",
+      "CR"
+    ],
+    "regulatory_references": [
+      "CRE underwriting",
+      "CCAR",
+      "FR Y-14Q"
+    ],
+    "insight": "Net Operating Income (NOI) or EBITDA divided by total debt service obligations",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_financial_snapshot",
+        "field": "noi",
+        "description": "Net operating income",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "1200000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_financial_snapshot",
+        "field": "debt_service",
+        "description": "Annual total debt service",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "900000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "gross_exposure_usd",
+        "description": "Gross exposure — weighting basis for rollup",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "5000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK to counterparty",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to enterprise_business_taxonomy",
+        "data_type": "BIGINT",
+        "sample_value": "303"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility DSCR",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id) THEN [noi] / [debt_service] from facility_financial_snapshot",
+        "source_references": []
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Wtd DSCR",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [counterparty_id] THEN SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
+        "source_references": []
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Wtd DSCR",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L3 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Wtd DSCR",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L2 LoB], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 4,
+    "directly_displayed": true,
+    "status": "ACTIVE"
+  },
+  {
+    "item_id": "PD",
+    "item_name": "Probability of Default",
+    "abbreviation": "PD",
+    "kind": "METRIC",
+    "definition": "Annualised probability that the obligor will default within 12 months. PD is inherently a counterparty-level attribute — all facilities under a single counterparty share the same PD. Sourced from internal rating model or counterparty_rating_observation. Basel III IRB regulatory floor is 0.03%.",
+    "generic_formula": "Model-assigned PD from rating scorecard",
+    "data_type": "Decimal",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "metric_class": "SOURCED",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "Basel III IRB",
+      "CCAR"
+    ],
+    "insight": "Annualised probability that the obligor will default within 12 months",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "pd_pct",
+        "description": "Internal PD model output",
+        "data_type": "DECIMAL(10,6)",
+        "sample_value": "0.023400"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "rating_source_id",
+        "description": "Rating source — filter for INTERNAL",
+        "data_type": "VARCHAR(30)",
+        "sample_value": "INTERNAL"
+      },
+      {
+        "layer": "L1",
+        "table": "counterparty",
+        "field": "pd_annual",
+        "description": "Fallback PD from counterparty master",
+        "data_type": "DECIMAL(10,6)",
+        "sample_value": "0.025000"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "gross_exposure_usd",
+        "description": "Gross exposure — weighting basis for rollup",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "5000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK to counterparty",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to enterprise_business_taxonomy",
+        "data_type": "BIGINT",
+        "sample_value": "303"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility PD (%)",
+        "in_record": true,
+        "sourcing_type": "Raw",
+        "level_logic": "For each DISTINCT(facility_id) THEN COALESCE(stressed_pd_pct, counterparty_rating_observation.pd_pct) WHERE rating_source_id = 'INTERNAL'. Basel floor: MAX(pd, 0.0003)",
+        "source_references": []
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Wtd PD (%)",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [counterparty_id] THEN SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
+        "source_references": []
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Wtd PD (%)",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L3 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Wtd PD (%)",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L2 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "LoB Wtd PD (%)",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L1 LoB], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
   }
 ]

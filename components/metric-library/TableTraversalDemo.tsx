@@ -122,6 +122,7 @@ interface TraversalStep {
   fieldsToShow: string[];
   narration: string;
   sampleResult?: string;
+  formula?: string;
 }
 
 interface DimensionDemo {
@@ -176,6 +177,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Now we have everything we need. The LTV formula divides the committed facility amount by the collateral value: $150M / $50M = 300%. This means the loan is significantly "underwater" -- the commitment far exceeds the collateral backing it.',
+        formula: 'LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: '$150M / $50M = 300%',
       },
     ],
@@ -212,6 +214,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'First, we calculate individual LTV for each facility (committed_amount / collateral_value). This is the same facility-level calculation we just saw. Each secured facility now has its own LTV percentage.',
+        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility: 240%, 60.7%, NULL',
       },
       {
@@ -242,6 +245,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Finally, we compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. This pools all exposure and collateral across the borrower\'s facilities, so larger loans naturally weigh more. Unsecured facilities are excluded entirely. Result: one LTV per borrower.',
+        formula: 'Counterparty LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
         sampleResult: 'Aggregate LTV = 185%',
       },
     ],
@@ -278,6 +282,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Calculate per-facility LTV first. Every rollup level above facility depends on having these individual ratios computed.',
+        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility LTVs computed',
       },
       {
@@ -308,6 +313,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Group all secured facilities by desk name, then compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. Larger facilities dominate the result. Result: one LTV number for the entire CRE Lending Desk.',
+        formula: 'Desk LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
         sampleResult: 'Desk LTV = 172%',
       },
     ],
@@ -344,6 +350,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Compute per-facility LTV ratios first. This is always the prerequisite step.',
+        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility LTVs computed',
       },
       {
@@ -384,6 +391,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Group all facilities whose taxonomy leaf traces up to the same L2 portfolio, then compute the aggregate ratio: SUM(committed_amount) / SUM(collateral_value) × 100. Larger facilities weigh more. Result: one LTV for the entire Commercial Real Estate portfolio.',
+        formula: 'Portfolio LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
         sampleResult: 'Portfolio LTV = 168%',
       },
     ],
@@ -420,6 +428,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Compute per-facility LTV ratios -- the foundation for all aggregation.',
+        formula: 'Per facility: LTV = committed_amount / SUM(collateral_value) × 100',
         sampleResult: 'Per facility LTVs computed',
       },
       {
@@ -460,6 +469,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         fieldsToShow: [],
         narration:
           'Group ALL facilities in the bank whose taxonomy path traces to the same root department. The aggregate ratio — SUM(committed_amount) / SUM(collateral_value) — gives a single board-level LTV for the entire Lending Division.',
+        formula: 'LoB LTV = SUM(committed_amount) / SUM(collateral_value) × 100',
         sampleResult: 'LoB LTV = 155%',
       },
     ],
@@ -963,6 +973,11 @@ export default function TableTraversalDemo() {
                   </code>
                 )}
               </div>
+              {step!.formula && (
+                <div className="my-2 px-3 py-2 rounded-lg bg-black/40 border border-gray-700 font-mono text-sm text-emerald-400 text-center">
+                  {step!.formula}
+                </div>
+              )}
               <p className="text-[13px] text-gray-300 leading-relaxed">{step!.narration}</p>
               {step!.sampleResult && (
                 <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">

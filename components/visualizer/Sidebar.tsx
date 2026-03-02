@@ -7,6 +7,63 @@ import { layerColors } from '../../utils/colors';
 import { debugRelationships } from '../../utils/relationshipDebug';
 import { getL3Categories } from '@/data/l3-tables';
 
+/** Expandable banner showing invalid relationships and missing table refs. */
+function RelationshipDebugBanner({
+  invalidCount,
+  missingTables,
+  invalidReasons,
+}: {
+  invalidCount: number;
+  missingTables: string[];
+  invalidReasons: string[];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="mt-2 rounded-md border border-amber-200 bg-amber-50/80">
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        className="w-full flex items-center gap-1.5 px-2 py-1.5 text-left text-sm text-amber-800 hover:bg-amber-100/80 rounded-md transition-colors"
+        aria-expanded={expanded}
+      >
+        <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+        <span>
+          {invalidCount} invalid relationship{invalidCount !== 1 ? 's' : ''}, {missingTables.length} missing table ref
+          {missingTables.length !== 1 ? 's' : ''}
+        </span>
+        <ChevronDown className={`w-3 h-3 ml-auto flex-shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      {expanded && (
+        <div className="px-2 pb-2 pt-0 text-xs text-amber-700 space-y-2">
+          <p>
+            Some relationships point to tables that don’t exist in the model. Fix by adding these tables or correcting
+            relationship names in your data source (Data Model page or Excel).
+          </p>
+          <div>
+            <span className="font-medium">Missing table keys:</span>{' '}
+            <code className="bg-amber-100/80 px-1 rounded text-[11px] break-all">
+              {missingTables.join(', ')}
+            </code>
+          </div>
+          {invalidReasons.length > 0 && invalidReasons.length <= 10 && (
+            <div>
+              <span className="font-medium">Reasons:</span>
+              <ul className="mt-0.5 list-disc list-inside space-y-0.5">
+                {invalidReasons.slice(0, 10).map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {invalidReasons.length > 10 && (
+            <p className="font-medium">First reason: {invalidReasons[0]}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Sidebar() {
   const {
     model,
@@ -129,15 +186,16 @@ export default function Sidebar() {
             ))}
           </div>
 
-          {/* Relationship debug: compact inline */}
+          {/* Relationship debug: compact inline + expandable details */}
           {model && (() => {
             const debug = debugRelationships(model);
             if (debug.invalid.length > 0 || debug.missingTables.length > 0) {
               return (
-                <div className="mt-2 flex items-center gap-1.5 text-sm text-amber-600">
-                  <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                  <span>{debug.invalid.length} invalid, {debug.missingTables.length} missing refs</span>
-                </div>
+                <RelationshipDebugBanner
+                  invalidCount={debug.invalid.length}
+                  missingTables={debug.missingTables}
+                  invalidReasons={debug.invalid.map(({ reason }) => reason)}
+                />
               );
             }
             return null;

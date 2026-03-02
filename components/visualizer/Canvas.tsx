@@ -923,6 +923,10 @@ export default function Canvas() {
         if (doubleClickZoomInTimeoutRef.current) {
           clearTimeout(doubleClickZoomInTimeoutRef.current);
           doubleClickZoomInTimeoutRef.current = null;
+          // Triple-click: expand all domain boxes (when in domain-overview) so all tables are visible
+          if (layoutMode === 'domain-overview') {
+            setExpandedDomains(new Set());
+          }
           // Triple-click: full reset — restore positions, zoom out, clear everything.
           // Must restore focus-compact positions BEFORE fit-to-view so zoom is
           // calculated from the correct (original) layout, not compacted positions.
@@ -953,7 +957,7 @@ export default function Canvas() {
         clearSelection();
       }
     },
-    [visibleTables, runFitToView, clearSelection, setTablePosition]
+    [visibleTables, runFitToView, clearSelection, setTablePosition, layoutMode, setExpandedDomains]
   );
 
   // Keyboard shortcuts

@@ -6,7 +6,12 @@
  * fictitious to avoid any appearance of real bank data.
  *
  * All arrays sized for 10 rows (ROWS_PER_TABLE) for referential integrity.
+ * MVP profile (--profile=mvp) scales to 100 counterparties / 400 facilities.
  */
+
+import { getMvpCounterpartyField } from './mvp-counterparties';
+import { getMvpAgreementField, getMvpFacilityField, getFacilityCounterpartyId, getFacilityAgreementId } from './mvp-agreements-facilities';
+import { MVP_ROW_COUNTS } from '../shared/mvp-config';
 
 /* ───────────────────────────── shared lookups ──────────────────────────── */
 
@@ -2408,6 +2413,12 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── counterparty ──────────── */
     case 'counterparty':
+      // MVP: rows 10+ use the mvp-counterparties module
+      if (rowIndex >= 10) {
+        const mvpVal = getMvpCounterpartyField(rowIndex, columnName);
+        if (mvpVal !== null) return mvpVal;
+        break;
+      }
       if (columnName === 'legal_name') return COUNTERPARTY_LEGAL_NAMES[idx];
       if (columnName === 'counterparty_type') return COUNTERPARTY_TYPES[idx];
       if (columnName === 'country_code') return CPTY_COUNTRIES[idx];
@@ -2501,6 +2512,12 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── credit_agreement_master ──────────── */
     case 'credit_agreement_master':
+      // MVP: rows 10+ use the mvp-agreements-facilities module
+      if (rowIndex >= 10) {
+        const mvpVal = getMvpAgreementField(rowIndex, columnName);
+        if (mvpVal !== null) return mvpVal;
+        break;
+      }
       if (columnName === 'agreement_type') return AGREEMENT_TYPES[idx];
       if (columnName === 'status_code') return AGREEMENT_STATUSES[idx];
       if (columnName === 'agreement_reference') return AGREEMENT_REFERENCES[idx];
@@ -2511,6 +2528,12 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── facility_master ──────────── */
     case 'facility_master':
+      // MVP: rows 10+ use the mvp-agreements-facilities module
+      if (rowIndex >= 10) {
+        const mvpVal = getMvpFacilityField(rowIndex, columnName);
+        if (mvpVal !== null) return mvpVal;
+        break;
+      }
       if (columnName === 'facility_name') return FACILITY_NAMES[idx];
       if (columnName === 'facility_type') return FACILITY_TYPES[idx];
       if (columnName === 'facility_status') return FACILITY_STATUSES[idx];
@@ -2745,6 +2768,18 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── counterparty_hierarchy ──────────── */
     case 'counterparty_hierarchy':
+      if (rowIndex >= 10) {
+        // MVP: Build a deterministic hierarchy. Every 4th counterparty is a parent; the rest are children.
+        // Parent group: counterparties 11-25 are "parents", each with ~3 children from 26-100.
+        const cpId = rowIndex + 1; // 1-based counterparty_id
+        const parentId = ((rowIndex - 10) % 15) + 11; // parent from IDs 11-25
+        if (columnName === 'immediate_parent_id') return cpId <= 25 ? cpId : parentId;
+        if (columnName === 'ultimate_parent_id') return cpId <= 25 ? cpId : parentId;
+        if (columnName === 'hierarchy_type') return 'CORPORATE_FAMILY';
+        if (columnName === 'ownership_pct') return cpId <= 25 ? 100.0 : (60 + (rowIndex % 40));
+        if (columnName === 'as_of_date') return '2025-01-31';
+        break;
+      }
       if (columnName === 'hierarchy_type') return 'CORPORATE_FAMILY';
       if (columnName === 'ownership_pct') return 100.0;
       break;
@@ -3025,6 +3060,20 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── credit_agreement_counterparty_participation ──────────── */
     case 'credit_agreement_counterparty_participation': {
+      if (rowIndex >= 10) {
+        // MVP: First 100 rows = borrower (1:1 with agreements), next 100 = guarantors
+        const isBorrower = rowIndex < 100;
+        const agrId = isBorrower ? (rowIndex + 1) : (rowIndex - 100 + 1);
+        if (columnName === 'credit_agreement_id') return Math.min(agrId, 100);
+        if (columnName === 'counterparty_id') return Math.min(agrId, 100);
+        if (columnName === 'counterparty_role_code') return isBorrower ? 'BORROWER' : 'GUARANTOR';
+        if (columnName === 'is_primary_flag') return isBorrower ? 'Y' : 'N';
+        if (columnName === 'participation_type') return isBorrower ? 'BORROWER' : 'GUARANTOR';
+        if (columnName === 'participation_pct') return 100.0;
+        if (columnName === 'source_record_id') return 200_000 + rowIndex + 1;
+        if (columnName === 'role_priority_rank') return isBorrower ? '1' : '2';
+        break;
+      }
       const caRoles = ['BORROWER', 'BORROWER', 'BORROWER', 'GUARANTOR', 'BORROWER', 'BORROWER', 'BORROWER', 'BORROWER', 'BORROWER', 'BORROWER'];
       const caPrimary = ['Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'];
       const caPcts = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0];
@@ -3040,6 +3089,20 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── facility_counterparty_participation ──────────── */
     case 'facility_counterparty_participation': {
+      if (rowIndex >= 10) {
+        // MVP: 1:1 with facilities — each facility links to its borrower counterparty
+        const facId = rowIndex + 1;
+        const cpId = getFacilityCounterpartyId(facId);
+        if (columnName === 'facility_id') return facId;
+        if (columnName === 'counterparty_id') return cpId;
+        if (columnName === 'counterparty_role_code') return 'BORROWER';
+        if (columnName === 'is_primary_flag') return 'Y';
+        if (columnName === 'participation_type') return 'BORROWER';
+        if (columnName === 'participation_pct') return 100.0;
+        if (columnName === 'role_priority_rank') return '1';
+        if (columnName === 'source_record_id') return 300_000 + rowIndex + 1;
+        break;
+      }
       // Each facility has the borrower counterparty in this table.
       // The counterparty_id FK here points to the counterparty (borrower), not the bank.
       // Roles reflect the borrower/guarantor side of the facility.
@@ -3058,6 +3121,22 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── facility_lender_allocation ──────────── */
     case 'facility_lender_allocation': {
+      if (rowIndex >= 10) {
+        // MVP: Map each allocation row to a facility. ~1.5 allocations per facility on average.
+        // Primary allocation: facility rowIndex gets LE 1 with majority share.
+        // For syndicated deals some facilities get a 2nd allocation row with LE 2.
+        const facId = Math.min(rowIndex + 1, 400);
+        const leId = (rowIndex % 5) < 3 ? 1 : ((rowIndex % 4) + 1);
+        const sharePct = leId === 1 ? (55 + (rowIndex % 25)) : (20 + (rowIndex % 15));
+        if (columnName === 'facility_id') return facId;
+        if (columnName === 'legal_entity_id') return Math.min(leId, 12);
+        if (columnName === 'bank_share_pct') return sharePct;
+        if (columnName === 'bank_commitment_amt') return Math.round(250_000_000 * sharePct / 100); // approximation
+        if (columnName === 'allocation_role') return leId === 1 ? 'LEAD_ARRANGER' : 'CO_LENDER';
+        if (columnName === 'is_lead_flag') return leId === 1 ? 'Y' : 'N';
+        if (columnName === 'source_record_id') return 400_000 + rowIndex + 1;
+        break;
+      }
       // Tracks the bank's (issuer-side) share of each facility via legal_entity_id.
       // Syndicated deals split across two legal entities; bilateral = 100% to one.
       const isSyndicated = AGREEMENT_TYPES[idx] === 'SYNDICATED';
@@ -3379,13 +3458,22 @@ const FIXED_SIZE_TABLES = new Set([
   'model_registry_dim', 'rule_registry', 'validation_check_registry',
 ]);
 
-export function getTableRowCount(tableName: string, requestedRows: number): number {
+export function getTableRowCount(tableName: string, requestedRows: number, profile?: string): number {
   // Dimension tables stay at 10 (their natural domain size)
   if (DIMENSION_TABLES.has(tableName)) return 10;
-  // Fixed-size tables stay at 10
-  if (FIXED_SIZE_TABLES.has(tableName)) return 10;
+  // Fixed-size tables stay at 10 (unless MVP profile overrides them)
+  if (FIXED_SIZE_TABLES.has(tableName)) {
+    if (profile === 'mvp' && tableName in MVP_ROW_COUNTS) {
+      return MVP_ROW_COUNTS[tableName];
+    }
+    return 10;
+  }
   // enterprise_business_taxonomy has full 249-row hierarchy from Excel
   if (tableName === 'enterprise_business_taxonomy') return EBT_ROW_COUNT;
+  // MVP profile: use per-table row counts
+  if (profile === 'mvp' && tableName in MVP_ROW_COUNTS) {
+    return MVP_ROW_COUNTS[tableName];
+  }
   // Everything else scales to the requested count
   return requestedRows;
 }

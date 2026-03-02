@@ -12,6 +12,9 @@
 /coverage
 scripts/output/
 
+# generated SQL exports
+sql/exports/
+
 # next.js
 /.next/
 /out/

@@ -1,8 +1,9 @@
 /**
  * Generates PostgreSQL DDL and seed SQL for all L1 tables from definitions.
  *
- * Run:   npx tsx scripts/l1/generate.ts            (default 10 rows)
- *        npx tsx scripts/l1/generate.ts --rows=100  (scale to 100 rows)
+ * Run:   npx tsx scripts/l1/generate.ts               (default 10 rows)
+ *        npx tsx scripts/l1/generate.ts --rows=100     (scale to 100 rows)
+ *        npx tsx scripts/l1/generate.ts --profile=mvp  (MVP: 100 cpty / 400 fac)
  *        SEED_ROWS=50 npx tsx scripts/l1/generate.ts
  *
  * Outputs: scripts/l1/output/ddl.sql, seed.sql, sample-data.json,
@@ -18,6 +19,11 @@ const OUT_DIR = path.join(__dirname, 'output');
 const SEED_AS_OF_DATE = '2025-01-31';
 
 /* ───────── CLI / env row-count configuration ───────── */
+
+function parseProfile(): string | undefined {
+  const arg = process.argv.find(a => a.startsWith('--profile='));
+  return arg ? arg.split('=')[1] : undefined;
+}
 
 function parseRequestedRows(): number {
   // --rows=N  CLI argument
@@ -35,6 +41,7 @@ function parseRequestedRows(): number {
   return 10; // default
 }
 
+const PROFILE = parseProfile();
 const REQUESTED_ROWS = parseRequestedRows();
 
 /** Determine how many rows to generate for a given table. */
@@ -42,7 +49,7 @@ function rowsForTable(t: TableDef): number {
   // If the table definition has an explicit maxRows cap, honour it
   if (t.maxRows !== undefined) return Math.min(REQUESTED_ROWS, t.maxRows);
   // Delegate to seed-data logic which knows table categories
-  return getTableRowCount(t.tableName, REQUESTED_ROWS);
+  return getTableRowCount(t.tableName, REQUESTED_ROWS, PROFILE);
 }
 
 /* ───────── Deterministic PRNG (mulberry32) ───────── */
@@ -358,7 +365,7 @@ function main() {
     '',
   ];
   const seedParts: string[] = [
-    `-- L1 Seed Data (generated, requested=${REQUESTED_ROWS} rows)`,
+    `-- L1 Seed Data (generated, profile=${PROFILE ?? 'default'}, requested=${REQUESTED_ROWS} rows)`,
     '-- Run after DDL. Referentially consistent.',
     '',
   ];
@@ -392,7 +399,7 @@ function main() {
 
   console.log(`Generated: ${OUT_DIR}/ddl.sql, seed.sql, sample-data.json, relationships.json, table-metadata.json`);
   console.log(`Tables: ${L1_TABLES.length}, Relationships: ${relationships.length}, Total rows: ${totalRows}`);
-  console.log(`Requested: ${REQUESTED_ROWS} rows per scalable table (dimensions capped at natural size)`);
+  console.log(`Profile: ${PROFILE ?? 'default'}, Requested: ${REQUESTED_ROWS} rows per scalable table (dimensions capped at natural size)`);
 }
 
 main();

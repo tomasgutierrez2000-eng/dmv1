@@ -4,13 +4,13 @@ Use a **single as_of_date** and **single run_version_id** for all artificial dat
 
 ## ID and date conventions
 
-| Dimension        | Convention   | Used in |
-|------------------|-------------|---------|
-| `facility_id`    | 1..10       | L1.facility_master, L2.position, L2.facility_exposure_snapshot, L3 |
-| `counterparty_id`| 1..10       | L1.counterparty, L2.position, L2.facility_exposure_snapshot, L3 |
-| `legal_entity_id`| 1           | L1, L2, L3 |
-| `as_of_date`     | 2025-01-31  | All L2 snapshots and L3 |
-| `run_version_id` | RUN_MVP_001 | L3 only |
+| Dimension        | Default (10-fac) | MVP profile (405-fac) | Used in |
+|------------------|------------------|-----------------------|---------|
+| `facility_id`    | 1..10            | 1..405                | L1.facility_master, L2.position, L2.facility_exposure_snapshot, L3 |
+| `counterparty_id`| 1..10            | 1..100                | L1.counterparty, L2.position, L2.facility_exposure_snapshot, L3 |
+| `legal_entity_id`| 1                | 1..12                 | L1, L2, L3 |
+| `as_of_date`     | 2025-01-31       | 2025-01-31            | All L2 snapshots and L3 |
+| `run_version_id` | RUN_MVP_001      | RUN_MVP_001           | L3 only |
 
 ## Execution order
 
@@ -21,6 +21,27 @@ Use a **single as_of_date** and **single run_version_id** for all artificial dat
 
 ## Linking rules
 
-- L2 seed rows must reference only **facility_id** and **counterparty_id** values that exist in L1 seed (1..10).
+- L2 seed rows must reference only **facility_id** and **counterparty_id** values that exist in L1 seed.
 - All L2 snapshot tables must use the same **as_of_date** (2025-01-31) so L3 population and metric formulaSQL joins resolve.
 - When using the values API or batch job, pass **runVersion=RUN_MVP_001** and **asOfDate=2025-01-31** so the UI shows linked data.
+
+## Quick export for handoff
+
+```bash
+npm run db:export
+```
+
+Produces `sql/exports/credit_dw_mvp.sql` — a single self-contained file with all L1/L2/L3 DDL and seed data wrapped in a transaction.
+
+Load into any PostgreSQL 15+ instance:
+
+```bash
+createdb credit_dw
+psql -d credit_dw -f sql/exports/credit_dw_mvp.sql
+```
+
+Then populate L3 reporting tables:
+
+```sql
+CALL l3.run_full_population('RUN_MVP_001', '2025-01-31');
+```

@@ -42,23 +42,30 @@ function dataDictionaryToModel(dd: DataDictionary): DataModel {
     }
   }
 
-  const relationships: Relationship[] = dd.relationships.map((r, i) => ({
-    id: `rel-${r.from_layer}-${r.from_table}-${r.from_field}-${i}`,
-    source: {
-      layer: r.from_layer,
-      table: r.from_table,
-      field: r.from_field,
-      tableKey: `${r.from_layer}.${r.from_table}`,
-    },
-    target: {
-      layer: r.to_layer,
-      table: r.to_table,
-      field: r.to_field,
-      tableKey: `${r.to_layer}.${r.to_table}`,
-    },
-    isCrossLayer: r.from_layer !== r.to_layer,
-    relationshipType: 'primary',
-  }));
+  type Rel = DataDictionary['relationships'][number];
+  const sourceKey = (r: Rel) => `${r.from_layer}.${r.from_table}`;
+  const targetKey = (r: Rel) => `${r.to_layer}.${r.to_table}`;
+  const relationships: Relationship[] = [];
+  dd.relationships.forEach((r, i) => {
+    if (!tables[sourceKey(r)] || !tables[targetKey(r)]) return; // skip invalid refs
+    relationships.push({
+      id: `rel-${r.from_layer}-${r.from_table}-${r.from_field}-${i}`,
+      source: {
+        layer: r.from_layer,
+        table: r.from_table,
+        field: r.from_field,
+        tableKey: sourceKey(r),
+      },
+      target: {
+        layer: r.to_layer,
+        table: r.to_table,
+        field: r.to_field,
+        tableKey: targetKey(r),
+      },
+      isCrossLayer: r.from_layer !== r.to_layer,
+      relationshipType: 'primary',
+    });
+  });
 
   const categories = Array.from(categorySet).sort();
 

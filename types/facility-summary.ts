@@ -78,6 +78,7 @@ export interface FacilitySummary {
 
   // Enrichment fields - RWA & Rating Bucket
   rwa_amt: number;
+  rwa_density_pct: number;
   internal_risk_rating_bucket_code: string;
   return_on_rwa_pct: number;
 

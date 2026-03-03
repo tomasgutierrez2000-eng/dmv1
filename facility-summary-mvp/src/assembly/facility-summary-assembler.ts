@@ -457,6 +457,12 @@ export const assembleFacilitySummary = (
 
       // Enrichment fields - RWA & Rating Bucket
       rwa_amt: latestExposure?.rwa_amt ?? 0,
+      rwa_density_pct: roundTo(
+        (latestExposure?.ead_amount ?? 0) > 0
+          ? ((latestExposure?.rwa_amt ?? 0) / (latestExposure?.ead_amount ?? 1)) * 100
+          : 0,
+        6
+      ),
       internal_risk_rating_bucket_code: latestExposure?.internal_risk_rating_bucket_code ?? "",
       return_on_rwa_pct: roundTo(
         (latestExposure?.rwa_amt ?? 0) > 0

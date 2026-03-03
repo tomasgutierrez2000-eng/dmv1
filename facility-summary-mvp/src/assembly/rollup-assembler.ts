@@ -227,6 +227,7 @@ export const assembleRollups = (
     );
     const irSensitivities = facilities.map((f) => f.interest_rate_sensitivity_pct);
     const avgIrSensitivity = weightedAverage(irSensitivities, exposures);
+    const rwaDensityPct = totalEad > 0 ? (totalRwa / totalEad) * 100 : 0;
     const avgReturnOnRwa = totalRwa > 0 ? (totalRevenue / totalRwa) * 100 : 0;
     const pricingExceptionCount = facilities.filter(
       (f) => f.pricing_exception_flag
@@ -317,6 +318,7 @@ export const assembleRollups = (
       avg_roe_pct: roundTo(avgRoe, 2),
       total_debt_service_amt: roundTo(totalDebtService, 2),
       total_rwa_amt: roundTo(totalRwa, 1),
+      rwa_density_pct: roundTo(rwaDensityPct, 6),
       avg_ir_sensitivity_pct: roundTo(avgIrSensitivity, 2),
       avg_return_on_rwa_pct: roundTo(avgReturnOnRwa, 2),
       pricing_exception_count: pricingExceptionCount,

@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-02T12:50:23.232Z",
+  "createdAt": "2026-03-03T02:49:56.824Z",
   "tables": [
     {
       "layer": "L1",
@@ -5307,6 +5307,9 @@
           "name": "rwa_amt"
         },
         {
+          "name": "rwa_density_pct"
+        },
+        {
           "name": "capital_req_amt"
         },
         {
@@ -5404,6 +5407,12 @@
         },
         {
           "name": "expected_loss_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         },
         {
           "name": "credit_limit_amt"
@@ -5533,6 +5542,9 @@
         },
         {
           "name": "total_rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         },
         {
           "name": "created_ts"
@@ -6345,6 +6357,9 @@
           "name": "rwa_amt"
         },
         {
+          "name": "rwa_density_pct"
+        },
+        {
           "name": "avg_pd_pct"
         },
         {
@@ -6981,6 +6996,12 @@
           "name": "expected_loss_amt"
         },
         {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
           "name": "credit_limit_amt"
         },
         {
@@ -7198,6 +7219,12 @@
         },
         {
           "name": "expected_loss_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         },
         {
           "name": "base_currency_code"

@@ -78,6 +78,7 @@ export interface FacilitySummary {
 
   // Enrichment fields - RWA & Rating Bucket
   rwa_amt: number;
+  rwa_density_pct: number;
   internal_risk_rating_bucket_code: string;
   return_on_rwa_pct: number;
 
@@ -167,6 +168,7 @@ export interface DeskSummary {
   avg_roe_pct: number;
   total_debt_service_amt: number;
   total_rwa_amt: number;
+  rwa_density_pct: number;
   avg_ir_sensitivity_pct: number;
   avg_return_on_rwa_pct: number;
   pricing_exception_count: number;
@@ -234,6 +236,7 @@ export interface LobL1Summary {
   avg_roe_pct: number;
   total_debt_service_amt: number;
   total_rwa_amt: number;
+  rwa_density_pct: number;
   avg_ir_sensitivity_pct: number;
   avg_return_on_rwa_pct: number;
   pricing_exception_count: number;

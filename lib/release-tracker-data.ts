@@ -9,6 +9,17 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-03-03: Auto-detected changes ─────────────────────────
+  { date: '2026-03-03', layer: 'L3', table: 'risk_metric_cube', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.risk_metric_cube' },
+  { date: '2026-03-03', layer: 'L3', table: 'counterparty_exposure_summary', field: 'rwa_amt', changeType: 'Added', rationale: 'Field added to L3.counterparty_exposure_summary' },
+  { date: '2026-03-03', layer: 'L3', table: 'counterparty_exposure_summary', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.counterparty_exposure_summary' },
+  { date: '2026-03-03', layer: 'L3', table: 'portfolio_summary', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.portfolio_summary' },
+  { date: '2026-03-03', layer: 'L3', table: 'lob_exposure_summary', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.lob_exposure_summary' },
+  { date: '2026-03-03', layer: 'L3', table: 'counterparty_detail_snapshot', field: 'rwa_amt', changeType: 'Added', rationale: 'Field added to L3.counterparty_detail_snapshot' },
+  { date: '2026-03-03', layer: 'L3', table: 'counterparty_detail_snapshot', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.counterparty_detail_snapshot' },
+  { date: '2026-03-03', layer: 'L3', table: 'legal_entity_risk_profile', field: 'rwa_amt', changeType: 'Added', rationale: 'Field added to L3.legal_entity_risk_profile' },
+  { date: '2026-03-03', layer: 'L3', table: 'legal_entity_risk_profile', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.legal_entity_risk_profile' },
+
   // ── 2026-03-02: Auto-detected changes ─────────────────────────
   { date: '2026-03-02', layer: 'L2', table: 'position', field: 'product_node_id', changeType: 'Added', rationale: 'Field added to L2.position' },
   { date: '2026-03-02', layer: 'L3', table: 'lob_credit_quality_summary', field: 'criticized_exposure_amt', changeType: 'Added', rationale: 'Field added to L3.lob_credit_quality_summary' },

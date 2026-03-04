@@ -14,6 +14,8 @@ const fmt = (n: number) =>
 
 const pct = (n: number) => `${n.toFixed(1)}%`;
 
+const fmtDscr = (n: number) => `${n.toFixed(2)}x`;
+
 const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   LOAN: { bg: 'bg-blue-500/15', text: 'text-blue-400' },
   COMMITMENT: { bg: 'bg-amber-500/15', text: 'text-amber-400' },
@@ -30,6 +32,13 @@ function TypeBadge({ type }: { type: string }) {
       {type}
     </span>
   );
+}
+
+function dscrBandColor(dscr: number): string {
+  if (dscr < 1.0) return 'text-red-400';
+  if (dscr < 1.25) return 'text-amber-400';
+  if (dscr < 1.5) return 'text-yellow-400';
+  return 'text-emerald-400';
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -72,7 +81,9 @@ export function PositionTable({ facility }: { facility: DemoFacility }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * FACILITY TABLE — shows facilities with committed, collateral, LTV
+ * FACILITY TABLE — shows facilities with metric-specific columns
+ *   LTV: Committed | Collateral | LTV
+ *   DSCR: NOI/EBITDA | Debt Service | DSCR
  * ──────────────────────────────────────────────────────────────────────────── */
 
 interface FacilityTableProps {
@@ -80,12 +91,22 @@ interface FacilityTableProps {
   groupBy?: 'desk' | 'counterparty';
   showPositionCount?: boolean;
   highlightResult?: boolean;
+  metricType?: 'LTV' | 'DSCR';
 }
 
-export function FacilityTable({ facilities, groupBy, showPositionCount, highlightResult = true }: FacilityTableProps) {
+export function FacilityTable({ facilities, groupBy, showPositionCount, highlightResult = true, metricType = 'LTV' }: FacilityTableProps) {
+  const isDscr = metricType === 'DSCR';
+
+  // LTV aggregates
   const totalCommitted = facilities.reduce((s, f) => s + f.committed_amt, 0);
   const totalCollateral = facilities.reduce((s, f) => s + f.collateral_value, 0);
   const totalLtv = totalCollateral > 0 ? (totalCommitted / totalCollateral) * 100 : 0;
+
+  // DSCR aggregates (exposure-weighted average)
+  const totalExposure = facilities.reduce((s, f) => s + f.committed_amt, 0);
+  const weightedDscr = totalExposure > 0
+    ? facilities.reduce((s, f) => s + (f.dscr_value ?? 0) * f.committed_amt, 0) / totalExposure
+    : 0;
 
   // Group facilities if requested
   let groups: { label: string; items: DemoFacility[] }[] = [];
@@ -107,6 +128,8 @@ export function FacilityTable({ facilities, groupBy, showPositionCount, highligh
     groups = Array.from(byCp.entries()).map(([label, items]) => ({ label, items }));
   }
 
+  const colSpan = (showPositionCount ? 1 : 0) + 4; // Facility + 2 metric cols + result col + optional positions
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -114,57 +137,104 @@ export function FacilityTable({ facilities, groupBy, showPositionCount, highligh
           <tr className="text-[10px] uppercase tracking-wider text-gray-500 border-b border-gray-800">
             <th className="text-left py-2 px-3 font-semibold">Facility</th>
             {showPositionCount && <th className="text-center py-2 px-3 font-semibold">Positions</th>}
-            <th className="text-right py-2 px-3 font-semibold">Committed</th>
-            <th className="text-right py-2 px-3 font-semibold">Collateral</th>
-            <th className="text-right py-2 px-3 font-semibold">LTV</th>
+            {isDscr ? (
+              <>
+                <th className="text-right py-2 px-3 font-semibold">Cashflow</th>
+                <th className="text-right py-2 px-3 font-semibold">Debt Service</th>
+                <th className="text-right py-2 px-3 font-semibold">DSCR</th>
+              </>
+            ) : (
+              <>
+                <th className="text-right py-2 px-3 font-semibold">Committed</th>
+                <th className="text-right py-2 px-3 font-semibold">Collateral</th>
+                <th className="text-right py-2 px-3 font-semibold">LTV</th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
           {groups.length > 0 ? (
             groups.map((g) => {
-              const gc = g.items.reduce((s, f) => s + f.committed_amt, 0);
-              const gv = g.items.reduce((s, f) => s + f.collateral_value, 0);
-              const gl = gv > 0 ? (gc / gv) * 100 : 0;
+              // Group subtotals
+              const gExp = g.items.reduce((s, f) => s + f.committed_amt, 0);
+              let subtotalValue: string;
+              let subtotalColor: string;
+              if (isDscr) {
+                const gWtd = gExp > 0
+                  ? g.items.reduce((s, f) => s + (f.dscr_value ?? 0) * f.committed_amt, 0) / gExp
+                  : 0;
+                subtotalValue = fmtDscr(gWtd);
+                subtotalColor = dscrBandColor(gWtd);
+              } else {
+                const gc = g.items.reduce((s, f) => s + f.committed_amt, 0);
+                const gv = g.items.reduce((s, f) => s + f.collateral_value, 0);
+                const gl = gv > 0 ? (gc / gv) * 100 : 0;
+                subtotalValue = pct(gl);
+                subtotalColor = 'text-amber-400';
+              }
+
               return (
                 <React.Fragment key={g.label}>
                   <tr className="bg-gray-800/30">
-                    <td colSpan={showPositionCount ? 5 : 4} className="py-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                    <td colSpan={colSpan} className="py-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">
                       {g.label}
                     </td>
                   </tr>
                   {g.items.map((f) => (
-                    <FacilityRow key={f.facility_id} facility={f} showPositionCount={showPositionCount} />
+                    <FacilityRow key={f.facility_id} facility={f} showPositionCount={showPositionCount} isDscr={isDscr} />
                   ))}
                   <tr className="bg-white/[0.02]">
                     <td className="py-1.5 px-3 text-xs text-gray-500 italic">Subtotal — {g.label}</td>
                     {showPositionCount && <td />}
-                    <td className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">{fmt(gc)}</td>
-                    <td className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">{fmt(gv)}</td>
-                    <td className="py-1.5 px-3 text-right font-mono text-xs text-amber-400 font-semibold">{pct(gl)}</td>
+                    {isDscr ? (
+                      <>
+                        <td className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">—</td>
+                        <td className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">—</td>
+                        <td className={`py-1.5 px-3 text-right font-mono text-xs font-semibold ${subtotalColor}`}>{subtotalValue}</td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">{fmt(g.items.reduce((s, f) => s + f.committed_amt, 0))}</td>
+                        <td className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">{fmt(g.items.reduce((s, f) => s + f.collateral_value, 0))}</td>
+                        <td className={`py-1.5 px-3 text-right font-mono text-xs font-semibold ${subtotalColor}`}>{subtotalValue}</td>
+                      </>
+                    )}
                   </tr>
                 </React.Fragment>
               );
             })
           ) : (
             facilities.map((f) => (
-              <FacilityRow key={f.facility_id} facility={f} showPositionCount={showPositionCount} />
+              <FacilityRow key={f.facility_id} facility={f} showPositionCount={showPositionCount} isDscr={isDscr} />
             ))
           )}
           {facilities.length > 1 && (
             <tr className={`font-semibold ${highlightResult ? 'bg-emerald-500/10' : 'bg-white/[0.03]'}`}>
               <td className="py-2 px-3 text-gray-300 text-xs uppercase tracking-wider">
-                Grand Total
+                {isDscr ? 'Weighted Avg' : 'Grand Total'}
               </td>
               {showPositionCount && (
                 <td className="py-2 px-3 text-center font-mono text-xs text-gray-400">
                   {facilities.reduce((s, f) => s + f.positions.length, 0)}
                 </td>
               )}
-              <td className="py-2 px-3 text-right font-mono text-emerald-400">{fmt(totalCommitted)}</td>
-              <td className="py-2 px-3 text-right font-mono text-emerald-400">{fmt(totalCollateral)}</td>
-              <td className={`py-2 px-3 text-right font-mono font-bold text-lg ${highlightResult ? 'text-emerald-400' : 'text-white'}`}>
-                {pct(totalLtv)}
-              </td>
+              {isDscr ? (
+                <>
+                  <td className="py-2 px-3 text-right font-mono text-gray-400">—</td>
+                  <td className="py-2 px-3 text-right font-mono text-gray-400">—</td>
+                  <td className={`py-2 px-3 text-right font-mono font-bold text-lg ${highlightResult ? 'text-emerald-400' : 'text-white'}`}>
+                    {fmtDscr(weightedDscr)}
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td className="py-2 px-3 text-right font-mono text-emerald-400">{fmt(totalCommitted)}</td>
+                  <td className="py-2 px-3 text-right font-mono text-emerald-400">{fmt(totalCollateral)}</td>
+                  <td className={`py-2 px-3 text-right font-mono font-bold text-lg ${highlightResult ? 'text-emerald-400' : 'text-white'}`}>
+                    {pct(totalLtv)}
+                  </td>
+                </>
+              )}
             </tr>
           )}
         </tbody>
@@ -173,7 +243,29 @@ export function FacilityTable({ facilities, groupBy, showPositionCount, highligh
   );
 }
 
-function FacilityRow({ facility: f, showPositionCount }: { facility: DemoFacility; showPositionCount?: boolean }) {
+function FacilityRow({ facility: f, showPositionCount, isDscr }: { facility: DemoFacility; showPositionCount?: boolean; isDscr?: boolean }) {
+  if (isDscr) {
+    const dscrColor = dscrBandColor(f.dscr_value ?? 0);
+    const cfLabel = f.cashflow_label ?? 'NOI';
+    return (
+      <tr className="border-b border-gray-800/50 hover:bg-white/[0.02]">
+        <td className="py-2 px-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[10px] text-gray-500">{f.facility_id}</span>
+            <span className="text-gray-300">{f.facility_name}</span>
+          </div>
+          <div className="text-[10px] text-gray-600 mt-0.5">{f.counterparty_name} · {cfLabel}</div>
+        </td>
+        {showPositionCount && (
+          <td className="py-2 px-3 text-center font-mono text-xs text-gray-500">{f.positions.length}</td>
+        )}
+        <td className="py-2 px-3 text-right font-mono text-gray-200">{fmt(f.noi_amt ?? 0)}</td>
+        <td className="py-2 px-3 text-right font-mono text-gray-200">{fmt(f.debt_service_amt ?? 0)}</td>
+        <td className={`py-2 px-3 text-right font-mono font-semibold ${dscrColor}`}>{fmtDscr(f.dscr_value ?? 0)}</td>
+      </tr>
+    );
+  }
+
   const ltvColor = f.ltv_pct >= 100 ? 'text-red-400' : f.ltv_pct >= 80 ? 'text-amber-400' : 'text-gray-200';
   return (
     <tr className="border-b border-gray-800/50 hover:bg-white/[0.02]">
@@ -193,4 +285,3 @@ function FacilityRow({ facility: f, showPositionCount }: { facility: DemoFacilit
     </tr>
   );
 }
-

@@ -694,11 +694,202 @@
         "sourcing_type": "Avg",
         "level_logic": "For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
         "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Wtd DSCR",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L1 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "source_references": []
       }
     ],
-    "number_of_instances": 4,
+    "number_of_instances": 5,
     "directly_displayed": true,
-    "status": "ACTIVE"
+    "status": "ACTIVE",
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-101",
+          "facility_name": "Sunrise Tower CRE Loan",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 50000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "noi_amt": 1585000,
+          "debt_service_amt": 1200000,
+          "dscr_value": 1.32,
+          "cashflow_label": "NOI",
+          "positions": [
+            {
+              "position_id": "P-101",
+              "facility_id": "F-101",
+              "position_type": "LOAN",
+              "balance_amount": 35000000,
+              "description": "Term Loan Tranche A"
+            },
+            {
+              "position_id": "P-102",
+              "facility_id": "F-101",
+              "position_type": "LOAN",
+              "balance_amount": 10000000,
+              "description": "Term Loan Tranche B"
+            },
+            {
+              "position_id": "P-103",
+              "facility_id": "F-101",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Undrawn Commitment"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-102",
+          "facility_name": "Sunrise Office Complex",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 30000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "noi_amt": 2100000,
+          "debt_service_amt": 1400000,
+          "dscr_value": 1.50,
+          "cashflow_label": "NOI",
+          "positions": [
+            {
+              "position_id": "P-104",
+              "facility_id": "F-102",
+              "position_type": "LOAN",
+              "balance_amount": 22000000,
+              "description": "Senior Secured Loan"
+            },
+            {
+              "position_id": "P-105",
+              "facility_id": "F-102",
+              "position_type": "COMMITMENT",
+              "balance_amount": 8000000,
+              "description": "Revolver Undrawn"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-103",
+          "facility_name": "Meridian Retail Center",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 20000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "noi_amt": 890000,
+          "debt_service_amt": 950000,
+          "dscr_value": 0.94,
+          "cashflow_label": "NOI",
+          "positions": [
+            {
+              "position_id": "P-106",
+              "facility_id": "F-103",
+              "position_type": "LOAN",
+              "balance_amount": 15000000,
+              "description": "Term Loan"
+            },
+            {
+              "position_id": "P-107",
+              "facility_id": "F-103",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Delayed Draw"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-104",
+          "facility_name": "Meridian Term Loan A",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 80000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "noi_amt": 5640000,
+          "debt_service_amt": 1380000,
+          "dscr_value": 4.09,
+          "cashflow_label": "EBITDA",
+          "positions": [
+            {
+              "position_id": "P-108",
+              "facility_id": "F-104",
+              "position_type": "LOAN",
+              "balance_amount": 55000000,
+              "description": "Term Loan A"
+            },
+            {
+              "position_id": "P-109",
+              "facility_id": "F-104",
+              "position_type": "LOAN",
+              "balance_amount": 20000000,
+              "description": "Term Loan B"
+            },
+            {
+              "position_id": "P-110",
+              "facility_id": "F-104",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Undrawn Commitment"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-105",
+          "facility_name": "Meridian Revolver",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 15000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "noi_amt": 3200000,
+          "debt_service_amt": 1050000,
+          "dscr_value": 3.05,
+          "cashflow_label": "EBITDA",
+          "positions": [
+            {
+              "position_id": "P-111",
+              "facility_id": "F-105",
+              "position_type": "LOAN",
+              "balance_amount": 9000000,
+              "description": "Drawn Revolver"
+            },
+            {
+              "position_id": "P-112",
+              "facility_id": "F-105",
+              "position_type": "COMMITMENT",
+              "balance_amount": 6000000,
+              "description": "Undrawn Revolver"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "item_id": "PD",

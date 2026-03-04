@@ -10,6 +10,7 @@ import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 
 const LTVLineageView = dynamic(() => import('./LTVLineageView'), { ssr: false });
+const DSCRLineageView = dynamic(() => import('./DSCRLineageView'), { ssr: false });
 
 interface ParentDetail {
   metric_id: string;
@@ -35,7 +36,7 @@ interface VariantSummary {
   source_field?: string;
 }
 
-const METRICS_WITH_DEEP_DIVE = new Set(['LTV']);
+const METRICS_WITH_DEEP_DIVE = new Set(['LTV', 'DSCR']);
 
 function getTabs(metricId: string) {
   const hasDeepDive = METRICS_WITH_DEEP_DIVE.has(metricId);
@@ -234,6 +235,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
               className="rounded-lg overflow-hidden"
             >
               {parentId === 'LTV' && <LTVLineageView />}
+              {parentId === 'DSCR' && <DSCRLineageView />}
             </section>
           ) : (
             <section

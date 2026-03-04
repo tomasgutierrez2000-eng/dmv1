@@ -10,6 +10,21 @@ export interface ReleaseEntry {
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
   // ── 2026-03-04: Auto-detected changes ─────────────────────────
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: '(new table)', changeType: 'Added', rationale: 'New L1 table added' },
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'internal_risk_rating_bucket_code', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'bucket_name', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'rating_score_min', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'rating_score_max', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'display_order', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'active_flag', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: '(new table)', changeType: 'Added', rationale: 'New L1 table added' },
+  { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'pricing_tier_code', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'tier_name', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'tier_ordinal', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'display_order', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
+  { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'active_flag', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
+
+  // ── 2026-03-04: Auto-detected changes ─────────────────────────
   { date: '2026-03-04', layer: 'L2', table: 'loan_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
   { date: '2026-03-04', layer: 'L2', table: 'derivative_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
   { date: '2026-03-04', layer: 'L2', table: 'sft_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },

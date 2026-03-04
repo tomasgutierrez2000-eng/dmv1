@@ -519,6 +519,76 @@
       "nullable": true
     }
   },
+  "L1.internal_risk_rating_bucket_dim": {
+    "internal_risk_rating_bucket_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "bucket_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rating_score_min": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rating_score_max": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "display_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
+  "L1.pricing_tier_dim": {
+    "pricing_tier_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "tier_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "tier_ordinal": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "display_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
   "L1.maturity_bucket_dim": {
     "maturity_bucket_id": {
       "type": "BIGINT",

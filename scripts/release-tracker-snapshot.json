@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-04T15:17:12.724Z",
+  "createdAt": "2026-03-04T17:25:42.255Z",
   "tables": [
     {
       "layer": "L1",
@@ -313,6 +313,51 @@
         },
         {
           "name": "materiality_threshold_amt"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "internal_risk_rating_bucket_dim",
+      "fields": [
+        {
+          "name": "internal_risk_rating_bucket_code"
+        },
+        {
+          "name": "bucket_name"
+        },
+        {
+          "name": "rating_score_min"
+        },
+        {
+          "name": "rating_score_max"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "pricing_tier_dim",
+      "fields": [
+        {
+          "name": "pricing_tier_code"
+        },
+        {
+          "name": "tier_name"
+        },
+        {
+          "name": "tier_ordinal"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
         }
       ]
     },

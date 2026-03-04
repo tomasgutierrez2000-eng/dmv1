@@ -156,6 +156,29 @@ export const L1_TABLES: TableDef[] = [
     ],
   },
   {
+    tableName: 'internal_risk_rating_bucket_dim',
+    scd: 'SCD-0',
+    columns: [
+      { name: 'internal_risk_rating_bucket_code', type: 'VARCHAR(20)', nullable: false, pk: true },
+      { name: 'bucket_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'rating_score_min', type: 'INTEGER', nullable: true },
+      { name: 'rating_score_max', type: 'INTEGER', nullable: true },
+      { name: 'display_order', type: 'INTEGER', nullable: true },
+      { name: 'active_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
+    ],
+  },
+  {
+    tableName: 'pricing_tier_dim',
+    scd: 'SCD-0',
+    columns: [
+      { name: 'pricing_tier_code', type: 'VARCHAR(20)', nullable: false, pk: true },
+      { name: 'tier_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'tier_ordinal', type: 'INTEGER', nullable: true },
+      { name: 'display_order', type: 'INTEGER', nullable: true },
+      { name: 'active_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
+    ],
+  },
+  {
     tableName: 'maturity_bucket_dim',
     scd: 'SCD-0',
     columns: [

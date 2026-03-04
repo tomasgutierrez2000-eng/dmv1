@@ -35,6 +35,7 @@ import {
   Sparkles,
   RefreshCw,
 } from 'lucide-react';
+import { DSCR_PORTFOLIO_BUCKETS } from './demo/demoRollupData';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * TYPES
@@ -1325,13 +1326,14 @@ function DeskDetail() {
 }
 
 /* ── PORTFOLIO ── */
-const DSCR_BUCKETS = [
-  { range: '< 1.0x', status: 'Critical', count: 3, exposure: 45, color: 'text-red-400', bg: 'bg-red-500/10' },
-  { range: '1.0 - 1.25x', status: 'Watch', count: 8, exposure: 180, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  { range: '1.25 - 1.5x', status: 'Adequate', count: 15, exposure: 420, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-  { range: '1.5 - 2.0x', status: 'Good', count: 22, exposure: 890, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  { range: '> 2.0x', status: 'Strong', count: 12, exposure: 650, color: 'text-emerald-300', bg: 'bg-emerald-500/10' },
-];
+const DSCR_BUCKETS = DSCR_PORTFOLIO_BUCKETS.map((b) => ({
+  range: b.range,
+  status: b.label,
+  count: b.count,
+  exposure: b.exposure / 1_000_000,
+  color: b.color,
+  bg: b.bg,
+}));
 
 function PortfolioDetail() {
   const totalExposure = DSCR_BUCKETS.reduce((s, b) => s + b.exposure, 0);

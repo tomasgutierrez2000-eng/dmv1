@@ -10,8 +10,14 @@ import {
   exposureWeightedDSCR,
   fmt,
   fmtM,
+  fmtDscr,
   DESK_CRE_POOLED,
   DESK_CI_POOLED,
+  DSCR_DESK_SEGMENTS,
+  DSCR_DESK_BLENDED,
+  DSCR_PORTFOLIO_BUCKETS,
+  DSCR_LOB_ENTRIES,
+  dscrBandColor,
 } from './demoRollupData';
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -425,35 +431,45 @@ function RollupCounterparty({ variant, stepIndex }: { variant: VariantKey; stepI
 /* ── Rollup: Desk ────────────────────────────────────────────────────────── */
 
 function RollupDesk({ variant, stepIndex }: { variant: VariantKey; stepIndex: number }) {
-  const revealed = useStaggerReveal(2, 600, stepIndex);
+  const totalItems = DSCR_DESK_SEGMENTS.length + 1; // segments + blended result
+  const revealed = useStaggerReveal(totalItems, 500, stepIndex);
+  const pooled = [DESK_CRE_POOLED, DESK_CI_POOLED];
+
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
         Product-Segmented DSCR
       </div>
 
-      <div
-        className="rounded-lg bg-blue-500/5 border border-blue-500/20 p-2.5 transition-all duration-500"
-        style={{ opacity: revealed > 0 ? 1 : 0, transform: revealed > 0 ? 'translateY(0)' : 'translateY(8px)' }}
-      >
-        <div className="text-[10px] font-bold text-blue-300 mb-1">CRE DSCR</div>
-        <div className="text-xs font-mono text-gray-300">
-          {fmt(DESK_CRE_POOLED.totalNumerator)} &divide; {fmt(DESK_CRE_POOLED.totalDenominator)} ={' '}
-          <span className="text-blue-400 font-bold">{DESK_CRE_POOLED.dscr.toFixed(2)}x</span>
+      {DSCR_DESK_SEGMENTS.map((seg, i) => (
+        <div
+          key={seg.label}
+          className={`rounded-lg border p-2.5 transition-all duration-500 ${seg.colorBg}`}
+          style={{ opacity: revealed > i ? 1 : 0, transform: revealed > i ? 'translateY(0)' : 'translateY(8px)' }}
+        >
+          <div className="flex items-center justify-between mb-1">
+            <div className={`text-[10px] font-bold ${seg.color}`}>{seg.label}</div>
+            <div className="text-[9px] text-gray-600">{fmtM(seg.exposure)} exposure</div>
+          </div>
+          <div className="text-xs font-mono text-gray-300">
+            {fmt(pooled[i].totalNumerator)} &divide; {fmt(pooled[i].totalDenominator)} ={' '}
+            <span className={`${seg.color} font-bold`}>{fmtDscr(seg.dscr)}</span>
+          </div>
+          <div className="text-[9px] text-gray-600 mt-0.5">{seg.numeratorLabel}-based &middot; {seg.productType} facilities only</div>
         </div>
-        <div className="text-[9px] text-gray-600 mt-0.5">CRE facilities only</div>
-      </div>
+      ))}
 
+      {/* Blended exposure-weighted average */}
       <div
-        className="rounded-lg bg-purple-500/5 border border-purple-500/20 p-2.5 transition-all duration-500"
-        style={{ opacity: revealed > 1 ? 1 : 0, transform: revealed > 1 ? 'translateY(0)' : 'translateY(8px)' }}
+        className="text-center pt-2 border-t border-gray-700 transition-all duration-700"
+        style={{ opacity: revealed > DSCR_DESK_SEGMENTS.length ? 1 : 0, transform: revealed > DSCR_DESK_SEGMENTS.length ? 'scale(1)' : 'scale(0.85)' }}
       >
-        <div className="text-[10px] font-bold text-purple-300 mb-1">C&I DSCR</div>
-        <div className="text-xs font-mono text-gray-300">
-          {fmt(DESK_CI_POOLED.totalNumerator)} &divide; {fmt(DESK_CI_POOLED.totalDenominator)} ={' '}
-          <span className="text-purple-400 font-bold">{DESK_CI_POOLED.dscr.toFixed(2)}x</span>
+        <div className="text-[10px] text-gray-500 mb-1">
+          Blended &Sigma;(DSCR &times; Exposure) &divide; &Sigma;(Exposure)
         </div>
-        <div className="text-[9px] text-gray-600 mt-0.5">C&I facilities only</div>
+        <div className="text-xl font-black text-white tabular-nums">
+          {fmtDscr(DSCR_DESK_BLENDED)}
+        </div>
       </div>
     </div>
   );
@@ -463,9 +479,10 @@ function RollupDesk({ variant, stepIndex }: { variant: VariantKey; stepIndex: nu
 
 function RollupPortfolio({ variant, stepIndex }: { variant: VariantKey; stepIndex: number }) {
   const cps = counterpartiesFor(variant);
-  const totalLines = cps.length + 1; // rows + result
-  const revealed = useStaggerReveal(totalLines, 400, stepIndex);
+  const totalLines = cps.length + 1 + DSCR_PORTFOLIO_BUCKETS.length; // rows + result + buckets
+  const revealed = useStaggerReveal(totalLines, 300, stepIndex);
   const wtdAvg = exposureWeightedDSCR(cps);
+  const bucketOffset = cps.length + 1;
 
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
@@ -499,6 +516,29 @@ function RollupPortfolio({ variant, stepIndex }: { variant: VariantKey; stepInde
           {wtdAvg.toFixed(2)}x
         </div>
       </div>
+
+      {/* Distribution buckets */}
+      <div className="pt-2 border-t border-gray-800 space-y-1">
+        <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600 mb-1">
+          Distribution
+        </div>
+        {DSCR_PORTFOLIO_BUCKETS.map((b, i) => (
+          <div
+            key={b.range}
+            className={`flex items-center justify-between text-[10px] px-2 py-1 rounded bg-white/[0.03] transition-all duration-400`}
+            style={{ opacity: revealed > bucketOffset + i ? 1 : 0, transform: revealed > bucketOffset + i ? 'translateX(0)' : 'translateX(-12px)' }}
+          >
+            <div className="flex items-center gap-2">
+              <span className={`font-mono font-bold ${b.color}`}>{b.range}</span>
+              <span className="text-gray-600">{b.label}</span>
+            </div>
+            <div className="flex items-center gap-3 text-gray-400 font-mono">
+              <span>{b.count} loans</span>
+              <span>{fmtM(b.exposure)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -506,37 +546,39 @@ function RollupPortfolio({ variant, stepIndex }: { variant: VariantKey; stepInde
 /* ── Rollup: Business Segment ────────────────────────────────────────────── */
 
 function RollupLoB({ variant, stepIndex }: { variant: VariantKey; stepIndex: number }) {
-  const revealed = useStaggerReveal(3, 500, stepIndex);
+  const totalItems = DSCR_LOB_ENTRIES.length + 2; // entries + caveat + usage
+  const revealed = useStaggerReveal(totalItems, 400, stepIndex);
+  const trendArrow = (t: 'up' | 'down' | 'flat') =>
+    t === 'up' ? '\u2191' : t === 'down' ? '\u2193' : '\u2192';
+  const trendColor = (t: 'up' | 'down' | 'flat') =>
+    t === 'up' ? 'text-emerald-400' : t === 'down' ? 'text-red-400' : 'text-gray-400';
+
   return (
     <div className="rounded-lg bg-white/[0.03] border border-gray-800 p-3 space-y-2">
       <div className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
         Trend Indicator (Not a Limit)
       </div>
 
-      <div
-        className="grid grid-cols-3 gap-2 transition-all duration-500"
-        style={{ opacity: revealed > 0 ? 1 : 0 }}
-      >
-        <div className="rounded bg-blue-500/10 border border-blue-500/20 p-2 text-center">
-          <div className="text-[9px] text-blue-300 font-bold">CRE</div>
-          <div className="text-sm font-mono font-bold text-blue-400">1.29x</div>
-          <div className="text-[8px] text-gray-600">NOI-based</div>
-        </div>
-        <div className="rounded bg-purple-500/10 border border-purple-500/20 p-2 text-center">
-          <div className="text-[9px] text-purple-300 font-bold">Corporate</div>
-          <div className="text-sm font-mono font-bold text-purple-400">2.64x</div>
-          <div className="text-[8px] text-gray-600">EBITDA-based</div>
-        </div>
-        <div className="rounded bg-amber-500/10 border border-amber-500/20 p-2 text-center">
-          <div className="text-[9px] text-amber-300 font-bold">Lev Fin</div>
-          <div className="text-sm font-mono font-bold text-amber-400">1.85x</div>
-          <div className="text-[8px] text-gray-600">Adj. EBITDA</div>
-        </div>
+      <div className="grid grid-cols-3 gap-2">
+        {DSCR_LOB_ENTRIES.map((entry, i) => (
+          <div
+            key={entry.label}
+            className={`rounded border p-2 text-center transition-all duration-500 ${entry.bg}`}
+            style={{ opacity: revealed > i ? 1 : 0, transform: revealed > i ? 'translateY(0)' : 'translateY(8px)' }}
+          >
+            <div className={`text-[9px] font-bold ${entry.color}`}>{entry.label}</div>
+            <div className="flex items-center justify-center gap-1">
+              <span className={`text-sm font-mono font-bold ${entry.color}`}>{fmtDscr(entry.dscr)}</span>
+              <span className={`text-xs font-bold ${trendColor(entry.trend)}`}>{trendArrow(entry.trend)}</span>
+            </div>
+            <div className="text-[8px] text-gray-600">{entry.note}</div>
+          </div>
+        ))}
       </div>
 
       <div
         className="text-[10px] text-gray-500 leading-relaxed transition-all duration-500"
-        style={{ opacity: revealed > 1 ? 1 : 0 }}
+        style={{ opacity: revealed > DSCR_LOB_ENTRIES.length ? 1 : 0 }}
       >
         These DSCRs are <span className="text-gray-300 font-semibold">not directly comparable</span> across segments
         because the underlying numerator definitions differ.
@@ -544,7 +586,7 @@ function RollupLoB({ variant, stepIndex }: { variant: VariantKey; stepIndex: num
 
       <div
         className="rounded bg-blue-500/[0.04] border border-blue-500/20 p-2 text-[10px] text-gray-400 transition-all duration-500"
-        style={{ opacity: revealed > 2 ? 1 : 0 }}
+        style={{ opacity: revealed > DSCR_LOB_ENTRIES.length + 1 ? 1 : 0 }}
       >
         <span className="text-blue-300 font-bold">Usage:</span> Trend monitoring only. Ask &ldquo;Is overall borrower quality
         improving or declining?&rdquo; &mdash; don&apos;t set hard limits at this level.

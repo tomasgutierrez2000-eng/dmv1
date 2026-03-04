@@ -8,13 +8,14 @@ import type { CatalogueItem, DemoFacility } from '@/lib/metric-library/types';
  * ──────────────────────────────────────────────────────────────────────────── */
 
 type LevelKey = 'lob' | 'portfolio' | 'desk' | 'counterparty' | 'facility' | 'position';
+type MetricMode = 'LTV' | 'DSCR' | 'GENERIC';
 
 interface PyramidNode {
   id: string;
   level: LevelKey;
   label: string;
   sublabel?: string;
-  ltv?: number;
+  metricValue?: number;
   committed?: number;
   collateral?: number;
   posCount?: number;
@@ -56,27 +57,41 @@ const fmt = (n: number) =>
     : `$${(n / 1_000).toFixed(0)}K`;
 
 const pct = (n: number) => `${n.toFixed(1)}%`;
+const fmtDscr = (n: number) => `${n.toFixed(2)}x`;
 
-function ltvColor(v: number): string {
+function metricValueColor(v: number, mode: MetricMode): string {
+  if (mode === 'DSCR') {
+    if (v < 1.0) return 'text-red-400';
+    if (v < 1.25) return 'text-amber-400';
+    if (v < 1.5) return 'text-yellow-400';
+    return 'text-emerald-400';
+  }
+  // LTV
   if (v >= 100) return 'text-red-400';
   if (v >= 80) return 'text-amber-400';
   return 'text-gray-200';
 }
 
-function ltvColorSvg(v: number): string {
-  if (v >= 100) return '#f87171';
-  if (v >= 80) return '#fbbf24';
-  return '#e5e7eb';
+function formatMetricValue(v: number, mode: MetricMode): string {
+  if (mode === 'DSCR') return fmtDscr(v);
+  return pct(v);
+}
+
+function dscrWeightedAvg(facs: DemoFacility[]): number {
+  const totalExp = facs.reduce((s, f) => s + f.committed_amt, 0);
+  if (totalExp === 0) return 0;
+  return facs.reduce((s, f) => s + (f.dscr_value ?? 0) * f.committed_amt, 0) / totalExp;
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
  * BUILD NODES & EDGES from demo_data.facilities
  * ──────────────────────────────────────────────────────────────────────────── */
 
-function buildGraph(facilities: DemoFacility[]): { nodes: PyramidNode[]; edges: PyramidEdge[] } {
+function buildGraph(facilities: DemoFacility[], mode: MetricMode): { nodes: PyramidNode[]; edges: PyramidEdge[] } {
   const nodes: PyramidNode[] = [];
   const edges: PyramidEdge[] = [];
   const nodeMap = new Map<string, PyramidNode>();
+  const isDscr = mode === 'DSCR';
 
   const makeNode = (id: string, level: LevelKey, label: string, sublabel?: string): PyramidNode => {
     if (nodeMap.has(id)) return nodeMap.get(id)!;
@@ -97,24 +112,34 @@ function buildGraph(facilities: DemoFacility[]): { nodes: PyramidNode[]; edges: 
   // Business Segment level — all facilities share the same lob_name in demo
   const lobName = facilities[0]?.lob_name ?? 'Business Segment';
   const lobId = 'lob-' + lobName.replace(/\s/g, '-');
-  const lobTotalC = facilities.reduce((s, f) => s + f.committed_amt, 0);
-  const lobTotalV = facilities.reduce((s, f) => s + f.collateral_value, 0);
   const lobNode = makeNode(lobId, 'lob', lobName);
-  lobNode.committed = lobTotalC;
-  lobNode.collateral = lobTotalV;
-  lobNode.ltv = lobTotalV > 0 ? (lobTotalC / lobTotalV) * 100 : 0;
+  if (isDscr) {
+    lobNode.committed = facilities.reduce((s, f) => s + f.committed_amt, 0);
+    lobNode.metricValue = dscrWeightedAvg(facilities);
+  } else {
+    const lobTotalC = facilities.reduce((s, f) => s + f.committed_amt, 0);
+    const lobTotalV = facilities.reduce((s, f) => s + f.collateral_value, 0);
+    lobNode.committed = lobTotalC;
+    lobNode.collateral = lobTotalV;
+    lobNode.metricValue = lobTotalV > 0 ? (lobTotalC / lobTotalV) * 100 : 0;
+  }
 
   // Portfolio level
   const portfolios = [...new Set(facilities.map((f) => f.portfolio_name))];
   for (const pName of portfolios) {
     const pFacs = facilities.filter((f) => f.portfolio_name === pName);
     const pId = 'port-' + pName.replace(/\s/g, '-');
-    const pTotalC = pFacs.reduce((s, f) => s + f.committed_amt, 0);
-    const pTotalV = pFacs.reduce((s, f) => s + f.collateral_value, 0);
     const pNode = makeNode(pId, 'portfolio', pName);
-    pNode.committed = pTotalC;
-    pNode.collateral = pTotalV;
-    pNode.ltv = pTotalV > 0 ? (pTotalC / pTotalV) * 100 : 0;
+    if (isDscr) {
+      pNode.committed = pFacs.reduce((s, f) => s + f.committed_amt, 0);
+      pNode.metricValue = dscrWeightedAvg(pFacs);
+    } else {
+      const pTotalC = pFacs.reduce((s, f) => s + f.committed_amt, 0);
+      const pTotalV = pFacs.reduce((s, f) => s + f.collateral_value, 0);
+      pNode.committed = pTotalC;
+      pNode.collateral = pTotalV;
+      pNode.metricValue = pTotalV > 0 ? (pTotalC / pTotalV) * 100 : 0;
+    }
     addEdge(lobId, pId);
   }
 
@@ -123,12 +148,17 @@ function buildGraph(facilities: DemoFacility[]): { nodes: PyramidNode[]; edges: 
   for (const dName of desks) {
     const dFacs = facilities.filter((f) => f.desk_name === dName);
     const dId = 'desk-' + dName.replace(/\s/g, '-');
-    const dTotalC = dFacs.reduce((s, f) => s + f.committed_amt, 0);
-    const dTotalV = dFacs.reduce((s, f) => s + f.collateral_value, 0);
     const dNode = makeNode(dId, 'desk', dName);
-    dNode.committed = dTotalC;
-    dNode.collateral = dTotalV;
-    dNode.ltv = dTotalV > 0 ? (dTotalC / dTotalV) * 100 : 0;
+    if (isDscr) {
+      dNode.committed = dFacs.reduce((s, f) => s + f.committed_amt, 0);
+      dNode.metricValue = dscrWeightedAvg(dFacs);
+    } else {
+      const dTotalC = dFacs.reduce((s, f) => s + f.committed_amt, 0);
+      const dTotalV = dFacs.reduce((s, f) => s + f.collateral_value, 0);
+      dNode.committed = dTotalC;
+      dNode.collateral = dTotalV;
+      dNode.metricValue = dTotalV > 0 ? (dTotalC / dTotalV) * 100 : 0;
+    }
     // Link to parent portfolio
     const parentPortfolioName = dFacs[0]?.portfolio_name;
     if (parentPortfolioName) {
@@ -142,14 +172,17 @@ function buildGraph(facilities: DemoFacility[]): { nodes: PyramidNode[]; edges: 
   for (const cpFac of counterparties) {
     const cpFacs = facilities.filter((f) => f.counterparty_id === cpFac.counterparty_id);
     const cpId = 'cp-' + cpFac.counterparty_id;
-    const cpTotalC = cpFacs.reduce((s, f) => s + f.committed_amt, 0);
-    const cpTotalV = cpFacs.reduce((s, f) => s + f.collateral_value, 0);
     const cpNode = makeNode(cpId, 'counterparty', cpFac.counterparty_name, cpFac.counterparty_id);
-    cpNode.committed = cpTotalC;
-    cpNode.collateral = cpTotalV;
-    cpNode.ltv = cpTotalV > 0 ? (cpTotalC / cpTotalV) * 100 : 0;
-    // Counterparty connects to desk level — but counterparty/desk are parallel groupings
-    // We won't draw edges from desk→counterparty; instead, counterparty→facility and desk→facility
+    if (isDscr) {
+      cpNode.committed = cpFacs.reduce((s, f) => s + f.committed_amt, 0);
+      cpNode.metricValue = dscrWeightedAvg(cpFacs);
+    } else {
+      const cpTotalC = cpFacs.reduce((s, f) => s + f.committed_amt, 0);
+      const cpTotalV = cpFacs.reduce((s, f) => s + f.collateral_value, 0);
+      cpNode.committed = cpTotalC;
+      cpNode.collateral = cpTotalV;
+      cpNode.metricValue = cpTotalV > 0 ? (cpTotalC / cpTotalV) * 100 : 0;
+    }
   }
 
   // Facility level
@@ -157,8 +190,12 @@ function buildGraph(facilities: DemoFacility[]): { nodes: PyramidNode[]; edges: 
     const fId = 'fac-' + f.facility_id;
     const fNode = makeNode(fId, 'facility', f.facility_name, f.facility_id);
     fNode.committed = f.committed_amt;
-    fNode.collateral = f.collateral_value;
-    fNode.ltv = f.ltv_pct;
+    if (isDscr) {
+      fNode.metricValue = f.dscr_value ?? 0;
+    } else {
+      fNode.collateral = f.collateral_value;
+      fNode.metricValue = f.ltv_pct;
+    }
 
     // Edge: desk → facility
     const deskId = 'desk-' + f.desk_name.replace(/\s/g, '-');
@@ -347,8 +384,9 @@ export default function HierarchyPyramid({ item, activeTab, onTabChange }: Hiera
   }, []);
 
   const facilities = item.demo_data?.facilities ?? [];
+  const mode: MetricMode = item.abbreviation === 'DSCR' ? 'DSCR' : item.abbreviation === 'LTV' ? 'LTV' : 'GENERIC';
 
-  const { nodes, edges } = useMemo(() => buildGraph(facilities), [facilities]);
+  const { nodes, edges } = useMemo(() => buildGraph(facilities, mode), [facilities, mode]);
   const { positions, width, height } = useMemo(() => computePositions(nodes), [nodes]);
 
   const posMap = useMemo(() => new Map(positions.map((p) => [p.id, p])), [positions]);
@@ -473,14 +511,17 @@ export default function HierarchyPyramid({ item, activeTab, onTabChange }: Hiera
                   </div>
                   {/* Values row */}
                   <div className="flex items-center gap-1.5">
-                    {node.ltv !== undefined && (
-                      <span className={`text-xs font-bold font-mono ${ltvColor(node.ltv)}`}>
-                        {pct(node.ltv)}
+                    {node.metricValue !== undefined && (
+                      <span className={`text-xs font-bold font-mono ${metricValueColor(node.metricValue, mode)}`}>
+                        {formatMetricValue(node.metricValue, mode)}
                       </span>
                     )}
                     {node.committed !== undefined && node.level !== 'position' && (
                       <span className="text-[9px] font-mono text-gray-500">
-                        {fmt(node.committed)}/{fmt(node.collateral ?? 0)}
+                        {mode === 'DSCR'
+                          ? fmt(node.committed)
+                          : `${fmt(node.committed)}/${fmt(node.collateral ?? 0)}`
+                        }
                       </span>
                     )}
                     {node.level === 'position' && node.posCount !== undefined && (
@@ -537,8 +578,10 @@ export default function HierarchyPyramid({ item, activeTab, onTabChange }: Hiera
                   {levelNodes.map((n) => (
                     <span key={n.id} className="text-[10px] text-gray-300">
                       {n.label}
-                      {n.ltv !== undefined && (
-                        <span className={`ml-1 font-mono font-bold ${ltvColor(n.ltv)}`}>{pct(n.ltv)}</span>
+                      {n.metricValue !== undefined && (
+                        <span className={`ml-1 font-mono font-bold ${metricValueColor(n.metricValue, mode)}`}>
+                          {formatMetricValue(n.metricValue, mode)}
+                        </span>
                       )}
                       {n.posCount !== undefined && (
                         <span className="ml-1 font-mono text-gray-500">{n.posCount} pos</span>

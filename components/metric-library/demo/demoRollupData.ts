@@ -66,6 +66,69 @@ export const DESK_CI_POOLED = {
   dscr: 2.64,
 };
 
+/* ── Desk-level segments (structured, with colors) ─────────────────────── */
+
+export interface DeskSegment {
+  label: string;
+  productType: 'CRE' | 'CI' | 'LevFin';
+  numeratorLabel: string;
+  dscr: number;
+  exposure: number;
+  color: string;
+  colorBg: string;
+}
+
+/*
+ * Math verification:
+ *   CRE: pooled from CRE facilities: 4,575,000 / 3,550,000 = 1.29x (matches DESK_CRE_POOLED)
+ *   C&I: pooled from C&I facilities: 10,640,000 / 4,030,000 = 2.64x (matches DESK_CI_POOLED)
+ *   Blended: (1.29 × 100M + 2.64 × 140M) / (100M + 140M) = (129M + 369.6M) / 240M = 2.08x
+ */
+export const DSCR_DESK_SEGMENTS: DeskSegment[] = [
+  { label: 'CRE Desk',  productType: 'CRE', numeratorLabel: 'NOI',    dscr: 1.29, exposure: 100_000_000, color: 'text-blue-400',   colorBg: 'bg-blue-500/10 border-blue-500/20' },
+  { label: 'C&I Desk',  productType: 'CI',  numeratorLabel: 'EBITDA', dscr: 2.64, exposure: 140_000_000, color: 'text-purple-400', colorBg: 'bg-purple-500/10 border-purple-500/20' },
+];
+
+/** Blended exposure-weighted DSCR across all desk segments */
+export const DSCR_DESK_BLENDED = 2.08;
+
+/* ── Portfolio distribution buckets ────────────────────────────────────── */
+
+export interface DSCRBucket {
+  range: string;
+  label: string;
+  count: number;
+  exposure: number;
+  color: string;
+  bg: string;
+}
+
+export const DSCR_PORTFOLIO_BUCKETS: DSCRBucket[] = [
+  { range: '< 1.0x',      label: 'Critical', count: 3,  exposure: 45_000_000,  color: 'text-red-400',     bg: 'bg-red-500/10' },
+  { range: '1.0 – 1.25x', label: 'Watch',    count: 8,  exposure: 180_000_000, color: 'text-amber-400',   bg: 'bg-amber-500/10' },
+  { range: '1.25 – 1.5x', label: 'Adequate', count: 15, exposure: 420_000_000, color: 'text-yellow-400',  bg: 'bg-yellow-500/10' },
+  { range: '1.5 – 2.0x',  label: 'Good',     count: 22, exposure: 890_000_000, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  { range: '> 2.0x',      label: 'Strong',   count: 12, exposure: 650_000_000, color: 'text-emerald-300', bg: 'bg-emerald-500/10' },
+];
+
+/* ── Business Segment-level trend data ─────────────────────────────────── */
+
+export interface DSCRLoBEntry {
+  label: string;
+  dscr: number;
+  numeratorBasis: string;
+  trend: 'up' | 'down' | 'flat';
+  color: string;
+  bg: string;
+  note: string;
+}
+
+export const DSCR_LOB_ENTRIES: DSCRLoBEntry[] = [
+  { label: 'CRE',       dscr: 1.29, numeratorBasis: 'NOI',         trend: 'down', color: 'text-blue-400',   bg: 'bg-blue-500/10 border-blue-500/20',   note: 'NOI-based' },
+  { label: 'Corporate',  dscr: 2.64, numeratorBasis: 'EBITDA',      trend: 'flat', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20', note: 'EBITDA-based' },
+  { label: 'Lev Fin',   dscr: 1.85, numeratorBasis: 'Adj. EBITDA', trend: 'up',   color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/20',  note: 'Adj. EBITDA' },
+];
+
 /* ── Helpers ──────────────────────────────────────────────────────────────── */
 
 export function facilitiesFor(v: VariantKey): FacilityRow[] {
@@ -99,4 +162,25 @@ export function exposureWeightedDSCR(rows: CounterpartyRow[]): number {
   const totalExposure = rows.reduce((s, r) => s + r.exposure, 0);
   const weighted = rows.reduce((s, r) => s + r.dscr * r.exposure, 0);
   return weighted / totalExposure;
+}
+
+/** Format DSCR ratio */
+export function fmtDscr(n: number): string {
+  return n.toFixed(2) + 'x';
+}
+
+/** DSCR risk band color */
+export function dscrBandColor(dscr: number): string {
+  if (dscr < 1.0) return 'text-red-400';
+  if (dscr < 1.25) return 'text-amber-400';
+  if (dscr < 1.5) return 'text-yellow-400';
+  return 'text-emerald-400';
+}
+
+/** DSCR risk band label */
+export function dscrBandLabel(dscr: number): string {
+  if (dscr < 1.0) return 'Critical';
+  if (dscr < 1.25) return 'Watch';
+  if (dscr < 1.5) return 'Adequate';
+  return 'Healthy';
 }

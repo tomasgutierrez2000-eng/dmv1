@@ -17,6 +17,7 @@ import { Loader, AlertCircle, Database, ArrowRight, FlaskConical } from 'lucide-
 import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
 import liquidityCapitalModel from '../../data/liquidity-capital-model.json';
+import { mergeModels } from '../../utils/mergeModels';
 
 export default function VisualizerPage() {
   const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, setSidebarOpen, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
@@ -49,10 +50,19 @@ export default function VisualizerPage() {
   const [dictLoading, setDictLoading] = useState(false);
   const [liqCapLoading, setLiqCapLoading] = useState(false);
 
-  const loadLiquidityCapitalTables = () => {
+  const loadLiquidityCapitalTables = async () => {
     setLiqCapLoading(true);
     try {
-      const model = liquidityCapitalModel as unknown as DataModel;
+      // Fetch the base model (L1+L2+L3) and merge liquidity/capital overlay on top
+      const res = await fetch('/api/l1-demo-model');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || res.statusText);
+      }
+      const baseModel = (await res.json()) as DataModel;
+      const overlayModel = liquidityCapitalModel as unknown as DataModel;
+      const model = mergeModels(baseModel, overlayModel);
+
       setModel(model);
       const { calculateLayout } = require('../../utils/layoutEngine');
       const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
@@ -60,7 +70,7 @@ export default function VisualizerPage() {
       const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
       if (isOverview) setTablePositionsReplace(positions);
       else setTablePositionsBulk(positions);
-      toast({ type: 'success', title: 'Liquidity/Capital tables loaded', description: `${Object.keys(model.tables).length} tables across ${model.categories.length} domains.` });
+      toast({ type: 'success', title: 'Full model loaded with Liquidity/Capital', description: `${Object.keys(model.tables).length} tables across ${model.categories.length} domains.` });
     } catch (e) {
       console.error('Load liquidity/capital tables failed:', e);
       toast({ type: 'error', title: 'Failed to load', description: e instanceof Error ? e.message : 'Unknown error.' });
@@ -142,13 +152,13 @@ export default function VisualizerPage() {
                   )}
                 </button>
 
-                {/* Secondary CTA - Load Sample Liquidity/Capital Tables */}
+                {/* Secondary CTA - Load Full Model + Liquidity/Capital */}
                 <button
                   type="button"
                   onClick={loadLiquidityCapitalTables}
                   disabled={liqCapLoading}
                   aria-busy={liqCapLoading}
-                  aria-label={liqCapLoading ? 'Loading Liquidity/Capital tables' : 'Load Sample Liquidity/Capital Tables'}
+                  aria-label={liqCapLoading ? 'Loading full model with Liquidity/Capital' : 'Load Full Model + Liquidity / Capital'}
                   className="w-full mb-4 py-3.5 px-6 rounded-lg bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   {liqCapLoading ? (
@@ -159,7 +169,7 @@ export default function VisualizerPage() {
                   ) : (
                     <>
                       <FlaskConical className="w-4 h-4 text-blue-500" />
-                      <span>Load Sample Liquidity / Capital Tables</span>
+                      <span>Load Full Model + Liquidity / Capital</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}

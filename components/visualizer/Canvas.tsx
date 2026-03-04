@@ -96,7 +96,7 @@ export default function Canvas() {
       if (!visibleLayers[table.layer]) return false;
       if (table.layer === 'L3' && l3CategoryExcluded.has(table.category)) return false;
       if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
-      if (filterRiskStripes.size > 0 && table.riskStripe && !filterRiskStripes.has(table.riskStripe)) return false;
+      if (filterRiskStripes.size > 0 && (!table.riskStripe || !filterRiskStripes.has(table.riskStripe))) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);

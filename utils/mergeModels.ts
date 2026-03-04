@@ -1,4 +1,5 @@
 import type { DataModel, TableDef, Field } from '../types/model';
+import { getRiskStripeForTable } from '../lib/risk-stripe-assignments';
 
 /**
  * Merge an overlay model on top of a base model.
@@ -8,6 +9,7 @@ import type { DataModel, TableDef, Field } from '../types/model';
  * - Categories are unioned (base order preserved, overlay-only appended).
  * - Relationships are concatenated.
  * - Layers are unioned.
+ * - Tables without an explicit riskStripe get a default based on layer+category.
  */
 export function mergeModels(base: DataModel, overlay: DataModel): DataModel {
   const tables: Record<string, TableDef> = { ...base.tables };
@@ -28,6 +30,16 @@ export function mergeModels(base: DataModel, overlay: DataModel): DataModel {
       fields: [...baseTable.fields, ...newFields],
       ...(overlayTable.riskStripe && { riskStripe: overlayTable.riskStripe }),
     };
+  }
+
+  // Assign default risk stripes to any table that still has none
+  for (const [key, table] of Object.entries(tables)) {
+    if (!table.riskStripe) {
+      tables[key] = {
+        ...table,
+        riskStripe: getRiskStripeForTable(table.layer, table.category),
+      };
+    }
   }
 
   const relationships = [...base.relationships, ...overlay.relationships];

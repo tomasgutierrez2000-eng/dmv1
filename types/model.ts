@@ -17,7 +17,7 @@ export interface Field {
   notes?: string; // L3 only
 }
 
-export type RiskStripe = 'Credit' | 'Capital' | 'Liquidity' | 'Other';
+export type RiskStripe = 'Credit' | 'Capital' | 'Liquidity' | 'Reference' | 'Other';
 
 export interface TableDef {
   key: string; // "L1.facility_master"

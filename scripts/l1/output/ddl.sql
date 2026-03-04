@@ -119,6 +119,23 @@ CREATE TABLE IF NOT EXISTS l1.default_definition_dim (
   materiality_threshold_amt DECIMAL(18,2)
 );
 
+CREATE TABLE IF NOT EXISTS l1.internal_risk_rating_bucket_dim (
+  internal_risk_rating_bucket_code VARCHAR(20) NOT NULL PRIMARY KEY,
+  bucket_name VARCHAR(200),
+  rating_score_min INTEGER,
+  rating_score_max INTEGER,
+  display_order INTEGER,
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
+);
+
+CREATE TABLE IF NOT EXISTS l1.pricing_tier_dim (
+  pricing_tier_code VARCHAR(20) NOT NULL PRIMARY KEY,
+  tier_name VARCHAR(200),
+  tier_ordinal INTEGER,
+  display_order INTEGER,
+  active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
+);
+
 CREATE TABLE IF NOT EXISTS l1.maturity_bucket_dim (
   maturity_bucket_id BIGINT NOT NULL PRIMARY KEY,
   bucket_code VARCHAR(20),

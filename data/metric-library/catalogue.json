@@ -814,5 +814,126 @@
     "number_of_instances": 5,
     "directly_displayed": true,
     "status": "ACTIVE"
+  },
+  {
+    "item_id": "INT_INCOME",
+    "item_name": "Interest Income",
+    "abbreviation": "INT_INCOME",
+    "kind": "METRIC",
+    "definition": "Annualized gross interest income calculated as drawn (funded) balance multiplied by the all-in interest rate. Measures gross revenue generated from lending before deducting funding costs. Key input to NIM analysis, CCAR revenue projections, and FR Y-9C interest income reporting.",
+    "generic_formula": "Drawn_Amount x All_In_Rate_Pct / 100",
+    "data_type": "Decimal",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": ["FP"],
+    "regulatory_references": ["FR Y-9C", "CCAR revenue projection", "FR Y-14Q"],
+    "insight": "Drawn (funded) balance multiplied by the all-in interest rate, annualized",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "drawn_amount",
+        "description": "Funded/outstanding balance on the facility",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "120000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_pricing_snapshot",
+        "field": "all_in_rate_pct",
+        "description": "All-in interest rate (base rate + spread) as annual percentage",
+        "data_type": "DECIMAL(8,4)",
+        "sample_value": "6.2500"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key — links exposure and pricing snapshots to a single facility",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INT",
+        "sample_value": "200"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility Interest Income ($)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id), drawn_amount x all_in_rate_pct / 100 — join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "source_references": [
+          { "layer": "L2", "table": "facility_exposure_snapshot", "field": "drawn_amount" },
+          { "layer": "L2", "table": "facility_pricing_snapshot", "field": "all_in_rate_pct" }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Interest Income ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [counterparty_id], SUM(facility.drawn_amount * facility.all_in_rate_pct / 100) across all facilities WHERE counterparty_id matches",
+        "source_references": []
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Interest Income ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L3 LoB], SUM(facility.drawn_amount * facility.all_in_rate_pct / 100) for all facilities WHERE lob_segment_id matches desk",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Interest Income ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L2 Business Segment], SUM including child L3 segments via parent_segment_id traversal",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Interest Income ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L1 Business Segment], SUM including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
   }
 ]

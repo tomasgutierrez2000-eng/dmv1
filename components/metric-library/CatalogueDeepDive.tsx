@@ -10,6 +10,7 @@ import {
   PieChart,
   Info,
 } from 'lucide-react';
+import Link from 'next/link';
 import type { CatalogueItem, DemoFacility } from '@/lib/metric-library/types';
 import LevelStepWalkthrough from './LevelStepWalkthrough';
 import type { FlowStep } from './LevelStepWalkthrough';
@@ -321,6 +322,18 @@ const INSIGHTS: Record<TabKey, string> = {
 };
 
 /* ────────────────────────────────────────────────────────────────────────────
+ * LINEAGE PAGE ROUTES — metrics with dedicated lineage pages
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+const LINEAGE_ROUTES: Record<string, { href: string; label: string }> = {
+  LTV:              { href: '/metrics/ltv-lineage',       label: 'LTV End-to-End Lineage' },
+  DSCR:             { href: '/metrics/dscr-lineage',      label: 'DSCR End-to-End Lineage' },
+  WABR:             { href: '/metrics/wabr-lineage',      label: 'WABR End-to-End Lineage' },
+  INT_INCOME:       { href: '/metrics/int-income-lineage', label: 'Interest Income End-to-End Lineage' },
+  COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',  label: 'Committed Amount End-to-End Lineage' },
+};
+
+/* ────────────────────────────────────────────────────────────────────────────
  * MAIN COMPONENT
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -328,10 +341,24 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
   const [activeTab, setActiveTab] = useState<TabKey>('position');
 
   const demo = item.demo_data;
+  const lineageRoute = LINEAGE_ROUTES[item.abbreviation];
+
   if (!demo || !demo.facilities.length) {
     return (
       <div className="text-center py-12 text-gray-500">
-        <p className="text-sm">No demo data available for this item.</p>
+        {lineageRoute ? (
+          <>
+            <p className="text-sm mb-4">This metric has a dedicated interactive lineage diagram with guided demo walkthrough.</p>
+            <Link
+              href={lineageRoute.href}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+            >
+              View {lineageRoute.label} →
+            </Link>
+          </>
+        ) : (
+          <p className="text-sm">No demo data available for this item.</p>
+        )}
       </div>
     );
   }

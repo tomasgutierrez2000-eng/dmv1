@@ -23,6 +23,7 @@ export const RELEASE_ENTRIES: ReleaseEntry[] = [
   { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'tier_ordinal', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
   { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'display_order', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
   { date: '2026-03-04', layer: 'L1', table: 'pricing_tier_dim', field: 'active_flag', changeType: 'Added', rationale: 'Field added to new L1.pricing_tier_dim' },
+  { date: '2026-03-04', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'total_debt_service_amt', changeType: 'Added', rationale: 'Field added to L2.counterparty_financial_snapshot' },
 
   // ── 2026-03-04: Auto-detected changes ─────────────────────────
   { date: '2026-03-04', layer: 'L2', table: 'loan_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },

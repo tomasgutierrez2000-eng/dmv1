@@ -616,6 +616,7 @@ CREATE TABLE IF NOT EXISTS l2.counterparty_financial_snapshot (
   shareholders_equity_amt NUMERIC(18,2),
   ebitda_amt NUMERIC(18,2),
   noi_amt NUMERIC(18,2),
+  total_debt_service_amt NUMERIC(18,2),
   CONSTRAINT fk_counterparty_financial_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_counterparty_financial_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );

@@ -1662,6 +1662,8 @@ export function getL2SeedValue(
       if (columnName === 'shareholders_equity_amt') return equity;
       if (columnName === 'ebitda_amt') return ebitda;
       if (columnName === 'noi_amt') return noi;
+      // Total debt service = interest expense + estimated principal repayment (10% of total liabilities annualised)
+      if (columnName === 'total_debt_service_amt') return intExp + Math.round(totalLiabilities * 0.10);
       break;
     }
   }

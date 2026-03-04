@@ -1328,5 +1328,23 @@
     "regulatory_references": [
       "FR Y-14M"
     ]
+  },
+  {
+    "metric_id": "INT_INCOME",
+    "metric_name": "Interest Income",
+    "definition": "Annualized gross interest income calculated as drawn (funded) balance multiplied by the all-in interest rate. Measures gross revenue generated from lending before deducting funding costs. Key input to NIM analysis, CCAR revenue projections, and FR Y-9C interest income reporting.",
+    "generic_formula": "Drawn_Amount × All_In_Rate_Pct / 100",
+    "metric_class": "CALCULATED",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "rollup_philosophy": "Additive — SUM at each aggregation level",
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR revenue projection",
+      "FR Y-14Q"
+    ]
   }
 ]

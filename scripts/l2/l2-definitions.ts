@@ -636,6 +636,7 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'shareholders_equity_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'ebitda_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'noi_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'total_debt_service_amt', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
 ];

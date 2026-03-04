@@ -18,6 +18,7 @@ import { PositionTable, FacilityTable } from './WorkedExampleTable';
 import HierarchyPyramid from './HierarchyPyramid';
 import TableTraversalDemo from './TableTraversalDemo';
 import IntIncomeTableTraversalDemo from './IntIncomeTableTraversalDemo';
+import DSCRTableTraversalDemo from './DSCRTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -725,9 +726,10 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
         </p>
       </div>
 
-      {/* Table Traversal Demo — animated walkthrough of how tables connect per dimension (LTV-specific) */}
+      {/* Table Traversal Demo — animated walkthrough of how tables connect per dimension */}
       {item.abbreviation === 'LTV' && <TableTraversalDemo />}
       {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
+      {item.abbreviation === 'DSCR' && <DSCRTableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}
       <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />

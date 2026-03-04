@@ -36,6 +36,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { DSCR_PORTFOLIO_BUCKETS } from './demo/demoRollupData';
+import DSCRTableTraversalDemo from './DSCRTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * TYPES
@@ -3649,6 +3650,13 @@ export default function DSCRLineageView({
             </div>
           </div>
           <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
+        </section>
+
+        <FlowArrow label="Watch how the tables connect for each dimension" />
+
+        {/* ── TABLE TRAVERSAL DEMO — animated database walkthrough ── */}
+        <section data-demo="table-traversal">
+          <DSCRTableTraversalDemo />
         </section>
 
         <FlowArrow label="Dashboard builder selects variant + dimension" />

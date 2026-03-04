@@ -2789,6 +2789,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "total_debt_service_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   }
 }

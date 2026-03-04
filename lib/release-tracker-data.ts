@@ -10,6 +10,9 @@ export interface ReleaseEntry {
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
   // ── 2026-03-04: Auto-detected changes ─────────────────────────
+  { date: '2026-03-04', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'total_debt_service_amt', changeType: 'Added', rationale: 'Field added to L2.counterparty_financial_snapshot' },
+
+  // ── 2026-03-04: Auto-detected changes ─────────────────────────
   { date: '2026-03-04', layer: 'L2', table: 'loan_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
   { date: '2026-03-04', layer: 'L2', table: 'derivative_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
   { date: '2026-03-04', layer: 'L2', table: 'sft_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },

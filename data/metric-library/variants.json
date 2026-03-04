@@ -332,12 +332,13 @@
     "parent_metric_id": "DSCR",
     "variant_type": "CALCULATED",
     "status": "ACTIVE",
-    "formula_display": "Cashflow / Total Debt Service",
+    "formula_display": "NOI / Debt_Service",
     "rollup_logic": {
-      "facility": "For each DISTINCT(facility_id) THEN [noi] / [debt_service] from facility_financial_snapshot",
-      "counterparty": "For each [counterparty_id] THEN SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
-      "desk": "For each [L3 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
-      "portfolio": "For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments"
+      "facility": "For each DISTINCT(facility_id) THEN [noi_amt] / [total_debt_service_amt] from facility_financial_snapshot. For CRE: property-level NOI.",
+      "counterparty": "For each [counterparty_id] THEN SUM(noi_amt) / SUM(total_debt_service_amt). CRE: aggregate from facility_financial_snapshot. C&I: from counterparty_financial_snapshot.noi_amt / counterparty_financial_snapshot.total_debt_service_amt.",
+      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3', THEN SUM(noi_amt) / SUM(total_debt_service_amt) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 LoB], SUM(noi_amt) / SUM(total_debt_service_amt) including child L3 segments via parent_segment_id traversal",
+      "lob": "For each [L1 LoB], SUM(noi_amt) / SUM(total_debt_service_amt) including all descendant L2/L3 segments via recursive parent_segment_id traversal"
     },
     "weighting_basis": "BY_EAD"
   },
@@ -1199,5 +1200,20 @@
     },
     "source_table": "position_exposure_snapshot",
     "source_field": "gross_exposure_usd"
+  },
+  {
+    "variant_id": "INT_INCOME_CALC",
+    "variant_name": "Interest Income (Calculated)",
+    "parent_metric_id": "INT_INCOME",
+    "variant_type": "CALCULATED",
+    "status": "ACTIVE",
+    "formula_display": "Drawn_Amount × All_In_Rate_Pct / 100",
+    "rollup_logic": {
+      "facility": "For each DISTINCT(facility_id) THEN [drawn_amount] × [all_in_rate_pct] / 100 — join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+      "counterparty": "For each [counterparty_id] THEN SUM(facility.drawn_amount × facility.all_in_rate_pct / 100) WHERE IS([counterparty_id])",
+      "desk": "For each [L3 LoB] SUM(facility.drawn_amount × facility.all_in_rate_pct / 100) for all facilities WHERE IS([lob_segment_id])",
+      "portfolio": "For each [L2 LoB] SUM including child L3 segments via parent_segment_id traversal",
+      "lob": "For each [L1 LoB] SUM including all descendant L2/L3 segments via recursive parent_segment_id traversal"
+    }
   }
 ]

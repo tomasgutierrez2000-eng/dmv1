@@ -264,4 +264,40 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
+  ({
+    id: 'C108',
+    name: 'Interest Income ($)',
+    page: 'P4',
+    section: 'Deep Dive',
+    metricType: 'Aggregate',
+    formula: 'SUM(drawn_amount * all_in_rate_pct / 100)',
+    description: 'Annualized gross interest income — drawn balance times all-in rate — summed across hierarchy levels.',
+    displayFormat: '$#,##0',
+    sampleValue: '—',
+    sourceFields: [
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'drawn_amount' },
+      { layer: 'L2', table: 'facility_pricing_snapshot', field: 'all_in_rate_pct' },
+      { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
+      { layer: 'L1', table: 'facility_master', field: 'lob_segment_id' },
+    ],
+    dimensions: [
+      { dimension: 'as_of_date', interaction: 'FILTER' },
+      { dimension: 'facility_id', interaction: 'GROUP_BY' },
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+    ],
+    allowedDimensions: ALL_DIMS,
+    displayNameByDimension: {
+      facility: 'Facility Interest Income ($)',
+      counterparty: 'Counterparty Interest Income ($)',
+      L3: 'L3 Desk Interest Income ($)',
+      L2: 'L2 Portfolio Interest Income ($)',
+      L1: 'L1 Department Interest Income ($)',
+    },
+    formulasByDimension: buildGroupedFormula(
+      'SUM(drawn_amount * all_in_rate_pct / 100)',
+      'SUM(fes.drawn_amount * fps.all_in_rate_pct / 100)',
+      'FROM L2.facility_exposure_snapshot fes JOIN L2.facility_pricing_snapshot fps ON fps.facility_id = fes.facility_id AND fps.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id',
+      'WHERE fes.as_of_date = :as_of_date'
+    ),
+  }),
 ];

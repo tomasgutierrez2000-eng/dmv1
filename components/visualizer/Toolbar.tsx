@@ -24,6 +24,7 @@ import { modelToSchemaExport } from '../../utils/schemaExport';
 import { schemaExportToModel } from '../../utils/schemaExport';
 import { schemaToFieldsSheetData, schemaToRelationshipsSheetData } from '../../utils/schemaExportExcel';
 import { parseSchemaFromWorkbook } from '../../utils/schemaExportExcel';
+import { exportSchemaToExcel } from '../../utils/schemaExportExcelPro';
 import { computeModelDiff } from '../../utils/modelDiff';
 import type { DataModel } from '../../types/model';
 import type { SchemaExport } from '../../types/schemaExport';
@@ -159,22 +160,14 @@ export default function Toolbar() {
         URL.revokeObjectURL(a.href);
         toast({ type: 'success', title: 'Schema exported', description: 'JSON file downloaded.' });
       } else {
-        const XLSX = await import('xlsx');
-        const wb = XLSX.utils.book_new();
-        const fieldsData = schemaToFieldsSheetData(exported);
-        const relData = schemaToRelationshipsSheetData(exported);
-        const wsFields = XLSX.utils.aoa_to_sheet(fieldsData);
-        const wsRels = XLSX.utils.aoa_to_sheet(relData);
-        XLSX.utils.book_append_sheet(wb, wsFields, 'Fields');
-        XLSX.utils.book_append_sheet(wb, wsRels, 'Relationships');
-        const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+        const buf = await exportSchemaToExcel(exported);
         const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `data-model-schema-${new Date().toISOString().slice(0, 10)}.xlsx`;
         a.click();
         URL.revokeObjectURL(a.href);
-        toast({ type: 'success', title: 'Schema exported', description: 'Excel file downloaded.' });
+        toast({ type: 'success', title: 'Schema exported', description: 'Excel file with 5 tabs downloaded.' });
       }
       return;
     }

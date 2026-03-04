@@ -9,6 +9,13 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-03-04: Auto-detected changes ─────────────────────────
+  { date: '2026-03-04', layer: 'L2', table: 'loan_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-04', layer: 'L2', table: 'derivative_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-04', layer: 'L2', table: 'sft_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-04', layer: 'L2', table: 'guarantee_lc_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-04', layer: 'L2', table: 'bond_security_position_detail', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+
   // ── 2026-03-03: Auto-detected changes ─────────────────────────
   { date: '2026-03-03', layer: 'L3', table: 'risk_metric_cube', field: 'rwa_density_pct', changeType: 'Added', rationale: 'Field added to L3.risk_metric_cube' },
   { date: '2026-03-03', layer: 'L3', table: 'counterparty_exposure_summary', field: 'rwa_amt', changeType: 'Added', rationale: 'Field added to L3.counterparty_exposure_summary' },

@@ -3,7 +3,7 @@
 import type { Relationship } from '../../types/model';
 import type { TablePosition } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS, ZOOM_THRESHOLDS } from '../../utils/layoutEngine';
 
 interface RelationshipLineProps {
   relationship: Relationship;
@@ -80,7 +80,6 @@ export default function RelationshipLine({
     ? compactTableHeight
     : (targetIsExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT);
 
-  const ZOOM_THRESHOLDS = { VERY_LOW: 0.25, LOW: 0.4, MEDIUM: 0.6, HIGH: 1.0 };
   const zoomLevel = zoom;
   const isCompact = isOverviewMode || viewMode === 'compact' || zoomLevel < ZOOM_THRESHOLDS.MEDIUM;
   const isDetailed = !isOverviewMode && viewMode === 'detailed' && zoomLevel >= ZOOM_THRESHOLDS.HIGH;

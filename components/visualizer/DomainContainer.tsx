@@ -43,7 +43,7 @@ export default function DomainContainer({
     const relationships = model ? model.relationships.filter(r => {
       const sourceTable = visibleTables.find(t => t.key === r.source.tableKey);
       const targetTable = visibleTables.find(t => t.key === r.target.tableKey);
-      return sourceTable || targetTable;
+      return sourceTable && targetTable;
     }).length : 0;
     
     return { byLayer, totalFields, relationships, tableCount: visibleTables.length };
@@ -93,7 +93,7 @@ export default function DomainContainer({
         }}
       >
         <div
-          className={`h-full ${isOverview ? 'px-3 py-2' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all duration-150 hover:bg-white/10 active:bg-white/15 active:scale-[0.995]`}
+          className={`h-full ${isOverview ? 'px-3 py-2' : 'px-6 py-4'} rounded-t-xl cursor-pointer transition-all duration-150 hover:bg-white/10 active:bg-white/15 active:scale-[0.995] focus:ring-2 focus:ring-white/40 focus:outline-none`}
           onClick={(e) => { e.stopPropagation(); onToggle(); }}
           role="button"
           tabIndex={0}

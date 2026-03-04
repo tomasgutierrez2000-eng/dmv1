@@ -43,6 +43,14 @@ export const OVERVIEW_CARD = {
   FIELD_OFFSET: 11, // baseline offset from content-area top to first field text
 } as const;
 
+/** Zoom level thresholds for progressive disclosure (shared by TableNode and RelationshipLine) */
+export const ZOOM_THRESHOLDS = {
+  VERY_LOW: 0.25,   // Below this: hide fields completely
+  LOW: 0.4,         // Below this: show only field names
+  MEDIUM: 0.6,      // Below this: show names + data types
+  HIGH: 1.0,        // Above this: show all details
+} as const;
+
 /** Compact overview: smaller cards and tighter spacing so more tables fit on screen; width allows ~20ch so field names don't truncate to garbled text */
 export function getCompactOverviewTableDimensions(): { width: number; height: number } {
   return { width: 200, height: 90 };

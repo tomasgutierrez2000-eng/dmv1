@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Database, Key, Link2, ChevronRight, ChevronDown, Layers, Search, RefreshCw, AlertCircle, Plus, Trash2, FileCode, Loader2, Pencil } from 'lucide-react';
+import { Database, Key, Link2, ChevronRight, ChevronDown, Layers, Search, RefreshCw, AlertCircle, Plus, Trash2, FileCode, Loader2, Pencil, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface FieldDefinition {
@@ -530,9 +530,18 @@ export default function DataModelPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tables..."
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                className="pl-10 pr-8 py-2 w-full border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
                 style={{ color: '#111827' }}
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-gray-400 hover:text-gray-700 transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
             <div className="flex space-x-2">
               <button
@@ -711,6 +720,18 @@ export default function DataModelPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {viewMode === 'layers' ? (
           <div className="space-y-6">
+            {searchQuery && filteredTables.length === 0 && (
+              <div className="text-center py-12">
+                <Search className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">No tables match &ldquo;{searchQuery}&rdquo;</p>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+                >
+                  Clear search
+                </button>
+              </div>
+            )}
             {(['L1', 'L2', 'L3'] as const).map((layer) => {
               const tables = tablesByLayer[layer];
               const isExpanded = expandedLayers.has(layer);
@@ -721,6 +742,7 @@ export default function DataModelPage() {
                   <button
                     onClick={() => toggleLayer(layer)}
                     className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    aria-expanded={isExpanded}
                   >
                     <div className="flex items-center space-x-3">
                       {isExpanded ? (
@@ -766,9 +788,9 @@ export default function DataModelPage() {
                               onClick={() => setSelectedTable(table.id === selectedTable ? null : table.id)}
                             >
                               <div className="flex items-start justify-between mb-2">
-                                <div className="flex items-center space-x-2">
-                                  <Database className="w-4 h-4" style={{ color: colors.text }} />
-                                  <h3 className="font-bold text-sm" style={{ color: colors.text }}>
+                                <div className="flex items-center space-x-2 min-w-0">
+                                  <Database className="w-4 h-4 flex-shrink-0" style={{ color: colors.text }} />
+                                  <h3 className="font-bold text-sm truncate" style={{ color: colors.text }} title={table.name}>
                                     {table.name}
                                   </h3>
                                 </div>
@@ -823,7 +845,7 @@ export default function DataModelPage() {
                                   {table.fields.map((field, idx) => (
                                     <div
                                       key={idx}
-                                      className="text-xs font-mono bg-white bg-opacity-70 p-1.5 rounded border border-gray-200"
+                                      className="text-xs font-mono bg-white bg-opacity-70 p-1.5 rounded border border-gray-200 break-all"
                                     >
                                       {field}
                                     </div>
@@ -901,6 +923,7 @@ export default function DataModelPage() {
                 <button
                   onClick={() => setSelectedTable(null)}
                   className="text-pwc-gray-light hover:text-gray-600 text-2xl"
+                  aria-label="Close detail panel"
                 >
                   ×
                 </button>

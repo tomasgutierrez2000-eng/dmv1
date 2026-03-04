@@ -381,6 +381,24 @@
           "description": "Add to l2.borrowing_position_detail.treasury_control_flag CHAR(1)",
           "isPK": false,
           "isFK": false
+        },
+        {
+          "name": "issue date",
+          "description": "Add to l2.borrowing_position_detail.issue_date DATE",
+          "isPK": false,
+          "isFK": false
+        },
+        {
+          "name": "original amount",
+          "description": "Add to l2.borrowing_position_detail.original_amount NUMERIC(18,2)",
+          "isPK": false,
+          "isFK": false
+        },
+        {
+          "name": "interest rate type",
+          "description": "Add to l2.borrowing_position_detail.interest_rate_type_code VARCHAR(30)",
+          "isPK": false,
+          "isFK": false
         }
       ]
     },
@@ -4830,33 +4848,9 @@
         },
         {
           "name": "asset/liability id",
-          "description": "Existing: l2.cash_flow.facility_id / position_id",
+          "description": "Add to l2.cash_flow.position_id BIGINT — FK to the asset or liability generating the cashflow",
           "isPK": false,
           "isFK": true
-        },
-        {
-          "name": "inbound/outbound cash flow",
-          "description": "Existing: l2.cash_flow.flow_direction",
-          "isPK": false,
-          "isFK": false
-        },
-        {
-          "name": "contractual cashflow dates",
-          "description": "Existing: l2.cash_flow.cash_flow_date / flow_date",
-          "isPK": false,
-          "isFK": false
-        },
-        {
-          "name": "principal cashflow amount",
-          "description": "Add to l2.cash_flow.principal_cashflow_amt NUMERIC(18,2) \u2014 currently only combined amount",
-          "isPK": false,
-          "isFK": false
-        },
-        {
-          "name": "interest cashflow amount",
-          "description": "Add to l2.cash_flow.interest_cashflow_amt NUMERIC(18,2) \u2014 currently only combined amount",
-          "isPK": false,
-          "isFK": false
         },
         {
           "name": "payment id",
@@ -4865,32 +4859,26 @@
           "isFK": false
         },
         {
-          "name": "facility_id",
-          "description": "FK to facility/position",
-          "isPK": false,
-          "isFK": true
-        },
-        {
-          "name": "as_of_date",
-          "description": "Snapshot date",
+          "name": "flow direction",
+          "description": "Add to l2.cash_flow.flow_direction VARCHAR(20) — Inbound/Outbound",
           "isPK": false,
           "isFK": false
         },
         {
-          "name": "flow_direction",
-          "description": "Inbound/Outbound",
+          "name": "cash flow date",
+          "description": "Add to l2.cash_flow.cash_flow_date DATE — projected flow date",
           "isPK": false,
           "isFK": false
         },
         {
-          "name": "cash_flow_date",
-          "description": "Projected flow date",
+          "name": "principal cashflow amount",
+          "description": "Add to l2.cash_flow.principal_cashflow_amt NUMERIC(18,2)",
           "isPK": false,
           "isFK": false
         },
         {
-          "name": "amount",
-          "description": "Combined flow amount",
+          "name": "interest cashflow amount",
+          "description": "Add to l2.cash_flow.interest_cashflow_amt NUMERIC(18,2)",
           "isPK": false,
           "isFK": false
         }

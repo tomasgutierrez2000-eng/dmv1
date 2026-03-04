@@ -76,7 +76,7 @@ const layerColors = {
   L1: { bg: '#D04A02', border: '#D04A02', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-orange-100 text-orange-800' },
   L2: { bg: '#E87722', border: '#E87722', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-amber-100 text-amber-800' },
   L3: { bg: '#6B7280', border: '#6B7280', text: '#ffffff', cardBadge: 'bg-white/20 text-white', badge: 'bg-gray-100 text-gray-700' },
-};
+} as const;
 
 // Transform parsed data dictionary to visualization format
 const transformDataDictionary = (dataDict: DataDictionary): TableDefinition[] => {
@@ -375,6 +375,16 @@ export default function DataModelPage() {
     );
   }, [searchQuery, tableDefinitions]);
 
+  const filteredTableIds = useMemo(() => new Set(filteredTables.map((t) => t.id)), [filteredTables]);
+
+  const filteredRelationships = useMemo(() => {
+    if (!dataDictionary) return [];
+    if (!searchQuery) return dataDictionary.relationships;
+    return dataDictionary.relationships.filter(
+      (rel) => filteredTableIds.has(rel.from_table) || filteredTableIds.has(rel.to_table)
+    );
+  }, [dataDictionary, searchQuery, filteredTableIds]);
+
   const tablesByLayer = useMemo(() => {
     const grouped = { L1: [] as TableDefinition[], L2: [] as TableDefinition[], L3: [] as TableDefinition[] };
     filteredTables.forEach((table) => {
@@ -457,7 +467,7 @@ export default function DataModelPage() {
             <div>
               <h1 className="text-3xl font-bold" style={{ color: '#111827' }}>Bank Data Model</h1>
               <p className="mt-2 text-sm" style={{ color: '#4b5563' }}>
-                {tableDefinitions.length} tables from parsed Excel workbook
+                {searchQuery ? `${filteredTables.length} of ${tableDefinitions.length}` : tableDefinitions.length} tables from parsed Excel workbook
               </p>
             </div>
             <div className="flex items-center flex-wrap gap-2">
@@ -733,6 +743,9 @@ export default function DataModelPage() {
 
                   {isExpanded && (
                     <div className="border-t border-gray-200 p-6">
+                      {tables.length === 0 ? (
+                        <p className="text-gray-400 text-sm italic">No tables match the current search.</p>
+                      ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {tables.map((table) => {
                           const isTableExpanded = expandedTables.has(table.id);
@@ -743,8 +756,8 @@ export default function DataModelPage() {
                               key={table.id}
                               className={`border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
                                 selectedTable === table.id
-                                  ? 'ring-4 ring-yellow-400 border-yellow-500'
-                                  : `border-${colors.border}`
+                                  ? 'ring-4 ring-yellow-400'
+                                  : ''
                               }`}
                               style={{
                                 backgroundColor: colors.bg,
@@ -821,6 +834,7 @@ export default function DataModelPage() {
                           );
                         })}
                       </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -829,10 +843,13 @@ export default function DataModelPage() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold mb-4">Table Relationships</h2>
-            {dataDictionary && dataDictionary.relationships.length > 0 ? (
+            <h2 className="text-xl font-bold mb-4">
+              Table Relationships
+              {searchQuery && <span className="text-sm font-normal text-gray-500 ml-2">({filteredRelationships.length} matching)</span>}
+            </h2>
+            {filteredRelationships.length > 0 ? (
               <div className="space-y-4">
-                {dataDictionary.relationships.map((rel, idx) => (
+                {filteredRelationships.map((rel, idx) => (
                   <div key={idx} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center space-x-2">
@@ -857,7 +874,7 @@ export default function DataModelPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600">No relationships found in parsed data dictionary.</p>
+              <p className="text-gray-600">{searchQuery ? 'No relationships match the current search.' : 'No relationships found in parsed data dictionary.'}</p>
             )}
           </div>
         )}

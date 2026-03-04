@@ -6,6 +6,22 @@ export type TableSize = 'small' | 'medium' | 'large';
 
 export type VisibleLayers = { L1: boolean; L2: boolean; L3: boolean };
 
+/** Base card dimensions for non-overview modes (shared by TableNode, RelationshipLine, Canvas) */
+export const BASE_CARD = {
+  TABLE_WIDTH: 560,
+  COLLAPSED_HEIGHT: 320,
+  EXPANDED_HEIGHT: 600,
+  HEADER_HEIGHT: 56,
+  FOOTER_HEIGHT: 48,
+} as const;
+
+/** Size multipliers per table size setting (shared by TableNode, RelationshipLine, Canvas) */
+export const SIZE_MULTIPLIERS: Record<TableSize, { width: number; height: number }> = {
+  small: { width: 0.8, height: 0.9 },
+  medium: { width: 1.0, height: 1.0 },
+  large: { width: 1.35, height: 1.25 },
+};
+
 /** Overview table dimensions by size (used by layout, Canvas, and TableNode) - larger for readability */
 export function getOverviewTableDimensions(tableSize: TableSize): { width: number; height: number } {
   switch (tableSize) {

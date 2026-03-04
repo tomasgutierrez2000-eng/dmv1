@@ -1907,7 +1907,7 @@
       "name": "counterparty_credit_profile",
       "layer": "L2",
       "category": "Customer",
-      "riskStripe": "Other",
+      "riskStripe": "Reference",
       "fields": [
         {
           "name": "income documentation",
@@ -2297,7 +2297,7 @@
       "name": "legal_entity_cost_center_hierarchy",
       "layer": "L1",
       "category": "Legal Entity",
-      "riskStripe": "Other",
+      "riskStripe": "Reference",
       "fields": [
         {
           "name": "child cost center id",
@@ -4901,7 +4901,7 @@
       "name": "counterparty_financial_snapshot",
       "layer": "L2",
       "category": "Customer",
-      "riskStripe": "Other",
+      "riskStripe": "Reference",
       "fields": [
         {
           "name": "date of financials",
@@ -5096,7 +5096,7 @@
       "name": "counterparty",
       "layer": "L1",
       "category": "Customer",
-      "riskStripe": "Other",
+      "riskStripe": "Reference",
       "fields": [
         {
           "name": "as of date",
@@ -5579,7 +5579,7 @@
       "name": "legal_entity",
       "layer": "L1",
       "category": "Legal Entity",
-      "riskStripe": "Other",
+      "riskStripe": "Reference",
       "fields": [
         {
           "name": "legal entity id",
@@ -5873,7 +5873,7 @@
       "name": "ledger_account_dim",
       "layer": "L1",
       "category": "GL",
-      "riskStripe": "Other",
+      "riskStripe": "Reference",
       "fields": [
         {
           "name": "as of date",

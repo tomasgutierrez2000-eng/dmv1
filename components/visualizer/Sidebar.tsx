@@ -106,7 +106,7 @@ export default function Sidebar() {
       if (!visibleLayers[table.layer]) return false;
       if (table.layer === 'L3' && l3CategoryExcluded.has(table.category)) return false;
       if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
-      if (filterRiskStripes.size > 0 && table.riskStripe && !filterRiskStripes.has(table.riskStripe)) return false;
+      if (filterRiskStripes.size > 0 && (!table.riskStripe || !filterRiskStripes.has(table.riskStripe))) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
@@ -298,6 +298,7 @@ export default function Sidebar() {
               { stripe: 'Credit' as RiskStripe, color: '#dc2626', bg: '#fef2f2' },
               { stripe: 'Capital' as RiskStripe, color: '#7c3aed', bg: '#f5f3ff' },
               { stripe: 'Liquidity' as RiskStripe, color: '#2563eb', bg: '#eff6ff' },
+              { stripe: 'Reference' as RiskStripe, color: '#0d9488', bg: '#f0fdfa' },
               { stripe: 'Other' as RiskStripe, color: '#6b7280', bg: '#f9fafb' },
             ]).map(({ stripe, color, bg }) => {
               const active = filterRiskStripes.size === 0 || filterRiskStripes.has(stripe);

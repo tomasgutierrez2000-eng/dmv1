@@ -18,6 +18,7 @@ import { PositionTable, FacilityTable } from './WorkedExampleTable';
 import HierarchyPyramid from './HierarchyPyramid';
 import TableTraversalDemo from './TableTraversalDemo';
 import IntIncomeTableTraversalDemo from './IntIncomeTableTraversalDemo';
+import IntExpenseTableTraversalDemo from './IntExpenseTableTraversalDemo';
 import DSCRTableTraversalDemo from './DSCRTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -605,8 +606,9 @@ const LINEAGE_ROUTES: Record<string, { href: string; label: string }> = {
   LTV:              { href: '/metrics/ltv-lineage',       label: 'LTV End-to-End Lineage' },
   DSCR:             { href: '/metrics/dscr-lineage',      label: 'DSCR End-to-End Lineage' },
   WABR:             { href: '/metrics/wabr-lineage',      label: 'WABR End-to-End Lineage' },
-  INT_INCOME:       { href: '/metrics/int-income-lineage', label: 'Interest Income End-to-End Lineage' },
-  COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',  label: 'Committed Amount End-to-End Lineage' },
+  INT_INCOME:       { href: '/metrics/int-income-lineage',  label: 'Interest Income End-to-End Lineage' },
+  INT_EXPENSE:      { href: '/metrics/int-expense-lineage', label: 'Interest Expense End-to-End Lineage' },
+  COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',   label: 'Committed Amount End-to-End Lineage' },
 };
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -623,6 +625,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
     return (
       <div className="space-y-6">
         {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
+        {item.abbreviation === 'INT_EXPENSE' && <IntExpenseTableTraversalDemo />}
         <div className="text-center py-12 text-gray-500">
           {lineageRoute ? (
             <>
@@ -729,6 +732,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
       {/* Table Traversal Demo — animated walkthrough of how tables connect per dimension */}
       {item.abbreviation === 'LTV' && <TableTraversalDemo />}
       {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
+      {item.abbreviation === 'INT_EXPENSE' && <IntExpenseTableTraversalDemo />}
       {item.abbreviation === 'DSCR' && <DSCRTableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}

@@ -364,16 +364,9 @@ export default function Canvas() {
     }
 
     const overviewDims = getOverviewTableDimensions(tableSize);
-    const BASE_TW = 560;
-    const BASE_TH = 320;
-    const SM: Record<string, { w: number; h: number }> = {
-      small: { w: 0.8, h: 0.9 },
-      medium: { w: 1.0, h: 1.0 },
-      large: { w: 1.35, h: 1.25 },
-    };
     const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
-    const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
-    const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
+    const tw = isOverview ? overviewDims.width : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
+    const th = isOverview ? overviewDims.height : BASE_CARD.COLLAPSED_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
     const hGap = Math.round(tw * (isOverview ? 0.24 : 0.16));
     const vGap = Math.round(th * (isOverview ? 0.24 : 0.18));
 
@@ -638,16 +631,9 @@ export default function Canvas() {
     if (fieldRels.length === 0) return;
 
     const overviewDims = getOverviewTableDimensions(tableSize);
-    const BASE_TW = 560;
-    const BASE_TH = 320;
-    const SM: Record<string, { w: number; h: number }> = {
-      small: { w: 0.8, h: 0.9 },
-      medium: { w: 1.0, h: 1.0 },
-      large: { w: 1.35, h: 1.25 },
-    };
     const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
-    const tw = isOverview ? overviewDims.width : BASE_TW * SM[tableSize].w;
-    const th = isOverview ? overviewDims.height : BASE_TH * SM[tableSize].h;
+    const tw = isOverview ? overviewDims.width : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
+    const th = isOverview ? overviewDims.height : BASE_CARD.COLLAPSED_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
 
     const anchorKey = selectedField.tableKey;
     const currentPositions = useModelStore.getState().tablePositions;

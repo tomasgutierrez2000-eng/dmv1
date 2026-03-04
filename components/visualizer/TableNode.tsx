@@ -5,7 +5,7 @@ import type { TableDef } from '../../types/model';
 import { layerColors } from '../../utils/colors';
 import { getCategoryColor } from '../../utils/colors';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS, ZOOM_THRESHOLDS } from '../../utils/layoutEngine';
 
 interface TableNodeProps {
   table: TableDef;
@@ -84,15 +84,6 @@ export default function TableNode({
     ? compactTableHeight
     : (isOverviewMode ? COLLAPSED_HEIGHT : (isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT));
   const SCROLLABLE_AREA_HEIGHT = EXPANDED_HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT;
-  
-  // Progressive disclosure based on zoom level
-  // Define zoom thresholds for different detail levels
-  const ZOOM_THRESHOLDS = {
-    VERY_LOW: 0.25,   // Below this: hide fields completely
-    LOW: 0.4,         // Below this: show only field names
-    MEDIUM: 0.6,      // Below this: show names + data types
-    HIGH: 1.0,        // Above this: show all details
-  };
   
   // Determine what to show based on zoom level
   const zoomLevel = zoom; // Use actual zoom value from store

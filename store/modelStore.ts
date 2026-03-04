@@ -288,6 +288,7 @@ export const useModelStore = create<ModelStore>((set) => ({
       selectedField: null,
       selectedSampleDataCell: null,
       focusMode: false,
+      detailPanelOpen: false,
       requestFitToView: Date.now(), // trigger fit-to-view so content is always visible
     }),
   setRequestFitToView: () => set({ requestFitToView: Date.now() }),

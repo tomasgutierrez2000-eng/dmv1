@@ -12807,6 +12807,12 @@
           "description": "",
           "category": "Uncategorized",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
         }
       ]
     }
@@ -20412,7 +20418,7 @@
     {
       "name": "metric_value_fact",
       "layer": "L3",
-      "category": "L3",
+      "category": "Dashboard Consumption",
       "fields": [
         {
           "name": "run_version_id",

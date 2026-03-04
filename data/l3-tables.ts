@@ -1,12 +1,12 @@
 /**
- * L3 Table manifest — 49 tables from the SQL generation package.
+ * L3 Table manifest — 50 tables from the SQL generation package.
  * Matches sql/l3/01_DDL_all_tables.sql and execution order in 06_ORCHESTRATOR.sql.
  */
 
 export type L3Tier = 1 | 2 | 3 | 4;
 
 export interface L3TableDef {
-  id: string;           // T01..T49
+  id: string;           // T01..T50
   name: string;         // table name (e.g. exposure_metric_cube)
   category: string;    // from DDL comment (e.g. "Exposure & Risk Metrics")
   tier: L3Tier;        // population tier: 1 = L1+L2 only, 2 = reads T1, 3 = reads T1–2, 4 = reads all

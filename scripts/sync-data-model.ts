@@ -343,6 +343,12 @@ export function syncDataModel(): SyncReport {
       ddTableMap.L3.set(table.name, newTable);
       report.tablesAdded.push(`L3.${table.name}`);
     } else {
+      // Sync category from l3-tables.ts manifest
+      if (meta && existing.category !== meta.category) {
+        report.fieldsAdded.push(`L3.${table.name} category: ${existing.category} → ${meta.category}`);
+        existing.category = meta.category;
+      }
+
       const existingFields = new Set(existing.fields.map(f => f.name));
       for (const col of table.columns) {
         if (!existingFields.has(col.name)) {

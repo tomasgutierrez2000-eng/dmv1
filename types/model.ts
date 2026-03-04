@@ -17,11 +17,14 @@ export interface Field {
   notes?: string; // L3 only
 }
 
+export type RiskStripe = 'Credit' | 'Capital' | 'Liquidity' | 'Other';
+
 export interface TableDef {
   key: string; // "L1.facility_master"
   name: string; // "facility_master"
   layer: 'L1' | 'L2' | 'L3';
   category: string;
+  riskStripe?: RiskStripe;
   fields: Field[];
 }
 

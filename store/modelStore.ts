@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { DataModel, TablePosition } from '../types/model';
+import type { DataModel, TablePosition, RiskStripe } from '../types/model';
 
 interface ModelStore {
   // Data
@@ -27,6 +27,8 @@ interface ModelStore {
   filterCategories: Set<string>; // Set of selected category names (empty = all)
   /** L3 only: categories to hide. Empty = show all L3 categories. */
   l3CategoryExcluded: Set<string>;
+  /** Risk stripe filter. Empty = show all stripes. */
+  filterRiskStripes: Set<RiskStripe>;
   
   // UI
   theme: 'dark' | 'light';
@@ -66,6 +68,8 @@ interface ModelStore {
   toggleFilterCategory: (category: string) => void;
   toggleL3Category: (category: string) => void; // When L3 visible: show/hide this L3 category
   setL3CategoryExcluded: (categories: Set<string>) => void;
+  toggleRiskStripe: (stripe: RiskStripe) => void;
+  clearRiskStripes: () => void;
   setTheme: (theme: 'dark' | 'light') => void;
   setShowMinimap: (show: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
@@ -106,6 +110,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   visibleLayers: { L1: true, L2: true, L3: true },
   filterCategories: new Set<string>(), // Empty set = show all categories
   l3CategoryExcluded: new Set<string>(), // Empty = show all L3 categories
+  filterRiskStripes: new Set<RiskStripe>(), // Empty = show all stripes
   theme: 'dark',
   showMinimap: true,
   sidebarOpen: true,
@@ -211,6 +216,14 @@ export const useModelStore = create<ModelStore>((set) => ({
       return { l3CategoryExcluded: next };
     }),
   setL3CategoryExcluded: (categories) => set({ l3CategoryExcluded: categories }),
+  toggleRiskStripe: (stripe) =>
+    set((state) => {
+      const next = new Set(state.filterRiskStripes);
+      if (next.has(stripe)) next.delete(stripe);
+      else next.add(stripe);
+      return { filterRiskStripes: next };
+    }),
+  clearRiskStripes: () => set({ filterRiskStripes: new Set<RiskStripe>() }),
   setTheme: (theme) => set({ theme }),
   setShowMinimap: (show) => set({ showMinimap: show }),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),

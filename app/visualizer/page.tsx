@@ -13,9 +13,10 @@ import KeyboardShortcutsPanel from '../../components/visualizer/KeyboardShortcut
 import L3SampleDataStrip from '../../components/visualizer/L3SampleDataStrip';
 import VisualizerTour from '../../components/visualizer/VisualizerTour';
 import { getTourCompleted } from '../../components/visualizer/VisualizerTour';
-import { Loader, AlertCircle, Database, ArrowRight } from 'lucide-react';
+import { Loader, AlertCircle, Database, ArrowRight, FlaskConical } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
+import liquidityCapitalModel from '../../data/liquidity-capital-model.json';
 
 export default function VisualizerPage() {
   const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, setSidebarOpen, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
@@ -46,6 +47,27 @@ export default function VisualizerPage() {
   };
 
   const [dictLoading, setDictLoading] = useState(false);
+  const [liqCapLoading, setLiqCapLoading] = useState(false);
+
+  const loadLiquidityCapitalTables = () => {
+    setLiqCapLoading(true);
+    try {
+      const model = liquidityCapitalModel as unknown as DataModel;
+      setModel(model);
+      const { calculateLayout } = require('../../utils/layoutEngine');
+      const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
+      const positions = calculateLayout(model, layoutMode, {}, undefined, tableSize, visibleLayers, compactOverview);
+      const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+      if (isOverview) setTablePositionsReplace(positions);
+      else setTablePositionsBulk(positions);
+      toast({ type: 'success', title: 'Liquidity/Capital tables loaded', description: `${Object.keys(model.tables).length} tables across ${model.categories.length} domains.` });
+    } catch (e) {
+      console.error('Load liquidity/capital tables failed:', e);
+      toast({ type: 'error', title: 'Failed to load', description: e instanceof Error ? e.message : 'Unknown error.' });
+    } finally {
+      setLiqCapLoading(false);
+    }
+  };
 
   const loadFromDataDictionary = async () => {
     setDictLoading(true);
@@ -115,6 +137,29 @@ export default function VisualizerPage() {
                   ) : (
                     <>
                       <span>Load from Data Model (current tables &amp; fields)</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+
+                {/* Secondary CTA - Load Sample Liquidity/Capital Tables */}
+                <button
+                  type="button"
+                  onClick={loadLiquidityCapitalTables}
+                  disabled={liqCapLoading}
+                  aria-busy={liqCapLoading}
+                  aria-label={liqCapLoading ? 'Loading Liquidity/Capital tables' : 'Load Sample Liquidity/Capital Tables'}
+                  className="w-full mb-4 py-3.5 px-6 rounded-lg bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                >
+                  {liqCapLoading ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      <span>Loading…</span>
+                    </>
+                  ) : (
+                    <>
+                      <FlaskConical className="w-4 h-4 text-blue-500" />
+                      <span>Load Sample Liquidity / Capital Tables</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}

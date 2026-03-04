@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTriangle, X } from 'lucide-react';
+import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTriangle, X, Shield } from 'lucide-react';
+import type { RiskStripe } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
 import { debugRelationships } from '../../utils/relationshipDebug';
@@ -70,10 +71,13 @@ export default function Sidebar() {
     searchQuery,
     visibleLayers,
     filterCategories,
+    filterRiskStripes,
     l3CategoryExcluded,
     setSearchQuery,
     setVisibleLayer,
     toggleFilterCategory,
+    toggleRiskStripe,
+    clearRiskStripes,
     toggleL3Category,
     setSelectedTable,
     sidebarOpen,
@@ -90,12 +94,19 @@ export default function Sidebar() {
     }
   }, [searchQuery, model]);
 
+  // Detect whether model has any risk stripes set
+  const hasRiskStripes = useMemo(() => {
+    if (!model) return false;
+    return Object.values(model.tables).some((t) => t.riskStripe);
+  }, [model]);
+
   const filteredTables = useMemo(() => {
     if (!model) return [];
     return Object.values(model.tables).filter((table) => {
       if (!visibleLayers[table.layer]) return false;
       if (table.layer === 'L3' && l3CategoryExcluded.has(table.category)) return false;
       if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
+      if (filterRiskStripes.size > 0 && table.riskStripe && !filterRiskStripes.has(table.riskStripe)) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
@@ -104,7 +115,7 @@ export default function Sidebar() {
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, l3CategoryExcluded, searchQuery]);
+  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery]);
 
   const tablesByCategory = useMemo(() => {
     const grouped = new Map<string, typeof filteredTables>();
@@ -265,6 +276,55 @@ export default function Sidebar() {
           </div>
         )}
       </div>
+
+      {/* Risk Stripe Filter - only when model has risk stripes */}
+      {hasRiskStripes && (
+        <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Shield className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Risk Stripe</span>
+            {filterRiskStripes.size > 0 && (
+              <button
+                onClick={clearRiskStripes}
+                className="ml-auto text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                aria-label="Clear risk stripe filter"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5">
+            {([
+              { stripe: 'Credit' as RiskStripe, color: '#dc2626', bg: '#fef2f2' },
+              { stripe: 'Capital' as RiskStripe, color: '#7c3aed', bg: '#f5f3ff' },
+              { stripe: 'Liquidity' as RiskStripe, color: '#2563eb', bg: '#eff6ff' },
+              { stripe: 'Other' as RiskStripe, color: '#6b7280', bg: '#f9fafb' },
+            ]).map(({ stripe, color, bg }) => {
+              const active = filterRiskStripes.size === 0 || filterRiskStripes.has(stripe);
+              const count = model ? Object.values(model.tables).filter((t) => t.riskStripe === stripe).length : 0;
+              return (
+                <button
+                  key={stripe}
+                  onClick={() => toggleRiskStripe(stripe)}
+                  className={`flex-1 px-2 py-1.5 rounded-lg text-[12px] font-semibold transition-all duration-150 border ${
+                    active
+                      ? 'shadow-sm'
+                      : 'bg-white text-gray-400 border-gray-200 hover:text-gray-600 hover:border-gray-300'
+                  }`}
+                  style={active ? { backgroundColor: bg, borderColor: color, color } : undefined}
+                  aria-label={`${active ? 'Hide' : 'Show'} ${stripe} tables`}
+                  aria-pressed={active}
+                >
+                  <div className="text-center">
+                    {stripe}
+                    <div className="text-[10px] opacity-70 font-medium">{count}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Search - Apple-style search bar */}
       <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0" data-tour="search">

@@ -61,6 +61,7 @@ export default function Canvas() {
     searchQuery,
     visibleLayers,
     filterCategories,
+    filterRiskStripes,
     l3CategoryExcluded,
     layoutMode,
     tableSize,
@@ -95,6 +96,7 @@ export default function Canvas() {
       if (!visibleLayers[table.layer]) return false;
       if (table.layer === 'L3' && l3CategoryExcluded.has(table.category)) return false;
       if (filterCategories.size > 0 && !filterCategories.has(table.category)) return false;
+      if (filterRiskStripes.size > 0 && table.riskStripe && !filterRiskStripes.has(table.riskStripe)) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
@@ -103,7 +105,7 @@ export default function Canvas() {
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, l3CategoryExcluded, searchQuery]);
+  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery]);
 
   // When model loads, reset domain collapse state so all categories start expanded
   const prevModelRef = useRef<typeof model>(null);
@@ -196,15 +198,16 @@ export default function Canvas() {
     ));
   }, [layoutMode, model, visibleTables, tablePositions, tableSize, viewMode, effectiveExpandedDomains, toggleExpandedDomain, setRequestFitToDomain]);
 
-  // True when user has applied filters that narrow the visible set (category, layer, or L3 exclusion).
+  // True when user has applied filters that narrow the visible set (category, layer, risk stripe, or L3 exclusion).
   const filtersNarrowing = useMemo(
     () =>
       filterCategories.size > 0 ||
+      filterRiskStripes.size > 0 ||
       !visibleLayers.L1 ||
       !visibleLayers.L2 ||
       !visibleLayers.L3 ||
       l3CategoryExcluded.size > 0,
-    [filterCategories, visibleLayers, l3CategoryExcluded]
+    [filterCategories, filterRiskStripes, visibleLayers, l3CategoryExcluded]
   );
 
   // Compute zoom/pan to fit a set of positions (same math as runFitToView). Returns null if invalid.

@@ -64,6 +64,7 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T47', name: 'lob_deterioration_summary',         category: 'Business Segment Summary',                tier: 3 },
   { id: 'T48', name: 'lob_rating_distribution',           category: 'Business Segment Summary',                tier: 3 },
   { id: 'T49', name: 'lob_top_contributors',               category: 'Business Segment Summary',                tier: 3 },
+  { id: 'T50', name: 'metric_value_fact',                  category: 'Dashboard Consumption',                   tier: 1 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

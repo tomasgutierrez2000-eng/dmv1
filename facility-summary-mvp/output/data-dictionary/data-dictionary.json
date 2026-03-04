@@ -8549,6 +8549,94 @@
           "data_type": "TIMESTAMP"
         }
       ]
+    },
+    {
+      "name": "internal_risk_rating_bucket_dim",
+      "layer": "L1",
+      "category": "Ratings",
+      "fields": [
+        {
+          "name": "internal_risk_rating_bucket_code",
+          "description": "Bucket identifier code (e.g. \"AAA\", \"BBB\")",
+          "why_required": "Primary key for rating bucket lookup",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "bucket_name",
+          "description": "Human-readable name of the rating bucket",
+          "why_required": "Display label for reports and dashboards",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "rating_score_min",
+          "description": "Lower bound of the internal rating score range",
+          "why_required": "Defines bucket boundaries for rating classification",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "rating_score_max",
+          "description": "Upper bound of the internal rating score range",
+          "why_required": "Defines bucket boundaries for rating classification",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "display_order",
+          "description": "Sort order for display in reports",
+          "why_required": "Consistent ordering in UI and reports",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "active_flag",
+          "description": "Y/N flag indicating if bucket is currently in use",
+          "why_required": "Soft-delete support for reference data",
+          "data_type": "CHAR(1)"
+        }
+      ]
+    },
+    {
+      "name": "pricing_tier_dim",
+      "layer": "L1",
+      "category": "Facility",
+      "fields": [
+        {
+          "name": "pricing_tier_code",
+          "description": "Unique tier identifier code",
+          "why_required": "Primary key for pricing tier lookup",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "tier_name",
+          "description": "Human-readable tier name (e.g. \"Investment Grade\", \"High Yield\")",
+          "why_required": "Display label for revenue and pricing reports",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "tier_ordinal",
+          "description": "Numeric rank for sorting tiers",
+          "why_required": "Defines tier ordering for comparison analytics",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "display_order",
+          "description": "Sort order for display in reports",
+          "why_required": "Consistent ordering in UI and reports",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "active_flag",
+          "description": "Y/N flag indicating if tier is currently in use",
+          "why_required": "Soft-delete support for reference data",
+          "data_type": "CHAR(1)"
+        }
+      ]
     }
   ],
   "L2": [
@@ -13290,6 +13378,11 @@
               "field": "hierarchy_id"
             }
           }
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6),"
         }
       ]
     },
@@ -13600,6 +13693,16 @@
               "field": "industry_code"
             }
           }
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4),"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6),"
         }
       ]
     },
@@ -13944,6 +14047,11 @@
               "field": "lob_node_id"
             }
           }
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6),"
         }
       ]
     },
@@ -16577,6 +16685,11 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6),"
         }
       ]
     },
@@ -18261,6 +18374,16 @@
           "description": "",
           "category": "Counterparty Analytics",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4),"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6),"
         }
       ]
     },
@@ -18703,6 +18826,16 @@
           "description": "",
           "category": "Legal Entity Analytics",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4),"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6),"
         }
       ]
     },

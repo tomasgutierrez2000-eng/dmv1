@@ -19,7 +19,9 @@
     "release-tracker:sync": "tsx scripts/release-tracker-sync.ts",
     "release-tracker:init": "tsx scripts/release-tracker-sync.ts --init",
     "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit",
-    "db:export": "bash scripts/export-mvp-sql.sh"
+    "db:export": "bash scripts/export-mvp-sql.sh",
+    "sync:data-model": "tsx scripts/sync-data-model.ts",
+    "export:data-model": "tsx scripts/export-data-model-excel.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

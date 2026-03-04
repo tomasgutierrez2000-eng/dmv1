@@ -17,6 +17,7 @@ import type { FlowStep } from './LevelStepWalkthrough';
 import { PositionTable, FacilityTable } from './WorkedExampleTable';
 import HierarchyPyramid from './HierarchyPyramid';
 import TableTraversalDemo from './TableTraversalDemo';
+import IntIncomeTableTraversalDemo from './IntIncomeTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -345,20 +346,23 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
 
   if (!demo || !demo.facilities.length) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        {lineageRoute ? (
-          <>
-            <p className="text-sm mb-4">This metric has a dedicated interactive lineage diagram with guided demo walkthrough.</p>
-            <Link
-              href={lineageRoute.href}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-            >
-              View {lineageRoute.label} →
-            </Link>
-          </>
-        ) : (
-          <p className="text-sm">No demo data available for this item.</p>
-        )}
+      <div className="space-y-6">
+        {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
+        <div className="text-center py-12 text-gray-500">
+          {lineageRoute ? (
+            <>
+              <p className="text-sm mb-4">This metric has a dedicated interactive lineage diagram with guided demo walkthrough.</p>
+              <Link
+                href={lineageRoute.href}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+              >
+                View {lineageRoute.label} →
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm">No demo data available for this item.</p>
+          )}
+        </div>
       </div>
     );
   }
@@ -388,6 +392,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
 
       {/* Table Traversal Demo — animated walkthrough of how tables connect per dimension */}
       {item.abbreviation === 'LTV' && <TableTraversalDemo />}
+      {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}
       <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />

@@ -5,7 +5,7 @@ import { useModelStore } from '../../store/modelStore';
 import TableNode from './TableNode';
 import RelationshipLine from './RelationshipLine';
 import DomainContainer from './DomainContainer';
-import { calculateLayout, getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
+import { calculateLayout, getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS } from '../../utils/layoutEngine';
 import type { TablePosition } from '../../types/model';
 
 export default function Canvas() {
@@ -130,8 +130,6 @@ export default function Canvas() {
     if (layoutMode !== 'domain-overview' || !model) return null;
     const domains = new Set(visibleTables.map((t) => t.category));
     const domainPositions = new Map<string, { x: number; y: number; width: number; height: number }>();
-    const BASE_TABLE_WIDTH = 560;
-    const BASE_TABLE_HEIGHT = 320;
     let tableWidth: number;
     let tableHeight: number;
     if (viewMode === 'compact') {
@@ -214,22 +212,15 @@ export default function Canvas() {
   const computeFitView = useCallback(
     (positionsToFit: Array<{ x: number; y: number }>, visibleCount: number): { zoom: number; pan: { x: number; y: number }; centerX: number; centerY: number } | null => {
       if (positionsToFit.length === 0) return null;
-      const BASE_TABLE_WIDTH = 560;
-      const BASE_TABLE_HEIGHT = 320;
-      const SIZE_MULTIPLIERS = {
-        small: { width: 0.8, height: 0.9 },
-        medium: { width: 1.0, height: 1.0 },
-        large: { width: 1.35, height: 1.25 },
-      };
       const overviewDims = getOverviewTableDimensions(tableSize);
       const compactDims = getCompactOverviewTableDimensions();
       const useOverviewDims = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
       const tableWidth = useOverviewDims
         ? (viewMode === 'compact' ? compactDims.width : overviewDims.width)
-        : BASE_TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
+        : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
       const tableHeight = useOverviewDims
         ? (viewMode === 'compact' ? compactDims.height : overviewDims.height)
-        : (viewMode === 'compact' ? 84 : BASE_TABLE_HEIGHT * SIZE_MULTIPLIERS[tableSize].height);
+        : (viewMode === 'compact' ? 84 : BASE_CARD.COLLAPSED_HEIGHT * SIZE_MULTIPLIERS[tableSize].height);
 
       const minX = Math.min(...positionsToFit.map((p) => p.x));
       const maxX = Math.max(...positionsToFit.map((p) => p.x + tableWidth));
@@ -386,27 +377,39 @@ export default function Canvas() {
     const hGap = Math.round(tw * (isOverview ? 0.24 : 0.16));
     const vGap = Math.round(th * (isOverview ? 0.24 : 0.18));
 
-    const n = visibleTables.length;
-    const cols = n <= 4 ? n : Math.max(2, Math.ceil(Math.sqrt(n)));
-    const rows = Math.max(1, Math.ceil(n / cols));
     const stepX = tw + hGap;
     const stepY = th + vGap;
-    const gridW = cols * stepX - hGap;
-    const gridH = rows * stepY - vGap;
-    const startX = -gridW / 2;
-    const startY = -gridH / 2;
 
-    const compactPositions = visibleTables
-      .slice()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((table, idx) => {
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        return {
-          key: table.key,
-          x: startX + col * stepX,
-          y: startY + row * stepY,
-        };
+    // Group tables by category so domain containers don't overlap when rendered.
+    const byCategory = new Map<string, typeof visibleTables>();
+    visibleTables.forEach((t) => {
+      if (!byCategory.has(t.category)) byCategory.set(t.category, []);
+      byCategory.get(t.category)!.push(t);
+    });
+
+    const compactPositions: Array<{ key: string; x: number; y: number }> = [];
+    let groupOffsetY = 0;
+
+    Array.from(byCategory.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([, tables]) => {
+        const sorted = tables.slice().sort((a, b) => a.name.localeCompare(b.name));
+        const groupCols = sorted.length <= 4 ? sorted.length : Math.max(2, Math.ceil(Math.sqrt(sorted.length)));
+        const groupRows = Math.max(1, Math.ceil(sorted.length / groupCols));
+        const groupW = groupCols * stepX - hGap;
+        const startX = -groupW / 2;
+
+        sorted.forEach((table, idx) => {
+          const col = idx % groupCols;
+          const row = Math.floor(idx / groupCols);
+          compactPositions.push({
+            key: table.key,
+            x: startX + col * stepX,
+            y: groupOffsetY + row * stepY,
+          });
+        });
+
+        groupOffsetY += groupRows * stepY + vGap;
       });
 
     compactPositions.forEach(({ key, x, y }) => setTablePosition(key, { x, y }));
@@ -418,6 +421,9 @@ export default function Canvas() {
     );
     setTimeout(() => setIsAnimating(false), 320);
   }, [searchQuery, model, visibleTables, layoutMode, tableSize, runFitToView, setTablePosition]);
+
+  // O(1) lookup set for visible table keys (avoids O(N) .some() per relationship)
+  const visibleTableKeys = useMemo(() => new Set(visibleTables.map((t) => t.key)), [visibleTables]);
 
   // Filter relationships to only show between visible tables with valid positions.
   // Memoized so downstream consumers (focusVisibleTableKeys, JSX) don't recompute every render.
@@ -456,15 +462,12 @@ export default function Canvas() {
       if (rel.relationshipType === 'secondary' && !showSecondaryRelationships) return false;
 
       // Both tables must be visible on screen with valid positions
-      const sourceVisible = visibleTables.some((t) => t.key === rel.source.tableKey);
-      const targetVisible = visibleTables.some((t) => t.key === rel.target.tableKey);
-      const sourceHasPos = !!tablePositions[rel.source.tableKey];
-      const targetHasPos = !!tablePositions[rel.target.tableKey];
-      return sourceVisible && targetVisible && sourceHasPos && targetHasPos;
+      return visibleTableKeys.has(rel.source.tableKey) && visibleTableKeys.has(rel.target.tableKey)
+        && !!tablePositions[rel.source.tableKey] && !!tablePositions[rel.target.tableKey];
     });
   }, [
     model, focusMode, viewMode, showRelationships, showPrimaryRelationships, showSecondaryRelationships,
-    selectedRelationship, selectedField, selectedTable, visibleTables, tablePositions,
+    selectedRelationship, selectedField, selectedTable, visibleTableKeys, tablePositions,
   ]);
 
   // When a field (or table) is selected in focus mode, determine which tables are relevant
@@ -492,6 +495,21 @@ export default function Canvas() {
     }
     return keys.size > 0 ? keys : null;
   }, [focusMode, model, selectedField, selectedTable, selectedRelationship, visibleRelationships]);
+
+  // Pre-compute relationship counts per table to avoid O(N*R) in render loop
+  const relationshipCountsMap = useMemo(() => {
+    const counts = new Map<string, { incoming: number; outgoing: number }>();
+    if (!model) return counts;
+    for (const rel of model.relationships) {
+      const src = counts.get(rel.source.tableKey) || { incoming: 0, outgoing: 0 };
+      src.outgoing++;
+      counts.set(rel.source.tableKey, src);
+      const tgt = counts.get(rel.target.tableKey) || { incoming: 0, outgoing: 0 };
+      tgt.incoming++;
+      counts.set(rel.target.tableKey, tgt);
+    }
+    return counts;
+  }, [model]);
 
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -1178,10 +1196,7 @@ export default function Canvas() {
               return null;
             }
             const position = tablePositions[table.key] || { x: 0, y: 0 };
-            const relationshipCounts = model ? {
-              incoming: model.relationships.filter(r => r.target.tableKey === table.key).length,
-              outgoing: model.relationships.filter(r => r.source.tableKey === table.key).length,
-            } : { incoming: 0, outgoing: 0 };
+            const relationshipCounts = relationshipCountsMap.get(table.key) || { incoming: 0, outgoing: 0 };
 
             const beingDragged = isDraggingTable === table.key;
             const isThisSelected = selectedTable === table.key;

@@ -5,7 +5,7 @@ import type { TableDef } from '../../types/model';
 import { layerColors } from '../../utils/colors';
 import { getCategoryColor } from '../../utils/colors';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS } from '../../utils/layoutEngine';
 
 interface TableNodeProps {
   table: TableDef;
@@ -20,20 +20,6 @@ interface TableNodeProps {
   selectedField?: { tableKey: string; fieldName: string } | null;
   onFieldSelect?: (tableKey: string, fieldName: string) => void;
 }
-
-// Base dimensions - larger defaults so boxes and text use more screen
-const BASE_TABLE_WIDTH = 560;
-const BASE_COLLAPSED_HEIGHT = 320;
-const BASE_EXPANDED_HEIGHT = 600;
-const BASE_HEADER_HEIGHT = 56;
-const BASE_FOOTER_HEIGHT = 48;
-
-// Size multipliers (large = noticeably bigger for focus/detailed use)
-const SIZE_MULTIPLIERS = {
-  small: { width: 0.8, height: 0.9 },
-  medium: { width: 1.0, height: 1.0 },
-  large: { width: 1.35, height: 1.25 },
-};
 
 export default function TableNode({
   table,
@@ -70,10 +56,10 @@ export default function TableNode({
     ? (viewMode === 'compact' ? getCompactOverviewTableDimensions() : getOverviewTableDimensions(tableSize))
     : null;
   
-  const baseWidth = BASE_TABLE_WIDTH * sizeMultiplier.width;
-  const baseCollapsedHeight = BASE_COLLAPSED_HEIGHT * sizeMultiplier.height;
-  const baseExpandedHeight = BASE_EXPANDED_HEIGHT * sizeMultiplier.height;
-  const baseHeaderHeight = BASE_HEADER_HEIGHT * sizeMultiplier.height;
+  const baseWidth = BASE_CARD.TABLE_WIDTH * sizeMultiplier.width;
+  const baseCollapsedHeight = BASE_CARD.COLLAPSED_HEIGHT * sizeMultiplier.height;
+  const baseExpandedHeight = BASE_CARD.EXPANDED_HEIGHT * sizeMultiplier.height;
+  const baseHeaderHeight = BASE_CARD.HEADER_HEIGHT * sizeMultiplier.height;
   
   // OVERVIEW MODE: Use small/medium/large dimensions from layout engine
   const TABLE_WIDTH = isOverviewMode && overviewDims
@@ -90,7 +76,7 @@ export default function TableNode({
     : Math.max(32, Math.round(baseHeaderHeight));
   const FOOTER_HEIGHT = isOverviewMode && overviewDims
     ? Math.max(12, Math.round(overviewDims.height * 0.16))
-    : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
+    : Math.max(24, Math.round(BASE_CARD.FOOTER_HEIGHT * sizeMultiplier.height));
   const compactTableHeight = isOverviewMode
     ? (viewMode === 'compact' ? getCompactOverviewTableDimensions().height : Math.max(56, OVERVIEW_CARD.HEADER_H + OVERVIEW_CARD.FOOTER_H + 6))
     : Math.max(84, HEADER_HEIGHT + FOOTER_HEIGHT);

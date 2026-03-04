@@ -3,7 +3,7 @@
 import type { Relationship } from '../../types/model';
 import type { TablePosition } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
-import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD } from '../../utils/layoutEngine';
+import { getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS } from '../../utils/layoutEngine';
 
 interface RelationshipLineProps {
   relationship: Relationship;
@@ -19,15 +19,6 @@ interface RelationshipLineProps {
   onSelect: () => void;
   onHover: (hovered: boolean) => void;
 }
-
-// Base dimensions - must match TableNode geometry
-const BASE_TABLE_WIDTH = 560;
-const BASE_TABLE_HEIGHT = 320;
-const SIZE_MULTIPLIERS = {
-  small: { width: 0.8, height: 0.9 },
-  medium: { width: 1.0, height: 1.0 },
-  large: { width: 1.35, height: 1.25 },
-};
 
 export default function RelationshipLine({
   relationship,
@@ -51,14 +42,10 @@ export default function RelationshipLine({
 
   // CRITICAL: Use EXACT same calculations as TableNode (and overview dimensions when in domain-overview)
   const sizeMultiplier = SIZE_MULTIPLIERS[tableSize];
-  const BASE_COLLAPSED_HEIGHT = 320;
-  const BASE_EXPANDED_HEIGHT = 600;
-  const BASE_HEADER_HEIGHT = 56;
-  const BASE_FOOTER_HEIGHT = 48;
-  const baseWidth = BASE_TABLE_WIDTH * sizeMultiplier.width;
-  const baseCollapsedHeight = BASE_COLLAPSED_HEIGHT * sizeMultiplier.height;
-  const baseExpandedHeight = BASE_EXPANDED_HEIGHT * sizeMultiplier.height;
-  const baseHeaderHeight = BASE_HEADER_HEIGHT * sizeMultiplier.height;
+  const baseWidth = BASE_CARD.TABLE_WIDTH * sizeMultiplier.width;
+  const baseCollapsedHeight = BASE_CARD.COLLAPSED_HEIGHT * sizeMultiplier.height;
+  const baseExpandedHeight = BASE_CARD.EXPANDED_HEIGHT * sizeMultiplier.height;
+  const baseHeaderHeight = BASE_CARD.HEADER_HEIGHT * sizeMultiplier.height;
 
   const TABLE_WIDTH = isOverviewMode && overviewDims
     ? overviewDims.width
@@ -75,7 +62,7 @@ export default function RelationshipLine({
     : Math.max(32, Math.round(baseHeaderHeight));
   const FOOTER_HEIGHT = isOverviewMode
     ? OVERVIEW_CARD.FOOTER_H
-    : Math.max(24, Math.round(BASE_FOOTER_HEIGHT * sizeMultiplier.height));
+    : Math.max(24, Math.round(BASE_CARD.FOOTER_HEIGHT * sizeMultiplier.height));
 
   const sourceTable = model?.tables[relationship.source.tableKey];
   const targetTable = model?.tables[relationship.target.tableKey];

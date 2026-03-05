@@ -26,7 +26,7 @@
         "layer": "L2",
         "table": "position",
         "field": "position_id",
-        "description": "Individual exposure identifier \u2014 finest grain in the data model",
+        "description": "Individual exposure identifier — finest grain in the data model",
         "data_type": "BIGINT",
         "sample_value": "1"
       },
@@ -50,7 +50,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key \u2014 grain of facility-level calculation",
+        "description": "Primary key — grain of facility-level calculation",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -58,7 +58,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "committed_facility_amt",
-        "description": "Total authorized credit line \u2014 the committed limit",
+        "description": "Total authorized credit line — the committed limit",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "50000000.00"
       },
@@ -74,7 +74,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK to counterparty \u2014 grouping key for counterparty-level rollup",
+        "description": "FK to counterparty — grouping key for counterparty-level rollup",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -82,7 +82,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to enterprise_business_taxonomy \u2014 desk/portfolio/business segment resolution",
+        "description": "FK to enterprise_business_taxonomy — desk/portfolio/business segment resolution",
         "data_type": "BIGINT",
         "sample_value": "303"
       },
@@ -90,7 +90,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "managed_segment_id",
-        "description": "Hierarchy node ID \u2014 links facility to organizational segment",
+        "description": "Hierarchy node ID — links facility to organizational segment",
         "data_type": "BIGINT",
         "sample_value": "303"
       },
@@ -98,7 +98,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent_segment_id",
-        "description": "Self-referential FK \u2014 traverses L3->L2->L1 hierarchy",
+        "description": "Self-referential FK — traverses L3->L2->L1 hierarchy",
         "data_type": "BIGINT",
         "sample_value": "302"
       },
@@ -143,7 +143,7 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "facility_id",
-            "description": "Primary key \u2014 grain of calculation"
+            "description": "Primary key — grain of calculation"
           }
         ]
       },
@@ -170,7 +170,7 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "counterparty_id",
-            "description": "FK to counterparty \u2014 grouping key"
+            "description": "FK to counterparty — grouping key"
           },
           {
             "layer": "L1",
@@ -203,19 +203,19 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "lob_segment_id",
-            "description": "FK to Business Segment taxonomy \u2014 desk resolution"
+            "description": "FK to Business Segment taxonomy — desk resolution"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "Business Segment hierarchy node \u2014 L3 leaf segment"
+            "description": "Business Segment hierarchy node — L3 leaf segment"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "tree_level",
-            "description": "Hierarchy depth \u2014 filter for L3"
+            "description": "Hierarchy depth — filter for L3"
           },
           {
             "layer": "L1",
@@ -230,7 +230,7 @@
         "dashboard_display_name": "Portfolio LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -254,19 +254,19 @@
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "Business Segment hierarchy node \u2014 L2 parent segment"
+            "description": "Business Segment hierarchy node — L2 parent segment"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
-            "description": "Self-referential FK \u2014 traverse up from L3 to L2"
+            "description": "Self-referential FK — traverse up from L3 to L2"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "tree_level",
-            "description": "Hierarchy depth \u2014 filter for L2"
+            "description": "Hierarchy depth — filter for L2"
           }
         ]
       },
@@ -275,7 +275,7 @@
         "dashboard_display_name": "LTV",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -299,19 +299,19 @@
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "Business Segment hierarchy node \u2014 L1 root segment"
+            "description": "Business Segment hierarchy node — L1 root segment"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
-            "description": "Self-referential FK \u2014 recursive traversal to collect all descendants"
+            "description": "Self-referential FK — recursive traversal to collect all descendants"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "tree_level",
-            "description": "Hierarchy depth \u2014 filter for L1"
+            "description": "Hierarchy depth — filter for L1"
           }
         ]
       }
@@ -604,7 +604,7 @@
     "item_name": "Debt Service Coverage Ratio",
     "abbreviation": "DSCR",
     "kind": "METRIC",
-    "definition": "Net Operating Income (NOI) or EBITDA divided by total debt service obligations. Measures borrower's ability to service debt from operating cash flow. Core CRE underwriting KPI \u2014 values below 1.0x indicate insufficient cash flow. Required in FR Y-14Q and CCAR stress testing.",
+    "definition": "Net Operating Income (NOI) or EBITDA divided by total debt service obligations. Measures borrower's ability to service debt from operating cash flow. Core CRE underwriting KPI — values below 1.0x indicate insufficient cash flow. Required in FR Y-14Q and CCAR stress testing.",
     "generic_formula": "Cashflow / Total Debt Service",
     "data_type": "Decimal",
     "unit_type": "RATIO",
@@ -920,7 +920,7 @@
     "item_name": "Probability of Default",
     "abbreviation": "PD",
     "kind": "METRIC",
-    "definition": "Annualised probability that the obligor will default within 12 months. PD is inherently a counterparty-level attribute \u2014 all facilities under a single counterparty share the same PD. Sourced from internal rating model or counterparty_rating_observation. Basel III IRB regulatory floor is 0.03%.",
+    "definition": "Annualised probability that the obligor will default within 12 months. PD is inherently a counterparty-level attribute — all facilities under a single counterparty share the same PD. Sourced from internal rating model or counterparty_rating_observation. Basel III IRB regulatory floor is 0.03%.",
     "generic_formula": "Model-assigned PD from rating scorecard",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
@@ -947,7 +947,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "rating_source_id",
-        "description": "Rating source \u2014 filter for INTERNAL",
+        "description": "Rating source — filter for INTERNAL",
         "data_type": "VARCHAR(30)",
         "sample_value": "INTERNAL"
       },
@@ -963,7 +963,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "Gross exposure \u2014 weighting basis for rollup",
+        "description": "Gross exposure — weighting basis for rollup",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "5000000.00"
       },
@@ -1071,7 +1071,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key \u2014 links exposure and pricing snapshots to a single facility",
+        "description": "Primary key — links exposure and pricing snapshots to a single facility",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1079,7 +1079,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1087,7 +1087,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },
@@ -1114,7 +1114,7 @@
         "dashboard_display_name": "Facility Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), drawn_amount x all_in_rate_pct / 100 \u2014 join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id), drawn_amount x all_in_rate_pct / 100 — join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
         "source_references": [
           {
             "layer": "L2",
@@ -1206,7 +1206,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key \u2014 links exposure and pricing snapshots to a single facility",
+        "description": "Primary key — links exposure and pricing snapshots to a single facility",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1214,7 +1214,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1222,7 +1222,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },
@@ -1249,17 +1249,25 @@
         "dashboard_display_name": "Facility Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), drawn_amount x cost_of_funds_pct / 100 \u2014 join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id) THEN join facility_exposure_snapshot ON facility_id + as_of_date to get [drawn_amount], join facility_pricing_snapshot ON facility_id + as_of_date to get [cost_of_funds_pct]. Compute: [drawn_amount] * [cost_of_funds_pct] / 100",
         "source_references": [
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
-            "field": "drawn_amount"
+            "field": "drawn_amount",
+            "description": "Funded/outstanding balance on the facility"
           },
           {
             "layer": "L2",
             "table": "facility_pricing_snapshot",
-            "field": "cost_of_funds_pct"
+            "field": "cost_of_funds_pct",
+            "description": "FTP cost-of-funds rate (annual percentage)"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — grain of calculation"
           }
         ]
       },
@@ -1268,32 +1276,168 @@
         "dashboard_display_name": "Counterparty Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [counterparty_id], SUM(facility.drawn_amount * facility.cost_of_funds_pct / 100) across all facilities WHERE counterparty_id matches",
-        "source_references": []
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: join facility_exposure_snapshot and facility_pricing_snapshot ON facility_id + as_of_date. Compute: SUM([drawn_amount] * [cost_of_funds_pct] / 100) across all matched facilities",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Funded/outstanding balance on the facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "FTP cost-of-funds rate (annual percentage)"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — grouping key"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Facility identifier for join"
+          }
+        ]
       },
       {
         "level": "desk",
         "dashboard_display_name": "Desk Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L3 LoB], SUM(facility.drawn_amount * facility.cost_of_funds_pct / 100) for all facilities WHERE lob_segment_id matches desk",
-        "source_references": []
+        "level_logic": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: join facility_exposure_snapshot and facility_pricing_snapshot ON facility_id + as_of_date. Compute: SUM([drawn_amount] * [cost_of_funds_pct] / 100) across all matched facilities",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Funded/outstanding balance on the facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "FTP cost-of-funds rate (annual percentage)"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to Business Segment taxonomy — desk resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business Segment hierarchy node — L3 leaf segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L3"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "segment_name",
+            "description": "Desk name at L3 level"
+          }
+        ]
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Portfolio Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L2 Business Segment], SUM including child L3 segments via parent_segment_id traversal",
-        "source_references": []
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: join facility_exposure_snapshot and facility_pricing_snapshot ON facility_id + as_of_date. Compute: SUM([drawn_amount] * [cost_of_funds_pct] / 100) across all matched facilities",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Funded/outstanding balance on the facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "FTP cost-of-funds rate (annual percentage)"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to Business Segment taxonomy"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business Segment hierarchy node — L2 parent segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Self-referential FK — traverse up from L3 to L2"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L2"
+          }
+        ]
       },
       {
         "level": "lob",
         "dashboard_display_name": "Business Segment Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L1 Business Segment], SUM including all descendant L2/L3 segments via recursive parent_segment_id traversal",
-        "source_references": []
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: join facility_exposure_snapshot and facility_pricing_snapshot ON facility_id + as_of_date. Compute: SUM([drawn_amount] * [cost_of_funds_pct] / 100) across all matched facilities",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Funded/outstanding balance on the facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "FTP cost-of-funds rate (annual percentage)"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to Business Segment taxonomy"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business Segment hierarchy node — L1 root segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Self-referential FK — recursive traversal to collect all descendants"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L1"
+          }
+        ]
       }
     ],
     "number_of_instances": 5,
@@ -1320,7 +1464,7 @@
       "CECL",
       "Basel III"
     ],
-    "insight": "Exposure-weighted average notch change in internal risk ratings \u2014 negative means improvement, positive means deterioration",
+    "insight": "Exposure-weighted average notch change in internal risk ratings — negative means improvement, positive means deterioration",
     "ingredient_fields": [
       {
         "layer": "L2",
@@ -1334,7 +1478,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "prior_rating_value",
-        "description": "Previous internal risk rating before the most recent review \u2014 the difference gives the notch change",
+        "description": "Previous internal risk rating before the most recent review — the difference gives the notch change",
         "data_type": "INT",
         "sample_value": "2"
       },
@@ -1342,7 +1486,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "rating_type",
-        "description": "Filter field \u2014 INTERNAL for bank's own ratings, EXTERNAL for agency ratings (S&P, Moody's, Fitch)",
+        "description": "Filter field — INTERNAL for bank's own ratings, EXTERNAL for agency ratings (S&P, Moody's, Fitch)",
         "data_type": "VARCHAR(20)",
         "sample_value": "INTERNAL"
       },
@@ -1350,7 +1494,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "Total gross credit exposure in USD \u2014 used as the weighting factor for exposure-weighted averages",
+        "description": "Total gross credit exposure in USD — used as the weighting factor for exposure-weighted averages",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "20000000.00"
       },
@@ -1358,7 +1502,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key \u2014 links exposure snapshots to facilities",
+        "description": "Primary key — links exposure snapshots to facilities",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1366,7 +1510,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation and join to rating observations",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation and join to rating observations",
         "data_type": "BIGINT",
         "sample_value": "7890"
       },
@@ -1374,7 +1518,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "301"
       },
@@ -1425,7 +1569,7 @@
         "dashboard_display_name": "Counterparty Migration Score",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [counterparty_id], SUM((rating_value - prior_rating_value) * gross_exposure_usd) / SUM(gross_exposure_usd) \u2014 exposure-weighted average notch change across all facilities",
+        "level_logic": "For each [counterparty_id], SUM((rating_value - prior_rating_value) * gross_exposure_usd) / SUM(gross_exposure_usd) — exposure-weighted average notch change across all facilities",
         "source_references": []
       },
       {
@@ -1462,7 +1606,7 @@
     "item_name": "Exception Rate",
     "abbreviation": "EXCPN_RT",
     "kind": "METRIC",
-    "definition": "Number of facilities with active policy exceptions divided by total facility count, expressed as a percentage. Measures the proportion of the loan book approved outside standard underwriting guidelines. A key credit risk governance KPI \u2014 elevated rates signal weakening credit standards and attract regulatory scrutiny under OCC Comptroller's Handbook, SR 11-7, and CCAR.",
+    "definition": "Number of facilities with active policy exceptions divided by total facility count, expressed as a percentage. Measures the proportion of the loan book approved outside standard underwriting guidelines. A key credit risk governance KPI — elevated rates signal weakening credit standards and attract regulatory scrutiny under OCC Comptroller's Handbook, SR 11-7, and CCAR.",
     "generic_formula": "Exception_Count / Total_Facility_Count x 100",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
@@ -1499,7 +1643,7 @@
         "layer": "L2",
         "table": "facility_credit_approval",
         "field": "exception_severity",
-        "description": "Severity classification: MINOR, MAJOR, or CRITICAL \u2014 used to filter Material Exception Rate variant",
+        "description": "Severity classification: MINOR, MAJOR, or CRITICAL — used to filter Material Exception Rate variant",
         "data_type": "VARCHAR(10)",
         "sample_value": "MAJOR"
       },
@@ -1507,7 +1651,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key \u2014 each active facility counts as one in the denominator",
+        "description": "Primary key — each active facility counts as one in the denominator",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1515,7 +1659,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower \u2014 enables counterparty-level pooled division",
+        "description": "FK linking facility to borrower — enables counterparty-level pooled division",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1523,7 +1667,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },
@@ -1550,7 +1694,7 @@
         "dashboard_display_name": "Facility Exception Rate (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), CASE WHEN exception_flag = true THEN 100.00 ELSE 0.00 END \u2014 join facility_credit_approval on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id), CASE WHEN exception_flag = true THEN 100.00 ELSE 0.00 END — join facility_credit_approval on facility_id + as_of_date",
         "source_references": [
           {
             "layer": "L2",
@@ -1564,7 +1708,7 @@
         "dashboard_display_name": "Counterparty Exception Rate (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [counterparty_id], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 across all facilities WHERE counterparty_id matches \u2014 pooled division",
+        "level_logic": "For each [counterparty_id], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 across all facilities WHERE counterparty_id matches — pooled division",
         "source_references": []
       },
       {
@@ -1572,7 +1716,7 @@
         "dashboard_display_name": "Desk Exception Rate (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L3 LoB], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 for all facilities WHERE lob_segment_id matches desk \u2014 pooled division",
+        "level_logic": "For each [L3 LoB], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 for all facilities WHERE lob_segment_id matches desk — pooled division",
         "source_references": []
       },
       {
@@ -1741,7 +1885,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "total_collateral_mv_usd",
-        "description": "Pre-computed SUM of current_valuation_usd from collateral_snapshot \u2014 materialized per facility for performance and audit trail",
+        "description": "Pre-computed SUM of current_valuation_usd from collateral_snapshot — materialized per facility for performance and audit trail",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "120000000.00"
       },
@@ -1749,7 +1893,7 @@
         "layer": "L1",
         "table": "facility_counterparty_participation",
         "field": "participation_pct",
-        "description": "Counterparty ownership share in the facility \u2014 used for counterparty-level attribution",
+        "description": "Counterparty ownership share in the facility — used for counterparty-level attribution",
         "data_type": "DECIMAL(10,4)",
         "sample_value": "100.0000"
       },
@@ -1757,7 +1901,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key \u2014 links collateral snapshots and participation records to a single facility",
+        "description": "Primary key — links collateral snapshots and participation records to a single facility",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1765,7 +1909,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1773,7 +1917,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },

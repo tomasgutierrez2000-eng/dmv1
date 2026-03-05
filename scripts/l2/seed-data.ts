@@ -908,26 +908,70 @@ function cfDate(idx: number): string {
   return `2025-01-${String(day).padStart(2, '0')}`;
 }
 
-// Financial snapshot amounts
-function noi(idx: number): number {
-  if (drawn(idx) === 0) return 0;
-  return vary(Math.round(drawn(idx) * 0.07), idx, 0.10);
+// ── DSCR target distribution — realistic GSIB-level variation ──
+// CRE (BL=3, BRIDGE=7): median ~1.30x, range 0.70-2.80x
+// C&I (all others):      median ~2.50x, range 0.85-7.00x
+const CRE_DSCR_BUCKETS = [
+  // [dscr, weight] — distressed to strong
+  0.72, 0.78, 0.85, 0.91, 0.96,          // distressed (5)
+  1.02, 1.05, 1.08, 1.10, 1.12, 1.15, 1.18, 1.20, 1.22, 1.24,  // watch (10)
+  1.26, 1.28, 1.30, 1.32, 1.35, 1.38, 1.40, 1.42, 1.45, 1.48,  // healthy (10)
+  1.50, 1.55, 1.60, 1.65, 1.70, 1.75, 1.80, 1.85, 1.90, 1.95,  // solid (10)
+  2.00, 2.10, 2.20, 2.40, 2.80,          // strong (5)
+];
+const CI_DSCR_BUCKETS = [
+  0.85, 0.92, 0.97,                       // distressed (3)
+  1.10, 1.15, 1.20, 1.30, 1.40, 1.50,    // watch (6)
+  1.60, 1.70, 1.80, 1.90, 2.00, 2.10, 2.20, 2.30, 2.40, 2.50,  // healthy (10)
+  2.60, 2.80, 3.00, 3.20, 3.50, 3.80, 4.00, 4.20, 4.50, 4.80,  // solid (10)
+  5.00, 5.50, 6.00, 6.50, 7.00,          // strong (5)
+];
+const CRE_PRODUCT_NODES = new Set([3, 7]); // BL, BRIDGE
+
+function dscrTarget(idx: number): number {
+  const f = fid(idx);
+  const c = cycle(idx);
+  // Use facility-specific PRNG for deterministic but varied assignment
+  const rng = mulberry32(f * 1000 + 42);
+  const r = rng(); // 0..1
+  const productNode = ((f - 1) % 10) + 1;
+  const isCre = CRE_PRODUCT_NODES.has(productNode);
+  const buckets = isCre ? CRE_DSCR_BUCKETS : CI_DSCR_BUCKETS;
+  const bucketIdx = Math.floor(r * buckets.length);
+  const baseDscr = buckets[Math.min(bucketIdx, buckets.length - 1)];
+  // Cycle drift: stress in cycle 2, recovery in cycle 3
+  const cycleDrift = [0, -0.03, -0.12, 0.05, 0.02][c] ?? 0;
+  return Math.max(0.50, baseDscr + cycleDrift);
 }
+
+// Financial snapshot amounts — debt service is base, NOI/EBITDA derived from target DSCR
 function debtService(idx: number): number {
   if (drawn(idx) === 0) return 0;
   return vary(Math.round(drawn(idx) * 0.048), idx, 0.10);
 }
-function revenue(idx: number): number {
+function noi(idx: number): number {
   if (drawn(idx) === 0) return 0;
-  return vary(Math.round(drawn(idx) * 0.12), idx, 0.10);
-}
-function opex(idx: number): number {
-  if (drawn(idx) === 0) return 0;
-  return vary(Math.round(drawn(idx) * 0.045), idx, 0.10);
+  const tds = debtService(idx);
+  return Math.round(tds * dscrTarget(idx));
 }
 function ebitda(idx: number): number {
   if (drawn(idx) === 0) return 0;
-  return vary(Math.round(drawn(idx) * 0.085), idx, 0.10);
+  const tds = debtService(idx);
+  return Math.round(tds * dscrTarget(idx));
+}
+function revenue(idx: number): number {
+  if (drawn(idx) === 0) return 0;
+  // Revenue = NOI / ~0.6 margin for CRE, EBITDA / ~0.4 margin for C&I
+  const f = fid(idx);
+  const productNode = ((f - 1) % 10) + 1;
+  const isCre = CRE_PRODUCT_NODES.has(productNode);
+  const income = isCre ? noi(idx) : ebitda(idx);
+  const margin = isCre ? 0.55 + (f % 7) * 0.02 : 0.35 + (f % 5) * 0.03;
+  return Math.round(income / margin);
+}
+function opex(idx: number): number {
+  if (drawn(idx) === 0) return 0;
+  return Math.max(0, revenue(idx) - noi(idx));
 }
 function interestExpense(idx: number): number {
   if (drawn(idx) === 0) return 0;

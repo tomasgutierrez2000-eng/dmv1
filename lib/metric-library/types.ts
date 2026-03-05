@@ -87,6 +87,10 @@ export interface DemoFacility {
   debt_service_amt?: number;
   dscr_value?: number;
   cashflow_label?: string;
+  /** Undrawn Exposure fields (optional — only present for UE demo data) */
+  unfunded_amt?: number;
+  bank_share_pct?: number;
+  undrawn_exposure_amt?: number;
 }
 
 /** Demo data bundle stored per CatalogueItem. */

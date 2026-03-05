@@ -2145,5 +2145,381 @@
     "number_of_instances": 5,
     "directly_displayed": true,
     "status": "ACTIVE"
+  },
+  {
+    "item_id": "UNDRAWN_EXP",
+    "item_name": "Undrawn Exposure",
+    "abbreviation": "UE",
+    "kind": "METRIC",
+    "definition": "Committed but not yet drawn portion of credit exposure in USD, calculated as the sum of position-level unfunded amounts multiplied by the bank's participation share. Reflects contingent funding risk — the maximum additional drawdown the bank may be called upon to fund.",
+    "generic_formula": "SUM(unfunded_amount per position) * Bank_Share",
+    "data_type": "Decimal",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "metric_class": "HYBRID",
+    "domain_ids": ["EL"],
+    "regulatory_references": ["FR Y-14Q", "FR2590", "Basel III"],
+    "insight": "Potential future drawdown risk",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "positions",
+        "field": "unfunded_amount",
+        "description": "Unfunded/undrawn amount per position — the portion of the position not yet drawn",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "15000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "positions",
+        "field": "position_id",
+        "description": "Primary key identifying each position within a facility",
+        "data_type": "BIGINT",
+        "sample_value": "90001"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key — grain of calculation at facility level",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_active_flag",
+        "description": "Active facility indicator (Y/N) — filters to current active facilities only",
+        "data_type": "VARCHAR(1)",
+        "sample_value": "Y"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "bank_share",
+        "description": "Bank's participation share of the facility (0.0–1.0)",
+        "data_type": "DECIMAL(5,4)",
+        "sample_value": "1.0000"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_counterparty_participation",
+        "field": "participation_pct",
+        "description": "Counterparty's participation percentage in the facility (0.0–1.0)",
+        "data_type": "DECIMAL(5,4)",
+        "sample_value": "0.5000"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INT",
+        "sample_value": "200"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "tree_level",
+        "description": "Hierarchy depth label (L1, L2, L3) — filter for aggregation level",
+        "data_type": "VARCHAR(2)",
+        "sample_value": "L3"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "segment_name",
+        "description": "Business segment name at each hierarchy level",
+        "data_type": "VARCHAR(100)",
+        "sample_value": "CRE Lending Desk"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility Undrawn Exposure ($)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id) WHERE IS(MAX([as_of_date])) AND [facility_active_flag]='Y', THEN lookup [position_id] from L2.positions WHERE IS([facility_id]). For each [facility_id]: SUM(ARRAY{[unfunded_amount] for each [position_id]}) * [bank_share]",
+        "source_references": [
+          {"layer": "L2", "table": "positions", "field": "unfunded_amount", "description": "Unfunded/undrawn amount per position"},
+          {"layer": "L2", "table": "positions", "field": "position_id", "description": "Position identifier for iteration"},
+          {"layer": "L1", "table": "facility_master", "field": "facility_id", "description": "Primary key — grain of calculation"},
+          {"layer": "L1", "table": "facility_master", "field": "facility_active_flag", "description": "Active facility filter"},
+          {"layer": "L1", "table": "facility_master", "field": "bank_share", "description": "Bank's participation share"}
+        ],
+        "spec_formula": "For each Distinct([Facility ID]), WHEN IS(MAX(AS_OF_DATE) AND [Facility_Active_Flag]=\"Y\", THEN Lookup [Position_ID] within Positions table WHEN IS([Facility_ID]) FOR each [Facility_ID] SUM(ARRAY{[unfunded_amount]} for each [Position_ID]}) * [Bank_Share] == [Facility Outstanding Exposure, Bank Share Only]"
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Undrawn Exposure ($)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: lookup [participation_pct] from L1.facility_counterparty_participation WHERE IS([counterparty_id]) AND IS([facility_id]), THEN [participation_pct] * [Facility Undrawn Exposure, Bank Share Only] == [Counterparty Share Undrawn Exposure]. For each [counterparty_id] SUM(ARRAY{[Counterparty Share Undrawn Exposure]})",
+        "source_references": [
+          {"layer": "L1", "table": "facility_counterparty_participation", "field": "participation_pct", "description": "Counterparty participation percentage in facility"},
+          {"layer": "L1", "table": "facility_master", "field": "counterparty_id", "description": "FK to counterparty — grouping key"},
+          {"layer": "L1", "table": "facility_master", "field": "facility_id", "description": "Facility identifier for join"},
+          {"layer": "L1", "table": "facility_master", "field": "bank_share", "description": "Bank's participation share"}
+        ],
+        "spec_formula": "For each [Counterparty_ID], lookup [Facility_ID] in Facility Master table WHEN IS(Counterparty_ID) THEN for each [Facility_ID] lookup [participation_pct] in facility_counterparty_participation table WHEN IS([Counterparty_ID] AND [Facility_ID]) THEN for each [Facility_ID] take [participation_pct]* [Facility Outstanding Exposure, Bank Share Only]*[Bank_Share] == [Counterparty Share Outstanding Exposure] THEN for each [Counterparty_ID] SUM([Counterparty Share Outstanding Exposure])"
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Undrawn Exposure ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: compute [Facility Undrawn Exposure, Bank Share Only]. For each [L3 LoB] SUM(ARRAY{[Facility Undrawn Exposure, Bank Share Only]})",
+        "source_references": [
+          {"layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to Business Segment taxonomy — desk resolution"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "Business Segment hierarchy node — L3 leaf segment"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L3"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "segment_name", "description": "Desk name at L3 level"}
+        ],
+        "spec_formula": "For each [l3 Lob], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]=\"L3\" and [Description]=[L3 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) THEN SUM([Facility Outstanding Exposure, Bank Share Only])"
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Undrawn Exposure ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: compute [Facility Undrawn Exposure, Bank Share Only]. For each [L2 Business Segment] SUM(ARRAY{[Facility Undrawn Exposure, Bank Share Only]})",
+        "source_references": [
+          {"layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to Business Segment taxonomy"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "Business Segment hierarchy node — L2 parent segment"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "parent_segment_id", "description": "Self-referential FK — traverse up from L3 to L2"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L2"}
+        ],
+        "spec_formula": "For each [l2 Lob], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]=\"L2\" and [Description]=[L2 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) THEN SUM([Facility Oustanding Exposure, Bank Share Only])"
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Undrawn Exposure ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: compute [Facility Undrawn Exposure, Bank Share Only]. For each [L1 Business Segment] SUM(ARRAY{[Facility Undrawn Exposure, Bank Share Only]})",
+        "source_references": [
+          {"layer": "L1", "table": "facility_master", "field": "lob_segment_id", "description": "FK to Business Segment taxonomy"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "managed_segment_id", "description": "Business Segment hierarchy node — L1 root segment"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "parent_segment_id", "description": "Self-referential FK — recursive traversal to collect all descendants"},
+          {"layer": "L1", "table": "enterprise_business_taxonomy", "field": "tree_level", "description": "Hierarchy depth — filter for L1"}
+        ],
+        "spec_formula": "For each [l1 Lob], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]=\"L1\" and [Description]=[L1 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) THEN SUM([Facility Outstanding Exposure, Bank Share Only])"
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE",
+    "executable_metric_id": "C001",
+    "normalized_de_name": "Undrawn Exposure ($)",
+    "data_element_in_dm": "unfunded_amount",
+    "spec_definition": "Committed but not yet drawn portion of credit exposure in USD. Reflects contingent funding risk.",
+    "spec_discrepancy_notes": [
+      "COUNTERPARTY_FORMULA: Spec multiplies [Facility Outstanding Exposure, Bank Share Only] by [Bank_Share] a second time at counterparty level. Since the facility-level value already incorporates Bank_Share (SUM(unfunded) * Bank_Share), the counterparty formula uses participation_pct * [Facility Undrawn Exposure, Bank Share Only] without the redundant Bank_Share multiplier to avoid double-counting.",
+      "NAMING: Spec uses 'Facility Outstanding Exposure, Bank Share Only' as the intermediate result name across all levels; implementation normalizes to 'Facility Undrawn Exposure, Bank Share Only' to distinguish from drawn/total exposure metrics.",
+      "SPEC_TYPO: L2 Portfolio level logic has typo 'Oustanding' (missing 't'); corrected to 'Outstanding' in level_logic but preserved verbatim in spec_formula."
+    ],
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-201",
+          "facility_name": "Sunrise Tower Revolver",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 50000000,
+          "collateral_value": 75000000,
+          "ltv_pct": 66.7,
+          "unfunded_amt": 15000000,
+          "bank_share_pct": 1.0,
+          "undrawn_exposure_amt": 15000000,
+          "positions": [
+            {
+              "position_id": "P-201",
+              "facility_id": "F-201",
+              "position_type": "LOAN",
+              "balance_amount": 25000000,
+              "description": "Term Loan Tranche A"
+            },
+            {
+              "position_id": "P-202",
+              "facility_id": "F-201",
+              "position_type": "LOAN",
+              "balance_amount": 10000000,
+              "description": "Term Loan Tranche B"
+            },
+            {
+              "position_id": "P-203",
+              "facility_id": "F-201",
+              "position_type": "COMMITMENT",
+              "balance_amount": 15000000,
+              "description": "Undrawn Revolver"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-202",
+          "facility_name": "Sunrise Office Line of Credit",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 30000000,
+          "collateral_value": 40000000,
+          "ltv_pct": 75.0,
+          "unfunded_amt": 12000000,
+          "bank_share_pct": 0.75,
+          "undrawn_exposure_amt": 9000000,
+          "positions": [
+            {
+              "position_id": "P-204",
+              "facility_id": "F-202",
+              "position_type": "LOAN",
+              "balance_amount": 18000000,
+              "description": "Senior Secured Loan"
+            },
+            {
+              "position_id": "P-205",
+              "facility_id": "F-202",
+              "position_type": "COMMITMENT",
+              "balance_amount": 12000000,
+              "description": "Undrawn Line of Credit"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-203",
+          "facility_name": "Meridian Construction Loan",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 80000000,
+          "collateral_value": 100000000,
+          "ltv_pct": 80.0,
+          "unfunded_amt": 20000000,
+          "bank_share_pct": 0.5,
+          "undrawn_exposure_amt": 10000000,
+          "positions": [
+            {
+              "position_id": "P-206",
+              "facility_id": "F-203",
+              "position_type": "LOAN",
+              "balance_amount": 40000000,
+              "description": "Construction Draw A"
+            },
+            {
+              "position_id": "P-207",
+              "facility_id": "F-203",
+              "position_type": "LOAN",
+              "balance_amount": 20000000,
+              "description": "Construction Draw B"
+            },
+            {
+              "position_id": "P-208",
+              "facility_id": "F-203",
+              "position_type": "COMMITMENT",
+              "balance_amount": 20000000,
+              "description": "Delayed Draw"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-204",
+          "facility_name": "Meridian Warehouse Facility",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 25000000,
+          "collateral_value": 20000000,
+          "ltv_pct": 125.0,
+          "unfunded_amt": 15000000,
+          "bank_share_pct": 1.0,
+          "undrawn_exposure_amt": 15000000,
+          "positions": [
+            {
+              "position_id": "P-209",
+              "facility_id": "F-204",
+              "position_type": "LOAN",
+              "balance_amount": 10000000,
+              "description": "Warehouse Drawdown"
+            },
+            {
+              "position_id": "P-210",
+              "facility_id": "F-204",
+              "position_type": "COMMITMENT",
+              "balance_amount": 15000000,
+              "description": "Undrawn Warehouse"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-205",
+          "facility_name": "Meridian Working Capital Revolver",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 40000000,
+          "collateral_value": 50000000,
+          "ltv_pct": 80.0,
+          "unfunded_amt": 32000000,
+          "bank_share_pct": 0.8,
+          "undrawn_exposure_amt": 25600000,
+          "positions": [
+            {
+              "position_id": "P-211",
+              "facility_id": "F-205",
+              "position_type": "LOAN",
+              "balance_amount": 8000000,
+              "description": "Drawn Working Capital"
+            },
+            {
+              "position_id": "P-212",
+              "facility_id": "F-205",
+              "position_type": "COMMITMENT",
+              "balance_amount": 32000000,
+              "description": "Undrawn Revolver"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

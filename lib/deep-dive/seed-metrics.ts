@@ -300,4 +300,41 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
+  ({
+    id: 'C109',
+    name: 'Counterparty Allocation (%)',
+    page: 'P4',
+    section: 'Deep Dive',
+    metricType: 'Ratio',
+    formula: 'SUM(participation_pct * committed_facility_amt) / SUM(committed_facility_amt)',
+    description: 'Counterparty share of facility — Legal (contractual participation_pct) and Economic (legal − CRM adjustment) variants. Exposure-weighted average at counterparty level.',
+    displayFormat: '#,##0.00%',
+    sampleValue: '—',
+    sourceFields: [
+      { layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct' },
+      { layer: 'L2', table: 'counterparty_allocation_snapshot', field: 'economic_allocation_pct' },
+      { layer: 'L2', table: 'counterparty_allocation_snapshot', field: 'crm_adjustment_pct' },
+      { layer: 'L1', table: 'facility_master', field: 'committed_facility_amt' },
+      { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
+    ],
+    dimensions: [
+      { dimension: 'as_of_date', interaction: 'FILTER' },
+      { dimension: 'facility_id', interaction: 'GROUP_BY' },
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+    ],
+    allowedDimensions: ['facility', 'counterparty'] as typeof ALL_DIMS,
+    displayNameByDimension: {
+      facility: 'Facility Allocation (%)',
+      counterparty: 'Counterparty Wtd Allocation (%)',
+      L3: 'N/A',
+      L2: 'N/A',
+      L1: 'N/A',
+    },
+    formulasByDimension: buildGroupedFormula(
+      'SUM(participation_pct * committed_facility_amt) / SUM(committed_facility_amt)',
+      'SUM(fcp.participation_pct * fm.committed_facility_amt) / NULLIF(SUM(fm.committed_facility_amt), 0)',
+      'FROM L1.facility_counterparty_participation fcp LEFT JOIN L1.facility_master fm ON fm.facility_id = fcp.facility_id',
+      'WHERE fm.facility_active_flag = \'Y\''
+    ),
+  }),
 ];

@@ -23,6 +23,7 @@ import DSCRTableTraversalDemo from './DSCRTableTraversalDemo';
 import RRMigTableTraversalDemo from './RRMigTableTraversalDemo';
 import ExceptionRateTableTraversalDemo from './ExceptionRateTableTraversalDemo';
 import AllocPctTableTraversalDemo from './AllocPctTableTraversalDemo';
+import CollMvTableTraversalDemo from './CollMvTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -615,6 +616,7 @@ const LINEAGE_ROUTES: Record<string, { href: string; label: string }> = {
   COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',   label: 'Committed Amount End-to-End Lineage' },
   EXCPN_RT:         { href: '/metrics/exception-rate-lineage', label: 'Exception Rate End-to-End Lineage' },
   ALLOC_PCT:        { href: '/metrics/allocation-pct-lineage', label: 'Allocation % End-to-End Lineage' },
+  COLL_MV:          { href: '/metrics/coll-mv-lineage',    label: 'Collateral MV End-to-End Lineage' },
 };
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -635,6 +637,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
         {item.abbreviation === 'RR_MIG' && <RRMigTableTraversalDemo />}
         {item.abbreviation === 'EXCPN_RT' && <ExceptionRateTableTraversalDemo />}
         {item.abbreviation === 'ALLOC_PCT' && <AllocPctTableTraversalDemo />}
+        {item.abbreviation === 'COLL_MV' && <CollMvTableTraversalDemo />}
         <div className="text-center py-12 text-gray-500">
           {lineageRoute ? (
             <>
@@ -746,6 +749,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
       {item.abbreviation === 'RR_MIG' && <RRMigTableTraversalDemo />}
       {item.abbreviation === 'EXCPN_RT' && <ExceptionRateTableTraversalDemo />}
       {item.abbreviation === 'ALLOC_PCT' && <AllocPctTableTraversalDemo />}
+      {item.abbreviation === 'COLL_MV' && <CollMvTableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}
       <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />

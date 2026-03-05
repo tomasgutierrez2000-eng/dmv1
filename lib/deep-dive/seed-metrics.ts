@@ -446,4 +446,41 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fm.facility_active_flag = \'Y\''
     ),
   }),
+  ({
+    id: 'C113',
+    name: 'Current Collateral Market Value ($)',
+    page: 'P4',
+    section: 'Deep Dive',
+    metricType: 'Aggregate',
+    formula: 'SUM(current_valuation_usd)',
+    description: 'Current market value of pledged collateral securing credit exposure. Aggregated from collateral_snapshot per facility, participation-weighted at counterparty level.',
+    displayFormat: '$#,##0',
+    sampleValue: '—',
+    sourceFields: [
+      { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd' },
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'total_collateral_mv_usd' },
+      { layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct' },
+      { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
+      { layer: 'L1', table: 'facility_master', field: 'lob_segment_id' },
+    ],
+    dimensions: [
+      { dimension: 'as_of_date', interaction: 'FILTER' },
+      { dimension: 'facility_id', interaction: 'GROUP_BY' },
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+    ],
+    allowedDimensions: ALL_DIMS,
+    displayNameByDimension: {
+      facility: 'Facility Collateral MV ($)',
+      counterparty: 'Counterparty Collateral MV ($)',
+      L3: 'L3 Desk Collateral MV ($)',
+      L2: 'L2 Portfolio Collateral MV ($)',
+      L1: 'L1 Department Collateral MV ($)',
+    },
+    formulasByDimension: buildGroupedFormula(
+      'SUM(current_valuation_usd)',
+      'SUM(cs.current_valuation_usd)',
+      'FROM L2.collateral_snapshot cs LEFT JOIN L1.facility_master fm ON fm.facility_id = cs.facility_id',
+      'WHERE cs.as_of_date = :as_of_date'
+    ),
+  }),
 ];

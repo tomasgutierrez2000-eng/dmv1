@@ -26,7 +26,7 @@
         "layer": "L2",
         "table": "position",
         "field": "position_id",
-        "description": "Individual exposure identifier — finest grain in the data model",
+        "description": "Individual exposure identifier \u2014 finest grain in the data model",
         "data_type": "BIGINT",
         "sample_value": "1"
       },
@@ -50,7 +50,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key — grain of facility-level calculation",
+        "description": "Primary key \u2014 grain of facility-level calculation",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -58,7 +58,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "committed_facility_amt",
-        "description": "Total authorized credit line — the committed limit",
+        "description": "Total authorized credit line \u2014 the committed limit",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "50000000.00"
       },
@@ -74,7 +74,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK to counterparty — grouping key for counterparty-level rollup",
+        "description": "FK to counterparty \u2014 grouping key for counterparty-level rollup",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -82,7 +82,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to enterprise_business_taxonomy — desk/portfolio/business segment resolution",
+        "description": "FK to enterprise_business_taxonomy \u2014 desk/portfolio/business segment resolution",
         "data_type": "BIGINT",
         "sample_value": "303"
       },
@@ -90,7 +90,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "managed_segment_id",
-        "description": "Hierarchy node ID — links facility to organizational segment",
+        "description": "Hierarchy node ID \u2014 links facility to organizational segment",
         "data_type": "BIGINT",
         "sample_value": "303"
       },
@@ -98,7 +98,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent_segment_id",
-        "description": "Self-referential FK — traverses L3->L2->L1 hierarchy",
+        "description": "Self-referential FK \u2014 traverses L3->L2->L1 hierarchy",
         "data_type": "BIGINT",
         "sample_value": "302"
       },
@@ -143,7 +143,7 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "facility_id",
-            "description": "Primary key — grain of calculation"
+            "description": "Primary key \u2014 grain of calculation"
           }
         ]
       },
@@ -170,7 +170,7 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "counterparty_id",
-            "description": "FK to counterparty — grouping key"
+            "description": "FK to counterparty \u2014 grouping key"
           },
           {
             "layer": "L1",
@@ -203,19 +203,19 @@
             "layer": "L1",
             "table": "facility_master",
             "field": "lob_segment_id",
-            "description": "FK to Business Segment taxonomy — desk resolution"
+            "description": "FK to Business Segment taxonomy \u2014 desk resolution"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "Business Segment hierarchy node — L3 leaf segment"
+            "description": "Business Segment hierarchy node \u2014 L3 leaf segment"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "tree_level",
-            "description": "Hierarchy depth — filter for L3"
+            "description": "Hierarchy depth \u2014 filter for L3"
           },
           {
             "layer": "L1",
@@ -230,7 +230,7 @@
         "dashboard_display_name": "Portfolio LTV (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -254,19 +254,19 @@
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "Business Segment hierarchy node — L2 parent segment"
+            "description": "Business Segment hierarchy node \u2014 L2 parent segment"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
-            "description": "Self-referential FK — traverse up from L3 to L2"
+            "description": "Self-referential FK \u2014 traverse up from L3 to L2"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "tree_level",
-            "description": "Hierarchy depth — filter for L2"
+            "description": "Hierarchy depth \u2014 filter for L2"
           }
         ]
       },
@@ -275,7 +275,7 @@
         "dashboard_display_name": "LTV",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100",
         "source_references": [
           {
             "layer": "L1",
@@ -299,19 +299,19 @@
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
-            "description": "Business Segment hierarchy node — L1 root segment"
+            "description": "Business Segment hierarchy node \u2014 L1 root segment"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
-            "description": "Self-referential FK — recursive traversal to collect all descendants"
+            "description": "Self-referential FK \u2014 recursive traversal to collect all descendants"
           },
           {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "tree_level",
-            "description": "Hierarchy depth — filter for L1"
+            "description": "Hierarchy depth \u2014 filter for L1"
           }
         ]
       }
@@ -604,7 +604,7 @@
     "item_name": "Debt Service Coverage Ratio",
     "abbreviation": "DSCR",
     "kind": "METRIC",
-    "definition": "Net Operating Income (NOI) or EBITDA divided by total debt service obligations. Measures borrower's ability to service debt from operating cash flow. Core CRE underwriting KPI — values below 1.0x indicate insufficient cash flow. Required in FR Y-14Q and CCAR stress testing.",
+    "definition": "Net Operating Income (NOI) or EBITDA divided by total debt service obligations. Measures borrower's ability to service debt from operating cash flow. Core CRE underwriting KPI \u2014 values below 1.0x indicate insufficient cash flow. Required in FR Y-14Q and CCAR stress testing.",
     "generic_formula": "Cashflow / Total Debt Service",
     "data_type": "Decimal",
     "unit_type": "RATIO",
@@ -641,7 +641,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "Gross exposure — weighting basis for rollup",
+        "description": "Gross exposure \u2014 weighting basis for rollup",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "5000000.00"
       },
@@ -763,7 +763,7 @@
           "ltv_pct": 0,
           "noi_amt": 2100000,
           "debt_service_amt": 1400000,
-          "dscr_value": 1.50,
+          "dscr_value": 1.5,
           "cashflow_label": "NOI",
           "positions": [
             {
@@ -896,7 +896,7 @@
     "item_name": "Probability of Default",
     "abbreviation": "PD",
     "kind": "METRIC",
-    "definition": "Annualised probability that the obligor will default within 12 months. PD is inherently a counterparty-level attribute — all facilities under a single counterparty share the same PD. Sourced from internal rating model or counterparty_rating_observation. Basel III IRB regulatory floor is 0.03%.",
+    "definition": "Annualised probability that the obligor will default within 12 months. PD is inherently a counterparty-level attribute \u2014 all facilities under a single counterparty share the same PD. Sourced from internal rating model or counterparty_rating_observation. Basel III IRB regulatory floor is 0.03%.",
     "generic_formula": "Model-assigned PD from rating scorecard",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
@@ -923,7 +923,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "rating_source_id",
-        "description": "Rating source — filter for INTERNAL",
+        "description": "Rating source \u2014 filter for INTERNAL",
         "data_type": "VARCHAR(30)",
         "sample_value": "INTERNAL"
       },
@@ -939,7 +939,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "Gross exposure — weighting basis for rollup",
+        "description": "Gross exposure \u2014 weighting basis for rollup",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "5000000.00"
       },
@@ -1017,8 +1017,14 @@
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
     "metric_class": "CALCULATED",
-    "domain_ids": ["FP"],
-    "regulatory_references": ["FR Y-9C", "CCAR revenue projection", "FR Y-14Q"],
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR revenue projection",
+      "FR Y-14Q"
+    ],
     "insight": "Drawn (funded) balance multiplied by the all-in interest rate, annualized",
     "ingredient_fields": [
       {
@@ -1041,7 +1047,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key — links exposure and pricing snapshots to a single facility",
+        "description": "Primary key \u2014 links exposure and pricing snapshots to a single facility",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1049,7 +1055,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
+        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1057,7 +1063,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },
@@ -1084,10 +1090,18 @@
         "dashboard_display_name": "Facility Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), drawn_amount x all_in_rate_pct / 100 — join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id), drawn_amount x all_in_rate_pct / 100 \u2014 join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
         "source_references": [
-          { "layer": "L2", "table": "facility_exposure_snapshot", "field": "drawn_amount" },
-          { "layer": "L2", "table": "facility_pricing_snapshot", "field": "all_in_rate_pct" }
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "all_in_rate_pct"
+          }
         ]
       },
       {
@@ -1138,8 +1152,14 @@
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
     "metric_class": "CALCULATED",
-    "domain_ids": ["FP"],
-    "regulatory_references": ["FR Y-9C Schedule HI", "CCAR", "FTP Policy"],
+    "domain_ids": [
+      "FP"
+    ],
+    "regulatory_references": [
+      "FR Y-9C Schedule HI",
+      "CCAR",
+      "FTP Policy"
+    ],
     "insight": "Drawn (funded) balance multiplied by the FTP cost-of-funds rate, annualized",
     "ingredient_fields": [
       {
@@ -1162,7 +1182,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key — links exposure and pricing snapshots to a single facility",
+        "description": "Primary key \u2014 links exposure and pricing snapshots to a single facility",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1170,7 +1190,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
+        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1178,7 +1198,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },
@@ -1205,10 +1225,18 @@
         "dashboard_display_name": "Facility Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), drawn_amount x cost_of_funds_pct / 100 — join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id), drawn_amount x cost_of_funds_pct / 100 \u2014 join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
         "source_references": [
-          { "layer": "L2", "table": "facility_exposure_snapshot", "field": "drawn_amount" },
-          { "layer": "L2", "table": "facility_pricing_snapshot", "field": "cost_of_funds_pct" }
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct"
+          }
         ]
       },
       {
@@ -1259,9 +1287,16 @@
     "unit_type": "RATIO",
     "direction": "LOWER_BETTER",
     "metric_class": "DERIVED",
-    "domain_ids": ["CR"],
-    "regulatory_references": ["FR Y-9C", "CCAR", "CECL", "Basel III"],
-    "insight": "Exposure-weighted average notch change in internal risk ratings — negative means improvement, positive means deterioration",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-9C",
+      "CCAR",
+      "CECL",
+      "Basel III"
+    ],
+    "insight": "Exposure-weighted average notch change in internal risk ratings \u2014 negative means improvement, positive means deterioration",
     "ingredient_fields": [
       {
         "layer": "L2",
@@ -1275,7 +1310,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "prior_rating_value",
-        "description": "Previous internal risk rating before the most recent review — the difference gives the notch change",
+        "description": "Previous internal risk rating before the most recent review \u2014 the difference gives the notch change",
         "data_type": "INT",
         "sample_value": "2"
       },
@@ -1283,7 +1318,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "rating_type",
-        "description": "Filter field — INTERNAL for bank's own ratings, EXTERNAL for agency ratings (S&P, Moody's, Fitch)",
+        "description": "Filter field \u2014 INTERNAL for bank's own ratings, EXTERNAL for agency ratings (S&P, Moody's, Fitch)",
         "data_type": "VARCHAR(20)",
         "sample_value": "INTERNAL"
       },
@@ -1291,7 +1326,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "Total gross credit exposure in USD — used as the weighting factor for exposure-weighted averages",
+        "description": "Total gross credit exposure in USD \u2014 used as the weighting factor for exposure-weighted averages",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "20000000.00"
       },
@@ -1299,7 +1334,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key — links exposure snapshots to facilities",
+        "description": "Primary key \u2014 links exposure snapshots to facilities",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1307,7 +1342,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower — enables counterparty-level aggregation and join to rating observations",
+        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation and join to rating observations",
         "data_type": "BIGINT",
         "sample_value": "7890"
       },
@@ -1315,7 +1350,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "301"
       },
@@ -1344,9 +1379,21 @@
         "sourcing_type": "Calc",
         "level_logic": "For each DISTINCT(facility_id), (rating_value - prior_rating_value) from counterparty_rating_observation joined through facility_master.counterparty_id, WHERE rating_type = 'INTERNAL'",
         "source_references": [
-          { "layer": "L2", "table": "counterparty_rating_observation", "field": "rating_value" },
-          { "layer": "L2", "table": "counterparty_rating_observation", "field": "prior_rating_value" },
-          { "layer": "L2", "table": "facility_exposure_snapshot", "field": "gross_exposure_usd" }
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_value"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "prior_rating_value"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "gross_exposure_usd"
+          }
         ]
       },
       {
@@ -1354,7 +1401,7 @@
         "dashboard_display_name": "Counterparty Migration Score",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [counterparty_id], SUM((rating_value - prior_rating_value) * gross_exposure_usd) / SUM(gross_exposure_usd) — exposure-weighted average notch change across all facilities",
+        "level_logic": "For each [counterparty_id], SUM((rating_value - prior_rating_value) * gross_exposure_usd) / SUM(gross_exposure_usd) \u2014 exposure-weighted average notch change across all facilities",
         "source_references": []
       },
       {
@@ -1391,14 +1438,21 @@
     "item_name": "Exception Rate",
     "abbreviation": "EXCPN_RT",
     "kind": "METRIC",
-    "definition": "Number of facilities with active policy exceptions divided by total facility count, expressed as a percentage. Measures the proportion of the loan book approved outside standard underwriting guidelines. A key credit risk governance KPI — elevated rates signal weakening credit standards and attract regulatory scrutiny under OCC Comptroller's Handbook, SR 11-7, and CCAR.",
+    "definition": "Number of facilities with active policy exceptions divided by total facility count, expressed as a percentage. Measures the proportion of the loan book approved outside standard underwriting guidelines. A key credit risk governance KPI \u2014 elevated rates signal weakening credit standards and attract regulatory scrutiny under OCC Comptroller's Handbook, SR 11-7, and CCAR.",
     "generic_formula": "Exception_Count / Total_Facility_Count x 100",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
     "direction": "LOWER_BETTER",
     "metric_class": "CALCULATED",
-    "domain_ids": ["CR"],
-    "regulatory_references": ["OCC Comptroller's Handbook", "SR 11-7", "FR Y-14Q", "CCAR"],
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "OCC Comptroller's Handbook",
+      "SR 11-7",
+      "FR Y-14Q",
+      "CCAR"
+    ],
     "insight": "Count of exception-flagged facilities divided by total active facilities, expressed as a percentage",
     "ingredient_fields": [
       {
@@ -1421,7 +1475,7 @@
         "layer": "L2",
         "table": "facility_credit_approval",
         "field": "exception_severity",
-        "description": "Severity classification: MINOR, MAJOR, or CRITICAL — used to filter Material Exception Rate variant",
+        "description": "Severity classification: MINOR, MAJOR, or CRITICAL \u2014 used to filter Material Exception Rate variant",
         "data_type": "VARCHAR(10)",
         "sample_value": "MAJOR"
       },
@@ -1429,7 +1483,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key — each active facility counts as one in the denominator",
+        "description": "Primary key \u2014 each active facility counts as one in the denominator",
         "data_type": "BIGINT",
         "sample_value": "12345"
       },
@@ -1437,7 +1491,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to borrower — enables counterparty-level pooled division",
+        "description": "FK linking facility to borrower \u2014 enables counterparty-level pooled division",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1445,7 +1499,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "lob_segment_id",
-        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
         "data_type": "INT",
         "sample_value": "303"
       },
@@ -1472,9 +1526,13 @@
         "dashboard_display_name": "Facility Exception Rate (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), CASE WHEN exception_flag = true THEN 100.00 ELSE 0.00 END — join facility_credit_approval on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id), CASE WHEN exception_flag = true THEN 100.00 ELSE 0.00 END \u2014 join facility_credit_approval on facility_id + as_of_date",
         "source_references": [
-          { "layer": "L2", "table": "facility_credit_approval", "field": "exception_flag" }
+          {
+            "layer": "L2",
+            "table": "facility_credit_approval",
+            "field": "exception_flag"
+          }
         ]
       },
       {
@@ -1482,7 +1540,7 @@
         "dashboard_display_name": "Counterparty Exception Rate (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [counterparty_id], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 across all facilities WHERE counterparty_id matches — pooled division",
+        "level_logic": "For each [counterparty_id], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 across all facilities WHERE counterparty_id matches \u2014 pooled division",
         "source_references": []
       },
       {
@@ -1490,7 +1548,7 @@
         "dashboard_display_name": "Desk Exception Rate (%)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [L3 LoB], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 for all facilities WHERE lob_segment_id matches desk — pooled division",
+        "level_logic": "For each [L3 LoB], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 for all facilities WHERE lob_segment_id matches desk \u2014 pooled division",
         "source_references": []
       },
       {
@@ -1519,15 +1577,22 @@
     "item_name": "Counterparty Allocation %",
     "abbreviation": "ALLOC_PCT",
     "kind": "METRIC",
-    "definition": "Percentage share of a credit facility allocated to a specific counterparty. Two variants: Legal Participation % (contractual share from syndication agreement) and Economic Allocation % (effective exposure share after credit risk mitigation — CDS, sub-participations, guarantees). A concentration risk KPI measuring obligor dependency in syndicated lending structures.",
-    "generic_formula": "Legal: participation_pct | Economic: legal_participation_pct − crm_adjustment_pct",
+    "definition": "Percentage share of a credit facility allocated to a specific counterparty. Two variants: Legal Participation % (contractual share from syndication agreement) and Economic Allocation % (effective exposure share after credit risk mitigation \u2014 CDS, sub-participations, guarantees). A concentration risk KPI measuring obligor dependency in syndicated lending structures.",
+    "generic_formula": "Legal: participation_pct | Economic: legal_participation_pct \u2212 crm_adjustment_pct",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
     "metric_class": "DERIVED",
-    "domain_ids": ["CR"],
-    "regulatory_references": ["FR Y-14Q", "Basel III CRE", "Large Exposure Framework", "CCAR"],
-    "insight": "Counterparty share of facility — contractual (legal) and risk-adjusted (economic) views",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q",
+      "Basel III CRE",
+      "Large Exposure Framework",
+      "CCAR"
+    ],
+    "insight": "Counterparty share of facility \u2014 contractual (legal) and risk-adjusted (economic) views",
     "ingredient_fields": [
       {
         "layer": "L1",
@@ -1557,7 +1622,7 @@
         "layer": "L2",
         "table": "counterparty_allocation_snapshot",
         "field": "economic_allocation_pct",
-        "description": "Net economic exposure = legal_participation_pct − crm_adjustment_pct",
+        "description": "Net economic exposure = legal_participation_pct \u2212 crm_adjustment_pct",
         "data_type": "DECIMAL(5,2)",
         "sample_value": "45.00"
       },
@@ -1565,7 +1630,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "committed_facility_amt",
-        "description": "Committed amount — weighting basis for counterparty-level rollup",
+        "description": "Committed amount \u2014 weighting basis for counterparty-level rollup",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "100000000.00"
       },
@@ -1573,7 +1638,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to counterparty — enables counterparty-level aggregation",
+        "description": "FK linking facility to counterparty \u2014 enables counterparty-level aggregation",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
@@ -1581,7 +1646,7 @@
         "layer": "L1",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Primary key — joins participation and allocation snapshot tables",
+        "description": "Primary key \u2014 joins participation and allocation snapshot tables",
         "data_type": "BIGINT",
         "sample_value": "12345"
       }
@@ -1594,8 +1659,16 @@
         "sourcing_type": "Raw",
         "level_logic": "For each DISTINCT([Facility_ID], [Counterparty_ID]) lookup [participation_pct] FROM facility_counterparty_participation (legal) OR [economic_allocation_pct] FROM counterparty_allocation_snapshot (economic)",
         "source_references": [
-          { "layer": "L1", "table": "facility_counterparty_participation", "field": "participation_pct" },
-          { "layer": "L2", "table": "counterparty_allocation_snapshot", "field": "economic_allocation_pct" }
+          {
+            "layer": "L1",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_allocation_snapshot",
+            "field": "economic_allocation_pct"
+          }
         ]
       },
       {
@@ -1603,7 +1676,7 @@
         "dashboard_display_name": "Counterparty Wtd Allocation %",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [counterparty_id], SUM(allocation_pct × committed_facility_amt) / SUM(committed_facility_amt) — exposure-weighted average across all facilities for that counterparty",
+        "level_logic": "For each [counterparty_id], SUM(allocation_pct \u00d7 committed_facility_amt) / SUM(committed_facility_amt) \u2014 exposure-weighted average across all facilities for that counterparty",
         "source_references": []
       },
       {
@@ -1632,6 +1705,159 @@
       }
     ],
     "number_of_instances": 2,
+    "directly_displayed": true,
+    "status": "ACTIVE"
+  },
+  {
+    "item_id": "COLL_MV",
+    "item_name": "Current Collateral Market Value",
+    "abbreviation": "COLL_MV",
+    "kind": "METRIC",
+    "definition": "Current market value of pledged collateral securing credit exposure in USD. Aggregated from individual collateral asset appraisals per facility, then participation-weighted at the counterparty level. Supports recovery analysis, secured lending assessment, Basel III CRM capital relief, and CCAR stress testing.",
+    "generic_formula": "SUM(current_valuation_usd)",
+    "data_type": "Decimal",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": [
+      "CR",
+      "CM"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q",
+      "Basel III CRM",
+      "CCAR"
+    ],
+    "insight": "Amount of credit risk mitigated by pledged collateral",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "collateral_snapshot",
+        "field": "current_valuation_usd",
+        "description": "Current market appraisal of each collateral asset in USD",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "55000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "collateral_snapshot",
+        "field": "facility_id",
+        "description": "FK linking collateral asset to the secured facility",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "total_collateral_mv_usd",
+        "description": "Pre-computed SUM of current_valuation_usd from collateral_snapshot \u2014 materialized per facility for performance and audit trail",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "120000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_counterparty_participation",
+        "field": "participation_pct",
+        "description": "Counterparty ownership share in the facility \u2014 used for counterparty-level attribution",
+        "data_type": "DECIMAL(10,4)",
+        "sample_value": "100.0000"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key \u2014 links collateral snapshots and participation records to a single facility",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower \u2014 enables counterparty-level aggregation",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to business taxonomy \u2014 enables desk/portfolio/Business Segment rollup",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INT",
+        "sample_value": "200"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each DISTINCT([Facility_ID]) WHEN [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) Lookup each [Collateral_Snapshot_ID] FROM the Collateral_Snapshot table WHEN IS([Facility_ID]) THEN for each [Facility_ID] SUM(ARRAY{[current_valuation_usd]}) based on matched [Collateral_Snapshot_ID]",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "current_valuation_usd"
+          }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [Counterparty_ID] lookup [Facility_ID] in Facility Master table WHEN [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) AND IS([Counterparty_ID]) THEN For each [Facility_ID] lookup [participation_pct] WHEN IS([Counterparty_ID]) AND IS([Facility_ID]) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [Facility_ID] calculate [current_valuation_usd]*[participation_pct] == [Counterparty_Participation_Collateral_MV] THEN For each [Counterparty_ID] SUM(ARRAY{[Counterparty_Participation_Collateral_MV]})",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct"
+          }
+        ]
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L3 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L3' and [Description]=[L3 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [L3 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L2 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L2' and [Description]=[L2 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [L2 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L1 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L1' and [Description]=[L1 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [L1 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
     "directly_displayed": true,
     "status": "ACTIVE"
   }

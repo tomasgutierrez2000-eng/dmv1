@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // sql.js uses CJS + WASM — must be loaded natively, not bundled by webpack
-  serverExternalPackages: ['sql.js'],
   experimental: {
     serverComponentsExternalPackages: ['sql.js'],
   },

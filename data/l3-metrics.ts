@@ -231,6 +231,186 @@ export const DIMENSION_LABELS: Record<string, string> = {
 // ═══════════════════════════════════════════════════════════════
 
 export const L3_METRICS: L3Metric[] = [
+  {
+    id: 'C001',
+    name: 'Undrawn Exposure',
+    page: 'P2',
+    section: 'Exposure Breakdown',
+    metricType: 'Aggregate',
+    formula: 'SUM(unfunded_amount per position) * bank_share',
+    formulaSQL: `SELECT
+  fm.facility_id,
+  SUM(p.unfunded_amount) * fm.bank_share AS undrawn_exposure
+FROM facility_master fm
+JOIN positions p ON p.facility_id = fm.facility_id
+WHERE fm.facility_active_flag = 'Y'
+GROUP BY fm.facility_id, fm.bank_share`,
+    description: 'Committed but not yet drawn portion of credit exposure in USD. Reflects contingent funding risk — the maximum additional drawdown the bank may be called upon to fund.',
+    displayFormat: '$,.0f',
+    sampleValue: '$15,000,000',
+    sourceFields: [
+      { layer: 'L2', table: 'positions', field: 'unfunded_amount', description: 'Unfunded/undrawn amount per position' },
+      { layer: 'L2', table: 'positions', field: 'position_id', description: 'Position identifier for iteration' },
+      { layer: 'L1', table: 'facility_master', field: 'facility_id', description: 'Primary key — grain of calculation' },
+      { layer: 'L1', table: 'facility_master', field: 'facility_active_flag', description: 'Active facility filter' },
+      { layer: 'L1', table: 'facility_master', field: 'bank_share', description: "Bank's participation share (0.0-1.0)" },
+      { layer: 'L1', table: 'facility_master', field: 'counterparty_id', description: 'FK to counterparty — grouping key' },
+      { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to business taxonomy — desk/portfolio/lob rollup' },
+      { layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct', description: 'Counterparty participation percentage in facility' },
+      { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id', description: 'Hierarchy node PK' },
+      { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'parent_segment_id', description: 'FK for recursive hierarchy traversal' },
+      { layer: 'L1', table: 'enterprise_business_taxonomy', field: 'tree_level', description: 'Hierarchy depth label (L1/L2/L3)' },
+    ],
+    dimensions: [
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+      { dimension: 'lob_segment_id', interaction: 'GROUP_BY' },
+      { dimension: 'product_node_id', interaction: 'FILTER' },
+    ],
+    allowedDimensions: ['facility', 'counterparty', 'L3', 'L2', 'L1'],
+    formulasByDimension: {
+      facility: {
+        formula: 'SUM(unfunded_amount per position) * bank_share',
+        formulaSQL: `SELECT
+  fm.facility_id,
+  SUM(p.unfunded_amount) * fm.bank_share AS undrawn_exposure
+FROM facility_master fm
+JOIN positions p ON p.facility_id = fm.facility_id
+WHERE fm.facility_active_flag = 'Y'
+GROUP BY fm.facility_id, fm.bank_share`,
+      },
+      counterparty: {
+        formula: 'SUM(participation_pct * Facility Undrawn Exposure) per counterparty',
+        formulaSQL: `SELECT
+  fm.counterparty_id,
+  SUM(fac_ue.undrawn_exposure * fcp.participation_pct) AS undrawn_exposure
+FROM (
+  SELECT fm2.facility_id, SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
+  FROM facility_master fm2
+  JOIN positions p ON p.facility_id = fm2.facility_id
+  WHERE fm2.facility_active_flag = 'Y'
+  GROUP BY fm2.facility_id, fm2.bank_share
+) fac_ue
+JOIN facility_master fm ON fm.facility_id = fac_ue.facility_id
+JOIN facility_counterparty_participation fcp
+  ON fcp.facility_id = fac_ue.facility_id AND fcp.counterparty_id = fm.counterparty_id
+GROUP BY fm.counterparty_id`,
+      },
+      L3: {
+        formula: 'SUM(Facility Undrawn Exposure) per L3 desk',
+        formulaSQL: `SELECT
+  ebt.managed_segment_id,
+  SUM(fac_ue.undrawn_exposure) AS undrawn_exposure
+FROM (
+  SELECT fm2.facility_id, fm2.lob_segment_id,
+         SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
+  FROM facility_master fm2
+  JOIN positions p ON p.facility_id = fm2.facility_id
+  WHERE fm2.facility_active_flag = 'Y'
+  GROUP BY fm2.facility_id, fm2.lob_segment_id, fm2.bank_share
+) fac_ue
+JOIN enterprise_business_taxonomy ebt
+  ON ebt.managed_segment_id = fac_ue.lob_segment_id AND ebt.tree_level = 'L3'
+GROUP BY ebt.managed_segment_id`,
+      },
+      L2: {
+        formula: 'SUM(Facility Undrawn Exposure) per L2 portfolio',
+        formulaSQL: `SELECT
+  ebt_l2.managed_segment_id,
+  SUM(fac_ue.undrawn_exposure) AS undrawn_exposure
+FROM (
+  SELECT fm2.facility_id, fm2.lob_segment_id,
+         SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
+  FROM facility_master fm2
+  JOIN positions p ON p.facility_id = fm2.facility_id
+  WHERE fm2.facility_active_flag = 'Y'
+  GROUP BY fm2.facility_id, fm2.lob_segment_id, fm2.bank_share
+) fac_ue
+JOIN enterprise_business_taxonomy ebt_l3
+  ON ebt_l3.managed_segment_id = fac_ue.lob_segment_id
+JOIN enterprise_business_taxonomy ebt_l2
+  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id AND ebt_l2.tree_level = 'L2'
+GROUP BY ebt_l2.managed_segment_id`,
+      },
+      L1: {
+        formula: 'SUM(Facility Undrawn Exposure) per L1 business segment',
+        formulaSQL: `SELECT
+  ebt_l1.managed_segment_id,
+  SUM(fac_ue.undrawn_exposure) AS undrawn_exposure
+FROM (
+  SELECT fm2.facility_id, fm2.lob_segment_id,
+         SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
+  FROM facility_master fm2
+  JOIN positions p ON p.facility_id = fm2.facility_id
+  WHERE fm2.facility_active_flag = 'Y'
+  GROUP BY fm2.facility_id, fm2.lob_segment_id, fm2.bank_share
+) fac_ue
+JOIN enterprise_business_taxonomy ebt_l3
+  ON ebt_l3.managed_segment_id = fac_ue.lob_segment_id
+JOIN enterprise_business_taxonomy ebt_l2
+  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+JOIN enterprise_business_taxonomy ebt_l1
+  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id AND ebt_l1.tree_level = 'L1'
+GROUP BY ebt_l1.managed_segment_id`,
+      },
+    },
+    displayNameByDimension: {
+      facility: 'Facility Undrawn Exposure ($)',
+      counterparty: 'Counterparty Undrawn Exposure ($)',
+      L3: 'Desk Undrawn Exposure ($)',
+      L2: 'Portfolio Undrawn Exposure ($)',
+      L1: 'Business Segment Undrawn Exposure ($)',
+    },
+    nodes: [
+      {
+        id: 'src-positions', layer: 'L2', table: 'positions', field: 'unfunded_amount',
+        fields: ['unfunded_amount', 'position_id', 'facility_id'],
+        description: 'Position-level unfunded (undrawn) amounts per facility',
+        sampleValue: '15000000',
+      },
+      {
+        id: 'src-facility', layer: 'L1', table: 'facility_master', field: 'facility_id',
+        fields: ['facility_id', 'bank_share', 'facility_active_flag', 'counterparty_id', 'lob_segment_id'],
+        description: 'Facility master — bank share, active flag, hierarchy keys',
+        sampleValue: 'F-201',
+      },
+      {
+        id: 'src-participation', layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct',
+        fields: ['participation_pct', 'facility_id', 'counterparty_id'],
+        description: 'Counterparty participation percentages per facility',
+        sampleValue: '0.50',
+      },
+      {
+        id: 'src-taxonomy', layer: 'L1', table: 'enterprise_business_taxonomy', field: 'managed_segment_id',
+        fields: ['managed_segment_id', 'parent_segment_id', 'tree_level', 'segment_name'],
+        description: 'Business hierarchy for desk/portfolio/Business Segment rollup',
+        sampleValue: 'SEG-L3-CRE',
+      },
+      {
+        id: 'calc-fac', layer: 'transform', table: '', field: 'facility_undrawn_exposure',
+        formula: 'SUM(unfunded_amount per position) * bank_share',
+        description: 'Aggregate position unfunded amounts and apply bank share',
+        filterCriteria: 'WHERE facility_active_flag = Y AND MAX(as_of_date)',
+      },
+      {
+        id: 'calc-rollup', layer: 'transform', table: '', field: 'rollup_undrawn_exposure',
+        formula: 'SUM(facility_undrawn_exposure) per hierarchy level',
+        description: 'Roll up facility values via counterparty → desk → portfolio → Business Segment',
+      },
+      {
+        id: 'output', layer: 'L3', table: 'l3_exposure_breakdown', field: 'undrawn_exposure',
+        description: 'Undrawn Exposure ($) — contingent funding risk',
+        sampleValue: '$15,000,000',
+      },
+    ],
+    edges: [
+      { from: 'src-positions', to: 'calc-fac', label: 'SUM per facility_id' },
+      { from: 'src-facility', to: 'calc-fac', label: 'bank_share × filter' },
+      { from: 'calc-fac', to: 'calc-rollup', label: 'facility-level values' },
+      { from: 'src-participation', to: 'calc-rollup', label: 'counterparty pct' },
+      { from: 'src-taxonomy', to: 'calc-rollup', label: 'hierarchy traversal' },
+      { from: 'calc-rollup', to: 'output' },
+    ],
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════

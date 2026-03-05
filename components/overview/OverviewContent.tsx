@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Network, MessageCircle, BookOpen, History, Activity, Target, Telescope, Cpu } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Network, MessageCircle, BookOpen, History, Activity, Target, Telescope, Cpu, Columns3 } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewContent() {
@@ -23,7 +23,7 @@ export default function OverviewContent() {
               <p className="text-sm text-slate-400 mt-1">Three-layer architecture for banking and financial services data</p>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-5 gap-2">
             {/* Executive Summary — hover/focus dropdown */}
             <div className="relative group">
               <button
@@ -64,6 +64,7 @@ export default function OverviewContent() {
               { href: '/architecture', icon: Layers, label: 'Architecture', bg: 'bg-teal-600', hover: 'hover:bg-teal-500' },
               // Metrics engine dormant — hidden from nav
               // { href: '/metrics/library', icon: Library, label: 'Metrics', bg: 'bg-violet-600', hover: 'hover:bg-violet-500' },
+              { href: '/data-elements', icon: Columns3, label: 'Data Elements', bg: 'bg-cyan-600', hover: 'hover:bg-cyan-500' },
               { href: '/agent', icon: MessageCircle, label: 'Ask AI', bg: 'bg-slate-700', hover: 'hover:bg-slate-600' },
               { href: '/guide', icon: BookOpen, label: 'Playbook', bg: 'bg-blue-600', hover: 'hover:bg-blue-500' },
             ].map((item) => (
@@ -354,27 +355,35 @@ export default function OverviewContent() {
 
             {/* Metrics Engine & Metric Library — dormant, hidden from walkthroughs */}
 
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 opacity-60 cursor-default" aria-disabled="true">
+            <Link
+              href="/data-elements"
+              className="bg-slate-900/80 border border-cyan-500/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500/50 hover:bg-slate-900 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            >
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-700/60 flex items-center justify-center flex-shrink-0">
-                  <Network className="w-6 h-6 text-slate-500" />
+                <div className="w-12 h-12 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0 group-hover:bg-cyan-500/25 transition-colors">
+                  <Columns3 className="w-6 h-6 text-cyan-400" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1 text-slate-400">Impact Analysis</h4>
-                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-500 bg-slate-700/60 px-2 py-0.5 rounded">Coming soon</span>
+                  <h4 className="font-semibold text-lg mb-1 text-white">Data Elements Library</h4>
+                  <p className="text-sm text-slate-400">Tables, fields &amp; relationships</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-500 mb-4">
-                Select a table or field and see everything upstream and downstream that depends on it.
+              <p className="text-sm text-slate-300 mb-4 leading-relaxed">
+                Browse all tables and fields across L1, L2, and L3. Search by name, explore FK relationships, view data types, and trace which metrics depend on each table.
               </p>
-            </div>
+              <div className="flex items-center gap-2 text-cyan-400 font-medium text-sm group-hover:gap-3 transition-all">
+                <Play className="w-4 h-4" />
+                <span>Open Data Elements</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </Link>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-8">
           <h3 className="text-xl font-semibold mb-6 text-center text-white">Quick Actions</h3>
-          <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <Link
               href="/visualizer"
               className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
@@ -384,6 +393,14 @@ export default function OverviewContent() {
               <p className="text-sm text-slate-400">Explore the full data model with interactive ERD and sample data</p>
             </Link>
             {/* Metric Library — dormant */}
+            <Link
+              href="/data-elements"
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"
+            >
+              <Columns3 className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+              <h4 className="font-semibold mb-2 text-white">Data Elements</h4>
+              <p className="text-sm text-slate-400">Browse all tables, fields, and FK relationships across L1/L2/L3</p>
+            </Link>
             <Link
               href="/guide"
               className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"

@@ -411,19 +411,17 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
   }),
   ({
     id: 'C112',
-    name: 'Counterparty Allocation (%)',
+    name: 'Counterparty Share or Allocation (%)',
     page: 'P4',
     section: 'Deep Dive',
     metricType: 'Ratio',
-    formula: 'SUM(participation_pct * committed_facility_amt) / SUM(committed_facility_amt)',
-    description: 'Counterparty share of facility — Legal (contractual participation_pct) and Economic (legal − CRM adjustment) variants. Exposure-weighted average at counterparty level.',
+    formula: 'participation_pct',
+    description: 'Exposure allocated to specific counterparty representing their share of the facility which the client can draw on. Concentration KPI measuring obligor dependency risk.',
     displayFormat: '#,##0.00%',
     sampleValue: '—',
     sourceFields: [
       { layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct' },
-      { layer: 'L2', table: 'counterparty_allocation_snapshot', field: 'economic_allocation_pct' },
-      { layer: 'L2', table: 'counterparty_allocation_snapshot', field: 'crm_adjustment_pct' },
-      { layer: 'L1', table: 'facility_master', field: 'committed_facility_amt' },
+      { layer: 'L1', table: 'facility_master', field: 'facility_id' },
       { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
     ],
     dimensions: [
@@ -433,15 +431,15 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     ],
     allowedDimensions: ['facility', 'counterparty'] as typeof ALL_DIMS,
     displayNameByDimension: {
-      facility: 'Facility Allocation (%)',
-      counterparty: 'Counterparty Wtd Allocation (%)',
+      facility: 'N/A',
+      counterparty: 'N/A',
       L3: 'N/A',
       L2: 'N/A',
       L1: 'N/A',
     },
     formulasByDimension: buildGroupedFormula(
-      'SUM(participation_pct * committed_facility_amt) / SUM(committed_facility_amt)',
-      'SUM(fcp.participation_pct * fm.committed_facility_amt) / NULLIF(SUM(fm.committed_facility_amt), 0)',
+      'participation_pct',
+      'fcp.participation_pct',
       'FROM L1.facility_counterparty_participation fcp LEFT JOIN L1.facility_master fm ON fm.facility_id = fcp.facility_id',
       'WHERE fm.facility_active_flag = \'Y\''
     ),

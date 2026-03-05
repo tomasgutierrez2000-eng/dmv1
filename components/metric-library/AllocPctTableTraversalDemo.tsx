@@ -44,14 +44,14 @@ const TABLES: Record<string, TableDef> = {
   },
   cas: {
     id: 'cas',
-    name: 'counterparty_allocation_snapshot',
-    layer: 'L2',
-    shortName: 'Allocation Snapshot',
+    name: 'facility_counterparty_participation',
+    layer: 'L1',
+    shortName: 'Participation (detail)',
     fields: [
       { name: 'facility_id', sampleValue: '12345' },
       { name: 'counterparty_id', sampleValue: '7890' },
-      { name: 'legal_participation_pct', sampleValue: '60.0000' },
-      { name: 'crm_adjustment_pct', sampleValue: '15.0000' },
+      { name: 'participation_pct', sampleValue: '60.0000' },
+      { name: 'is_primary_flag', sampleValue: 'Y' },
     ],
   },
   fm: {
@@ -145,7 +145,7 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         highlightTable: 'fcp',
         fieldsToShow: ['facility_id', 'counterparty_id', 'participation_pct'],
         narration:
-          'Start at the participation table. Each row is a (facility, counterparty) pair with its contractual participation percentage. For facility 12345 and counterparty 7890, the legal participation is 60.00%.',
+          'Start at the participation table. Each row is a (facility, counterparty) pair with its participation percentage. For facility 12345 and counterparty 7890, the allocation is 60.00%.',
       },
       {
         kind: 'join',
@@ -158,24 +158,14 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
           'Join to facility_master to get the facility\'s committed amount and product type. The committed amount ($100M) may be needed for weighted calculations at higher levels.',
       },
       {
-        kind: 'join',
-        highlightTable: 'cas',
-        arrowFrom: 'fcp',
-        arrowTo: 'cas',
-        joinKey: 'facility_id + counterparty_id',
-        fieldsToShow: ['legal_participation_pct', 'crm_adjustment_pct'],
-        narration:
-          'For economic allocation, join to the allocation snapshot to get CRM adjustments. The snapshot records the legal participation (60.00%) and the CRM adjustment (15.00%) applied by risk management.',
-      },
-      {
         kind: 'result',
         highlightTable: 'calc',
-        arrowFrom: 'cas',
+        arrowFrom: 'fm',
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
-          'Legal allocation: direct lookup = 60.00%. Economic allocation: 60.00% \u2212 15.00% = 45.00%. The CRM adjustment reflects risk transfer between counterparties.',
-        sampleResult: 'Legal: 60.00% | Economic: 45.00%',
+          'Allocation %: direct raw lookup = 60.00%. This is the counterparty\'s share of the facility which they can draw on.',
+        sampleResult: 'Allocation: 60.00%',
       },
     ],
   },
@@ -183,8 +173,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    description: 'Weighted average allocation across all facilities for a borrower',
-    tables: ['fcp', 'fm', 'cp', 'cas', 'calc', 'wtdavg'],
+    description: 'Raw lookup of allocation % for each facility belonging to a counterparty',
+    tables: ['fcp', 'fm', 'cp', 'calc'],
     steps: [
       {
         kind: 'source',
@@ -220,18 +210,8 @@ const DIMENSION_DEMOS: DimensionDemo[] = [
         arrowTo: 'calc',
         fieldsToShow: [],
         narration:
-          'Calculate per-facility allocation for each facility. Facility A: 60.00%, Facility B: 45.00%, Facility C: 55.00%. Each facility has its own contractual allocation percentage.',
-        sampleResult: '60%, 45%, 55% per facility',
-      },
-      {
-        kind: 'aggregate',
-        highlightTable: 'wtdavg',
-        arrowFrom: 'calc',
-        arrowTo: 'wtdavg',
-        fieldsToShow: [],
-        narration:
-          'Weighted average: \u03A3(alloc_pct \u00D7 committed_amt) / \u03A3(committed_amt). (60%\u00D7$100M + 45%\u00D7$75M + 55%\u00D7$50M) / ($100M + $75M + $50M) = $121.25M / $225M = 54.67%. Simple averaging would be wrong \u2014 larger facilities must count more.',
-        sampleResult: 'Wtd Avg = 54.67%',
+          'Raw lookup of allocation % for each facility: Facility A: 60.00%, Facility B: 100.00%, Facility C: 35.00%. Each facility retains its own participation_pct — no aggregation is applied.',
+        sampleResult: '60%, 100%, 35% per facility',
       },
     ],
   },
@@ -928,7 +908,7 @@ export default function AllocPctTableTraversalDemo() {
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> L2 Snapshot</span>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500" /> L1 Reference</span>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Calculation</span>
-          <span className="ml-auto font-medium">Allocation = participation_pct (legal) | legal {'\u2212'} crm_adj (economic)</span>
+          <span className="ml-auto font-medium">Allocation = participation_pct (raw lookup)</span>
         </div>
       </div>
     </div>

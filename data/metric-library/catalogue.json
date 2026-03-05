@@ -1574,138 +1574,105 @@
   },
   {
     "item_id": "ALLOC_PCT",
-    "item_name": "Counterparty Allocation %",
+    "item_name": "Counterparty Share or Allocation (%)",
     "abbreviation": "ALLOC_PCT",
     "kind": "METRIC",
-    "definition": "Percentage share of a credit facility allocated to a specific counterparty. Two variants: Legal Participation % (contractual share from syndication agreement) and Economic Allocation % (effective exposure share after credit risk mitigation \u2014 CDS, sub-participations, guarantees). A concentration risk KPI measuring obligor dependency in syndicated lending structures.",
-    "generic_formula": "Legal: participation_pct | Economic: legal_participation_pct \u2212 crm_adjustment_pct",
+    "definition": "Exposure allocated to specific counterparty representing their share of the facility which the client can draw on. Concentration KPI measuring obligor dependency risk.",
+    "generic_formula": "participation_pct lookup from facility_counterparty_participation",
     "data_type": "Decimal",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
-    "metric_class": "DERIVED",
+    "metric_class": "SOURCED",
     "domain_ids": [
       "CR"
     ],
     "regulatory_references": [
       "FR Y-14Q",
-      "Basel III CRE",
-      "Large Exposure Framework",
-      "CCAR"
+      "Large Exposure Framework"
     ],
-    "insight": "Counterparty share of facility \u2014 contractual (legal) and risk-adjusted (economic) views",
+    "insight": "Concentration risk identification",
     "ingredient_fields": [
       {
         "layer": "L1",
-        "table": "facility_counterparty_participation",
-        "field": "participation_pct",
-        "description": "Contractual participation percentage from syndication agreement",
-        "data_type": "DECIMAL(5,2)",
-        "sample_value": "60.00"
-      },
-      {
-        "layer": "L2",
-        "table": "counterparty_allocation_snapshot",
-        "field": "legal_participation_pct",
-        "description": "Denormalized legal participation for audit trail",
-        "data_type": "DECIMAL(5,2)",
-        "sample_value": "60.00"
-      },
-      {
-        "layer": "L2",
-        "table": "counterparty_allocation_snapshot",
-        "field": "crm_adjustment_pct",
-        "description": "Total credit risk mitigation reduction (CDS, sub-participation, risk participation, guarantees)",
-        "data_type": "DECIMAL(5,2)",
-        "sample_value": "15.00"
-      },
-      {
-        "layer": "L2",
-        "table": "counterparty_allocation_snapshot",
-        "field": "economic_allocation_pct",
-        "description": "Net economic exposure = legal_participation_pct \u2212 crm_adjustment_pct",
-        "data_type": "DECIMAL(5,2)",
-        "sample_value": "45.00"
-      },
-      {
-        "layer": "L1",
         "table": "facility_master",
-        "field": "committed_facility_amt",
-        "description": "Committed amount \u2014 weighting basis for counterparty-level rollup",
-        "data_type": "DECIMAL(18,2)",
-        "sample_value": "100000000.00"
+        "field": "facility_id",
+        "description": "Primary key — joins to participation table",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
       },
       {
         "layer": "L1",
         "table": "facility_master",
         "field": "counterparty_id",
-        "description": "FK linking facility to counterparty \u2014 enables counterparty-level aggregation",
+        "description": "FK linking facility to counterparty",
         "data_type": "BIGINT",
         "sample_value": "67890"
       },
       {
         "layer": "L1",
-        "table": "facility_master",
-        "field": "facility_id",
-        "description": "Primary key \u2014 joins participation and allocation snapshot tables",
-        "data_type": "BIGINT",
-        "sample_value": "12345"
+        "table": "facility_counterparty_participation",
+        "field": "participation_pct",
+        "description": "Counterparty share of the facility",
+        "data_type": "DECIMAL(5,2)",
+        "sample_value": "60.00"
       }
     ],
     "level_definitions": [
       {
         "level": "facility",
-        "dashboard_display_name": "Facility Allocation %",
+        "dashboard_display_name": null,
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "For each DISTINCT([Facility_ID], [Counterparty_ID]) lookup [participation_pct] FROM facility_counterparty_participation (legal) OR [economic_allocation_pct] FROM counterparty_allocation_snapshot (economic)",
+        "level_logic": "For each [Facility_ID] lookup [Counterparty_ID] in Facility Master table THEN for each [Counterparty_ID] lookup [participation_pct] in facility_counterparty_participation table WHEN IS([Counterparty_ID] AND [Facility_ID])",
         "source_references": [
           {
             "layer": "L1",
             "table": "facility_counterparty_participation",
             "field": "participation_pct"
-          },
-          {
-            "layer": "L2",
-            "table": "counterparty_allocation_snapshot",
-            "field": "economic_allocation_pct"
           }
         ]
       },
       {
         "level": "counterparty",
-        "dashboard_display_name": "Counterparty Wtd Allocation %",
+        "dashboard_display_name": null,
         "in_record": true,
-        "sourcing_type": "Avg",
-        "level_logic": "For each [counterparty_id], SUM(allocation_pct \u00d7 committed_facility_amt) / SUM(committed_facility_amt) \u2014 exposure-weighted average across all facilities for that counterparty",
-        "source_references": []
+        "sourcing_type": "Raw",
+        "level_logic": "For each [Counterparty_ID] lookup [Facility_ID] in Facility Master table THEN for each [Facility_ID] lookup [participation_pct] in facility_counterparty_participation table WHEN IS([Counterparty_ID] AND [Facility_ID])",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct"
+          }
+        ]
       },
       {
         "level": "desk",
-        "dashboard_display_name": "N/A",
+        "dashboard_display_name": null,
         "in_record": false,
         "sourcing_type": "N/A",
-        "level_logic": "Allocation % is a facility-counterparty relationship attribute. It does not aggregate to organizational levels (desk, portfolio, business segment).",
+        "level_logic": "N/A",
         "source_references": []
       },
       {
         "level": "portfolio",
-        "dashboard_display_name": "N/A",
+        "dashboard_display_name": null,
         "in_record": false,
         "sourcing_type": "N/A",
-        "level_logic": "Allocation % is a facility-counterparty relationship attribute. It does not aggregate to organizational levels.",
+        "level_logic": "N/A",
         "source_references": []
       },
       {
         "level": "lob",
-        "dashboard_display_name": "N/A",
+        "dashboard_display_name": null,
         "in_record": false,
         "sourcing_type": "N/A",
-        "level_logic": "Allocation % is a facility-counterparty relationship attribute. It does not aggregate to organizational levels.",
+        "level_logic": "N/A",
         "source_references": []
       }
     ],
     "number_of_instances": 2,
-    "directly_displayed": true,
+    "directly_displayed": false,
     "status": "ACTIVE"
   },
   {

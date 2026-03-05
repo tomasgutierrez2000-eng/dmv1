@@ -109,3 +109,99 @@ AGENT_PROVIDER           # gemini|claude|ollama
 - **Data dictionary** cached at `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
 - When modifying metrics: always update both the catalogue item AND the L3 metric definition if both exist
 - Level definitions use `sourcing_type`: `Raw` (direct field), `Calc` (computed), `Agg` (aggregated), `Avg` (weighted average)
+
+## GCP Cloud SQL PostgreSQL — DDL & Data Upload Rules
+
+When generating or modifying SQL DDL or INSERT data for PostgreSQL upload, follow these rules to avoid syntax errors, type mismatches, and FK constraint violations.
+
+### DDL Syntax Rules
+
+1. **Reserved words as column names must be double-quoted:**
+   - `value` is reserved in PostgreSQL — always use `"value"` in CREATE TABLE and INSERT column lists
+   - Other truly reserved words: `ALL`, `AND`, `ARRAY`, `AS`, `BETWEEN`, `CASE`, `CHECK`, `COLUMN`, `CONSTRAINT`, `CREATE`, `CROSS`, `DEFAULT`, `DISTINCT`, `DO`, `ELSE`, `END`, `EXCEPT`, `FALSE`, `FETCH`, `FOR`, `FOREIGN`, `FROM`, `FULL`, `GRANT`, `GROUP`, `HAVING`, `IN`, `INNER`, `INTO`, `IS`, `JOIN`, `LEADING`, `LEFT`, `LIKE`, `LIMIT`, `NOT`, `NULL`, `OFFSET`, `ON`, `ONLY`, `OR`, `ORDER`, `OUTER`, `PRIMARY`, `REFERENCES`, `RIGHT`, `SELECT`, `TABLE`, `THEN`, `TO`, `TRUE`, `UNION`, `UNIQUE`, `USER`, `USING`, `WHEN`, `WHERE`, `WINDOW`, `WITH`
+   - Non-reserved (OK unquoted): `name`, `status`, `type`, `key`, `comment`, `level`, `role`, `action`, `source`, `position`, `domain`
+
+2. **Constraint name length limit is 63 characters (NAMEDATALEN):**
+   - PostgreSQL silently truncates names >63 chars — no error, but confusing when debugging
+   - Use abbreviations for long table names in constraint names (e.g., `fk_ca_cp_participation_` instead of `fk_credit_agreement_counterparty_participation_`)
+
+3. **Every table MUST have a PRIMARY KEY** for GCP Cloud SQL logical replication. Use `BIGSERIAL PRIMARY KEY` for fact tables without a natural key.
+
+4. **SET search_path** is required when FK REFERENCES cross schemas:
+   - L2 DDL: `SET search_path TO l1, l2, public;` (references L1 tables)
+   - L3 DDL: `SET search_path TO l1, l2, l3, public;` (references L1/L2 tables)
+   - L1 DDL: not needed if all FKs are within L1 and fully schema-qualified
+
+5. **COALESCE in unique indexes must match column type:**
+   - BIGINT column: `COALESCE(facility_id, 0)` — NOT `COALESCE(facility_id, '')`
+   - VARCHAR column: `COALESCE(variant_id, '')` — NOT `COALESCE(variant_id, 0)`
+
+### Data Type Rules
+
+6. **ID columns use BIGINT, not VARCHAR(64):**
+   - All `_id` columns across L1, L2, L3 are `BIGINT` (e.g., `counterparty_id BIGINT`)
+   - Exception: `metric_id`, `variant_id`, `source_metric_id`, `mdrm_id`, `mapped_line_id`, `mapped_column_id` remain `VARCHAR(64)` — these store string identifiers, not numeric IDs
+   - The DDL generator (`lib/ddl-generator.ts`) defaults `_id` to BIGINT; override via explicit `data_type` in data dictionary for string IDs
+
+7. **Code columns use VARCHAR, not BIGINT:**
+   - `_code` suffix columns (e.g., `fr2590_category_code`, `pricing_tier_code`, `internal_risk_rating_bucket_code`) are `VARCHAR(20)` or `VARCHAR(30)`
+   - If a dim table PK is VARCHAR, all FK references must also be VARCHAR — never mix BIGINT PK with VARCHAR FK or vice versa
+
+8. **INSERT value types must match column DDL types exactly:**
+   - BIGINT/INTEGER column: unquoted integer → `42` (not `'42'`)
+   - VARCHAR column: quoted string → `'STANDARD'` (not `STANDARD` or `42`)
+   - NUMERIC/DECIMAL column: unquoted number → `125.50` (not `'125.50'`)
+   - DATE column: quoted string → `'2025-01-31'`
+   - NULL: always unquoted → `NULL`
+   - PostgreSQL will implicitly cast `'42'` to INTEGER, but bare `42` into VARCHAR will fail
+
+9. **No non-numeric strings in NUMERIC columns:**
+   - `'SOFR-30D'` in a `NUMERIC(10,4)` column will crash — use a numeric rate value like `0.0530`
+   - If a column stores both codes and numbers, the DDL type must be VARCHAR
+
+### FK Referential Integrity Rules
+
+10. **Parent table INSERTs must appear BEFORE child table INSERTs in the data file:**
+    - L1 dim/reference tables first, then L1 master tables, then L2 snapshot/event tables
+    - If a dim table (e.g., `pricing_tier_dim`) is defined late in the DDL, its seed data still must load before any L2 table that references it
+
+11. **Every FK value in a child row must exist in the parent table:**
+    - Watch for non-contiguous parent ID ranges (e.g., seed IDs 1-100 + scenario IDs 5001-5050 creates a gap at 101-5000)
+    - Child rows referencing IDs in the gap will violate FK constraints
+    - Fix: cap child FK values using `valid_ids[(value - 1) % len(valid_ids)]` where `valid_ids` is built from actual parent INSERT data
+
+12. **String FK values must exactly match parent PK values:**
+    - `pricing_tier = 'STANDARD'` fails if `pricing_tier_dim` only has codes `'1'`-`'10'` (where `'3'` = Standard)
+    - `credit_status_code = 'CURRENT'` fails if the dim table uses integer codes `1`-`10`
+    - Always verify FK string values against the actual parent PK values, not human-readable labels
+
+13. **After capping FK values, check for duplicate composite PKs:**
+    - Modular arithmetic capping can map multiple child rows to the same parent ID, creating PK collisions
+    - Run a deduplication pass: track `(pk_col_1, pk_col_2, ...)` tuples and drop duplicates
+
+14. **Validate ALL FK constraints, not just L2→L1:**
+    - L1 tables have internal FKs (e.g., `counterparty_hierarchy.counterparty_id → counterparty.counterparty_id`)
+    - L2 tables have self-referential FKs (e.g., `amendment_change_detail.amendment_id → amendment_event.amendment_id`)
+    - Check all 156 constraints (90 L1 internal + 66 L2→L1/L2)
+
+### Data Dictionary ↔ DDL Sync
+
+15. **The data dictionary is the source of truth for the visualizer, not the SQL files:**
+    - Visualizer reads from `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
+    - DDL generator (`lib/ddl-generator.ts`) converts data dictionary → SQL via `sqlTypeForField()`
+    - If you edit SQL DDL files directly, the data dictionary becomes out of sync — update both
+    - Type priority: explicit `data_type` field in data dictionary > naming convention defaults in DDL generator
+
+16. **DDL generator type inference defaults (in `lib/ddl-generator.ts`):**
+    - `_id` → `BIGINT` (override with explicit `data_type: "VARCHAR(64)"` for string IDs)
+    - `_code` → `VARCHAR(30)`
+    - `_name`, `_desc`, `_text` → `VARCHAR(500)`
+    - `_amt` → `NUMERIC(20,4)`
+    - `_pct` → `NUMERIC(10,6)`
+    - `_value` → `NUMERIC(12,6)`
+    - `_count` → `INTEGER`
+    - `_flag` → `BOOLEAN`
+    - `_date` → `DATE`
+    - `_ts` → `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`
+    - `_bps` → `NUMERIC(10,4)`
+    - fallback → `VARCHAR(64)`

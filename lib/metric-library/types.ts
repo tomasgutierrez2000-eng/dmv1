@@ -55,6 +55,8 @@ export interface LevelDefinition {
   sourcing_type: SourcingType;
   level_logic: string;
   source_references: IngredientField[];
+  /** Per-level formula text from the specification table (for traceability). */
+  spec_formula?: string;
 }
 
 /** Individual position (exposure) within a facility — for demo walkthrough. */
@@ -114,6 +116,14 @@ export interface CatalogueItem {
   status: 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
   executable_metric_id?: string | null;
   demo_data?: DemoData;
+  /** Normalized data element name from the specification table. */
+  normalized_de_name?: string;
+  /** Physical data model column name (for sourced/hybrid metrics). */
+  data_element_in_dm?: string | null;
+  /** Alternate definition from specification document (for traceability). */
+  spec_definition?: string;
+  /** Documented differences between the specification and the implementation. */
+  spec_discrepancy_notes?: string[];
 }
 
 /* ── Legacy types (kept for backward compat during migration) ── */

@@ -45,6 +45,9 @@ const instructions: unknown[][] = [
   ['  weighting_basis     – BY_EAD | BY_OUTSTANDING | BY_COMMITTED  (for weighted-avg metrics)'],
   ['  regulatory_references – Comma-separated regulatory citations (e.g., FR Y-14Q, CCAR)'],
   ['  display_format      – Excel/dashboard format string (e.g., 0.00%, $#,##0.0M, 0.00x)'],
+  ['  normalized_de_name – Business glossary canonical name (e.g., Interest Income)'],
+  ['  data_element_in_dm – Physical data model column name (e.g., interest_income_amt)'],
+  ['  spec_definition    – Alternate definition from specification document (for traceability)'],
   [],
   ['PER-DIMENSION BLOCKS (5 dimensions x 4 columns each):'],
   ['  Dimensions: Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)'],
@@ -56,6 +59,7 @@ const instructions: unknown[][] = [
   ['                           "For each [grouping_key] THEN lookup [facility_id] WHERE IS([grouping_key])."'],
   ['                           "For each [facility_id]: formula_expression"'],
   ['    {dim}_display_name   – Dashboard label at this level (e.g., Facility LTV (%))'],
+  ['    {dim}_spec_formula   – (Optional) Per-level formula text from the specification table for traceability'],
   [],
   ['═══════════════════════════════════════════════════════════════════════'],
   ['  INGREDIENT FIELDS SHEET — Atomic Source Fields'],
@@ -125,31 +129,40 @@ const metricsHeaders = [
   'weighting_basis',
   'regulatory_references',
   'display_format',
+  // Spec-alignment metadata
+  'normalized_de_name',
+  'data_element_in_dm',
+  'spec_definition',
   // Facility dimension
   'facility_in_record',
   'facility_sourcing_type',
   'facility_level_logic',
   'facility_display_name',
+  'facility_spec_formula',
   // Counterparty dimension
   'counterparty_in_record',
   'counterparty_sourcing_type',
   'counterparty_level_logic',
   'counterparty_display_name',
+  'counterparty_spec_formula',
   // Desk (L3) dimension
   'desk_in_record',
   'desk_sourcing_type',
   'desk_level_logic',
   'desk_display_name',
+  'desk_spec_formula',
   // Portfolio (L2) dimension
   'portfolio_in_record',
   'portfolio_sourcing_type',
   'portfolio_level_logic',
   'portfolio_display_name',
+  'portfolio_spec_formula',
   // Business Segment (L1) dimension
   'lob_in_record',
   'lob_sourcing_type',
   'lob_level_logic',
   'lob_display_name',
+  'lob_spec_formula',
 ];
 
 const metricsExamples: unknown[][] = [
@@ -167,31 +180,40 @@ const metricsExamples: unknown[][] = [
     'BY_EAD',
     'FR Y-14Q, CCAR, CRE underwriting, OCC Comptroller\'s Handbook',
     '0.00%',
+    // Spec-alignment metadata
+    'Loan-to-Value Ratio',
+    '',
+    '',
     // Facility
     'Y',
     'Calc',
     'For each DISTINCT(facility_id) THEN [committed_facility_amt] / [collateral_value] x 100',
     'Facility LTV (%)',
+    '',
     // Counterparty
     'Y',
     'Calc',
     'For each [counterparty_id] THEN lookup [facility_id] WHERE IS([counterparty_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'Counterparty LTV (%)',
+    '',
     // Desk
     'Y',
     'Calc',
     'For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L3\' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'Desk LTV (%)',
+    '',
     // Portfolio
     'Y',
     'Calc',
     'For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L2\' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'Portfolio LTV (%)',
+    '',
     // Business Segment
     'Y',
     'Calc',
     'For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L1\' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: SUM(committed_facility_amt) / SUM(collateral_value) x 100',
     'LTV',
+    '',
   ],
 
   // ── EAD (SUM rollup example — contrast with weighted avg) ──
@@ -208,31 +230,40 @@ const metricsExamples: unknown[][] = [
     '',
     'Basel III IRB, FR Y-14Q',
     '$#,##0.0M',
+    // Spec-alignment metadata
+    'Exposure at Default',
+    '',
+    '',
     // Facility
     'Y',
     'Calc',
     'For each DISTINCT(facility_id) THEN [drawn_amount] + [ccf] * ([committed_facility_amt] - [drawn_amount])',
     'Facility EAD ($)',
+    '',
     // Counterparty
     'Y',
     'Agg',
     'For each [counterparty_id] THEN SUM(facility.ead) WHERE IS([counterparty_id])',
     'Counterparty EAD ($)',
+    '',
     // Desk
     'Y',
     'Agg',
     'For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]=\'L3\'. SUM(facility.ead) for all facilities WHERE IS([lob_segment_id])',
     'Desk EAD ($)',
+    '',
     // Portfolio
     'Y',
     'Agg',
     'For each [L2 Business Segment], SUM(facility.ead) for all facilities under L2 segment including all child L3 segments via parent_segment_id traversal',
     'Portfolio EAD ($)',
+    '',
     // Business Segment
     'Y',
     'Agg',
     'For each [L1 Business Segment], SUM(facility.ead) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal',
     'Business Segment Total EAD ($)',
+    '',
   ],
 
   // ── DSCR (weighted avg rollup, N/A at Business Segment) ──
@@ -249,28 +280,37 @@ const metricsExamples: unknown[][] = [
     'BY_EAD',
     'CRE underwriting, CCAR, FR Y-14Q',
     '0.00x',
+    // Spec-alignment metadata
+    'Debt Service Coverage Ratio',
+    '',
+    '',
     // Facility
     'Y',
     'Calc',
     'For each DISTINCT(facility_id) THEN [noi] / [debt_service] from facility_financial_snapshot',
     'Facility DSCR',
+    '',
     // Counterparty
     'Y',
     'Avg',
     'For each [counterparty_id] THEN SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])',
     'Counterparty Wtd DSCR',
+    '',
     // Desk
     'Y',
     'Avg',
     'For each [L3 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])',
     'Desk Wtd DSCR',
+    '',
     // Portfolio
     'Y',
     'Avg',
     'For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments',
     'Portfolio Wtd DSCR',
+    '',
     // Business Segment
     'N',
+    '',
     '',
     '',
     '',
@@ -290,31 +330,40 @@ const metricsExamples: unknown[][] = [
     'BY_EAD',
     'Basel III IRB, CCAR',
     '0.00%',
+    // Spec-alignment metadata
+    'Probability of Default',
+    '',
+    '',
     // Facility
     'Y',
     'Raw',
     'For each DISTINCT(facility_id) THEN COALESCE(stressed_pd_pct, counterparty_rating_observation.pd_pct) WHERE rating_source_id = \'INTERNAL\'. Basel floor: MAX(pd, 0.0003)',
     'Facility PD (%)',
+    '',
     // Counterparty
     'Y',
     'Avg',
     'For each [counterparty_id] THEN SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])',
     'Counterparty Wtd PD (%)',
+    '',
     // Desk
     'Y',
     'Avg',
     'For each [L3 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])',
     'Desk Wtd PD (%)',
+    '',
     // Portfolio
     'Y',
     'Avg',
     'For each [L2 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments',
     'Portfolio Wtd PD (%)',
+    '',
     // Business Segment
     'Y',
     'Avg',
     'For each [L1 Business Segment], SUM(facility.pd * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant segments',
     'Business Segment Wtd PD (%)',
+    '',
   ],
 
   // ── Empty rows for user to fill ──

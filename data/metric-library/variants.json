@@ -1209,11 +1209,11 @@
     "status": "ACTIVE",
     "formula_display": "Drawn_Amount × All_In_Rate_Pct / 100",
     "rollup_logic": {
-      "facility": "For each DISTINCT(facility_id) THEN [drawn_amount] × [all_in_rate_pct] / 100 — join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
-      "counterparty": "For each [counterparty_id] THEN SUM(facility.drawn_amount × facility.all_in_rate_pct / 100) WHERE IS([counterparty_id])",
-      "desk": "For each [L3 LoB] SUM(facility.drawn_amount × facility.all_in_rate_pct / 100) for all facilities WHERE IS([lob_segment_id])",
-      "portfolio": "For each [L2 LoB] SUM including child L3 segments via parent_segment_id traversal",
-      "lob": "For each [L1 LoB] SUM including all descendant L2/L3 segments via recursive parent_segment_id traversal"
+      "facility": "For each DISTINCT(facility_id) THEN lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), THEN lookup [all_in_rate_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [facility_id]: [drawn_amount] x [all_in_rate_pct] / 100",
+      "counterparty": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot, lookup [all_in_rate_pct] from L2.facility_pricing_snapshot. For each [counterparty_id] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: lookup [drawn_amount], lookup [all_in_rate_pct]. For each [L3 LoB] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+      "portfolio": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: lookup [drawn_amount], lookup [all_in_rate_pct]. For each [L2 Business Segment] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+      "lob": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: lookup [drawn_amount], lookup [all_in_rate_pct]. For each [L1 Business Segment] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})"
     }
   }
 ]

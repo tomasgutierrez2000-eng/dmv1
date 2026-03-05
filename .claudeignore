@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Worktree copies (don't index other worktrees)
+.claude/worktrees/
+
+# Large data files
+*.xlsx
+*.xlsb
+*.xls
+
+# Environment
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

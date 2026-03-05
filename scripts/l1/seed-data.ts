@@ -1670,7 +1670,7 @@ const RATE_FLOORS = [1.00, 1.50, 1.00, 2.00, 1.25, 0.75, 1.50, 0.50, 1.00, 2.00]
 const RATE_CAPS = [8.00, 9.50, 8.50, 10.00, 9.00, 7.50, 9.50, 6.00, 8.50, 10.00];
 const AMORT_TYPES = ['BULLET', 'AMORTIZING', 'BULLET', 'AMORTIZING', 'BULLET', 'BULLET', 'AMORTIZING', 'BULLET', 'BULLET', 'AMORTIZING'];
 const PAYMENT_FREQS = ['QUARTERLY', 'MONTHLY', 'QUARTERLY', 'QUARTERLY', 'MONTHLY', 'QUARTERLY', 'MONTHLY', 'QUARTERLY', 'QUARTERLY', 'MONTHLY'];
-const DAY_COUNT_CONVENTIONS = [1, 2, 1, 1, 2, 1, 2, 1, 1, 2]; // 1=ACT/360, 2=ACT/365
+const DAY_COUNT_CONVENTIONS = ['ACT/360', 'ACT/365', 'ACT/360', 'ACT/360', 'ACT/365', 'ACT/360', 'ACT/365', 'ACT/360', 'ACT/360', 'ACT/365'];
 const REVOLVING_FLAGS = ['Y', 'N', 'Y', 'N', 'N', 'Y', 'N', 'N', 'Y', 'N'];
 
 export const COMMITTED_AMOUNTS = [250_000_000, 500_000_000, 1_000_000_000, 2_500_000_000, 750_000_000, 1_500_000_000, 3_000_000_000, 400_000_000, 600_000_000, 5_000_000_000];
@@ -2131,7 +2131,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── fr2590_category_dim ──────────── */
     case 'fr2590_category_dim':
-      if (columnName === 'fr2590_category_code') return idx + 1;
+      if (columnName === 'fr2590_category_code') return String(idx + 1);
       if (columnName === 'category_name') return FR2590_CATEGORY_NAMES[idx];
       if (columnName === 'definition') return FR2590_DEFINITIONS[idx];
       if (columnName === 'display_order') return idx + 1;
@@ -2273,7 +2273,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'comments') return 'Loaded from product taxonomy';
       if (columnName === 'description') return PRODUCT_NAMES[idx];
       if (columnName === 'long_description') return `${PRODUCT_NAMES[idx]} product type`;
-      if (columnName === 'fr2590_category_code') return (idx % 10) + 1;
+      if (columnName === 'fr2590_category_code') return String((idx % 10) + 1);
       if (columnName === 'parent') return idx < 3 ? 'ROOT' : (idx < 6 ? PRODUCT_CODES[0] : PRODUCT_CODES[1]);
       if (columnName === 'parent_leaf') return idx >= 6 ? 'Y' : 'N';
       if (columnName === 'requestor') return 'Enterprise Data Office';
@@ -2546,7 +2546,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'created_by') return 'SYSTEM';
       if (columnName === 'day_count_convention') return DAY_COUNT_CONVENTIONS[idx];
       if (columnName === 'facility_reference') return FACILITY_REFERENCES[idx];
-      if (columnName === 'interest_rate_reference') return Math.round((ALL_IN_RATES[idx] - (SPREAD_BPS[idx] / 100)) * 100) / 100;
+      if (columnName === 'interest_rate_reference') return ['SOFR', 'SOFR', 'EURIBOR', 'SONIA', 'SOFR', 'PRIME', 'CDOR', 'BBSW', 'HIBOR', 'SOR'][idx];
       if (columnName === 'interest_rate_spread_bps') return SPREAD_BPS[idx];
       if (columnName === 'interest_rate_type') return idx % 2 === 0 ? 'FLOATING' : 'FIXED';
       if (columnName === 'next_repricing_date') return idx % 2 === 0 ? '2025-04-30' : '9999-12-31';
@@ -2830,8 +2830,8 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const eiCpty1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 1];
       const eiCpty2 = [5, 7, 8, 3, 9, 7, 2, 10, 6, 3];
       const eiTypes = ['SUPPLY_CHAIN', 'REVENUE_DEPENDENCY', 'SUPPLY_CHAIN', 'FINANCIAL_DEPENDENCY', 'SUPPLY_CHAIN', 'REVENUE_DEPENDENCY', 'SUPPLY_CHAIN', 'FINANCIAL_DEPENDENCY', 'REVENUE_DEPENDENCY', 'SUPPLY_CHAIN'];
-      const eiScores = ['HIGH', 'MEDIUM', 'LOW', 'HIGH', 'MEDIUM', 'LOW', 'HIGH', 'MEDIUM', 'LOW', 'HIGH'];
-      const eiRationales = [0.85, 0.60, 0.35, 0.90, 0.55, 0.30, 0.80, 0.50, 0.25, 0.75];
+      const eiScores = [0.85, 0.60, 0.35, 0.90, 0.55, 0.30, 0.80, 0.50, 0.25, 0.75];
+      const eiRationales = ['Key supplier relationship', 'Major revenue source', 'Minor supply chain link', 'Critical financial dependency', 'Moderate supply chain link', 'Minor revenue dependency', 'Key supplier relationship', 'Moderate financial dependency', 'Minor supply chain link', 'Significant supplier relationship'];
       if (columnName === 'counterparty_id_1') return eiCpty1[idx];
       if (columnName === 'counterparty_id_2') return eiCpty2[idx];
       if (columnName === 'interdependence_type_code') return eiTypes[idx];
@@ -2904,8 +2904,8 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const limitNames = ['Single Name Limit', 'Sector Concentration', 'Country Limit', 'Product Limit', 'Maturity Limit', 'FX Exposure Limit', 'Leveraged Lending', 'CRE Concentration', 'FIG Limit', 'Unsecured Limit'];
       const limitAmounts = [5_000_000_000, 25_000_000_000, 15_000_000_000, 10_000_000_000, 20_000_000_000, 8_000_000_000, 12_000_000_000, 18_000_000_000, 7_000_000_000, 6_000_000_000];
       const limitScopes = ['COUNTERPARTY', 'SECTOR', 'COUNTRY', 'PRODUCT', 'MATURITY', 'CURRENCY', 'SECTOR', 'ASSET_CLASS', 'SECTOR', 'COLLATERAL'];
-      const limitTypes = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]; // limit_type is DECIMAL — 1 = hard limit
-      const riskTiers = [1.0, 2.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0, 2.0, 3.0]; // also DECIMAL
+      const limitTypes = ['HARD', 'HARD', 'HARD', 'HARD', 'HARD', 'HARD', 'HARD', 'HARD', 'HARD', 'HARD'];
+      const riskTiers = ['IG_HIGH', 'IG_MID', 'IG_MID', 'HY', 'HY', 'IG_MID', 'IG_HIGH', 'IG_HIGH', 'IG_MID', 'HY'];
       const innerThresholds = [80.0, 75.0, 80.0, 85.0, 75.0, 80.0, 70.0, 75.0, 80.0, 85.0];
       const outerThresholds = [95.0, 90.0, 95.0, 95.0, 90.0, 95.0, 85.0, 90.0, 95.0, 95.0];
       if (columnName === 'rule_code') return limitRuleCodes[idx];
@@ -3044,7 +3044,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'reporting_entity_dim': {
       const reJurisdictions = ['US_FED', 'US_FED', 'US_FED', 'EU', 'EU', 'JP', 'CA', 'US_FED', 'US_FED', 'US_FED'];
       const reFuncCurrencies = ['USD', 'USD', 'USD', 'EUR', 'EUR', 'JPY', 'CAD', 'USD', 'USD', 'USD'];
-      const reConsolBasis = ['2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31', '2025-01-31'];
+      const reConsolBasis = ['FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'SUB_CONSOLIDATED', 'SOLO', 'SOLO', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED'];
       if (columnName === 'entity_code') return REPORTING_ENTITY_CODES[idx];
       if (columnName === 'entity_name') return REPORTING_ENTITY_NAMES[idx];
       if (columnName === 'reporting_entity_code') return REPORTING_ENTITY_CODES[idx];
@@ -3292,7 +3292,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'line_item_code') return rcdLineItems[idx];
       if (columnName === 'report_code') return rcdReportCodes[idx];
       if (columnName === 'schedule_code') return rcdSchedules[idx];
-      if (columnName === 'uom') return 1.0; // units (not thousands)
+      if (columnName === 'uom') return 'UNITS';
       break;
     }
 
@@ -3342,7 +3342,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
         'CRE sector-specific downturn scenario', 'Concentrated single-name default stress',
       ];
       const scRegCodes = ['CCAR_BASE', 'CCAR_ADV', 'CCAR_SEV', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'];
-      const scHorizons = ['9', '9', '9', '4', '8', '4', '4', '4', '4', '1'];
+      const scHorizons = [9, 9, 9, 4, 8, 4, 4, 4, 4, 1];
       const scStarts = ['2025-01-01', '2025-01-01', '2025-01-01', '2025-01-01', '2008-09-01', '2020-03-01', '2025-01-01', '2025-01-01', '2025-01-01', '2025-01-01'];
       const scEnds = ['2027-09-30', '2027-09-30', '2027-09-30', '2025-12-31', '2010-04-30', '2021-06-30', '2025-12-31', '2025-12-31', '2025-12-31', '2025-03-31'];
       const scShocks = [

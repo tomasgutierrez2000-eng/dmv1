@@ -213,7 +213,7 @@
       "nullable": true
     },
     "ccf": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(5,4)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -640,6 +640,12 @@
       "type": "VARCHAR(20)",
       "pk": false,
       "fk": "l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)",
+      "nullable": true
+    },
+    "total_collateral_mv_usd": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
       "nullable": true
     }
   },
@@ -1269,7 +1275,7 @@
       "nullable": true
     },
     "rate_index_code": {
-      "type": "DECIMAL(10,4)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1997,7 +2003,7 @@
       "nullable": true
     },
     "prior_rating_value": {
-      "type": "DECIMAL(18,4)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -2021,7 +2027,7 @@
       "nullable": true
     },
     "rating_value": {
-      "type": "DECIMAL(18,4)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true

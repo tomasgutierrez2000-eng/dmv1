@@ -5354,6 +5354,7 @@
           "name": "fr2590_category_code",
           "description": "Primary key for FR2590 grouping.",
           "category": "Regulatory Mapping",
+          "data_type": "VARCHAR(20)",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false

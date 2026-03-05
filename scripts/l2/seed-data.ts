@@ -1134,6 +1134,7 @@ export function getL2SeedValue(
       if (columnName === 'outstanding_balance_amt') return d;
       if (columnName === 'undrawn_commitment_amt') return undrawn;
       if (columnName === 'total_collateral_mv_usd') return val;
+      if (columnName === 'internal_risk_rating_bucket_code') return String((idx % 10) + 1);
       break;
     }
 
@@ -1282,6 +1283,7 @@ export function getL2SeedValue(
       if (columnName === 'prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
       if (columnName === 'rate_cap_pct') return pick([12.00, 10.00, 12.00, 10.00, 14.00, 9.00, 12.00, 10.00, 12.00, 8.00], fid(idx) - 1);
       if (columnName === 'rate_index_code') return pick(['SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR', 'SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR'], fid(idx) - 1);
+      if (columnName === 'pricing_tier') return String((idx % 10) + 1);
       break;
 
     // ═══════════════════════════════════════════════════════════════════

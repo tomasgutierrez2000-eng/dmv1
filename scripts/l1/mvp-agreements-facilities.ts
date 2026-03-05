@@ -356,13 +356,13 @@ export function getMvpFacilityField(
     case 'amortization_type':
       return entry.isRevolving ? 'BULLET' : seededPick(rng, ['AMORTIZING', 'BULLET']);
     case 'created_by': return 'SYSTEM';
-    case 'day_count_convention': return rng() < 0.6 ? 1 : 2; // 1=ACT/360
+    case 'day_count_convention': return rng() < 0.6 ? 'ACT/360' : 'ACT/365';
     case 'facility_reference':
       return `FAC-${originYear}-${String(rowIndex + 1).padStart(3, '0')}-${entry.tranche}`;
     case 'interest_rate_spread_bps': return baseSpreadBps;
     case 'interest_rate_reference': {
-      const allIn = Math.round((baseSpreadBps / 100 + 2.5 + rng() * 1.5) * 100) / 100;
-      return Math.round((allIn - baseSpreadBps / 100) * 100) / 100;
+      const refs = ['SOFR', 'SOFR', 'EURIBOR', 'SONIA', 'SOFR', 'PRIME', 'CDOR', 'BBSW', 'HIBOR', 'SOR'];
+      return refs[rowIndex % refs.length];
     }
     case 'interest_rate_type':
       return entry.isRevolving || rng() < 0.6 ? 'FLOATING' : 'FIXED';

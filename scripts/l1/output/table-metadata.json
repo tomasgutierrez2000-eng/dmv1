@@ -137,7 +137,7 @@
       "nullable": true
     },
     "display_order": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -501,7 +501,7 @@
       "nullable": true
     },
     "days_past_due_threshold": {
-      "type": "VARCHAR(255)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -627,13 +627,13 @@
       "nullable": true
     },
     "bucket_end_days": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "bucket_start_days": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -671,7 +671,7 @@
       "nullable": true
     },
     "display_order": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -795,7 +795,7 @@
       "nullable": true
     },
     "pd_implied": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -933,7 +933,7 @@
       "nullable": true
     },
     "calendar_year": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -945,19 +945,19 @@
       "nullable": true
     },
     "calendar_month": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "day_of_month": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "day_of_week": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -969,7 +969,7 @@
       "nullable": true
     },
     "fiscal_year": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -981,7 +981,7 @@
       "nullable": true
     },
     "fiscal_month": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1023,13 +1023,13 @@
       "nullable": true
     },
     "date_day": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "date_month": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1041,7 +1041,7 @@
       "nullable": true
     },
     "date_year": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1067,19 +1067,19 @@
       "nullable": true
     },
     "hour_of_day": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "minute_of_hour": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "second_of_minute": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1301,7 +1301,7 @@
       "nullable": true
     },
     "substatus": {
-      "type": "DECIMAL(10,4)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1423,7 +1423,7 @@
       "nullable": true
     },
     "substatus": {
-      "type": "DECIMAL(10,4)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1615,7 +1615,7 @@
       "nullable": true
     },
     "priority_rank": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1701,13 +1701,13 @@
       "nullable": true
     },
     "lgd_downturn": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "pd_12m": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1811,7 +1811,7 @@
       "nullable": true
     },
     "minimum_holding_period_days": {
-      "type": "VARCHAR(255)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -2235,7 +2235,7 @@
       "nullable": true
     },
     "country_of_incorporation": {
-      "type": "DECIMAL(10,4)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -2337,13 +2337,13 @@
       "nullable": true
     },
     "lgd_unsecured": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "pd_annual": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -2791,7 +2791,7 @@
       "nullable": true
     },
     "day_count_convention": {
-      "type": "INTEGER",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -2803,7 +2803,7 @@
       "nullable": true
     },
     "interest_rate_reference": {
-      "type": "DECIMAL(8,6)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -2815,7 +2815,7 @@
       "nullable": true
     },
     "interest_rate_type": {
-      "type": "DECIMAL(8,6)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -3351,7 +3351,7 @@
       "nullable": true
     },
     "lien_priority": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -3375,7 +3375,7 @@
       "nullable": true
     },
     "original_cost": {
-      "type": "VARCHAR(100)",
+      "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -3791,7 +3791,7 @@
       "nullable": true
     },
     "display_order": {
-      "type": "VARCHAR(100)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -4153,7 +4153,7 @@
       "nullable": false
     },
     "interdependence_strength_score": {
-      "type": "VARCHAR(255)",
+      "type": "DECIMAL(5,2)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -4165,7 +4165,7 @@
       "nullable": true
     },
     "rationale": {
-      "type": "DECIMAL(10,4)",
+      "type": "VARCHAR(255)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -4537,7 +4537,7 @@
       "nullable": true
     },
     "limit_type": {
-      "type": "DECIMAL(10,4)",
+      "type": "VARCHAR(30)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -4555,7 +4555,7 @@
       "nullable": true
     },
     "risk_tier": {
-      "type": "DECIMAL(18,2)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -4913,7 +4913,7 @@
       "nullable": true
     },
     "is_period_end": {
-      "type": "DATE",
+      "type": "CHAR(1)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -4981,7 +4981,7 @@
       "nullable": true
     },
     "consolidation_basis": {
-      "type": "DATE",
+      "type": "VARCHAR(50)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -5605,7 +5605,7 @@
       "nullable": true
     },
     "uom": {
-      "type": "DECIMAL(18,2)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -5783,7 +5783,7 @@
       "nullable": true
     },
     "scenario_horizon_months": {
-      "type": "VARCHAR(255)",
+      "type": "INTEGER",
       "pk": false,
       "fk": null,
       "nullable": true

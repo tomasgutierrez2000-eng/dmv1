@@ -1297,6 +1297,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "cost_of_funds_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.facility_profitability_snapshot": {
@@ -2468,6 +2474,166 @@
     },
     "total_debt_service_amt": {
       "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L2.facility_risk_snapshot": {
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "pd_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "lgd_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ccf": {
+      "type": "DECIMAL(6,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "ead_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expected_loss_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "rwa_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "risk_weight_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "internal_risk_rating": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "currency_code": {
+      "type": "VARCHAR(20)",
+      "pk": false,
+      "fk": "l1.currency_dim(currency_code)",
+      "nullable": true
+    }
+  },
+  "L2.facility_credit_approval": {
+    "approval_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.facility_master(facility_id)",
+      "nullable": false
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "as_of_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "approval_status": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "approval_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "approved_amount": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_type_code": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_severity": {
+      "type": "VARCHAR(30)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "exception_reason": {
+      "type": "VARCHAR(500)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "approved_by": {
+      "type": "VARCHAR(100)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "expiry_date": {
+      "type": "DATE",
       "pk": false,
       "fk": null,
       "nullable": true

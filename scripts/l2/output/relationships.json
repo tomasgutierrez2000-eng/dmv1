@@ -1052,5 +1052,90 @@
     },
     "isCrossLayer": true,
     "relationshipType": "primary"
+  },
+  {
+    "id": "L2.facility_risk_snapshot.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L2",
+      "table": "facility_risk_snapshot",
+      "field": "facility_id",
+      "tableKey": "L2.facility_risk_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.facility_risk_snapshot.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L2",
+      "table": "facility_risk_snapshot",
+      "field": "counterparty_id",
+      "tableKey": "L2.facility_risk_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.facility_risk_snapshot.currency_code->L1.currency_dim.currency_code",
+    "source": {
+      "layer": "L2",
+      "table": "facility_risk_snapshot",
+      "field": "currency_code",
+      "tableKey": "L2.facility_risk_snapshot"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "currency_dim",
+      "field": "currency_code",
+      "tableKey": "L1.currency_dim"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.facility_credit_approval.facility_id->L1.facility_master.facility_id",
+    "source": {
+      "layer": "L2",
+      "table": "facility_credit_approval",
+      "field": "facility_id",
+      "tableKey": "L2.facility_credit_approval"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L1.facility_master"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L2.facility_credit_approval.counterparty_id->L1.counterparty.counterparty_id",
+    "source": {
+      "layer": "L2",
+      "table": "facility_credit_approval",
+      "field": "counterparty_id",
+      "tableKey": "L2.facility_credit_approval"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "counterparty",
+      "field": "counterparty_id",
+      "tableKey": "L1.counterparty"
+    },
+    "isCrossLayer": true,
+    "relationshipType": "primary"
   }
 ]

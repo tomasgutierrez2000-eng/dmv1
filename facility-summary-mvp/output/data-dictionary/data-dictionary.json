@@ -8637,6 +8637,222 @@
           "data_type": "CHAR(1)"
         }
       ]
+    },
+    {
+      "name": "lob_hierarchy_config",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "hierarchy_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "hierarchy_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "hierarchy_type",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "root_segment_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_business_taxonomy",
+              "field": "managed_segment_id"
+            }
+          }
+        },
+        {
+          "name": "is_active",
+          "description": "",
+          "why_required": "",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "limit_assignment",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "limit_assignment_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "limit_rule_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_rule",
+              "field": "limit_rule_id"
+            }
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
+        },
+        {
+          "name": "lob_segment_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_business_taxonomy",
+              "field": "managed_segment_id"
+            }
+          }
+        },
+        {
+          "name": "assigned_limit_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "effective_from_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_to_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_active",
+          "description": "",
+          "why_required": "",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "pipeline_stage_dim",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "pipeline_stage_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "stage_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "stage_order",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "is_active",
+          "description": "",
+          "why_required": "",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        }
+      ]
     }
   ],
   "L2": [
@@ -9611,6 +9827,12 @@
               "field": "internal_risk_rating_bucket_code"
             }
           }
+        },
+        {
+          "name": "total_collateral_mv_usd",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
         }
       ]
     },
@@ -10460,6 +10682,12 @@
           "name": "fee_rate_pct",
           "description": "",
           "category": "Facility snapshots",
+          "data_type": "DECIMAL(10,6)"
+        },
+        {
+          "name": "cost_of_funds_pct",
+          "description": "",
+          "why_required": "",
           "data_type": "DECIMAL(10,6)"
         }
       ]
@@ -12813,6 +13041,229 @@
           "description": "",
           "why_required": "",
           "data_type": "DECIMAL(18,2)"
+        }
+      ]
+    },
+    {
+      "name": "facility_risk_snapshot",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
+        },
+        {
+          "name": "pd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(10,6)"
+        },
+        {
+          "name": "lgd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(10,6)"
+        },
+        {
+          "name": "ccf",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(6,4)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "expected_loss_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(10,6)"
+        },
+        {
+          "name": "internal_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "facility_credit_approval",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "approval_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "approval_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "approval_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "approved_amount",
+          "description": "",
+          "why_required": "",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "exception_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "CHAR(1)"
+        },
+        {
+          "name": "exception_type",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "exception_reason",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "approved_by",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "expiry_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "exception_type_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "exception_severity",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
         }
       ]
     }
@@ -24931,6 +25382,110 @@
       "to_field": "counterparty_id",
       "from_layer": "L3",
       "to_layer": "L1"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "lob_hierarchy_config",
+      "from_field": "root_segment_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_business_taxonomy",
+      "to_field": "managed_segment_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "limit_assignment",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "limit_assignment",
+      "from_field": "facility_id",
+      "to_layer": "L1",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "limit_assignment",
+      "from_field": "counterparty_id",
+      "to_layer": "L1",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "limit_assignment",
+      "from_field": "lob_segment_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_business_taxonomy",
+      "to_field": "managed_segment_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_risk_snapshot",
+      "from_field": "facility_id",
+      "to_layer": "L1",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_risk_snapshot",
+      "from_field": "counterparty_id",
+      "to_layer": "L1",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_risk_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_credit_approval",
+      "from_field": "facility_id",
+      "to_layer": "L1",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_credit_approval",
+      "from_field": "counterparty_id",
+      "to_layer": "L1",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "product_node_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_product_taxonomy",
+      "to_field": "product_node_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "counterparty_financial_snapshot",
+      "from_field": "counterparty_id",
+      "to_layer": "L1",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "counterparty_financial_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
     }
   ],
   "derivation_dag": {}

@@ -1437,4 +1437,46 @@ export const L1_TABLES: TableDef[] = [
       { name: 'shock_parameters_json', type: 'VARCHAR(255)', nullable: true },
     ],
   },
+  // ========== L3-referenced reference tables ==========
+  {
+    tableName: 'lob_hierarchy_config',
+    scd: 'SCD-1',
+    columns: [
+      { name: 'hierarchy_id', type: 'VARCHAR(64)', nullable: false, pk: true },
+      { name: 'hierarchy_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'hierarchy_type', type: 'VARCHAR(50)', nullable: true },
+      { name: 'root_segment_id', type: 'BIGINT', nullable: true, fk: 'l1.enterprise_business_taxonomy(managed_segment_id)' },
+      { name: 'is_active', type: 'CHAR(1)', nullable: true, default: "'Y'" },
+      { name: 'created_ts', type: 'TIMESTAMP', nullable: false, default: 'CURRENT_TIMESTAMP' },
+      { name: 'updated_ts', type: 'TIMESTAMP', nullable: true },
+    ],
+  },
+  {
+    tableName: 'limit_assignment',
+    scd: 'SCD-1',
+    columns: [
+      { name: 'limit_assignment_id', type: 'BIGINT', nullable: false, pk: true },
+      { name: 'limit_rule_id', type: 'BIGINT', nullable: false, fk: 'l1.limit_rule(limit_rule_id)' },
+      { name: 'facility_id', type: 'BIGINT', nullable: true, fk: 'l1.facility_master(facility_id)' },
+      { name: 'counterparty_id', type: 'BIGINT', nullable: true, fk: 'l1.counterparty(counterparty_id)' },
+      { name: 'lob_segment_id', type: 'BIGINT', nullable: true, fk: 'l1.enterprise_business_taxonomy(managed_segment_id)' },
+      { name: 'assigned_limit_amt', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'effective_from_date', type: 'DATE', nullable: true },
+      { name: 'effective_to_date', type: 'DATE', nullable: true },
+      { name: 'is_active', type: 'CHAR(1)', nullable: true, default: "'Y'" },
+      { name: 'created_ts', type: 'TIMESTAMP', nullable: false, default: 'CURRENT_TIMESTAMP' },
+      { name: 'updated_ts', type: 'TIMESTAMP', nullable: true },
+    ],
+  },
+  {
+    tableName: 'pipeline_stage_dim',
+    scd: 'SCD-0',
+    columns: [
+      { name: 'pipeline_stage_code', type: 'VARCHAR(30)', nullable: false, pk: true },
+      { name: 'stage_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'stage_order', type: 'INTEGER', nullable: true },
+      { name: 'is_active', type: 'CHAR(1)', nullable: true, default: "'Y'" },
+      { name: 'description', type: 'VARCHAR(500)', nullable: true },
+    ],
+  },
 ];

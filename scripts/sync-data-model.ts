@@ -272,12 +272,26 @@ export function syncDataModel(): SyncReport {
         }
       }
     } else {
-      // Table exists — check for missing fields
+      // Table exists — check for missing fields and relationships
       const existingFields = new Set(existing.fields.map(f => f.name));
       for (const col of table.columns) {
         if (!existingFields.has(col.name)) {
           existing.fields.push(tsColToField(table.tableName, col));
           report.fieldsAdded.push(`L1.${table.tableName}.${col.name}`);
+        }
+        // Ensure FK relationships exist for all FK columns (even pre-existing ones)
+        if (col.fk) {
+          const fk = parseFkString(col.fk);
+          if (fk) {
+            const relKey = `L1.${table.tableName}.${col.name}->${fk.layer}.${fk.table}.${fk.field}`;
+            if (!relSet.has(relKey)) {
+              dd.relationships.push({
+                from_layer: 'L1', from_table: table.tableName, from_field: col.name,
+                to_layer: fk.layer, to_table: fk.table, to_field: fk.field,
+              });
+              relSet.add(relKey);
+            }
+          }
         }
       }
     }
@@ -318,6 +332,20 @@ export function syncDataModel(): SyncReport {
         if (!existingFields.has(col.name)) {
           existing.fields.push(tsColToField(table.tableName, col));
           report.fieldsAdded.push(`L2.${table.tableName}.${col.name}`);
+        }
+        // Ensure FK relationships exist for all FK columns (even pre-existing ones)
+        if (col.fk) {
+          const fk = parseFkString(col.fk);
+          if (fk) {
+            const relKey = `L2.${table.tableName}.${col.name}->${fk.layer}.${fk.table}.${fk.field}`;
+            if (!relSet.has(relKey)) {
+              dd.relationships.push({
+                from_layer: 'L2', from_table: table.tableName, from_field: col.name,
+                to_layer: fk.layer, to_table: fk.table, to_field: fk.field,
+              });
+              relSet.add(relKey);
+            }
+          }
         }
       }
     }

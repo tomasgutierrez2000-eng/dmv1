@@ -1247,5 +1247,143 @@
     "number_of_instances": 5,
     "directly_displayed": true,
     "status": "ACTIVE"
+  },
+  {
+    "item_id": "RR_MIG",
+    "item_name": "Risk Rating Migration",
+    "abbreviation": "RR_MIG",
+    "kind": "METRIC",
+    "definition": "Exposure-weighted average notch change in internal credit risk ratings. Measures the direction and magnitude of credit quality migration across the portfolio. Positive values indicate net deterioration (more downgrades); negative values indicate net improvement (more upgrades). Key input to CCAR stress scenario projections, CECL expected credit loss re-measurement, Basel III risk-weighted asset determination, and OCC credit quality examination.",
+    "generic_formula": "SUM((Rating_Value - Prior_Rating_Value) x Gross_Exposure_USD) / SUM(Gross_Exposure_USD)",
+    "data_type": "Decimal",
+    "unit_type": "RATIO",
+    "direction": "LOWER_BETTER",
+    "metric_class": "DERIVED",
+    "domain_ids": ["CR"],
+    "regulatory_references": ["FR Y-9C", "CCAR", "CECL", "Basel III"],
+    "insight": "Exposure-weighted average notch change in internal risk ratings — negative means improvement, positive means deterioration",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "rating_value",
+        "description": "Current internal risk rating on a 1-5 scale (1=Minimal Risk, 5=High/Default)",
+        "data_type": "INT",
+        "sample_value": "3"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "prior_rating_value",
+        "description": "Previous internal risk rating before the most recent review — the difference gives the notch change",
+        "data_type": "INT",
+        "sample_value": "2"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "rating_type",
+        "description": "Filter field — INTERNAL for bank's own ratings, EXTERNAL for agency ratings (S&P, Moody's, Fitch)",
+        "data_type": "VARCHAR(20)",
+        "sample_value": "INTERNAL"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "gross_exposure_usd",
+        "description": "Total gross credit exposure in USD — used as the weighting factor for exposure-weighted averages",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "20000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key — links exposure snapshots to facilities",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation and join to rating observations",
+        "data_type": "BIGINT",
+        "sample_value": "7890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "data_type": "INT",
+        "sample_value": "301"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INT",
+        "sample_value": "301"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INT",
+        "sample_value": "30"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility Migration Score",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id), (rating_value - prior_rating_value) from counterparty_rating_observation joined through facility_master.counterparty_id, WHERE rating_type = 'INTERNAL'",
+        "source_references": [
+          { "layer": "L2", "table": "counterparty_rating_observation", "field": "rating_value" },
+          { "layer": "L2", "table": "counterparty_rating_observation", "field": "prior_rating_value" },
+          { "layer": "L2", "table": "facility_exposure_snapshot", "field": "gross_exposure_usd" }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Migration Score",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [counterparty_id], SUM((rating_value - prior_rating_value) * gross_exposure_usd) / SUM(gross_exposure_usd) — exposure-weighted average notch change across all facilities",
+        "source_references": []
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Migration Score",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L3 LoB], SUM(notch_change * gross_exposure_usd) / SUM(gross_exposure_usd) for all facilities WHERE lob_segment_id matches desk",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Migration Score",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L2 Business Segment], exposure-weighted average including child L3 segments via parent_segment_id traversal",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Migration Score",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L1 Business Segment], exposure-weighted average including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
   }
 ]

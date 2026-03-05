@@ -20,6 +20,7 @@ import TableTraversalDemo from './TableTraversalDemo';
 import IntIncomeTableTraversalDemo from './IntIncomeTableTraversalDemo';
 import IntExpenseTableTraversalDemo from './IntExpenseTableTraversalDemo';
 import DSCRTableTraversalDemo from './DSCRTableTraversalDemo';
+import RRMigTableTraversalDemo from './RRMigTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -608,6 +609,7 @@ const LINEAGE_ROUTES: Record<string, { href: string; label: string }> = {
   WABR:             { href: '/metrics/wabr-lineage',      label: 'WABR End-to-End Lineage' },
   INT_INCOME:       { href: '/metrics/int-income-lineage',  label: 'Interest Income End-to-End Lineage' },
   INT_EXPENSE:      { href: '/metrics/int-expense-lineage', label: 'Interest Expense End-to-End Lineage' },
+  RR_MIG:           { href: '/metrics/rr-migration-lineage', label: 'Risk Rating Migration Lineage' },
   COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',   label: 'Committed Amount End-to-End Lineage' },
 };
 
@@ -626,6 +628,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
       <div className="space-y-6">
         {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
         {item.abbreviation === 'INT_EXPENSE' && <IntExpenseTableTraversalDemo />}
+        {item.abbreviation === 'RR_MIG' && <RRMigTableTraversalDemo />}
         <div className="text-center py-12 text-gray-500">
           {lineageRoute ? (
             <>
@@ -734,6 +737,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
       {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
       {item.abbreviation === 'INT_EXPENSE' && <IntExpenseTableTraversalDemo />}
       {item.abbreviation === 'DSCR' && <DSCRTableTraversalDemo />}
+      {item.abbreviation === 'RR_MIG' && <RRMigTableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}
       <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />

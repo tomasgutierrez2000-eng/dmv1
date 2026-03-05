@@ -300,4 +300,41 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
+  ({
+    id: 'C109',
+    name: 'Risk Rating Migration Score',
+    page: 'P4',
+    section: 'Deep Dive',
+    metricType: 'Ratio',
+    formula: 'SUM((rating_value - prior_rating_value) * gross_exposure_usd) / NULLIF(SUM(gross_exposure_usd), 0)',
+    description: 'Exposure-weighted average notch change in internal credit risk ratings. Positive = deterioration, negative = improvement.',
+    displayFormat: '+0.00',
+    sampleValue: '—',
+    sourceFields: [
+      { layer: 'L2', table: 'counterparty_rating_observation', field: 'rating_value' },
+      { layer: 'L2', table: 'counterparty_rating_observation', field: 'prior_rating_value' },
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd' },
+      { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
+      { layer: 'L1', table: 'facility_master', field: 'lob_segment_id' },
+    ],
+    dimensions: [
+      { dimension: 'as_of_date', interaction: 'FILTER' },
+      { dimension: 'facility_id', interaction: 'GROUP_BY' },
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+    ],
+    allowedDimensions: ALL_DIMS,
+    displayNameByDimension: {
+      facility: 'Facility Migration Score',
+      counterparty: 'Counterparty Migration Score',
+      L3: 'L3 Desk Migration Score',
+      L2: 'L2 Portfolio Migration Score',
+      L1: 'L1 Department Migration Score',
+    },
+    formulasByDimension: buildGroupedFormula(
+      'SUM((rating_value - prior_rating_value) * gross_exposure_usd) / NULLIF(SUM(CASE WHEN prior_rating_value IS NOT NULL THEN gross_exposure_usd ELSE 0 END), 0)',
+      "SUM((CAST(cro.rating_value AS REAL) - CAST(cro.prior_rating_value AS REAL)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN cro.prior_rating_value IS NOT NULL THEN fes.gross_exposure_usd ELSE 0 END), 0)",
+      "FROM L2.facility_exposure_snapshot fes LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id LEFT JOIN L2.counterparty_rating_observation cro ON cro.counterparty_id = fm.counterparty_id AND cro.as_of_date = fes.as_of_date AND cro.rating_type = 'INTERNAL'",
+      'WHERE fes.as_of_date = :as_of_date AND cro.prior_rating_value IS NOT NULL'
+    ),
+  }),
 ];

@@ -34,7 +34,7 @@ export function sqlTypeForField(field: DataDictionaryField): string {
     if (upper === 'BOOL') return 'BOOLEAN';
     if (upper === 'INT') return 'INTEGER';
   }
-  if (name.endsWith('_id')) return 'VARCHAR(64)';
+  if (name.endsWith('_id')) return 'BIGINT';
   if (name.endsWith('_code')) return 'VARCHAR(30)';
   if (name.endsWith('_name') || name.endsWith('_desc') || name.endsWith('_text'))
     return 'VARCHAR(500)';

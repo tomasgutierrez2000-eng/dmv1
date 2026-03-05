@@ -21,7 +21,8 @@
     "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit",
     "db:export": "bash scripts/export-mvp-sql.sh",
     "sync:data-model": "tsx scripts/sync-data-model.ts",
-    "export:data-model": "tsx scripts/export-data-model-excel.ts"
+    "export:data-model": "tsx scripts/export-data-model-excel.ts",
+    "validate": "tsx scripts/validate-data-model.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

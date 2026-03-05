@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-05T05:43:57.553Z",
+  "createdAt": "2026-03-05T06:52:48.658Z",
   "tables": [
     {
       "layer": "L1",
@@ -3308,6 +3308,93 @@
       ]
     },
     {
+      "layer": "L1",
+      "tableName": "lob_hierarchy_config",
+      "fields": [
+        {
+          "name": "hierarchy_id"
+        },
+        {
+          "name": "hierarchy_name"
+        },
+        {
+          "name": "hierarchy_type"
+        },
+        {
+          "name": "root_segment_id"
+        },
+        {
+          "name": "is_active"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "limit_assignment",
+      "fields": [
+        {
+          "name": "limit_assignment_id"
+        },
+        {
+          "name": "limit_rule_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "assigned_limit_amt"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "is_active"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "pipeline_stage_dim",
+      "fields": [
+        {
+          "name": "pipeline_stage_code"
+        },
+        {
+          "name": "stage_name"
+        },
+        {
+          "name": "stage_order"
+        },
+        {
+          "name": "is_active"
+        },
+        {
+          "name": "description"
+        }
+      ]
+    },
+    {
       "layer": "L2",
       "tableName": "position",
       "fields": [
@@ -4009,6 +4096,9 @@
         },
         {
           "name": "fee_rate_pct"
+        },
+        {
+          "name": "cost_of_funds_pct"
         }
       ]
     },
@@ -4666,6 +4756,96 @@
         },
         {
           "name": "total_debt_service_amt"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "facility_risk_snapshot",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "pd_pct"
+        },
+        {
+          "name": "lgd_pct"
+        },
+        {
+          "name": "ccf"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "expected_loss_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "internal_risk_rating"
+        },
+        {
+          "name": "currency_code"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "facility_credit_approval",
+      "fields": [
+        {
+          "name": "approval_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "approval_status"
+        },
+        {
+          "name": "approval_date"
+        },
+        {
+          "name": "approved_amount"
+        },
+        {
+          "name": "exception_flag"
+        },
+        {
+          "name": "exception_type"
+        },
+        {
+          "name": "exception_type_code"
+        },
+        {
+          "name": "exception_severity"
+        },
+        {
+          "name": "exception_reason"
+        },
+        {
+          "name": "approved_by"
+        },
+        {
+          "name": "expiry_date"
         }
       ]
     },

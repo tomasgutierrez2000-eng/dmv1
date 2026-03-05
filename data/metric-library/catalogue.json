@@ -624,7 +624,7 @@
       {
         "layer": "L2",
         "table": "facility_financial_snapshot",
-        "field": "noi",
+        "field": "noi_amt",
         "description": "Net operating income — numerator for CRE facilities",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "1200000.00"
@@ -640,7 +640,7 @@
       {
         "layer": "L2",
         "table": "facility_financial_snapshot",
-        "field": "debt_service",
+        "field": "total_debt_service_amt",
         "description": "Annual total debt service",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "900000.00"
@@ -938,7 +938,7 @@
       {
         "layer": "L2",
         "table": "counterparty_rating_observation",
-        "field": "pd_pct",
+        "field": "pd_implied",
         "description": "Internal PD model output",
         "data_type": "DECIMAL(10,6)",
         "sample_value": "0.023400"
@@ -1968,24 +1968,24 @@
         "level": "desk",
         "dashboard_display_name": null,
         "in_record": false,
-        "sourcing_type": "N/A",
-        "level_logic": "N/A",
+        "sourcing_type": "Calc",
+        "level_logic": "Not applicable at desk level — allocation is facility-to-counterparty only",
         "source_references": []
       },
       {
         "level": "portfolio",
         "dashboard_display_name": null,
         "in_record": false,
-        "sourcing_type": "N/A",
-        "level_logic": "N/A",
+        "sourcing_type": "Calc",
+        "level_logic": "Not applicable at portfolio level — allocation is facility-to-counterparty only",
         "source_references": []
       },
       {
         "level": "lob",
         "dashboard_display_name": null,
         "in_record": false,
-        "sourcing_type": "N/A",
-        "level_logic": "N/A",
+        "sourcing_type": "Calc",
+        "level_logic": "Not applicable at lob level — allocation is facility-to-counterparty only",
         "source_references": []
       }
     ],

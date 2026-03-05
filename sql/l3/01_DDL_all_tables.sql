@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS l3.exposure_metric_cube (
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
     -- FK: org_unit_id → L1.org_unit_dim.org_unit_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: product_node_id → L1.product_hierarchy.product_node_id
+    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: facility_id → L1.facility_master.facility_id
     -- FK: instrument_id → L1.instrument_master.instrument_id
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS l3.exposure_metric_cube (
     -- FK: country_code → L1.country_dim.country_code
     -- FK: currency_code → L1.currency_dim.currency_code
     -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate by as_of_date)
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
 
 -- T2: risk_metric_cube (Exposure & Risk Metrics)
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS l3.risk_metric_cube (
     -- FK: scenario_id → L1.scenario_dim.scenario_id
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: product_node_id → L1.product_hierarchy.product_node_id
+    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: facility_id → L1.facility_master.facility_id
     -- FK: instrument_id → L1.instrument_master.instrument_id
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS l3.risk_metric_cube (
     -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate)
     -- FK: model_id → L1.model_registry_dim.model_id
     -- FK: rating_grade_id → L1.rating_grade_dim.rating_grade_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
 
 -- T3: counterparty_exposure_summary (Exposure & Risk Metrics)
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS l3.counterparty_exposure_summary (
     -- FK: sccl_group_id → L1.sccl_counterparty_group.sccl_group_id (nullable)
     -- FK: country_code → L1.country_dim.country_code
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
     -- FK: region_code → L1.region_dim.region_code
     -- FK: industry_code → L1.industry_dim.industry_code
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS l3.facility_exposure_summary (
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T5: portfolio_summary (Exposure & Risk Metrics)
 CREATE TABLE IF NOT EXISTS l3.portfolio_summary (
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS l3.portfolio_summary (
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T6: crm_allocation_summary (Credit Risk Mitigation (CRM))
 CREATE TABLE IF NOT EXISTS l3.crm_allocation_summary (
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS l3.crm_allocation_summary (
     -- FK: crm_id → L1.collateral_asset_master.collateral_asset_id OR L1.crm_protection_master.protection_id (by crm_type_code)
     -- FK: currency_code → L1.currency_dim.currency_code
     -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate)
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: risk_mitigant_id → L1.risk_mitigant_master.risk_mitigant_id
     -- FK: risk_mitigant_subtype_code → L1.risk_mitigant_type_dim.risk_mitigant_subtype_code
 
@@ -268,7 +268,7 @@ CREATE TABLE IF NOT EXISTS l3.collateral_portfolio_valuation (
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: collateral_type_id → L1.collateral_type.collateral_type_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T8: limit_current_state (Limits & Appetite)
 CREATE TABLE IF NOT EXISTS l3.limit_current_state (
@@ -298,12 +298,12 @@ CREATE TABLE IF NOT EXISTS l3.limit_current_state (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: limit_definition_id → L1.limit_definition.limit_definition_id
+    -- FK: limit_definition_id → L1.limit_rule.limit_rule_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
     -- FK: limit_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: status_last_changed_event_id → L3.limit_real_time_event_log.event_id
+    -- NOTE: status_last_changed_event_id references a real-time event log (not materialised in this DDL)
 
 -- T9: limit_utilization_timeseries (Limits & Appetite)
 CREATE TABLE IF NOT EXISTS l3.limit_utilization_timeseries (
@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS l3.limit_utilization_timeseries (
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
     -- FK: limit_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T10: limit_attribution_summary (Limits & Appetite)
 CREATE TABLE IF NOT EXISTS l3.limit_attribution_summary (
@@ -350,9 +350,9 @@ CREATE TABLE IF NOT EXISTS l3.limit_attribution_summary (
     -- FK: facility_id → L1.facility_master.facility_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: product_node_id → L1.product_hierarchy.product_node_id
+    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: org_unit_id → L1.org_unit_dim.org_unit_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
 
 -- T11: limit_breach_fact (Limits & Appetite)
@@ -373,7 +373,7 @@ CREATE TABLE IF NOT EXISTS l3.limit_breach_fact (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T12: credit_event_summary (Credit Events & Performance)
 CREATE TABLE IF NOT EXISTS l3.credit_event_summary (
@@ -404,7 +404,7 @@ CREATE TABLE IF NOT EXISTS l3.credit_event_summary (
     -- FK: facility_id → L1.facility_master.facility_id
     -- FK: credit_event_type_id → L1.credit_event_type_dim.credit_event_type_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T13: rating_migration_summary (Credit Events & Performance)
 CREATE TABLE IF NOT EXISTS l3.rating_migration_summary (
@@ -429,7 +429,7 @@ CREATE TABLE IF NOT EXISTS l3.rating_migration_summary (
     -- FK: from_rating_grade_id → L1.rating_grade_dim.rating_grade_id
     -- FK: to_rating_grade_id → L1.rating_grade_dim.rating_grade_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T14: default_loss_recovery_summary (Credit Events & Performance)
 CREATE TABLE IF NOT EXISTS l3.default_loss_recovery_summary (
@@ -452,7 +452,7 @@ CREATE TABLE IF NOT EXISTS l3.default_loss_recovery_summary (
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: facility_id → L1.facility_master.facility_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T15: report_run (Regulatory Reporting Output)
 CREATE TABLE IF NOT EXISTS l3.report_run (
@@ -510,7 +510,7 @@ CREATE TABLE IF NOT EXISTS l3.report_cell_contribution_fact (
     -- FK: currency_code → L1.currency_dim.currency_code (nullable)
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: rule_id → L1.rule_registry.rule_id (recommended) OR reference to L1.regulatory_mapping
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T18: report_cell_rule_execution (Regulatory Reporting Output)
 CREATE TABLE IF NOT EXISTS l3.report_cell_rule_execution (
@@ -578,12 +578,12 @@ CREATE TABLE IF NOT EXISTS l3.fr2590_position_snapshot (
     -- FK: counterparty_id → L1.counterparty.counterparty_id (nullable)
     -- FK: facility_id → L1.facility_master.facility_id (nullable)
     -- FK: instrument_id → L1.instrument_master.instrument_id (nullable)
-    -- FK: product_node_id → L1.product_hierarchy.product_node_id
+    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: country_code → L1.country_dim.country_code
     -- FK: currency_code → L1.currency_dim.currency_code
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: mdrm_id → L1.regulatory_mapping.mdrm_id (or equivalent)
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: fr2590_category_code → L1.fr2590_category_dim.fr2590_category_code
 
 -- T21: fr2590_counterparty_aggregate (FR 2590 Helper Artifacts)
@@ -606,10 +606,10 @@ CREATE TABLE IF NOT EXISTS l3.fr2590_counterparty_aggregate (
     -- FK: report_run_id → L3.report_run.report_run_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: product_node_id → L1.product_hierarchy.product_node_id
+    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: country_code → L1.country_dim.country_code
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: fr2590_category_code → L1.fr2590_category_dim.fr2590_category_code
 
 -- T22: lob_exposure_summary (LoB Summary)
@@ -649,7 +649,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_exposure_summary (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
     -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
@@ -684,7 +684,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_profitability_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: period_start_date → L1.date_dim.calendar_date
     -- FK: period_end_date → L1.date_dim.calendar_date
@@ -713,7 +713,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_pricing_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T25: lob_delinquency_summary (LoB Summary)
@@ -743,7 +743,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_delinquency_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T26: lob_profitability_allocation_summary (LoB Summary)
@@ -769,7 +769,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_profitability_allocation_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: allocation_dim_id → L1.region_dim.region_code (if REGION)
 
 -- T27: deal_pipeline_stage_summary (LoB Summary)
@@ -791,7 +791,7 @@ CREATE TABLE IF NOT EXISTS l3.deal_pipeline_stage_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: pipeline_stage_code → L1.pipeline_stage_dim.pipeline_stage_code
 
 -- T28: lob_credit_quality_summary (LoB Summary)
@@ -820,7 +820,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_credit_quality_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T29: kpi_period_summary (LoB Summary)
 CREATE TABLE IF NOT EXISTS l3.kpi_period_summary (
@@ -947,7 +947,7 @@ CREATE TABLE IF NOT EXISTS l3.counterparty_detail_snapshot (
     -- FK: region_code → L1.region_dim.region_code
     -- FK: industry_code → L1.industry_dim.industry_code
     -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T33: limit_tier_status_matrix (Limits & Appetite)
 CREATE TABLE IF NOT EXISTS l3.limit_tier_status_matrix (
@@ -1109,7 +1109,7 @@ CREATE TABLE IF NOT EXISTS l3.stress_test_breach_detail (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T41: regulatory_compliance_state (Regulatory Reporting Output)
 CREATE TABLE IF NOT EXISTS l3.regulatory_compliance_state (
@@ -1253,7 +1253,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_risk_ratio_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T47: lob_deterioration_summary (LoB Summary)
@@ -1280,7 +1280,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_deterioration_summary (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T48: lob_rating_distribution (LoB Summary)
@@ -1300,7 +1300,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_rating_distribution (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T49: lob_top_contributors (LoB Summary)
 CREATE TABLE IF NOT EXISTS l3.lob_top_contributors (
@@ -1321,7 +1321,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_top_contributors (
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.lob_node.lob_node_id
+    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: counterparty_id → L1.counterparty.counterparty_id
 
 -- T50: metric_value_fact (Dashboard consumption — pre-calculated metric values by level)

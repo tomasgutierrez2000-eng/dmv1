@@ -1133,6 +1133,7 @@ export function getL2SeedValue(
       if (columnName === 'product_node_id') return fid(idx);
       if (columnName === 'outstanding_balance_amt') return d;
       if (columnName === 'undrawn_commitment_amt') return undrawn;
+      if (columnName === 'total_collateral_mv_usd') return val;
       break;
     }
 

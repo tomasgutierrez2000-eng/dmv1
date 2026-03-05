@@ -1159,6 +1159,14 @@
         "sample_value": "12345"
       },
       {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "total_collateral_mv_usd",
+        "description": "Pre-computed SUM of current_valuation_usd from collateral_snapshot — materialized per facility for performance and audit trail",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "120000000.00"
+      },
+      {
         "layer": "L1",
         "table": "facility_counterparty_participation",
         "field": "participation_pct",
@@ -1223,7 +1231,7 @@
         "dashboard_display_name": "Counterparty Collateral MV ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each [Counterparty_ID] lookup [Facility_ID] in Facility Master table WHEN [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) AND IS([Counterparty_ID]) THEN For each [Facility_ID] lookup [participation_pct] WHEN IS([Counterparty_ID]) AND IS([Facility_ID]) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [Facility_ID] calculate [current_valuation_usd]*[participation_pct] == [Counterparty_Participation_Collateral_MV] THEN For each [Counterparty_ID] SUM(ARRAY{[Counterparty_Participation_Collateral_MV]})",
+        "level_logic": "For each [Counterparty_ID] lookup [Facility_ID] in Facility Master table WHEN [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) AND IS([Counterparty_ID]) THEN For each [Facility_ID] lookup [participation_pct] WHEN IS([Counterparty_ID]) AND IS([Facility_ID]) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [Facility_ID] calculate [current_valuation_usd]*[participation_pct] == [Counterparty_Participation_Collateral_MV] THEN For each [Counterparty_ID] SUM(ARRAY{[Counterparty_Participation_Collateral_MV]})",
         "source_references": [
           { "layer": "L1", "table": "facility_counterparty_participation", "field": "participation_pct" }
         ]
@@ -1233,7 +1241,7 @@
         "dashboard_display_name": "Desk Collateral MV ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L3 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L3' and [Description]=[L3 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [L3 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "level_logic": "For each [L3 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L3' and [Description]=[L3 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [L3 LoB] SUM(ARRAY{[current_valuation_USD]})",
         "source_references": []
       },
       {
@@ -1241,7 +1249,7 @@
         "dashboard_display_name": "Portfolio Collateral MV ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L2 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L2' and [Description]=[L2 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [L2 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "level_logic": "For each [L2 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L2' and [Description]=[L2 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [L2 LoB] SUM(ARRAY{[current_valuation_USD]})",
         "source_references": []
       },
       {
@@ -1249,7 +1257,7 @@
         "dashboard_display_name": "Business Segment Collateral MV ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L1 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L1' and [Description]=[L1 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [L1 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "level_logic": "For each [L1 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L1' and [Description]=[L1 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [total_collateral_mv_usd] from facility_exposure_snapshot THEN For each [L1 LoB] SUM(ARRAY{[current_valuation_USD]})",
         "source_references": []
       }
     ],

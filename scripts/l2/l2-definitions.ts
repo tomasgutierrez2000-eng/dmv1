@@ -136,6 +136,7 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'limit_status_code', type: 'VARCHAR(30)', nullable: true },
       { name: 'rwa_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'internal_risk_rating_bucket_code', type: 'VARCHAR(20)', nullable: true, fk: 'l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)' },
+      { name: 'total_collateral_mv_usd', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
   {

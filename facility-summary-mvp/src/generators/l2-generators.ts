@@ -116,6 +116,7 @@ export const generateL2Data = (l1: L1Data): L2Data => {
         as_of_date: asOfDate,
         number_of_loans: numberOfLoans,
         allocated_equity_amt: roundTo(allocatedEquity, 1),
+        total_collateral_mv_usd: 0, // populated below after collateral_snapshot generation
       });
       exposureSeq += 1;
     });
@@ -263,6 +264,16 @@ export const generateL2Data = (l1: L1Data): L2Data => {
 
     amendmentSeq += 1;
   });
+
+  // Compute total_collateral_mv_usd per facility from collateral snapshots
+  const collateralMvByFacility = new Map<string, number>();
+  for (const cs of collateralSnapshot) {
+    const prev = collateralMvByFacility.get(cs.facility_id) ?? 0;
+    collateralMvByFacility.set(cs.facility_id, prev + cs.current_valuation_usd);
+  }
+  for (const snapshot of facilityExposureSnapshot) {
+    snapshot.total_collateral_mv_usd = roundTo(collateralMvByFacility.get(snapshot.facility_id) ?? 0, 1);
+  }
 
   return {
     facilityExposureSnapshot,

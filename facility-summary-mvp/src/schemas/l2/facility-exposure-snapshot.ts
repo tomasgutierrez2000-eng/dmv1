@@ -14,4 +14,7 @@ export interface FacilityExposureSnapshot {
   as_of_date: string;
   number_of_loans: number;
   allocated_equity_amt: number;
+  /** Pre-computed SUM of current_valuation_usd from collateral_snapshot for this facility.
+   *  Materialized for GSIB-scale performance and audit trail. */
+  total_collateral_mv_usd: number;
 }

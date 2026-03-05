@@ -128,6 +128,7 @@ const L2_FIELDS = [
   { field: 'haircut_pct', table: 'collateral_snapshot', desc: 'Regulatory risk adjustment percentage', used: false },
   { field: 'eligible_value_usd', table: 'collateral_snapshot', desc: 'Post-haircut value for CRM purposes', used: false },
   { field: 'allocated_amount_usd', table: 'collateral_snapshot', desc: 'Amount allocated to this facility', used: false },
+  { field: 'total_collateral_mv_usd', table: 'facility_exposure_snapshot', desc: 'Pre-computed SUM of current_valuation_usd (materialized aggregate)', used: true },
 ];
 
 /** L3 output tables that store Collateral MV values */

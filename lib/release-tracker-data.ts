@@ -9,6 +9,9 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-03-05: Auto-detected changes ─────────────────────────
+  { date: '2026-03-05', layer: 'L2', table: 'facility_exposure_snapshot', field: 'total_collateral_mv_usd', changeType: 'Added', rationale: 'Field added to L2.facility_exposure_snapshot' },
+
   // ── 2026-03-04: Auto-detected changes ─────────────────────────
   { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: '(new table)', changeType: 'Added', rationale: 'New L1 table added' },
   { date: '2026-03-04', layer: 'L1', table: 'internal_risk_rating_bucket_dim', field: 'internal_risk_rating_bucket_code', changeType: 'Added', rationale: 'Field added to new L1.internal_risk_rating_bucket_dim' },

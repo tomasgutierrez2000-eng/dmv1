@@ -312,6 +312,7 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     sampleValue: '—',
     sourceFields: [
       { layer: 'L2', table: 'collateral_snapshot', field: 'current_valuation_usd' },
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'total_collateral_mv_usd' },
       { layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct' },
       { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
       { layer: 'L1', table: 'facility_master', field: 'lob_segment_id' },

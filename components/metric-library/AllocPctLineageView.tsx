@@ -11,7 +11,6 @@ import {
   ArrowDown,
   CheckCircle2,
   ShieldCheck,
-  Zap,
   Eye,
   GitBranch,
   ChevronDown,
@@ -21,20 +20,18 @@ import {
   FolderTree,
   PieChart,
   Info,
-  Layers,
   Link2,
   Play,
   Network,
   Workflow,
-  RefreshCw,
   Sparkles,
-  Scale,
 } from 'lucide-react';
 import {
   FACILITIES,
   COUNTERPARTIES,
   fmtPct,
   fmtM,
+  facilitiesForCounterparty,
 } from './demo/allocPctDemoRollupData';
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -45,7 +42,7 @@ interface InputField {
   name: string;
   field: string;
   table: string;
-  layer: 'L1' | 'L2';
+  layer: 'L1';
   value: string;
   description: string;
 }
@@ -54,15 +51,10 @@ interface InputField {
  * STATIC DATA
  * ──────────────────────────────────────────────────────────────────────────── */
 
-const LEGAL_INPUTS: InputField[] = [
-  { name: 'Participation %', field: 'participation_pct', table: 'facility_counterparty_participation', layer: 'L1', value: '60.00%', description: 'Contractual share of the facility assigned to this counterparty' },
-  { name: 'Committed Amount (weight)', field: 'committed_facility_amt', table: 'facility_master', layer: 'L1', value: '$100,000,000', description: 'Total committed facility amount used for weighted-average rollup' },
-];
-
-const ECONOMIC_INPUTS: InputField[] = [
-  { name: 'Legal Participation %', field: 'legal_participation_pct', table: 'counterparty_allocation_snapshot', layer: 'L2', value: '60.00%', description: 'Contractual participation percent (sourced from L1 at snapshot time)' },
-  { name: 'CRM Adjustment %', field: 'crm_adjustment_pct', table: 'counterparty_allocation_snapshot', layer: 'L2', value: '15.00%', description: 'Credit risk mitigation adjustment (CDS, sub-participation, guarantees)' },
-  { name: 'Committed Amount (weight)', field: 'committed_facility_amt', table: 'facility_master', layer: 'L1', value: '$100,000,000', description: 'Total committed facility amount used for weighted-average rollup' },
+const INPUTS: InputField[] = [
+  { name: 'Participation %', field: 'participation_pct', table: 'facility_counterparty_participation', layer: 'L1', value: '60.00%', description: 'Counterparty share of the facility' },
+  { name: 'Facility ID', field: 'facility_id', table: 'facility_master', layer: 'L1', value: 'F-201', description: 'FK linking to facility master' },
+  { name: 'Counterparty ID', field: 'counterparty_id', table: 'facility_master', layer: 'L1', value: 'CP-01', description: 'FK linking facility to counterparty' },
 ];
 
 const ROLLUP_LEVELS = [
@@ -70,9 +62,9 @@ const ROLLUP_LEVELS = [
     key: 'facility',
     label: 'Facility',
     icon: Table2,
-    desc: 'Direct lookup (legal) or calculation (economic) for one facility-counterparty pair',
-    method: 'Direct / Calc',
-    purpose: 'Per-loan participation share',
+    desc: 'Raw lookup of participation_pct for one facility-counterparty pair',
+    method: 'Raw',
+    purpose: 'Per-facility counterparty share',
     tier: 'T2',
     active: true,
   },
@@ -80,10 +72,10 @@ const ROLLUP_LEVELS = [
     key: 'counterparty',
     label: 'Counterparty',
     icon: Users,
-    desc: 'WEIGHTED_AVERAGE — weighted by committed_facility_amt across all facilities for one borrower',
-    method: 'WTD_AVG',
-    purpose: 'Obligor-level exposure concentration',
-    tier: 'T3',
+    desc: 'Raw lookup — each facility retains its own participation_pct',
+    method: 'Raw',
+    purpose: 'Counterparty share across facilities',
+    tier: 'T2',
     active: true,
   },
   {
@@ -120,19 +112,9 @@ const ROLLUP_LEVELS = [
 
 /** L1 reference tables used by Counterparty Allocation % */
 const L1_TABLES = [
-  { table: 'facility_master', desc: 'Loan identity — facility type, maturity, counterparty FK, committed_facility_amt', fields: ['facility_id (PK)', 'counterparty_id (FK)', 'lob_segment_id (FK)', 'committed_facility_amt'] },
-  { table: 'facility_counterparty_participation', desc: 'Counterparty participation records — legal share of each facility', fields: ['facility_id (FK)', 'counterparty_id (FK)', 'participation_pct', 'is_primary_flag'], primary: true },
+  { table: 'facility_master', desc: 'Loan identity — facility type, maturity, counterparty FK', fields: ['facility_id (PK)', 'counterparty_id (FK)', 'lob_segment_id (FK)', 'committed_facility_amt'] },
+  { table: 'facility_counterparty_participation', desc: 'Counterparty participation records — share of each facility', fields: ['facility_id (FK)', 'counterparty_id (FK)', 'participation_pct', 'is_primary_flag'], primary: true },
   { table: 'counterparty', desc: 'Borrower identity — legal name, credit rating, industry', fields: ['counterparty_id (PK)', 'legal_name', 'industry_code'] },
-  { table: 'enterprise_business_taxonomy', desc: 'Organizational hierarchy — desk, portfolio, business segment tree', fields: ['managed_segment_id (PK)', 'parent_segment_id (FK)', 'segment_name', 'segment_level'] },
-];
-
-/** L2 snapshot fields used by Economic variant */
-const L2_FIELDS = [
-  { field: 'legal_participation_pct', table: 'counterparty_allocation_snapshot', desc: 'Contractual participation % (mirrored from L1)', used: true },
-  { field: 'crm_adjustment_pct', table: 'counterparty_allocation_snapshot', desc: 'Credit risk mitigation reduction percentage', used: true },
-  { field: 'economic_allocation_pct', table: 'counterparty_allocation_snapshot', desc: 'Net allocation after CRM adjustments', used: true },
-  { field: 'crm_methodology', table: 'counterparty_allocation_snapshot', desc: 'CRM method: COMPREHENSIVE, SUBSTITUTION, or NONE', used: false },
-  { field: 'as_of_date', table: 'counterparty_allocation_snapshot', desc: 'Snapshot observation date', used: false },
 ];
 
 /** L3 output tables that store Allocation % values */
@@ -140,29 +122,29 @@ const L3_OUTPUT_TABLES = [
   {
     table: 'metric_value_fact',
     desc: 'Generic metric storage — Allocation % at facility and counterparty levels',
-    fields: ['metric_id = ALLOC_PCT', 'variant_id = LEGAL | ECONOMIC', 'aggregation_level', 'facility_id | counterparty_id', 'value', 'unit = PERCENTAGE'],
+    fields: ['metric_id = ALLOC_PCT', 'aggregation_level', 'facility_id | counterparty_id', 'value', 'unit = PERCENTAGE'],
     primary: true,
   },
 ];
 
 /** Join chain data for each rollup level */
-interface JoinHop { from: string; fromLayer: 'L1' | 'L2'; to: string; toLayer: 'L1' | 'L2'; joinKey: string; note?: string }
+interface JoinHop { from: string; fromLayer: 'L1'; to: string; toLayer: 'L1'; joinKey: string; note?: string }
 interface JoinChainData { hops: JoinHop[]; aggregation: string; result: string }
 
 const ROLLUP_JOIN_CHAINS: Record<string, JoinChainData> = {
   facility: {
     hops: [
-      { from: 'facility_counterparty_participation', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get committed amount for weighting' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'facility_counterparty_participation', toLayer: 'L1', joinKey: 'facility_id, counterparty_id', note: 'Lookup participation_pct' },
     ],
-    aggregation: 'Legal: direct lookup of participation_pct | Economic: legal_participation_pct − crm_adjustment_pct',
+    aggregation: 'Raw: direct lookup of participation_pct WHERE facility_id AND counterparty_id',
     result: 'One Allocation % value per (facility, counterparty) pair',
   },
   counterparty: {
     hops: [
-      { from: 'facility_counterparty_participation', fromLayer: 'L1', to: 'facility_master', toLayer: 'L1', joinKey: 'facility_id', note: 'Get committed_facility_amt for weighting' },
+      { from: 'facility_master', fromLayer: 'L1', to: 'facility_counterparty_participation', toLayer: 'L1', joinKey: 'facility_id, counterparty_id', note: 'Lookup participation_pct per facility' },
     ],
-    aggregation: 'WTD_AVG: Σ(allocation_pct × committed_facility_amt) / Σ(committed_facility_amt) GROUP BY counterparty_id',
-    result: 'Weighted average Allocation % per borrower',
+    aggregation: 'Raw: for each counterparty, list participation_pct per facility',
+    result: 'Allocation % per facility for each counterparty',
   },
 };
 
@@ -260,93 +242,46 @@ function PlainEnglish({ children }: { children: React.ReactNode }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * STEP 1 — METRIC DEFINITION CARD (Both Variants)
+ * STEP 1 — METRIC DEFINITION CARD
  * ──────────────────────────────────────────────────────────────────────────── */
 
 function MetricDefCard() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Legal Variant */}
-      <div className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
-          <span className="text-sm font-bold text-cyan-400">Legal Participation % (Observed)</span>
-        </div>
+    <div className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 p-4 max-w-lg">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
+        <span className="text-sm font-bold text-cyan-400">Counterparty Share or Allocation (%)</span>
+      </div>
 
-        <div className="space-y-1.5 text-xs mb-3">
-          <div className="flex justify-between"><span className="text-gray-500">Metric Class</span><span className="text-gray-300">OBSERVED</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Unit Type</span><span className="text-gray-300">PERCENTAGE</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Direction</span><span className="text-gray-300">NEUTRAL</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Rollup</span><span className="text-gray-300">WEIGHTED_AVERAGE</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Source</span><span className="text-gray-300">L1 Reference</span></div>
-        </div>
+      <div className="space-y-1.5 text-xs mb-3">
+        <div className="flex justify-between"><span className="text-gray-500">Metric Class</span><span className="text-gray-300">SOURCED</span></div>
+        <div className="flex justify-between"><span className="text-gray-500">Unit Type</span><span className="text-gray-300">PERCENTAGE</span></div>
+        <div className="flex justify-between"><span className="text-gray-500">Direction</span><span className="text-gray-300">NEUTRAL</span></div>
+        <div className="flex justify-between"><span className="text-gray-500">Rollup</span><span className="text-gray-300">Raw (facility &amp; counterparty only)</span></div>
+        <div className="flex justify-between"><span className="text-gray-500">Source</span><span className="text-gray-300">L1 Reference</span></div>
+      </div>
 
-        <div className="bg-black/30 rounded-lg p-3 mb-3">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-500">participation_pct</span>
-            <span className="text-white font-mono font-bold">60.00%</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <code className="text-xs text-gray-400 font-mono">Direct lookup from L1</code>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" aria-hidden="true" />
-            <span className="text-lg font-black text-cyan-400 tabular-nums">60.00%</span>
-          </div>
-        </div>
-
-        <div className="mt-3 pt-3 border-t border-white/5 flex items-start gap-1.5 text-[10px] text-gray-500">
-          <Info className="w-3 h-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <span>
-            <strong className="text-cyan-300">T2:</strong> Sourced from the bank&apos;s contractual participation records.
-            Validated against facility totals (all participations must sum to 100%).
-          </span>
+      <div className="bg-black/30 rounded-lg p-3 mb-3">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-500">participation_pct</span>
+          <span className="text-white font-mono font-bold">60.00%</span>
         </div>
       </div>
 
-      {/* Economic Variant */}
-      <div className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
-          <span className="text-sm font-bold text-cyan-400">Economic Allocation % (Calculated)</span>
+      <div className="flex items-center justify-between">
+        <code className="text-xs text-gray-400 font-mono">Direct lookup from L1</code>
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-cyan-400" aria-hidden="true" />
+          <span className="text-lg font-black text-cyan-400 tabular-nums">60.00%</span>
         </div>
+      </div>
 
-        <div className="space-y-1.5 text-xs mb-3">
-          <div className="flex justify-between"><span className="text-gray-500">Metric Class</span><span className="text-gray-300">CALCULATED</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Unit Type</span><span className="text-gray-300">PERCENTAGE</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Direction</span><span className="text-gray-300">NEUTRAL</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Rollup</span><span className="text-gray-300">WEIGHTED_AVERAGE</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Source</span><span className="text-gray-300">L2 Snapshot</span></div>
-        </div>
-
-        <div className="bg-black/30 rounded-lg p-3 mb-3">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-gray-500">legal_participation_pct</span>
-            <span className="text-white font-mono font-bold">60.00%</span>
-          </div>
-          <div className="flex items-center justify-center text-gray-600 text-sm my-1">&minus;</div>
-          <div className="flex items-center justify-between text-xs mt-1">
-            <span className="text-gray-500">crm_adjustment_pct</span>
-            <span className="text-white font-mono font-bold">15.00%</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <code className="text-xs text-gray-400 font-mono">Legal &minus; CRM Adjustment</code>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" aria-hidden="true" />
-            <span className="text-lg font-black text-cyan-400 tabular-nums">45.00%</span>
-          </div>
-        </div>
-
-        <div className="mt-3 pt-3 border-t border-white/5 flex items-start gap-1.5 text-[10px] text-gray-500">
-          <Info className="w-3 h-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <span>
-            <strong className="text-cyan-300">T3:</strong> Always calculated by the platform. Economic allocation
-            reflects risk transfer via CDS, sub-participations, or guarantees.
-          </span>
-        </div>
+      <div className="mt-3 pt-3 border-t border-white/5 flex items-start gap-1.5 text-[10px] text-gray-500">
+        <Info className="w-3 h-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
+        <span>
+          Exposure allocated to specific counterparty representing their share of the facility
+          which the client can draw on. Concentration KPI measuring obligor dependency risk.
+        </span>
       </div>
     </div>
   );
@@ -357,7 +292,6 @@ function MetricDefCard() {
  * ──────────────────────────────────────────────────────────────────────────── */
 
 function InputFieldSection({ input }: { input: InputField }) {
-  const layerColor = input.layer === 'L1' ? 'text-blue-300' : 'text-amber-300';
   return (
     <div className="rounded-lg border border-gray-800 bg-white/[0.02] p-3">
       <div className="flex items-center justify-between mb-2">
@@ -367,61 +301,13 @@ function InputFieldSection({ input }: { input: InputField }) {
       <div className="space-y-1 text-[10px]">
         <div className="flex items-center gap-2">
           <span className="text-gray-600">Source:</span>
-          <code className={`font-mono ${layerColor}`}>{input.layer}.{input.table}</code>
+          <code className="font-mono text-blue-300">{input.layer}.{input.table}</code>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-gray-600">Field:</span>
           <code className="font-mono text-cyan-400">{input.field}</code>
         </div>
         <div className="text-gray-500">{input.description}</div>
-      </div>
-    </div>
-  );
-}
-
-/* ────────────────────────────────────────────────────────────────────────────
- * FOUNDATIONAL RULE — WEIGHTED AVERAGE
- * ──────────────────────────────────────────────────────────────────────────── */
-
-function FoundationalRule() {
-  return (
-    <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/[0.06] p-4 mb-5">
-      <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <Scale className="w-4 h-4 text-cyan-400" aria-hidden="true" />
-        </div>
-        <div>
-          <div className="text-xs font-bold text-cyan-300 mb-1.5">
-            Foundational Rule: Percentage Metrics Use Weighted Averages
-          </div>
-          <p className="text-xs text-gray-300 leading-relaxed">
-            Allocation % is a <strong className="text-white">percentage</strong>, not a dollar amount. Percentages cannot
-            be simply averaged — they must be weighted by the underlying exposure (committed_facility_amt) to produce
-            a meaningful aggregate figure.
-          </p>
-          <div className="mt-2 bg-black/30 rounded-lg p-3">
-            <div className="flex items-center gap-4 text-xs">
-              <div className="flex-1 text-center">
-                <div className="text-cyan-400 font-mono mb-1">
-                  {'Σ'}(pct &times; weight) / {'Σ'}(weight)
-                </div>
-                <div className="text-[9px] text-cyan-400/60">Correct for percentages</div>
-              </div>
-              <div className="text-gray-600 text-lg">vs.</div>
-              <div className="flex-1 text-center">
-                <div className="text-amber-400 font-mono mb-1 opacity-70">
-                  avg(pct<sub>1</sub>, pct<sub>2</sub>, ...)
-                </div>
-                <div className="text-[9px] text-amber-400/60">Wrong — ignores exposure size</div>
-              </div>
-            </div>
-          </div>
-          <PlainEnglish>
-            If Facility A ($100M committed) has 60% participation and Facility B ($200M committed) has 35%,
-            the weighted average is (60&times;100 + 35&times;200) / (100 + 200) = 43.33%, not (60 + 35) / 2 = 47.5%.
-            Larger facilities have proportionally more influence on the aggregate.
-          </PlainEnglish>
-        </div>
       </div>
     </div>
   );
@@ -525,28 +411,24 @@ function JoinChainVisual({ levelKey }: { levelKey: string }) {
       </div>
 
       <div className="space-y-1.5">
-        {chain.hops.map((hop, i) => {
-          const fromColor = hop.fromLayer === 'L2' ? 'text-amber-300' : 'text-blue-300';
-          const toColor = hop.toLayer === 'L2' ? 'text-amber-300' : 'text-blue-300';
-          return (
-            <div key={i} className="flex items-center gap-2 text-[10px]">
-              <span className="w-4 h-4 rounded-full bg-white/5 flex items-center justify-center text-[8px] font-bold text-gray-500 flex-shrink-0">{i + 1}</span>
-              <code className={`font-mono ${fromColor}`}>{hop.from}</code>
-              <span className="text-gray-600">&rarr;</span>
-              <code className={`font-mono ${toColor}`}>{hop.to}</code>
-              <span className="text-gray-700">ON</span>
-              <code className="font-mono text-cyan-400">{hop.joinKey}</code>
-              {hop.note && <span className="text-gray-600 italic ml-1">({hop.note})</span>}
-            </div>
-          );
-        })}
+        {chain.hops.map((hop, i) => (
+          <div key={i} className="flex items-center gap-2 text-[10px]">
+            <span className="w-4 h-4 rounded-full bg-white/5 flex items-center justify-center text-[8px] font-bold text-gray-500 flex-shrink-0">{i + 1}</span>
+            <code className="font-mono text-blue-300">{hop.from}</code>
+            <span className="text-gray-600">&rarr;</span>
+            <code className="font-mono text-blue-300">{hop.to}</code>
+            <span className="text-gray-700">ON</span>
+            <code className="font-mono text-cyan-400">{hop.joinKey}</code>
+            {hop.note && <span className="text-gray-600 italic ml-1">({hop.note})</span>}
+          </div>
+        ))}
       </div>
 
       <div className="mt-2 pt-2 border-t border-white/5 flex items-start gap-2 text-[10px]">
-        <RefreshCw className="w-3 h-3 text-purple-400 flex-shrink-0 mt-0.5" />
+        <Sparkles className="w-3 h-3 text-cyan-400 flex-shrink-0 mt-0.5" />
         <div>
           <span className="text-gray-500 font-medium">Aggregation: </span>
-          <span className="text-purple-300">{chain.aggregation}</span>
+          <span className="text-cyan-300">{chain.aggregation}</span>
         </div>
       </div>
 
@@ -585,45 +467,30 @@ function FacilityDetail() {
     <div className="space-y-3">
       <div className="bg-black/30 rounded-lg p-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Facility-Level Allocation</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <div className="text-[9px] font-bold text-cyan-300 mb-1">Legal Variant</div>
-            <div className="text-sm font-mono text-cyan-400 text-center">
-              Direct lookup: participation_pct
-            </div>
-          </div>
-          <div>
-            <div className="text-[9px] font-bold text-cyan-300 mb-1">Economic Variant</div>
-            <div className="text-sm font-mono text-cyan-400 text-center">
-              legal_participation_pct &minus; crm_adjustment_pct
-            </div>
-          </div>
+        <div className="text-sm font-mono text-cyan-400 text-center">
+          Raw lookup: participation_pct
         </div>
         <PlainEnglish>
-          For one facility, what share does this counterparty hold? Legal = the contractual share.
-          Economic = the share after credit risk mitigation (CDS, sub-participations, guarantees) is applied.
+          For each facility, look up the counterparty&apos;s participation_pct from
+          facility_counterparty_participation WHERE facility_id AND counterparty_id match.
         </PlainEnglish>
       </div>
       <JoinChainVisual levelKey="facility" />
 
       {/* Sample facilities */}
       <div className="rounded-lg border border-gray-800 overflow-hidden">
-        <div className="grid grid-cols-6 text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-white/[0.03] px-3 py-1.5">
+        <div className="grid grid-cols-4 text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-white/[0.03] px-3 py-1.5">
           <div>Facility</div>
+          <div>Counterparty</div>
           <div className="text-right">Committed</div>
-          <div className="text-right">Legal %</div>
-          <div className="text-right">CRM Adj</div>
-          <div className="text-right">Economic %</div>
-          <div className="text-right">CRM Method</div>
+          <div className="text-right">Allocation %</div>
         </div>
         {FACILITIES.map((f) => (
-          <div key={f.facilityId} className="grid grid-cols-6 text-xs px-3 py-1.5 border-t border-gray-800/50">
+          <div key={f.facilityId} className="grid grid-cols-4 text-xs px-3 py-1.5 border-t border-gray-800/50">
             <div className="text-gray-400 truncate">{f.name}</div>
+            <div className="text-gray-400">{f.counterpartyName}</div>
             <div className="text-right text-gray-300 font-mono">{fmtM(f.committedAmt)}</div>
-            <div className="text-right text-cyan-400 font-mono">{fmtPct(f.legalPct)}</div>
-            <div className="text-right text-amber-400 font-mono">{f.crmAdjPct > 0 ? fmtPct(f.crmAdjPct) : '—'}</div>
-            <div className="text-right text-cyan-400 font-mono font-bold">{fmtPct(f.economicPct)}</div>
-            <div className="text-right text-gray-500 text-[10px]">{f.crmMethod}</div>
+            <div className="text-right text-cyan-400 font-mono font-bold">{fmtPct(f.participationPct)}</div>
           </div>
         ))}
       </div>
@@ -635,36 +502,36 @@ function CounterpartyDetail() {
   return (
     <div className="space-y-3">
       <div className="text-xs text-gray-400 leading-relaxed">
-        A single borrower may participate in multiple facilities with different allocation percentages.
-        The counterparty-level Allocation % is the <strong className="text-white">weighted average</strong> across
-        all facilities, weighted by committed_facility_amt.
+        A single counterparty may participate in multiple facilities with different allocation percentages.
+        At the counterparty level, each facility&apos;s participation_pct is displayed as a <strong className="text-white">raw lookup</strong> —
+        no weighted average is applied.
       </div>
       <JoinChainVisual levelKey="counterparty" />
 
-      <div className="rounded-lg border border-gray-800 overflow-hidden">
-        <div className="grid grid-cols-5 text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-white/[0.03] px-3 py-1.5">
-          <div>Counterparty</div>
-          <div className="text-right">Facilities</div>
-          <div className="text-right">Total Committed</div>
-          <div className="text-right">Wtd Legal %</div>
-          <div className="text-right">Wtd Economic %</div>
-        </div>
-        {COUNTERPARTIES.map((cp) => (
-          <div key={cp.name} className="grid grid-cols-5 text-xs px-3 py-1.5 border-t border-gray-800/50">
-            <div className="text-gray-300 font-medium">{cp.name}</div>
-            <div className="text-right text-gray-400 font-mono">{cp.facilityCount}</div>
-            <div className="text-right text-gray-400 font-mono">{fmtM(cp.totalCommitted)}</div>
-            <div className="text-right text-cyan-400 font-mono font-bold">{fmtPct(cp.wtdLegalPct)}</div>
-            <div className="text-right text-cyan-400 font-mono font-bold">{fmtPct(cp.wtdEconomicPct)}</div>
+      {/* Show facilities grouped by counterparty */}
+      {COUNTERPARTIES.map((cp) => {
+        const cpFacilities = facilitiesForCounterparty(cp.name);
+        return (
+          <div key={cp.name} className="rounded-lg border border-gray-800 overflow-hidden">
+            <div className="bg-white/[0.03] px-3 py-1.5 flex items-center justify-between">
+              <span className="text-xs font-bold text-gray-300">{cp.name}</span>
+              <span className="text-[10px] text-gray-500">{cp.facilityCount} facilities | {fmtM(cp.totalCommitted)} total committed</span>
+            </div>
+            <div className="grid grid-cols-3 text-[9px] font-bold uppercase tracking-wider text-gray-500 px-3 py-1">
+              <div>Facility</div>
+              <div className="text-right">Committed</div>
+              <div className="text-right">Allocation %</div>
+            </div>
+            {cpFacilities.map((f) => (
+              <div key={f.facilityId} className="grid grid-cols-3 text-xs px-3 py-1.5 border-t border-gray-800/50">
+                <div className="text-gray-400 truncate">{f.name}</div>
+                <div className="text-right text-gray-300 font-mono">{fmtM(f.committedAmt)}</div>
+                <div className="text-right text-cyan-400 font-mono font-bold">{fmtPct(f.participationPct)}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-
-      <PlainEnglish>
-        Unlike Interest Income where you simply add dollar amounts, Allocation % requires weighting
-        by committed amounts. A 35% share of a $200M facility matters more than a 100% share of a $75M facility
-        when computing the aggregate counterparty-level allocation.
-      </PlainEnglish>
+        );
+      })}
     </div>
   );
 }
@@ -681,8 +548,6 @@ function NALevelDetail() {
           <p className="text-[10px] text-gray-600 leading-relaxed">
             Counterparty Allocation % is a relationship-level metric that describes how exposure is distributed
             among counterparties for a given facility. It does not aggregate meaningfully above the counterparty level.
-            Desk, portfolio, and business segment views show this metric only as a drill-through to the underlying
-            facility-counterparty pairs, never as a rolled-up aggregate.
           </p>
         </div>
       </div>
@@ -695,7 +560,7 @@ function NALevelDetail() {
  * ──────────────────────────────────────────────────────────────────────────── */
 
 function DashboardConsumption() {
-  const [selectedLevel, setSelectedLevel] = useState('counterparty');
+  const [selectedLevel, setSelectedLevel] = useState('facility');
   const activeLevels = ['facility', 'counterparty'];
   const levelLabels: Record<string, string> = {
     facility: 'Facility',
@@ -740,7 +605,7 @@ function DashboardConsumption() {
           <div className="rounded-xl border border-gray-700 bg-black/40 p-4">
             <div className="text-[10px] text-gray-500 mb-1">{levelLabels[selectedLevel]} Allocation %</div>
             <div className="text-2xl font-black text-cyan-400 tabular-nums mb-2">
-              {selectedLevel === 'facility' ? '60.00%' : fmtPct(COUNTERPARTIES[0].wtdLegalPct)}
+              {fmtPct(FACILITIES[0].participationPct)}
             </div>
             <div className="text-[10px] text-gray-500">
               {selectedLevel === 'facility'
@@ -811,31 +676,26 @@ function FooterLegend() {
   return (
     <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-5 mt-6">
       <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">Legend</div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-blue-600" />
           <span className="text-[10px] text-gray-400">L1 Reference</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded bg-amber-600" />
-          <span className="text-[10px] text-gray-400">L2 Snapshot</span>
-        </div>
-        <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-emerald-600" />
-          <span className="text-[10px] text-gray-400">L3 Output / Calc</span>
+          <span className="text-[10px] text-gray-400">L3 Output</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-pink-600" />
           <span className="text-[10px] text-gray-400">Dashboard</span>
         </div>
       </div>
-      <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-2 md:grid-cols-3 gap-2">
         <TierBadge tier="T1" />
         <TierBadge tier="T2" />
-        <TierBadge tier="T3" />
       </div>
       <div className="mt-3 pt-3 border-t border-gray-800 text-[10px] text-gray-600">
-        Regulatory references: FR Y-14Q, Basel III CRE, Large Exposure Framework
+        Regulatory references: FR Y-14Q, Large Exposure Framework
       </div>
     </div>
   );
@@ -876,7 +736,7 @@ export default function AllocPctLineageView({
               </Link>
               <h1 className="text-xl font-bold text-white">Counterparty Allocation % End-to-End Lineage</h1>
               <p className="text-xs text-gray-500 mt-0.5">
-                From data model to dashboard — complete lineage with weighted-average rollup
+                From data model to dashboard — raw lookup at facility and counterparty levels
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -891,7 +751,7 @@ export default function AllocPctLineageView({
               )}
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
-                <span className="text-xs text-gray-400">Percentage (WTD_AVG)</span>
+                <span className="text-xs text-gray-400">Percentage (Raw)</span>
               </div>
             </div>
           </div>
@@ -907,59 +767,34 @@ export default function AllocPctLineageView({
             icon={Calculator}
             step="Step 1 — Metric Definition"
             layerColor="bg-purple-600"
-            title="Counterparty Allocation % Configuration"
-            subtitle="Two variants: Legal Participation % (observed) and Economic Allocation % (calculated)"
+            title="Counterparty Share or Allocation (%) Configuration"
+            subtitle="Raw sourced metric — participation_pct from facility_counterparty_participation"
           />
-          <div data-demo="step1-variant-legal">
-            <div data-demo="step1-variant-economic">
-              <MetricDefCard />
-            </div>
-          </div>
+          <MetricDefCard />
 
-          {/* Legal input fields */}
+          {/* Input fields */}
           <div className="mt-5 mb-2">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-2">Legal Variant Inputs</div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-2">Input Fields</div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" data-demo="num-section-legal">
-            {LEGAL_INPUTS.map((input) => (
-              <div key={input.field} data-demo={input.field === 'participation_pct' ? 'den-section-legal' : undefined}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-demo="num-section">
+            {INPUTS.map((input) => (
+              <div key={input.field}>
                 <InputFieldSection input={input} />
               </div>
             ))}
           </div>
 
-          <div data-demo="result-legal" className="mt-4">
+          <div data-demo="result" className="mt-4">
             <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/[0.06] p-4 text-center">
-              <div className="text-xs text-gray-500 mb-1">Legal Participation %</div>
+              <div className="text-xs text-gray-500 mb-1">Allocation %</div>
               <div className="text-2xl font-black text-cyan-400 tabular-nums">60.00%</div>
               <div className="text-[10px] text-gray-600 mt-1">Direct lookup from facility_counterparty_participation</div>
             </div>
           </div>
 
-          {/* Economic input fields */}
-          <div className="mt-5 mb-2">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-2">Economic Variant Inputs</div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-demo="num-section-economic">
-            {ECONOMIC_INPUTS.map((input) => (
-              <div key={input.field} data-demo={input.field === 'crm_adjustment_pct' ? 'den-section-economic' : undefined}>
-                <InputFieldSection input={input} />
-              </div>
-            ))}
-          </div>
-
-          <div data-demo="result-economic" className="mt-4">
-            <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/[0.06] p-4 text-center">
-              <div className="text-xs text-gray-500 mb-1">Economic Allocation %</div>
-              <div className="text-2xl font-black text-cyan-400 tabular-nums">45.00%</div>
-              <div className="text-[10px] text-gray-600 mt-1">60.00% &minus; 15.00% = 45.00% (legal &minus; CRM adjustment)</div>
-            </div>
-          </div>
-
           <InsightCallout>
-            <strong>Two views of the same relationship.</strong> Legal Participation % reflects the contractual
-            share from syndication agreements. Economic Allocation % adjusts for credit risk mitigation
-            (CDS, sub-participations, guarantees) to show the true economic exposure.
+            Allocation % is a direct raw lookup — no calculation required. The value represents the
+            counterparty&apos;s share of the facility which they can draw on.
           </InsightCallout>
         </section>
 
@@ -973,7 +808,7 @@ export default function AllocPctLineageView({
             step="Step 2 — L1 Reference Data"
             layerColor="bg-blue-600"
             title="Dimensional Anchors"
-            subtitle="Reference tables that identify the facility, counterparty participation, and organizational hierarchy"
+            subtitle="Reference tables that identify the facility and counterparty participation"
           />
           <div className="space-y-2">
             {L1_TABLES.map((t) => (
@@ -1003,145 +838,23 @@ export default function AllocPctLineageView({
             ))}
           </div>
           <InsightCallout>
-            <strong>facility_counterparty_participation is the key table.</strong> Unlike most metrics that
-            derive values from L2 snapshots, the Legal variant of Allocation % is sourced directly from this
-            L1 reference table. The <code className="text-blue-300">participation_pct</code> field is
-            the contractual share — it changes only when the syndication structure is modified.
+            <strong>facility_counterparty_participation is the key table.</strong> Allocation % is sourced
+            directly from this L1 reference table. The <code className="text-blue-300">participation_pct</code> field
+            stores the counterparty&apos;s share — it changes only when the participation structure is modified.
           </InsightCallout>
         </section>
 
-        <FlowArrow label="L1 participation records feed into L2 snapshot" />
+        <FlowArrow label="Results stored in L3 tables" />
 
-        {/* ── STEP 3: L2 SNAPSHOT ── */}
-        <section data-demo="step3" aria-labelledby={`${headingPrefix}-step3`}>
-          <SectionHeading
-            id={`${headingPrefix}-step3`}
-            icon={Layers}
-            step="Step 3 — L2 Snapshot Data"
-            layerColor="bg-amber-600"
-            title="Counterparty Allocation Snapshot"
-            subtitle="Snapshot table capturing economic allocation with CRM adjustments"
-          />
-          <div className="rounded-lg border border-gray-800 overflow-hidden">
-            <div className="grid grid-cols-4 text-[9px] font-bold uppercase tracking-wider text-gray-500 bg-white/[0.03] px-3 py-1.5">
-              <div>Field</div>
-              <div>Table</div>
-              <div>Description</div>
-              <div className="text-right">Used</div>
-            </div>
-            {L2_FIELDS.map((f) => (
-              <div
-                key={f.field}
-                className={`grid grid-cols-4 text-xs px-3 py-1.5 border-t border-gray-800/50 ${
-                  f.used ? 'bg-cyan-500/5' : ''
-                }`}
-              >
-                <code className={`font-mono ${f.used ? 'text-cyan-400' : 'text-gray-500'}`}>{f.field}</code>
-                <code className="font-mono text-amber-300 text-[10px]">{f.table}</code>
-                <div className="text-gray-400 text-[10px]">{f.desc}</div>
-                <div className="text-right">
-                  {f.used && <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 inline" />}
-                </div>
-              </div>
-            ))}
-          </div>
-          <InsightCallout>
-            <strong>Economic variant only.</strong> The L2 snapshot is used exclusively by the Economic Allocation %
-            variant. It captures the legal participation, applies CRM adjustments, and stores the resulting
-            economic allocation. The Legal variant reads directly from L1 and does not use this snapshot.
-          </InsightCallout>
-        </section>
-
-        <FlowArrow label="Fields feed into calculation engine" />
-
-        {/* ── STEP 4: CALCULATION ── */}
-        <section data-demo="step4" aria-labelledby={`${headingPrefix}-step4`}>
-          <SectionHeading
-            id={`${headingPrefix}-step4`}
-            icon={Zap}
-            step="Step 4 — Calculation Engine"
-            layerColor="bg-emerald-600"
-            title="Allocation % Calculation"
-            subtitle="Legal variant: direct observation (T2) | Economic variant: platform-calculated (T3)"
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Legal */}
-            <div data-demo="step4-variant-legal">
-              <div className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
-                    <span className="text-xs font-bold text-cyan-400">Legal Participation % (Observed)</span>
-                  </div>
-                  <TierBadge tier="T2" />
-                </div>
-                <div className="bg-black/30 rounded-lg p-3 mb-3">
-                  <div className="text-sm font-mono text-center space-y-1">
-                    <div className="text-gray-400">
-                      <code className="text-blue-300">participation_pct</code>
-                    </div>
-                    <div className="text-gray-600">&darr;</div>
-                    <div className="text-cyan-400 font-bold text-lg">60.00%</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-1.5 text-[10px] text-gray-500">
-                  <Info className="w-3 h-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  <span>
-                    <strong className="text-cyan-300">T2 (Source + Validate):</strong> Sourced from the bank. Validated
-                    that all counterparty participations for a facility sum to 100%.
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Economic */}
-            <div data-demo="step4-variant-economic">
-              <div className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
-                    <span className="text-xs font-bold text-cyan-400">Economic Allocation % (Calculated)</span>
-                  </div>
-                  <TierBadge tier="T3" />
-                </div>
-                <div className="bg-black/30 rounded-lg p-3 mb-3">
-                  <div className="text-sm font-mono text-center space-y-1">
-                    <div className="text-gray-400">
-                      <code className="text-amber-300">legal_participation_pct</code> &minus;{' '}
-                      <code className="text-amber-300">crm_adjustment_pct</code>
-                    </div>
-                    <div className="text-gray-600">&darr;</div>
-                    <div className="text-gray-300">
-                      60.00% &minus; 15.00%
-                    </div>
-                    <div className="text-gray-600">&darr;</div>
-                    <div className="text-cyan-400 font-bold text-lg">45.00%</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-1.5 text-[10px] text-gray-500">
-                  <Info className="w-3 h-3 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  <span>
-                    <strong className="text-cyan-300">T3 (Always Calculate):</strong> The platform always derives
-                    Economic Allocation % from the legal participation minus CRM adjustments.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <FlowArrow label="Results stored in L3 tables, then rolled up" />
-
-        {/* ── STEP 5: L3 OUTPUT + ROLLUP ── */}
+        {/* ── STEP 3: L3 OUTPUT + ROLLUP ── */}
         <section data-demo="step5" aria-labelledby={`${headingPrefix}-step5`}>
           <SectionHeading
             id={`${headingPrefix}-step5`}
             icon={GitBranch}
-            step="Step 5 — L3 Output & Rollup Hierarchy"
+            step="Step 3 — L3 Output & Rollup Hierarchy"
             layerColor="bg-emerald-600"
             title="Storage & Aggregation"
-            subtitle="Weighted average at facility/counterparty — N/A above counterparty level"
+            subtitle="Raw at facility and counterparty — N/A above counterparty level"
           />
 
           <div className="mb-4">
@@ -1152,8 +865,6 @@ export default function AllocPctLineageView({
             <L3OutputTablesView />
           </div>
 
-          <div data-demo="foundational-rule"><FoundationalRule /></div>
-
           <div className="mb-2">
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1.5">
               <Link2 className="w-3 h-3" aria-hidden="true" />
@@ -1163,14 +874,14 @@ export default function AllocPctLineageView({
           <RollupPyramid expandedLevel={expandedLevel} onToggle={(k) => setExpandedLevel(expandedLevel === k ? null : k)} />
         </section>
 
-        <FlowArrow label="Aggregated values feed into dashboards" />
+        <FlowArrow label="Values feed into dashboards" />
 
-        {/* ── STEP 6: DASHBOARD ── */}
+        {/* ── STEP 4: DASHBOARD ── */}
         <section data-demo="step6" aria-labelledby={`${headingPrefix}-step6`}>
           <SectionHeading
             id={`${headingPrefix}-step6`}
             icon={LayoutDashboard}
-            step="Step 6 — Dashboard Consumption"
+            step="Step 4 — Dashboard Consumption"
             layerColor="bg-pink-600"
             title="Self-Service Connection"
             subtitle="Pick the aggregation level — facility or counterparty only"

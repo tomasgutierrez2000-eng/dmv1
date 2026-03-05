@@ -101,6 +101,9 @@ export interface DemoData {
   facilities: DemoFacility[];
 }
 
+// Re-export generic demo entity from metric-config for convenience.
+export type { DemoEntity } from './metric-config';
+
 /** The unified catalogue item — replaces ParentMetric + MetricVariant. */
 export interface CatalogueItem {
   item_id: string;

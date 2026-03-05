@@ -1126,5 +1126,135 @@
     "number_of_instances": 5,
     "directly_displayed": true,
     "status": "ACTIVE"
+  },
+  {
+    "item_id": "COLL_MV",
+    "item_name": "Current Collateral Market Value",
+    "abbreviation": "COLL_MV",
+    "kind": "METRIC",
+    "definition": "Current market value of pledged collateral securing credit exposure in USD. Aggregated from individual collateral asset appraisals per facility, then participation-weighted at the counterparty level. Supports recovery analysis, secured lending assessment, Basel III CRM capital relief, and CCAR stress testing.",
+    "generic_formula": "SUM(current_valuation_usd)",
+    "data_type": "Decimal",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": ["CR", "CM"],
+    "regulatory_references": ["FR Y-14Q", "Basel III CRM", "CCAR"],
+    "insight": "Amount of credit risk mitigated by pledged collateral",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "collateral_snapshot",
+        "field": "current_valuation_usd",
+        "description": "Current market appraisal of each collateral asset in USD",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "55000000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "collateral_snapshot",
+        "field": "facility_id",
+        "description": "FK linking collateral asset to the secured facility",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_counterparty_participation",
+        "field": "participation_pct",
+        "description": "Counterparty ownership share in the facility — used for counterparty-level attribution",
+        "data_type": "DECIMAL(10,4)",
+        "sample_value": "100.0000"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key — links collateral snapshots and participation records to a single facility",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower — enables counterparty-level aggregation",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INT",
+        "sample_value": "200"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each DISTINCT([Facility_ID]) WHEN [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) Lookup each [Collateral_Snapshot_ID] FROM the Collateral_Snapshot table WHEN IS([Facility_ID]) THEN for each [Facility_ID] SUM(ARRAY{[current_valuation_usd]}) based on matched [Collateral_Snapshot_ID]",
+        "source_references": [
+          { "layer": "L2", "table": "collateral_snapshot", "field": "current_valuation_usd" }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [Counterparty_ID] lookup [Facility_ID] in Facility Master table WHEN [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) AND IS([Counterparty_ID]) THEN For each [Facility_ID] lookup [participation_pct] WHEN IS([Counterparty_ID]) AND IS([Facility_ID]) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [Facility_ID] calculate [current_valuation_usd]*[participation_pct] == [Counterparty_Participation_Collateral_MV] THEN For each [Counterparty_ID] SUM(ARRAY{[Counterparty_Participation_Collateral_MV]})",
+        "source_references": [
+          { "layer": "L1", "table": "facility_counterparty_participation", "field": "participation_pct" }
+        ]
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L3 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L3' and [Description]=[L3 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [L3 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L2 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L2' and [Description]=[L2 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [L2 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Collateral MV ($)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each [L1 LoB], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]='L1' and [Description]=[L1 LoB], THEN lookup [Facility_ID] in Facility Master table WHEN IS([Lob_segment_ID]) AND [Facility_Active_Flag]='Y' AND IS(MAX([As_Of_Date])) THEN For each [Facility_ID] select [current_valuation_usd] from Facility Derived Table THEN For each [L1 LoB] SUM(ARRAY{[current_valuation_USD]})",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
   }
 ]

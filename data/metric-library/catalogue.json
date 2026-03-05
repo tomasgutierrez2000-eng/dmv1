@@ -2521,5 +2521,622 @@
         }
       ]
     }
+  },
+  {
+    "item_id": "EXT_RATING",
+    "item_name": "External Credit Rating",
+    "abbreviation": "EXT_RTG",
+    "kind": "DATA_ELEMENT",
+    "definition": "Current external credit agency rating (S&P, Moody's, Fitch) assigned to the obligor. At the counterparty level this is a direct lookup from the most recent external rating observation. At higher aggregation levels (Desk, Portfolio, Business Segment), the rating is computed as the notch-weighted average: each counterparty's rating is converted to a numeric notch via rating_scale_dim, the notch values are averaged across all counterparties in the group, rounded to the nearest integer, and reverse-looked-up to the corresponding rating label.",
+    "generic_formula": "Lookup rating_value FROM counterparty_rating_observation WHERE rating_type='EXTERNAL' AND MAX(as_of_date); at aggregate levels: AVG(rating_notch) → ROUND → reverse lookup rating_value",
+    "data_type": "String",
+    "unit_type": "ORDINAL",
+    "direction": "NEUTRAL",
+    "metric_class": "HYBRID",
+    "domain_ids": [
+      "CR"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q",
+      "Basel III",
+      "CCAR"
+    ],
+    "insight": "Creditworthiness from external perspective",
+    "number_of_instances": 4,
+    "directly_displayed": true,
+    "status": "ACTIVE",
+    "executable_metric_id": null,
+    "normalized_de_name": "Risk Rating - External Rating",
+    "data_element_in_dm": "external_risk_rating",
+    "spec_definition": "Current external credit agency rating assigned to the obligor. Used for benchmarking, regulatory reporting, and external credit risk validation. Sourced based on external Rating provider (S&P, Moodys, Fitch) - populated based on firm's preferred recognized rating provider.",
+    "spec_discrepancy_notes": [
+      "HIERARCHY_JOIN: Spec says 'lookup [Counterparty_ID] in Counterparty Master table WHEN IS([Lob_segment_ID])'; actual model uses facility_master for lob_segment_id (counterparty_master does not carry lob_segment_id). Join path: enterprise_business_taxonomy → facility_master → DISTINCT counterparty_id.",
+      "COUNTERPARTY_LOGIC: Spec provides no explicit counterparty-level logic or display name. Implementation infers direct lookup from counterparty_rating_observation WHERE rating_type='EXTERNAL' AND MAX(as_of_date), with agency tie-breaking via rating_source.priority_rank.",
+      "MRD_TABLE_MAPPING: Spec references 'MRD ratings table'; implementation maps to rating_scale_dim (L1 dimension table with rating_notch, rating_value, scale_type).",
+      "AVERAGING_METHOD: Spec says 'Average' at desk/portfolio/LoB levels but does not specify arithmetic vs exposure-weighted. Implementation uses simple arithmetic mean of notch values across distinct counterparties.",
+      "DISPLAY_SCALE: Spec does not specify which external scale (S&P, Moody's, Fitch) to use for the reverse-lookup display label after notch averaging. Implementation defaults to EXTERNAL_SP (S&P)."
+    ],
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "rating_grade_id",
+        "description": "FK to rating_scale_dim — maps observation to canonical rating grade with standardized notch",
+        "data_type": "BIGINT",
+        "sample_value": "15"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "rating_value",
+        "description": "Source-system rating label (e.g., 'AA', 'BBB+') — retained for traceability",
+        "data_type": "VARCHAR(20)",
+        "sample_value": "BBB+"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "rating_type",
+        "description": "INTERNAL or EXTERNAL — filter for external agency ratings only",
+        "data_type": "VARCHAR(20)",
+        "sample_value": "EXTERNAL"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "counterparty_id",
+        "description": "FK to counterparty — links rating observation to obligor",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty_rating_observation",
+        "field": "as_of_date",
+        "description": "Snapshot as-of date — MAX(as_of_date) selects the most recent rating",
+        "data_type": "DATE",
+        "sample_value": "2025-03-31"
+      },
+      {
+        "layer": "L1",
+        "table": "rating_scale_dim",
+        "field": "rating_grade_id",
+        "description": "PK — unique identifier for each rating grade entry, join target from counterparty_rating_observation",
+        "data_type": "BIGINT",
+        "sample_value": "15"
+      },
+      {
+        "layer": "L1",
+        "table": "rating_scale_dim",
+        "field": "rating_notch",
+        "description": "Standardized numeric notch (1=best, N=worst) — enables cross-scale comparison and notch averaging",
+        "data_type": "INTEGER",
+        "sample_value": "8"
+      },
+      {
+        "layer": "L1",
+        "table": "rating_scale_dim",
+        "field": "rating_value",
+        "description": "Display label for the rating grade (e.g., 'AA', 'BBB') — reverse-lookup target after notch averaging",
+        "data_type": "VARCHAR(20)",
+        "sample_value": "BBB+"
+      },
+      {
+        "layer": "L1",
+        "table": "rating_scale_dim",
+        "field": "scale_type",
+        "description": "Rating scale source: EXTERNAL_SP, EXTERNAL_MOODYS, EXTERNAL_FITCH — filter for external scales",
+        "data_type": "VARCHAR(30)",
+        "sample_value": "EXTERNAL_SP"
+      },
+      {
+        "layer": "L1",
+        "table": "rating_source",
+        "field": "priority_rank",
+        "description": "Precedence order when multiple external ratings exist — selects preferred agency (1=highest priority)",
+        "data_type": "INTEGER",
+        "sample_value": "1"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower — enables counterparty-to-facility traversal for hierarchy rollup",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to enterprise_business_taxonomy — enables desk/portfolio/Business Segment rollup",
+        "data_type": "INTEGER",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INTEGER",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INTEGER",
+        "sample_value": "200"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "tree_level",
+        "description": "Hierarchy depth label (L1, L2, L3) — filter for aggregation level",
+        "data_type": "VARCHAR(2)",
+        "sample_value": "L3"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "segment_name",
+        "description": "Business segment name at each hierarchy level",
+        "data_type": "VARCHAR(100)",
+        "sample_value": "CRE Lending Desk"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "",
+        "in_record": false,
+        "sourcing_type": "Raw",
+        "level_logic": "N/A — External credit ratings are assigned at the obligor (counterparty) level, not the facility level. All facilities under a counterparty inherit the counterparty's external rating.",
+        "source_references": [],
+        "spec_formula": null
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "External Rating",
+        "in_record": true,
+        "sourcing_type": "Raw",
+        "level_logic": "For each [counterparty_id] THEN lookup [rating_grade_id] from L2.counterparty_rating_observation WHERE IS([counterparty_id]) AND [rating_type]='EXTERNAL' AND IS(MAX([as_of_date])). If multiple agencies exist, select by MIN([priority_rank]) from L1.rating_source. JOIN L1.rating_scale_dim ON [rating_grade_id] to retrieve [rating_value] as display label.",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_grade_id",
+            "description": "FK to canonical rating grade"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_type",
+            "description": "Filter for EXTERNAL ratings"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "as_of_date",
+            "description": "Most recent observation filter"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "Display label for the rating grade"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_source",
+            "field": "priority_rank",
+            "description": "Agency precedence for tie-breaking"
+          }
+        ],
+        "spec_formula": null
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Avg. External Rating",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]), THEN lookup DISTINCT [counterparty_id] from facility_master. For each [counterparty_id]: lookup [rating_grade_id] from L2.counterparty_rating_observation WHERE IS([counterparty_id]) AND [rating_type]='EXTERNAL' AND IS(MAX([as_of_date])), JOIN L1.rating_scale_dim ON [rating_grade_id] to retrieve [rating_notch]. For each [L3 LoB]: AVG(ARRAY{[rating_notch]}) → ROUND to nearest integer → reverse lookup [rating_value] from L1.rating_scale_dim WHERE [rating_notch]=ROUND(AVG) AND [scale_type]='EXTERNAL_SP'",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_grade_id",
+            "description": "FK to canonical rating grade"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_type",
+            "description": "Filter for EXTERNAL ratings"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "Numeric notch for averaging"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "Reverse-lookup target for display label"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to Business Segment taxonomy — desk resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for collecting distinct obligors"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business Segment hierarchy node — L3 leaf segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L3"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "segment_name",
+            "description": "Desk name at L3 level"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "as_of_date",
+            "description": "Most recent observation filter"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "scale_type",
+            "description": "Filter for EXTERNAL_SP display scale"
+          }
+        ],
+        "spec_formula": "For each [l3 Lob], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]=\"L3\" and [Description]=[L3 LoB], THEN lookup [Counterparty_ID] in Counterparty Master table WHEN IS([Lob_segment_ID]) For each [Counterparty_ID] look up notch number for each [External Risk Rating] when IS(MAX(As_Of_date)) from MRD ratings table, For each [Lob_segment_ID] AVG([External Risk Ratings notch]) == [calculated avg external notch], THEN Round([calculated external avg of notch]) == [rounded calculated avg external notch], THEN Lookup [rounded calculated avg external notch] in MRD ratings table, Return [Average L3 External Risk Rating]"
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "External Rating (Avg.)",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal, THEN lookup DISTINCT [counterparty_id] from facility_master. For each [counterparty_id]: lookup [rating_grade_id] from L2.counterparty_rating_observation WHERE IS([counterparty_id]) AND [rating_type]='EXTERNAL' AND IS(MAX([as_of_date])), JOIN L1.rating_scale_dim ON [rating_grade_id] to retrieve [rating_notch]. For each [L2 Business Segment]: AVG(ARRAY{[rating_notch]}) → ROUND to nearest integer → reverse lookup [rating_value] from L1.rating_scale_dim WHERE [rating_notch]=ROUND(AVG) AND [scale_type]='EXTERNAL_SP'",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_grade_id",
+            "description": "FK to canonical rating grade"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_type",
+            "description": "Filter for EXTERNAL ratings"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "Numeric notch for averaging"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "Reverse-lookup target for display label"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to Business Segment taxonomy"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for collecting distinct obligors"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business Segment hierarchy node — L2 parent segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Self-referential FK — traverse up from L3 to L2"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L2"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "as_of_date",
+            "description": "Most recent observation filter"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "scale_type",
+            "description": "Filter for EXTERNAL_SP display scale"
+          }
+        ],
+        "spec_formula": "For each [l2 Lob], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]=\"L2\" and [Description]=[L2 LoB], THEN lookup [Counterparty_ID] in Counterparty Master table WHEN IS([Lob_segment_ID]) For each [Counterparty_ID] look up notch number for each [External Risk Rating] when IS(MAX(As_Of_date)) from MRD ratings table, For each [Lob_segment_ID] AVG([External Risk Ratings notch]) == [calculated avg external notch], THEN Round([calculated external avg of notch]) == [rounded calculated avg external notch], THEN Lookup [rounded calculated avg external notch] in MRD ratings table, Return [Average L2 External Risk Rating]"
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "External Rating (Avg.)",
+        "in_record": true,
+        "sourcing_type": "Avg",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal, THEN lookup DISTINCT [counterparty_id] from facility_master. For each [counterparty_id]: lookup [rating_grade_id] from L2.counterparty_rating_observation WHERE IS([counterparty_id]) AND [rating_type]='EXTERNAL' AND IS(MAX([as_of_date])), JOIN L1.rating_scale_dim ON [rating_grade_id] to retrieve [rating_notch]. For each [L1 Business Segment]: AVG(ARRAY{[rating_notch]}) → ROUND to nearest integer → reverse lookup [rating_value] from L1.rating_scale_dim WHERE [rating_notch]=ROUND(AVG) AND [scale_type]='EXTERNAL_SP'",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_grade_id",
+            "description": "FK to canonical rating grade"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "rating_type",
+            "description": "Filter for EXTERNAL ratings"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "Numeric notch for averaging"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "Reverse-lookup target for display label"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to Business Segment taxonomy"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for collecting distinct obligors"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business Segment hierarchy node — L1 root segment"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Self-referential FK — recursive traversal to collect all descendants"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth — filter for L1"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty_rating_observation",
+            "field": "as_of_date",
+            "description": "Most recent observation filter"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "scale_type",
+            "description": "Filter for EXTERNAL_SP display scale"
+          }
+        ],
+        "spec_formula": "For each [l1 Lob], lookup [Lob_segment_Id] from Enterprise_Business_Taxonomy master table WHEN [Tree_level]=\"L1\" and [Description]=[L1 LoB], THEN lookup [Counterparty_ID] in Counterparty Master table WHEN IS([Lob_segment_ID]) For each [Counterparty_ID] look up notch number for each [External Risk Rating] when IS(MAX(As_Of_date)) from MRD ratings table, For each [Lob_segment_ID] AVG([External Risk Ratings notch]) == [calculated avg external notch], THEN Round([calculated external avg of notch]) == [rounded calculated avg external notch], THEN Lookup [rounded calculated avg external notch] in MRD ratings table, Return [Average L1 External Risk Rating]"
+      }
+    ],
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-301",
+          "facility_name": "Sunrise Tower CRE Loan",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 50000000,
+          "collateral_value": 75000000,
+          "ltv_pct": 66.7,
+          "external_rating": "BBB+",
+          "external_rating_notch": 8,
+          "positions": [
+            {
+              "position_id": "P-301",
+              "facility_id": "F-301",
+              "position_type": "LOAN",
+              "balance_amount": 35000000,
+              "description": "Term Loan Tranche A"
+            },
+            {
+              "position_id": "P-302",
+              "facility_id": "F-301",
+              "position_type": "LOAN",
+              "balance_amount": 10000000,
+              "description": "Term Loan Tranche B"
+            },
+            {
+              "position_id": "P-303",
+              "facility_id": "F-301",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Undrawn Commitment"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-302",
+          "facility_name": "Sunrise Office Complex",
+          "counterparty_id": "CP-01",
+          "counterparty_name": "Sunrise Properties",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 30000000,
+          "collateral_value": 40000000,
+          "ltv_pct": 75.0,
+          "external_rating": "BBB+",
+          "external_rating_notch": 8,
+          "positions": [
+            {
+              "position_id": "P-304",
+              "facility_id": "F-302",
+              "position_type": "LOAN",
+              "balance_amount": 22000000,
+              "description": "Senior Secured Loan"
+            },
+            {
+              "position_id": "P-305",
+              "facility_id": "F-302",
+              "position_type": "COMMITMENT",
+              "balance_amount": 8000000,
+              "description": "Revolver Undrawn"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-303",
+          "facility_name": "Meridian Term Loan A",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CRE",
+          "desk_name": "CRE Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 80000000,
+          "collateral_value": 100000000,
+          "ltv_pct": 80.0,
+          "external_rating": "A-",
+          "external_rating_notch": 7,
+          "positions": [
+            {
+              "position_id": "P-306",
+              "facility_id": "F-303",
+              "position_type": "LOAN",
+              "balance_amount": 55000000,
+              "description": "Term Loan A"
+            },
+            {
+              "position_id": "P-307",
+              "facility_id": "F-303",
+              "position_type": "LOAN",
+              "balance_amount": 20000000,
+              "description": "Term Loan B"
+            },
+            {
+              "position_id": "P-308",
+              "facility_id": "F-303",
+              "position_type": "COMMITMENT",
+              "balance_amount": 5000000,
+              "description": "Delayed Draw"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-304",
+          "facility_name": "Meridian Warehouse Facility",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 25000000,
+          "collateral_value": 20000000,
+          "ltv_pct": 125.0,
+          "external_rating": "A-",
+          "external_rating_notch": 7,
+          "positions": [
+            {
+              "position_id": "P-309",
+              "facility_id": "F-304",
+              "position_type": "LOAN",
+              "balance_amount": 18000000,
+              "description": "Warehouse Drawdown"
+            },
+            {
+              "position_id": "P-310",
+              "facility_id": "F-304",
+              "position_type": "COMMITMENT",
+              "balance_amount": 7000000,
+              "description": "Undrawn Portion"
+            }
+          ]
+        },
+        {
+          "facility_id": "F-305",
+          "facility_name": "Meridian Working Capital Revolver",
+          "counterparty_id": "CP-02",
+          "counterparty_name": "Meridian Holdings",
+          "lob_segment_id": "SEG-L3-CORP",
+          "desk_name": "Corp Lending Desk",
+          "portfolio_name": "Commercial Real Estate",
+          "lob_name": "Commercial Banking",
+          "committed_amt": 40000000,
+          "collateral_value": 50000000,
+          "ltv_pct": 80.0,
+          "external_rating": "A-",
+          "external_rating_notch": 7,
+          "positions": [
+            {
+              "position_id": "P-311",
+              "facility_id": "F-305",
+              "position_type": "LOAN",
+              "balance_amount": 8000000,
+              "description": "Drawn Working Capital"
+            },
+            {
+              "position_id": "P-312",
+              "facility_id": "F-305",
+              "position_type": "COMMITMENT",
+              "balance_amount": 32000000,
+              "description": "Undrawn Revolver"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

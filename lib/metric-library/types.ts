@@ -91,6 +91,9 @@ export interface DemoFacility {
   unfunded_amt?: number;
   bank_share_pct?: number;
   undrawn_exposure_amt?: number;
+  /** External Rating fields (optional — only present for EXT_RATING demo data) */
+  external_rating?: string;
+  external_rating_notch?: number;
 }
 
 /** Demo data bundle stored per CatalogueItem. */

@@ -50,15 +50,22 @@ export function DataElementsError({
   onRetry,
   backHref,
   backLabel = 'Back to Data Elements',
+  dark = false,
 }: {
   message?: string;
   onRetry?: () => void;
   backHref?: string;
   backLabel?: string;
+  /** Use when error is shown on a dark background (e.g. table detail page) */
+  dark?: boolean;
 }) {
+  const textClass = dark ? 'text-gray-300' : 'text-gray-800';
+  const linkClass = dark
+    ? 'border border-gray-600 text-gray-300 hover:bg-gray-800'
+    : 'border border-gray-300 text-gray-700 hover:bg-gray-50';
   return (
     <div className="min-h-[200px] flex flex-col items-center justify-center text-center px-6" role="alert">
-      <p className="text-gray-300 font-medium">{message}</p>
+      <p className={`font-medium ${textClass}`}>{message}</p>
       <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
         {onRetry && (
           <button
@@ -72,7 +79,7 @@ export function DataElementsError({
         {backHref && (
           <Link
             href={backHref}
-            className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 text-sm font-medium hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            className={`px-4 py-2 rounded-lg text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${linkClass}`}
           >
             {backLabel}
           </Link>

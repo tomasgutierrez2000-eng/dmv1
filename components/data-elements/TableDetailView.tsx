@@ -69,6 +69,7 @@ export default function TableDetailView({ layer, tableName }: TableDetailViewPro
           onRetry={fetchData}
           backHref="/data-elements"
           backLabel="Back to Data Elements"
+          dark
         />
       </div>
     );

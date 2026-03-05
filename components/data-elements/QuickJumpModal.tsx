@@ -157,7 +157,7 @@ export default function QuickJumpModal({ tables, isOpen, onClose }: QuickJumpMod
         {query.trim() && (
           <div className="max-h-80 overflow-y-auto py-2">
             {results.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-gray-500">
+              <div className="px-4 py-6 text-center text-sm text-gray-400">
                 No tables or fields match &ldquo;{query}&rdquo;
               </div>
             ) : (
@@ -174,18 +174,18 @@ export default function QuickJumpModal({ tables, isOpen, onClose }: QuickJumpMod
                   {result.type === 'table' ? (
                     <div className="flex items-center gap-2 min-w-0">
                       <Database className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" aria-hidden />
-                      <code className="font-mono text-sm truncate">{result.table.name}</code>
-                      <span className="text-xs text-gray-500">{result.table.category}</span>
+                      <code className="font-mono text-sm truncate text-inherit">{result.table.name}</code>
+                      <span className="text-xs text-gray-400">{result.table.category}</span>
                     </div>
                   ) : (
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <code className="font-mono text-xs text-gray-500">{result.table.name}</code>
-                        <span className="text-gray-600">.</span>
+                        <code className="font-mono text-xs text-gray-400">{result.table.name}</code>
+                        <span className="text-gray-500">.</span>
                         <code className="font-mono text-sm text-purple-300">{result.fieldName}</code>
                       </div>
                       {result.fieldDescription && (
-                        <p className="text-xs text-gray-500 truncate mt-0.5">{result.fieldDescription}</p>
+                        <p className="text-xs text-gray-400 truncate mt-0.5">{result.fieldDescription}</p>
                       )}
                     </div>
                   )}

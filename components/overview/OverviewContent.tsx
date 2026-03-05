@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Eye, Network, MessageCircle, BookOpen, Library, History, Activity, Target, Telescope, Cpu } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Network, MessageCircle, BookOpen, History, Activity, Target, Telescope, Cpu } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewContent() {
@@ -23,7 +23,7 @@ export default function OverviewContent() {
               <p className="text-sm text-slate-400 mt-1">Three-layer architecture for banking and financial services data</p>
             </div>
           </div>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {/* Executive Summary — hover/focus dropdown */}
             <div className="relative group">
               <button
@@ -62,7 +62,8 @@ export default function OverviewContent() {
             {/* Other nav items */}
             {[
               { href: '/architecture', icon: Layers, label: 'Architecture', bg: 'bg-teal-600', hover: 'hover:bg-teal-500' },
-              { href: '/metrics/library', icon: Library, label: 'Metrics', bg: 'bg-violet-600', hover: 'hover:bg-violet-500' },
+              // Metrics engine dormant — hidden from nav
+              // { href: '/metrics/library', icon: Library, label: 'Metrics', bg: 'bg-violet-600', hover: 'hover:bg-violet-500' },
               { href: '/agent', icon: MessageCircle, label: 'Ask AI', bg: 'bg-slate-700', hover: 'hover:bg-slate-600' },
               { href: '/guide', icon: BookOpen, label: 'Playbook', bg: 'bg-blue-600', hover: 'hover:bg-blue-500' },
             ].map((item) => (
@@ -351,51 +352,7 @@ export default function OverviewContent() {
               </div>
             </button>
 
-            <Link
-              href="/metrics"
-              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
-                  <Eye className="w-6 h-6 text-slate-300" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1 text-white">Metrics Engine</h4>
-                  <p className="text-sm text-slate-400">View, edit &amp; manage metrics</p>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 mb-4 leading-relaxed">
-                See all metrics, walk through how each is calculated, edit formulas and source fields, create new metrics, and visualize lineage. Export and import via Excel or JSON.
-              </p>
-              <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
-                <Play className="w-4 h-4" aria-hidden />
-                <span>Open Metrics Engine</span>
-                <ArrowRight className="w-4 h-4" aria-hidden />
-              </div>
-            </Link>
-
-            <Link
-              href="/metrics/library"
-              className="bg-slate-900/80 border border-slate-700 rounded-xl p-6 cursor-pointer hover:border-slate-600 hover:bg-slate-900 transition-all group"
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-600 transition-colors">
-                  <Library className="w-6 h-6 text-slate-300" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1 text-white">Metric Library</h4>
-                  <p className="text-sm text-slate-400">Browse all metrics &amp; variants</p>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 mb-4 leading-relaxed">
-                The comprehensive catalog of all parent metrics, variants, domains, lineage, governance, and validation rules. Search, filter, and explore the full metric taxonomy.
-              </p>
-              <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover:text-slate-300 group-hover:gap-3 transition-all">
-                <Play className="w-4 h-4" />
-                <span>Open Metric Library</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </Link>
+            {/* Metrics Engine & Metric Library — dormant, hidden from walkthroughs */}
 
             <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 opacity-60 cursor-default" aria-disabled="true">
               <div className="flex items-start gap-4 mb-4">
@@ -417,7 +374,7 @@ export default function OverviewContent() {
         {/* Quick Actions */}
         <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-8">
           <h3 className="text-xl font-semibold mb-6 text-center text-white">Quick Actions</h3>
-          <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
             <Link
               href="/visualizer"
               className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
@@ -426,14 +383,7 @@ export default function OverviewContent() {
               <h4 className="font-semibold mb-2 text-white">Interactive Visualizer</h4>
               <p className="text-sm text-slate-400">Explore the full data model with interactive ERD and sample data</p>
             </Link>
-            <Link
-              href="/metrics/library"
-              className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"
-            >
-              <BarChart3 className="w-8 h-8 mx-auto mb-3 text-slate-300" />
-              <h4 className="font-semibold mb-2 text-white">Metric Library</h4>
-              <p className="text-sm text-slate-400">Browse all metrics with lineage, formulas, and variant governance</p>
-            </Link>
+            {/* Metric Library — dormant */}
             <Link
               href="/guide"
               className="bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg p-6 text-center transition-all hover:border-slate-500 group"

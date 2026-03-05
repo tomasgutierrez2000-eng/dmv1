@@ -226,6 +226,7 @@ for (const row of metricsRows) {
     // Level definition for catalogue
     if (in_record || level_logic) {
       const dimSrcKey: DimSrcKey = `${metric_id}:${dim}`;
+      const spec_formula = str(row[`${dim}_spec_formula`]) || undefined;
       level_definitions.push({
         level: dim,
         dashboard_display_name: display_name || `${dim.charAt(0).toUpperCase() + dim.slice(1)} ${metric_name}`,
@@ -233,6 +234,7 @@ for (const row of metricsRows) {
         sourcing_type,
         level_logic,
         source_references: dimSourcesByMetricDim.get(dimSrcKey) ?? [],
+        ...(spec_formula ? { spec_formula } : {}),
       });
     }
   }
@@ -280,6 +282,9 @@ for (const row of metricsRows) {
   // ── 3. Upsert CatalogueItem ────────────────────────────────────────
 
   const existingCat = catalogueMap.get(metric_id);
+  const normalized_de_name = str(row['normalized_de_name']) || undefined;
+  const data_element_in_dm = str(row['data_element_in_dm']) || undefined;
+  const spec_definition = str(row['spec_definition']) || undefined;
   const catalogueItem: CatalogueItem = {
     item_id: metric_id,
     item_name: metric_name,
@@ -300,6 +305,11 @@ for (const row of metricsRows) {
     directly_displayed: true,
     status: 'ACTIVE',
     ...(existingCat?.demo_data ? { demo_data: existingCat.demo_data } : {}),
+    ...(normalized_de_name ? { normalized_de_name } : {}),
+    ...(data_element_in_dm ? { data_element_in_dm } : {}),
+    ...(spec_definition ? { spec_definition } : {}),
+    // Preserve manually-managed spec_discrepancy_notes from existing entry
+    ...(existingCat?.spec_discrepancy_notes ? { spec_discrepancy_notes: existingCat.spec_discrepancy_notes } : {}),
   };
 
   catalogueMap.set(metric_id, catalogueItem);

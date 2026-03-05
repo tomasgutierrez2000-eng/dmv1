@@ -1090,7 +1090,7 @@
         "dashboard_display_name": "Facility Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), drawn_amount x all_in_rate_pct / 100 \u2014 join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id) THEN lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), THEN lookup [all_in_rate_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [facility_id]: [drawn_amount] x [all_in_rate_pct] / 100",
         "source_references": [
           {
             "layer": "L2",
@@ -1102,44 +1102,58 @@
             "table": "facility_pricing_snapshot",
             "field": "all_in_rate_pct"
           }
-        ]
+        ],
+        "spec_formula": "Average(Outstanding Amt * Interest Rate for each Position under the Facility ID)"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Counterparty Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [counterparty_id], SUM(facility.drawn_amount * facility.all_in_rate_pct / 100) across all facilities WHERE counterparty_id matches",
-        "source_references": []
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [all_in_rate_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [counterparty_id] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+        "source_references": [],
+        "spec_formula": "Average Balance * Interest Rate"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Desk Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L3 LoB], SUM(facility.drawn_amount * facility.all_in_rate_pct / 100) for all facilities WHERE lob_segment_id matches desk",
-        "source_references": []
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [all_in_rate_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [L3 LoB] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+        "source_references": [],
+        "spec_formula": null
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Portfolio Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L2 Business Segment], SUM including child L3 segments via parent_segment_id traversal",
-        "source_references": []
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all child L3 segments via parent_segment_id traversal. For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [all_in_rate_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [L2 Business Segment] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+        "source_references": [],
+        "spec_formula": "Average Balance * Interest Rate"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Business Segment Interest Income ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L1 Business Segment], SUM including all descendant L2/L3 segments via recursive parent_segment_id traversal",
-        "source_references": []
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [all_in_rate_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [L1 Business Segment] SUM(ARRAY{[drawn_amount] x [all_in_rate_pct] / 100})",
+        "source_references": [],
+        "spec_formula": "Average Balance * Interest Rate"
       }
     ],
     "number_of_instances": 5,
     "directly_displayed": true,
-    "status": "ACTIVE"
+    "status": "ACTIVE",
+    "normalized_de_name": "Interest Income",
+    "data_element_in_dm": "interest_income_amt",
+    "spec_definition": "Total interest earned on outstanding exposures during the reporting period.",
+    "spec_discrepancy_notes": [
+      "FORMULA: Spec uses 'Average Balance x Interest Rate' (CCAR PPNR style); implementation uses point-in-time 'drawn_amount x all_in_rate_pct / 100' (monitoring snapshot). Aligning to avg_balance would require adding avg_balance_amt to facility_exposure_snapshot.",
+      "FACILITY_SOURCING: Spec labels facility as 'Aggregation'; correct type is 'Calc' (calculation from two inputs, not aggregation from children).",
+      "L3_DESK: Spec excludes L3 Desk; kept active for GSIB management reporting per Fed SR 15-18.",
+      "POSITION_GRAIN: Spec references position-level averaging ('each Position under the Facility ID'); current model calculates at facility grain using drawn_amount from facility_exposure_snapshot."
+    ]
   },
   {
     "item_id": "INT_EXPENSE",
@@ -1225,7 +1239,7 @@
         "dashboard_display_name": "Facility Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id), drawn_amount x cost_of_funds_pct / 100 \u2014 join facility_exposure_snapshot and facility_pricing_snapshot on facility_id + as_of_date",
+        "level_logic": "For each DISTINCT(facility_id) THEN lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), THEN lookup [cost_of_funds_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [facility_id]: [drawn_amount] x [cost_of_funds_pct] / 100",
         "source_references": [
           {
             "layer": "L2",
@@ -1244,7 +1258,7 @@
         "dashboard_display_name": "Counterparty Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [counterparty_id], SUM(facility.drawn_amount * facility.cost_of_funds_pct / 100) across all facilities WHERE counterparty_id matches",
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [cost_of_funds_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [counterparty_id] SUM(ARRAY{[drawn_amount] x [cost_of_funds_pct] / 100})",
         "source_references": []
       },
       {
@@ -1252,7 +1266,7 @@
         "dashboard_display_name": "Desk Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L3 LoB], SUM(facility.drawn_amount * facility.cost_of_funds_pct / 100) for all facilities WHERE lob_segment_id matches desk",
+        "level_logic": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 LoB], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [cost_of_funds_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [L3 LoB] SUM(ARRAY{[drawn_amount] x [cost_of_funds_pct] / 100})",
         "source_references": []
       },
       {
@@ -1260,7 +1274,7 @@
         "dashboard_display_name": "Portfolio Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L2 Business Segment], SUM including child L3 segments via parent_segment_id traversal",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all child L3 segments via parent_segment_id traversal. For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [cost_of_funds_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [L2 Business Segment] SUM(ARRAY{[drawn_amount] x [cost_of_funds_pct] / 100})",
         "source_references": []
       },
       {
@@ -1268,7 +1282,7 @@
         "dashboard_display_name": "Business Segment Interest Expense ($)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each [L1 Business Segment], SUM including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) \u2014 including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: lookup [drawn_amount] from L2.facility_exposure_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])), lookup [cost_of_funds_pct] from L2.facility_pricing_snapshot WHERE IS([facility_id]) AND IS(MAX([as_of_date])). For each [L1 Business Segment] SUM(ARRAY{[drawn_amount] x [cost_of_funds_pct] / 100})",
         "source_references": []
       }
     ],

@@ -76,14 +76,17 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     page: 'P4',
     section: 'Deep Dive',
     metricType: 'Ratio',
-    formula: 'SUM(dscr_value * outstanding_exposure) / SUM(outstanding_exposure)',
-    description: 'Exposure-weighted DSCR across hierarchy levels.',
+    formula: 'CASE(CRE: NOI, C&I: EBITDA) / Total Debt Service — exposure-weighted',
+    description: 'Exposure-weighted DSCR across hierarchy levels. CRE facilities use NOI as numerator; C&I/PF facilities use EBITDA.',
     displayFormat: '0.00x',
     sampleValue: '—',
     sourceFields: [
       { layer: 'L2', table: 'facility_financial_snapshot', field: 'noi_amt' },
+      { layer: 'L2', table: 'facility_financial_snapshot', field: 'ebitda_amt' },
       { layer: 'L2', table: 'facility_financial_snapshot', field: 'total_debt_service_amt' },
       { layer: 'L2', table: 'facility_exposure_snapshot', field: 'gross_exposure_usd' },
+      { layer: 'L1', table: 'facility_master', field: 'product_node_id' },
+      { layer: 'L1', table: 'enterprise_product_taxonomy', field: 'product_code' },
     ],
     dimensions: [
       { dimension: 'as_of_date', interaction: 'FILTER' },
@@ -92,9 +95,9 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
     ],
     allowedDimensions: ALL_DIMS,
     formulasByDimension: buildGroupedFormula(
-      'SUM((noi_amt / NULLIF(total_debt_service_amt, 0)) * gross_exposure_usd) / NULLIF(SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END), 0)',
-      'SUM((ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN ffs.total_debt_service_amt > 0 THEN fes.gross_exposure_usd ELSE 0 END), 0)',
-      "FROM L2.facility_exposure_snapshot fes LEFT JOIN L2.facility_financial_snapshot ffs ON ffs.facility_id = fes.facility_id AND ffs.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id",
+      'SUM((CASE WHEN product_code IN (CRE) THEN noi_amt ELSE ebitda_amt END / NULLIF(total_debt_service_amt, 0)) * gross_exposure_usd) / NULLIF(SUM(CASE WHEN total_debt_service_amt > 0 THEN gross_exposure_usd ELSE 0 END), 0)',
+      "SUM((CASE WHEN ept.product_code IN ('BL','BRIDGE') THEN ffs.noi_amt ELSE ffs.ebitda_amt END / NULLIF(ffs.total_debt_service_amt, 0)) * fes.gross_exposure_usd) / NULLIF(SUM(CASE WHEN ffs.total_debt_service_amt > 0 THEN fes.gross_exposure_usd ELSE 0 END), 0)",
+      "FROM L2.facility_exposure_snapshot fes LEFT JOIN L2.facility_financial_snapshot ffs ON ffs.facility_id = fes.facility_id AND ffs.as_of_date = fes.as_of_date LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id LEFT JOIN L1.enterprise_product_taxonomy ept ON ept.product_node_id = fm.product_node_id",
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),

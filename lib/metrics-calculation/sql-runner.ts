@@ -8,7 +8,17 @@ const RUN_TIMEOUT_MS = 10_000;
 
 export type SampleDataByTable = Record<string, { columns: string[]; rows: unknown[][] }>;
 
-const SQLJS_DIST_DIR = path.join(process.cwd(), 'node_modules', 'sql.js', 'dist');
+function findSqljsDistDir(): string {
+  // Walk up from cwd to find node_modules/sql.js/dist (handles git worktrees)
+  let dir = process.cwd();
+  while (dir !== path.dirname(dir)) {
+    const candidate = path.join(dir, 'node_modules', 'sql.js', 'dist');
+    if (fs.existsSync(candidate)) return candidate;
+    dir = path.dirname(dir);
+  }
+  return path.join(process.cwd(), 'node_modules', 'sql.js', 'dist');
+}
+const SQLJS_DIST_DIR = findSqljsDistDir();
 
 async function initSqlJsEngine() {
   const locateFile = (file: string) => path.join(SQLJS_DIST_DIR, file);

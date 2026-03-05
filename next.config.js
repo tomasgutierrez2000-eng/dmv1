@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // sql.js uses CJS + WASM — must be loaded natively, not bundled by webpack
+  serverExternalPackages: ['sql.js'],
+  experimental: {
+    serverComponentsExternalPackages: ['sql.js'],
+  },
   // Expose env to server (helps when .env isn't loaded at startup)
   env: {
     OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL,

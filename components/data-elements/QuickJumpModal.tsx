@@ -117,28 +117,37 @@ export default function QuickJumpModal({ tables, isOpen, onClose }: QuickJumpMod
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]" aria-hidden={!isOpen}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+      <div
+        className="relative w-full max-w-lg bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quick-jump-label"
+      >
+        <span id="quick-jump-label" className="sr-only">Quick jump to table or field</span>
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
           <Search className="w-5 h-5 text-gray-500 flex-shrink-0" aria-hidden />
           <input
             ref={inputRef}
+            id="quick-jump-input"
             type="text"
             placeholder="Jump to table or field..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 bg-transparent text-sm text-gray-200 placeholder-gray-500 focus:outline-none"
-            aria-label="Search tables and fields"
+            aria-label="Jump to table or field"
+            aria-describedby="quick-jump-hint"
           />
           <button
             type="button"
             onClick={onClose}
             className="p-1 rounded hover:bg-gray-800 text-gray-500 hover:text-gray-300"
+            aria-label="Close quick jump"
           >
             <X className="w-4 h-4" />
           </button>
@@ -188,7 +197,7 @@ export default function QuickJumpModal({ tables, isOpen, onClose }: QuickJumpMod
 
         {/* Hint */}
         {!query.trim() && (
-          <div className="px-4 py-6 text-center text-xs text-gray-600">
+          <div id="quick-jump-hint" className="px-4 py-6 text-center text-xs text-gray-600">
             Type to search across all tables and fields
           </div>
         )}

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Search, ChevronLeft, Database, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import type { DataDictionary, DataDictionaryTable } from '@/lib/data-dictionary';
 import { flattenTables, getDistinctCategories, tableMatchesSearch, countPKs, countFKs } from '@/lib/data-elements/utils';
@@ -14,17 +14,26 @@ import { DataElementsLoading, DataElementsError, DataElementsEmpty } from './Dat
 type SortField = 'name' | 'fields' | 'category' | 'fkCount';
 type SortDir = 'asc' | 'desc';
 const ITEMS_PER_PAGE = 20;
+const SEARCH_DEBOUNCE_MS = 250;
 
 export default function DataElementsMainView() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [dd, setDd] = useState<DataDictionary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters from URL
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') ?? '');
+  // Search: URL is source of truth for filtering; transient state for responsive input
+  const searchQuery = searchParams.get('q') ?? '';
+  const [inputValue, setInputValue] = useState(searchQuery);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputValueRef = useRef(inputValue);
+  const lastPushedQRef = useRef<string | null>(null);
+  inputValueRef.current = inputValue;
+
+  // Other filters from URL (state so we can update URL on change)
   const [selectedLayer, setSelectedLayer] = useState<string | null>(searchParams.get('layer'));
   const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get('category'));
   const [showOnlyPK, setShowOnlyPK] = useState(searchParams.get('pk') === '1');
@@ -35,18 +44,79 @@ export default function DataElementsMainView() {
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [quickJumpOpen, setQuickJumpOpen] = useState(false);
 
-  // Sync filter state to URL
+  // Sync input from URL only when the URL change came from outside (e.g. back/forward), not from our own debounce
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
-    if (selectedLayer) params.set('layer', selectedLayer);
-    if (selectedCategory) params.set('category', selectedCategory);
-    if (showOnlyPK) params.set('pk', '1');
-    if (showOnlyFK) params.set('fk', '1');
-    const qs = params.toString();
-    const newUrl = qs ? `/data-elements?${qs}` : '/data-elements';
-    router.replace(newUrl, { scroll: false });
-  }, [searchQuery, selectedLayer, selectedCategory, showOnlyPK, showOnlyFK, router]);
+    const q = searchParams.get('q') ?? '';
+    if (q !== lastPushedQRef.current) {
+      lastPushedQRef.current = null;
+      setInputValue(q);
+    }
+  }, [searchParams]);
+
+  // Build URL from current params and optional q override; preserve other params
+  const replaceUrl = useCallback(
+    (q: string | null, layer: string | null, category: string | null, pk: boolean, fk: boolean) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (q?.trim()) params.set('q', q.trim());
+      else params.delete('q');
+      if (layer) params.set('layer', layer);
+      else params.delete('layer');
+      if (category) params.set('category', category);
+      else params.delete('category');
+      if (pk) params.set('pk', '1');
+      else params.delete('pk');
+      if (fk) params.set('fk', '1');
+      else params.delete('fk');
+      const qs = params.toString();
+      const newUrl = qs ? `${pathname}?${qs}` : pathname;
+      router.replace(newUrl, { scroll: false });
+    },
+    [searchParams, pathname, router]
+  );
+
+  // Debounced URL update for search
+  const scheduleSearchUrlUpdate = useCallback(
+    (value: string) => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = setTimeout(() => {
+        searchDebounceRef.current = null;
+        const q = (value ?? '').trim() || null;
+        lastPushedQRef.current = q ?? '';
+        replaceUrl(q, selectedLayer, selectedCategory, showOnlyPK, showOnlyFK);
+      }, SEARCH_DEBOUNCE_MS);
+    },
+    [replaceUrl, selectedLayer, selectedCategory, showOnlyPK, showOnlyFK]
+  );
+
+  // Flush search to URL immediately (blur / Enter)
+  const flushSearchToUrl = useCallback(() => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = null;
+    }
+    const q = (inputValue ?? '').trim() || null;
+    lastPushedQRef.current = q ?? '';
+    replaceUrl(q, selectedLayer, selectedCategory, showOnlyPK, showOnlyFK);
+  }, [inputValue, replaceUrl, selectedLayer, selectedCategory, showOnlyPK, showOnlyFK]);
+
+  // Sync layer/category/pk/fk to URL when they change; flush current input first so in-progress typing is not lost
+  useEffect(() => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = null;
+    }
+    const q = (inputValueRef.current ?? '').trim() || null;
+    lastPushedQRef.current = q ?? '';
+    replaceUrl(q, selectedLayer, selectedCategory, showOnlyPK, showOnlyFK);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when filter toggles change; read latest input via ref
+  }, [selectedLayer, selectedCategory, showOnlyPK, showOnlyFK]);
+
+  // Cleanup debounce on unmount to avoid replaceUrl after unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, []);
 
   const fetchData = useCallback(() => {
     setError(null);
@@ -152,11 +222,17 @@ export default function DataElementsMainView() {
   const visibleCategories = showAllCategories ? availableCategories : availableCategories.slice(0, MAX_VISIBLE_CATEGORIES);
 
   function clearFilters() {
-    setSearchQuery('');
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = null;
+    }
+    lastPushedQRef.current = '';
+    setInputValue('');
     setSelectedLayer(null);
     setSelectedCategory(null);
     setShowOnlyPK(false);
     setShowOnlyFK(false);
+    replaceUrl('', null, null, false, false);
   }
 
   return (
@@ -179,7 +255,7 @@ export default function DataElementsMainView() {
             </p>
           )}
 
-          {/* Search */}
+          {/* Search: input uses transient state; filtering uses URL (searchQuery) */}
           <div className="mt-4 relative">
             <label htmlFor="data-elements-search" className="sr-only">
               Search tables and fields
@@ -187,9 +263,21 @@ export default function DataElementsMainView() {
             <input
               id="data-elements-search"
               type="search"
+              autoComplete="off"
               placeholder="Search by table name, category, field name, or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={inputValue}
+              onChange={(e) => {
+                const v = e.target.value;
+                setInputValue(v);
+                scheduleSearchUrlUpdate(v);
+              }}
+              onBlur={flushSearchToUrl}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  flushSearchToUrl();
+                }
+              }}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow"
             />
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
@@ -311,8 +399,11 @@ export default function DataElementsMainView() {
               />
             ) : (
               <div>
-                <p className="text-sm text-gray-500 mb-4" aria-live="polite">
+                <p className="text-sm text-gray-500 mb-4" aria-live="polite" aria-atomic="true">
                   Showing {(safePage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(safePage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} table{filtered.length !== 1 ? 's' : ''}
+                  {searchQuery.trim() ? (
+                    <span> for &ldquo;{searchQuery.trim()}&rdquo;</span>
+                  ) : null}
                 </p>
                 <div className="grid gap-3">
                   {paged.map((table) => (
@@ -322,27 +413,29 @@ export default function DataElementsMainView() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-4 mt-6">
+                  <nav className="flex items-center justify-center gap-4 mt-6" aria-label="Table list pagination">
                     <button
                       type="button"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={safePage <= 1}
+                      aria-label="Previous page"
                       className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     >
                       Previous
                     </button>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500" aria-live="polite">
                       Page {safePage} of {totalPages}
                     </span>
                     <button
                       type="button"
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={safePage >= totalPages}
+                      aria-label="Next page"
                       className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     >
                       Next
                     </button>
-                  </div>
+                  </nav>
                 )}
               </div>
             )}

@@ -199,6 +199,7 @@ function FieldRow({
               onClick={(e) => { e.stopPropagation(); onCopy(); }}
               className="opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 p-0.5 rounded hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 flex-shrink-0"
               title="Copy field path"
+              aria-label={isCopied ? 'Copied' : `Copy path for ${field.name}`}
               style={{ opacity: isCopied ? 1 : undefined }}
             >
               {isCopied ? (

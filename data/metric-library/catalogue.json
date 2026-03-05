@@ -625,9 +625,17 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "noi",
-        "description": "Net operating income",
+        "description": "Net operating income — numerator for CRE facilities",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "1200000.00"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_financial_snapshot",
+        "field": "ebitda_amt",
+        "description": "EBITDA — numerator for C&I and Project Finance facilities",
+        "data_type": "DECIMAL(18,2)",
+        "sample_value": "5640000.00"
       },
       {
         "layer": "L2",
@@ -641,9 +649,25 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "Gross exposure \u2014 weighting basis for rollup",
+        "description": "Gross exposure — weighting basis for rollup",
         "data_type": "DECIMAL(18,2)",
         "sample_value": "5000000.00"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "product_node_id",
+        "description": "FK to enterprise_product_taxonomy — determines CRE vs C&I product classification",
+        "data_type": "BIGINT",
+        "sample_value": "101"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_product_taxonomy",
+        "field": "product_code",
+        "description": "Product type code (CRE, CI, PF) — drives numerator selection (NOI vs EBITDA)",
+        "data_type": "VARCHAR(20)",
+        "sample_value": "CRE"
       },
       {
         "layer": "L1",
@@ -668,7 +692,7 @@
         "dashboard_display_name": "Facility DSCR",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each DISTINCT(facility_id) THEN [noi] / [debt_service] from facility_financial_snapshot",
+        "level_logic": "For each DISTINCT(facility_id) THEN lookup [product_node_id] in facility_master, join enterprise_product_taxonomy to resolve [product_code]. IF product_code IN ('CRE') THEN [noi_amt] / [total_debt_service_amt] from facility_financial_snapshot. IF product_code IN ('CI','PF') THEN [ebitda_amt] / [total_debt_service_amt] from facility_financial_snapshot.",
         "source_references": []
       },
       {
@@ -676,7 +700,7 @@
         "dashboard_display_name": "Counterparty Wtd DSCR",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [counterparty_id] THEN SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) WHERE IS([counterparty_id])",
+        "level_logic": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
         "source_references": []
       },
       {
@@ -684,7 +708,7 @@
         "dashboard_display_name": "Desk Wtd DSCR",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L3 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities WHERE IS([lob_segment_id])",
+        "level_logic": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
         "source_references": []
       },
       {
@@ -692,7 +716,7 @@
         "dashboard_display_name": "Portfolio Wtd DSCR",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L2 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L2 segment including child L3 segments",
+        "level_logic": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
         "source_references": []
       },
       {
@@ -700,7 +724,7 @@
         "dashboard_display_name": "Business Segment Wtd DSCR",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "For each [L1 Business Segment], SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd) for all facilities under L1 department including all descendant L2/L3 segments via recursive parent_segment_id traversal",
+        "level_logic": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
         "source_references": []
       }
     ],

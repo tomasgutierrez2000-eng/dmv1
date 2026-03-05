@@ -332,13 +332,13 @@
     "parent_metric_id": "DSCR",
     "variant_type": "CALCULATED",
     "status": "ACTIVE",
-    "formula_display": "NOI / Debt_Service",
+    "formula_display": "CRE: NOI / Debt_Service; C&I/PF: EBITDA / Debt_Service (exposure-weighted at rollup)",
     "rollup_logic": {
-      "facility": "For each DISTINCT(facility_id) THEN [noi_amt] / [total_debt_service_amt] from facility_financial_snapshot. For CRE: property-level NOI.",
-      "counterparty": "For each [counterparty_id] THEN SUM(noi_amt) / SUM(total_debt_service_amt). CRE: aggregate from facility_financial_snapshot. C&I: from counterparty_financial_snapshot.noi_amt / counterparty_financial_snapshot.total_debt_service_amt.",
-      "desk": "For each [L3 LoB], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3', THEN SUM(noi_amt) / SUM(total_debt_service_amt) for all facilities WHERE IS([lob_segment_id])",
-      "portfolio": "For each [L2 LoB], SUM(noi_amt) / SUM(total_debt_service_amt) including child L3 segments via parent_segment_id traversal",
-      "lob": "For each [L1 LoB], SUM(noi_amt) / SUM(total_debt_service_amt) including all descendant L2/L3 segments via recursive parent_segment_id traversal"
+      "facility": "For each DISTINCT(facility_id) THEN lookup [product_node_id] in facility_master, join enterprise_product_taxonomy to resolve [product_code]. IF product_code IN ('CRE') THEN [noi_amt] / [total_debt_service_amt] from facility_financial_snapshot. IF product_code IN ('CI','PF') THEN [ebitda_amt] / [total_debt_service_amt] from facility_financial_snapshot.",
+      "counterparty": "For each [counterparty_id] THEN lookup [facility_id] in facility_master WHERE IS([counterparty_id]). For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
+      "desk": "For each [L3 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L3' AND [segment_name]=[L3 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]). For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
+      "portfolio": "For each [L2 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L2' AND [segment_name]=[L2 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all child L3 segments via parent_segment_id traversal. For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)",
+      "lob": "For each [L1 Business Segment], lookup [lob_segment_id] from enterprise_business_taxonomy WHERE [tree_level]='L1' AND [segment_name]=[L1 Business Segment], THEN lookup [facility_id] in facility_master WHERE IS([lob_segment_id]) — including all descendant L2/L3 segments via recursive parent_segment_id traversal. For each [facility_id]: compute facility-level DSCR (CRE: noi_amt, C&I/PF: ebitda_amt / total_debt_service_amt). Weighted average: SUM(facility.dscr * facility.gross_exposure_usd) / SUM(facility.gross_exposure_usd)"
     },
     "weighting_basis": "BY_EAD"
   },

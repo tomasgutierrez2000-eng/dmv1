@@ -19,6 +19,7 @@ import HierarchyPyramid from './HierarchyPyramid';
 import TableTraversalDemo from './TableTraversalDemo';
 import IntIncomeTableTraversalDemo from './IntIncomeTableTraversalDemo';
 import DSCRTableTraversalDemo from './DSCRTableTraversalDemo';
+import ExceptionRateTableTraversalDemo from './ExceptionRateTableTraversalDemo';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * HELPERS
@@ -607,6 +608,7 @@ const LINEAGE_ROUTES: Record<string, { href: string; label: string }> = {
   WABR:             { href: '/metrics/wabr-lineage',      label: 'WABR End-to-End Lineage' },
   INT_INCOME:       { href: '/metrics/int-income-lineage', label: 'Interest Income End-to-End Lineage' },
   COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',  label: 'Committed Amount End-to-End Lineage' },
+  EXCPN_RT:         { href: '/metrics/exception-rate-lineage', label: 'Exception Rate End-to-End Lineage' },
 };
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -623,6 +625,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
     return (
       <div className="space-y-6">
         {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
+        {item.abbreviation === 'EXCPN_RT' && <ExceptionRateTableTraversalDemo />}
         <div className="text-center py-12 text-gray-500">
           {lineageRoute ? (
             <>
@@ -730,6 +733,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
       {item.abbreviation === 'LTV' && <TableTraversalDemo />}
       {item.abbreviation === 'INT_INCOME' && <IntIncomeTableTraversalDemo />}
       {item.abbreviation === 'DSCR' && <DSCRTableTraversalDemo />}
+      {item.abbreviation === 'EXCPN_RT' && <ExceptionRateTableTraversalDemo />}
 
       {/* Hierarchy pyramid — visual overview */}
       <HierarchyPyramid item={item} activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as TabKey)} />

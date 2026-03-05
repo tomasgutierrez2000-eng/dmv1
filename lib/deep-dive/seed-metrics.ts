@@ -300,4 +300,40 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE fes.as_of_date = :as_of_date'
     ),
   }),
+  ({
+    id: 'C109',
+    name: 'Exception Rate (%)',
+    page: 'P4',
+    section: 'Deep Dive',
+    metricType: 'Ratio',
+    formula: 'COUNT(CASE WHEN exception_flag THEN 1 END) / COUNT(*) * 100',
+    description: 'Percentage of facilities with active policy exceptions — pooled count division across hierarchy levels.',
+    displayFormat: '0.00%',
+    sampleValue: '—',
+    sourceFields: [
+      { layer: 'L2', table: 'facility_credit_approval', field: 'exception_flag' },
+      { layer: 'L2', table: 'facility_credit_approval', field: 'exception_severity' },
+      { layer: 'L1', table: 'facility_master', field: 'counterparty_id' },
+      { layer: 'L1', table: 'facility_master', field: 'lob_segment_id' },
+    ],
+    dimensions: [
+      { dimension: 'as_of_date', interaction: 'FILTER' },
+      { dimension: 'facility_id', interaction: 'GROUP_BY' },
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+    ],
+    allowedDimensions: ALL_DIMS,
+    displayNameByDimension: {
+      facility: 'Facility Exception Rate (%)',
+      counterparty: 'Counterparty Exception Rate (%)',
+      L3: 'L3 Desk Exception Rate (%)',
+      L2: 'L2 Portfolio Exception Rate (%)',
+      L1: 'L1 Department Exception Rate (%)',
+    },
+    formulasByDimension: buildGroupedFormula(
+      'COUNT(CASE WHEN exception_flag THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)',
+      'COUNT(CASE WHEN fca.exception_flag THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)',
+      'FROM L1.facility_master fm LEFT JOIN L2.facility_credit_approval fca ON fca.facility_id = fm.facility_id AND fca.as_of_date = :as_of_date',
+      'WHERE fm.status = :active_status'
+    ),
+  }),
 ];

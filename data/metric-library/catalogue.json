@@ -1126,5 +1126,133 @@
     "number_of_instances": 5,
     "directly_displayed": true,
     "status": "ACTIVE"
+  },
+  {
+    "item_id": "EXCPN_RT",
+    "item_name": "Exception Rate",
+    "abbreviation": "EXCPN_RT",
+    "kind": "METRIC",
+    "definition": "Number of facilities with active policy exceptions divided by total facility count, expressed as a percentage. Measures the proportion of the loan book approved outside standard underwriting guidelines. A key credit risk governance KPI — elevated rates signal weakening credit standards and attract regulatory scrutiny under OCC Comptroller's Handbook, SR 11-7, and CCAR.",
+    "generic_formula": "Exception_Count / Total_Facility_Count x 100",
+    "data_type": "Decimal",
+    "unit_type": "PERCENTAGE",
+    "direction": "LOWER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": ["CR"],
+    "regulatory_references": ["OCC Comptroller's Handbook", "SR 11-7", "FR Y-14Q", "CCAR"],
+    "insight": "Count of exception-flagged facilities divided by total active facilities, expressed as a percentage",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_credit_approval",
+        "field": "exception_flag",
+        "description": "Boolean indicating whether the facility was approved with a policy exception",
+        "data_type": "BOOLEAN",
+        "sample_value": "true"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_credit_approval",
+        "field": "exception_type_code",
+        "description": "Category of exception: LTV_BREACH, DSCR_BREACH, TENOR_BREACH, DOC_WAIVER, COVENANT_WAIVER, CONCENTRATION",
+        "data_type": "VARCHAR(30)",
+        "sample_value": "LTV_BREACH"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_credit_approval",
+        "field": "exception_severity",
+        "description": "Severity classification: MINOR, MAJOR, or CRITICAL — used to filter Material Exception Rate variant",
+        "data_type": "VARCHAR(10)",
+        "sample_value": "MAJOR"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "facility_id",
+        "description": "Primary key — each active facility counts as one in the denominator",
+        "data_type": "BIGINT",
+        "sample_value": "12345"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "counterparty_id",
+        "description": "FK linking facility to borrower — enables counterparty-level pooled division",
+        "data_type": "BIGINT",
+        "sample_value": "67890"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "lob_segment_id",
+        "description": "FK to business taxonomy — enables desk/portfolio/Business Segment rollup",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "managed_segment_id",
+        "description": "Hierarchy node PK for desk/portfolio/Business Segment tree",
+        "data_type": "INT",
+        "sample_value": "303"
+      },
+      {
+        "layer": "L1",
+        "table": "enterprise_business_taxonomy",
+        "field": "parent_segment_id",
+        "description": "FK enabling recursive tree traversal for rollup hierarchy",
+        "data_type": "INT",
+        "sample_value": "200"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Facility Exception Rate (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each DISTINCT(facility_id), CASE WHEN exception_flag = true THEN 100.00 ELSE 0.00 END — join facility_credit_approval on facility_id + as_of_date",
+        "source_references": [
+          { "layer": "L2", "table": "facility_credit_approval", "field": "exception_flag" }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Counterparty Exception Rate (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [counterparty_id], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 across all facilities WHERE counterparty_id matches — pooled division",
+        "source_references": []
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Desk Exception Rate (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [L3 LoB], COUNT(WHERE exception_flag = true) / COUNT(*) x 100 for all facilities WHERE lob_segment_id matches desk — pooled division",
+        "source_references": []
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Portfolio Exception Rate (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [L2 Business Segment], pool exception counts and facility counts across all child L3 segments via parent_segment_id traversal, then divide",
+        "source_references": []
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Business Segment Exception Rate (%)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each [L1 Business Segment], pool exception counts and facility counts across all descendant L2/L3 segments via recursive parent_segment_id traversal, then divide",
+        "source_references": []
+      }
+    ],
+    "number_of_instances": 5,
+    "directly_displayed": true,
+    "status": "ACTIVE"
   }
 ]

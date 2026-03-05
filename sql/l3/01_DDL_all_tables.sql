@@ -1,5 +1,5 @@
 -- ============================================================
--- L3 Data Model DDL - All 49 Tables
+-- L3 Data Model DDL - All 54 Tables (T01-T50 original + T51-T54 convention alignment)
 -- Auto-generated from L3_Complete_Updated.xlsx
 -- Target: PostgreSQL
 -- ============================================================
@@ -1343,4 +1343,88 @@ CREATE TABLE IF NOT EXISTS l3.metric_value_fact (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS uq_metric_value_fact ON l3.metric_value_fact (run_version_id, as_of_date, metric_id, COALESCE(variant_id, ''), aggregation_level, COALESCE(facility_id, ''), COALESCE(counterparty_id, ''), COALESCE(desk_id, ''), COALESCE(portfolio_id, ''), COALESCE(lob_id, ''));
 CREATE INDEX IF NOT EXISTS ix_metric_value_fact_lookup ON l3.metric_value_fact (metric_id, aggregation_level, as_of_date, run_version_id);
+
+-- ============================================================
+-- T51-T54: Convention alignment tables
+-- T51-T52: Calculated overlay tables (derived fields split from L2 snapshots)
+-- T53-T54: Promoted from L2 (entirely computed tables)
+-- ============================================================
+
+-- T51: facility_financial_calc (Facility Analytics)
+-- Derived financial metrics split from l2.facility_financial_snapshot.
+-- Same grain (facility_id, as_of_date); FK back to L2 source.
+CREATE TABLE IF NOT EXISTS l3.facility_financial_calc (
+    facility_id                                   BIGINT NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    dscr_value                                    NUMERIC(12,6),
+    ltv_pct                                       NUMERIC(10,6),
+    net_income_amt                                NUMERIC(18,2),
+    interest_rate_sensitivity_pct                 NUMERIC(10,6),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (facility_id, as_of_date)
+    -- FK: facility_id, as_of_date → l2.facility_financial_snapshot(facility_id, as_of_date)
+);
+
+-- T52: facility_exposure_calc (Exposure & Risk Metrics)
+-- Derived exposure metrics split from l2.facility_exposure_snapshot.
+-- Same grain (facility_id, as_of_date); FK back to L2 source.
+CREATE TABLE IF NOT EXISTS l3.facility_exposure_calc (
+    facility_id                                   BIGINT NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    net_exposure_usd                              NUMERIC(18,2),
+    coverage_ratio_pct                            NUMERIC(10,4),
+    days_until_maturity                           INTEGER,
+    rwa_amt                                       NUMERIC(18,2),
+    number_of_loans                               INTEGER,
+    number_of_facilities                          INTEGER,
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (facility_id, as_of_date)
+    -- FK: facility_id, as_of_date → l2.facility_exposure_snapshot(facility_id, as_of_date)
+);
+
+-- T53: data_quality_score_snapshot (Data Quality)
+-- Promoted from L2: all metrics (dq_score_pct, issue_count, etc.) are calculated.
+CREATE TABLE IF NOT EXISTS l3.data_quality_score_snapshot (
+    score_id                                      BIGINT NOT NULL PRIMARY KEY,
+    as_of_date                                    DATE NOT NULL,
+    target_table                                  VARCHAR(100),
+    source_system_id                              BIGINT,
+    completeness_pct                              NUMERIC(10,4),
+    validity_pct                                  NUMERIC(10,4),
+    overall_score                                 NUMERIC(10,4),
+    dimension_id                                  BIGINT,
+    dimension_name                                VARCHAR(200),
+    dq_score_id                                   BIGINT,
+    dq_score_pct                                  NUMERIC(10,4),
+    impact_pct                                    NUMERIC(10,4),
+    impacted_report_codes                         VARCHAR(20),
+    issue_count                                   INTEGER,
+    reconciliation_break_count                    INTEGER,
+    score_dimension                               VARCHAR(30),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    -- FK: source_system_id → l1.source_system_registry(source_system_id)
+);
+
+-- T54: stress_test_result (Stress Testing)
+-- Promoted from L2: all measures are scenario-model derived outputs.
+CREATE TABLE IF NOT EXISTS l3.stress_test_result (
+    result_id                                     BIGINT NOT NULL PRIMARY KEY,
+    scenario_id                                   BIGINT NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    portfolio_id                                  BIGINT,
+    loss_amount                                   NUMERIC(18,2),
+    pnl_impact                                    NUMERIC(18,2),
+    capital_impact_pct                            NUMERIC(10,4),
+    execution_date                                DATE,
+    expected_loss_usd                             NUMERIC(18,2),
+    result_description                            VARCHAR(2000),
+    result_status                                 VARCHAR(30),
+    scenario_type                                 VARCHAR(50),
+    stress_test_result_id                         BIGINT,
+    total_breaches                                INTEGER,
+    total_exposure_usd                            NUMERIC(18,2),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    -- FK: scenario_id → l1.scenario_dim(scenario_id)
+    -- FK: portfolio_id → l1.portfolio_dim(portfolio_id)
+);
 

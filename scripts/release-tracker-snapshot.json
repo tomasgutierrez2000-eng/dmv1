@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-05T00:35:30.616Z",
+  "createdAt": "2026-03-05T05:43:57.553Z",
   "tables": [
     {
       "layer": "L1",
@@ -4323,57 +4323,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "stress_test_result",
-      "fields": [
-        {
-          "name": "result_id"
-        },
-        {
-          "name": "scenario_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "portfolio_id"
-        },
-        {
-          "name": "loss_amount"
-        },
-        {
-          "name": "pnl_impact"
-        },
-        {
-          "name": "capital_impact_pct"
-        },
-        {
-          "name": "execution_date"
-        },
-        {
-          "name": "expected_loss_usd"
-        },
-        {
-          "name": "result_description"
-        },
-        {
-          "name": "result_status"
-        },
-        {
-          "name": "scenario_type"
-        },
-        {
-          "name": "stress_test_result_id"
-        },
-        {
-          "name": "total_breaches"
-        },
-        {
-          "name": "total_exposure_usd"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "deal_pipeline_fact",
       "fields": [
         {
@@ -4536,81 +4485,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "metric_threshold",
-      "fields": [
-        {
-          "name": "threshold_id"
-        },
-        {
-          "name": "metric_definition_id"
-        },
-        {
-          "name": "threshold_type"
-        },
-        {
-          "name": "threshold_value"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "inner_threshold_pct"
-        },
-        {
-          "name": "last_threshold_updated_date"
-        },
-        {
-          "name": "limit_type"
-        },
-        {
-          "name": "limit_value"
-        },
-        {
-          "name": "lod1_sponsor"
-        },
-        {
-          "name": "lod2_sponsor"
-        },
-        {
-          "name": "metric_category"
-        },
-        {
-          "name": "metric_code"
-        },
-        {
-          "name": "metric_description"
-        },
-        {
-          "name": "metric_id_display"
-        },
-        {
-          "name": "metric_name"
-        },
-        {
-          "name": "metric_owner"
-        },
-        {
-          "name": "metric_threshold_id"
-        },
-        {
-          "name": "outer_threshold_pct"
-        },
-        {
-          "name": "report_deadline"
-        },
-        {
-          "name": "report_frequency"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "exception_event",
       "fields": [
         {
@@ -4732,60 +4606,6 @@
         },
         {
           "name": "flag_trigger_value"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
-      "tableName": "data_quality_score_snapshot",
-      "fields": [
-        {
-          "name": "score_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "target_table"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "completeness_pct"
-        },
-        {
-          "name": "validity_pct"
-        },
-        {
-          "name": "overall_score"
-        },
-        {
-          "name": "dimension_id"
-        },
-        {
-          "name": "dimension_name"
-        },
-        {
-          "name": "dq_score_id"
-        },
-        {
-          "name": "dq_score_pct"
-        },
-        {
-          "name": "impact_pct"
-        },
-        {
-          "name": "impacted_report_codes"
-        },
-        {
-          "name": "issue_count"
-        },
-        {
-          "name": "reconciliation_break_count"
-        },
-        {
-          "name": "score_dimension"
         }
       ]
     },
@@ -7579,6 +7399,177 @@
         },
         {
           "name": "display_format"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_financial_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_exposure_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "net_exposure_usd"
+        },
+        {
+          "name": "coverage_ratio_pct"
+        },
+        {
+          "name": "days_until_maturity"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "number_of_facilities"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "data_quality_score_snapshot",
+      "fields": [
+        {
+          "name": "score_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "target_table"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "completeness_pct"
+        },
+        {
+          "name": "validity_pct"
+        },
+        {
+          "name": "overall_score"
+        },
+        {
+          "name": "dimension_id"
+        },
+        {
+          "name": "dimension_name"
+        },
+        {
+          "name": "dq_score_id"
+        },
+        {
+          "name": "dq_score_pct"
+        },
+        {
+          "name": "impact_pct"
+        },
+        {
+          "name": "impacted_report_codes"
+        },
+        {
+          "name": "issue_count"
+        },
+        {
+          "name": "reconciliation_break_count"
+        },
+        {
+          "name": "score_dimension"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "stress_test_result",
+      "fields": [
+        {
+          "name": "result_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "portfolio_id"
+        },
+        {
+          "name": "loss_amount"
+        },
+        {
+          "name": "pnl_impact"
+        },
+        {
+          "name": "capital_impact_pct"
+        },
+        {
+          "name": "execution_date"
+        },
+        {
+          "name": "expected_loss_usd"
+        },
+        {
+          "name": "result_description"
+        },
+        {
+          "name": "result_status"
+        },
+        {
+          "name": "scenario_type"
+        },
+        {
+          "name": "stress_test_result_id"
+        },
+        {
+          "name": "total_breaches"
+        },
+        {
+          "name": "total_exposure_usd"
         },
         {
           "name": "created_ts"

@@ -69,19 +69,18 @@ const CONFIG = {
       icon: "📊",
       color: "#F59E0B",
       description:
-        "L2 snapshot (15 fields). Monthly reading of gross/net exposure, drawn/undrawn amounts, and coverage ratio. Key change: net_exposure_usd and coverage_ratio_pct are now stored directly here (previously derived in L3). Also carries fr2590_category_code and product_node_id for reporting.",
+        "L2 snapshot — atomic exposure data. Monthly reading of gross exposure, drawn/undrawn amounts, and source-system fields. Derived fields (net_exposure_usd, coverage_ratio_pct, rwa_amt, days_until_maturity) live in L3.facility_exposure_calc. Also carries fr2590_category_code and product_node_id for reporting.",
       fields: [
         { name: "gross_exposure_usd", value: "$178.3M" },
-        { name: "net_exposure_usd", value: "$83.3M" },
         { name: "drawn_amount", value: "$162.5M" },
         { name: "undrawn_amount", value: "$87.5M" },
-        { name: "coverage_ratio_pct", value: "53.3%" },
+        { name: "committed_amount", value: "$250.0M" },
         { name: "fr2590_category_code", value: "→ fr2590_category_dim" },
         { name: "lob_segment_id", value: "→ enterprise_business_taxonomy" },
         { name: "as_of_date", value: "2026-02-28" },
       ],
       annotation:
-        "L2 snapshot — now 15 fields. Key change: net_exposure_usd and coverage_ratio_pct stored directly (not L3 only). Also carries its own lob_segment_id and product_node_id FKs for denormalized reporting. EAD is still derived from position_detail (funded + unfunded × CCF).",
+        "L2 snapshot — atomic exposure fields only. Derived fields (net_exposure_usd, coverage_ratio_pct, rwa_amt, days_until_maturity) moved to L3.facility_exposure_calc. Carries its own lob_segment_id and product_node_id FKs for denormalized reporting. EAD is still derived from position_detail (funded + unfunded × CCF).",
     },
     {
       id: "position",
@@ -212,7 +211,7 @@ const CONFIG = {
     {
       field: "coverage_ratio_pct",
       explanation:
-        "Now on L2 facility_exposure_snapshot: SUM(collateral_snapshot.allocated_amount_usd) ÷ gross_exposure_usd. Previously L3-only.",
+        "On L3 facility_exposure_calc: SUM(collateral_snapshot.allocated_amount_usd) ÷ gross_exposure_usd. Derived from L2 atomic inputs.",
       inputs: [
         { value: "$95.0M", label: "SUM(allocated_amount_usd)", source: "collateral_snapshot" },
         { value: "$178.3M", label: "gross_exposure_usd", source: "facility_exposure_snapshot" },
@@ -234,7 +233,7 @@ const CONFIG = {
     {
       field: "net_exposure_usd",
       explanation:
-        "Now on L2 facility_exposure_snapshot: gross_exposure_usd − SUM(collateral_snapshot.allocated_amount_usd). Previously L3-only.",
+        "On L3 facility_exposure_calc: gross_exposure_usd − SUM(collateral_snapshot.allocated_amount_usd). Derived from L2 atomic inputs.",
       inputs: [
         { value: "$178.3M", label: "gross_exposure_usd", source: "facility_exposure_snapshot" },
         { value: "$95.0M", label: "SUM(allocated_amount_usd)", source: "collateral_snapshot" },
@@ -327,10 +326,15 @@ const CONFIG = {
         title: "L2 Snapshot — Exposure (facility_exposure_snapshot)",
         fields: [
           { name: "gross_exposure_usd", value: "$178.3M", source: "facility_exposure_snapshot", type: "direct" },
-          { name: "net_exposure_usd", value: "$83.3M", source: "facility_exposure_snapshot", type: "direct" },
           { name: "drawn_amount", value: "$162.5M", source: "facility_exposure_snapshot", type: "direct" },
           { name: "undrawn_amount", value: "$87.5M", source: "facility_exposure_snapshot", type: "direct" },
-          { name: "coverage_ratio_pct", value: "53.3%", source: "facility_exposure_snapshot", type: "direct" },
+        ],
+      },
+      {
+        title: "L3 Derived — Exposure Calc (facility_exposure_calc)",
+        fields: [
+          { name: "net_exposure_usd", value: "$83.3M", source: "facility_exposure_calc", type: "derived" },
+          { name: "coverage_ratio_pct", value: "53.3%", source: "facility_exposure_calc", type: "derived" },
         ],
       },
       {
@@ -740,9 +744,9 @@ function Step4({ config }: any) {
       <div className="step-title">Calculations & Enrichment</div>
       <div className="step-intro">
         Some fields are <strong style={{ color: "var(--white)" }}>derived</strong> by combining values
-        from different sources. In the updated model, some previously-derived fields (net_exposure_usd,
-        coverage_ratio_pct) are now stored directly on L2 facility_exposure_snapshot, while others (EAD,
-        expected_loss, limit_status) are still calculated. Click any to see the formula.
+        from different sources. Calculated fields (net_exposure_usd, coverage_ratio_pct, rwa_amt)
+        live on L3 facility_exposure_calc, while atomic source values stay on L2. Other derived
+        fields (EAD, expected_loss, limit_status) are also calculated. Click any to see the formula.
       </div>
       <div className="calc-grid">
         {config.calculations.map((c: any, i: number) => {

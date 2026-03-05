@@ -187,5 +187,5 @@ $$;
 -- T10: Read L2.limit_contribution_snapshot, compute contribution_pct = contribution/utilized × 100
 -- T16-T19: Populated by regulatory engine from T15 + L1.report_cell_definition + L1.rule_registry
 -- T21: Aggregate T20 by counterparty, rank within entity
--- T41: Read L2.metric_threshold WHERE classification='REGULATORY', variance = current - threshold
+-- T41: Read L1.metric_threshold WHERE classification='REGULATORY', variance = current - threshold
 -- ============================================================

@@ -8637,6 +8637,169 @@
           "data_type": "CHAR(1)"
         }
       ]
+    },
+    {
+      "name": "metric_threshold",
+      "layer": "L1",
+      "category": "Limits & FX",
+      "fields": [
+        {
+          "name": "metric_threshold_id",
+          "description": "Surrogate identifier",
+          "category": "Metrics",
+          "why_required": "PK",
+          "simplification_note": "Portfolio-level KRI threshold definitions (Tier 1 Capital Ratio, Large Exposure Limit %). Different scope from L1 limit_threshold which defines entity-level limit bands. | Reference/config: threshold definitions, governance attributes for scorecard and Metric Details Drawer.",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "metric_code",
+          "description": "Metric code (joins to financial_metric_observation)",
+          "category": "Metrics",
+          "why_required": "Links to metric observations"
+        },
+        {
+          "name": "metric_name",
+          "description": "Human-readable metric name",
+          "category": "Metrics",
+          "why_required": "Scorecard display name"
+        },
+        {
+          "name": "metric_id_display",
+          "description": "Display metric ID (e.g., CRA-001)",
+          "category": "Metrics",
+          "why_required": "Metric ID on scorecard"
+        },
+        {
+          "name": "metric_description",
+          "description": "Detailed description of metric",
+          "category": "Metrics",
+          "why_required": "Metric Details Drawer description"
+        },
+        {
+          "name": "metric_category",
+          "description": "Classification (Regulatory / Internal / FED Benchmark / Industry Benchmark)",
+          "category": "Metrics",
+          "why_required": "Metric Type tag"
+        },
+        {
+          "name": "limit_type",
+          "description": "CEILING or FLOOR",
+          "category": "Metrics",
+          "why_required": "Determines breach direction"
+        },
+        {
+          "name": "limit_value",
+          "description": "Limit/threshold value",
+          "category": "Metrics",
+          "why_required": "Limit column in scorecard"
+        },
+        {
+          "name": "inner_threshold_pct",
+          "description": "Warning threshold (% of limit)",
+          "category": "Metrics",
+          "why_required": "Approaching Limit trigger"
+        },
+        {
+          "name": "outer_threshold_pct",
+          "description": "Breach threshold (% of limit)",
+          "category": "Metrics",
+          "why_required": "Breach trigger"
+        },
+        {
+          "name": "report_frequency",
+          "description": "Reporting frequency (Monthly/Quarterly)",
+          "category": "Metrics",
+          "why_required": "Metric Details Drawer"
+        },
+        {
+          "name": "report_deadline",
+          "description": "Report deadline description",
+          "category": "Metrics",
+          "why_required": "Metric Details Drawer"
+        },
+        {
+          "name": "metric_owner",
+          "description": "Metric owner name",
+          "category": "Metrics",
+          "why_required": "Governance attribute"
+        },
+        {
+          "name": "lod1_sponsor",
+          "description": "1LoD sponsor name",
+          "category": "Metrics",
+          "why_required": "Governance attribute"
+        },
+        {
+          "name": "lod2_sponsor",
+          "description": "2LoD sponsor name",
+          "category": "Metrics",
+          "why_required": "Governance attribute"
+        },
+        {
+          "name": "last_threshold_updated_date",
+          "description": "Date thresholds were last updated",
+          "category": "Metrics",
+          "why_required": "Governance attribute"
+        },
+        {
+          "name": "active_flag",
+          "description": "Active indicator",
+          "category": "Metrics",
+          "why_required": "Filter active metrics"
+        },
+        {
+          "name": "threshold_id",
+          "description": "",
+          "category": "Ratings & metrics",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "metric_definition_id",
+          "description": "",
+          "category": "Ratings & metrics",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "metric_definition_dim",
+              "field": "metric_definition_id"
+            }
+          }
+        },
+        {
+          "name": "threshold_type",
+          "description": "",
+          "category": "Ratings & metrics",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "threshold_value",
+          "description": "",
+          "category": "Ratings & metrics",
+          "data_type": "DECIMAL(18,4)"
+        },
+        {
+          "name": "effective_from_date",
+          "description": "",
+          "category": "Ratings & metrics",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_to_date",
+          "description": "",
+          "category": "Ratings & metrics",
+          "data_type": "DATE"
+        }
+      ]
     }
   ],
   "L2": [
@@ -9500,20 +9663,6 @@
           }
         },
         {
-          "name": "net_exposure_usd",
-          "description": "Net exposure after CRM (USD)",
-          "category": "Exposure",
-          "why_required": "Gross/Net toggle Pages 2,3,6,7",
-          "simplification_note": "L2 review addition"
-        },
-        {
-          "name": "coverage_ratio_pct",
-          "description": "Coverage ratio (collateral / exposure)",
-          "category": "Exposure",
-          "why_required": "Page 2 KPI: Coverage Ratio",
-          "simplification_note": "L2 review addition"
-        },
-        {
           "name": "exposure_type_id",
           "description": "",
           "category": "Exposure & collateral snapshots",
@@ -9562,24 +9711,6 @@
           "data_type": "DECIMAL(18,2)"
         },
         {
-          "name": "number_of_loans",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "number_of_facilities",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "days_until_maturity",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "INTEGER"
-        },
-        {
           "name": "facility_utilization_status",
           "description": "",
           "category": "Exposure & collateral snapshots",
@@ -9590,12 +9721,6 @@
           "description": "",
           "category": "Exposure & collateral snapshots",
           "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "rwa_amt",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "DECIMAL(18,2)"
         },
         {
           "name": "internal_risk_rating_bucket_code",
@@ -11367,144 +11492,6 @@
       ]
     },
     {
-      "name": "stress_test_result",
-      "layer": "L2",
-      "category": "Stress Testing",
-      "fields": [
-        {
-          "name": "stress_test_result_id",
-          "description": "PK — scenario execution result",
-          "category": "Stress Testing",
-          "why_required": "Primary key",
-          "simplification_note": "Stress test scenario execution results. Links L1 scenario_dim to outcomes. 1 row = 1 scenario × 1 execution date. | L2 review new table",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "scenario_id",
-          "description": "FK to scenario_dim",
-          "category": "Stress Testing",
-          "why_required": "Scenario link",
-          "simplification_note": "L2 review new table",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
-        },
-        {
-          "name": "execution_date",
-          "description": "Date stress test executed",
-          "category": "Stress Testing",
-          "why_required": "Historical tracking",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "scenario_type",
-          "description": "REGULATORY_BASELINE, REGULATORY_ADVERSE, INTERNAL_IDIOSYNCRATIC, etc.",
-          "category": "Stress Testing",
-          "why_required": "Page 5 type column",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "total_exposure_usd",
-          "description": "Total exposure under scenario (USD)",
-          "category": "Stress Testing",
-          "why_required": "Page 5 Exposure",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "expected_loss_usd",
-          "description": "Expected loss under scenario (USD)",
-          "category": "Stress Testing",
-          "why_required": "Page 5 Expected Loss",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "capital_impact_pct",
-          "description": "Capital impact as % of Tier 1",
-          "category": "Stress Testing",
-          "why_required": "Page 5 Capital Impact",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "total_breaches",
-          "description": "Count of threshold breaches",
-          "category": "Stress Testing",
-          "why_required": "Page 5 Breaches",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "result_status",
-          "description": "PASS, WARNING, FAIL",
-          "category": "Stress Testing",
-          "why_required": "Page 5 Result Status pill",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "result_description",
-          "description": "Executive summary of outcome",
-          "category": "Stress Testing",
-          "why_required": "Results Drawer",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "as_of_date",
-          "description": "Reporting date",
-          "category": "Stress Testing",
-          "why_required": "Snapshot",
-          "simplification_note": "L2 review new table",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "result_id",
-          "description": "",
-          "category": "Stress test & pipeline",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "portfolio_id",
-          "description": "",
-          "category": "Stress test & pipeline",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
-        },
-        {
-          "name": "loss_amount",
-          "description": "",
-          "category": "Stress test & pipeline",
-          "data_type": "DECIMAL(18,2)"
-        },
-        {
-          "name": "pnl_impact",
-          "description": "",
-          "category": "Stress test & pipeline",
-          "data_type": "DECIMAL(18,2)"
-        }
-      ]
-    },
-    {
       "name": "deal_pipeline_fact",
       "layer": "L2",
       "category": "Deal Pipeline",
@@ -11959,169 +11946,6 @@
       ]
     },
     {
-      "name": "metric_threshold",
-      "layer": "L2",
-      "category": "Metrics",
-      "fields": [
-        {
-          "name": "metric_threshold_id",
-          "description": "Surrogate identifier",
-          "category": "Metrics",
-          "why_required": "PK",
-          "simplification_note": "Portfolio-level KRI threshold definitions (Tier 1 Capital Ratio, Large Exposure Limit %). Different scope from L1 limit_threshold which defines entity-level limit bands. | Reference/config: threshold definitions, governance attributes for scorecard and Metric Details Drawer.",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "metric_code",
-          "description": "Metric code (joins to financial_metric_observation)",
-          "category": "Metrics",
-          "why_required": "Links to metric observations"
-        },
-        {
-          "name": "metric_name",
-          "description": "Human-readable metric name",
-          "category": "Metrics",
-          "why_required": "Scorecard display name"
-        },
-        {
-          "name": "metric_id_display",
-          "description": "Display metric ID (e.g., CRA-001)",
-          "category": "Metrics",
-          "why_required": "Metric ID on scorecard"
-        },
-        {
-          "name": "metric_description",
-          "description": "Detailed description of metric",
-          "category": "Metrics",
-          "why_required": "Metric Details Drawer description"
-        },
-        {
-          "name": "metric_category",
-          "description": "Classification (Regulatory / Internal / FED Benchmark / Industry Benchmark)",
-          "category": "Metrics",
-          "why_required": "Metric Type tag"
-        },
-        {
-          "name": "limit_type",
-          "description": "CEILING or FLOOR",
-          "category": "Metrics",
-          "why_required": "Determines breach direction"
-        },
-        {
-          "name": "limit_value",
-          "description": "Limit/threshold value",
-          "category": "Metrics",
-          "why_required": "Limit column in scorecard"
-        },
-        {
-          "name": "inner_threshold_pct",
-          "description": "Warning threshold (% of limit)",
-          "category": "Metrics",
-          "why_required": "Approaching Limit trigger"
-        },
-        {
-          "name": "outer_threshold_pct",
-          "description": "Breach threshold (% of limit)",
-          "category": "Metrics",
-          "why_required": "Breach trigger"
-        },
-        {
-          "name": "report_frequency",
-          "description": "Reporting frequency (Monthly/Quarterly)",
-          "category": "Metrics",
-          "why_required": "Metric Details Drawer"
-        },
-        {
-          "name": "report_deadline",
-          "description": "Report deadline description",
-          "category": "Metrics",
-          "why_required": "Metric Details Drawer"
-        },
-        {
-          "name": "metric_owner",
-          "description": "Metric owner name",
-          "category": "Metrics",
-          "why_required": "Governance attribute"
-        },
-        {
-          "name": "lod1_sponsor",
-          "description": "1LoD sponsor name",
-          "category": "Metrics",
-          "why_required": "Governance attribute"
-        },
-        {
-          "name": "lod2_sponsor",
-          "description": "2LoD sponsor name",
-          "category": "Metrics",
-          "why_required": "Governance attribute"
-        },
-        {
-          "name": "last_threshold_updated_date",
-          "description": "Date thresholds were last updated",
-          "category": "Metrics",
-          "why_required": "Governance attribute"
-        },
-        {
-          "name": "active_flag",
-          "description": "Active indicator",
-          "category": "Metrics",
-          "why_required": "Filter active metrics"
-        },
-        {
-          "name": "threshold_id",
-          "description": "",
-          "category": "Ratings & metrics",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "metric_definition_id",
-          "description": "",
-          "category": "Ratings & metrics",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "metric_definition_dim",
-              "field": "metric_definition_id"
-            }
-          }
-        },
-        {
-          "name": "threshold_type",
-          "description": "",
-          "category": "Ratings & metrics",
-          "data_type": "VARCHAR(50)"
-        },
-        {
-          "name": "threshold_value",
-          "description": "",
-          "category": "Ratings & metrics",
-          "data_type": "DECIMAL(18,4)"
-        },
-        {
-          "name": "effective_from_date",
-          "description": "",
-          "category": "Ratings & metrics",
-          "data_type": "DATE"
-        },
-        {
-          "name": "effective_to_date",
-          "description": "",
-          "category": "Ratings & metrics",
-          "data_type": "DATE"
-        }
-      ]
-    },
-    {
       "name": "exception_event",
       "layer": "L2",
       "category": "Exceptions",
@@ -12446,140 +12270,6 @@
       ]
     },
     {
-      "name": "data_quality_score_snapshot",
-      "layer": "L2",
-      "category": "Data Quality",
-      "fields": [
-        {
-          "name": "dq_score_id",
-          "description": "PK — DQ score observation",
-          "category": "Data Quality",
-          "why_required": "Primary key",
-          "simplification_note": "L2 review new table",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "score_dimension",
-          "description": "LOB, LEGAL_ENTITY, ATTRIBUTE, REGULATORY_REPORT, OVERALL",
-          "category": "Data Quality",
-          "why_required": "Routes to Page 4 visual",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "dimension_id",
-          "description": "FK to scored entity (polymorphic)",
-          "category": "Data Quality",
-          "why_required": "Target entity",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "dimension_name",
-          "description": "Human-readable name",
-          "category": "Data Quality",
-          "why_required": "UI display",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "dq_score_pct",
-          "description": "Data quality score 0-100%",
-          "category": "Data Quality",
-          "why_required": "Capsule bars, KPI",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "issue_count",
-          "description": "Count of DQ issues",
-          "category": "Data Quality",
-          "why_required": "Attribute card",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "reconciliation_break_count",
-          "description": "Count of recon breaks",
-          "category": "Data Quality",
-          "why_required": "KPI: Recon Breaks",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "impacted_report_codes",
-          "description": "Comma-separated impacted report codes",
-          "category": "Data Quality",
-          "why_required": "Attribute card: tags",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "impact_pct",
-          "description": "Contribution to DQ score degradation %",
-          "category": "Data Quality",
-          "why_required": "Attribute card: % Impact",
-          "simplification_note": "L2 review new table"
-        },
-        {
-          "name": "as_of_date",
-          "description": "Snapshot date (month-end)",
-          "category": "Data Quality",
-          "why_required": "DQ Trend chart",
-          "simplification_note": "L2 review new table",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "score_id",
-          "description": "",
-          "category": "Exceptions & data quality",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "target_table",
-          "description": "",
-          "category": "Exceptions & data quality",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "source_system_id",
-          "description": "",
-          "category": "Exceptions & data quality",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "source_system_registry",
-              "field": "source_system_id"
-            }
-          }
-        },
-        {
-          "name": "completeness_pct",
-          "description": "",
-          "category": "Exceptions & data quality",
-          "data_type": "DECIMAL(10,4)"
-        },
-        {
-          "name": "validity_pct",
-          "description": "",
-          "category": "Exceptions & data quality",
-          "data_type": "DECIMAL(10,4)"
-        },
-        {
-          "name": "overall_score",
-          "description": "",
-          "category": "Exceptions & data quality",
-          "data_type": "DECIMAL(10,4)"
-        }
-      ]
-    },
-    {
       "name": "facility_financial_snapshot",
       "layer": "L2",
       "category": "L2",
@@ -12674,30 +12364,6 @@
           "description": "",
           "category": "L2",
           "data_type": "BIGINT"
-        },
-        {
-          "name": "dscr_value",
-          "description": "",
-          "category": "L2",
-          "data_type": "DECIMAL(12,6)"
-        },
-        {
-          "name": "ltv_pct",
-          "description": "",
-          "category": "L2",
-          "data_type": "DECIMAL(10,6)"
-        },
-        {
-          "name": "net_income_amt",
-          "description": "",
-          "category": "L2",
-          "data_type": "DECIMAL(18,2)"
-        },
-        {
-          "name": "interest_rate_sensitivity_pct",
-          "description": "",
-          "category": "L2",
-          "data_type": "DECIMAL(10,6)"
         }
       ]
     },
@@ -20503,6 +20169,404 @@
           "description": "",
           "category": "L3",
           "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "data_quality_score_snapshot",
+      "layer": "L3",
+      "category": "Data Quality",
+      "fields": [
+        {
+          "name": "dq_score_id",
+          "description": "PK — DQ score observation",
+          "category": "Data Quality",
+          "why_required": "Primary key",
+          "simplification_note": "L2 review new table",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "score_dimension",
+          "description": "LOB, LEGAL_ENTITY, ATTRIBUTE, REGULATORY_REPORT, OVERALL",
+          "category": "Data Quality",
+          "why_required": "Routes to Page 4 visual",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "dimension_id",
+          "description": "FK to scored entity (polymorphic)",
+          "category": "Data Quality",
+          "why_required": "Target entity",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "dimension_name",
+          "description": "Human-readable name",
+          "category": "Data Quality",
+          "why_required": "UI display",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "dq_score_pct",
+          "description": "Data quality score 0-100%",
+          "category": "Data Quality",
+          "why_required": "Capsule bars, KPI",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "issue_count",
+          "description": "Count of DQ issues",
+          "category": "Data Quality",
+          "why_required": "Attribute card",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "reconciliation_break_count",
+          "description": "Count of recon breaks",
+          "category": "Data Quality",
+          "why_required": "KPI: Recon Breaks",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "impacted_report_codes",
+          "description": "Comma-separated impacted report codes",
+          "category": "Data Quality",
+          "why_required": "Attribute card: tags",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "impact_pct",
+          "description": "Contribution to DQ score degradation %",
+          "category": "Data Quality",
+          "why_required": "Attribute card: % Impact",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot date (month-end)",
+          "category": "Data Quality",
+          "why_required": "DQ Trend chart",
+          "simplification_note": "L2 review new table",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "score_id",
+          "description": "",
+          "category": "Exceptions & data quality",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "target_table",
+          "description": "",
+          "category": "Exceptions & data quality",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "category": "Exceptions & data quality",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
+        },
+        {
+          "name": "completeness_pct",
+          "description": "",
+          "category": "Exceptions & data quality",
+          "data_type": "DECIMAL(10,4)"
+        },
+        {
+          "name": "validity_pct",
+          "description": "",
+          "category": "Exceptions & data quality",
+          "data_type": "DECIMAL(10,4)"
+        },
+        {
+          "name": "overall_score",
+          "description": "",
+          "category": "Exceptions & data quality",
+          "data_type": "DECIMAL(10,4)"
+        }
+      ]
+    },
+    {
+      "name": "stress_test_result",
+      "layer": "L3",
+      "category": "Stress Testing",
+      "fields": [
+        {
+          "name": "stress_test_result_id",
+          "description": "PK — scenario execution result",
+          "category": "Stress Testing",
+          "why_required": "Primary key",
+          "simplification_note": "Stress test scenario execution results. Links L1 scenario_dim to outcomes. 1 row = 1 scenario × 1 execution date. | L2 review new table",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "scenario_id",
+          "description": "FK to scenario_dim",
+          "category": "Stress Testing",
+          "why_required": "Scenario link",
+          "simplification_note": "L2 review new table",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "scenario_dim",
+              "field": "scenario_id"
+            }
+          }
+        },
+        {
+          "name": "execution_date",
+          "description": "Date stress test executed",
+          "category": "Stress Testing",
+          "why_required": "Historical tracking",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "scenario_type",
+          "description": "REGULATORY_BASELINE, REGULATORY_ADVERSE, INTERNAL_IDIOSYNCRATIC, etc.",
+          "category": "Stress Testing",
+          "why_required": "Page 5 type column",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "total_exposure_usd",
+          "description": "Total exposure under scenario (USD)",
+          "category": "Stress Testing",
+          "why_required": "Page 5 Exposure",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "expected_loss_usd",
+          "description": "Expected loss under scenario (USD)",
+          "category": "Stress Testing",
+          "why_required": "Page 5 Expected Loss",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "capital_impact_pct",
+          "description": "Capital impact as % of Tier 1",
+          "category": "Stress Testing",
+          "why_required": "Page 5 Capital Impact",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "total_breaches",
+          "description": "Count of threshold breaches",
+          "category": "Stress Testing",
+          "why_required": "Page 5 Breaches",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "result_status",
+          "description": "PASS, WARNING, FAIL",
+          "category": "Stress Testing",
+          "why_required": "Page 5 Result Status pill",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "result_description",
+          "description": "Executive summary of outcome",
+          "category": "Stress Testing",
+          "why_required": "Results Drawer",
+          "simplification_note": "L2 review new table"
+        },
+        {
+          "name": "as_of_date",
+          "description": "Reporting date",
+          "category": "Stress Testing",
+          "why_required": "Snapshot",
+          "simplification_note": "L2 review new table",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "result_id",
+          "description": "",
+          "category": "Stress test & pipeline",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "portfolio_id",
+          "description": "",
+          "category": "Stress test & pipeline",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "portfolio_dim",
+              "field": "portfolio_id"
+            }
+          }
+        },
+        {
+          "name": "loss_amount",
+          "description": "",
+          "category": "Stress test & pipeline",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "pnl_impact",
+          "description": "",
+          "category": "Stress test & pipeline",
+          "data_type": "DECIMAL(18,2)"
+        }
+      ]
+    },
+    {
+      "name": "facility_financial_calc",
+      "layer": "L3",
+      "category": "Facility Analytics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to facility_master — identifies the facility",
+          "category": "Primary Key",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot as-of date",
+          "category": "Primary Key",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "dscr_value",
+          "description": "",
+          "category": "L2",
+          "data_type": "DECIMAL(12,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "",
+          "category": "L2",
+          "data_type": "DECIMAL(10,6)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "category": "L2",
+          "data_type": "DECIMAL(18,2)"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "",
+          "category": "L2",
+          "data_type": "DECIMAL(10,6)"
+        }
+      ]
+    },
+    {
+      "name": "facility_exposure_calc",
+      "layer": "L3",
+      "category": "Exposure & Risk Metrics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to facility_master — identifies the facility",
+          "category": "Primary Key",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot as-of date",
+          "category": "Primary Key",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "net_exposure_usd",
+          "description": "Net exposure after CRM (USD)",
+          "category": "Exposure",
+          "why_required": "Gross/Net toggle Pages 2,3,6,7",
+          "simplification_note": "L2 review addition"
+        },
+        {
+          "name": "coverage_ratio_pct",
+          "description": "Coverage ratio (collateral / exposure)",
+          "category": "Exposure",
+          "why_required": "Page 2 KPI: Coverage Ratio",
+          "simplification_note": "L2 review addition"
+        },
+        {
+          "name": "number_of_loans",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "number_of_facilities",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "days_until_maturity",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "DECIMAL(18,2)"
         }
       ]
     }

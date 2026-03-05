@@ -102,6 +102,9 @@ CREATE TABLE IF NOT EXISTS l2.exposure_counterparty_attribution (
   CONSTRAINT fk_exposure_counterparty_attribution_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
+-- Note: net_exposure_usd, coverage_ratio_pct, days_until_maturity, rwa_amt,
+-- number_of_loans, number_of_facilities moved to l3.facility_exposure_calc
+-- (derived fields → L3 convention).
 CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   facility_id BIGINT NOT NULL,
   as_of_date DATE NOT NULL,
@@ -111,7 +114,6 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   undrawn_amount NUMERIC(18,2),
   source_system_id BIGINT,
   counterparty_id BIGINT,
-  coverage_ratio_pct NUMERIC(10,4),
   currency_code VARCHAR(20),
   exposure_amount_local NUMERIC(18,2),
   facility_exposure_id BIGINT,
@@ -119,16 +121,11 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   gross_exposure_usd NUMERIC(18,2),
   legal_entity_id BIGINT,
   lob_segment_id BIGINT,
-  net_exposure_usd NUMERIC(18,2),
   product_node_id BIGINT,
   outstanding_balance_amt NUMERIC(18,2),
   undrawn_commitment_amt NUMERIC(18,2),
-  number_of_loans INTEGER,
-  number_of_facilities INTEGER,
-  days_until_maturity INTEGER,
   facility_utilization_status VARCHAR(30),
   limit_status_code VARCHAR(30),
-  rwa_amt NUMERIC(18,2),
   internal_risk_rating_bucket_code VARCHAR(20),
   total_collateral_mv_usd NUMERIC(18,2),
   PRIMARY KEY (facility_id, as_of_date),
@@ -214,6 +211,8 @@ CREATE TABLE IF NOT EXISTS l2.cash_flow (
   CONSTRAINT fk_cash_flow_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
+-- Note: dscr_value, ltv_pct, net_income_amt, interest_rate_sensitivity_pct
+-- moved to l3.facility_financial_calc (derived fields → L3 convention).
 CREATE TABLE IF NOT EXISTS l2.facility_financial_snapshot (
   facility_id BIGINT NOT NULL,
   as_of_date DATE NOT NULL,
@@ -228,10 +227,6 @@ CREATE TABLE IF NOT EXISTS l2.facility_financial_snapshot (
   currency_code VARCHAR(20),
   reporting_period VARCHAR(20),
   financial_snapshot_id BIGINT,
-  dscr_value NUMERIC(12,6),
-  ltv_pct NUMERIC(10,6),
-  net_income_amt NUMERIC(18,2),
-  interest_rate_sensitivity_pct NUMERIC(10,6),
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_financial_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
 );
@@ -418,25 +413,8 @@ CREATE TABLE IF NOT EXISTS l2.stress_test_breach (
   CONSTRAINT fk_stress_test_breach_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
-CREATE TABLE IF NOT EXISTS l2.stress_test_result (
-  result_id BIGINT NOT NULL PRIMARY KEY,
-  scenario_id BIGINT NOT NULL,
-  as_of_date DATE NOT NULL,
-  portfolio_id BIGINT,
-  loss_amount NUMERIC(18,2),
-  pnl_impact NUMERIC(18,2),
-  capital_impact_pct NUMERIC(10,4),
-  execution_date DATE,
-  expected_loss_usd NUMERIC(18,2),
-  result_description VARCHAR(2000),
-  result_status VARCHAR(30),
-  scenario_type VARCHAR(50),
-  stress_test_result_id BIGINT,
-  total_breaches INTEGER,
-  total_exposure_usd NUMERIC(18,2),
-  CONSTRAINT fk_stress_test_result_scenario_id FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim(scenario_id),
-  CONSTRAINT fk_stress_test_result_portfolio_id FOREIGN KEY (portfolio_id) REFERENCES l1.portfolio_dim(portfolio_id)
-);
+-- stress_test_result promoted to L3 (all measures are scenario-model derived).
+-- See sql/l3/01_DDL_all_tables.sql for l3.stress_test_result.
 
 CREATE TABLE IF NOT EXISTS l2.deal_pipeline_fact (
   pipeline_id BIGINT NOT NULL PRIMARY KEY,
@@ -504,32 +482,8 @@ CREATE TABLE IF NOT EXISTS l2.financial_metric_observation (
   CONSTRAINT fk_financial_metric_observation_context_id FOREIGN KEY (context_id) REFERENCES l1.context_dim(context_id)
 );
 
-CREATE TABLE IF NOT EXISTS l2.metric_threshold (
-  threshold_id BIGINT NOT NULL PRIMARY KEY,
-  metric_definition_id BIGINT NOT NULL,
-  threshold_type VARCHAR(50),
-  threshold_value NUMERIC(18,4),
-  effective_from_date DATE,
-  effective_to_date DATE,
-  active_flag CHAR(1),
-  inner_threshold_pct NUMERIC(10,4),
-  last_threshold_updated_date DATE,
-  limit_type VARCHAR(50),
-  limit_value NUMERIC(18,4),
-  lod1_sponsor VARCHAR(100),
-  lod2_sponsor VARCHAR(100),
-  metric_category VARCHAR(50),
-  metric_code VARCHAR(20),
-  metric_description VARCHAR(2000),
-  metric_id_display VARCHAR(100),
-  metric_name VARCHAR(200),
-  metric_owner VARCHAR(100),
-  metric_threshold_id BIGINT,
-  outer_threshold_pct NUMERIC(10,4),
-  report_deadline VARCHAR(100),
-  report_frequency VARCHAR(30),
-  CONSTRAINT fk_metric_threshold_metric_definition_id FOREIGN KEY (metric_definition_id) REFERENCES l1.metric_definition_dim(metric_definition_id)
-);
+-- metric_threshold demoted to L1 (pure configuration/reference data).
+-- See l1 DDL for l1.metric_threshold.
 
 CREATE TABLE IF NOT EXISTS l2.exception_event (
   exception_id BIGINT NOT NULL PRIMARY KEY,
@@ -579,25 +533,8 @@ CREATE TABLE IF NOT EXISTS l2.risk_flag (
   CONSTRAINT fk_risk_flag_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
-CREATE TABLE IF NOT EXISTS l2.data_quality_score_snapshot (
-  score_id BIGINT NOT NULL PRIMARY KEY,
-  as_of_date DATE NOT NULL,
-  target_table VARCHAR(100),
-  source_system_id BIGINT,
-  completeness_pct NUMERIC(10,4),
-  validity_pct NUMERIC(10,4),
-  overall_score NUMERIC(10,4),
-  dimension_id BIGINT,
-  dimension_name VARCHAR(200),
-  dq_score_id BIGINT,
-  dq_score_pct NUMERIC(10,4),
-  impact_pct NUMERIC(10,4),
-  impacted_report_codes VARCHAR(20),
-  issue_count INTEGER,
-  reconciliation_break_count INTEGER,
-  score_dimension VARCHAR(30),
-  CONSTRAINT fk_data_quality_score_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
-);
+-- data_quality_score_snapshot promoted to L3 (all metrics are calculated).
+-- See sql/l3/01_DDL_all_tables.sql for l3.data_quality_score_snapshot.
 
 CREATE TABLE IF NOT EXISTS l2.counterparty_financial_snapshot (
   financial_snapshot_id BIGINT NOT NULL PRIMARY KEY,

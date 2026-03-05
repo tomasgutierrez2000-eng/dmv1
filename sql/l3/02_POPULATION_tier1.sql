@@ -188,7 +188,7 @@ LEFT JOIN l2.facility_exposure_snapshot fes   ON p.facility_id = fes.facility_id
 LEFT JOIN l1.facility_master fm              ON p.facility_id = fm.facility_id
 LEFT JOIN l2.counterparty_rating_observation cro
             ON p.counterparty_id = cro.counterparty_id AND cro.as_of_date = p_as_of_date AND cro.rating_source_id = 'INTERNAL'
-LEFT JOIN l2.stress_test_result str          ON p.position_id = str.position_id AND str.as_of_date = p_as_of_date
+LEFT JOIN l3.stress_test_result str          ON p.position_id = str.position_id AND str.as_of_date = p_as_of_date
 LEFT JOIN l1.fx_rate fx                      ON p.currency_code = fx.from_currency_code
                                              AND fx.to_currency_code = p_base_currency AND fx.as_of_date = p_as_of_date
 LEFT JOIN l2.facility_lob_attribution fla    ON p.facility_id = fla.facility_id AND fla.as_of_date = p_as_of_date
@@ -512,7 +512,7 @@ SELECT
          ELSE 'PASS' END,
     MAX(str.as_of_date),
     p_base_currency, CURRENT_TIMESTAMP
-FROM l2.stress_test_result str
+FROM l3.stress_test_result str
 JOIN l1.scenario_dim sd ON str.scenario_id = sd.scenario_id
 LEFT JOIN l2.stress_test_breach stb ON str.scenario_id = stb.scenario_id AND str.as_of_date = stb.as_of_date
 LEFT JOIN l1.fx_rate fx ON str.currency_code = fx.from_currency_code

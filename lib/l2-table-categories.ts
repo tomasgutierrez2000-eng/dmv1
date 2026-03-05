@@ -1,5 +1,7 @@
 /**
- * L2 table categories for the demo model (26 tables: snapshots, events, attributions).
+ * L2 table categories for the demo model (23 tables: snapshots, events, attributions).
+ * Note: data_quality_score_snapshot and stress_test_result promoted to L3 (derived).
+ * Note: metric_threshold demoted to L1 (reference/configuration).
  */
 export const L2_CATEGORY_ORDER = [
   'Position & exposure',
@@ -33,14 +35,11 @@ export const L2_TABLE_CATEGORIES: Record<string, string> = {
   credit_event: 'Credit events',
   credit_event_facility_link: 'Credit events',
   stress_test_breach: 'Stress test & pipeline',
-  stress_test_result: 'Stress test & pipeline',
   deal_pipeline_fact: 'Stress test & pipeline',
   counterparty_rating_observation: 'Ratings & metrics',
   financial_metric_observation: 'Ratings & metrics',
-  metric_threshold: 'Ratings & metrics',
   exception_event: 'Exceptions & data quality',
   risk_flag: 'Exceptions & data quality',
-  data_quality_score_snapshot: 'Exceptions & data quality',
 };
 
 const DEFAULT_L2_CATEGORY = 'L2';

@@ -93,6 +93,7 @@ export const L1_TABLE_CATEGORIES: Record<string, string> = {
   // Limits & FX
   limit_rule: 'Limits & FX',
   limit_threshold: 'Limits & FX',
+  metric_threshold: 'Limits & FX',
   fx_rate: 'Limits & FX',
   // Run & reporting
   run_control: 'Run & reporting',

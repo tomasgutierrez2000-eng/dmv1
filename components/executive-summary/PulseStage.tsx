@@ -519,7 +519,7 @@ export function PulseFullView() {
           items={[
             ...INGESTION_NODES.map(n => ({ label: n.label })),
             { label: 'L1 Reference', sub: '78 tables' },
-            { label: 'L2 Snapshots', sub: '26 tables' },
+            { label: 'L2 Snapshots', sub: '25 tables' },
           ]}
         />
         <FullViewArrow />

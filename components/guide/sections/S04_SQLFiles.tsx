@@ -84,7 +84,7 @@ export default function S04_SQLFiles() {
             <div className="pl-12">
               <span className="text-slate-500">├── </span>
               <span className="text-cyan-300">01_DDL_all_tables.sql</span>
-              <span className="text-slate-600 ml-4">← Creates all 49 tables</span>
+              <span className="text-slate-600 ml-4">← Creates all 54 tables</span>
             </div>
             <div className="pl-12">
               <span className="text-slate-500">├── </span>

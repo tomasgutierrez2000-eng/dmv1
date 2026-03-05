@@ -291,7 +291,7 @@ $$;
 
 -- ============================================================
 -- T30: risk_appetite_metric_state
--- Reads: L1.metric_definition_dim, L2.metric_threshold, T8 (for dynamic metric values)
+-- Reads: L1.metric_definition_dim, L1.metric_threshold, T8 (for dynamic metric values)
 -- Formula: status = BREACH if value >= outer_threshold (CEILING) or <= outer_threshold (FLOOR)
 --          utilization% = current_value / limit_value × 100
 --          velocity = current_util% - util%_N_days_ago
@@ -344,9 +344,9 @@ SELECT
     'USD', CURRENT_TIMESTAMP
 
 FROM l1.metric_definition_dim md
-JOIN l2.metric_threshold mt ON md.metric_code = mt.metric_code AND mt.as_of_date = p_as_of_date
-LEFT JOIN l2.metric_threshold prior30 ON md.metric_code = prior30.metric_code AND prior30.as_of_date = p_as_of_date - INTERVAL '30 days'
-LEFT JOIN l2.metric_threshold prior90 ON md.metric_code = prior90.metric_code AND prior90.as_of_date = p_as_of_date - INTERVAL '90 days'
+JOIN l1.metric_threshold mt ON md.metric_code = mt.metric_code AND mt.as_of_date = p_as_of_date
+LEFT JOIN l1.metric_threshold prior30 ON md.metric_code = prior30.metric_code AND prior30.as_of_date = p_as_of_date - INTERVAL '30 days'
+LEFT JOIN l1.metric_threshold prior90 ON md.metric_code = prior90.metric_code AND prior90.as_of_date = p_as_of_date - INTERVAL '90 days'
 WHERE md.is_risk_appetite_metric = TRUE;
 $$;
 

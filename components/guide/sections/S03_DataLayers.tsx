@@ -55,7 +55,7 @@ export default function S03_DataLayers() {
                 <div className="w-8 h-8 rounded bg-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-300">L2</div>
                 <div>
                   <div className="text-sm font-semibold text-emerald-300">Snapshots & Events</div>
-                  <div className="text-[10px] text-emerald-400/60">26 tables</div>
+                  <div className="text-[10px] text-emerald-400/60">25 tables</div>
                 </div>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -72,7 +72,7 @@ export default function S03_DataLayers() {
                 <div className="w-8 h-8 rounded bg-purple-500/20 flex items-center justify-center text-xs font-bold text-purple-300">L3</div>
                 <div>
                   <div className="text-sm font-semibold text-purple-300">Analytics & Reporting</div>
-                  <div className="text-[10px] text-purple-400/60">49 tables</div>
+                  <div className="text-[10px] text-purple-400/60">54 tables</div>
                 </div>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -152,7 +152,7 @@ export default function S03_DataLayers() {
       <SubSection id="l2-snapshots">
         <SubTitle>L2 — Snapshots & Events</SubTitle>
         <P>
-          If L1 is &quot;what exists,&quot; L2 is &quot;what happened and when.&quot; These 26 tables capture
+          If L1 is &quot;what exists,&quot; L2 is &quot;what happened and when.&quot; These 25 tables capture
           time-series data — monthly photographs of facility exposure, collateral valuations,
           ratings — plus event records like defaults, amendments, and rating changes.
         </P>
@@ -182,7 +182,7 @@ export default function S03_DataLayers() {
             <div className="space-y-1 text-[11px] text-slate-500">
               <div><InlineCode>credit_event</InlineCode></div>
               <div><InlineCode>amendment_event</InlineCode></div>
-              <div><InlineCode>stress_test_result</InlineCode></div>
+              <div><InlineCode>stress_test_breach</InlineCode></div>
               <div><InlineCode>deal_pipeline_fact</InlineCode></div>
               <div><InlineCode>risk_flag</InlineCode></div>
             </div>
@@ -206,7 +206,7 @@ export default function S03_DataLayers() {
       <SubSection id="l3-analytics">
         <SubTitle>L3 — Analytics & Reporting</SubTitle>
         <P>
-          L3 is where the magic happens. These 49 tables are <strong>derived</strong> — they don&apos;t
+          L3 is where the magic happens. These 54 tables are <strong>derived</strong> — they don&apos;t
           store raw data. Instead, they combine L1 + L2 data through SQL queries to produce
           the actual numbers that appear on dashboards: exposure summaries, risk metrics,
           KPI roll-ups, regulatory snapshots.

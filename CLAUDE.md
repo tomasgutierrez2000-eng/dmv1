@@ -4,11 +4,19 @@
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 
 ## Architecture: Three-Layer Data Model
-- **L1 (Business Segment):** Core entity-level tables, reference data
-- **L2 (Portfolio):** Consolidated views of L1 data
-- **L3 (Desk/Derived):** 106+ calculated metrics and fact tables across 7 dashboard pages (P1–P7)
+- **L1 — Reference Data (82 tables):** Dimensions, masters, lookups, hierarchies, configuration. Rarely changes. Examples: `counterparty`, `facility_master`, `currency_dim`, `metric_threshold`
+- **L2 — Atomic Data (25 tables):** Raw source-system snapshots and events. Point-in-time observations, not computed. Examples: `facility_exposure_snapshot`, `credit_event`, `position`
+- **L3 — Derived Data (54 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
 
 Rollup hierarchy: **Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)**
+
+### L1/L2/L3 Convention (VITAL)
+**Every field and table MUST follow this rule:**
+- **L1:** Only reference/configuration data — no calculations, no time-series snapshots
+- **L2:** Only atomic/raw data — if a field is computed from other fields (ratios, aggregations, derived metrics), it belongs in L3
+- **L3:** All derived/calculated data — ratios (DSCR, LTV, coverage), aggregations, scores, summaries
+- **Calculated overlay pattern:** When an L2 table has a mix of raw and derived fields, split the derived fields into a new L3 table at the same grain (same PK) with a FK back to the L2 source. Example: `l2.facility_financial_snapshot` (raw inputs) → `l3.facility_financial_calc` (DSCR, LTV, net income)
+- **Data flows forward only:** L1 → L2 → L3. L3 reads from L1+L2. L2 reads from L1. Never backwards.
 
 ## Key Directories
 ```
@@ -27,7 +35,7 @@ lib/                    # Core business logic
   deep-dive/            # Seed metrics, lineage parser, cross-tier resolver
 data/                   # Data definitions
   l3-metrics.ts         # 106+ metric definitions (SOURCE OF TRUTH for L3 metrics)
-  l3-tables.ts          # 50 L3 table definitions
+  l3-tables.ts          # 54 L3 table definitions
   metric-library/       # catalogue.json, variants.json, parent-metrics.json, domains.json
 scripts/                # CLI data processing scripts
 ```

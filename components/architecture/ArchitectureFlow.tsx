@@ -481,11 +481,11 @@ export default function ArchitectureFlow() {
         </span>
         <span className="flex items-center gap-1">
           <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: '#E87722' }} />
-          L2 Snapshots (26 tables)
+          L2 Snapshots (25 tables)
         </span>
         <span className="flex items-center gap-1">
           <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: '#6B7280' }} />
-          L3 Analytics (49 tables)
+          L3 Analytics (54 tables)
         </span>
         <span className="text-slate-600">|</span>
         <span className="flex items-center gap-1">

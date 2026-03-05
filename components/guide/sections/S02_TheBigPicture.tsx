@@ -58,7 +58,7 @@ export default function S02_TheBigPicture() {
                   <div className="text-[9px] sm:text-[10px] font-mono text-emerald-400">L2</div>
                 </div>
                 <p className="text-[10px] text-emerald-300/70 mt-1.5">Snapshots & Events</p>
-                <p className="text-[9px] text-slate-500">26 tables</p>
+                <p className="text-[9px] text-slate-500">25 tables</p>
               </div>
 
               <FlowArrow />
@@ -70,7 +70,7 @@ export default function S02_TheBigPicture() {
                   <div className="text-[9px] sm:text-[10px] font-mono text-purple-400">L3</div>
                 </div>
                 <p className="text-[10px] text-purple-300/70 mt-1.5">Analytics</p>
-                <p className="text-[9px] text-slate-500">49 tables</p>
+                <p className="text-[9px] text-slate-500">54 tables</p>
               </div>
 
               <FlowArrow />

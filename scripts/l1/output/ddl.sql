@@ -1210,6 +1210,34 @@ CREATE TABLE IF NOT EXISTS l1.limit_threshold (
   CONSTRAINT fk_limit_threshold_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id)
 );
 
+-- metric_threshold demoted from L2 (pure configuration/reference data).
+CREATE TABLE IF NOT EXISTS l1.metric_threshold (
+  threshold_id BIGINT NOT NULL PRIMARY KEY,
+  metric_definition_id BIGINT NOT NULL,
+  threshold_type VARCHAR(50),
+  threshold_value NUMERIC(18,4),
+  effective_from_date DATE,
+  effective_to_date DATE,
+  active_flag CHAR(1),
+  inner_threshold_pct NUMERIC(10,4),
+  last_threshold_updated_date DATE,
+  limit_type VARCHAR(50),
+  limit_value NUMERIC(18,4),
+  lod1_sponsor VARCHAR(100),
+  lod2_sponsor VARCHAR(100),
+  metric_category VARCHAR(50),
+  metric_code VARCHAR(20),
+  metric_description VARCHAR(2000),
+  metric_id_display VARCHAR(100),
+  metric_name VARCHAR(200),
+  metric_owner VARCHAR(100),
+  metric_threshold_id BIGINT,
+  outer_threshold_pct NUMERIC(10,4),
+  report_deadline VARCHAR(100),
+  report_frequency VARCHAR(30),
+  CONSTRAINT fk_metric_threshold_metric_definition_id FOREIGN KEY (metric_definition_id) REFERENCES l1.metric_definition_dim(metric_definition_id)
+);
+
 CREATE TABLE IF NOT EXISTS l1.fx_rate (
   fx_rate_id BIGINT NOT NULL PRIMARY KEY,
   as_of_date DATE,

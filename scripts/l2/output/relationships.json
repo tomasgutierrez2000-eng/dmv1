@@ -799,40 +799,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.stress_test_result.scenario_id->L1.scenario_dim.scenario_id",
-    "source": {
-      "layer": "L2",
-      "table": "stress_test_result",
-      "field": "scenario_id",
-      "tableKey": "L2.stress_test_result"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "scenario_dim",
-      "field": "scenario_id",
-      "tableKey": "L1.scenario_dim"
-    },
-    "isCrossLayer": true,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L2.stress_test_result.portfolio_id->L1.portfolio_dim.portfolio_id",
-    "source": {
-      "layer": "L2",
-      "table": "stress_test_result",
-      "field": "portfolio_id",
-      "tableKey": "L2.stress_test_result"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "portfolio_dim",
-      "field": "portfolio_id",
-      "tableKey": "L1.portfolio_dim"
-    },
-    "isCrossLayer": true,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L2.deal_pipeline_fact.counterparty_id->L1.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
@@ -986,23 +952,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.metric_threshold.metric_definition_id->L1.metric_definition_dim.metric_definition_id",
-    "source": {
-      "layer": "L2",
-      "table": "metric_threshold",
-      "field": "metric_definition_id",
-      "tableKey": "L2.metric_threshold"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "metric_definition_dim",
-      "field": "metric_definition_id",
-      "tableKey": "L1.metric_definition_dim"
-    },
-    "isCrossLayer": true,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L2.exception_event.facility_id->L1.facility_master.facility_id",
     "source": {
       "layer": "L2",
@@ -1066,23 +1015,6 @@
       "table": "counterparty",
       "field": "counterparty_id",
       "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": true,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L2.data_quality_score_snapshot.source_system_id->L1.source_system_registry.source_system_id",
-    "source": {
-      "layer": "L2",
-      "table": "data_quality_score_snapshot",
-      "field": "source_system_id",
-      "tableKey": "L2.data_quality_score_snapshot"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "source_system_registry",
-      "field": "source_system_id",
-      "tableKey": "L1.source_system_registry"
     },
     "isCrossLayer": true,
     "relationshipType": "primary"

@@ -59,6 +59,7 @@ export default function Canvas() {
     expandedTables,
     expandedDomains,
     searchQuery,
+    searchMode,
     visibleLayers,
     filterCategories,
     filterRiskStripes,
@@ -100,12 +101,16 @@ export default function Canvas() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
-        const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
-        if (!matchesName && !matchesField) return false;
+        if (searchMode === 'tables') {
+          if (!matchesName) return false;
+        } else {
+          const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
+          if (!matchesName && !matchesField) return false;
+        }
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery]);
+  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery, searchMode]);
 
   // When model loads, reset domain collapse state so all categories start expanded
   const prevModelRef = useRef<typeof model>(null);
@@ -342,16 +347,12 @@ export default function Canvas() {
     const activeSearch = searchQuery.trim();
     if (!model) return;
 
-    // Restore original positions when search is cleared.
+    // Restore original positions when search is cleared — single bulk update.
     if (!activeSearch) {
       if (savedSearchPositionsRef.current) {
         const saved = savedSearchPositionsRef.current;
         savedSearchPositionsRef.current = null;
-        Object.entries(saved).forEach(([key, pos]) => {
-          if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
-            setTablePosition(key, pos);
-          }
-        });
+        setTablePositionsReplace(saved);
       }
       return;
     }
@@ -367,53 +368,46 @@ export default function Canvas() {
     const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
     const tw = isOverview ? overviewDims.width : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
     const th = isOverview ? overviewDims.height : BASE_CARD.COLLAPSED_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
-    const hGap = Math.round(tw * (isOverview ? 0.24 : 0.16));
-    const vGap = Math.round(th * (isOverview ? 0.24 : 0.18));
+    const hGap = Math.round(tw * 0.18);
+    const vGap = Math.round(th * 0.18);
 
     const stepX = tw + hGap;
     const stepY = th + vGap;
 
-    // Group tables by category so domain containers don't overlap when rendered.
-    const byCategory = new Map<string, typeof visibleTables>();
-    visibleTables.forEach((t) => {
-      if (!byCategory.has(t.category)) byCategory.set(t.category, []);
-      byCategory.get(t.category)!.push(t);
+    // Flat grid layout: arrange all search results in a wide grid sorted by category then name.
+    // This avoids vertical stacking of category groups while still keeping related tables nearby.
+    const sorted = visibleTables.slice().sort((a, b) => {
+      const c = a.category.localeCompare(b.category);
+      return c !== 0 ? c : a.name.localeCompare(b.name);
     });
 
-    const compactPositions: Array<{ key: string; x: number; y: number }> = [];
-    let groupOffsetY = 0;
+    const totalCount = sorted.length;
+    // Target a roughly 4:3 aspect ratio grid (wider than tall)
+    const cols = totalCount <= 4 ? totalCount : Math.max(4, Math.ceil(Math.sqrt(totalCount * 1.3)));
+    const gridW = cols * stepX - hGap;
+    const startX = -gridW / 2;
 
-    Array.from(byCategory.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .forEach(([, tables]) => {
-        const sorted = tables.slice().sort((a, b) => a.name.localeCompare(b.name));
-        const groupCols = sorted.length <= 4 ? sorted.length : Math.max(2, Math.ceil(Math.sqrt(sorted.length)));
-        const groupRows = Math.max(1, Math.ceil(sorted.length / groupCols));
-        const groupW = groupCols * stepX - hGap;
-        const startX = -groupW / 2;
+    const compactPositions: Record<string, TablePosition> = {};
+    const compactList: Array<{ x: number; y: number }> = [];
 
-        sorted.forEach((table, idx) => {
-          const col = idx % groupCols;
-          const row = Math.floor(idx / groupCols);
-          compactPositions.push({
-            key: table.key,
-            x: startX + col * stepX,
-            y: groupOffsetY + row * stepY,
-          });
-        });
+    sorted.forEach((table, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const pos = {
+        x: startX + col * stepX,
+        y: row * stepY,
+      };
+      compactPositions[table.key] = pos;
+      compactList.push(pos);
+    });
 
-        groupOffsetY += groupRows * stepY + vGap;
-      });
-
-    compactPositions.forEach(({ key, x, y }) => setTablePosition(key, { x, y }));
+    // Single bulk update instead of N individual setTablePosition calls
+    setTablePositionsBulk(compactPositions);
 
     setIsAnimating(true);
-    runFitToView(
-      compactPositions.map((p) => ({ x: p.x, y: p.y })),
-      compactPositions.length
-    );
+    runFitToView(compactList, compactList.length);
     setTimeout(() => setIsAnimating(false), 320);
-  }, [searchQuery, model, visibleTables, layoutMode, tableSize, runFitToView, setTablePosition]);
+  }, [searchQuery, model, visibleTables, layoutMode, tableSize, runFitToView, setTablePositionsBulk, setTablePositionsReplace]);
 
   // O(1) lookup set for visible table keys (avoids O(N) .some() per relationship)
   const visibleTableKeys = useMemo(() => new Set(visibleTables.map((t) => t.key)), [visibleTables]);

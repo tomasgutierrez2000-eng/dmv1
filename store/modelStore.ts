@@ -29,6 +29,8 @@ interface ModelStore {
   l3CategoryExcluded: Set<string>;
   /** Risk stripe filter. Empty = show all stripes. */
   filterRiskStripes: Set<RiskStripe>;
+  /** Search mode: 'tables' = match table names only, 'all' = match tables and fields. */
+  searchMode: 'tables' | 'all';
   
   // UI
   theme: 'dark' | 'light';
@@ -70,6 +72,7 @@ interface ModelStore {
   setL3CategoryExcluded: (categories: Set<string>) => void;
   toggleRiskStripe: (stripe: RiskStripe) => void;
   clearRiskStripes: () => void;
+  setSearchMode: (mode: 'tables' | 'all') => void;
   setTheme: (theme: 'dark' | 'light') => void;
   setShowMinimap: (show: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
@@ -111,6 +114,7 @@ export const useModelStore = create<ModelStore>((set) => ({
   filterCategories: new Set<string>(), // Empty set = show all categories
   l3CategoryExcluded: new Set<string>(), // Empty = show all L3 categories
   filterRiskStripes: new Set<RiskStripe>(), // Empty = show all stripes
+  searchMode: 'all' as 'tables' | 'all',
   theme: 'dark',
   showMinimap: true,
   sidebarOpen: true,
@@ -224,6 +228,7 @@ export const useModelStore = create<ModelStore>((set) => ({
       return { filterRiskStripes: next };
     }),
   clearRiskStripes: () => set({ filterRiskStripes: new Set<RiskStripe>() }),
+  setSearchMode: (mode) => set({ searchMode: mode }),
   setTheme: (theme) => set({ theme }),
   setShowMinimap: (show) => set({ showMinimap: show }),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),

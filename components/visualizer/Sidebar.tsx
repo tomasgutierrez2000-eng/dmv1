@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTriangle, X, Shield } from 'lucide-react';
+import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTriangle, X, Shield, Type, Columns3 } from 'lucide-react';
 import type { RiskStripe } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
@@ -69,11 +69,13 @@ export default function Sidebar() {
   const {
     model,
     searchQuery,
+    searchMode,
     visibleLayers,
     filterCategories,
     filterRiskStripes,
     l3CategoryExcluded,
     setSearchQuery,
+    setSearchMode,
     setVisibleLayer,
     toggleFilterCategory,
     toggleRiskStripe,
@@ -110,12 +112,16 @@ export default function Sidebar() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
-        const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
-        if (!matchesName && !matchesField) return false;
+        if (searchMode === 'tables') {
+          if (!matchesName) return false;
+        } else {
+          const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
+          if (!matchesName && !matchesField) return false;
+        }
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery]);
+  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery, searchMode]);
 
   const tablesByCategory = useMemo(() => {
     const grouped = new Map<string, typeof filteredTables>();
@@ -329,6 +335,35 @@ export default function Sidebar() {
 
       {/* Search - Apple-style search bar */}
       <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0" data-tour="search">
+        {/* Search mode toggle */}
+        <div className="flex items-center gap-1 mb-2">
+          <button
+            onClick={() => setSearchMode('tables')}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+              searchMode === 'tables'
+                ? 'bg-gray-900 text-white shadow-sm'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+            }`}
+            aria-pressed={searchMode === 'tables'}
+            aria-label="Search table names only"
+          >
+            <Type className="w-3 h-3" />
+            Tables
+          </button>
+          <button
+            onClick={() => setSearchMode('all')}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+              searchMode === 'all'
+                ? 'bg-gray-900 text-white shadow-sm'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+            }`}
+            aria-pressed={searchMode === 'all'}
+            aria-label="Search tables and fields"
+          >
+            <Columns3 className="w-3 h-3" />
+            Tables &amp; Fields
+          </button>
+        </div>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           <input
@@ -336,9 +371,9 @@ export default function Sidebar() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tables and fields…"
+            placeholder={searchMode === 'tables' ? 'Search table names…' : 'Search tables and fields…'}
             className="w-full pl-8 pr-8 py-2 bg-gray-50 text-gray-900 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none text-sm placeholder:text-gray-400 transition-all"
-            aria-label="Search tables and fields"
+            aria-label={searchMode === 'tables' ? 'Search table names' : 'Search tables and fields'}
           />
           {searchQuery && (
             <button

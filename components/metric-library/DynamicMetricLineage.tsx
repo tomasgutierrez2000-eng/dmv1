@@ -14,7 +14,6 @@ import {
   Briefcase,
   FolderTree,
   PieChart,
-  Info,
   Zap,
   BookOpen,
 } from 'lucide-react';
@@ -22,13 +21,8 @@ import type { CatalogueItem, LevelDefinition, IngredientField, RollupLevelKey } 
 import type { DemoEntity } from '@/lib/metric-library/metric-config';
 import type { L3Metric } from '@/data/l3-metrics';
 import { buildVisualizationConfig, convertDemoData } from '@/lib/metric-library/config-builder';
-import { generateAllDemoSteps, generatePositionSteps, generateInsights } from '@/lib/metric-library/demo-step-generator';
 import LineageFlowView from '@/components/lineage/LineageFlowView';
-import LevelStepWalkthrough from './LevelStepWalkthrough';
-import { PositionTable, EntityTable } from './WorkedExampleTable';
-import HierarchyPyramid from './HierarchyPyramid';
 import GenericTableTraversalDemo from './GenericTableTraversalDemo';
-import GenericFormulaAnimation from './GenericFormulaAnimation';
 import AutoDemoOrchestrator from './AutoDemoOrchestrator';
 import type { DemoSideEffects } from './demo/useDemoEngine';
 
@@ -79,11 +73,6 @@ export default function DynamicMetricLineage({ item, l3Metric }: DynamicMetricLi
   // Build visualization config and entities
   const config = useMemo(() => buildVisualizationConfig(item), [item]);
   const entities = useMemo(() => convertDemoData(item, config.metric_fields) ?? [], [item, config]);
-
-  // Auto-generate demo steps and insights
-  const allSteps = useMemo(() => generateAllDemoSteps(config, item, entities), [config, item, entities]);
-  const positionSteps = useMemo(() => generatePositionSteps(config, entities), [config, entities]);
-  const insights = useMemo(() => generateInsights(config, item), [config, item]);
 
   // Sorted level definitions (follow canonical order)
   const levels = useMemo(() => {
@@ -209,19 +198,6 @@ export default function DynamicMetricLineage({ item, l3Metric }: DynamicMetricLi
         <section data-demo="rollup-hierarchy">
           <SectionHeader icon={Layers} title="Rollup Hierarchy" subtitle="How this metric computes at each level" />
 
-          {/* Hierarchy Pyramid (config-driven) */}
-          {hasDemoData && (
-            <div className="mb-6">
-              <HierarchyPyramid
-                item={item}
-                config={config}
-                entities={entities}
-                activeTab={activeWalkthrough}
-                onTabChange={(tab) => setActiveWalkthrough(tab as TabKey)}
-              />
-            </div>
-          )}
-
           {/* Level Cards */}
           <div className="space-y-3" data-demo="level-cards">
             {levels.map((level) => (
@@ -248,69 +224,6 @@ export default function DynamicMetricLineage({ item, l3Metric }: DynamicMetricLi
           </section>
         )}
 
-        {/* ── Formula Animation ───────────────────────────────────── */}
-        {config.formula_decomposition.numerator.length > 0 && (
-          <section data-demo="formula-animation">
-            <SectionHeader icon={Zap} title="Formula Animation" subtitle="Watch how the formula builds up" />
-            <GenericFormulaAnimation
-              config={config}
-              entities={entities}
-              rollupLevel={activeWalkthrough}
-            />
-          </section>
-        )}
-
-        {/* ── Interactive Walkthrough ─────────────────────────────── */}
-        {hasDemoData && (
-          <section data-demo="walkthrough">
-            <SectionHeader icon={BookOpen} title="Step-by-Step Walkthrough" subtitle="Detailed calculation flow at each level" />
-
-            {/* Tab bar */}
-            <div className="flex gap-1.5 flex-wrap mb-4" role="tablist" data-demo="walkthrough-tabs">
-              {levels.map((level) => {
-                const Icon = LEVEL_ICONS[level.level] ?? Table2;
-                const isActive = activeWalkthrough === level.level;
-                const color = LEVEL_COLORS[level.level] ?? 'gray';
-                return (
-                  <button
-                    key={level.level}
-                    role="tab"
-                    aria-selected={isActive}
-                    onClick={() => setActiveWalkthrough(level.level as TabKey)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                      isActive
-                        ? `bg-${color}-500 text-white shadow-md`
-                        : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" aria-hidden />
-                    {level.dashboard_display_name}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Insight callout */}
-            {insights[activeWalkthrough] && (
-              <div className="flex items-start gap-3 bg-blue-950/30 rounded-lg p-3 border border-blue-900/40 mb-4">
-                <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden />
-                <p className="text-xs text-blue-200 leading-relaxed">{insights[activeWalkthrough]}</p>
-              </div>
-            )}
-
-            {/* Walkthrough content */}
-            <div role="tabpanel" data-demo="walkthrough-content">
-              <WalkthroughPanel
-                level={activeWalkthrough}
-                item={item}
-                config={config}
-                entities={entities}
-                allSteps={allSteps}
-                positionSteps={positionSteps}
-              />
-            </div>
-          </section>
-        )}
       </main>
     </div>
   );
@@ -424,82 +337,3 @@ function LevelCard({
   );
 }
 
-function WalkthroughPanel({
-  level,
-  item,
-  config,
-  entities,
-  allSteps,
-  positionSteps,
-}: {
-  level: TabKey;
-  item: CatalogueItem;
-  config: ReturnType<typeof buildVisualizationConfig>;
-  entities: DemoEntity[];
-  allSteps: ReturnType<typeof generateAllDemoSteps>;
-  positionSteps: ReturnType<typeof generatePositionSteps>;
-}) {
-  const metricLabel = item.abbreviation;
-  const steps = allSteps[level] ?? [];
-  const legacyFacilities = item.demo_data?.facilities ?? [];
-  const exampleFacility = legacyFacilities[0];
-
-  const tabEntities = useMemo(() => {
-    if (!entities.length) return [];
-    const example = entities[0];
-    switch (level) {
-      case 'facility':
-        return [example];
-      case 'counterparty':
-        return entities.filter(e => e.counterparty_id === example.counterparty_id);
-      case 'desk':
-        return example.desk_name ? entities.filter(e => e.desk_name === example.desk_name) : entities;
-      case 'portfolio':
-      case 'lob':
-        return entities;
-    }
-  }, [entities, level]);
-
-  const title = {
-    facility: `Facility-Level ${metricLabel}`,
-    counterparty: `Counterparty-Level ${metricLabel}`,
-    desk: `Desk-Level ${metricLabel} (L3)`,
-    portfolio: `Portfolio-Level ${metricLabel} (L2)`,
-    lob: `Business Segment-Level ${metricLabel} (L1)`,
-  }[level];
-
-  return (
-    <div className="space-y-4">
-      <LevelStepWalkthrough
-        steps={steps}
-        title={title}
-        subtitle={`${metricLabel} calculation walkthrough`}
-      />
-
-      {tabEntities.length > 0 && (
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-3">
-            Worked Example — {level === 'facility' ? 'Facility Detail' : `${level} aggregation`}
-          </div>
-          <EntityTable
-            entities={tabEntities}
-            columns={config.worked_example_columns}
-            config={config}
-            groupBy={level === 'portfolio' || level === 'lob' ? 'desk' : undefined}
-            showPositionCount={level === 'facility'}
-          />
-
-          {/* Position breakdown for facility level */}
-          {level === 'facility' && exampleFacility && (
-            <div className="mt-3 pt-3 border-t border-gray-800">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                Position Breakdown
-              </div>
-              <PositionTable facility={exampleFacility} />
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}

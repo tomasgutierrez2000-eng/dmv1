@@ -4,6 +4,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { getModelGapsPath } from '@/lib/config';
 
 export interface ModelGap {
   gapItem: string;
@@ -13,8 +14,6 @@ export interface ModelGap {
   impactedMetrics: string;
 }
 
-const MODEL_GAPS_PATH = path.join(process.cwd(), 'data', 'model-gaps.json');
-
 export interface ModelGapsFile {
   version?: number;
   gaps: ModelGap[];
@@ -23,18 +22,20 @@ export interface ModelGapsFile {
 const DEFAULT_FILE: ModelGapsFile = { version: 1, gaps: [] };
 
 function ensureDataDir(): void {
-  const dir = path.dirname(MODEL_GAPS_PATH);
+  const p = getModelGapsPath();
+  const dir = path.dirname(p);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
 export function readModelGaps(): ModelGap[] {
-  if (!fs.existsSync(MODEL_GAPS_PATH)) {
+  const p = getModelGapsPath();
+  if (!fs.existsSync(p)) {
     return [];
   }
   try {
-    const raw = fs.readFileSync(MODEL_GAPS_PATH, 'utf-8');
+    const raw = fs.readFileSync(p, 'utf-8');
     const data = JSON.parse(raw) as ModelGapsFile;
     return Array.isArray(data.gaps) ? data.gaps : [];
   } catch {
@@ -45,5 +46,5 @@ export function readModelGaps(): ModelGap[] {
 export function writeModelGaps(gaps: ModelGap[]): void {
   ensureDataDir();
   const data: ModelGapsFile = { version: 1, gaps };
-  fs.writeFileSync(MODEL_GAPS_PATH, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(getModelGapsPath(), JSON.stringify(data, null, 2), 'utf-8');
 }

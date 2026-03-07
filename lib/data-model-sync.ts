@@ -5,6 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { getSqlLayerDir } from '@/lib/config';
 import type { DataDictionary } from './data-dictionary';
 import { readDataDictionary } from './data-dictionary';
 import { generateL3Ddl, generateLayerDdl } from './ddl-generator';
@@ -14,7 +15,7 @@ export function writeDdlFiles(dd: DataDictionary): string[] {
   const written: string[] = [];
   for (const layer of ['L1', 'L2', 'L3'] as const) {
     if (dd[layer].length === 0) continue;
-    const sqlDir = path.join(process.cwd(), 'sql', layer.toLowerCase());
+    const sqlDir = getSqlLayerDir(layer.toLowerCase() as 'l1' | 'l2' | 'l3');
     if (!fs.existsSync(sqlDir)) {
       fs.mkdirSync(sqlDir, { recursive: true });
     }

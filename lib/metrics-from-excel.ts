@@ -8,10 +8,8 @@
  */
 
 import fs from 'fs';
-import path from 'path';
 import type { L3Metric, CalculationDimension } from '@/data/l3-metrics';
-
-const EXCEL_PATH = path.join(process.cwd(), 'data', 'metrics_dimensions_filled.xlsx');
+import { getMetricsExcelPath } from '@/lib/config';
 
 const DIMENSION_BLOCKS: { key: CalculationDimension; col: number }[] = [
   { key: 'facility', col: 7 },
@@ -27,10 +25,11 @@ function isInRecord(value: unknown): boolean {
 }
 
 export function loadMetricsFromExcel(): L3Metric[] | null {
-  if (!fs.existsSync(EXCEL_PATH)) return null;
+  const excelPath = getMetricsExcelPath();
+  if (!fs.existsSync(excelPath)) return null;
   try {
     const XLSX = require('xlsx');
-    const wb = XLSX.read(fs.readFileSync(EXCEL_PATH), { type: 'buffer' });
+    const wb = XLSX.read(fs.readFileSync(excelPath), { type: 'buffer' });
     const sheet = wb.Sheets[wb.SheetNames[0]];
     if (!sheet) return null;
     const raw = XLSX.utils.sheet_to_json(sheet, { defval: '', header: 1 }) as string[][];

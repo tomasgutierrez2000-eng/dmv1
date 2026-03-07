@@ -56,6 +56,68 @@ export function getCompactOverviewTableDimensions(): { width: number; height: nu
   return { width: 200, height: 90 };
 }
 
+/** Options for computing a compact, non-overlapping layout for a subset of tables (e.g. when search or filters narrow the view). */
+export interface CompactNarrowedLayoutOptions {
+  layoutMode: LayoutMode;
+  tableSize: TableSize;
+  compactOverview: boolean;
+}
+
+/**
+ * Computes a compact grid layout for a set of tables so they appear grouped by category
+ * with no overlap. Used when the user searches or applies filters so visible tables
+ * don't stay scattered at "separate ends" of the full layout.
+ * Returns positions keyed by table key; spacing guarantees no overlapping cards.
+ */
+export function calculateCompactNarrowedLayout(
+  tables: TableDef[],
+  options: CompactNarrowedLayoutOptions
+): Record<string, TablePosition> {
+  const positions: Record<string, TablePosition> = {};
+  if (tables.length === 0) return positions;
+
+  const { layoutMode, tableSize, compactOverview } = options;
+  const overviewDims = compactOverview ? getCompactOverviewTableDimensions() : getOverviewTableDimensions(tableSize);
+  const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
+  const tw = isOverview ? overviewDims.width : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
+  const th = isOverview ? overviewDims.height : BASE_CARD.COLLAPSED_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
+  const hGap = Math.round(tw * (isOverview ? 0.24 : 0.16));
+  const vGap = Math.round(th * (isOverview ? 0.24 : 0.18));
+  const stepX = tw + hGap;
+  const stepY = th + vGap;
+
+  const byCategory = new Map<string, TableDef[]>();
+  tables.forEach((t) => {
+    const cat = t.category || 'Uncategorized';
+    if (!byCategory.has(cat)) byCategory.set(cat, []);
+    byCategory.get(cat)!.push(t);
+  });
+
+  let groupOffsetY = 0;
+  const sortedCategories = Array.from(byCategory.entries()).sort(([a], [b]) => a.localeCompare(b));
+
+  for (const [, categoryTables] of sortedCategories) {
+    const sorted = categoryTables.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const groupCols = sorted.length <= 4 ? sorted.length : Math.max(2, Math.ceil(Math.sqrt(sorted.length)));
+    const groupRows = Math.max(1, Math.ceil(sorted.length / groupCols));
+    const groupW = groupCols * stepX - hGap;
+    const startX = -groupW / 2;
+
+    sorted.forEach((table, idx) => {
+      const col = idx % groupCols;
+      const row = Math.floor(idx / groupCols);
+      positions[table.key] = {
+        x: startX + col * stepX,
+        y: groupOffsetY + row * stepY,
+      };
+    });
+
+    groupOffsetY += groupRows * stepY + vGap;
+  }
+
+  return positions;
+}
+
 export function calculateLayout(
   model: DataModel,
   mode: LayoutMode,

@@ -1,9 +1,18 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import DSCRLineageView from '@/components/metric-library/DSCRLineageView';
-import DSCRLineageDemo from '@/components/metric-library/DSCRLineageDemo';
+import dynamic from 'next/dynamic';
 import type { DemoSideEffects } from '@/components/metric-library/demo/useDemoEngine';
+
+const DSCRLineageView = dynamic(
+  () => import('@/components/metric-library/DSCRLineageView').then((m) => m.default),
+  { loading: () => <div className="min-h-[60vh] flex items-center justify-center text-pwc-gray-light">Loading lineage…</div>, ssr: false }
+);
+
+const DSCRLineageDemo = dynamic(
+  () => import('@/components/metric-library/DSCRLineageDemo').then((m) => m.default),
+  { ssr: false }
+);
 
 /* ────────────────────────────────────────────────────────────────────────────
  * DSCRLineageWithDemo — client wrapper that manages demo lifecycle

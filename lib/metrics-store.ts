@@ -8,8 +8,7 @@ import path from 'path';
 import type { L3Metric } from '@/data/l3-metrics';
 import { loadMetricsFromExcel } from './metrics-from-excel';
 import { DEEP_DIVE_SEED_METRICS } from './deep-dive/seed-metrics';
-
-const METRICS_PATH = path.join(process.cwd(), 'data', 'metrics-custom.json');
+import { getMetricsCustomPath } from '@/lib/config';
 
 export interface CustomMetricsFile {
   version?: number;
@@ -17,18 +16,20 @@ export interface CustomMetricsFile {
 }
 
 function ensureDataDir(): void {
-  const dir = path.dirname(METRICS_PATH);
+  const metricsPath = getMetricsCustomPath();
+  const dir = path.dirname(metricsPath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
 export function readCustomMetrics(): L3Metric[] {
-  if (!fs.existsSync(METRICS_PATH)) {
+  const metricsPath = getMetricsCustomPath();
+  if (!fs.existsSync(metricsPath)) {
     return [];
   }
   try {
-    const raw = fs.readFileSync(METRICS_PATH, 'utf-8');
+    const raw = fs.readFileSync(getMetricsCustomPath(), 'utf-8');
     const data = JSON.parse(raw) as CustomMetricsFile;
     return Array.isArray(data.metrics) ? data.metrics : [];
   } catch (err) {
@@ -48,7 +49,7 @@ export function isReadOnlyFsError(err: unknown): boolean {
 export function writeCustomMetrics(metrics: L3Metric[]): void {
   ensureDataDir();
   const data: CustomMetricsFile = { version: 1, metrics };
-  fs.writeFileSync(METRICS_PATH, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(getMetricsCustomPath(), JSON.stringify(data, null, 2), 'utf-8');
 }
 
 /** Next id for new metrics (e.g. C001, C002). */

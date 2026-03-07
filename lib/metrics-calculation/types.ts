@@ -15,6 +15,8 @@ export interface RunMetricResult {
 export interface RunMetricError {
   ok: false;
   error: string;
+  /** Machine-readable code for clients (e.g. SAMPLE_DATA_MISSING, TIMEOUT, RUNNER_FAILED). */
+  code?: string;
   hint?: string;
   sqlExecuted?: string;
   inputRowCounts?: Record<string, number>;

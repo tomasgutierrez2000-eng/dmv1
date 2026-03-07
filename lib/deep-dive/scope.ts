@@ -7,6 +7,7 @@ export const DEEP_DIVE_METRIC_IDS = [
   'C105',
   'C106',
   'C107',
+  'C114', // Undrawn Exposure
 ] as const;
 
 const set = new Set<string>(DEEP_DIVE_METRIC_IDS);

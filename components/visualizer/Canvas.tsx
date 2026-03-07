@@ -5,7 +5,15 @@ import { useModelStore } from '../../store/modelStore';
 import TableNode from './TableNode';
 import RelationshipLine from './RelationshipLine';
 import DomainContainer from './DomainContainer';
-import { calculateLayout, getOverviewTableDimensions, getCompactOverviewTableDimensions, OVERVIEW_CARD, BASE_CARD, SIZE_MULTIPLIERS } from '../../utils/layoutEngine';
+import {
+  calculateLayout,
+  calculateCompactNarrowedLayout,
+  getOverviewTableDimensions,
+  getCompactOverviewTableDimensions,
+  OVERVIEW_CARD,
+  BASE_CARD,
+  SIZE_MULTIPLIERS,
+} from '../../utils/layoutEngine';
 import type { TablePosition } from '../../types/model';
 
 export default function Canvas() {
@@ -59,7 +67,6 @@ export default function Canvas() {
     expandedTables,
     expandedDomains,
     searchQuery,
-    searchMode,
     visibleLayers,
     filterCategories,
     filterRiskStripes,
@@ -101,16 +108,12 @@ export default function Canvas() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
-        if (searchMode === 'tables') {
-          if (!matchesName) return false;
-        } else {
-          const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
-          if (!matchesName && !matchesField) return false;
-        }
+        const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
+        if (!matchesName && !matchesField) return false;
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery, searchMode]);
+  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery]);
 
   // When model loads, reset domain collapse state so all categories start expanded
   const prevModelRef = useRef<typeof model>(null);
@@ -303,20 +306,20 @@ export default function Canvas() {
   );
 
   // Apply layout when model, layout mode, table size, visible layers, or compact view change.
-  // Use bulk set to avoid N re-renders and lag; defer fit so it runs after positions commit.
+  // Defer layout calculation to requestAnimationFrame so UI stays responsive with large models.
   useEffect(() => {
     if (!model) return;
     const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
-    const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers, compactOverview);
     const isOverviewLayout = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
-    if (isOverviewLayout) {
-      setTablePositionsReplace(newPositions);
-    } else {
-      setTablePositionsBulk(newPositions);
-    }
-    // Fit camera to the new layout so content is always visible after layout changes.
-    // Deferred to next frame so positions are committed before fit reads them.
-    const id = requestAnimationFrame(() => setRequestFitToView());
+    const id = requestAnimationFrame(() => {
+      const newPositions = calculateLayout(model, layoutMode, {}, zoom, tableSize, visibleLayers, compactOverview);
+      if (isOverviewLayout) {
+        setTablePositionsReplace(newPositions);
+      } else {
+        setTablePositionsBulk(newPositions);
+      }
+      requestAnimationFrame(() => setRequestFitToView());
+    });
     return () => cancelAnimationFrame(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- zoom intentionally excluded
   }, [model, layoutMode, tableSize, visibleLayers, viewMode, setTablePosition, setTablePositionsBulk, setTablePositionsReplace, setRequestFitToView]);
@@ -331,83 +334,47 @@ export default function Canvas() {
     fitToTablesNow(visibleTables);
   }, [model, visibleTables, layoutMode, tableSize, searchQuery, filtersNarrowing, fitToTablesNow]);
 
-  // When user searches or applies filters: fit view to the narrowed set (closer view, no scroll).
-  // Debounced (300ms) so typing doesn’t trigger repeated fits; single filter change still fits once.
-  useEffect(() => {
-    const searchOrFilterActive = !!searchQuery.trim() || filtersNarrowing;
-    if (!searchOrFilterActive || !model || visibleTables.length === 0 || savedPositionsRef.current) return;
-    const tablesToFit = visibleTables;
-    const id = setTimeout(() => fitToTablesNow(tablesToFit), 300);
-    return () => clearTimeout(id);
-  }, [searchQuery, filtersNarrowing, model, visibleTables, layoutMode, tableSize, fitToTablesNow]);
+  // Memoize compact narrowed layout so we don't recalc when only selection changes.
+  const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
+  const compactNarrowedPositions = useMemo(() => {
+    if (visibleTables.length === 0) return {};
+    return calculateCompactNarrowedLayout(visibleTables, { layoutMode, tableSize, compactOverview });
+  }, [visibleTables, layoutMode, tableSize, compactOverview]);
 
-  // Search compact mode: temporarily cluster matched tables for a denser, easier-to-read view.
-  // Restores original positions once search is cleared.
+  // Narrowed view (search or filters): apply a compact, non-overlapping layout so tables
+  // don't stay scattered at separate ends of the screen. Restore when both are cleared.
   useEffect(() => {
-    const activeSearch = searchQuery.trim();
+    const narrowed = !!searchQuery.trim() || filtersNarrowing;
     if (!model) return;
 
-    // Restore original positions when search is cleared — single bulk update.
-    if (!activeSearch) {
+    if (!narrowed) {
       if (savedSearchPositionsRef.current) {
         const saved = savedSearchPositionsRef.current;
         savedSearchPositionsRef.current = null;
-        setTablePositionsReplace(saved);
+        Object.entries(saved).forEach(([key, pos]) => {
+          if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
+            setTablePosition(key, pos);
+          }
+        });
       }
       return;
     }
 
-    // Avoid conflicting with field focus compact mode.
     if (savedPositionsRef.current || visibleTables.length === 0) return;
 
     if (!savedSearchPositionsRef.current) {
       savedSearchPositionsRef.current = { ...useModelStore.getState().tablePositions };
     }
 
-    const overviewDims = getOverviewTableDimensions(tableSize);
-    const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
-    const tw = isOverview ? overviewDims.width : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
-    const th = isOverview ? overviewDims.height : BASE_CARD.COLLAPSED_HEIGHT * SIZE_MULTIPLIERS[tableSize].height;
-    const hGap = Math.round(tw * 0.18);
-    const vGap = Math.round(th * 0.18);
-
-    const stepX = tw + hGap;
-    const stepY = th + vGap;
-
-    // Flat grid layout: arrange all search results in a wide grid sorted by category then name.
-    // This avoids vertical stacking of category groups while still keeping related tables nearby.
-    const sorted = visibleTables.slice().sort((a, b) => {
-      const c = a.category.localeCompare(b.category);
-      return c !== 0 ? c : a.name.localeCompare(b.name);
+    Object.entries(compactNarrowedPositions).forEach(([key, pos]) => {
+      setTablePosition(key, pos);
     });
 
-    const totalCount = sorted.length;
-    // Target a roughly 4:3 aspect ratio grid (wider than tall)
-    const cols = totalCount <= 4 ? totalCount : Math.max(4, Math.ceil(Math.sqrt(totalCount * 1.3)));
-    const gridW = cols * stepX - hGap;
-    const startX = -gridW / 2;
-
-    const compactPositions: Record<string, TablePosition> = {};
-    const compactList: Array<{ x: number; y: number }> = [];
-
-    sorted.forEach((table, idx) => {
-      const col = idx % cols;
-      const row = Math.floor(idx / cols);
-      const pos = {
-        x: startX + col * stepX,
-        y: row * stepY,
-      };
-      compactPositions[table.key] = pos;
-      compactList.push(pos);
-    });
-
-    // Single bulk update instead of N individual setTablePosition calls
-    setTablePositionsBulk(compactPositions);
-
+    const positionsArray = Object.values(compactNarrowedPositions);
     setIsAnimating(true);
-    runFitToView(compactList, compactList.length);
+    runFitToView(positionsArray, positionsArray.length);
     setTimeout(() => setIsAnimating(false), 320);
-  }, [searchQuery, model, visibleTables, layoutMode, tableSize, runFitToView, setTablePositionsBulk, setTablePositionsReplace]);
+  }, [searchQuery, filtersNarrowing, model, visibleTables.length, compactNarrowedPositions, runFitToView, setTablePosition]);
 
   // O(1) lookup set for visible table keys (avoids O(N) .some() per relationship)
   const visibleTableKeys = useMemo(() => new Set(visibleTables.map((t) => t.key)), [visibleTables]);
@@ -1109,9 +1076,8 @@ export default function Canvas() {
               : undefined
           }
         >
-          {/* Domain Containers - In domain and domain-overview layout modes.
-              Hidden during focus-compact because tables are repositioned outside their domains. */}
-          {layoutMode === 'domain-overview' && model && !savedPositionsRef.current && domainContainerElements}
+          {/* Domain Containers - In domain-overview when not narrowed. Hidden during focus-compact or when search/filter apply compact layout. */}
+          {layoutMode === 'domain-overview' && model && !savedPositionsRef.current && !hasNarrowedView && domainContainerElements}
 
           {/* Relationship Lines - Render behind tables */}
           {visibleRelationships.map((rel) => {

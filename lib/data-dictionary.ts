@@ -6,6 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { getDataDictionaryPath as getDataDictionaryPathConfig, getDataDictionaryDir as getDataDictionaryDirConfig } from '@/lib/config';
 
 export interface DataDictionaryField {
   name: string;
@@ -51,28 +52,21 @@ export interface DataDictionary {
   derivation_dag: Record<string, string[]>;
 }
 
-const DATA_DICTIONARY_DIR = path.join(
-  process.cwd(),
-  'facility-summary-mvp',
-  'output',
-  'data-dictionary'
-);
-const DATA_DICTIONARY_PATH = path.join(DATA_DICTIONARY_DIR, 'data-dictionary.json');
-
 export function getDataDictionaryPath(): string {
-  return DATA_DICTIONARY_PATH;
+  return getDataDictionaryPathConfig();
 }
 
 export function getDataDictionaryDir(): string {
-  return DATA_DICTIONARY_DIR;
+  return getDataDictionaryDirConfig();
 }
 
 export function readDataDictionary(): DataDictionary | null {
-  if (!fs.existsSync(DATA_DICTIONARY_PATH)) {
+  const p = getDataDictionaryPath();
+  if (!fs.existsSync(p)) {
     return null;
   }
   try {
-    const raw = fs.readFileSync(DATA_DICTIONARY_PATH, 'utf-8');
+    const raw = fs.readFileSync(p, 'utf-8');
     return JSON.parse(raw) as DataDictionary;
   } catch {
     return null;
@@ -80,11 +74,12 @@ export function readDataDictionary(): DataDictionary | null {
 }
 
 export function writeDataDictionary(data: DataDictionary): void {
-  if (!fs.existsSync(DATA_DICTIONARY_DIR)) {
-    fs.mkdirSync(DATA_DICTIONARY_DIR, { recursive: true });
+  const dir = getDataDictionaryDir();
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
   fs.writeFileSync(
-    DATA_DICTIONARY_PATH,
+    getDataDictionaryPath(),
     JSON.stringify(data, null, 2),
     'utf-8'
   );

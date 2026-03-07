@@ -13,11 +13,11 @@ import {
 } from '@/lib/data-dictionary';
 import { L3_TABLES, type L3TableDef } from '@/data/l3-tables';
 import {
-  L3_METRICS,
   DASHBOARD_PAGES,
   type L3Metric,
   type DashboardPage,
 } from '@/data/l3-metrics';
+import { getMergedMetrics } from '@/lib/metrics-store';
 
 // ─── Bundle type (merged from all providers) ─────────────────────────────────
 
@@ -54,7 +54,7 @@ function provideL3Tables(): L3TableDef[] {
 }
 
 function provideL3Metrics(): L3Metric[] {
-  return [...L3_METRICS];
+  return getMergedMetrics();
 }
 
 /** Build the full schema bundle by calling all providers. */

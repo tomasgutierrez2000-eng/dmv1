@@ -484,4 +484,41 @@ export const DEEP_DIVE_SEED_METRICS: L3Metric[] = [
       'WHERE cs.as_of_date = :as_of_date'
     ),
   }),
+  ({
+    id: 'C114',
+    name: 'Undrawn Exposure ($)',
+    page: 'P4',
+    section: 'Deep Dive',
+    metricType: 'Aggregate',
+    formula: 'SUM(undrawn_amount)',
+    description: 'Total undrawn/unfunded exposure — available credit not yet utilized. Facility: sum unfunded_amount from position_detail × bank_share; Counterparty: participation-weighted; L3/L2/L1: aggregated by LoB.',
+    displayFormat: '$#,##0.0M',
+    sampleValue: '—',
+    sourceFields: [
+      { layer: 'L2', table: 'facility_exposure_snapshot', field: 'undrawn_amount' },
+      { layer: 'L2', table: 'position_detail', field: 'unfunded_amount' },
+      { layer: 'L2', table: 'position', field: 'facility_id' },
+      { layer: 'L1', table: 'facility_master', field: 'lob_segment_id' },
+      { layer: 'L1', table: 'facility_counterparty_participation', field: 'participation_pct' },
+    ],
+    dimensions: [
+      { dimension: 'as_of_date', interaction: 'FILTER' },
+      { dimension: 'facility_id', interaction: 'GROUP_BY' },
+      { dimension: 'counterparty_id', interaction: 'GROUP_BY' },
+    ],
+    allowedDimensions: ALL_DIMS,
+    displayNameByDimension: {
+      facility: 'Facility Undrawn Exposure ($)',
+      counterparty: 'Counterparty Undrawn Exposure ($)',
+      L3: 'L3 Desk Undrawn Exposure ($)',
+      L2: 'L2 Portfolio Undrawn Exposure ($)',
+      L1: 'L1 Department Undrawn Exposure ($)',
+    },
+    formulasByDimension: buildGroupedFormula(
+      'SUM(undrawn_amount)',
+      'SUM(fes.undrawn_amount)',
+      'FROM L2.facility_exposure_snapshot fes LEFT JOIN L1.facility_master fm ON fm.facility_id = fes.facility_id',
+      'WHERE fes.as_of_date = :as_of_date'
+    ),
+  }),
 ];

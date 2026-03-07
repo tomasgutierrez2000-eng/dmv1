@@ -1,22 +1,28 @@
 import fs from 'fs';
 import path from 'path';
+import { getSampleDataL1Path, getSampleDataL2Path, getProjectRoot } from '@/lib/config';
 import type { RunMetricOutput } from './types';
 
-const L1_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
-const L2_PATH = path.join(process.cwd(), 'scripts/l2/output/sample-data.json');
-const RUN_TIMEOUT_MS = 10_000;
+function getRunTimeoutMs(): number {
+  const env = process.env.METRIC_RUN_TIMEOUT_MS;
+  if (env != null && env !== '') {
+    const n = parseInt(env, 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return 10_000;
+}
 
 export type SampleDataByTable = Record<string, { columns: string[]; rows: unknown[][] }>;
 
 function findSqljsDistDir(): string {
-  // Walk up from cwd to find node_modules/sql.js/dist (handles git worktrees)
-  let dir = process.cwd();
+  // Walk up from project root to find node_modules/sql.js/dist (handles git worktrees)
+  let dir = getProjectRoot();
   while (dir !== path.dirname(dir)) {
     const candidate = path.join(dir, 'node_modules', 'sql.js', 'dist');
     if (fs.existsSync(candidate)) return candidate;
     dir = path.dirname(dir);
   }
-  return path.join(process.cwd(), 'node_modules', 'sql.js', 'dist');
+  return path.join(getProjectRoot(), 'node_modules', 'sql.js', 'dist');
 }
 const SQLJS_DIST_DIR = findSqljsDistDir();
 
@@ -98,22 +104,24 @@ function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; error?:
   const now = Date.now();
   const cacheStale = now - _cacheTs > CACHE_TTL_MS;
 
+  const l1Path = getSampleDataL1Path();
+  const l2Path = getSampleDataL2Path();
   try {
     if (needsL1) {
       if (!_cachedL1 || cacheStale) {
-        if (!fs.existsSync(L1_PATH)) {
-          return { data: {}, error: 'L1 sample data not found. Run: npx tsx scripts/l1/generate.ts' };
+        if (!fs.existsSync(l1Path)) {
+          return { data: {}, error: `L1 sample data not found at ${l1Path}. Run: npx tsx scripts/l1/generate.ts` };
         }
-        _cachedL1 = JSON.parse(fs.readFileSync(L1_PATH, 'utf-8')) as SampleDataByTable;
+        _cachedL1 = JSON.parse(fs.readFileSync(l1Path, 'utf-8')) as SampleDataByTable;
         _cacheTs = now;
       }
     }
     if (needsL2) {
       if (!_cachedL2 || cacheStale) {
-        if (!fs.existsSync(L2_PATH)) {
-          return { data: {}, error: 'L2 sample data not found. Run: npx tsx scripts/l2/generate.ts' };
+        if (!fs.existsSync(l2Path)) {
+          return { data: {}, error: `L2 sample data not found at ${l2Path}. Run: npx tsx scripts/l2/generate.ts` };
         }
-        _cachedL2 = JSON.parse(fs.readFileSync(L2_PATH, 'utf-8')) as SampleDataByTable;
+        _cachedL2 = JSON.parse(fs.readFileSync(l2Path, 'utf-8')) as SampleDataByTable;
         _cacheTs = now;
       }
     }
@@ -154,7 +162,12 @@ export async function runSqlMetric(input: {
   const { rawSql, tableKeys } = input;
   const { data: sampleData, error: loadError } = loadSampleData(tableKeys);
   if (loadError) {
-    return { ok: false, error: loadError, hint: 'Generate L1/L2 sample data first.' };
+    return {
+      ok: false,
+      error: loadError,
+      code: 'SAMPLE_DATA_MISSING',
+      hint: 'Generate L1/L2 sample data (npm run generate:l1, npm run generate:l2) or set SAMPLE_DATA_L1_PATH / SAMPLE_DATA_L2_PATH.',
+    };
   }
 
   let dateToUse = input.asOfDate;
@@ -208,6 +221,7 @@ export async function runSqlMetric(input: {
         stmt.free();
       }
 
+      const runTimeoutMs = getRunTimeoutMs();
       const startedAt = Date.now();
       const statement = db.prepare(sqlExecuted);
       statement.bind({ ':as_of_date': dateToUse ?? '' });
@@ -215,13 +229,15 @@ export async function runSqlMetric(input: {
       const values: unknown[][] = [];
       while (statement.step()) {
         values.push(statement.get());
-        if (Date.now() - startedAt > RUN_TIMEOUT_MS) {
+        if (Date.now() - startedAt > runTimeoutMs) {
           statement.free();
           return {
             ok: false,
-            error: `SQL execution exceeded timeout (${RUN_TIMEOUT_MS}ms)`,
+            error: `SQL execution exceeded timeout (${runTimeoutMs}ms)`,
+            code: 'TIMEOUT',
             sqlExecuted,
             inputRowCounts,
+            hint: 'Increase METRIC_RUN_TIMEOUT_MS in env for slower runs.',
           };
         }
       }
@@ -280,6 +296,7 @@ export async function runSqlMetric(input: {
     return {
       ok: false,
       error: `Runner failed: ${msg}`,
+      code: 'RUNNER_FAILED',
       sqlExecuted,
       inputRowCounts,
       hint: 'Check that formulaSQL uses only L1/L2 tables and :as_of_date.',

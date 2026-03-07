@@ -158,6 +158,25 @@ export default function MetricsEngineLayout(props: MetricsEngineLayoutProps) {
               );
             })}
           </div>
+          <div className="px-2 mt-4">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 px-2 mb-1">
+              Pipeline
+            </div>
+            <Link
+              href="/metrics/dscr-lineage"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-left text-gray-300 hover:bg-white/[0.04] hover:text-white transition-colors text-xs"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+              DSCR Pipeline
+            </Link>
+            <Link
+              href="/metrics/undrawn-exposure-lineage"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-left text-gray-300 hover:bg-white/[0.04] hover:text-white transition-colors text-xs"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+              Undrawn Exposure Pipeline
+            </Link>
+          </div>
         </div>
         <div className="p-3 border-t border-white/[0.04] space-y-2">
           <button onClick={onStartCreate} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-sm font-medium">

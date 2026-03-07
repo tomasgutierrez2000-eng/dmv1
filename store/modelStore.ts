@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import type { DataModel, TablePosition, RiskStripe } from '../types/model';
 
+/**
+ * Single store for visualizer: data, view (zoom/pan), selection, filters, UI.
+ * For granular subscriptions (fewer re-renders), use hooks/useModelStoreSelectors.ts
+ * (e.g. useCanvasZoomPan(), useCanvasSelection()) so components only subscribe to the slice they need.
+ */
 interface ModelStore {
   // Data
   model: DataModel | null;

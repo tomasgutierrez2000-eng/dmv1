@@ -1,6 +1,7 @@
 'use client';
 
-import { X, FileCode } from 'lucide-react';
+import { FileCode } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
 import type { ModelDiff } from '../../utils/modelDiff';
 
 export default function SchemaImportModal({
@@ -27,22 +28,14 @@ export default function SchemaImportModal({
     s.tablesAdded + s.tablesRemoved + s.tablesModified + s.relationshipsAdded + s.relationshipsRemoved;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
-      <div
-        className="bg-pwc-gray border border-pwc-gray-light rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col text-pwc-white"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-pwc-gray-light">
-          <h2 className="text-lg font-semibold">Schema import – track changes for SQL &amp; visualization</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-2 rounded hover:bg-pwc-gray-light text-pwc-gray-light hover:text-pwc-white"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="p-4 overflow-y-auto flex-1 space-y-4">
+    <Modal
+      open
+      onClose={onClose}
+      title="Schema import – track changes for SQL &amp; visualization"
+      panelClassName="max-w-2xl w-full max-h-[85vh] flex flex-col text-pwc-white"
+    >
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="space-y-4 overflow-y-auto flex-1 pr-2">
           {/* SQL changes summary – what has to be updated in SQL */}
           <div className="flex items-start gap-3 p-3 rounded-lg bg-pwc-black/60 border border-pwc-orange/40">
             <FileCode className="w-5 h-5 text-pwc-orange flex-shrink-0 mt-0.5" />
@@ -132,7 +125,7 @@ export default function SchemaImportModal({
             </section>
           )}
         </div>
-        <div className="flex justify-end gap-2 p-4 border-t border-pwc-gray-light">
+        <div className="flex justify-end gap-2 pt-4 mt-4 border-t border-pwc-gray-light shrink-0">
           <button
             type="button"
             onClick={onClose}
@@ -149,6 +142,6 @@ export default function SchemaImportModal({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

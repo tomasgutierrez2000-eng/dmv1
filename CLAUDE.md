@@ -76,7 +76,7 @@ Pipeline: `runMetricCalculation()` → `resolveFormulaForDimension()` → escape
 - **Commit messages:** Descriptive English — `Add [feature]`, `Fix [bug]`, `Merge branch 'claude/...'`
 - **Branch naming:** `claude/<adjective-scientist>` for worktree sessions
 - **Component files:** PascalCase (`LineageExplorer.tsx`)
-- **API responses:** `{ ok?: boolean, error?: string, data?: T }`
+- **API responses:** Success: `{ ok?: boolean, data?: T }`; error: `{ ok: false, error: string, details?: string, code?: string }`. Use `lib/api-response.ts` (`jsonSuccess`, `jsonError`, `normalizeCaughtError`) for consistent responses. See `docs/DEPLOYMENT.md` for path overrides and read/write requirements.
 - **Metric IDs:** `C001`-`C107` for L3 metrics, `MET-XXX` for catalogue items
 - **No Prettier** — ESLint only (Next.js config)
 - **No test framework** — validation via CLI scripts (`npm run test:metrics`, `npm run test:calc-engine`)
@@ -105,8 +105,8 @@ AGENT_PROVIDER           # gemini|claude|ollama
 
 ## Important Patterns
 - **Metric storage priority:** Excel (`metrics_dimensions_filled.xlsx`) > JSON (`metrics-custom.json`) > seed metrics — merged via `getMergedMetrics()`
-- **Schema bundle** (`/api/schema/bundle`): unified DataDictionary + L3 Tables + L3 Metrics. Supports `?summary=true` for token-efficient agent prompts
-- **Data dictionary** cached at `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
+- **Schema bundle** (`/api/schema/bundle`): unified DataDictionary + L3 Tables + L3 Metrics (metrics list = `getMergedMetrics()` so agent and calculation see the same set). Supports `?summary=true` for token-efficient agent prompts
+- **Data dictionary** cached at `facility-summary-mvp/output/data-dictionary/data-dictionary.json`. **Sync order:** (1) `npm run sync:data-model` — merges L1/L2 definitions + L3 (from `data/l3-tables.ts` and DDL) into `data-dictionary.json`; (2) generate DDL via `/api/data-model/generate-ddl` or sync script; (3) optional `apply-ddl` when `DATABASE_URL` is set. The `facility-summary-mvp/output/` directory is owned by this repo’s sync/upload flows (or an external pipeline that writes the same JSON); the visualizer and data-model APIs read from it.
 - When modifying metrics: always update both the catalogue item AND the L3 metric definition if both exist
 - Level definitions use `sourcing_type`: `Raw` (direct field), `Calc` (computed), `Agg` (aggregated), `Avg` (weighted average)
 

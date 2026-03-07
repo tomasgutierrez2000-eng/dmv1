@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDataDictionary } from '@/lib/data-dictionary';
 import { buildFullDdl, executeDdl } from '@/lib/data-model-sync';
+import { jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 /**
  * Apply DDL: dry run returns SQL; execute runs against PostgreSQL when DATABASE_URL is set.
@@ -13,10 +14,7 @@ export async function POST(request: NextRequest) {
 
     const dd = readDataDictionary();
     if (!dd) {
-      return NextResponse.json(
-        { error: 'Data dictionary not found. Load or create a model first.' },
-        { status: 404 }
-      );
+      return jsonError('Data dictionary not found. Load or create a model first.', { status: 404 });
     }
 
     const fullSql = buildFullDdl(dd);
@@ -50,15 +48,10 @@ export async function POST(request: NextRequest) {
     const status = result.error?.includes('DATABASE_URL') || result.error?.includes('pg')
       ? 503
       : 500;
-    return NextResponse.json(
-      { error: result.error, sql: fullSql },
-      { status }
-    );
+    return NextResponse.json({ ok: false, error: result.error ?? 'DDL execution failed', sql: fullSql }, { status });
   } catch (error) {
     console.error('Apply DDL error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to apply DDL.' },
-      { status: 500 }
-    );
+    const { message, details, status } = normalizeCaughtError(error);
+    return jsonError(message, { status, details });
   }
 }

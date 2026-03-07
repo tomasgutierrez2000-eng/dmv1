@@ -9,6 +9,7 @@
     "dev:3002": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
+    "typecheck": "tsc --noEmit",
     "lint": "next lint",
     "audit": "npm audit",
     "generate:l1": "tsx scripts/l1/generate.ts",

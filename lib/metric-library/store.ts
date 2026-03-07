@@ -5,17 +5,24 @@
 
 import fs from 'fs';
 import path from 'path';
+import { getMetricLibraryDir } from '@/lib/config';
 import type { MetricDomain, ParentMetric, MetricVariant, CatalogueItem } from './types';
 
-const LIBRARY_DIR = path.join(process.cwd(), 'data', 'metric-library');
-const DOMAINS_PATH = path.join(LIBRARY_DIR, 'domains.json');
-const CATALOGUE_PATH = path.join(LIBRARY_DIR, 'catalogue.json');
-const PARENT_METRICS_PATH = path.join(LIBRARY_DIR, 'parent-metrics.json');
-const VARIANTS_PATH = path.join(LIBRARY_DIR, 'variants.json');
+function getLibraryPaths() {
+  const dir = getMetricLibraryDir();
+  return {
+    dir,
+    domains: path.join(dir, 'domains.json'),
+    catalogue: path.join(dir, 'catalogue.json'),
+    parentMetrics: path.join(dir, 'parent-metrics.json'),
+    variants: path.join(dir, 'variants.json'),
+  };
+}
 
 function ensureDir(): void {
-  if (!fs.existsSync(LIBRARY_DIR)) {
-    fs.mkdirSync(LIBRARY_DIR, { recursive: true });
+  const dir = getMetricLibraryDir();
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
@@ -37,11 +44,11 @@ function writeJson<T>(filePath: string, data: T): void {
 // ─── Domains ───────────────────────────────────────────────────────────────────
 
 export function getDomains(): MetricDomain[] {
-  return readJson<MetricDomain[]>(DOMAINS_PATH, []);
+  return readJson<MetricDomain[]>(getLibraryPaths().domains, []);
 }
 
 export function saveDomains(domains: MetricDomain[]): void {
-  writeJson(DOMAINS_PATH, domains);
+  writeJson(getLibraryPaths().domains, domains);
 }
 
 // ─── Catalogue Items ───────────────────────────────────────────────────────────
@@ -52,7 +59,7 @@ export function getCatalogueItems(filters?: {
   status?: string;
   search?: string;
 }): CatalogueItem[] {
-  const all = readJson<CatalogueItem[]>(CATALOGUE_PATH, []);
+  const all = readJson<CatalogueItem[]>(getLibraryPaths().catalogue, []);
   let list = all;
 
   if (filters?.kind) {
@@ -84,45 +91,45 @@ export function getCatalogueItems(filters?: {
 }
 
 export function getCatalogueItem(itemId: string): CatalogueItem | null {
-  const all = readJson<CatalogueItem[]>(CATALOGUE_PATH, []);
+  const all = readJson<CatalogueItem[]>(getLibraryPaths().catalogue, []);
   return all.find((item) => item.item_id === itemId) ?? null;
 }
 
 export function saveCatalogueItems(items: CatalogueItem[]): void {
-  writeJson(CATALOGUE_PATH, items);
+  writeJson(getLibraryPaths().catalogue, items);
 }
 
 export function upsertCatalogueItem(item: CatalogueItem): void {
-  const all = readJson<CatalogueItem[]>(CATALOGUE_PATH, []);
+  const all = readJson<CatalogueItem[]>(getLibraryPaths().catalogue, []);
   const idx = all.findIndex((i) => i.item_id === item.item_id);
   if (idx >= 0) all[idx] = item;
   else all.push(item);
-  writeJson(CATALOGUE_PATH, all);
+  writeJson(getLibraryPaths().catalogue, all);
 }
 
 // ─── Legacy: Parent metrics (kept for backward compat) ─────────────────────────
 
 export function getParentMetrics(domainId?: string): ParentMetric[] {
-  const all = readJson<ParentMetric[]>(PARENT_METRICS_PATH, []);
+  const all = readJson<ParentMetric[]>(getLibraryPaths().parentMetrics, []);
   if (!domainId) return all;
   return all.filter((p) => p.domain_ids?.includes(domainId));
 }
 
 export function getParentMetric(metricId: string): ParentMetric | null {
-  const all = readJson<ParentMetric[]>(PARENT_METRICS_PATH, []);
+  const all = readJson<ParentMetric[]>(getLibraryPaths().parentMetrics, []);
   return all.find((p) => p.metric_id === metricId) ?? null;
 }
 
 export function saveParentMetrics(parents: ParentMetric[]): void {
-  writeJson(PARENT_METRICS_PATH, parents);
+  writeJson(getLibraryPaths().parentMetrics, parents);
 }
 
 export function upsertParentMetric(parent: ParentMetric): void {
-  const all = readJson<ParentMetric[]>(PARENT_METRICS_PATH, []);
+  const all = readJson<ParentMetric[]>(getLibraryPaths().parentMetrics, []);
   const idx = all.findIndex((p) => p.metric_id === parent.metric_id);
   if (idx >= 0) all[idx] = parent;
   else all.push(parent);
-  writeJson(PARENT_METRICS_PATH, all);
+  writeJson(getLibraryPaths().parentMetrics, all);
 }
 
 // ─── Legacy: Variants (kept for backward compat) ───────────────────────────────
@@ -133,7 +140,7 @@ export function getVariants(filters?: {
   domain_id?: string;
   executable_only?: boolean;
 }): MetricVariant[] {
-  const all = readJson<MetricVariant[]>(VARIANTS_PATH, []);
+  const all = readJson<MetricVariant[]>(getLibraryPaths().variants, []);
   let list = all;
 
   if (filters?.parent_metric_id) {
@@ -155,32 +162,32 @@ export function getVariants(filters?: {
 }
 
 export function getVariant(variantId: string): MetricVariant | null {
-  const all = readJson<MetricVariant[]>(VARIANTS_PATH, []);
+  const all = readJson<MetricVariant[]>(getLibraryPaths().variants, []);
   return all.find((v) => v.variant_id === variantId) ?? null;
 }
 
 export function getVariantByExecutableMetricId(executableMetricId: string): MetricVariant | null {
-  const all = readJson<MetricVariant[]>(VARIANTS_PATH, []);
+  const all = readJson<MetricVariant[]>(getLibraryPaths().variants, []);
   return all.find((v) => v.executable_metric_id === executableMetricId) ?? null;
 }
 
 export function saveVariants(variants: MetricVariant[]): void {
-  writeJson(VARIANTS_PATH, variants);
+  writeJson(getLibraryPaths().variants, variants);
 }
 
 export function saveVariant(variant: MetricVariant): void {
-  const all = readJson<MetricVariant[]>(VARIANTS_PATH, []);
+  const all = readJson<MetricVariant[]>(getLibraryPaths().variants, []);
   const idx = all.findIndex((v) => v.variant_id === variant.variant_id);
   if (idx >= 0) all[idx] = variant;
   else all.push(variant);
-  writeJson(VARIANTS_PATH, all);
+  writeJson(getLibraryPaths().variants, all);
 }
 
 export function addVariant(variant: MetricVariant): void {
-  const all = readJson<MetricVariant[]>(VARIANTS_PATH, []);
+  const all = readJson<MetricVariant[]>(getLibraryPaths().variants, []);
   if (all.some((v) => v.variant_id === variant.variant_id)) {
     throw new Error(`Variant ${variant.variant_id} already exists`);
   }
   all.push(variant);
-  writeJson(VARIANTS_PATH, all);
+  writeJson(getLibraryPaths().variants, all);
 }

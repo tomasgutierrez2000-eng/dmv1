@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'metricId is required' }, { status: 400 });
   }
   if (!isDeepDiveMetric(metricId)) {
-    return NextResponse.json({ error: 'Deep dive is currently enabled for 8 metrics only (C100-C107).' }, { status: 400 });
+    return NextResponse.json({ error: 'Deep dive is currently enabled for 9 metrics only (C100-C107, C114).' }, { status: 400 });
   }
   if (!dimension || !VALID_CALCULATION_DIMENSIONS.includes(dimension)) {
     return NextResponse.json({ error: 'dimension must be one of: ' + VALID_CALCULATION_DIMENSIONS.join(', ') }, { status: 400 });
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'metricId required' }, { status: 400 });
   }
   if (!isDeepDiveMetric(metricId)) {
-    return NextResponse.json({ error: 'Deep dive is currently enabled for 8 metrics only (C100-C107).' }, { status: 400 });
+    return NextResponse.json({ error: 'Deep dive is currently enabled for 9 metrics only (C100-C107, C114).' }, { status: 400 });
   }
 
   const metric = getMetricForCalculation(metricId);

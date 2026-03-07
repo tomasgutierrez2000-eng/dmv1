@@ -22,7 +22,7 @@ export default function MetricDeepDivePage() {
     }
     if (!isDeepDiveMetric(metricId)) {
       setLoading(false);
-      setError('Deep dive is currently enabled for 8 metrics only (C100-C107).');
+      setError('Deep dive is currently enabled for 9 metrics only (C100-C107, C114).');
       return;
     }
     fetch(`/api/metrics?id=${encodeURIComponent(metricId)}`)

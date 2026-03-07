@@ -21,6 +21,9 @@
     "release-tracker:init": "tsx scripts/release-tracker-sync.ts --init",
     "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit",
     "db:export": "bash scripts/export-mvp-sql.sh",
+    "db:load-gsib": "tsx scripts/load-gsib-export.ts",
+    "db:verify-gsib": "tsx scripts/verify-gsib-load.ts",
+    "db:verify-scenarios": "tsx scripts/verify-cro-scenarios.ts",
     "sync:data-model": "tsx scripts/sync-data-model.ts",
     "export:data-model": "tsx scripts/export-data-model-excel.ts",
     "validate": "tsx scripts/validate-data-model.ts"

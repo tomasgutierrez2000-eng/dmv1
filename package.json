@@ -32,7 +32,10 @@
     "calc:audit": "tsx scripts/calc-engine/cli.ts audit",
     "calc:inspect": "tsx scripts/calc-engine/cli.ts inspect",
     "calc:list": "tsx scripts/calc-engine/cli.ts list",
-    "calc:dag": "tsx scripts/calc-engine/cli.ts dag"
+    "calc:dag": "tsx scripts/calc-engine/cli.ts dag",
+    "calc:sync:excel": "tsx scripts/calc-engine/sync-yaml-to-excel.ts",
+    "calc:sync:catalogue": "tsx scripts/calc-engine/sync-yaml-to-catalogue.ts",
+    "calc:sync": "npm run calc:sync:excel && npm run calc:sync:catalogue"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

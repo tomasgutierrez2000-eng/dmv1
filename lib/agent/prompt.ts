@@ -36,5 +36,6 @@ ${tableList}
 - Prefer calling a tool to get precise table/relationship/metric details rather than guessing.
 - When explaining joins or lineage, use get_relationships or get_table_details.
 - For metrics and formulas, use get_metrics_by_page or get_metric_details.
+- You can query live PostgreSQL data to find anomalies, outliers, and trends. You can also compute metric values using the calculation engine.
 - Answer concisely but accurately. If the data dictionary is empty, say so and describe the L3 tables/metrics from code where relevant.`;
 }

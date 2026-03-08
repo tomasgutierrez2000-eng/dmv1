@@ -46,120 +46,53 @@ export default function S08_DashboardUI() {
               <FilePath key="f2">app/data-model/</FilePath>,
             ],
             [
+              '/data-elements',
+              'Data Elements',
+              'Browse all tables, fields, and relationships with search and detail views.',
+              <FilePath key="f3">components/data-elements/</FilePath>,
+            ],
+            [
               '/metrics/library',
               'Metric Library',
               'Browse domains, parent metrics, and variants. View governance and rollup logic.',
-              <FilePath key="f3">components/metric-library/</FilePath>,
+              <FilePath key="f4">components/metric-library/</FilePath>,
             ],
             [
-              '/metrics/deep-dive',
-              'Metrics Deep Dive',
-              'Run metric calculations on demand. Currently supports DSCR.',
-              <FilePath key="f4">components/metrics-engine/</FilePath>,
-            ],
-            [
-              '/metrics',
-              'Metrics Dashboard',
-              'View all metrics, explore lineage, and see how metrics are built.',
-              <FilePath key="f5">app/metrics/page.tsx</FilePath>,
-            ],
-            [
-              '/dashboard',
-              'Facility Dashboard',
-              'Executive dashboard — KPIs, charts, filterable facility table.',
-              <FilePath key="f6">components/dashboard/</FilePath>,
+              '/executive-summary',
+              'Executive Summary',
+              'Animated four-act walkthrough of the data architecture for stakeholders.',
+              <FilePath key="f5">components/executive-summary/</FilePath>,
             ],
             [
               '/agent',
               'AI Agent',
               'Chat with an AI about the data model. Ask questions in plain English.',
-              <FilePath key="f7">app/agent/</FilePath>,
+              <FilePath key="f6">app/agent/</FilePath>,
             ],
             [
               '/upload',
               'Excel Upload',
               'Upload Excel files to import schema definitions or metric data.',
-              <FilePath key="f8">app/upload/</FilePath>,
+              <FilePath key="f7">app/upload/</FilePath>,
             ],
             [
               '/guide',
               'Team Playbook',
               'This guide! The page you are reading right now.',
-              <FilePath key="f9">components/guide/</FilePath>,
+              <FilePath key="f8">components/guide/</FilePath>,
             ],
-          ]}
-        />
-      </SubSection>
-
-      {/* ── Dashboard Overview ───────────────────────────────────── */}
-      <SubSection id="dashboard-overview">
-        <SubTitle>Facility Dashboard</SubTitle>
-        <P>
-          The Facility Dashboard (<FilePath>components/dashboard/</FilePath>) is the primary
-          executive view. It shows portfolio-level KPIs and lets users drill into individual
-          facilities.
-        </P>
-
-        <DiagramBox title="Dashboard Layout">
-          <div className="space-y-3">
-            {/* KPI Row */}
-            <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3">
-              <p className="text-[10px] text-slate-500 font-mono uppercase mb-2">Summary Cards (top row)</p>
-              <div className="flex flex-wrap gap-2">
-                {['Total Facilities', 'Committed Amount', 'Outstanding Exposure', 'Avg Utilization', 'Watch List', 'Avg Risk Rating', 'Coverage Ratio'].map(k => (
-                  <div key={k} className="bg-slate-900/60 border border-slate-700/40 rounded px-2 py-1.5 text-[10px] text-slate-300">
-                    {k}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Filters Row */}
-            <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3">
-              <p className="text-[10px] text-slate-500 font-mono uppercase mb-2">Filters Bar</p>
-              <div className="flex flex-wrap gap-2">
-                {['Search', 'Status', 'Product', 'Business Segment', 'Region', 'Risk Rating', 'Amendments', 'Syndication'].map(f => (
-                  <div key={f} className="bg-slate-900/60 border border-slate-600/40 rounded px-2 py-1 text-[10px] text-slate-400">
-                    {f}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Charts Row */}
-            <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3">
-              <p className="text-[10px] text-slate-500 font-mono uppercase mb-2">Charts Section</p>
-              <div className="flex gap-2">
-                {['Exposure by Product', 'Exposure by Region', 'Exposure by Risk Rating'].map(c => (
-                  <div key={c} className="flex-1 bg-slate-900/60 border border-slate-700/40 rounded p-2 text-center">
-                    <div className="text-lg mb-1">📊</div>
-                    <div className="text-[10px] text-slate-400">{c}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3">
-              <p className="text-[10px] text-slate-500 font-mono uppercase mb-2">Facility Table (sortable, paginated)</p>
-              <div className="text-[10px] text-slate-500">
-                Columns: Facility Name, Counterparty, Product, Committed, Outstanding, Utilization, Risk Rating, Status...
-              </div>
-            </div>
-          </div>
-        </DiagramBox>
-
-        <P>
-          <strong>Key component files:</strong>
-        </P>
-        <DataTable
-          headers={['Component', 'File', 'Purpose']}
-          rows={[
-            ['SummaryCards', <FilePath key="f1">components/dashboard/SummaryCards.tsx</FilePath>, 'The 7 KPI cards at the top'],
-            ['FiltersBar', <FilePath key="f2">components/dashboard/FiltersBar.tsx</FilePath>, 'Search and filter controls'],
-            ['ChartsSection', <FilePath key="f3">components/dashboard/ChartsSection.tsx</FilePath>, 'The three charts'],
-            ['DashboardTable', <FilePath key="f4">components/dashboard/DashboardTable.tsx</FilePath>, 'The sortable facility table'],
-            ['DashboardWrapper', <FilePath key="f5">components/dashboard/DashboardWrapper.tsx</FilePath>, 'Orchestrates all components'],
+            [
+              '/architecture',
+              'Architecture',
+              'Technical pipeline diagram showing the L1 → L2 → L3 data flow.',
+              <FilePath key="f9">components/architecture/</FilePath>,
+            ],
+            [
+              '/release-tracker',
+              'Release Tracker',
+              'Changelog tracking schema evolution across versions.',
+              <FilePath key="f10">lib/release-tracker-data.ts</FilePath>,
+            ],
           ]}
         />
       </SubSection>
@@ -198,7 +131,7 @@ export default function S08_DashboardUI() {
 
         <CardGrid>
           <Card title="Main View" subtitle="LibraryMainView.tsx" accent="bg-blue-500">
-            The top-level view showing all 8 domains as tabs. Click a domain to see its
+            The top-level view showing all domains as tabs. Click a domain to see its
             parent metrics. Shows counts, search, and domain descriptions.
           </Card>
           <Card title="Parent Detail" subtitle="ParentDetailView.tsx" accent="bg-emerald-500">

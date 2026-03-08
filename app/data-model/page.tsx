@@ -164,12 +164,12 @@ export default function DataModelPage() {
     fields: Array<{ name: string; data_type: string; is_pk: boolean }>;
   }>({ layer: 'L1', name: '', category: '', fields: [{ name: '', data_type: 'VARCHAR(64)', is_pk: true }] });
 
-  const [addFieldForm, setAddFieldForm] = useState<{ name: string; data_type: string; is_pk: boolean }>({ name: '', data_type: 'VARCHAR(64)', is_pk: false });
+  const [addFieldForm, setAddFieldForm] = useState<{ name: string; data_type: string; is_pk: boolean; fk_target: string; description: string }>({ name: '', data_type: 'VARCHAR(64)', is_pk: false, fk_target: '', description: '' });
 
   const [editTableOpen, setEditTableOpen] = useState(false);
   const [editTableForm, setEditTableForm] = useState<{ layer: 'L1' | 'L2' | 'L3'; tableName: string; category: string } | null>(null);
   const [editFieldOpen, setEditFieldOpen] = useState(false);
-  const [editFieldForm, setEditFieldForm] = useState<{ layer: 'L1' | 'L2' | 'L3'; tableName: string; fieldName: string; name: string; data_type: string; is_pk: boolean } | null>(null);
+  const [editFieldForm, setEditFieldForm] = useState<{ layer: 'L1' | 'L2' | 'L3'; tableName: string; fieldName: string; name: string; data_type: string; is_pk: boolean; description: string } | null>(null);
 
   const loadDataDictionary = useCallback(async () => {
     setLoading(true);
@@ -999,10 +999,13 @@ export default function DataModelPage() {
                     onSubmit={(e) => {
                       e.preventDefault();
                       if (!addFieldForm.name.trim()) { setActionError('Field name required'); return; }
+                      const fkParts = addFieldForm.fk_target.trim().split('.');
+                      const fkTarget = fkParts.length === 3 ? { layer: fkParts[0], table: fkParts[1], field: fkParts[2] } : undefined;
                       handleAddField(raw.layer, raw.name, {
                         name: addFieldForm.name.trim(),
+                        description: addFieldForm.description.trim() || undefined,
                         data_type: addFieldForm.data_type || undefined,
-                        pk_fk: addFieldForm.is_pk ? { is_pk: true } : undefined,
+                        pk_fk: (addFieldForm.is_pk || fkTarget) ? { is_pk: addFieldForm.is_pk, ...(fkTarget ? { fk_target: fkTarget } : {}) } : undefined,
                       });
                     }}
                     className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex flex-wrap items-end gap-2"
@@ -1020,11 +1023,30 @@ export default function DataModelPage() {
                       className="border border-gray-300 rounded px-2 py-1.5 text-sm"
                     >
                       <option value="VARCHAR(64)">VARCHAR(64)</option>
+                      <option value="VARCHAR(500)">VARCHAR(500)</option>
+                      <option value="BIGINT">BIGINT</option>
+                      <option value="INTEGER">INTEGER</option>
                       <option value="NUMERIC(20,4)">NUMERIC(20,4)</option>
+                      <option value="NUMERIC(10,6)">NUMERIC(10,6)</option>
+                      <option value="BOOLEAN">BOOLEAN</option>
                       <option value="DATE">DATE</option>
                       <option value="TIMESTAMP">TIMESTAMP</option>
-                      <option value="INTEGER">INTEGER</option>
+                      <option value="TEXT">TEXT</option>
                     </select>
+                    <input
+                      type="text"
+                      value={addFieldForm.fk_target}
+                      onChange={(e) => setAddFieldForm((f) => ({ ...f, fk_target: e.target.value }))}
+                      placeholder="FK target (e.g. l1.counterparty.counterparty_id)"
+                      className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+                    />
+                    <input
+                      type="text"
+                      value={addFieldForm.description}
+                      onChange={(e) => setAddFieldForm((f) => ({ ...f, description: e.target.value }))}
+                      placeholder="Description"
+                      className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+                    />
                     <label className="flex items-center gap-1 text-sm">
                       <input type="checkbox" checked={addFieldForm.is_pk} onChange={(e) => setAddFieldForm((f) => ({ ...f, is_pk: e.target.checked }))} />
                       PK
@@ -1056,6 +1078,7 @@ export default function DataModelPage() {
                               name: f.name,
                               data_type: f.data_type || 'VARCHAR(64)',
                               is_pk: !!f.pk_fk?.is_pk,
+                              description: f.description || '',
                             });
                             setEditFieldOpen(true);
                           }}
@@ -1174,6 +1197,7 @@ export default function DataModelPage() {
                 if (!editFieldForm.name.trim()) { setActionError('Field name required'); return; }
                 handleUpdateField(editFieldForm.layer, editFieldForm.tableName, editFieldForm.fieldName, {
                   name: editFieldForm.name.trim(),
+                  description: editFieldForm.description.trim() || undefined,
                   data_type: editFieldForm.data_type || undefined,
                   pk_fk: { is_pk: editFieldForm.is_pk },
                 });
@@ -1198,11 +1222,26 @@ export default function DataModelPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="VARCHAR(64)">VARCHAR(64)</option>
+                  <option value="VARCHAR(500)">VARCHAR(500)</option>
+                  <option value="BIGINT">BIGINT</option>
+                  <option value="INTEGER">INTEGER</option>
                   <option value="NUMERIC(20,4)">NUMERIC(20,4)</option>
+                  <option value="NUMERIC(10,6)">NUMERIC(10,6)</option>
+                  <option value="BOOLEAN">BOOLEAN</option>
                   <option value="DATE">DATE</option>
                   <option value="TIMESTAMP">TIMESTAMP</option>
-                  <option value="INTEGER">INTEGER</option>
+                  <option value="TEXT">TEXT</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                  type="text"
+                  value={editFieldForm.description}
+                  onChange={(e) => setEditFieldForm((f) => f ? { ...f, description: e.target.value } : null)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="Field description"
+                />
               </div>
               <label className="flex items-center gap-2">
                 <input

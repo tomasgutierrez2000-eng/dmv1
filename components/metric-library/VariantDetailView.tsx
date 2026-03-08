@@ -170,7 +170,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
             )}
             {v.executable_metric_id && (
               <Link
-                href={`/metrics/deep-dive/${encodeURIComponent(v.executable_metric_id)}`}
+                href="/metrics/library"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
               >
                 <ExternalLink className="w-4 h-4" aria-hidden />
@@ -276,7 +276,7 @@ export default function VariantDetailView({ parentId, variantId }: { parentId: s
                 This variant is linked to metric <code className="font-mono bg-amber-100/50 px-1 rounded">{v.executable_metric_id}</code>.
               </p>
               <Link
-                href={`/metrics/deep-dive/${encodeURIComponent(v.executable_metric_id)}`}
+                href="/metrics/library"
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden />

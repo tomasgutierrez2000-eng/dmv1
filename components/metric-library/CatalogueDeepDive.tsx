@@ -19,7 +19,6 @@ import { generateAllDemoSteps, generatePositionSteps, generateInsights } from '@
 import LevelStepWalkthrough from './LevelStepWalkthrough';
 import type { FlowStep } from './LevelStepWalkthrough';
 import { PositionTable, EntityTable } from './WorkedExampleTable';
-import HierarchyPyramid from './HierarchyPyramid';
 import GenericTableTraversalDemo from './GenericTableTraversalDemo';
 import GenericFormulaAnimation from './GenericFormulaAnimation';
 
@@ -61,16 +60,16 @@ const TABS: TabDef[] = [
  * ──────────────────────────────────────────────────────────────────────────── */
 
 const LINEAGE_ROUTES: Record<string, { href: string; label: string }> = {
-  LTV:              { href: '/metrics/ltv-lineage',            label: 'LTV End-to-End Lineage' },
-  DSCR:             { href: '/metrics/dscr-lineage',           label: 'DSCR End-to-End Lineage' },
-  WABR:             { href: '/metrics/wabr-lineage',           label: 'WABR End-to-End Lineage' },
-  INT_INCOME:       { href: '/metrics/int-income-lineage',     label: 'Interest Income End-to-End Lineage' },
-  INT_EXPENSE:      { href: '/metrics/int-expense-lineage',    label: 'Interest Expense End-to-End Lineage' },
-  RR_MIG:           { href: '/metrics/rr-migration-lineage',   label: 'Risk Rating Migration Lineage' },
-  COMMITTED_AMOUNT: { href: '/metrics/committed-lineage',      label: 'Committed Amount End-to-End Lineage' },
-  EXCPN_RT:         { href: '/metrics/exception-rate-lineage', label: 'Exception Rate End-to-End Lineage' },
-  ALLOC_PCT:        { href: '/metrics/allocation-pct-lineage', label: 'Allocation % End-to-End Lineage' },
-  COLL_MV:          { href: '/metrics/coll-mv-lineage',        label: 'Collateral MV End-to-End Lineage' },
+  LTV:              { href: '/metrics/LTV/lineage',            label: 'LTV End-to-End Lineage' },
+  DSCR:             { href: '/metrics/DSCR/lineage',           label: 'DSCR End-to-End Lineage' },
+  WABR:             { href: '/metrics/WABR/lineage',           label: 'WABR End-to-End Lineage' },
+  INT_INCOME:       { href: '/metrics/INT_INCOME/lineage',     label: 'Interest Income End-to-End Lineage' },
+  INT_EXPENSE:      { href: '/metrics/INT_EXPENSE/lineage',    label: 'Interest Expense End-to-End Lineage' },
+  RR_MIG:           { href: '/metrics/RR_MIG/lineage',         label: 'Risk Rating Migration Lineage' },
+  COMMITTED_AMOUNT: { href: '/metrics/COMMITTED/lineage',      label: 'Committed Amount End-to-End Lineage' },
+  EXCPN_RT:         { href: '/metrics/EXCPN_RT/lineage',       label: 'Exception Rate End-to-End Lineage' },
+  ALLOC_PCT:        { href: '/metrics/ALLOC_PCT/lineage',      label: 'Allocation % End-to-End Lineage' },
+  COLL_MV:          { href: '/metrics/COLL_MV/lineage',        label: 'Collateral MV End-to-End Lineage' },
 };
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -270,15 +269,6 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
           rollupLevel={TAB_TO_ROLLUP[activeTab]}
         />
       )}
-
-      {/* Hierarchy pyramid — config-driven */}
-      <HierarchyPyramid
-        item={item}
-        config={config}
-        entities={entities}
-        activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as TabKey)}
-      />
 
       {/* Tab bar */}
       <div className="flex gap-1.5 flex-wrap" role="tablist" aria-label="Deep-dive level tabs">

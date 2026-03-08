@@ -6,8 +6,6 @@
 import fs from 'fs';
 import path from 'path';
 import type { L3Metric } from '@/data/l3-metrics';
-import { loadMetricsFromExcel } from './metrics-from-excel';
-import { DEEP_DIVE_SEED_METRICS } from './deep-dive/seed-metrics';
 import { getMetricsCustomPath } from '@/lib/config';
 
 export interface CustomMetricsFile {
@@ -62,15 +60,7 @@ export function nextCustomMetricId(existing: L3Metric[]): string {
   return `C${String(max + 1).padStart(3, '0')}`;
 }
 
-/** All metrics: Excel (if present) + custom JSON merged by id. Custom metrics always appear. */
+/** All metrics from custom JSON. Upload metrics via /api/metrics/import or /api/metrics/library/import. */
 export function getMergedMetrics(): L3Metric[] {
-  const fromExcel = loadMetricsFromExcel();
-  const base = fromExcel && fromExcel.length > 0 ? fromExcel : [];
-  const custom = readCustomMetrics();
-
-  const byId = new Map<string, L3Metric>();
-  for (const m of base) byId.set(m.id, m);
-  for (const m of custom) byId.set(m.id, m);
-  for (const m of DEEP_DIVE_SEED_METRICS) byId.set(m.id, m);
-  return Array.from(byId.values());
+  return readCustomMetrics();
 }

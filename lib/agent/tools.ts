@@ -12,7 +12,9 @@ import {
   findTableInBundle,
 } from '@/lib/schema-bundle';
 import { metricsByPage, getMetric } from '@/data/l3-metrics';
-import type { DashboardPage } from '@/data/l3-metrics';
+import type { CalculationDimension, DashboardPage } from '@/data/l3-metrics';
+import { getMetricById } from '@/lib/metrics-calculation/registry';
+import { runMetricCalculation } from '@/lib/metrics-calculation/engine';
 
 const LAYER_ENUM = ['L1', 'L2', 'L3'] as const;
 const PAGE_ENUM = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'] as const;
@@ -132,6 +134,44 @@ export const TOOL_DECLARATIONS: FunctionDeclaration[] = [
       required: ['query'],
     },
   },
+  {
+    name: 'query_live_data',
+    description:
+      'Execute a read-only SELECT query against the live PostgreSQL database. Use this to find anomalies, outliers, trends in actual data. Only SELECT statements are allowed.',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        sql: {
+          type: Type.STRING,
+          description: 'A SELECT SQL query',
+        },
+        limit: {
+          type: Type.INTEGER,
+          description: 'Max rows (default 100, max 1000)',
+        },
+      },
+      required: ['sql'],
+    },
+  },
+  {
+    name: 'compute_metric_value',
+    description:
+      'Calculate an L3 metric value using the metrics calculation engine',
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        metricId: {
+          type: Type.STRING,
+          description: 'Metric ID (e.g. C001)',
+        },
+        dimension: {
+          type: Type.STRING,
+          description: 'Calculation dimension: facility, counterparty, L1, L2, or L3',
+        },
+      },
+      required: ['metricId'],
+    },
+  },
 ];
 
 // ─── Handlers (run with current bundle; return JSON-serializable object) ───
@@ -139,7 +179,7 @@ export const TOOL_DECLARATIONS: FunctionDeclaration[] = [
 export type ToolHandler = (
   args: Record<string, unknown>,
   bundle: SchemaBundle
-) => Record<string, unknown>;
+) => Record<string, unknown> | Promise<Record<string, unknown>>;
 
 function handleGetTablesByLayer(
   args: Record<string, unknown>,
@@ -308,6 +348,90 @@ function handleSearchTablesOrMetrics(
   };
 }
 
+async function handleQueryLiveData(
+  args: Record<string, unknown>,
+  _bundle: SchemaBundle
+): Promise<Record<string, unknown>> {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    return { error: 'DATABASE_URL is not configured. Cannot query live data.' };
+  }
+
+  const sql = String(args.sql ?? '').trim();
+  if (!sql) {
+    return { error: 'sql parameter is required.' };
+  }
+
+  // Only allow SELECT statements
+  if (!/^\s*SELECT\b/i.test(sql)) {
+    return { error: 'Only SELECT queries are allowed. Your query must start with SELECT.' };
+  }
+
+  const rawLimit = args.limit != null ? Number(args.limit) : 100;
+  const limit = Math.max(1, Math.min(rawLimit, 1000));
+
+  try {
+    // Dynamic require to avoid bundling pg when not needed
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Pool } = require('pg') as typeof import('pg');
+    const pool = new Pool({ connectionString: databaseUrl, statement_timeout: 10_000 });
+
+    try {
+      const limitedSql = `SELECT * FROM (${sql}) AS _agent_q LIMIT ${limit}`;
+      const result = await pool.query(limitedSql);
+      const columns = result.fields?.map((f: { name: string }) => f.name) ?? [];
+      return {
+        rows: result.rows ?? [],
+        rowCount: result.rowCount ?? 0,
+        columns,
+      };
+    } finally {
+      await pool.end();
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Query failed: ${message}` };
+  }
+}
+
+async function handleComputeMetricValue(
+  args: Record<string, unknown>,
+  _bundle: SchemaBundle
+): Promise<Record<string, unknown>> {
+  const metricId = String(args.metricId ?? '').trim();
+  if (!metricId) {
+    return { error: 'metricId is required.' };
+  }
+
+  const metric = getMetricById(metricId);
+  if (!metric) {
+    return {
+      error: `Metric not found: ${metricId}.`,
+      hint: 'Use get_metrics_by_page or search_tables_or_metrics to find valid metric IDs.',
+    };
+  }
+
+  const dimension = (String(args.dimension ?? 'facility').trim()) as CalculationDimension;
+  const validDimensions = ['facility', 'counterparty', 'L1', 'L2', 'L3'];
+  if (!validDimensions.includes(dimension)) {
+    return {
+      error: `Invalid dimension: ${dimension}. Must be one of: ${validDimensions.join(', ')}`,
+    };
+  }
+
+  try {
+    const result = await runMetricCalculation({
+      metric,
+      dimension,
+      asOfDate: null,
+    });
+    return result as unknown as Record<string, unknown>;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Metric calculation failed: ${message}` };
+  }
+}
+
 // ─── Registry: name -> handler ─────────────────────────────────────────────
 
 export const TOOL_HANDLERS: Record<string, ToolHandler> = {
@@ -318,18 +442,20 @@ export const TOOL_HANDLERS: Record<string, ToolHandler> = {
   get_metrics_by_page: handleGetMetricsByPage,
   get_metric_details: handleGetMetricDetails,
   search_tables_or_metrics: handleSearchTablesOrMetrics,
+  query_live_data: handleQueryLiveData,
+  compute_metric_value: handleComputeMetricValue,
 };
 
 /** Execute a tool by name. Returns JSON-serializable result. */
-export function runTool(
+export async function runTool(
   name: string,
   args: Record<string, unknown>,
   bundle: SchemaBundle
-): Record<string, unknown> {
+): Promise<Record<string, unknown>> {
   const handler = TOOL_HANDLERS[name];
   if (!handler) return { error: `Unknown tool: ${name}.` };
   try {
-    return handler(args ?? {}, bundle);
+    return await handler(args ?? {}, bundle);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { error: `Tool ${name} failed: ${message}` };

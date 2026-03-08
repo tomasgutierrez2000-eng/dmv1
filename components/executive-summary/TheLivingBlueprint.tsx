@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { STAGES, STAGE_CONNECTIONS } from '../architecture/architectureData';
 import type { ArchStage, ArchNode } from '../architecture/architectureData';
+import { useSchemaBundle } from './useSchemaBundle';
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Heartbeat pulse animation (SVG)
@@ -437,6 +438,7 @@ function SystemHealth() {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function TheLivingBlueprint() {
+  const { counts } = useSchemaBundle();
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -555,9 +557,9 @@ export default function TheLivingBlueprint() {
             </div>
 
             <div className="flex items-center gap-4 text-[10px] text-slate-500 font-mono">
-              <span>153 tables</span>
+              <span>{counts.totalTables || 153} tables</span>
               <span className="text-slate-700">|</span>
-              <span>27 metrics</span>
+              <span>{counts.metricCount || 27} metrics</span>
               <span className="text-slate-700">|</span>
               <span>6 stages</span>
             </div>

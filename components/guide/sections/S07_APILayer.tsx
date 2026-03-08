@@ -106,10 +106,10 @@ export default function S07_APILayer() {
                 <span key="f3" className="text-[10px]">app/api/metrics/consumable/</span>,
               ],
               [
-                <span key="m4" className="text-blue-400 font-mono">POST</span>,
-                <InlineCode key="e4">/api/metrics/deep-dive/run</InlineCode>,
-                'Run a metric calculation on demand (e.g., DSCR at facility level)',
-                <span key="f4" className="text-[10px]">app/api/metrics/deep-dive/run/</span>,
+                <span key="m4" className="text-emerald-400 font-mono">GET</span>,
+                <InlineCode key="e4">/api/metrics/values/[metricId]</InlineCode>,
+                'Get computed values for a metric',
+                <span key="f4" className="text-[10px]">app/api/metrics/values/[metricId]/</span>,
               ],
             ]}
           />

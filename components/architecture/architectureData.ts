@@ -656,7 +656,7 @@ const consumption: ArchStage = {
       detail: {
         description:
           'Visual lineage diagrams showing how each metric traces from source fields through joins, formulas, and rollup logic. Available for LTV, DSCR, WABR, Interest Income, and Committed Amount.',
-        link: '/metrics/ltv-lineage',
+        link: '/metrics/LTV/lineage',
       },
     },
   ],

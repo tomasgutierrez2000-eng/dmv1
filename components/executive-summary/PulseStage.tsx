@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
 } from 'lucide-react';
 import type { PulseAct } from './pulseData';
+import { useSchemaBundle } from './useSchemaBundle';
 import {
   TIMING,
   SOURCE_NODES,
@@ -142,9 +143,10 @@ function SourceSystemsAct() {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 function IngestionAct() {
+  const { counts } = useSchemaBundle();
   const [showCanonical, setShowCanonical] = useState(false);
-  const l1Count = useCountUp(78, TIMING.counterDurationMs, showCanonical);
-  const l2Count = useCountUp(26, TIMING.counterDurationMs, showCanonical);
+  const l1Count = useCountUp(counts.l1Tables || 78, TIMING.counterDurationMs, showCanonical);
+  const l2Count = useCountUp(counts.l2Tables || 26, TIMING.counterDurationMs, showCanonical);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowCanonical(true), 2500);
@@ -230,9 +232,10 @@ function IngestionAct() {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 function ProcessingAct() {
+  const { counts } = useSchemaBundle();
   const [showFormula, setShowFormula] = useState(false);
   const parentCount = useCountUp(12, TIMING.counterDurationMs, true);
-  const variantCount = useCountUp(27, TIMING.counterDurationMs, true);
+  const variantCount = useCountUp(counts.metricCount || 27, TIMING.counterDurationMs, true);
   const domainCount = useCountUp(8, TIMING.counterDurationMs, true);
 
   useEffect(() => {
@@ -351,6 +354,7 @@ function ProcessingAct() {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 function OutputsAct() {
+  const { counts } = useSchemaBundle();
   return (
     <div className="flex flex-col gap-6 max-w-5xl w-full">
       {/* KPI Cards */}
@@ -431,8 +435,8 @@ function OutputsAct() {
           </div>
           {[
             { icon: LayoutDashboard, label: 'Interactive Dashboards', desc: '7 dashboard pages with drill-down', color: '#f472b6' },
-            { icon: Library, label: 'Metric Library', desc: '27 metric variants across 8 domains', color: '#f472b6' },
-            { icon: BarChart3, label: 'Schema Visualizer', desc: '153 tables with full relationship mapping', color: '#f472b6' },
+            { icon: Library, label: 'Metric Library', desc: `${counts.metricCount || 27} metric variants across 8 domains`, color: '#f472b6' },
+            { icon: BarChart3, label: 'Schema Visualizer', desc: `${counts.totalTables || 153} tables with full relationship mapping`, color: '#f472b6' },
           ].map((item, i) => (
             <motion.div
               key={item.label}
@@ -494,6 +498,7 @@ function FullViewArrow() {
 }
 
 export function PulseFullView() {
+  const { counts } = useSchemaBundle();
   return (
     <motion.div
       className="w-full max-w-6xl"
@@ -518,8 +523,8 @@ export function PulseFullView() {
           color="#60a5fa"
           items={[
             ...INGESTION_NODES.map(n => ({ label: n.label })),
-            { label: 'L1 Reference', sub: '78 tables' },
-            { label: 'L2 Snapshots', sub: '25 tables' },
+            { label: 'L1 Reference', sub: `${counts.l1Tables || 78} tables` },
+            { label: 'L2 Snapshots', sub: `${counts.l2Tables || 25} tables` },
           ]}
         />
         <FullViewArrow />
@@ -528,7 +533,7 @@ export function PulseFullView() {
           color="#a78bfa"
           items={[
             ...PROCESSING_TIER_NODES.map(n => ({ label: n.label, sub: n.subtitle })),
-            { label: 'Metric Derivation', sub: '27 variants' },
+            { label: 'Metric Derivation', sub: `${counts.metricCount || 27} variants` },
           ]}
         />
         <FullViewArrow />
@@ -537,8 +542,8 @@ export function PulseFullView() {
           color="#f472b6"
           items={[
             { label: '7 Dashboard Pages', sub: 'KPIs to drill-down' },
-            { label: 'Metric Library', sub: '27 variants' },
-            { label: 'Schema Visualizer', sub: '153 tables' },
+            { label: 'Metric Library', sub: `${counts.metricCount || 27} variants` },
+            { label: 'Schema Visualizer', sub: `${counts.totalTables || 153} tables` },
             { label: 'Lineage Explorer', sub: 'full traceability' },
           ]}
         />

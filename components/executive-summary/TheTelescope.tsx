@@ -21,6 +21,7 @@ import {
   getNodeById,
 } from './telescopeData';
 import type { ArchStage, ArchNode, TelescopeAction } from './telescopeData';
+import { useSchemaBundle } from './useSchemaBundle';
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Shared animation variants
@@ -46,6 +47,7 @@ const fadeScale = {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 function OrbitView({ onZoomStage }: { onZoomStage: (id: string) => void }) {
+  const { counts } = useSchemaBundle();
   return (
     <div className="flex flex-col items-center gap-8 w-full max-w-6xl">
       <div className="text-center mb-4">
@@ -150,8 +152,8 @@ function OrbitView({ onZoomStage }: { onZoomStage: (id: string) => void }) {
       >
         {[
           { label: 'Source Systems', value: '8', color: '#94a3b8' },
-          { label: 'Total Tables', value: '153', color: '#D04A02' },
-          { label: 'Metric Variants', value: '27', color: '#a78bfa' },
+          { label: 'Total Tables', value: String(counts.totalTables || 153), color: '#D04A02' },
+          { label: 'Metric Variants', value: String(counts.metricCount || 27), color: '#a78bfa' },
           { label: 'Delivery Channels', value: '5', color: '#f472b6' },
         ].map((s) => (
           <div key={s.label} className="flex flex-col items-center gap-1">

@@ -120,7 +120,10 @@ export function generateLayerDdl(
 ): string {
   const schema = layerToSchema(layer);
   const tables = dd[layer].filter((t) => t.fields.length > 0);
-  const header = `-- ${layer} Data Model DDL\n-- Generated from data dictionary (viz cache)\n-- Target: PostgreSQL\n\nCREATE SCHEMA IF NOT EXISTS ${schema};\n\n`;
+  const searchPath =
+    layer === 'L3' ? `\nSET search_path TO l1, l2, l3, public;\n` :
+    layer === 'L2' ? `\nSET search_path TO l1, l2, public;\n` : '';
+  const header = `-- ${layer} Data Model DDL\n-- Generated from data dictionary (viz cache)\n-- Target: PostgreSQL\n\nCREATE SCHEMA IF NOT EXISTS ${schema};${searchPath}\n\n`;
   const body = tables
     .map((t) => `-- ${t.name} (${t.category})\n${buildCreateTable(t, schema)}\n`)
     .join('\n');

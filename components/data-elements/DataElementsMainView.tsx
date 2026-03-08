@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { Search, ChevronLeft, Database, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, ChevronLeft, Database, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
 import type { DataDictionary, DataDictionaryTable } from '@/lib/data-dictionary';
 import { flattenTables, getDistinctCategories, tableMatchesSearch, countPKs, countFKs } from '@/lib/data-elements/utils';
 import StatsBar from './StatsBar';
@@ -24,6 +24,8 @@ export default function DataElementsMainView() {
   const [dd, setDd] = useState<DataDictionary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Search: URL is source of truth for filtering; transient state for responsive input
   const searchQuery = searchParams.get('q') ?? '';
@@ -126,7 +128,7 @@ export default function DataElementsMainView() {
         if (!r.ok) throw new Error('Failed to load data dictionary');
         return r.json();
       })
-      .then((data: DataDictionary) => setDd(data))
+      .then((data: DataDictionary) => { setDd(data); setLastUpdated(new Date()); })
       .catch(() => setError('Could not load the data dictionary.'))
       .finally(() => setLoading(false));
   }, []);
@@ -248,6 +250,22 @@ export default function DataElementsMainView() {
               Overview
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">Data Elements Library</h1>
+            <div className="ml-auto flex items-center gap-3">
+              {lastUpdated && (
+                <span className="text-xs text-gray-400">
+                  Loaded {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => { setRefreshing(true); fetch('/api/data-dictionary').then(r => r.json()).then((data: DataDictionary) => { setDd(data); setLastUpdated(new Date()); }).catch(() => {}).finally(() => setRefreshing(false)); }}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 px-2 py-1 rounded border border-gray-200 hover:border-blue-300"
+                title="Refresh data dictionary"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
           </div>
           {!loading && !error && (
             <p className="text-sm text-gray-500 mt-1">

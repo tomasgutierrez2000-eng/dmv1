@@ -85,4 +85,28 @@ export const CLAUDE_TOOLS: ClaudeTool[] = [
       required: ['query'],
     },
   },
+  {
+    name: 'query_live_data',
+    description: 'Execute a read-only SELECT query against the live PostgreSQL database. Use this to find anomalies, outliers, trends in actual data. Only SELECT statements are allowed.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        sql: { type: 'string', description: 'A SELECT SQL query' },
+        limit: { type: 'integer', description: 'Max rows (default 100, max 1000)' },
+      },
+      required: ['sql'],
+    },
+  },
+  {
+    name: 'compute_metric_value',
+    description: 'Calculate an L3 metric value using the metrics calculation engine',
+    input_schema: {
+      type: 'object',
+      properties: {
+        metricId: { type: 'string', description: 'Metric ID (e.g. C001)' },
+        dimension: { type: 'string', description: 'Calculation dimension: facility, counterparty, L1, L2, or L3' },
+      },
+      required: ['metricId'],
+    },
+  },
 ];

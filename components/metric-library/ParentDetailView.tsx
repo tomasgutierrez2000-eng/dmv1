@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import type { MetricDomain } from '@/lib/metric-library/types';
@@ -9,8 +8,7 @@ import { TypeBadge, StatusBadge } from './badges';
 import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 
-const LTVLineageView = dynamic(() => import('./LTVLineageView'), { ssr: false });
-const DSCRLineageView = dynamic(() => import('./DSCRLineageView'), { ssr: false });
+/* Metric-specific lineage views removed — dynamic lineage at /metrics/[id]/lineage */
 
 interface ParentDetail {
   metric_id: string;
@@ -234,8 +232,7 @@ export default function ParentDetailView({ parentId }: { parentId: string }) {
               aria-labelledby="parent-tab-rollup-btn"
               className="rounded-lg overflow-hidden"
             >
-              {parentId === 'LTV' && <LTVLineageView />}
-              {parentId === 'DSCR' && <DSCRLineageView />}
+              {/* Metric-specific lineage views removed */}
             </section>
           ) : (
             <section

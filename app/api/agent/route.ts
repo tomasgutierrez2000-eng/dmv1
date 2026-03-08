@@ -160,7 +160,7 @@ async function runClaudeAgent(params: {
         const name = block.name ?? 'unknown';
         const input = block.input ?? {};
         toolCallsMade.push({ name, args: input });
-        const result = runTool(name, input, bundle);
+        const result = await runTool(name, input, bundle);
         toolResults.push({ type: 'tool_result', tool_use_id: id, content: JSON.stringify(result) });
       }
 
@@ -292,7 +292,7 @@ async function runLlamaAgent(params: {
           // ignore
         }
         toolCallsMade.push({ name, args });
-        const result = runTool(name, args, bundle);
+        const result = await runTool(name, args, bundle);
         currentMessages.push({
           role: 'tool',
           tool_call_id: tc.id ?? '',
@@ -501,14 +501,15 @@ export async function POST(request: NextRequest) {
 
       // Run each function call and build response parts
       const functionCalls = response.functionCalls ?? [];
-      const responseParts = functionCalls.map((fc) => {
+      const responseParts = [];
+      for (const fc of functionCalls) {
         const name = fc.name ?? 'unknown';
         const args = (fc.args ?? {}) as Record<string, unknown>;
         toolCallsMade.push({ name, args });
-        const result = runTool(name, args, bundle);
+        const result = await runTool(name, args, bundle);
         const id = fc.id ?? name;
-        return createPartFromFunctionResponse(id, name, result);
-      });
+        responseParts.push(createPartFromFunctionResponse(id, name, result));
+      }
 
       // Single user turn with all function responses
       contents.push(createUserContent(responseParts));

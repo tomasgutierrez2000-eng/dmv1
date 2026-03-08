@@ -49,6 +49,7 @@ export default function VisualizerPage() {
 
   const [dictLoading, setDictLoading] = useState(false);
   const [liqCapLoading, setLiqCapLoading] = useState(false);
+  const [lastLoaded, setLastLoaded] = useState<Date | null>(null);
 
   const loadLiquidityCapitalTables = async () => {
     setLiqCapLoading(true);
@@ -95,6 +96,7 @@ export default function VisualizerPage() {
       const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
       if (isOverview) setTablePositionsReplace(positions);
       else setTablePositionsBulk(positions);
+      setLastLoaded(new Date());
       toast({ type: 'success', title: 'Model loaded', description: `Data dictionary: ${Object.keys(model.tables).length} tables (edits from Data Model page).` });
     } catch (e) {
       console.error('Load from data dictionary failed:', e);

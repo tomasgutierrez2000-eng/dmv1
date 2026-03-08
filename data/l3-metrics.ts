@@ -231,6 +231,10 @@ export const DIMENSION_LABELS: Record<string, string> = {
 // ═══════════════════════════════════════════════════════════════
 
 export const L3_METRICS: L3Metric[] = [
+  /* Seed metrics removed — real metrics come from getMergedMetrics() (Excel > custom JSON > deep-dive seeds) */
+];
+
+const _REMOVED_SEED_METRICS: L3Metric[] = [
   {
     id: 'C001',
     name: 'Undrawn Exposure',

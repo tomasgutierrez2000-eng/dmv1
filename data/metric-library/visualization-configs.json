@@ -109,7 +109,7 @@
         {
           "op": "*",
           "field": "bank_share_pct",
-          "label": "Bank's participation percentage — used at counterparty level to weight collateral share",
+          "label": "Bank's participation percentage from current allocation record",
           "sample_value": 0,
           "source_table": "facility_lender_allocation",
           "source_layer": "L1"
@@ -117,7 +117,7 @@
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each active facility as of the most recent as_of_date, look up all collateral_snapshot records linked to that facility_id and SUM current_valuation_usd across all associated collateral positions.\n"
+      "formula_display": "For each active facility, SUM current_valuation_usd across all collateral positions, weighted by the bank's current participation share. Formula: SUM(current_valuation_usd) * COALESCE(bank_share_pct, 100) / 100.\n"
     },
     "worked_example_columns": [
       {

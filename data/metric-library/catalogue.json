@@ -853,7 +853,7 @@
     "abbreviation": "COLL-MV",
     "kind": "METRIC",
     "definition": "Current market value of all pledged collateral securing a credit exposure, denominated in USD. At the facility level, aggregates across all collateral positions linked to the facility. At the counterparty level, applies the bank's participation percentage (bank_share_pct) to reflect only the bank's proportionate share of collateral coverage. Supports recovery analysis, secured lending assessment, and credit risk mitigation quantification. Data element: Current_valuation_USD. Sourced from L2 Atomic Layer (collateral_snapshot).\n",
-    "generic_formula": "For each active facility as of the most recent as_of_date, look up all collateral_snapshot records linked to that facility_id and SUM current_valuation_usd across all associated collateral positions.\n",
+    "generic_formula": "For each active facility, SUM current_valuation_usd across all collateral positions, weighted by the bank's current participation share. Formula: SUM(current_valuation_usd) * COALESCE(bank_share_pct, 100) / 100.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
@@ -894,8 +894,8 @@
         "level": "facility",
         "dashboard_display_name": "Current Collateral Market Value (facility)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "For each active facility as of the most recent as_of_date, look up all collateral_snapshot records linked to that facility_id and SUM current_valuation_usd across all associated collateral positions.\n",
+        "sourcing_type": "Calc",
+        "level_logic": "For each active facility, SUM current_valuation_usd across all collateral positions, weighted by the bank's current participation share. Formula: SUM(current_valuation_usd) * COALESCE(bank_share_pct, 100) / 100.\n",
         "source_references": [
           {
             "layer": "L2",
@@ -955,7 +955,25 @@
             "layer": "L1",
             "table": "facility_lender_allocation",
             "field": "bank_share_pct",
-            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+            "description": "Bank's participation percentage from current allocation record"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current allocation row to prevent double-counting"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
           }
         ]
       },
@@ -963,8 +981,8 @@
         "level": "counterparty",
         "dashboard_display_name": "Current Collateral Market Value (counterparty)",
         "in_record": true,
-        "sourcing_type": "Calc",
-        "level_logic": "For each counterparty, look up all active facilities via facility_master. For each facility, retrieve the bank's participation percentage (bank_share_pct) from facility_lender_allocation and the facility-level current_valuation_usd (summed across all collateral positions). Multiply collateral value by participation percentage to get the bank's attributable share, then SUM across all facilities for the counterparty. Formula: SUM(current_valuation_usd * bank_share_pct / 100) per counterparty_id.\n",
+        "sourcing_type": "Agg",
+        "level_logic": "SUM of bank-share-weighted facility collateral values per counterparty. Formula: SUM(facility_collateral_mv * COALESCE(bank_share_pct, 100) / 100) grouped by counterparty_id.\n",
         "source_references": [
           {
             "layer": "L2",
@@ -1024,7 +1042,25 @@
             "layer": "L1",
             "table": "facility_lender_allocation",
             "field": "bank_share_pct",
-            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+            "description": "Bank's participation percentage from current allocation record"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current allocation row to prevent double-counting"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
           }
         ]
       },
@@ -1033,7 +1069,7 @@
         "dashboard_display_name": "Current Collateral Market Value (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each L3 desk in enterprise_business_taxonomy, look up all active facilities with a matching lob_segment_id, retrieve their facility-level current collateral market value, and SUM across all facilities for the desk.\n",
+        "level_logic": "SUM of bank-share-weighted facility collateral values per L3 desk segment.\n",
         "source_references": [
           {
             "layer": "L2",
@@ -1093,7 +1129,25 @@
             "layer": "L1",
             "table": "facility_lender_allocation",
             "field": "bank_share_pct",
-            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+            "description": "Bank's participation percentage from current allocation record"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current allocation row to prevent double-counting"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
           }
         ]
       },
@@ -1102,7 +1156,7 @@
         "dashboard_display_name": "Current Collateral Market Value (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each L2 portfolio segment, traverse enterprise_business_taxonomy from facility lob_segment_id (L3 desk) up to its parent_segment_id (L2 portfolio). SUM facility-level collateral market values across all facilities belonging to desks within the portfolio.\n",
+        "level_logic": "SUM of bank-share-weighted facility collateral values per L2 portfolio segment. Traverses enterprise_business_taxonomy: L3 desk → L2 portfolio (parent_segment_id).\n",
         "source_references": [
           {
             "layer": "L2",
@@ -1162,7 +1216,25 @@
             "layer": "L1",
             "table": "facility_lender_allocation",
             "field": "bank_share_pct",
-            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+            "description": "Bank's participation percentage from current allocation record"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current allocation row to prevent double-counting"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
           }
         ]
       },
@@ -1171,7 +1243,7 @@
         "dashboard_display_name": "Current Collateral Market Value (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "For each L1 business segment / department, traverse enterprise_business_taxonomy two levels up from the facility's lob_segment_id (L3 desk → L2 portfolio → L1 business segment). SUM facility-level collateral market values across all facilities within the segment.\n",
+        "level_logic": "SUM of bank-share-weighted facility collateral values per L1 business segment. Traverses enterprise_business_taxonomy: L3 desk → L2 portfolio → L1 segment.\n",
         "source_references": [
           {
             "layer": "L2",
@@ -1231,7 +1303,25 @@
             "layer": "L1",
             "table": "facility_lender_allocation",
             "field": "bank_share_pct",
-            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+            "description": "Bank's participation percentage from current allocation record"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current allocation row to prevent double-counting"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
           }
         ]
       }

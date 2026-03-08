@@ -65,7 +65,28 @@ Pipeline: `runMetricCalculation()` → `resolveFormulaForDimension()` → escape
 - Or pre-defined `nodes[]` + `edges[]` for complex DAGs
 - Narrative parser in `lib/deep-dive/lineage-parser.ts` extracts steps from pipe-delimited level logic
 
-## Adding a New Metric (Common Workflow)
+## Adding a New Metric (Automated Pipeline)
+**One command:** Write YAML → `npm run calc:full` → catalogue + demo + viz config all auto-generated.
+
+1. **Write YAML** in `scripts/calc_engine/metrics/{domain}/{METRIC_ID}.yaml` with `catalogue` block:
+   ```yaml
+   catalogue:
+     item_id: "MET-XXX"           # Catalogue ID (default: metric_id)
+     abbreviation: "SHORT_NAME"   # For UI display
+     insight: "Business insight..."
+     rollup_strategy: "direct-sum" # or "sum-ratio", "weighted-avg"
+     primary_value_field: "result_field_name"
+   ```
+2. **(Optional) Write Python calculator** in `scripts/calc_engine/calculators/` for auto-generated demo data. Register in `__init__.py`.
+3. **Run `npm run calc:full`** — syncs YAML → Excel + catalogue (creates if new), generates ingredient_fields from YAML source_tables, builds viz config, runs Python demo generator.
+
+### Individual commands
+- `npm run calc:sync` — YAML → Excel + catalogue (no demo data)
+- `npm run calc:demo -- --metric MET-XXX --persist --force` — generate demo for one metric
+- `npm run calc:demo:all` — generate demo for all metrics with calculators
+- `npm run calc:full` — calc:sync + calc:demo:all
+
+### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`
 2. If executable: add L3Metric entry to `data/l3-metrics.ts` with `formulaSQL` and `sourceFields`
 3. Link via `executable_metric_id` on the catalogue item
@@ -92,7 +113,10 @@ npm run dev              # Dev server (port 3000)
 npm run build            # Production build
 npm run test:metrics     # Validate metric definitions
 npm run test:calc-engine # Test calculation engine
-npm run calc:sync        # YAML → Excel + catalogue (Option C)
+npm run calc:sync        # YAML → Excel + catalogue (sync only, no demo)
+npm run calc:demo        # Generate demo data (use --metric MET-XXX for one)
+npm run calc:demo:all    # Generate demo data for all metrics with calculators
+npm run calc:full        # calc:sync + calc:demo:all (full pipeline)
 npm run db:introspect    # Introspect PostgreSQL → update data dictionary
 npm run sync:data-model  # Sync model from DDL (offline fallback) or DB
 npm run export:data-model # Export to Excel

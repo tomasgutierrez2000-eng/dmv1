@@ -90,5 +90,49 @@
         "subtotal_fn": "sum"
       }
     ]
+  },
+  "MET-001": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "current_valuation_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "current_valuation_usd",
+          "label": "Current market value of the collateral asset in USD",
+          "sample_value": 0,
+          "source_table": "collateral_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation percentage — used at counterparty level to weight collateral share",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each active facility as of the most recent as_of_date, look up all collateral_snapshot records linked to that facility_id and SUM current_valuation_usd across all associated collateral positions.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "current_valuation_usd",
+        "header": "Current Valuation Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      }
+    ]
   }
 }

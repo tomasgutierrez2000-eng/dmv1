@@ -573,49 +573,49 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 1602133334.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
           "ltv_pct": 312.08,
           "positions": [
             {
               "position_id": "P-10",
               "facility_id": "F-10",
               "position_type": "REV",
-              "balance_amount": 2100000000.0,
+              "balance_amount": 2100000000,
               "description": "REV exposure"
             },
             {
               "position_id": "P-415",
               "facility_id": "F-10",
               "position_type": "LOAN",
-              "balance_amount": 2050000000.0,
+              "balance_amount": 2050000000,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-820",
               "facility_id": "F-10",
               "position_type": "REV",
-              "balance_amount": 2150000000.0,
+              "balance_amount": 2150000000,
               "description": "REV exposure"
             },
             {
               "position_id": "P-1225",
               "facility_id": "F-10",
               "position_type": "LOAN",
-              "balance_amount": 2000000000.0,
+              "balance_amount": 2000000000,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-1630",
               "facility_id": "F-10",
               "position_type": "REV",
-              "balance_amount": 2080000000.0,
+              "balance_amount": 2080000000,
               "description": "REV exposure"
             }
           ],
-          "interest_expense_amt": 5025000000.0,
-          "committed_facility_amt": 5000000000.0,
-          "bank_share_pct": 100.0,
+          "interest_expense_amt": 5025000000,
+          "committed_facility_amt": 5000000000,
+          "bank_share_pct": 100,
           "cost_of_funds_pct": 100.5,
           "all_in_rate_pct": 5.4,
           "spread_bps": 115
@@ -629,49 +629,49 @@
           "desk_name": "Lease Up Industrial Desk",
           "portfolio_name": "Industrial / Logistics",
           "lob_name": "Corporate Banking",
-          "committed_amt": 83143770.0,
-          "collateral_value": 83808920.0,
+          "committed_amt": 83143770,
+          "collateral_value": 83808920,
           "ltv_pct": 99.21,
           "positions": [
             {
               "position_id": "P-71",
               "facility_id": "F-71",
               "position_type": "REV",
-              "balance_amount": 33257508.0,
+              "balance_amount": 33257508,
               "description": "REV exposure"
             },
             {
               "position_id": "P-476",
               "facility_id": "F-71",
               "position_type": "COMMIT",
-              "balance_amount": 37414697.0,
+              "balance_amount": 37414697,
               "description": "COMMIT exposure"
             },
             {
               "position_id": "P-881",
               "facility_id": "F-71",
               "position_type": "LOAN",
-              "balance_amount": 41571885.0,
+              "balance_amount": 41571885,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-1286",
               "facility_id": "F-71",
               "position_type": "REV",
-              "balance_amount": 45729074.0,
+              "balance_amount": 45729074,
               "description": "REV exposure"
             },
             {
               "position_id": "P-1691",
               "facility_id": "F-71",
               "position_type": "COMMIT",
-              "balance_amount": 48223387.0,
+              "balance_amount": 48223387,
               "description": "COMMIT exposure"
             }
           ],
           "interest_expense_amt": 62669616.6375,
-          "committed_facility_amt": 83143770.0,
-          "bank_share_pct": 75.0,
+          "committed_facility_amt": 83143770,
+          "bank_share_pct": 75,
           "cost_of_funds_pct": 100.5,
           "all_in_rate_pct": 6.6,
           "spread_bps": 185
@@ -685,49 +685,49 @@
           "desk_name": "Unknown",
           "portfolio_name": "Family Office Services",
           "lob_name": "Corporate Banking",
-          "committed_amt": 32683468.0,
-          "collateral_value": 33380717.0,
+          "committed_amt": 32683468,
+          "collateral_value": 33380717,
           "ltv_pct": 97.91,
           "positions": [
             {
               "position_id": "P-178",
               "facility_id": "F-178",
               "position_type": "LOAN",
-              "balance_amount": 15688065.0,
+              "balance_amount": 15688065,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-583",
               "facility_id": "F-178",
               "position_type": "REV",
-              "balance_amount": 16341734.0,
+              "balance_amount": 16341734,
               "description": "REV exposure"
             },
             {
               "position_id": "P-988",
               "facility_id": "F-178",
               "position_type": "COMMIT",
-              "balance_amount": 16014899.0,
+              "balance_amount": 16014899,
               "description": "COMMIT exposure"
             },
             {
               "position_id": "P-1393",
               "facility_id": "F-178",
               "position_type": "LOAN",
-              "balance_amount": 15361230.0,
+              "balance_amount": 15361230,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-1798",
               "facility_id": "F-178",
               "position_type": "REV",
-              "balance_amount": 15688065.0,
+              "balance_amount": 15688065,
               "description": "REV exposure"
             }
           ],
           "interest_expense_amt": 18722724.6438,
-          "committed_facility_amt": 32683468.0,
-          "bank_share_pct": 57.0,
+          "committed_facility_amt": 32683468,
+          "bank_share_pct": 57,
           "cost_of_funds_pct": 100.5,
           "all_in_rate_pct": 7.4,
           "spread_bps": 265
@@ -741,49 +741,49 @@
           "desk_name": "Inventory Finance Desk",
           "portfolio_name": "Asset-Based Lending",
           "lob_name": "Corporate Banking",
-          "committed_amt": 4036363.0,
-          "collateral_value": 4014837.0,
+          "committed_amt": 4036363,
+          "collateral_value": 4014837,
           "ltv_pct": 100.54,
           "positions": [
             {
               "position_id": "P-275",
               "facility_id": "F-275",
               "position_type": "REV",
-              "balance_amount": 2220000.0,
+              "balance_amount": 2220000,
               "description": "REV exposure"
             },
             {
               "position_id": "P-680",
               "facility_id": "F-275",
               "position_type": "COMMIT",
-              "balance_amount": 2623636.0,
+              "balance_amount": 2623636,
               "description": "COMMIT exposure"
             },
             {
               "position_id": "P-1085",
               "facility_id": "F-275",
               "position_type": "LOAN",
-              "balance_amount": 3229090.0,
+              "balance_amount": 3229090,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-1490",
               "facility_id": "F-275",
               "position_type": "REV",
-              "balance_amount": 3430909.0,
+              "balance_amount": 3430909,
               "description": "REV exposure"
             },
             {
               "position_id": "P-1895",
               "facility_id": "F-275",
               "position_type": "COMMIT",
-              "balance_amount": 3309818.0,
+              "balance_amount": 3309818,
               "description": "COMMIT exposure"
             }
           ],
           "interest_expense_amt": 973570.7556,
-          "committed_facility_amt": 4036363.0,
-          "bank_share_pct": 24.0,
+          "committed_facility_amt": 4036363,
+          "bank_share_pct": 24,
           "cost_of_funds_pct": 100.5,
           "all_in_rate_pct": 9.12,
           "spread_bps": 437
@@ -797,54 +797,447 @@
           "desk_name": "Unknown",
           "portfolio_name": "Foreign Exchange",
           "lob_name": "Corporate Banking",
-          "committed_amt": 21844002.0,
-          "collateral_value": 21873126.0,
+          "committed_amt": 21844002,
+          "collateral_value": 21873126,
           "ltv_pct": 99.87,
           "positions": [
             {
               "position_id": "P-400",
               "facility_id": "F-400",
               "position_type": "LOAN",
-              "balance_amount": 10485121.0,
+              "balance_amount": 10485121,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-805",
               "facility_id": "F-400",
               "position_type": "REV",
-              "balance_amount": 10922001.0,
+              "balance_amount": 10922001,
               "description": "REV exposure"
             },
             {
               "position_id": "P-1210",
               "facility_id": "F-400",
               "position_type": "COMMIT",
-              "balance_amount": 10703561.0,
+              "balance_amount": 10703561,
               "description": "COMMIT exposure"
             },
             {
               "position_id": "P-1615",
               "facility_id": "F-400",
               "position_type": "LOAN",
-              "balance_amount": 10266681.0,
+              "balance_amount": 10266681,
               "description": "LOAN exposure"
             },
             {
               "position_id": "P-2020",
               "facility_id": "F-400",
               "position_type": "REV",
-              "balance_amount": 10485121.0,
+              "balance_amount": 10485121,
               "description": "REV exposure"
             }
           ],
           "interest_expense_amt": 6366434.3829,
-          "committed_facility_amt": 21844002.0,
-          "bank_share_pct": 29.0,
+          "committed_facility_amt": 21844002,
+          "bank_share_pct": 29,
           "cost_of_funds_pct": 100.5,
           "all_in_rate_pct": 6.38,
           "spread_bps": 163
         }
       ]
+    }
+  },
+  {
+    "item_id": "MET-001",
+    "item_name": "Current Collateral Market Value",
+    "abbreviation": "COLL-MV",
+    "kind": "METRIC",
+    "definition": "Current market value of all pledged collateral securing a credit exposure, denominated in USD. At the facility level, aggregates across all collateral positions linked to the facility. At the counterparty level, applies the bank's participation percentage (bank_share_pct) to reflect only the bank's proportionate share of collateral coverage. Supports recovery analysis, secured lending assessment, and credit risk mitigation quantification. Data element: Current_valuation_USD. Sourced from L2 Atomic Layer (collateral_snapshot).\n",
+    "generic_formula": "For each active facility as of the most recent as_of_date, look up all collateral_snapshot records linked to that facility_id and SUM current_valuation_usd across all associated collateral positions.\n",
+    "data_type": "NUMERIC(20,4)",
+    "unit_type": "CURRENCY",
+    "direction": "HIGHER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": [
+      "exposure"
+    ],
+    "regulatory_references": [
+      "Basel III Section CRE22"
+    ],
+    "insight": "Shows the total current market value of collateral securing the portfolio. A declining trend indicates collateral erosion — increasing uncovered exposure. Compare against gross exposure (EXP-002) to derive a real-time collateral coverage ratio. Critical input for LGD estimation and recovery projections.\n",
+    "number_of_instances": 5,
+    "directly_displayed": false,
+    "status": "DRAFT",
+    "executable_metric_id": "EXP-001",
+    "normalized_de_name": "Current Collateral Market Value",
+    "data_element_in_dm": "current_valuation_usd",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "collateral_snapshot",
+        "field": "current_valuation_usd",
+        "description": "Current market value of the collateral asset in USD",
+        "data_type": "VARCHAR(64)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L1",
+        "table": "facility_lender_allocation",
+        "field": "bank_share_pct",
+        "description": "Bank's participation percentage — used at counterparty level to weight collateral share",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Current Collateral Market Value (facility)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each active facility as of the most recent as_of_date, look up all collateral_snapshot records linked to that facility_id and SUM current_valuation_usd across all associated collateral positions.\n",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "collateral_asset_id",
+            "description": "collateral_asset_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "current_valuation_usd",
+            "description": "Current market value of the collateral asset in USD"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+          }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Current Collateral Market Value (counterparty)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "For each counterparty, look up all active facilities via facility_master. For each facility, retrieve the bank's participation percentage (bank_share_pct) from facility_lender_allocation and the facility-level current_valuation_usd (summed across all collateral positions). Multiply collateral value by participation percentage to get the bank's attributable share, then SUM across all facilities for the counterparty. Formula: SUM(current_valuation_usd * bank_share_pct / 100) per counterparty_id.\n",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "collateral_asset_id",
+            "description": "collateral_asset_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "current_valuation_usd",
+            "description": "Current market value of the collateral asset in USD"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+          }
+        ]
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Current Collateral Market Value (desk)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each L3 desk in enterprise_business_taxonomy, look up all active facilities with a matching lob_segment_id, retrieve their facility-level current collateral market value, and SUM across all facilities for the desk.\n",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "collateral_asset_id",
+            "description": "collateral_asset_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "current_valuation_usd",
+            "description": "Current market value of the collateral asset in USD"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+          }
+        ]
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Current Collateral Market Value (portfolio)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each L2 portfolio segment, traverse enterprise_business_taxonomy from facility lob_segment_id (L3 desk) up to its parent_segment_id (L2 portfolio). SUM facility-level collateral market values across all facilities belonging to desks within the portfolio.\n",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "collateral_asset_id",
+            "description": "collateral_asset_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "current_valuation_usd",
+            "description": "Current market value of the collateral asset in USD"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+          }
+        ]
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Current Collateral Market Value (lob)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "For each L1 business segment / department, traverse enterprise_business_taxonomy two levels up from the facility's lob_segment_id (L3 desk → L2 portfolio → L1 business segment). SUM facility-level collateral market values across all facilities within the segment.\n",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "collateral_asset_id",
+            "description": "collateral_asset_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "collateral_snapshot",
+            "field": "current_valuation_usd",
+            "description": "Current market value of the collateral asset in USD"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation percentage — used at counterparty level to weight collateral share"
+          }
+        ]
+      }
+    ],
+    "demo_data": {
+      "facilities": []
     }
   }
 ]

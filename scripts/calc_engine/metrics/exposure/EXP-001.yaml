@@ -1,0 +1,265 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Generated from: metric-bulk-entry spreadsheet row
+# Source row: Current Collateral Market Value ($)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ──────────────────────────────────────────
+metric_id: "EXP-001"
+name: "Current Collateral Market Value"
+version: "1.0.0"
+owner: "credit-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ──────────────────────────────────────────
+domain: "exposure"
+sub_domain: "collateral"
+metric_class: CALCULATED
+direction: HIGHER_BETTER
+unit_type: CURRENCY
+display_format: "$,.0f"
+description: >
+  Current market value of all pledged collateral securing a credit exposure, denominated in USD.
+  At the facility level, aggregates across all collateral positions linked to the facility.
+  At the counterparty level, applies the bank's participation percentage (bank_share_pct) to
+  reflect only the bank's proportionate share of collateral coverage. Supports recovery analysis,
+  secured lending assessment, and credit risk mitigation quantification.
+  Data element: Current_valuation_USD. Sourced from L2 Atomic Layer (collateral_snapshot).
+# ── REGULATORY REFERENCES ───────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    section: "CRE22"
+    description: "Credit Risk Mitigation — eligible financial collateral recognised under comprehensive approach"
+# ── SOURCE TABLES ───────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: collateral_snapshot
+    alias: cs
+    join_type: BASE
+    fields:
+      - name: collateral_asset_id
+        role: JOIN_KEY
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: current_valuation_usd
+        role: MEASURE
+        description: "Current market value of the collateral asset in USD"
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = cs.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: active_flag
+        role: FILTER
+  - schema: l1
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = fm.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's participation percentage — used at counterparty level to weight collateral share"
+# ── LEVEL FORMULAS ──────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: SUM
+    formula_text: >
+      For each active facility as of the most recent as_of_date, look up all
+      collateral_snapshot records linked to that facility_id and SUM
+      current_valuation_usd across all associated collateral positions.
+    formula_sql: |
+      SELECT
+        cs.facility_id                    AS dimension_key,
+        SUM(cs.current_valuation_usd)     AS metric_value
+      FROM l2.collateral_snapshot cs
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = cs.facility_id
+       AND fm.active_flag = 'Y'
+      WHERE cs.as_of_date = :as_of_date
+      GROUP BY cs.facility_id
+  counterparty:
+    aggregation_type: CUSTOM
+    formula_text: >
+      For each counterparty, look up all active facilities via facility_master.
+      For each facility, retrieve the bank's participation percentage (bank_share_pct)
+      from facility_lender_allocation and the facility-level current_valuation_usd
+      (summed across all collateral positions). Multiply collateral value by participation
+      percentage to get the bank's attributable share, then SUM across all facilities
+      for the counterparty.
+      Formula: SUM(current_valuation_usd * bank_share_pct / 100) per counterparty_id.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id                                        AS dimension_key,
+        SUM(
+          fac_coll.facility_collateral_mv * fla.bank_share_pct / 100.0
+        )                                                         AS metric_value
+      FROM l1.facility_master fm
+      INNER JOIN (
+        -- Facility-level collateral market value (sum across all collateral positions)
+        SELECT
+          cs_inner.facility_id,
+          SUM(cs_inner.current_valuation_usd) AS facility_collateral_mv
+        FROM l2.collateral_snapshot cs_inner
+        WHERE cs_inner.as_of_date = :as_of_date
+        GROUP BY cs_inner.facility_id
+      ) fac_coll
+        ON fac_coll.facility_id = fm.facility_id
+      LEFT JOIN l1.facility_lender_allocation fla
+        ON fla.facility_id = fm.facility_id
+      WHERE fm.active_flag = 'Y'
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: SUM
+    formula_text: >
+      For each L3 desk in enterprise_business_taxonomy, look up all
+      active facilities with a matching lob_segment_id, retrieve their facility-level
+      current collateral market value, and SUM across all facilities for the desk.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id                  AS dimension_key,
+        SUM(fac_coll.facility_collateral_mv)    AS metric_value
+      FROM l1.facility_master fm
+      INNER JOIN (
+        SELECT
+          cs_inner.facility_id,
+          SUM(cs_inner.current_valuation_usd) AS facility_collateral_mv
+        FROM l2.collateral_snapshot cs_inner
+        WHERE cs_inner.as_of_date = :as_of_date
+        GROUP BY cs_inner.facility_id
+      ) fac_coll
+        ON fac_coll.facility_id = fm.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fm.active_flag = 'Y'
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: >
+      For each L2 portfolio segment, traverse enterprise_business_taxonomy from facility
+      lob_segment_id (L3 desk) up to its parent_segment_id (L2 portfolio).
+      SUM facility-level collateral market values across all facilities belonging
+      to desks within the portfolio.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id               AS dimension_key,
+        SUM(fac_coll.facility_collateral_mv)    AS metric_value
+      FROM l1.facility_master fm
+      INNER JOIN (
+        SELECT
+          cs_inner.facility_id,
+          SUM(cs_inner.current_valuation_usd) AS facility_collateral_mv
+        FROM l2.collateral_snapshot cs_inner
+        WHERE cs_inner.as_of_date = :as_of_date
+        GROUP BY cs_inner.facility_id
+      ) fac_coll
+        ON fac_coll.facility_id = fm.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fm.active_flag = 'Y'
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      For each L1 business segment / department, traverse enterprise_business_taxonomy
+      two levels up from the facility's lob_segment_id (L3 desk → L2 portfolio → L1 business segment).
+      SUM facility-level collateral market values across all facilities within the segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id               AS dimension_key,
+        SUM(fac_coll.facility_collateral_mv)    AS metric_value
+      FROM l1.facility_master fm
+      INNER JOIN (
+        SELECT
+          cs_inner.facility_id,
+          SUM(cs_inner.current_valuation_usd) AS facility_collateral_mv
+        FROM l2.collateral_snapshot cs_inner
+        WHERE cs_inner.as_of_date = :as_of_date
+        GROUP BY cs_inner.facility_id
+      ) fac_coll
+        ON fac_coll.facility_id = fm.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fm.active_flag = 'Y'
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ──────────────────────────────────────────────────
+output:
+  table: metric_result
+  additional_tables:
+    - schema: l3
+      table: exposure_metric_cube
+      column: net_exposure_amt      # collateral MV informs net exposure derivation
+# ── VALIDATION RULES ────────────────────────────────────────
+validations:
+  - rule_id: "EXP-001-V01"
+    type: NOT_NULL
+    description: "Facility-level collateral market value must not be null for active facilities with linked collateral"
+    severity: ERROR
+  - rule_id: "EXP-001-V02"
+    type: NON_NEGATIVE
+    description: "Collateral market value must be >= 0 at all levels"
+    severity: ERROR
+  - rule_id: "EXP-001-V03"
+    type: RECONCILIATION
+    description: >
+      Sum of facility-level values must reconcile to counterparty total
+      (before participation weighting — raw collateral sum only). Apply
+      tolerance for floating-point rounding.
+    severity: WARNING
+    params:
+      levels_to_compare: [facility, desk, portfolio, business_segment]
+      tolerance_pct: 0.01
+  - rule_id: "EXP-001-V04"
+    type: PERIOD_OVER_PERIOD
+    description: "Flag total collateral market value changes greater than 15% vs prior period — may indicate revaluation event or data issue"
+    severity: WARNING
+    params:
+      max_change_pct: 15.0
+  - rule_id: "EXP-001-V05"
+    type: THRESHOLD
+    description: "Flag any single facility where collateral MV exceeds committed facility amount by more than 200% (potential data integrity issue)"
+    severity: WARNING
+    params:
+      max_value: 999999999999        # sentinel — enforced via custom cross-metric comparison
+# ── CATALOGUE ───────────────────────────────────────────────
+catalogue:
+  item_id: "MET-001"
+  abbreviation: "COLL-MV"
+  insight: >
+    Shows the total current market value of collateral securing the portfolio.
+    A declining trend indicates collateral erosion — increasing uncovered exposure.
+    Compare against gross exposure (EXP-002) to derive a real-time collateral
+    coverage ratio. Critical input for LGD estimation and recovery projections.
+  rollup_strategy: "direct-sum"
+  primary_value_field: "current_valuation_usd"
+# ── METADATA ────────────────────────────────────────────────
+tags:
+  - "collateral"
+  - "exposure"
+  - "credit-risk-mitigation"
+  - "recovery"
+  - "secured-lending"
+  - "lgd"
+dashboard_pages:
+  - "P1"
+  - "P3"
+legacy_metric_ids: []

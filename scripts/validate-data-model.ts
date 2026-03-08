@@ -15,8 +15,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { L1_TABLES } from './l1/l1-definitions';
-import { L2_TABLES } from './l2/l2-definitions';
 import { L3_TABLES } from '../data/l3-tables';
 import {
   CALCULATION_DIMENSIONS,
@@ -24,6 +22,7 @@ import {
   type L3Metric,
   type CalculationDimension,
 } from '../data/l3-metrics';
+import { parseDDL } from '../lib/ddl-parser';
 import { getMergedMetrics } from '../lib/metrics-store';
 import {
   readDataDictionary,
@@ -138,61 +137,6 @@ function check(id: string, group: number, name: string, details: string[], sever
   };
 }
 
-// ── L3 DDL Parser (copied from sync-data-model.ts) ──
-
-interface L3ParsedColumn {
-  name: string; type: string; nullable: boolean;
-  pk: boolean; fk: string; defaultVal: string;
-}
-interface L3ParsedTable { name: string; columns: L3ParsedColumn[]; pkColumns: string[] }
-
-function parseL3DDL(sql: string): L3ParsedTable[] {
-  const tables: L3ParsedTable[] = [];
-  const tableRegex = /CREATE TABLE IF NOT EXISTS l3\.(\w+)\s*\(([\s\S]*?)\);/g;
-  let match: RegExpExecArray | null;
-  while ((match = tableRegex.exec(sql)) !== null) {
-    const tableName = match[1];
-    const body = match[2];
-    const pkMatch = body.match(/PRIMARY KEY\s*\(([^)]+)\)/);
-    const pkColumns = pkMatch ? pkMatch[1].split(',').map(c => c.trim()) : [];
-
-    const afterTable = sql.substring(match.index + match[0].length, match.index + match[0].length + 2000);
-    const fkMap = new Map<string, string>();
-    const fkRegex = /-- FK:\s+(\w+)\s*→\s*(.+)/g;
-    let fkMatch: RegExpExecArray | null;
-    while ((fkMatch = fkRegex.exec(afterTable)) !== null) {
-      if (afterTable.substring(0, fkMatch.index).includes('CREATE TABLE')) break;
-      fkMap.set(fkMatch[1], fkMatch[2].trim());
-    }
-
-    const columns: L3ParsedColumn[] = [];
-    for (const line of body.split('\n')) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('PRIMARY KEY') || trimmed.startsWith('--')) continue;
-      const colMatch = trimmed.match(/^(\w+)\s+([\w(),.]+(?:\(\d+(?:,\d+)?\))?)\s*(.*?)(?:,\s*)?$/);
-      if (!colMatch) continue;
-      const rest = colMatch[3] || '';
-      const defaultMatch = rest.match(/DEFAULT\s+(.+)/i);
-      columns.push({
-        name: colMatch[1],
-        type: colMatch[2],
-        nullable: !rest.includes('NOT NULL'),
-        pk: pkColumns.includes(colMatch[1]),
-        fk: fkMap.get(colMatch[1]) ?? '',
-        defaultVal: defaultMatch ? defaultMatch[1].replace(/,\s*$/, '') : '',
-      });
-    }
-    tables.push({ name: tableName, columns, pkColumns });
-  }
-  return tables;
-}
-
-function parseFkString(fk: string): { layer: string; table: string; field: string } | null {
-  const m = fk.match(/^(l[123])\.(\w+)\((\w+)\)$/);
-  if (!m) return null;
-  return { layer: m[1].toUpperCase(), table: m[2], field: m[3] };
-}
-
 // ── Data Dictionary Lookup ──
 
 interface DDLookup {
@@ -231,67 +175,81 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
   const results: CheckResult[] = [];
   const { dd } = ddLookup;
 
-  // 1.1 L1 definitions <-> data dictionary
+  const L1_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/01-l1-ddl.sql');
+  const L2_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/02-l2-ddl.sql');
+  const L3_DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
+
+  // 1.1 L1 DDL <-> data dictionary
   {
     const issues: string[] = [];
-    const ddL1Names = new Set(dd.L1.map(t => t.name));
-    for (const table of L1_TABLES) {
-      if (!ddL1Names.has(table.tableName)) {
-        issues.push(`Missing from DD: L1.${table.tableName}`);
-      } else {
-        const ddTable = dd.L1.find(t => t.name === table.tableName)!;
-        const ddFields = new Set(ddTable.fields.map(f => f.name));
-        for (const col of table.columns) {
-          if (!ddFields.has(col.name)) {
-            issues.push(`Missing field in DD: L1.${table.tableName}.${col.name}`);
+    if (!fs.existsSync(L1_DDL_PATH)) {
+      issues.push('L1 DDL file not found: sql/gsib-export/01-l1-ddl.sql');
+    } else {
+      const l1Parsed = parseDDL(fs.readFileSync(L1_DDL_PATH, 'utf-8'), 'l1');
+      const ddL1Names = new Set(dd.L1.map(t => t.name));
+
+      for (const table of l1Parsed) {
+        if (!ddL1Names.has(table.name)) {
+          issues.push(`Missing from DD: L1.${table.name}`);
+        } else {
+          const ddTable = dd.L1.find(t => t.name === table.name)!;
+          const ddFields = new Set(ddTable.fields.map(f => f.name));
+          for (const col of table.columns) {
+            if (!ddFields.has(col.name)) {
+              issues.push(`Missing field in DD: L1.${table.name}.${col.name}`);
+            }
           }
         }
       }
-    }
-    const defL1Names = new Set(L1_TABLES.map(t => t.tableName));
-    for (const ddTable of dd.L1) {
-      if (!defL1Names.has(ddTable.name)) {
-        issues.push(`In DD but not in L1 definitions: L1.${ddTable.name}`);
+      const ddlNames = new Set(l1Parsed.map(t => t.name));
+      for (const ddTable of dd.L1) {
+        if (!ddlNames.has(ddTable.name)) {
+          issues.push(`In DD but not in L1 DDL: L1.${ddTable.name} (may exist only in PostgreSQL)`);
+        }
       }
     }
-    results.push(check('1.1', 1, 'L1 definitions \u2194 data dictionary', issues));
+    results.push(check('1.1', 1, 'L1 DDL \u2194 data dictionary', issues, issues.length > 0 ? 'WARN' : 'PASS'));
   }
 
-  // 1.2 L2 definitions <-> data dictionary
+  // 1.2 L2 DDL <-> data dictionary
   {
     const issues: string[] = [];
-    const ddL2Names = new Set(dd.L2.map(t => t.name));
-    for (const table of L2_TABLES) {
-      if (!ddL2Names.has(table.tableName)) {
-        issues.push(`Missing from DD: L2.${table.tableName}`);
-      } else {
-        const ddTable = dd.L2.find(t => t.name === table.tableName)!;
-        const ddFields = new Set(ddTable.fields.map(f => f.name));
-        for (const col of table.columns) {
-          if (!ddFields.has(col.name)) {
-            issues.push(`Missing field in DD: L2.${table.tableName}.${col.name}`);
+    if (!fs.existsSync(L2_DDL_PATH)) {
+      issues.push('L2 DDL file not found: sql/gsib-export/02-l2-ddl.sql');
+    } else {
+      const l2Parsed = parseDDL(fs.readFileSync(L2_DDL_PATH, 'utf-8'), 'l2');
+      const ddL2Names = new Set(dd.L2.map(t => t.name));
+
+      for (const table of l2Parsed) {
+        if (!ddL2Names.has(table.name)) {
+          issues.push(`Missing from DD: L2.${table.name}`);
+        } else {
+          const ddTable = dd.L2.find(t => t.name === table.name)!;
+          const ddFields = new Set(ddTable.fields.map(f => f.name));
+          for (const col of table.columns) {
+            if (!ddFields.has(col.name)) {
+              issues.push(`Missing field in DD: L2.${table.name}.${col.name}`);
+            }
           }
         }
       }
-    }
-    const defL2Names = new Set(L2_TABLES.map(t => t.tableName));
-    for (const ddTable of dd.L2) {
-      if (!defL2Names.has(ddTable.name)) {
-        issues.push(`In DD but not in L2 definitions: L2.${ddTable.name}`);
+      const ddlNames = new Set(l2Parsed.map(t => t.name));
+      for (const ddTable of dd.L2) {
+        if (!ddlNames.has(ddTable.name)) {
+          issues.push(`In DD but not in L2 DDL: L2.${ddTable.name} (may exist only in PostgreSQL)`);
+        }
       }
     }
-    results.push(check('1.2', 1, 'L2 definitions \u2194 data dictionary', issues));
+    results.push(check('1.2', 1, 'L2 DDL \u2194 data dictionary', issues, issues.length > 0 ? 'WARN' : 'PASS'));
   }
 
   // 1.3 L3 DDL <-> L3 tables manifest
   {
     const issues: string[] = [];
-    const DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
-    if (!fs.existsSync(DDL_PATH)) {
+    if (!fs.existsSync(L3_DDL_PATH)) {
       results.push(check('1.3', 1, 'L3 DDL \u2194 L3 tables manifest', ['DDL file not found: sql/l3/01_DDL_all_tables.sql']));
     } else {
-      const ddlSql = fs.readFileSync(DDL_PATH, 'utf-8');
-      const l3Parsed = parseL3DDL(ddlSql);
+      const l3Parsed = parseDDL(fs.readFileSync(L3_DDL_PATH, 'utf-8'), 'l3');
       const manifestNames = new Set(L3_TABLES.map(t => t.name));
       const ddlNames = new Set(l3Parsed.map(t => t.name));
 
@@ -312,10 +270,8 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
   // 1.4 L3 DDL <-> data dictionary L3
   {
     const issues: string[] = [];
-    const DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
-    if (fs.existsSync(DDL_PATH)) {
-      const ddlSql = fs.readFileSync(DDL_PATH, 'utf-8');
-      const l3Parsed = parseL3DDL(ddlSql);
+    if (fs.existsSync(L3_DDL_PATH)) {
+      const l3Parsed = parseDDL(fs.readFileSync(L3_DDL_PATH, 'utf-8'), 'l3');
       const ddL3Names = new Set(dd.L3.map(t => t.name));
 
       for (const t of l3Parsed) {
@@ -335,60 +291,21 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     results.push(check('1.4', 1, 'L3 DDL \u2194 data dictionary L3', issues));
   }
 
-  // 1.5 FK integrity
+  // 1.5 FK integrity — verify DD relationship targets exist
   {
     const issues: string[] = [];
-
-    // L1 FKs
-    for (const table of L1_TABLES) {
-      for (const col of table.columns) {
-        if (col.fk) {
-          const target = parseFkString(col.fk);
-          if (target) {
-            if (!ddLookup.fieldExists(target.layer, target.table, target.field)) {
-              issues.push(`L1.${table.tableName}.${col.name} FK -> ${col.fk} (target not found)`);
-            }
-          }
-        }
+    for (const rel of dd.relationships) {
+      if (!ddLookup.fieldExists(rel.to_layer, rel.to_table, rel.to_field)) {
+        issues.push(`${rel.from_layer}.${rel.from_table}.${rel.from_field} FK -> ${rel.to_layer}.${rel.to_table}.${rel.to_field} (target not found)`);
+      }
+      if (!ddLookup.fieldExists(rel.from_layer, rel.from_table, rel.from_field)) {
+        issues.push(`${rel.from_layer}.${rel.from_table}.${rel.from_field} FK source field not found in DD`);
       }
     }
-
-    // L2 FKs
-    for (const table of L2_TABLES) {
-      for (const col of table.columns) {
-        if (col.fk) {
-          const target = parseFkString(col.fk);
-          if (target) {
-            if (!ddLookup.fieldExists(target.layer, target.table, target.field)) {
-              issues.push(`L2.${table.tableName}.${col.name} FK -> ${col.fk} (target not found)`);
-            }
-          }
-        }
-      }
-    }
-
-    // L3 DDL FKs
-    const DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
-    if (fs.existsSync(DDL_PATH)) {
-      const ddlSql = fs.readFileSync(DDL_PATH, 'utf-8');
-      const l3Parsed = parseL3DDL(ddlSql);
-      for (const table of l3Parsed) {
-        for (const col of table.columns) {
-          if (col.fk) {
-            const m = col.fk.match(/^(L[123])\.(\w+)\.(\w+)/);
-            if (m) {
-              if (!ddLookup.fieldExists(m[1], m[2], m[3])) {
-                issues.push(`L3.${table.name}.${col.name} FK -> ${col.fk} (target not found)`);
-              }
-            }
-          }
-        }
-      }
-    }
-    results.push(check('1.5', 1, 'FK integrity', issues));
+    results.push(check('1.5', 1, 'FK integrity (DD relationships)', issues));
   }
 
-  // 1.6 Sample data alignment
+  // 1.6 Sample data alignment — compare sample data against data dictionary
   {
     const issues: string[] = [];
     const L1_SAMPLE = path.resolve(__dirname, 'l1/output/sample-data.json');
@@ -397,18 +314,17 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     if (fs.existsSync(L1_SAMPLE)) {
       try {
         const sampleData: Record<string, { columns: string[]; rows: unknown[][] }> = JSON.parse(fs.readFileSync(L1_SAMPLE, 'utf-8'));
-        // Sample data keys may be prefixed with "L1." (e.g., "L1.currency_dim")
-        const defNames = new Set(L1_TABLES.map(t => t.tableName));
+        const ddNames = new Set(dd.L1.map(t => t.name));
         for (const rawKey of Object.keys(sampleData)) {
           const key = rawKey.replace(/^L1\./, '');
-          if (!defNames.has(key)) {
-            issues.push(`L1 sample data has table "${key}" not in L1 definitions`);
+          if (!ddNames.has(key)) {
+            issues.push(`L1 sample data has table "${key}" not in data dictionary`);
           }
         }
-        for (const table of L1_TABLES) {
-          const sample = sampleData[table.tableName] ?? sampleData[`L1.${table.tableName}`];
-          if (sample && sample.columns.length !== table.columns.length) {
-            issues.push(`L1.${table.tableName}: sample has ${sample.columns.length} cols, definition has ${table.columns.length}`);
+        for (const ddTable of dd.L1) {
+          const sample = sampleData[ddTable.name] ?? sampleData[`L1.${ddTable.name}`];
+          if (sample && sample.columns.length !== ddTable.fields.length) {
+            issues.push(`L1.${ddTable.name}: sample has ${sample.columns.length} cols, DD has ${ddTable.fields.length}`);
           }
         }
       } catch { issues.push('Failed to parse L1 sample data JSON'); }
@@ -417,17 +333,17 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     if (fs.existsSync(L2_SAMPLE)) {
       try {
         const sampleData: Record<string, { columns: string[]; rows: unknown[][] }> = JSON.parse(fs.readFileSync(L2_SAMPLE, 'utf-8'));
-        const defNames = new Set(L2_TABLES.map(t => t.tableName));
+        const ddNames = new Set(dd.L2.map(t => t.name));
         for (const rawKey of Object.keys(sampleData)) {
           const key = rawKey.replace(/^L2\./, '');
-          if (!defNames.has(key)) {
-            issues.push(`L2 sample data has table "${key}" not in L2 definitions`);
+          if (!ddNames.has(key)) {
+            issues.push(`L2 sample data has table "${key}" not in data dictionary`);
           }
         }
-        for (const table of L2_TABLES) {
-          const sample = sampleData[table.tableName] ?? sampleData[`L2.${table.tableName}`];
-          if (sample && sample.columns.length !== table.columns.length) {
-            issues.push(`L2.${table.tableName}: sample has ${sample.columns.length} cols, definition has ${table.columns.length}`);
+        for (const ddTable of dd.L2) {
+          const sample = sampleData[ddTable.name] ?? sampleData[`L2.${ddTable.name}`];
+          if (sample && sample.columns.length !== ddTable.fields.length) {
+            issues.push(`L2.${ddTable.name}: sample has ${sample.columns.length} cols, DD has ${ddTable.fields.length}`);
           }
         }
       } catch { issues.push('Failed to parse L2 sample data JSON'); }
@@ -436,35 +352,21 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     results.push(check('1.6', 1, 'Sample data alignment', issues, issues.length > 0 ? 'WARN' : 'PASS'));
   }
 
-  // 1.7 DD relationships completeness — every FK in L1/L2 definitions should have a DD relationship
+  // 1.7 DD relationships completeness — every FK in DD fields should have a DD relationship
   {
     const issues: string[] = [];
     const relKeys = new Set(
       dd.relationships.map(r => `${r.from_layer}.${r.from_table}.${r.from_field}->${r.to_layer}.${r.to_table}.${r.to_field}`)
     );
 
-    for (const table of L1_TABLES) {
-      for (const col of table.columns) {
-        if (col.fk) {
-          const target = parseFkString(col.fk);
-          if (target) {
-            const key = `L1.${table.tableName}.${col.name}->${target.layer}.${target.table}.${target.field}`;
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (field.pk_fk?.fk_target) {
+            const fk = field.pk_fk.fk_target;
+            const key = `${layer}.${table.name}.${field.name}->${fk.layer}.${fk.table}.${fk.field}`;
             if (!relKeys.has(key)) {
-              issues.push(`Missing DD relationship: L1.${table.tableName}.${col.name} -> ${col.fk}`);
-            }
-          }
-        }
-      }
-    }
-
-    for (const table of L2_TABLES) {
-      for (const col of table.columns) {
-        if (col.fk) {
-          const target = parseFkString(col.fk);
-          if (target) {
-            const key = `L2.${table.tableName}.${col.name}->${target.layer}.${target.table}.${target.field}`;
-            if (!relKeys.has(key)) {
-              issues.push(`Missing DD relationship: L2.${table.tableName}.${col.name} -> ${col.fk}`);
+              issues.push(`Missing DD relationship: ${layer}.${table.name}.${field.name} -> ${fk.layer}.${fk.table}.${fk.field}`);
             }
           }
         }
@@ -474,7 +376,7 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     results.push(check('1.7', 1, 'DD relationships completeness', issues));
   }
 
-  // 1.8 Sample data column name coverage — definition columns should exist in sample data
+  // 1.8 Sample data column name coverage — DD columns should exist in sample data
   {
     const issues: string[] = [];
     const L1_SAMPLE = path.resolve(__dirname, 'l1/output/sample-data.json');
@@ -483,13 +385,13 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     if (fs.existsSync(L1_SAMPLE)) {
       try {
         const sampleData: Record<string, { columns: string[]; rows: unknown[][] }> = JSON.parse(fs.readFileSync(L1_SAMPLE, 'utf-8'));
-        for (const table of L1_TABLES) {
-          const sample = sampleData[table.tableName] ?? sampleData[`L1.${table.tableName}`];
+        for (const ddTable of dd.L1) {
+          const sample = sampleData[ddTable.name] ?? sampleData[`L1.${ddTable.name}`];
           if (!sample) continue;
           const sampleCols = new Set(sample.columns);
-          for (const col of table.columns) {
-            if (!sampleCols.has(col.name)) {
-              issues.push(`L1.${table.tableName}.${col.name}: in definition but missing from sample data columns`);
+          for (const field of ddTable.fields) {
+            if (!sampleCols.has(field.name)) {
+              issues.push(`L1.${ddTable.name}.${field.name}: in DD but missing from sample data columns`);
             }
           }
         }
@@ -499,13 +401,13 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     if (fs.existsSync(L2_SAMPLE)) {
       try {
         const sampleData: Record<string, { columns: string[]; rows: unknown[][] }> = JSON.parse(fs.readFileSync(L2_SAMPLE, 'utf-8'));
-        for (const table of L2_TABLES) {
-          const sample = sampleData[table.tableName] ?? sampleData[`L2.${table.tableName}`];
+        for (const ddTable of dd.L2) {
+          const sample = sampleData[ddTable.name] ?? sampleData[`L2.${ddTable.name}`];
           if (!sample) continue;
           const sampleCols = new Set(sample.columns);
-          for (const col of table.columns) {
-            if (!sampleCols.has(col.name)) {
-              issues.push(`L2.${table.tableName}.${col.name}: in definition but missing from sample data columns`);
+          for (const field of ddTable.fields) {
+            if (!sampleCols.has(field.name)) {
+              issues.push(`L2.${ddTable.name}.${field.name}: in DD but missing from sample data columns`);
             }
           }
         }
@@ -519,16 +421,14 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
   {
     const issues: string[] = [];
     const L3_FIELDS_PATH = path.resolve(__dirname, 'l3/output/l3-table-fields.json');
-    const DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
 
     if (!fs.existsSync(L3_FIELDS_PATH)) {
       issues.push('l3-table-fields.json not found (run L3 generation to populate visualizer)');
-    } else if (fs.existsSync(DDL_PATH)) {
+    } else if (fs.existsSync(L3_DDL_PATH)) {
       try {
         const l3Fields: Record<string, { category: string; fields: { name: string }[] }> =
           JSON.parse(fs.readFileSync(L3_FIELDS_PATH, 'utf-8'));
-        const ddlSql = fs.readFileSync(DDL_PATH, 'utf-8');
-        const l3Parsed = parseL3DDL(ddlSql);
+        const l3Parsed = parseDDL(fs.readFileSync(L3_DDL_PATH, 'utf-8'), 'l3');
         const fieldsTableNames = new Set(Object.keys(l3Fields));
 
         for (const table of l3Parsed) {
@@ -547,6 +447,28 @@ function validateStructuralIntegrity(ddLookup: DDLookup): CheckResult[] {
     }
 
     results.push(check('1.9', 1, 'L3 visualizer field alignment', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 1.10 Data type coverage — check all DD fields have data_type populated (from PostgreSQL)
+  {
+    const issues: string[] = [];
+    let missingCount = 0;
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (!field.data_type) {
+            missingCount++;
+            if (missingCount <= 10) {
+              issues.push(`${layer}.${table.name}.${field.name}: no data_type (run npm run db:introspect)`);
+            }
+          }
+        }
+      }
+    }
+    if (missingCount > 10) {
+      issues.push(`... and ${missingCount - 10} more fields missing data_type`);
+    }
+    results.push(check('1.10', 1, 'Data type coverage', issues, issues.length > 0 ? 'WARN' : 'PASS'));
   }
 
   return results;
@@ -967,24 +889,30 @@ function validateExportSurface(ddLookup: DDLookup): CheckResult[] {
         : issues.length > 0 ? 'WARN' : 'PASS'));
   }
 
-  // 7.2 Export field coverage (DD covers all definition fields)
+  // 7.2 Export field coverage — DDL fields exist in DD (export reads from DD)
   {
     const issues: string[] = [];
+    const L1_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/01-l1-ddl.sql');
+    const L2_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/02-l2-ddl.sql');
 
-    // L1
-    for (const table of L1_TABLES) {
-      for (const col of table.columns) {
-        if (!ddLookup.fieldExists('L1', table.tableName, col.name)) {
-          issues.push(`Export gap: L1.${table.tableName}.${col.name} not in DD`);
+    if (fs.existsSync(L1_DDL_PATH)) {
+      const l1Parsed = parseDDL(fs.readFileSync(L1_DDL_PATH, 'utf-8'), 'l1');
+      for (const table of l1Parsed) {
+        for (const col of table.columns) {
+          if (!ddLookup.fieldExists('L1', table.name, col.name)) {
+            issues.push(`Export gap: L1.${table.name}.${col.name} not in DD`);
+          }
         }
       }
     }
 
-    // L2
-    for (const table of L2_TABLES) {
-      for (const col of table.columns) {
-        if (!ddLookup.fieldExists('L2', table.tableName, col.name)) {
-          issues.push(`Export gap: L2.${table.tableName}.${col.name} not in DD`);
+    if (fs.existsSync(L2_DDL_PATH)) {
+      const l2Parsed = parseDDL(fs.readFileSync(L2_DDL_PATH, 'utf-8'), 'l2');
+      for (const table of l2Parsed) {
+        for (const col of table.columns) {
+          if (!ddLookup.fieldExists('L2', table.name, col.name)) {
+            issues.push(`Export gap: L2.${table.name}.${col.name} not in DD`);
+          }
         }
       }
     }

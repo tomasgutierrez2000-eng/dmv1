@@ -7,6 +7,7 @@
       "Bash(npm run validate*)",
       "Bash(npm run sync*)",
       "Bash(npm run export*)",
+      "Bash(npm run db:*)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)",
@@ -23,6 +24,19 @@
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
       "Bash(git clean -f*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-db-change.sh"
+          }
+        ]
+      }
     ]
   }
 }

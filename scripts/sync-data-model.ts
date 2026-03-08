@@ -1,35 +1,35 @@
 /**
- * Sync all data model sources into the data dictionary JSON.
+ * Sync data model from golden source (PostgreSQL or DDL files) into data dictionary JSON.
  *
- * Sources of structural truth:
- *   - L1/L2: scripts/l1/l1-definitions.ts, scripts/l2/l2-definitions.ts
- *   - L3:    sql/l3/01_DDL_all_tables.sql  +  data/l3-tables.ts (metadata)
+ * Golden source priority:
+ *   1. Live PostgreSQL database (if DATABASE_URL is set) — via introspect-db.ts
+ *   2. DDL files (offline fallback):
+ *      - L1: sql/gsib-export/01-l1-ddl.sql
+ *      - L2: sql/gsib-export/02-l2-ddl.sql
+ *      - L3: sql/l3/01_DDL_all_tables.sql
+ *
+ * Table metadata (SCD type, category) from:
+ *   - data/l1-table-meta.ts, data/l2-table-meta.ts, data/l3-tables.ts
  *
  * Target (single source for visualizer + Excel export):
  *   - facility-summary-mvp/output/data-dictionary/data-dictionary.json
  *
- * This script:
- *   1. Reads all structural sources
- *   2. Compares against existing data dictionary
- *   3. Adds missing tables and fields (preserving existing descriptions)
- *   4. Writes the updated data dictionary
- *   5. Reports what changed
- *
  * Run:  npx tsx scripts/sync-data-model.ts
+ *       (runs db:introspect first if DATABASE_URL is set)
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { L1_TABLES } from './l1/l1-definitions';
-import { L2_TABLES } from './l2/l2-definitions';
 import { L3_TABLES } from '../data/l3-tables';
+import { L1_META_MAP } from '../data/l1-table-meta';
+import { L2_META_MAP } from '../data/l2-table-meta';
+import { parseDDL, parseFkReference } from '../lib/ddl-parser';
 
 import type {
   DataDictionary,
   DataDictionaryTable,
   DataDictionaryField,
-  DataDictionaryRelationship,
 } from '../lib/data-dictionary';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -87,84 +87,17 @@ const FIELD_DESCRIPTIONS: Record<string, Record<string, { description: string; w
   },
 };
 
-// Category overrides for tables not yet in the data dictionary
-const TABLE_CATEGORIES: Record<string, string> = {
-  internal_risk_rating_bucket_dim: 'Ratings',
-  pricing_tier_dim: 'Facility',
-};
-
 // ═══════════════════════════════════════════════════════════════════════════
-// L3 DDL Parsing (shared with export-data-model-excel.ts)
+// Convert parsed DDL column to a DataDictionaryField
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface L3Column {
-  name: string; type: string; nullable: boolean;
-  pk: boolean; fk: string; defaultVal: string;
-}
-interface L3ParsedTable { name: string; columns: L3Column[]; pkColumns: string[] }
-
-function parseL3DDL(sql: string): L3ParsedTable[] {
-  const tables: L3ParsedTable[] = [];
-  const tableRegex = /CREATE TABLE IF NOT EXISTS l3\.(\w+)\s*\(([\s\S]*?)\);/g;
-  let match: RegExpExecArray | null;
-  while ((match = tableRegex.exec(sql)) !== null) {
-    const tableName = match[1];
-    const body = match[2];
-    const pkMatch = body.match(/PRIMARY KEY\s*\(([^)]+)\)/);
-    const pkColumns = pkMatch ? pkMatch[1].split(',').map(c => c.trim()) : [];
-
-    const afterTable = sql.substring(match.index + match[0].length, match.index + match[0].length + 2000);
-    const fkMap = new Map<string, string>();
-    const fkRegex = /-- FK:\s+(\w+)\s*→\s*(.+)/g;
-    let fkMatch: RegExpExecArray | null;
-    while ((fkMatch = fkRegex.exec(afterTable)) !== null) {
-      if (afterTable.substring(0, fkMatch.index).includes('CREATE TABLE')) break;
-      fkMap.set(fkMatch[1], fkMatch[2].trim());
-    }
-
-    const columns: L3Column[] = [];
-    for (const line of body.split('\n')) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('PRIMARY KEY') || trimmed.startsWith('--')) continue;
-      const colMatch = trimmed.match(/^(\w+)\s+([\w(),.]+(?:\(\d+(?:,\d+)?\))?)\s*(.*?)(?:,\s*)?$/);
-      if (!colMatch) continue;
-      const rest = colMatch[3] || '';
-      const defaultMatch = rest.match(/DEFAULT\s+(.+)/i);
-      columns.push({
-        name: colMatch[1],
-        type: colMatch[2],
-        nullable: !rest.includes('NOT NULL'),
-        pk: pkColumns.includes(colMatch[1]),
-        fk: fkMap.get(colMatch[1]) ?? '',
-        defaultVal: defaultMatch ? defaultMatch[1].replace(/,\s*$/, '') : '',
-      });
-    }
-    tables.push({ name: tableName, columns, pkColumns });
-  }
-  return tables;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FK string → relationship parser
-// ═══════════════════════════════════════════════════════════════════════════
-
-function parseFkString(fk: string): { layer: string; table: string; field: string } | null {
-  // Format: "l1.table_name(field_name)" or "l2.table_name(field_name)"
-  const m = fk.match(/^(l[123])\.(\w+)\((\w+)\)$/);
-  if (!m) return null;
-  return { layer: m[1].toUpperCase(), table: m[2], field: m[3] };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Convert a TS definition column to a DataDictionaryField
-// ═══════════════════════════════════════════════════════════════════════════
-
-function tsColToField(
+function parsedColToField(
   tableName: string,
-  col: { name: string; type: string; nullable?: boolean; pk?: boolean; fk?: string },
+  col: { name: string; type: string; pk: boolean; fk: string },
+  isComposite: boolean,
 ): DataDictionaryField {
   const desc = FIELD_DESCRIPTIONS[tableName]?.[col.name];
-  const fkTarget = col.fk ? parseFkString(col.fk) : undefined;
+  const fkTarget = col.fk ? parseFkReference(col.fk) : undefined;
 
   return {
     name: col.name,
@@ -173,35 +106,8 @@ function tsColToField(
     data_type: col.type,
     ...(col.pk || fkTarget ? {
       pk_fk: {
-        is_pk: !!col.pk,
-        is_composite: false,
-        ...(fkTarget ? { fk_target: fkTarget } : {}),
-      },
-    } : {}),
-  };
-}
-
-function l3ColToField(
-  tableName: string,
-  col: L3Column,
-): DataDictionaryField {
-  // Parse L3 FK comment format: "L1.table_name.field_name" or similar
-  let fkTarget: { layer: string; table: string; field: string } | undefined;
-  if (col.fk) {
-    const m = col.fk.match(/^(L[123])\.(\w+)\.(\w+)/);
-    if (m) {
-      fkTarget = { layer: m[1], table: m[2], field: m[3] };
-    }
-  }
-
-  return {
-    name: col.name,
-    description: '',
-    data_type: col.type,
-    ...(col.pk || fkTarget ? {
-      pk_fk: {
         is_pk: col.pk,
-        is_composite: false,
+        is_composite: isComposite && col.pk,
         ...(fkTarget ? { fk_target: fkTarget } : {}),
       },
     } : {}),
@@ -209,139 +115,115 @@ function l3ColToField(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Sync Logic
+// DDL-based sync (offline fallback when DATABASE_URL not available)
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface SyncReport {
   tablesAdded: string[];
   fieldsAdded: string[];
+  typesUpdated: string[];
   l3ManifestWarnings: string[];
 }
 
 export function syncDataModel(): SyncReport {
   const DD_PATH = path.resolve(__dirname, '../facility-summary-mvp/output/data-dictionary/data-dictionary.json');
-  const DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
+  const L1_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/01-l1-ddl.sql');
+  const L2_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/02-l2-ddl.sql');
+  const L3_DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
 
   // Read existing data dictionary
-  const dd: DataDictionary = JSON.parse(fs.readFileSync(DD_PATH, 'utf-8'));
+  let dd: DataDictionary;
+  if (fs.existsSync(DD_PATH)) {
+    dd = JSON.parse(fs.readFileSync(DD_PATH, 'utf-8'));
+  } else {
+    dd = { L1: [], L2: [], L3: [], relationships: [], derivation_dag: {} };
+  }
 
-  const report: SyncReport = { tablesAdded: [], fieldsAdded: [], l3ManifestWarnings: [] };
-
-  // Build lookup of existing DD tables by layer.name
-  const ddTableMap: Record<string, Map<string, DataDictionaryTable>> = {
-    L1: new Map(dd.L1.map(t => [t.name, t])),
-    L2: new Map(dd.L2.map(t => [t.name, t])),
-    L3: new Map(dd.L3.map(t => [t.name, t])),
-  };
+  const report: SyncReport = { tablesAdded: [], fieldsAdded: [], typesUpdated: [], l3ManifestWarnings: [] };
 
   // Build existing relationships set for dedup
   const relSet = new Set(
     dd.relationships.map(r => `${r.from_layer}.${r.from_table}.${r.from_field}->${r.to_layer}.${r.to_table}.${r.to_field}`)
   );
 
-  // ── Sync L1 ──
-  for (const table of L1_TABLES) {
-    const existing = ddTableMap.L1.get(table.tableName);
-    if (!existing) {
-      // Add entire table
-      const category = TABLE_CATEGORIES[table.tableName] ?? 'Uncategorized';
-      const newTable: DataDictionaryTable = {
-        name: table.tableName,
-        layer: 'L1',
-        category,
-        fields: table.columns.map(c => tsColToField(table.tableName, c)),
-      };
-      dd.L1.push(newTable);
-      ddTableMap.L1.set(table.tableName, newTable);
-      report.tablesAdded.push(`L1.${table.tableName}`);
+  // Parse all DDL files
+  const l1Parsed = parseDDL(fs.readFileSync(L1_DDL_PATH, 'utf-8'), 'l1');
+  const l2Parsed = parseDDL(fs.readFileSync(L2_DDL_PATH, 'utf-8'), 'l2');
+  const l3Parsed = parseDDL(fs.readFileSync(L3_DDL_PATH, 'utf-8'), 'l3');
 
-      // Add relationships for FK columns
-      for (const col of table.columns) {
-        if (col.fk) {
-          const fk = parseFkString(col.fk);
-          if (fk) {
-            const relKey = `L1.${table.tableName}.${col.name}->${fk.layer}.${fk.table}.${fk.field}`;
-            if (!relSet.has(relKey)) {
-              dd.relationships.push({
-                from_layer: 'L1', from_table: table.tableName, from_field: col.name,
-                to_layer: fk.layer, to_table: fk.table, to_field: fk.field,
-              });
-              relSet.add(relKey);
+  // Sync helper: process parsed tables for a given layer
+  function syncLayer(
+    layer: 'L1' | 'L2' | 'L3',
+    parsed: ReturnType<typeof parseDDL>,
+    getCategoryFn: (tableName: string) => string,
+  ) {
+    const ddTableMap = new Map(dd[layer].map(t => [t.name, t]));
+
+    for (const table of parsed) {
+      const isComposite = table.pkColumns.length > 1;
+      const existing = ddTableMap.get(table.name);
+
+      if (!existing) {
+        // New table from DDL
+        const newTable: DataDictionaryTable = {
+          name: table.name,
+          layer,
+          category: getCategoryFn(table.name),
+          fields: table.columns.map(c => parsedColToField(table.name, c, isComposite)),
+        };
+        dd[layer].push(newTable);
+        report.tablesAdded.push(`${layer}.${table.name}`);
+      } else {
+        // Update existing table: update types, add missing fields
+        const existingFieldMap = new Map(existing.fields.map(f => [f.name, f]));
+
+        for (const col of table.columns) {
+          const existingField = existingFieldMap.get(col.name);
+          if (!existingField) {
+            existing.fields.push(parsedColToField(table.name, col, isComposite));
+            report.fieldsAdded.push(`${layer}.${table.name}.${col.name}`);
+          } else {
+            // Update data_type from DDL (golden source)
+            if (existingField.data_type !== col.type) {
+              report.typesUpdated.push(
+                `${layer}.${table.name}.${col.name}: ${existingField.data_type ?? '(none)'} → ${col.type}`,
+              );
+              existingField.data_type = col.type;
+            }
+
+            // Update PK/FK from DDL
+            const fkTarget = col.fk ? parseFkReference(col.fk) : undefined;
+            if (col.pk || fkTarget) {
+              existingField.pk_fk = {
+                is_pk: col.pk,
+                is_composite: isComposite && col.pk,
+                ...(fkTarget ? { fk_target: fkTarget } : {}),
+              };
             }
           }
         }
-      }
-    } else {
-      // Table exists — check for missing fields and relationships
-      const existingFields = new Set(existing.fields.map(f => f.name));
-      for (const col of table.columns) {
-        if (!existingFields.has(col.name)) {
-          existing.fields.push(tsColToField(table.tableName, col));
-          report.fieldsAdded.push(`L1.${table.tableName}.${col.name}`);
-        }
-        // Ensure FK relationships exist for all FK columns (even pre-existing ones)
-        if (col.fk) {
-          const fk = parseFkString(col.fk);
-          if (fk) {
-            const relKey = `L1.${table.tableName}.${col.name}->${fk.layer}.${fk.table}.${fk.field}`;
-            if (!relSet.has(relKey)) {
-              dd.relationships.push({
-                from_layer: 'L1', from_table: table.tableName, from_field: col.name,
-                to_layer: fk.layer, to_table: fk.table, to_field: fk.field,
-              });
-              relSet.add(relKey);
-            }
-          }
-        }
-      }
-    }
-  }
 
-  // ── Sync L2 ──
-  for (const table of L2_TABLES) {
-    const existing = ddTableMap.L2.get(table.tableName);
-    if (!existing) {
-      const newTable: DataDictionaryTable = {
-        name: table.tableName,
-        layer: 'L2',
-        category: 'Uncategorized',
-        fields: table.columns.map(c => tsColToField(table.tableName, c)),
-      };
-      dd.L2.push(newTable);
-      ddTableMap.L2.set(table.tableName, newTable);
-      report.tablesAdded.push(`L2.${table.tableName}`);
-
-      for (const col of table.columns) {
-        if (col.fk) {
-          const fk = parseFkString(col.fk);
-          if (fk) {
-            const relKey = `L2.${table.tableName}.${col.name}->${fk.layer}.${fk.table}.${fk.field}`;
-            if (!relSet.has(relKey)) {
-              dd.relationships.push({
-                from_layer: 'L2', from_table: table.tableName, from_field: col.name,
-                to_layer: fk.layer, to_table: fk.table, to_field: fk.field,
-              });
-              relSet.add(relKey);
-            }
-          }
+        // Sync category from metadata
+        const metaCategory = getCategoryFn(table.name);
+        if (metaCategory !== 'Uncategorized' && existing.category !== metaCategory) {
+          existing.category = metaCategory;
         }
       }
-    } else {
-      const existingFields = new Set(existing.fields.map(f => f.name));
+
+      // Add FK relationships
       for (const col of table.columns) {
-        if (!existingFields.has(col.name)) {
-          existing.fields.push(tsColToField(table.tableName, col));
-          report.fieldsAdded.push(`L2.${table.tableName}.${col.name}`);
-        }
-        // Ensure FK relationships exist for all FK columns (even pre-existing ones)
         if (col.fk) {
-          const fk = parseFkString(col.fk);
-          if (fk) {
-            const relKey = `L2.${table.tableName}.${col.name}->${fk.layer}.${fk.table}.${fk.field}`;
+          const fkTarget = parseFkReference(col.fk);
+          if (fkTarget) {
+            const relKey = `${layer}.${table.name}.${col.name}->${fkTarget.layer}.${fkTarget.table}.${fkTarget.field}`;
             if (!relSet.has(relKey)) {
               dd.relationships.push({
-                from_layer: 'L2', from_table: table.tableName, from_field: col.name,
-                to_layer: fk.layer, to_table: fk.table, to_field: fk.field,
+                from_layer: layer,
+                from_table: table.name,
+                from_field: col.name,
+                to_layer: fkTarget.layer,
+                to_table: fkTarget.table,
+                to_field: fkTarget.field,
               });
               relSet.add(relKey);
             }
@@ -351,50 +233,23 @@ export function syncDataModel(): SyncReport {
     }
   }
 
-  // ── Sync L3 (from DDL) ──
-  const ddlSql = fs.readFileSync(DDL_PATH, 'utf-8');
-  const l3Parsed = parseL3DDL(ddlSql);
+  // Sync all layers from DDL
+  syncLayer('L1', l1Parsed, (name) => L1_META_MAP.get(name)?.category ?? 'Uncategorized');
+  syncLayer('L2', l2Parsed, (name) => L2_META_MAP.get(name)?.category ?? 'Uncategorized');
+
   const l3MetaMap = new Map(L3_TABLES.map(t => [t.name, t]));
+  syncLayer('L3', l3Parsed, (name) => l3MetaMap.get(name)?.category ?? 'Uncategorized');
 
+  // Check L3 manifest
   for (const table of l3Parsed) {
-    const existing = ddTableMap.L3.get(table.name);
-    const meta = l3MetaMap.get(table.name);
-
-    if (!existing) {
-      const newTable: DataDictionaryTable = {
-        name: table.name,
-        layer: 'L3',
-        category: meta?.category ?? 'Uncategorized',
-        fields: table.columns.map(c => l3ColToField(table.name, c)),
-      };
-      dd.L3.push(newTable);
-      ddTableMap.L3.set(table.name, newTable);
-      report.tablesAdded.push(`L3.${table.name}`);
-    } else {
-      // Sync category from l3-tables.ts manifest
-      if (meta && existing.category !== meta.category) {
-        report.fieldsAdded.push(`L3.${table.name} category: ${existing.category} → ${meta.category}`);
-        existing.category = meta.category;
-      }
-
-      const existingFields = new Set(existing.fields.map(f => f.name));
-      for (const col of table.columns) {
-        if (!existingFields.has(col.name)) {
-          existing.fields.push(l3ColToField(table.name, col));
-          report.fieldsAdded.push(`L3.${table.name}.${col.name}`);
-        }
-      }
-    }
-
-    // Check L3 manifest
-    if (!meta) {
+    if (!l3MetaMap.has(table.name)) {
       report.l3ManifestWarnings.push(
-        `${table.name} exists in DDL but missing from data/l3-tables.ts manifest`
+        `${table.name} exists in DDL but missing from data/l3-tables.ts manifest`,
       );
     }
   }
 
-  // ── Write updated data dictionary ──
+  // Write updated data dictionary
   const ddDir = path.dirname(DD_PATH);
   if (!fs.existsSync(ddDir)) fs.mkdirSync(ddDir, { recursive: true });
   fs.writeFileSync(DD_PATH, JSON.stringify(dd, null, 2), 'utf-8');
@@ -406,8 +261,27 @@ export function syncDataModel(): SyncReport {
 // CLI entry point
 // ═══════════════════════════════════════════════════════════════════════════
 
-function main() {
-  console.log('\n  Syncing data model sources → data dictionary...\n');
+async function main() {
+  // If DATABASE_URL is available, use introspection (the golden source)
+  const hasDb = !!process.env.DATABASE_URL;
+
+  if (hasDb) {
+    console.log('\n  DATABASE_URL detected — running introspection from live PostgreSQL...\n');
+    const { execSync } = await import('child_process');
+    try {
+      execSync('npx tsx scripts/introspect-db.ts', {
+        cwd: path.resolve(__dirname, '..'),
+        stdio: 'inherit',
+        env: process.env,
+      });
+      console.log('  Introspection complete. Data dictionary updated from PostgreSQL.\n');
+      return;
+    } catch (err) {
+      console.error('  Introspection failed, falling back to DDL parsing...\n');
+    }
+  }
+
+  console.log('\n  Syncing data model from DDL files → data dictionary...\n');
 
   const report = syncDataModel();
 
@@ -421,12 +295,18 @@ function main() {
     for (const f of report.fieldsAdded) console.log(`    + ${f}`);
   }
 
+  if (report.typesUpdated.length > 0) {
+    console.log(`  Updated ${report.typesUpdated.length} types:`);
+    for (const t of report.typesUpdated.slice(0, 20)) console.log(`    ~ ${t}`);
+    if (report.typesUpdated.length > 20) console.log(`    ... and ${report.typesUpdated.length - 20} more`);
+  }
+
   if (report.l3ManifestWarnings.length > 0) {
     console.log(`\n  L3 Manifest warnings:`);
     for (const w of report.l3ManifestWarnings) console.log(`    ! ${w}`);
   }
 
-  if (report.tablesAdded.length === 0 && report.fieldsAdded.length === 0) {
+  if (report.tablesAdded.length === 0 && report.fieldsAdded.length === 0 && report.typesUpdated.length === 0) {
     console.log('  All sources in sync. No changes needed.');
   }
 
@@ -448,4 +328,8 @@ function main() {
 
 // Run if called directly (not imported)
 const isDirectRun = process.argv[1]?.includes('sync-data-model');
-if (isDirectRun) main();
+if (isDirectRun) {
+  // Load dotenv for DATABASE_URL detection
+  try { require('dotenv/config'); } catch { /* not critical */ }
+  main();
+}

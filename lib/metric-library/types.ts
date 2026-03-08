@@ -94,6 +94,8 @@ export interface DemoFacility {
   /** External Rating fields (optional — only present for EXT_RATING demo data) */
   external_rating?: string;
   external_rating_notch?: number;
+  /** Generic extra fields for auto-generated demo data (new metrics not yet in typed interface). */
+  extra_fields?: Record<string, number | string>;
 }
 
 /** Demo data bundle stored per CatalogueItem. */

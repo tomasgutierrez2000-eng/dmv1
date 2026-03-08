@@ -1,0 +1,239 @@
+# IDENTIFICATION
+metric_id: "CR-001"
+name: "Debt Service Coverage Ratio"
+version: "1.0.0"
+owner: "credit-risk-analytics"
+status: ACTIVE
+effective_date: "2026-01-01"
+
+# CLASSIFICATION
+domain: "credit_risk"
+sub_domain: "debt_service_coverage"
+metric_class: CALCULATED
+direction: HIGHER_BETTER
+unit_type: RATIO
+display_format: ".2f"
+description: >
+  Ratio of net operating income (NOI) to total debt service obligations.
+  Measures a borrower's ability to service debt from operating cash flow.
+  Core CRE underwriting KPI — values below 1.0x indicate insufficient
+  cash flow. Required in FR Y-14Q and CCAR stress testing.
+
+# REGULATORY REFERENCES
+regulatory_references:
+  - framework: "FR Y-14Q"
+    schedule: "H.2"
+    description: "CRE loan DSCR reporting"
+  - framework: "CCAR"
+    section: "Stress Testing"
+    description: "Projected DSCR under adverse scenarios"
+
+# SOURCE TABLES
+source_tables:
+  - schema: l2
+    table: facility_financial_snapshot
+    alias: ffs
+    join_type: BASE
+    fields:
+      - name: noi_amt
+        role: MEASURE
+        description: "Net operating income — numerator for CRE and Project Finance DSCR"
+      - name: total_debt_service_amt
+        role: MEASURE
+        description: "Annual total debt service obligations — denominator"
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date"
+    fields:
+      - name: drawn_amount
+        role: MEASURE
+        description: "Weighting factor for weighted average at counterparty/desk levels"
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = ffs.facility_id"
+    fields:
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+  - schema: l1
+    table: counterparty
+    alias: cp
+    join_type: INNER
+    join_on: "cp.counterparty_id = fm.counterparty_id"
+    fields:
+      - name: legal_name
+        role: DIMENSION
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: INNER
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+      - name: segment_name
+        role: DIMENSION
+
+# LEVEL FORMULAS
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: "noi_amt / total_debt_service_amt per facility"
+    formula_sql: |
+      SELECT
+        ffs.facility_id::TEXT AS dimension_key,
+        fm.facility_name AS dimension_label,
+        CASE WHEN ffs.total_debt_service_amt > 0
+             THEN ffs.noi_amt / ffs.total_debt_service_amt
+             ELSE NULL END AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l1.facility_master fm ON fm.facility_id = ffs.facility_id
+      WHERE ffs.as_of_date = :as_of_date
+
+  counterparty:
+    aggregation_type: WEIGHTED_AVG
+    weighting_field: drawn_amount
+    formula_text: "WEIGHTED_AVG(DSCR, drawn_amount) per counterparty"
+    formula_sql: |
+      SELECT
+        fm.counterparty_id::TEXT AS dimension_key,
+        cp.legal_name AS dimension_label,
+        CASE WHEN SUM(COALESCE(fes.drawn_amount, 0)) > 0
+             THEN SUM(
+               CASE WHEN ffs.total_debt_service_amt > 0
+                    THEN (ffs.noi_amt / ffs.total_debt_service_amt) * COALESCE(fes.drawn_amount, 0)
+                    ELSE 0 END
+             ) / SUM(COALESCE(fes.drawn_amount, 0))
+             ELSE NULL END AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l1.facility_master fm ON fm.facility_id = ffs.facility_id
+      INNER JOIN l1.counterparty cp ON cp.counterparty_id = fm.counterparty_id
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date
+      WHERE ffs.as_of_date = :as_of_date
+      GROUP BY fm.counterparty_id, cp.legal_name
+
+  desk:
+    aggregation_type: WEIGHTED_AVG
+    weighting_field: drawn_amount
+    formula_text: "WEIGHTED_AVG(DSCR, drawn_amount) per desk (tree_level=3)"
+    formula_sql: |
+      SELECT
+        ebt_desk.managed_segment_id::TEXT AS dimension_key,
+        ebt_desk.segment_name AS dimension_label,
+        CASE WHEN SUM(COALESCE(fes.drawn_amount, 0)) > 0
+             THEN SUM(
+               CASE WHEN ffs.total_debt_service_amt > 0
+                    THEN (ffs.noi_amt / ffs.total_debt_service_amt) * COALESCE(fes.drawn_amount, 0)
+                    ELSE 0 END
+             ) / SUM(COALESCE(fes.drawn_amount, 0))
+             ELSE NULL END AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l1.facility_master fm ON fm.facility_id = ffs.facility_id
+      INNER JOIN l1.enterprise_business_taxonomy ebt_desk
+        ON ebt_desk.managed_segment_id = fm.lob_segment_id
+        AND ebt_desk.tree_level = 3
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date
+      WHERE ffs.as_of_date = :as_of_date
+      GROUP BY ebt_desk.managed_segment_id, ebt_desk.segment_name
+
+  portfolio:
+    aggregation_type: WEIGHTED_AVG
+    weighting_field: drawn_amount
+    formula_text: "WEIGHTED_AVG(DSCR, drawn_amount) per portfolio (tree_level=2)"
+    formula_sql: |
+      SELECT
+        ebt_port.managed_segment_id::TEXT AS dimension_key,
+        ebt_port.segment_name AS dimension_label,
+        CASE WHEN SUM(COALESCE(fes.drawn_amount, 0)) > 0
+             THEN SUM(
+               CASE WHEN ffs.total_debt_service_amt > 0
+                    THEN (ffs.noi_amt / ffs.total_debt_service_amt) * COALESCE(fes.drawn_amount, 0)
+                    ELSE 0 END
+             ) / SUM(COALESCE(fes.drawn_amount, 0))
+             ELSE NULL END AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l1.facility_master fm ON fm.facility_id = ffs.facility_id
+      INNER JOIN l1.enterprise_business_taxonomy ebt_desk
+        ON ebt_desk.managed_segment_id = fm.lob_segment_id
+      INNER JOIN l1.enterprise_business_taxonomy ebt_port
+        ON ebt_port.managed_segment_id = ebt_desk.parent_segment_id
+        AND ebt_port.tree_level = 2
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date
+      WHERE ffs.as_of_date = :as_of_date
+      GROUP BY ebt_port.managed_segment_id, ebt_port.segment_name
+
+  business_segment:
+    aggregation_type: WEIGHTED_AVG
+    weighting_field: drawn_amount
+    formula_text: "WEIGHTED_AVG(DSCR, drawn_amount) per business segment (tree_level=1)"
+    formula_sql: |
+      SELECT
+        ebt_bseg.managed_segment_id::TEXT AS dimension_key,
+        ebt_bseg.segment_name AS dimension_label,
+        CASE WHEN SUM(COALESCE(fes.drawn_amount, 0)) > 0
+             THEN SUM(
+               CASE WHEN ffs.total_debt_service_amt > 0
+                    THEN (ffs.noi_amt / ffs.total_debt_service_amt) * COALESCE(fes.drawn_amount, 0)
+                    ELSE 0 END
+             ) / SUM(COALESCE(fes.drawn_amount, 0))
+             ELSE NULL END AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l1.facility_master fm ON fm.facility_id = ffs.facility_id
+      INNER JOIN l1.enterprise_business_taxonomy ebt_desk
+        ON ebt_desk.managed_segment_id = fm.lob_segment_id
+      INNER JOIN l1.enterprise_business_taxonomy ebt_port
+        ON ebt_port.managed_segment_id = ebt_desk.parent_segment_id
+      INNER JOIN l1.enterprise_business_taxonomy ebt_bseg
+        ON ebt_bseg.managed_segment_id = ebt_port.parent_segment_id
+        AND ebt_bseg.tree_level = 1
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date
+      WHERE ffs.as_of_date = :as_of_date
+      GROUP BY ebt_bseg.managed_segment_id, ebt_bseg.segment_name
+
+# DEPENDENCIES
+depends_on: []
+
+# OUTPUT
+output:
+  table: metric_result
+
+# VALIDATION
+validations:
+  - rule_id: "CR-001-V01"
+    type: NOT_NULL
+    severity: ERROR
+    description: "No null DSCR values"
+  - rule_id: "CR-001-V02"
+    type: NON_NEGATIVE
+    severity: WARNING
+    description: "DSCR should normally be non-negative"
+  - rule_id: "CR-001-V03"
+    type: RECONCILIATION
+    severity: WARNING
+    description: "Weighted average at business_segment should reconcile with facility-level weighted average"
+    params:
+      levels_to_compare: [facility, business_segment]
+      tolerance_pct: 5.0
+
+tags: [gsib, ccar, credit_risk, cre_underwriting]
+dashboard_pages: [P3]
+legacy_metric_ids: [C003]

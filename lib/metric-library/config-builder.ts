@@ -505,6 +505,15 @@ export function demoFacilityToEntity(
   if (f.external_rating !== undefined) fields.external_rating = f.external_rating;
   if (f.external_rating_notch !== undefined) fields.external_rating_notch = f.external_rating_notch;
 
+  // Pass through auto-generated extra_fields (from Python calc-engine demo generator)
+  if (f.extra_fields) {
+    for (const [key, val] of Object.entries(f.extra_fields)) {
+      if (!(key in fields)) {
+        fields[key] = val;
+      }
+    }
+  }
+
   return {
     entity_id: f.facility_id,
     entity_name: f.facility_name,

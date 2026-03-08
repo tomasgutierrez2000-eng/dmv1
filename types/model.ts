@@ -6,7 +6,7 @@ export interface Field {
   isPK: boolean;
   isFK: boolean;
   fkTarget?: { layer: string; table: string; field: string };
-  dataType?: string; // L3 only
+  dataType?: string;
   formula?: string; // L3 only
   sourceTables?: Array<{ layer: string; table: string }>; // L3 only
   sourceFields?: string; // L3 only

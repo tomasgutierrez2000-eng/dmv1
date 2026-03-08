@@ -92,21 +92,40 @@ npm run dev              # Dev server (port 3000)
 npm run build            # Production build
 npm run test:metrics     # Validate metric definitions
 npm run test:calc-engine # Test calculation engine
-npm run sync:data-model  # Sync model definitions
+npm run db:introspect    # Introspect PostgreSQL → update data dictionary
+npm run sync:data-model  # Sync model from DDL (offline fallback) or DB
 npm run export:data-model # Export to Excel
+npm run validate         # Validate cross-referential integrity
 ```
 
 ## Environment Variables
 ```
+DATABASE_URL             # PostgreSQL (Neon) — golden source for schema
 GOOGLE_GEMINI_API_KEY    # Gemini agent
 ANTHROPIC_API_KEY        # Claude integration
 AGENT_PROVIDER           # gemini|claude|ollama
 ```
 
+## Golden Source: PostgreSQL
+The live PostgreSQL database (Neon, via `DATABASE_URL`) is the **golden source of truth** for all table structures, fields, data types, PKs, and FKs. The data flow is:
+
+1. **PostgreSQL** → `npm run db:introspect` → updates `data-dictionary.json` with exact types/PKs/FKs
+2. **data-dictionary.json** → consumed by visualizers, Excel exporter, validation, schema bundle API
+3. **DDL files** (`sql/gsib-export/*.sql`, `sql/l3/*.sql`) → offline fallback when `DATABASE_URL` unavailable
+4. **Table metadata** (`data/l1-table-meta.ts`, `data/l2-table-meta.ts`) → SCD types and categories only (not structural)
+
+When `DATABASE_URL` is set, `npm run sync:data-model` automatically delegates to introspection. Without it, falls back to DDL parsing via `lib/ddl-parser.ts`.
+
+### Auto-Sync Hook (MANDATORY)
+A Claude Code `PostToolUse` hook (`.claude/hooks/post-db-change.sh`) automatically runs `npm run db:introspect` after any Bash command that modifies the PostgreSQL schema (DDL operations, `db:load`, `apply-ddl`, `psql`). **Rules:**
+- **After ANY database schema change** (CREATE/ALTER/DROP TABLE, adding columns, loading DDL), the hook auto-syncs the data dictionary. If the hook doesn't fire, manually run `npm run db:introspect`.
+- **Never skip introspection** after schema changes — the visualizer, exporter, and validation all read from the data dictionary, not directly from PostgreSQL.
+- **After introspection**, verify the `/data-elements` page reflects the changes.
+
 ## Important Patterns
 - **Metric storage priority:** Excel (`metrics_dimensions_filled.xlsx`) > JSON (`metrics-custom.json`) > seed metrics — merged via `getMergedMetrics()`
 - **Schema bundle** (`/api/schema/bundle`): unified DataDictionary + L3 Tables + L3 Metrics (metrics list = `getMergedMetrics()` so agent and calculation see the same set). Supports `?summary=true` for token-efficient agent prompts
-- **Data dictionary** cached at `facility-summary-mvp/output/data-dictionary/data-dictionary.json`. **Sync order:** (1) `npm run sync:data-model` — merges L1/L2 definitions + L3 (from `data/l3-tables.ts` and DDL) into `data-dictionary.json`; (2) generate DDL via `/api/data-model/generate-ddl` or sync script; (3) optional `apply-ddl` when `DATABASE_URL` is set. The `facility-summary-mvp/output/` directory is owned by this repo’s sync/upload flows (or an external pipeline that writes the same JSON); the visualizer and data-model APIs read from it.
+- **Data dictionary** cached at `facility-summary-mvp/output/data-dictionary/data-dictionary.json`. Updated by `db:introspect` (PostgreSQL) or `sync:data-model` (DDL fallback). The visualizer and data-model APIs read from it.
 - When modifying metrics: always update both the catalogue item AND the L3 metric definition if both exist
 - Level definitions use `sourcing_type`: `Raw` (direct field), `Calc` (computed), `Agg` (aggregated), `Avg` (weighted average)
 

@@ -1,5 +1,7 @@
 /**
  * Export the GSIB Credit Risk data model to a professionally formatted Excel workbook.
+ * Reads ALL data from the data dictionary JSON (post-introspection from PostgreSQL).
+ *
  * Produces output/data-model-reference.xlsx with 4 tabs:
  *   1. Summary       — Model overview, category breakdowns, table index
  *   2. L1             — Reference & Master Data (field-level detail)
@@ -13,102 +15,38 @@ import ExcelJS from 'exceljs';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { L1_TABLES } from './l1/l1-definitions';
-import { L2_TABLES } from './l2/l2-definitions';
 import { L3_TABLES } from '../data/l3-tables';
+import { L1_META_MAP } from '../data/l1-table-meta';
+import { L2_META_MAP } from '../data/l2-table-meta';
 import { syncDataModel } from './sync-data-model';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Data Dictionary (descriptions + why_required)
+// Data Dictionary (single source for all layers)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DD_PATH = path.resolve(__dirname, '../facility-summary-mvp/output/data-dictionary/data-dictionary.json');
+
 interface DDField {
   name: string;
   description?: string;
   why_required?: string;
   category?: string;
   data_type?: string;
+  pk_fk?: {
+    is_pk?: boolean;
+    is_composite?: boolean;
+    fk_target?: { layer: string; table: string; field: string };
+  };
 }
 interface DDTable { name: string; layer: string; category: string; fields: DDField[] }
-interface DataDictionary { L1: DDTable[]; L2: DDTable[]; L3: DDTable[] }
+interface DDRelationship { from_layer: string; from_table: string; from_field: string; to_layer: string; to_table: string; to_field: string }
+interface DataDict { L1: DDTable[]; L2: DDTable[]; L3: DDTable[]; relationships: DDRelationship[] }
 
-const dd: DataDictionary = JSON.parse(fs.readFileSync(DD_PATH, 'utf-8'));
+let dd: DataDict;
 
-type FieldMeta = { description: string; why_required: string; category: string };
-const fieldLookup = new Map<string, FieldMeta>();
-const tableCategoryLookup = new Map<string, string>();
-
-for (const layer of ['L1', 'L2', 'L3'] as const) {
-  for (const table of dd[layer]) {
-    tableCategoryLookup.set(`${layer}.${table.name}`, table.category);
-    for (const f of table.fields) {
-      fieldLookup.set(`${layer}.${table.name}.${f.name}`, {
-        description: f.description ?? '',
-        why_required: f.why_required ?? '',
-        category: table.category,
-      });
-    }
-  }
+function loadDataDictionary() {
+  dd = JSON.parse(fs.readFileSync(DD_PATH, 'utf-8'));
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// L3 DDL Parsing
-// ═══════════════════════════════════════════════════════════════════════════
-
-const DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
-const ddlSql = fs.readFileSync(DDL_PATH, 'utf-8');
-
-interface L3Column {
-  name: string; type: string; nullable: boolean;
-  pk: boolean; fk: string; defaultVal: string;
-}
-interface L3ParsedTable { name: string; columns: L3Column[]; pkColumns: string[] }
-
-function parseL3DDL(sql: string): L3ParsedTable[] {
-  const tables: L3ParsedTable[] = [];
-  const tableRegex = /CREATE TABLE IF NOT EXISTS l3\.(\w+)\s*\(([\s\S]*?)\);/g;
-  let match: RegExpExecArray | null;
-  while ((match = tableRegex.exec(sql)) !== null) {
-    const tableName = match[1];
-    const body = match[2];
-    const pkMatch = body.match(/PRIMARY KEY\s*\(([^)]+)\)/);
-    const pkColumns = pkMatch ? pkMatch[1].split(',').map(c => c.trim()) : [];
-
-    const afterTable = sql.substring(match.index + match[0].length, match.index + match[0].length + 2000);
-    const fkMap = new Map<string, string>();
-    const fkRegex = /-- FK:\s+(\w+)\s*→\s*(.+)/g;
-    let fkMatch: RegExpExecArray | null;
-    while ((fkMatch = fkRegex.exec(afterTable)) !== null) {
-      if (afterTable.substring(0, fkMatch.index).includes('CREATE TABLE')) break;
-      fkMap.set(fkMatch[1], fkMatch[2].trim());
-    }
-
-    const columns: L3Column[] = [];
-    for (const line of body.split('\n')) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('PRIMARY KEY') || trimmed.startsWith('--')) continue;
-      const colMatch = trimmed.match(/^(\w+)\s+([\w(),.]+(?:\(\d+(?:,\d+)?\))?)\s*(.*?)(?:,\s*)?$/);
-      if (!colMatch) continue;
-      const colName = colMatch[1];
-      const rest = colMatch[3] || '';
-      const defaultMatch = rest.match(/DEFAULT\s+(.+)/i);
-      columns.push({
-        name: colName,
-        type: colMatch[2],
-        nullable: !rest.includes('NOT NULL'),
-        pk: pkColumns.includes(colName),
-        fk: fkMap.get(colName) ?? '',
-        defaultVal: defaultMatch ? defaultMatch[1].replace(/,\s*$/, '') : '',
-      });
-    }
-    tables.push({ name: tableName, columns, pkColumns });
-  }
-  return tables;
-}
-
-const l3Parsed = parseL3DDL(ddlSql);
-const l3MetaMap = new Map(L3_TABLES.map(t => [t.name, t]));
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Styling Constants
@@ -156,55 +94,10 @@ function applyBodyCell(cell: ExcelJS.Cell, isAlt: boolean): void {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Build Detail Sheet Data
+// Build Detail Sheet Data (all from data dictionary)
 // ═══════════════════════════════════════════════════════════════════════════
 
 type Row = (string | undefined)[];
-
-function buildL1L2Rows(
-  tables: Array<{ tableName: string; scd: string; columns: Array<{ name: string; type: string; nullable?: boolean; pk?: boolean; fk?: string; default?: string }> }>,
-  layer: 'L1' | 'L2',
-): Row[] {
-  const rows: Row[] = [];
-  for (const table of tables) {
-    const cat = tableCategoryLookup.get(`${layer}.${table.tableName}`) ?? 'Uncategorized';
-    for (const col of table.columns) {
-      const meta = fieldLookup.get(`${layer}.${table.tableName}.${col.name}`);
-      rows.push([
-        table.tableName, cat, table.scd, col.name,
-        meta?.description ?? '', meta?.why_required ?? '',
-        col.type,
-        col.nullable === false ? 'No' : 'Yes',
-        col.pk ? 'Yes' : '',
-        col.fk ?? '',
-        col.default ?? '',
-      ]);
-    }
-  }
-  return rows;
-}
-
-function buildL3Rows(): Row[] {
-  const rows: Row[] = [];
-  for (const table of l3Parsed) {
-    const meta = l3MetaMap.get(table.name);
-    const cat = tableCategoryLookup.get(`L3.${table.name}`) ?? meta?.category ?? 'Uncategorized';
-    const tier = meta ? `Tier ${meta.tier}` : '';
-    for (const col of table.columns) {
-      const fieldMeta = fieldLookup.get(`L3.${table.name}.${col.name}`);
-      rows.push([
-        table.name, cat, tier, col.name,
-        fieldMeta?.description ?? '', fieldMeta?.why_required ?? '',
-        col.type,
-        col.nullable ? 'Yes' : 'No',
-        col.pk ? 'Yes' : '',
-        col.fk,
-        col.defaultVal,
-      ]);
-    }
-  }
-  return rows;
-}
 
 const L1L2_HEADERS = ['Table Name', 'Category', 'SCD Type', 'Field Name', 'Description', 'Why Required', 'Data Type', 'Nullable', 'PK', 'FK Reference', 'Default'];
 const L3_HEADERS = ['Table Name', 'Category', 'Tier', 'Field Name', 'Description', 'Why Required', 'Data Type', 'Nullable', 'PK', 'FK Reference', 'Default'];
@@ -215,20 +108,102 @@ const COL_WIDTHS: Record<string, number> = {
   'Data Type': 20, 'Nullable': 10, 'PK': 7, 'FK Reference': 48, 'Default': 18,
 };
 
+// Build FK lookup from relationships for a given layer+table
+function buildFkLookup(layer: string, tableName: string): Map<string, string> {
+  const fks = new Map<string, string>();
+  for (const r of dd.relationships) {
+    if (r.from_layer === layer && r.from_table === tableName) {
+      fks.set(r.from_field, `${r.to_layer.toLowerCase()}.${r.to_table}(${r.to_field})`);
+    }
+  }
+  return fks;
+}
+
+function buildLayerRows(
+  layer: 'L1' | 'L2' | 'L3',
+  getScdOrTier: (tableName: string) => string,
+): Row[] {
+  const rows: Row[] = [];
+  for (const table of dd[layer]) {
+    const scdOrTier = getScdOrTier(table.name);
+    const fkLookup = buildFkLookup(layer, table.name);
+    for (const f of table.fields) {
+      const fkRef = f.pk_fk?.fk_target
+        ? `${f.pk_fk.fk_target.layer.toLowerCase()}.${f.pk_fk.fk_target.table}(${f.pk_fk.fk_target.field})`
+        : fkLookup.get(f.name) ?? '';
+      rows.push([
+        table.name,
+        table.category,
+        scdOrTier,
+        f.name,
+        f.description ?? '',
+        f.why_required ?? '',
+        f.data_type ?? '',
+        f.pk_fk?.is_pk ? 'No' : 'Yes',  // PK columns are NOT NULL
+        f.pk_fk?.is_pk ? 'Yes' : '',
+        fkRef,
+        '',  // Default (not stored in data dictionary enrichment)
+      ]);
+    }
+  }
+  return rows;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Compute Stats
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface LayerStats {
+  tableCount: number;
+  fieldCount: number;
+  pkCount: number;
+  fkCount: number;
+  categories: Map<string, number>;
+  tableIndex: Array<{ table: string; category: string; scdOrTier: string; fieldCount: number }>;
+}
+
+function computeLayerStats(
+  layer: 'L1' | 'L2' | 'L3',
+  getScdOrTier: (tableName: string) => string,
+): LayerStats {
+  const categories = new Map<string, number>();
+  const tableIndex: LayerStats['tableIndex'] = [];
+  let pkCount = 0, fkCount = 0;
+
+  for (const t of dd[layer]) {
+    categories.set(t.category, (categories.get(t.category) ?? 0) + 1);
+    const fkLookup = buildFkLookup(layer, t.name);
+    for (const f of t.fields) {
+      if (f.pk_fk?.is_pk) pkCount++;
+      if (f.pk_fk?.fk_target || fkLookup.has(f.name)) fkCount++;
+    }
+    tableIndex.push({
+      table: t.name,
+      category: t.category,
+      scdOrTier: getScdOrTier(t.name),
+      fieldCount: t.fields.length,
+    });
+  }
+
+  return {
+    tableCount: dd[layer].length,
+    fieldCount: dd[layer].reduce((s, t) => s + t.fields.length, 0),
+    pkCount,
+    fkCount,
+    categories,
+    tableIndex,
+  };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Create Detail Worksheet
 // ═══════════════════════════════════════════════════════════════════════════
 
 function addDetailSheet(wb: ExcelJS.Workbook, name: string, headers: string[], rows: Row[]): void {
   const ws = wb.addWorksheet(name);
-
-  // Column definitions
   ws.columns = headers.map(h => ({ header: h, width: COL_WIDTHS[h] ?? 15 }));
-
-  // Style header row
   applyHeaderRow(ws, 1);
 
-  // Add data rows with alternating fills per table group
   let prevTable = '';
   let colorIndex = 0;
   for (const row of rows) {
@@ -239,72 +214,8 @@ function addDetailSheet(wb: ExcelJS.Workbook, name: string, headers: string[], r
     excelRow.eachCell({ includeEmpty: true }, (cell) => applyBodyCell(cell, isAlt));
   }
 
-  // Freeze header row
   ws.views = [{ state: 'frozen', ySplit: 1, xSplit: 0 }];
-
-  // Auto-filter
   ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: rows.length + 1, column: headers.length } };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Compute Stats for Summary
-// ═══════════════════════════════════════════════════════════════════════════
-
-interface LayerStats {
-  tableCount: number;
-  fieldCount: number;
-  pkCount: number;
-  fkCount: number;
-  categories: Map<string, number>; // category -> table count
-  tableIndex: Array<{ table: string; category: string; scdOrTier: string; fieldCount: number }>;
-}
-
-function computeL1L2Stats(
-  tables: Array<{ tableName: string; scd: string; columns: Array<{ pk?: boolean; fk?: string }> }>,
-  layer: 'L1' | 'L2',
-): LayerStats {
-  const categories = new Map<string, number>();
-  const tableIndex: LayerStats['tableIndex'] = [];
-  let pkCount = 0, fkCount = 0;
-
-  for (const t of tables) {
-    const cat = tableCategoryLookup.get(`${layer}.${t.tableName}`) ?? 'Uncategorized';
-    categories.set(cat, (categories.get(cat) ?? 0) + 1);
-    let tPk = 0, tFk = 0;
-    for (const c of t.columns) {
-      if (c.pk) { pkCount++; tPk++; }
-      if (c.fk) { fkCount++; tFk++; }
-    }
-    tableIndex.push({ table: t.tableName, category: cat, scdOrTier: t.scd, fieldCount: t.columns.length });
-  }
-  return { tableCount: tables.length, fieldCount: tables.reduce((s, t) => s + t.columns.length, 0), pkCount, fkCount, categories, tableIndex };
-}
-
-function computeL3Stats(): LayerStats {
-  const categories = new Map<string, number>();
-  const tableIndex: LayerStats['tableIndex'] = [];
-  let pkCount = 0, fkCount = 0;
-
-  for (const t of l3Parsed) {
-    const meta = l3MetaMap.get(t.name);
-    const cat = tableCategoryLookup.get(`L3.${t.name}`) ?? meta?.category ?? 'Uncategorized';
-    categories.set(cat, (categories.get(cat) ?? 0) + 1);
-    for (const c of t.columns) {
-      if (c.pk) pkCount++;
-      if (c.fk) fkCount++;
-    }
-    tableIndex.push({
-      table: t.name,
-      category: cat,
-      scdOrTier: meta ? `Tier ${meta.tier}` : '',
-      fieldCount: t.columns.length,
-    });
-  }
-  return {
-    tableCount: l3Parsed.length,
-    fieldCount: l3Parsed.reduce((s, t) => s + t.columns.length, 0),
-    pkCount, fkCount, categories, tableIndex,
-  };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -325,7 +236,6 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
     fk: l1.fkCount + l2.fkCount + l3.fkCount,
   };
 
-  // ── Title ──
   let r = 1;
   ws.mergeCells(r, 1, r, 5);
   const titleCell = ws.getCell(r, 1);
@@ -334,13 +244,12 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
   titleCell.alignment = { horizontal: 'left', vertical: 'middle' };
   ws.getRow(r).height = 32;
 
-  // ── Section A: Model Overview ──
-  r += 2; // row 3
+  r += 2;
   ws.getCell(r, 1).value = 'Model Overview';
   ws.getCell(r, 1).font = sectionFont;
   ws.getRow(r).height = 22;
 
-  r += 1; // row 4 — header
+  r += 1;
   const overviewHeaders = ['Metric', 'L1 — Reference', 'L2 — Snapshot', 'L3 — Derived', 'Total'];
   overviewHeaders.forEach((h, i) => {
     const cell = ws.getCell(r, i + 1);
@@ -364,25 +273,19 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
     rowData.forEach((val, i) => {
       const cell = ws.getCell(r, i + 1);
       cell.value = val;
-      cell.font = i === 0
-        ? { name: 'Calibri', size: 10, bold: true }
-        : { name: 'Calibri', size: 10 };
-      cell.alignment = i === 0
-        ? { horizontal: 'left', vertical: 'middle' }
-        : { horizontal: 'center', vertical: 'middle' };
+      cell.font = i === 0 ? { name: 'Calibri', size: 10, bold: true } : { name: 'Calibri', size: 10 };
+      cell.alignment = i === 0 ? { horizontal: 'left', vertical: 'middle' } : { horizontal: 'center', vertical: 'middle' };
       cell.border = thinBorder;
       cell.fill = isAlt ? altFill : whiteFill;
     });
   }
 
-  // ── Section B: Category Breakdowns (side by side) ──
   r += 2;
   ws.getCell(r, 1).value = 'Categories by Layer';
   ws.getCell(r, 1).font = sectionFont;
   ws.getRow(r).height = 22;
 
   r++;
-  // Three side-by-side tables: cols 1-2 (L1), cols 4-5 (L2), cols 7-8 (L3)
   const catSections: Array<{ label: string; cats: Map<string, number>; startCol: number }> = [
     { label: 'L1 Category', cats: l1.categories, startCol: 1 },
     { label: 'L2 Category', cats: l2.categories, startCol: 4 },
@@ -393,17 +296,13 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
   for (const sec of catSections) {
     const hdrCell = ws.getCell(catHeaderRow, sec.startCol);
     hdrCell.value = sec.label;
-    hdrCell.fill = subHeaderFill;
-    hdrCell.font = subHeaderFont;
-    hdrCell.alignment = { horizontal: 'left', vertical: 'middle' };
-    hdrCell.border = thinBorder;
+    hdrCell.fill = subHeaderFill; hdrCell.font = subHeaderFont;
+    hdrCell.alignment = { horizontal: 'left', vertical: 'middle' }; hdrCell.border = thinBorder;
 
     const cntCell = ws.getCell(catHeaderRow, sec.startCol + 1);
     cntCell.value = 'Tables';
-    cntCell.fill = subHeaderFill;
-    cntCell.font = subHeaderFont;
-    cntCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    cntCell.border = thinBorder;
+    cntCell.fill = subHeaderFill; cntCell.font = subHeaderFont;
+    cntCell.alignment = { horizontal: 'center', vertical: 'middle' }; cntCell.border = thinBorder;
   }
 
   const maxCats = Math.max(l1.categories.size, l2.categories.size, l3.categories.size);
@@ -414,23 +313,18 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
       const entries = [...sec.cats.entries()];
       if (ci < entries.length) {
         const catCell = ws.getCell(dataRow, sec.startCol);
-        catCell.value = entries[ci][0];
-        catCell.font = bodyFont;
+        catCell.value = entries[ci][0]; catCell.font = bodyFont;
         catCell.alignment = { horizontal: 'left', vertical: 'middle' };
-        catCell.border = thinBorder;
-        catCell.fill = isAlt ? altFill : whiteFill;
+        catCell.border = thinBorder; catCell.fill = isAlt ? altFill : whiteFill;
 
         const cntCell = ws.getCell(dataRow, sec.startCol + 1);
-        cntCell.value = entries[ci][1];
-        cntCell.font = bodyFont;
+        cntCell.value = entries[ci][1]; cntCell.font = bodyFont;
         cntCell.alignment = { horizontal: 'center', vertical: 'middle' };
-        cntCell.border = thinBorder;
-        cntCell.fill = isAlt ? altFill : whiteFill;
+        cntCell.border = thinBorder; cntCell.fill = isAlt ? altFill : whiteFill;
       }
     }
   }
 
-  // ── Section C: Table Index ──
   r = catHeaderRow + maxCats + 3;
   ws.getCell(r, 1).value = 'Table Index';
   ws.getCell(r, 1).font = sectionFont;
@@ -440,11 +334,8 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
   const indexHeaders = ['Layer', 'Table Name', 'Category', 'SCD / Tier', 'Field Count'];
   indexHeaders.forEach((h, i) => {
     const cell = ws.getCell(r, i + 1);
-    cell.value = h;
-    cell.fill = subHeaderFill;
-    cell.font = subHeaderFont;
-    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-    cell.border = thinBorder;
+    cell.value = h; cell.fill = subHeaderFill; cell.font = subHeaderFont;
+    cell.alignment = { horizontal: 'center', vertical: 'middle' }; cell.border = thinBorder;
   });
   ws.getRow(r).height = 22;
 
@@ -463,27 +354,16 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
     const vals = [t.layer, t.table, t.category, t.scdOrTier, t.fieldCount];
     vals.forEach((val, i) => {
       const cell = ws.getCell(r, i + 1);
-      cell.value = val;
-      cell.font = bodyFont;
-      cell.alignment = i === 4
-        ? { horizontal: 'center', vertical: 'middle' }
-        : { horizontal: 'left', vertical: 'middle' };
-      cell.border = thinBorder;
-      cell.fill = isAlt ? altFill : whiteFill;
+      cell.value = val; cell.font = bodyFont;
+      cell.alignment = i === 4 ? { horizontal: 'center', vertical: 'middle' } : { horizontal: 'left', vertical: 'middle' };
+      cell.border = thinBorder; cell.fill = isAlt ? altFill : whiteFill;
     });
   }
 
-  // Column widths for summary sheet
-  ws.getColumn(1).width = 28;
-  ws.getColumn(2).width = 36;
-  ws.getColumn(3).width = 30;
-  ws.getColumn(4).width = 26;
-  ws.getColumn(5).width = 16;
-  ws.getColumn(6).width = 4;  // spacer
-  ws.getColumn(7).width = 30;
-  ws.getColumn(8).width = 12;
-
-  // Freeze panes at row 2 (below title)
+  ws.getColumn(1).width = 28; ws.getColumn(2).width = 36;
+  ws.getColumn(3).width = 30; ws.getColumn(4).width = 26;
+  ws.getColumn(5).width = 16; ws.getColumn(6).width = 4;
+  ws.getColumn(7).width = 30; ws.getColumn(8).width = 12;
   ws.views = [{ state: 'frozen', ySplit: 1, xSplit: 0 }];
 }
 
@@ -492,43 +372,37 @@ function addSummarySheet(wb: ExcelJS.Workbook, l1: LayerStats, l2: LayerStats, l
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function main() {
-  // Sync all sources → data dictionary before export
+  // Sync data dictionary from golden source before export
   console.log('  Syncing data model sources...');
-  const syncReport = syncDataModel();
-  if (syncReport.tablesAdded.length > 0 || syncReport.fieldsAdded.length > 0) {
-    console.log(`  Sync: added ${syncReport.tablesAdded.length} tables, ${syncReport.fieldsAdded.length} fields`);
-    // Re-read the data dictionary after sync to pick up new descriptions
-    const updatedDD: DataDictionary = JSON.parse(fs.readFileSync(DD_PATH, 'utf-8'));
-    fieldLookup.clear();
-    tableCategoryLookup.clear();
-    for (const layer of ['L1', 'L2', 'L3'] as const) {
-      for (const table of updatedDD[layer]) {
-        tableCategoryLookup.set(`${layer}.${table.name}`, table.category);
-        for (const f of table.fields) {
-          fieldLookup.set(`${layer}.${table.name}.${f.name}`, {
-            description: f.description ?? '',
-            why_required: f.why_required ?? '',
-            category: table.category,
-          });
-        }
-      }
-    }
-  } else {
-    console.log('  All sources in sync.');
-  }
+  syncDataModel();
+  console.log('  Sync complete.');
+
+  // Load the (now-synced) data dictionary
+  loadDataDictionary();
+
+  const l3MetaMap = new Map(L3_TABLES.map(t => [t.name, t]));
+
+  // SCD/Tier lookup functions
+  const getL1Scd = (name: string) => L1_META_MAP.get(name)?.scd ?? '';
+  const getL2Scd = (name: string) => L2_META_MAP.get(name)?.scd ?? '';
+  const getL3Tier = (name: string) => {
+    const meta = l3MetaMap.get(name);
+    return meta ? `Tier ${meta.tier}` : '';
+  };
 
   const wb = new ExcelJS.Workbook();
   wb.creator = 'GSIB Data Model Generator';
   wb.created = new Date();
 
-  // Compute data
-  const l1Rows = buildL1L2Rows(L1_TABLES, 'L1');
-  const l2Rows = buildL1L2Rows(L2_TABLES, 'L2');
-  const l3Rows = buildL3Rows();
+  // Build rows from data dictionary
+  const l1Rows = buildLayerRows('L1', getL1Scd);
+  const l2Rows = buildLayerRows('L2', getL2Scd);
+  const l3Rows = buildLayerRows('L3', getL3Tier);
 
-  const l1Stats = computeL1L2Stats(L1_TABLES, 'L1');
-  const l2Stats = computeL1L2Stats(L2_TABLES, 'L2');
-  const l3Stats = computeL3Stats();
+  // Compute stats
+  const l1Stats = computeLayerStats('L1', getL1Scd);
+  const l2Stats = computeLayerStats('L2', getL2Scd);
+  const l3Stats = computeLayerStats('L3', getL3Tier);
 
   // Build sheets
   addSummarySheet(wb, l1Stats, l2Stats, l3Stats);
@@ -542,7 +416,6 @@ async function main() {
   const outPath = path.join(outDir, 'data-model-reference.xlsx');
   await wb.xlsx.writeFile(outPath);
 
-  // Console summary
   console.log(`\n  Data Model Reference Excel generated`);
   console.log(`  ${outPath}\n`);
   console.log(`  Summary tab:`);

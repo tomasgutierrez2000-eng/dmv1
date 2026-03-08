@@ -1,129 +1,228 @@
 {
-  "createdAt": "2026-03-05T06:52:48.658Z",
+  "createdAt": "2026-03-08T17:37:16.354Z",
   "tables": [
     {
       "layer": "L1",
-      "tableName": "currency_dim",
+      "tableName": "control_relationship",
       "fields": [
         {
-          "name": "currency_code"
+          "name": "control_relationship_id"
         },
         {
-          "name": "currency_name"
+          "name": "parent_counterparty_id"
         },
         {
-          "name": "currency_symbol"
+          "name": "subsidiary_counterparty_id"
         },
         {
-          "name": "is_active"
+          "name": "control_type_code"
         },
         {
-          "name": "iso_numeric"
+          "name": "controlled_counterparty_id"
         },
         {
-          "name": "minor_unit_decimals"
+          "name": "controller_counterparty_id"
         },
         {
-          "name": "is_g10_currency"
+          "name": "ownership_pct"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "country_dim",
+      "tableName": "counterparty",
       "fields": [
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "legal_name"
+        },
+        {
+          "name": "counterparty_type"
+        },
         {
           "name": "country_code"
         },
         {
-          "name": "country_name"
+          "name": "entity_type_code"
         },
         {
-          "name": "is_active"
+          "name": "industry_id"
+        },
+        {
+          "name": "basel_asset_class"
+        },
+        {
+          "name": "basel_risk_grade"
+        },
+        {
+          "name": "call_report_counterparty_type"
+        },
+        {
+          "name": "country_of_domicile"
+        },
+        {
+          "name": "country_of_incorporation"
+        },
+        {
+          "name": "country_of_risk"
+        },
+        {
+          "name": "external_rating_fitch"
+        },
+        {
+          "name": "external_rating_moodys"
+        },
+        {
+          "name": "external_rating_sp"
+        },
+        {
+          "name": "fr2590_counterparty_type"
+        },
+        {
+          "name": "internal_risk_rating"
+        },
+        {
+          "name": "is_affiliated"
+        },
+        {
+          "name": "is_central_counterparty"
+        },
+        {
+          "name": "is_financial_institution"
+        },
+        {
+          "name": "is_insider"
+        },
+        {
+          "name": "is_multilateral_dev_bank"
+        },
+        {
+          "name": "is_parent_flag"
+        },
+        {
+          "name": "is_public_sector_entity"
+        },
+        {
+          "name": "is_regulated_entity"
+        },
+        {
+          "name": "is_sovereign"
+        },
+        {
+          "name": "lei_code"
+        },
+        {
+          "name": "lgd_unsecured"
+        },
+        {
+          "name": "pd_annual"
+        },
+        {
+          "name": "regulatory_counterparty_type"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "y14_obligor_type"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
         },
         {
           "name": "region_code"
-        },
-        {
-          "name": "basel_country_risk_weight"
-        },
-        {
-          "name": "is_developed_market"
-        },
-        {
-          "name": "is_fatf_high_risk"
-        },
-        {
-          "name": "is_ofac_sanctioned"
-        },
-        {
-          "name": "iso_alpha_3"
-        },
-        {
-          "name": "iso_numeric"
-        },
-        {
-          "name": "jurisdiction_id"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "region_dim",
+      "tableName": "counterparty_hierarchy",
       "fields": [
         {
-          "name": "region_code"
+          "name": "counterparty_id"
         },
         {
-          "name": "region_name"
+          "name": "as_of_date"
+        },
+        {
+          "name": "immediate_parent_id"
+        },
+        {
+          "name": "ultimate_parent_id"
+        },
+        {
+          "name": "ownership_pct"
         },
         {
           "name": "created_ts"
         },
         {
           "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "economic_interdependence_relationship",
+      "fields": [
+        {
+          "name": "econ_interdep_relationship_id"
         },
         {
-          "name": "display_order"
+          "name": "counterparty_id_1"
         },
         {
-          "name": "is_active_flag"
-        },
-        {
-          "name": "region_group_code"
+          "name": "counterparty_id_2"
         },
         {
           "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "regulatory_jurisdiction",
-      "fields": [
-        {
-          "name": "jurisdiction_code"
         },
         {
-          "name": "jurisdiction_name"
+          "name": "interdependence_strength_score"
+        },
+        {
+          "name": "interdependence_type_code"
+        },
+        {
+          "name": "rationale"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         },
         {
           "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "is_active"
-        },
-        {
-          "name": "jurisdiction_id"
-        },
-        {
-          "name": "primary_regulator"
-        },
-        {
-          "name": "regulatory_framework"
         }
       ]
     },
@@ -159,273 +258,6 @@
     },
     {
       "layer": "L1",
-      "tableName": "credit_event_type_dim",
-      "fields": [
-        {
-          "name": "credit_event_type_code"
-        },
-        {
-          "name": "credit_event_type_id"
-        },
-        {
-          "name": "credit_event_type_name"
-        },
-        {
-          "name": "default_trigger_flag"
-        },
-        {
-          "name": "active_flag"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "credit_status_dim",
-      "fields": [
-        {
-          "name": "credit_status_code"
-        },
-        {
-          "name": "credit_status_name"
-        },
-        {
-          "name": "default_flag"
-        },
-        {
-          "name": "delinquency_bucket"
-        },
-        {
-          "name": "status_category"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "exposure_type_dim",
-      "fields": [
-        {
-          "name": "exposure_type_id"
-        },
-        {
-          "name": "exposure_type_code"
-        },
-        {
-          "name": "exposure_type_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "basel_exposure_class"
-        },
-        {
-          "name": "ccf_pct"
-        },
-        {
-          "name": "off_balance_sheet_flag"
-        },
-        {
-          "name": "product_id"
-        },
-        {
-          "name": "sa_ccr_asset_class"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "amendment_status_dim",
-      "fields": [
-        {
-          "name": "amendment_status_code"
-        },
-        {
-          "name": "amendment_status_name"
-        },
-        {
-          "name": "status_group"
-        },
-        {
-          "name": "is_terminal_flag"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "amendment_type_dim",
-      "fields": [
-        {
-          "name": "amendment_type_code"
-        },
-        {
-          "name": "amendment_type_name"
-        },
-        {
-          "name": "description"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "default_definition_dim",
-      "fields": [
-        {
-          "name": "default_definition_id"
-        },
-        {
-          "name": "default_definition_code"
-        },
-        {
-          "name": "description"
-        },
-        {
-          "name": "jurisdiction_code"
-        },
-        {
-          "name": "days_past_due_threshold"
-        },
-        {
-          "name": "credit_event_trigger_flag"
-        },
-        {
-          "name": "materiality_threshold_amt"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "internal_risk_rating_bucket_dim",
-      "fields": [
-        {
-          "name": "internal_risk_rating_bucket_code"
-        },
-        {
-          "name": "bucket_name"
-        },
-        {
-          "name": "rating_score_min"
-        },
-        {
-          "name": "rating_score_max"
-        },
-        {
-          "name": "display_order"
-        },
-        {
-          "name": "active_flag"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "pricing_tier_dim",
-      "fields": [
-        {
-          "name": "pricing_tier_code"
-        },
-        {
-          "name": "tier_name"
-        },
-        {
-          "name": "tier_ordinal"
-        },
-        {
-          "name": "display_order"
-        },
-        {
-          "name": "active_flag"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "maturity_bucket_dim",
-      "fields": [
-        {
-          "name": "maturity_bucket_id"
-        },
-        {
-          "name": "bucket_code"
-        },
-        {
-          "name": "bucket_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "bucket_end_days"
-        },
-        {
-          "name": "bucket_start_days"
-        },
-        {
-          "name": "jurisdiction_code"
-        },
-        {
-          "name": "regulatory_framework"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "fr2590_category_dim",
-      "fields": [
-        {
-          "name": "fr2590_category_code"
-        },
-        {
-          "name": "category_name"
-        },
-        {
-          "name": "definition"
-        },
-        {
-          "name": "display_order"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
       "tableName": "counterparty_role_dim",
       "fields": [
         {
@@ -456,13 +288,97 @@
     },
     {
       "layer": "L1",
-      "tableName": "rating_scale_dim",
+      "tableName": "credit_agreement_counterparty_participation",
       "fields": [
         {
-          "name": "rating_scale_id"
+          "name": "agreement_participation_id"
         },
         {
-          "name": "scale_name"
+          "name": "credit_agreement_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "counterparty_role_code"
+        },
+        {
+          "name": "is_primary_flag"
+        },
+        {
+          "name": "participation_pct"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "role_priority_rank"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "facility_counterparty_participation",
+      "fields": [
+        {
+          "name": "facility_participation_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "counterparty_role_code"
+        },
+        {
+          "name": "is_primary_flag"
+        },
+        {
+          "name": "participation_pct"
+        },
+        {
+          "name": "role_priority_rank"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "sccl_counterparty_group",
+      "fields": [
+        {
+          "name": "sccl_group_id"
+        },
+        {
+          "name": "group_name"
         },
         {
           "name": "created_ts"
@@ -471,31 +387,778 @@
           "name": "updated_ts"
         },
         {
+          "name": "as_of_date"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "grouping_basis"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "sccl_group_name"
+        },
+        {
+          "name": "ultimate_parent_counterparty_id"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "sccl_counterparty_group_member",
+      "fields": [
+        {
+          "name": "member_id"
+        },
+        {
+          "name": "sccl_group_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "included_flag"
+        },
+        {
+          "name": "member_role_code"
+        },
+        {
+          "name": "ownership_pct"
+        },
+        {
+          "name": "sccl_group_member_id"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "credit_agreement_master",
+      "fields": [
+        {
+          "name": "credit_agreement_id"
+        },
+        {
+          "name": "borrower_counterparty_id"
+        },
+        {
+          "name": "lender_legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "agreement_type"
+        },
+        {
+          "name": "origination_date"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "status_code"
+        },
+        {
+          "name": "agreement_reference"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "facility_master",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "credit_agreement_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "facility_name"
+        },
+        {
+          "name": "facility_type"
+        },
+        {
+          "name": "facility_status"
+        },
+        {
+          "name": "committed_facility_amt"
+        },
+        {
+          "name": "origination_date"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "portfolio_id"
+        },
+        {
+          "name": "industry_code"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "product_node_id"
+        },
+        {
+          "name": "rate_index_id"
+        },
+        {
+          "name": "ledger_account_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "all_in_rate_pct"
+        },
+        {
+          "name": "amortization_type"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "day_count_convention"
+        },
+        {
+          "name": "facility_reference"
+        },
+        {
+          "name": "interest_rate_reference"
+        },
+        {
+          "name": "interest_rate_spread_bps"
+        },
+        {
+          "name": "interest_rate_type"
+        },
+        {
+          "name": "next_repricing_date"
+        },
+        {
+          "name": "payment_frequency"
+        },
+        {
+          "name": "prepayment_penalty_flag"
+        },
+        {
+          "name": "product_id"
+        },
+        {
+          "name": "rate_cap_pct"
+        },
+        {
+          "name": "rate_floor_pct"
+        },
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "revolving_flag"
+        },
+        {
           "name": "active_flag"
         },
         {
-          "name": "default_flag"
+          "name": "effective_start_date"
         },
         {
-          "name": "display_color_hex"
+          "name": "effective_end_date"
         },
         {
-          "name": "investment_grade_flag"
+          "name": "is_current_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "facility_lender_allocation",
+      "fields": [
+        {
+          "name": "lender_allocation_id"
         },
         {
-          "name": "pd_implied"
+          "name": "facility_id"
         },
         {
-          "name": "rating_grade_id"
+          "name": "legal_entity_id"
         },
         {
-          "name": "rating_notch"
+          "name": "bank_share_pct"
         },
         {
-          "name": "rating_value"
+          "name": "bank_commitment_amt"
         },
         {
-          "name": "scale_type"
+          "name": "allocation_role"
+        },
+        {
+          "name": "is_lead_flag"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "contract_master",
+      "fields": [
+        {
+          "name": "contract_id"
+        },
+        {
+          "name": "contract_type"
+        },
+        {
+          "name": "contract_status"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "contract_end_date"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "instrument_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "product_node_id"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "instrument_identifier",
+      "fields": [
+        {
+          "name": "instrument_id"
+        },
+        {
+          "name": "id_type"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "id_value"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "is_primary"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "instrument_master",
+      "fields": [
+        {
+          "name": "instrument_id"
+        },
+        {
+          "name": "country_code"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "coupon_frequency"
+        },
+        {
+          "name": "coupon_rate"
+        },
+        {
+          "name": "instrument_name"
+        },
+        {
+          "name": "instrument_type"
+        },
+        {
+          "name": "is_callable"
+        },
+        {
+          "name": "is_convertible"
+        },
+        {
+          "name": "issue_date"
+        },
+        {
+          "name": "issuer_counterparty_id"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "product_id"
+        },
+        {
+          "name": "seniority"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "collateral_asset_master",
+      "fields": [
+        {
+          "name": "collateral_asset_id"
+        },
+        {
+          "name": "collateral_type_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "country_code"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "charge_type"
+        },
+        {
+          "name": "collateral_asset_type"
+        },
+        {
+          "name": "collateral_id"
+        },
+        {
+          "name": "collateral_status"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "insurance_expiry_date"
+        },
+        {
+          "name": "insurance_flag"
+        },
+        {
+          "name": "lien_priority"
+        },
+        {
+          "name": "location_country_code"
+        },
+        {
+          "name": "location_description"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "original_cost"
+        },
+        {
+          "name": "regulatory_eligible_flag"
+        },
+        {
+          "name": "revaluation_frequency"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "valuation_currency_code"
+        },
+        {
+          "name": "vintage_date"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "collateral_eligibility_dim",
+      "fields": [
+        {
+          "name": "collateral_eligibility_id"
+        },
+        {
+          "name": "collateral_type_id"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "eligible_flag"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "regulatory_capital_basis_id"
+        },
+        {
+          "name": "haircut_method"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "collateral_haircut_dim",
+      "fields": [
+        {
+          "name": "collateral_haircut_id"
+        },
+        {
+          "name": "collateral_type_id"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "haircut_pct"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "maturity_bucket_id"
+        },
+        {
+          "name": "regulatory_capital_basis_id"
+        },
+        {
+          "name": "volatility_adjustment_pct"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "collateral_link",
+      "fields": [
+        {
+          "name": "collateral_link_id"
+        },
+        {
+          "name": "collateral_asset_id"
+        },
+        {
+          "name": "anchor_id"
+        },
+        {
+          "name": "anchor_type"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "link_type_code"
+        },
+        {
+          "name": "pledged_amount"
+        },
+        {
+          "name": "pledged_currency_code"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "collateral_type",
+      "fields": [
+        {
+          "name": "collateral_type_id"
+        },
+        {
+          "name": "name"
+        },
+        {
+          "name": "collateral_category"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "basel_rwa_weight"
+        },
+        {
+          "name": "hqla_level"
+        },
+        {
+          "name": "is_eligible_crm"
+        },
+        {
+          "name": "is_financial_collateral"
+        },
+        {
+          "name": "minimum_holding_period_days"
+        },
+        {
+          "name": "risk_mitigant_subtype_code"
+        },
+        {
+          "name": "standard_haircut_pct"
+        },
+        {
+          "name": "volatility_adjustment_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "crm_eligibility_dim",
+      "fields": [
+        {
+          "name": "crm_eligibility_id"
+        },
+        {
+          "name": "crm_type_code"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "eligible_flag"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "regulatory_capital_basis_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "eligibility_conditions"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "crm_protection_master",
+      "fields": [
+        {
+          "name": "protection_id"
+        },
+        {
+          "name": "crm_type_code"
+        },
+        {
+          "name": "beneficiary_legal_entity_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "notional_amount"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "enforceable_flag"
+        },
+        {
+          "name": "coverage_pct"
+        },
+        {
+          "name": "governing_law_jurisdiction_id"
+        },
+        {
+          "name": "protection_provider_counterparty_id"
+        },
+        {
+          "name": "protection_reference"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
         }
       ]
     },
@@ -534,148 +1197,100 @@
     },
     {
       "layer": "L1",
-      "tableName": "source_system_registry",
+      "tableName": "protection_link",
       "fields": [
+        {
+          "name": "protection_link_id"
+        },
+        {
+          "name": "protection_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "allocated_amount"
+        },
+        {
+          "name": "allocated_currency_code"
+        },
+        {
+          "name": "allocation_pct"
+        },
+        {
+          "name": "anchor_id"
+        },
+        {
+          "name": "anchor_type"
+        },
         {
           "name": "source_system_id"
         },
         {
-          "name": "source_system_name"
+          "name": "effective_start_date"
         },
         {
-          "name": "data_domain"
+          "name": "effective_end_date"
         },
         {
-          "name": "ingestion_frequency"
-        },
-        {
-          "name": "system_owner"
-        },
-        {
-          "name": "active_flag"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "date_dim",
-      "fields": [
-        {
-          "name": "date_id"
-        },
-        {
-          "name": "calendar_date"
-        },
-        {
-          "name": "calendar_year"
-        },
-        {
-          "name": "calendar_quarter"
-        },
-        {
-          "name": "calendar_month"
-        },
-        {
-          "name": "day_of_month"
-        },
-        {
-          "name": "day_of_week"
-        },
-        {
-          "name": "day_name"
-        },
-        {
-          "name": "fiscal_year"
-        },
-        {
-          "name": "fiscal_quarter"
-        },
-        {
-          "name": "fiscal_month"
-        },
-        {
-          "name": "is_weekend"
-        },
-        {
-          "name": "is_month_end"
-        },
-        {
-          "name": "is_quarter_end"
-        },
-        {
-          "name": "is_year_end"
-        },
-        {
-          "name": "is_us_business_day"
-        },
-        {
-          "name": "is_us_bank_holiday"
-        },
-        {
-          "name": "date_day"
-        },
-        {
-          "name": "date_month"
-        },
-        {
-          "name": "date_quarter"
-        },
-        {
-          "name": "date_year"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "date_time_dim",
-      "fields": [
-        {
-          "name": "date_time_id"
-        },
-        {
-          "name": "date_id"
-        },
-        {
-          "name": "timestamp_utc"
-        },
-        {
-          "name": "hour_of_day"
-        },
-        {
-          "name": "minute_of_hour"
-        },
-        {
-          "name": "second_of_minute"
-        },
-        {
-          "name": "timezone_code"
-        },
-        {
-          "name": "is_dst"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "regulatory_capital_basis_dim",
-      "fields": [
-        {
-          "name": "regulatory_capital_basis_id"
-        },
-        {
-          "name": "basis_code"
-        },
-        {
-          "name": "basis_name"
+          "name": "is_current_flag"
         },
         {
           "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "risk_mitigant_link",
+      "fields": [
+        {
+          "name": "risk_mitigant_link_id"
         },
         {
-          "name": "updated_ts"
+          "name": "risk_mitigant_id"
         },
         {
-          "name": "active_flag"
+          "name": "facility_id"
+        },
+        {
+          "name": "anchor_id"
+        },
+        {
+          "name": "anchor_type"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "risk_mitigant_master",
+      "fields": [
+        {
+          "name": "risk_mitigant_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "risk_mitigant_subtype_code"
+        },
+        {
+          "name": "collateral_asset_id"
         },
         {
           "name": "description"
@@ -687,34 +1302,628 @@
           "name": "effective_to_date"
         },
         {
-          "name": "jurisdiction_code"
+          "name": "is_active_flag"
+        },
+        {
+          "name": "mitigant_source_type"
+        },
+        {
+          "name": "protection_id"
+        },
+        {
+          "name": "provider_counterparty_id"
+        },
+        {
+          "name": "source_record_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "industry_dim",
+      "tableName": "risk_mitigant_type_dim",
       "fields": [
         {
-          "name": "industry_id"
+          "name": "risk_mitigant_subtype_code"
         },
         {
-          "name": "industry_code"
+          "name": "subtype_name"
         },
         {
-          "name": "industry_name"
+          "name": "created_ts"
         },
         {
-          "name": "industry_level"
-        },
-        {
-          "name": "industry_standard"
-        },
-        {
-          "name": "parent_industry_id"
+          "name": "updated_ts"
         },
         {
           "name": "active_flag"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "eligible_flag"
+        },
+        {
+          "name": "mitigant_category"
+        },
+        {
+          "name": "parent_group_code"
+        },
+        {
+          "name": "parent_group_name"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "csa_master",
+      "fields": [
+        {
+          "name": "csa_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "csa_type"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "eligible_collateral_desc"
+        },
+        {
+          "name": "governing_law"
+        },
+        {
+          "name": "independent_amount"
+        },
+        {
+          "name": "margin_frequency"
+        },
+        {
+          "name": "minimum_transfer_amount"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "threshold_amount"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "margin_agreement",
+      "fields": [
+        {
+          "name": "margin_agreement_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "csa_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "im_amount"
+        },
+        {
+          "name": "loaded_ts"
+        },
+        {
+          "name": "margin_model"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "vm_amount"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "netting_agreement",
+      "fields": [
+        {
+          "name": "netting_agreement_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "governing_law"
+        },
+        {
+          "name": "is_bankruptcy_remote"
+        },
+        {
+          "name": "is_enforceable"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "margin_frequency"
+        },
+        {
+          "name": "minimum_transfer_amount"
+        },
+        {
+          "name": "netting_agreement_type"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "threshold_amount"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "netting_set",
+      "fields": [
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "netting_agreement_id"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "governing_law"
+        },
+        {
+          "name": "is_enforceable_flag"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "master_agreement_reference"
+        },
+        {
+          "name": "netting_set_type"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "netting_set_link",
+      "fields": [
+        {
+          "name": "netting_set_link_id"
+        },
+        {
+          "name": "netting_set_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "anchor_id"
+        },
+        {
+          "name": "anchor_type"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "limit_rule",
+      "fields": [
+        {
+          "name": "limit_rule_id"
+        },
+        {
+          "name": "rule_code"
+        },
+        {
+          "name": "rule_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "inner_threshold_pct"
+        },
+        {
+          "name": "limit_amount_usd"
+        },
+        {
+          "name": "limit_scope"
+        },
+        {
+          "name": "limit_type"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "outer_threshold_pct"
+        },
+        {
+          "name": "risk_tier"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "limit_threshold",
+      "fields": [
+        {
+          "name": "limit_threshold_id"
+        },
+        {
+          "name": "limit_rule_id"
+        },
+        {
+          "name": "threshold_value"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "direction"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "escalation_action"
+        },
+        {
+          "name": "threshold_lower_abs"
+        },
+        {
+          "name": "threshold_lower_pct"
+        },
+        {
+          "name": "threshold_type"
+        },
+        {
+          "name": "threshold_upper_abs"
+        },
+        {
+          "name": "threshold_upper_pct"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "legal_entity",
+      "fields": [
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "legal_name"
+        },
+        {
+          "name": "legal_entity_name"
+        },
+        {
+          "name": "country_code"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "entity_type_code"
+        },
+        {
+          "name": "functional_currency_code"
+        },
+        {
+          "name": "institution_id"
+        },
+        {
+          "name": "is_reporting_entity"
+        },
+        {
+          "name": "lei_code"
+        },
+        {
+          "name": "primary_regulator"
+        },
+        {
+          "name": "rssd_id"
+        },
+        {
+          "name": "short_name"
+        },
+        {
+          "name": "tax_id"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "legal_entity_hierarchy",
+      "fields": [
+        {
+          "name": "hierarchy_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "parent_legal_entity_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "consolidation_method"
+        },
+        {
+          "name": "hierarchy_level"
+        },
+        {
+          "name": "hierarchy_path"
+        },
+        {
+          "name": "ownership_pct"
+        },
+        {
+          "name": "ultimate_parent_legal_entity_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "reporting_entity_dim",
+      "fields": [
+        {
+          "name": "reporting_entity_id"
+        },
+        {
+          "name": "entity_code"
+        },
+        {
+          "name": "entity_name"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "consolidation_basis"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "functional_currency_code"
+        },
+        {
+          "name": "is_current"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "reporting_entity_code"
+        },
+        {
+          "name": "reporting_entity_name"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "org_unit_dim",
+      "fields": [
+        {
+          "name": "org_unit_id"
+        },
+        {
+          "name": "org_unit_code"
+        },
+        {
+          "name": "org_unit_name"
+        },
+        {
+          "name": "parent_org_unit_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "cost_center_code"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "is_current"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "manager_user_id"
+        },
+        {
+          "name": "org_unit_type"
+        },
+        {
+          "name": "source_system_id"
         }
       ]
     },
@@ -849,6 +2058,36 @@
     },
     {
       "layer": "L1",
+      "tableName": "collateral_portfolio",
+      "fields": [
+        {
+          "name": "collateral_portfolio_id"
+        },
+        {
+          "name": "portfolio_id"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "portfolio_name_override"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
       "tableName": "portfolio_dim",
       "fields": [
         {
@@ -882,82 +2121,28 @@
     },
     {
       "layer": "L1",
-      "tableName": "org_unit_dim",
+      "tableName": "fr2590_category_dim",
       "fields": [
         {
-          "name": "org_unit_id"
+          "name": "fr2590_category_code"
         },
         {
-          "name": "org_unit_code"
+          "name": "category_name"
         },
         {
-          "name": "org_unit_name"
+          "name": "definition"
         },
         {
-          "name": "parent_org_unit_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "cost_center_code"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "is_current"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "manager_user_id"
-        },
-        {
-          "name": "org_unit_type"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "rating_source",
-      "fields": [
-        {
-          "name": "rating_source_id"
-        },
-        {
-          "name": "source_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
+          "name": "display_order"
         },
         {
           "name": "active_flag"
         },
         {
-          "name": "priority_rank"
+          "name": "created_ts"
         },
         {
-          "name": "rating_source_name"
-        },
-        {
-          "name": "rating_source_type"
-        },
-        {
-          "name": "vendor_code"
+          "name": "updated_ts"
         }
       ]
     },
@@ -1020,16 +2205,217 @@
     },
     {
       "layer": "L1",
-      "tableName": "collateral_type",
+      "tableName": "rating_mapping",
       "fields": [
         {
-          "name": "collateral_type_id"
+          "name": "rating_mapping_id"
         },
         {
-          "name": "name"
+          "name": "rating_scale_id"
         },
         {
-          "name": "collateral_category"
+          "name": "rating_source_id"
+        },
+        {
+          "name": "external_rating"
+        },
+        {
+          "name": "internal_grade_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "approved_by"
+        },
+        {
+          "name": "approved_ts"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "is_current"
+        },
+        {
+          "name": "mapping_method"
+        },
+        {
+          "name": "model_id"
+        },
+        {
+          "name": "rating_grade_code"
+        },
+        {
+          "name": "source_rating_code"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "rating_scale_dim",
+      "fields": [
+        {
+          "name": "rating_scale_id"
+        },
+        {
+          "name": "scale_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "default_flag"
+        },
+        {
+          "name": "display_color_hex"
+        },
+        {
+          "name": "investment_grade_flag"
+        },
+        {
+          "name": "pd_implied"
+        },
+        {
+          "name": "rating_grade_id"
+        },
+        {
+          "name": "rating_notch"
+        },
+        {
+          "name": "rating_value"
+        },
+        {
+          "name": "scale_type"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "rating_source",
+      "fields": [
+        {
+          "name": "rating_source_id"
+        },
+        {
+          "name": "source_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "priority_rank"
+        },
+        {
+          "name": "rating_source_name"
+        },
+        {
+          "name": "rating_source_type"
+        },
+        {
+          "name": "vendor_code"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "credit_event_type_dim",
+      "fields": [
+        {
+          "name": "credit_event_type_code"
+        },
+        {
+          "name": "credit_event_type_id"
+        },
+        {
+          "name": "credit_event_type_name"
+        },
+        {
+          "name": "default_trigger_flag"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "credit_status_dim",
+      "fields": [
+        {
+          "name": "credit_status_code"
+        },
+        {
+          "name": "credit_status_name"
+        },
+        {
+          "name": "default_flag"
+        },
+        {
+          "name": "delinquency_bucket"
+        },
+        {
+          "name": "status_category"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "amendment_status_dim",
+      "fields": [
+        {
+          "name": "amendment_status_code"
+        },
+        {
+          "name": "amendment_status_name"
+        },
+        {
+          "name": "status_group"
+        },
+        {
+          "name": "is_terminal_flag"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "amendment_type_dim",
+      "fields": [
+        {
+          "name": "amendment_type_code"
+        },
+        {
+          "name": "amendment_type_name"
         },
         {
           "name": "description"
@@ -1042,30 +2428,189 @@
         },
         {
           "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "default_definition_dim",
+      "fields": [
+        {
+          "name": "default_definition_id"
         },
         {
-          "name": "basel_rwa_weight"
+          "name": "default_definition_code"
         },
         {
-          "name": "hqla_level"
+          "name": "description"
         },
         {
-          "name": "is_eligible_crm"
+          "name": "jurisdiction_code"
         },
         {
-          "name": "is_financial_collateral"
+          "name": "days_past_due_threshold"
         },
         {
-          "name": "minimum_holding_period_days"
+          "name": "credit_event_trigger_flag"
         },
         {
-          "name": "risk_mitigant_subtype_code"
+          "name": "materiality_threshold_amt"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "exposure_type_dim",
+      "fields": [
+        {
+          "name": "exposure_type_id"
         },
         {
-          "name": "standard_haircut_pct"
+          "name": "exposure_type_code"
         },
         {
-          "name": "volatility_adjustment_pct"
+          "name": "exposure_type_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "basel_exposure_class"
+        },
+        {
+          "name": "ccf_pct"
+        },
+        {
+          "name": "off_balance_sheet_flag"
+        },
+        {
+          "name": "product_id"
+        },
+        {
+          "name": "sa_ccr_asset_class"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "scenario_dim",
+      "fields": [
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "scenario_code"
+        },
+        {
+          "name": "scenario_name"
+        },
+        {
+          "name": "scenario_type"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "is_active"
+        },
+        {
+          "name": "regulatory_scenario_code"
+        },
+        {
+          "name": "scenario_end_date"
+        },
+        {
+          "name": "scenario_horizon_months"
+        },
+        {
+          "name": "scenario_start_date"
+        },
+        {
+          "name": "shock_parameters_json"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "context_dim",
+      "fields": [
+        {
+          "name": "context_id"
+        },
+        {
+          "name": "context_domain"
+        },
+        {
+          "name": "context_code"
+        },
+        {
+          "name": "context_name"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "is_active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "fx_rate",
+      "fields": [
+        {
+          "name": "fx_rate_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "from_currency_code"
+        },
+        {
+          "name": "to_currency_code"
+        },
+        {
+          "name": "rate"
+        },
+        {
+          "name": "rate_type"
+        },
+        {
+          "name": "effective_ts"
+        },
+        {
+          "name": "loaded_ts"
+        },
+        {
+          "name": "provider"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -1185,1603 +2730,142 @@
     },
     {
       "layer": "L1",
-      "tableName": "context_dim",
+      "tableName": "date_dim",
       "fields": [
         {
-          "name": "context_id"
+          "name": "date_id"
         },
         {
-          "name": "context_domain"
+          "name": "calendar_date"
         },
         {
-          "name": "context_code"
+          "name": "calendar_year"
         },
         {
-          "name": "context_name"
+          "name": "calendar_quarter"
         },
         {
-          "name": "description"
+          "name": "calendar_month"
         },
         {
-          "name": "is_active_flag"
+          "name": "day_of_month"
+        },
+        {
+          "name": "day_of_week"
+        },
+        {
+          "name": "day_name"
+        },
+        {
+          "name": "fiscal_year"
+        },
+        {
+          "name": "fiscal_quarter"
+        },
+        {
+          "name": "fiscal_month"
+        },
+        {
+          "name": "is_weekend"
+        },
+        {
+          "name": "is_month_end"
+        },
+        {
+          "name": "is_quarter_end"
+        },
+        {
+          "name": "is_year_end"
+        },
+        {
+          "name": "is_us_business_day"
+        },
+        {
+          "name": "is_us_bank_holiday"
+        },
+        {
+          "name": "date_day"
+        },
+        {
+          "name": "date_month"
+        },
+        {
+          "name": "date_quarter"
+        },
+        {
+          "name": "date_year"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "metric_definition_dim",
+      "tableName": "date_time_dim",
       "fields": [
         {
-          "name": "metric_definition_id"
+          "name": "date_time_id"
         },
         {
-          "name": "metric_code"
+          "name": "date_id"
         },
         {
-          "name": "metric_name"
+          "name": "timestamp_utc"
+        },
+        {
+          "name": "hour_of_day"
+        },
+        {
+          "name": "minute_of_hour"
+        },
+        {
+          "name": "second_of_minute"
+        },
+        {
+          "name": "timezone_code"
+        },
+        {
+          "name": "is_dst"
         },
         {
           "name": "created_ts"
         },
         {
           "name": "updated_ts"
-        },
-        {
-          "name": "calculation_rule_id"
-        },
-        {
-          "name": "definition_text"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "is_active_flag"
-        },
-        {
-          "name": "metric_domain"
-        },
-        {
-          "name": "periodicity_code"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "unit_of_measure"
-        },
-        {
-          "name": "version"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "counterparty",
+      "tableName": "maturity_bucket_dim",
       "fields": [
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "legal_name"
-        },
-        {
-          "name": "counterparty_type"
-        },
-        {
-          "name": "country_code"
-        },
-        {
-          "name": "entity_type_code"
-        },
-        {
-          "name": "industry_id"
-        },
-        {
-          "name": "basel_asset_class"
-        },
-        {
-          "name": "basel_risk_grade"
-        },
-        {
-          "name": "call_report_counterparty_type"
-        },
-        {
-          "name": "country_of_domicile"
-        },
-        {
-          "name": "country_of_incorporation"
-        },
-        {
-          "name": "country_of_risk"
-        },
-        {
-          "name": "external_rating_fitch"
-        },
-        {
-          "name": "external_rating_moodys"
-        },
-        {
-          "name": "external_rating_sp"
-        },
-        {
-          "name": "fr2590_counterparty_type"
-        },
-        {
-          "name": "internal_risk_rating"
-        },
-        {
-          "name": "is_affiliated"
-        },
-        {
-          "name": "is_central_counterparty"
-        },
-        {
-          "name": "is_financial_institution"
-        },
-        {
-          "name": "is_insider"
-        },
-        {
-          "name": "is_multilateral_dev_bank"
-        },
-        {
-          "name": "is_parent_flag"
-        },
-        {
-          "name": "is_public_sector_entity"
-        },
-        {
-          "name": "is_regulated_entity"
-        },
-        {
-          "name": "is_sovereign"
-        },
-        {
-          "name": "lei_code"
-        },
-        {
-          "name": "lgd_unsecured"
-        },
-        {
-          "name": "pd_annual"
-        },
-        {
-          "name": "regulatory_counterparty_type"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "y14_obligor_type"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "legal_entity",
-      "fields": [
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "legal_name"
-        },
-        {
-          "name": "legal_entity_name"
-        },
-        {
-          "name": "country_code"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "entity_type_code"
-        },
-        {
-          "name": "functional_currency_code"
-        },
-        {
-          "name": "institution_id"
-        },
-        {
-          "name": "is_reporting_entity"
-        },
-        {
-          "name": "lei_code"
-        },
-        {
-          "name": "primary_regulator"
-        },
-        {
-          "name": "rssd_id"
-        },
-        {
-          "name": "short_name"
-        },
-        {
-          "name": "tax_id"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "instrument_master",
-      "fields": [
-        {
-          "name": "instrument_id"
-        },
-        {
-          "name": "country_code"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "coupon_frequency"
-        },
-        {
-          "name": "coupon_rate"
-        },
-        {
-          "name": "instrument_name"
-        },
-        {
-          "name": "instrument_type"
-        },
-        {
-          "name": "is_callable"
-        },
-        {
-          "name": "is_convertible"
-        },
-        {
-          "name": "issue_date"
-        },
-        {
-          "name": "issuer_counterparty_id"
-        },
-        {
-          "name": "maturity_date"
-        },
-        {
-          "name": "product_id"
-        },
-        {
-          "name": "seniority"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "instrument_identifier",
-      "fields": [
-        {
-          "name": "instrument_id"
-        },
-        {
-          "name": "id_type"
-        },
-        {
-          "name": "effective_start_date"
-        },
-        {
-          "name": "effective_end_date"
-        },
-        {
-          "name": "id_value"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "is_primary"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "credit_agreement_master",
-      "fields": [
-        {
-          "name": "credit_agreement_id"
-        },
-        {
-          "name": "borrower_counterparty_id"
-        },
-        {
-          "name": "lender_legal_entity_id"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "agreement_type"
-        },
-        {
-          "name": "origination_date"
-        },
-        {
-          "name": "maturity_date"
-        },
-        {
-          "name": "status_code"
-        },
-        {
-          "name": "agreement_reference"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "facility_master",
-      "fields": [
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "credit_agreement_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "facility_name"
-        },
-        {
-          "name": "facility_type"
-        },
-        {
-          "name": "facility_status"
-        },
-        {
-          "name": "committed_facility_amt"
-        },
-        {
-          "name": "origination_date"
-        },
-        {
-          "name": "maturity_date"
-        },
-        {
-          "name": "portfolio_id"
-        },
-        {
-          "name": "industry_code"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "product_node_id"
-        },
-        {
-          "name": "rate_index_id"
-        },
-        {
-          "name": "ledger_account_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "all_in_rate_pct"
-        },
-        {
-          "name": "amortization_type"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "day_count_convention"
-        },
-        {
-          "name": "facility_reference"
-        },
-        {
-          "name": "interest_rate_reference"
-        },
-        {
-          "name": "interest_rate_spread_bps"
-        },
-        {
-          "name": "interest_rate_type"
-        },
-        {
-          "name": "next_repricing_date"
-        },
-        {
-          "name": "payment_frequency"
-        },
-        {
-          "name": "prepayment_penalty_flag"
-        },
-        {
-          "name": "product_id"
-        },
-        {
-          "name": "rate_cap_pct"
-        },
-        {
-          "name": "rate_floor_pct"
-        },
-        {
-          "name": "region_code"
-        },
-        {
-          "name": "revolving_flag"
-        },
-        {
-          "name": "active_flag"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "contract_master",
-      "fields": [
-        {
-          "name": "contract_id"
-        },
-        {
-          "name": "contract_type"
-        },
-        {
-          "name": "contract_status"
-        },
-        {
-          "name": "effective_start_date"
-        },
-        {
-          "name": "contract_end_date"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "instrument_id"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "netting_set_id"
-        },
-        {
-          "name": "product_node_id"
-        },
-        {
-          "name": "source_record_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "netting_agreement",
-      "fields": [
-        {
-          "name": "netting_agreement_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "governing_law"
-        },
-        {
-          "name": "is_bankruptcy_remote"
-        },
-        {
-          "name": "is_enforceable"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "margin_frequency"
-        },
-        {
-          "name": "minimum_transfer_amount"
-        },
-        {
-          "name": "netting_agreement_type"
-        },
-        {
-          "name": "netting_set_id"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "threshold_amount"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "netting_set",
-      "fields": [
-        {
-          "name": "netting_set_id"
-        },
-        {
-          "name": "netting_agreement_id"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "governing_law"
-        },
-        {
-          "name": "is_enforceable_flag"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "master_agreement_reference"
-        },
-        {
-          "name": "netting_set_type"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "netting_set_link",
-      "fields": [
-        {
-          "name": "netting_set_link_id"
-        },
-        {
-          "name": "netting_set_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "anchor_id"
-        },
-        {
-          "name": "anchor_type"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "csa_master",
-      "fields": [
-        {
-          "name": "csa_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "csa_type"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "eligible_collateral_desc"
-        },
-        {
-          "name": "governing_law"
-        },
-        {
-          "name": "independent_amount"
-        },
-        {
-          "name": "margin_frequency"
-        },
-        {
-          "name": "minimum_transfer_amount"
-        },
-        {
-          "name": "netting_set_id"
-        },
-        {
-          "name": "threshold_amount"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "margin_agreement",
-      "fields": [
-        {
-          "name": "margin_agreement_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "csa_id"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "im_amount"
-        },
-        {
-          "name": "loaded_ts"
-        },
-        {
-          "name": "margin_model"
-        },
-        {
-          "name": "netting_set_id"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "vm_amount"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "collateral_asset_master",
-      "fields": [
-        {
-          "name": "collateral_asset_id"
-        },
-        {
-          "name": "collateral_type_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "country_code"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "charge_type"
-        },
-        {
-          "name": "collateral_asset_type"
-        },
-        {
-          "name": "collateral_id"
-        },
-        {
-          "name": "collateral_status"
-        },
-        {
-          "name": "description"
-        },
-        {
-          "name": "insurance_expiry_date"
-        },
-        {
-          "name": "insurance_flag"
-        },
-        {
-          "name": "lien_priority"
-        },
-        {
-          "name": "location_country_code"
-        },
-        {
-          "name": "location_description"
-        },
-        {
-          "name": "maturity_date"
-        },
-        {
-          "name": "original_cost"
-        },
-        {
-          "name": "regulatory_eligible_flag"
-        },
-        {
-          "name": "revaluation_frequency"
-        },
-        {
-          "name": "source_record_id"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "valuation_currency_code"
-        },
-        {
-          "name": "vintage_date"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "collateral_link",
-      "fields": [
-        {
-          "name": "collateral_link_id"
-        },
-        {
-          "name": "collateral_asset_id"
-        },
-        {
-          "name": "anchor_id"
-        },
-        {
-          "name": "anchor_type"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "link_type_code"
-        },
-        {
-          "name": "pledged_amount"
-        },
-        {
-          "name": "pledged_currency_code"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "collateral_eligibility_dim",
-      "fields": [
-        {
-          "name": "collateral_eligibility_id"
-        },
-        {
-          "name": "collateral_type_id"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "eligible_flag"
-        },
-        {
-          "name": "jurisdiction_code"
-        },
-        {
-          "name": "regulatory_capital_basis_id"
-        },
-        {
-          "name": "haircut_method"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "collateral_haircut_dim",
-      "fields": [
-        {
-          "name": "collateral_haircut_id"
-        },
-        {
-          "name": "collateral_type_id"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "haircut_pct"
-        },
-        {
-          "name": "jurisdiction_code"
-        },
         {
           "name": "maturity_bucket_id"
         },
         {
-          "name": "regulatory_capital_basis_id"
+          "name": "bucket_code"
         },
         {
-          "name": "volatility_adjustment_pct"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "crm_eligibility_dim",
-      "fields": [
-        {
-          "name": "crm_eligibility_id"
+          "name": "bucket_name"
         },
         {
-          "name": "crm_type_code"
+          "name": "created_ts"
         },
         {
-          "name": "effective_from_date"
+          "name": "updated_ts"
         },
         {
-          "name": "effective_to_date"
+          "name": "active_flag"
         },
         {
-          "name": "eligible_flag"
+          "name": "bucket_end_days"
+        },
+        {
+          "name": "bucket_start_days"
         },
         {
           "name": "jurisdiction_code"
         },
         {
-          "name": "regulatory_capital_basis_id"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "eligibility_conditions"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "crm_protection_master",
-      "fields": [
-        {
-          "name": "protection_id"
-        },
-        {
-          "name": "crm_type_code"
-        },
-        {
-          "name": "beneficiary_legal_entity_id"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "notional_amount"
-        },
-        {
-          "name": "maturity_date"
-        },
-        {
-          "name": "enforceable_flag"
-        },
-        {
-          "name": "coverage_pct"
-        },
-        {
-          "name": "governing_law_jurisdiction_id"
-        },
-        {
-          "name": "protection_provider_counterparty_id"
-        },
-        {
-          "name": "protection_reference"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "protection_link",
-      "fields": [
-        {
-          "name": "protection_link_id"
-        },
-        {
-          "name": "protection_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "allocated_amount"
-        },
-        {
-          "name": "allocated_currency_code"
-        },
-        {
-          "name": "allocation_pct"
-        },
-        {
-          "name": "anchor_id"
-        },
-        {
-          "name": "anchor_type"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "risk_mitigant_type_dim",
-      "fields": [
-        {
-          "name": "risk_mitigant_subtype_code"
-        },
-        {
-          "name": "subtype_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "display_order"
-        },
-        {
-          "name": "eligible_flag"
-        },
-        {
-          "name": "mitigant_category"
-        },
-        {
-          "name": "parent_group_code"
-        },
-        {
-          "name": "parent_group_name"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "risk_mitigant_master",
-      "fields": [
-        {
-          "name": "risk_mitigant_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "risk_mitigant_subtype_code"
-        },
-        {
-          "name": "collateral_asset_id"
-        },
-        {
-          "name": "description"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "is_active_flag"
-        },
-        {
-          "name": "mitigant_source_type"
-        },
-        {
-          "name": "protection_id"
-        },
-        {
-          "name": "provider_counterparty_id"
-        },
-        {
-          "name": "source_record_id"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "risk_mitigant_link",
-      "fields": [
-        {
-          "name": "risk_mitigant_link_id"
-        },
-        {
-          "name": "risk_mitigant_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "anchor_id"
-        },
-        {
-          "name": "anchor_type"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "collateral_portfolio",
-      "fields": [
-        {
-          "name": "collateral_portfolio_id"
-        },
-        {
-          "name": "portfolio_id"
-        },
-        {
-          "name": "description"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "portfolio_name_override"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "counterparty_hierarchy",
-      "fields": [
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "immediate_parent_id"
-        },
-        {
-          "name": "ultimate_parent_id"
-        },
-        {
-          "name": "ownership_pct"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "legal_entity_hierarchy",
-      "fields": [
-        {
-          "name": "hierarchy_id"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "parent_legal_entity_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "consolidation_method"
-        },
-        {
-          "name": "hierarchy_level"
-        },
-        {
-          "name": "hierarchy_path"
-        },
-        {
-          "name": "ownership_pct"
-        },
-        {
-          "name": "ultimate_parent_legal_entity_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "control_relationship",
-      "fields": [
-        {
-          "name": "control_relationship_id"
-        },
-        {
-          "name": "parent_counterparty_id"
-        },
-        {
-          "name": "subsidiary_counterparty_id"
-        },
-        {
-          "name": "control_type_code"
-        },
-        {
-          "name": "controlled_counterparty_id"
-        },
-        {
-          "name": "controller_counterparty_id"
-        },
-        {
-          "name": "ownership_pct"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "economic_interdependence_relationship",
-      "fields": [
-        {
-          "name": "econ_interdep_relationship_id"
-        },
-        {
-          "name": "counterparty_id_1"
-        },
-        {
-          "name": "counterparty_id_2"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "interdependence_strength_score"
-        },
-        {
-          "name": "interdependence_type_code"
-        },
-        {
-          "name": "rationale"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "credit_agreement_counterparty_participation",
-      "fields": [
-        {
-          "name": "agreement_participation_id"
-        },
-        {
-          "name": "credit_agreement_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "counterparty_role_code"
-        },
-        {
-          "name": "is_primary_flag"
-        },
-        {
-          "name": "participation_pct"
-        },
-        {
-          "name": "source_record_id"
-        },
-        {
-          "name": "role_priority_rank"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "facility_counterparty_participation",
-      "fields": [
-        {
-          "name": "facility_participation_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "counterparty_role_code"
-        },
-        {
-          "name": "is_primary_flag"
-        },
-        {
-          "name": "participation_pct"
-        },
-        {
-          "name": "role_priority_rank"
-        },
-        {
-          "name": "source_record_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "facility_lender_allocation",
-      "fields": [
-        {
-          "name": "lender_allocation_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "legal_entity_id"
-        },
-        {
-          "name": "bank_share_pct"
-        },
-        {
-          "name": "bank_commitment_amt"
-        },
-        {
-          "name": "allocation_role"
-        },
-        {
-          "name": "is_lead_flag"
-        },
-        {
-          "name": "source_record_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "sccl_counterparty_group",
-      "fields": [
-        {
-          "name": "sccl_group_id"
-        },
-        {
-          "name": "group_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "grouping_basis"
-        },
-        {
-          "name": "jurisdiction_code"
-        },
-        {
-          "name": "run_version_id"
-        },
-        {
-          "name": "sccl_group_name"
-        },
-        {
-          "name": "ultimate_parent_counterparty_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "sccl_counterparty_group_member",
-      "fields": [
-        {
-          "name": "member_id"
-        },
-        {
-          "name": "sccl_group_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "effective_end_date"
-        },
-        {
-          "name": "effective_start_date"
-        },
-        {
-          "name": "included_flag"
-        },
-        {
-          "name": "member_role_code"
-        },
-        {
-          "name": "ownership_pct"
-        },
-        {
-          "name": "sccl_group_member_id"
-        },
-        {
-          "name": "source_system_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "limit_rule",
-      "fields": [
-        {
-          "name": "limit_rule_id"
-        },
-        {
-          "name": "rule_code"
-        },
-        {
-          "name": "rule_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "inner_threshold_pct"
-        },
-        {
-          "name": "limit_amount_usd"
-        },
-        {
-          "name": "limit_scope"
-        },
-        {
-          "name": "limit_type"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "outer_threshold_pct"
-        },
-        {
-          "name": "risk_tier"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "limit_threshold",
-      "fields": [
-        {
-          "name": "limit_threshold_id"
-        },
-        {
-          "name": "limit_rule_id"
-        },
-        {
-          "name": "threshold_value"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "direction"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "escalation_action"
-        },
-        {
-          "name": "threshold_lower_abs"
-        },
-        {
-          "name": "threshold_lower_pct"
-        },
-        {
-          "name": "threshold_type"
-        },
-        {
-          "name": "threshold_upper_abs"
-        },
-        {
-          "name": "threshold_upper_pct"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "fx_rate",
-      "fields": [
-        {
-          "name": "fx_rate_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "from_currency_code"
-        },
-        {
-          "name": "to_currency_code"
-        },
-        {
-          "name": "rate"
-        },
-        {
-          "name": "rate_type"
-        },
-        {
-          "name": "effective_ts"
-        },
-        {
-          "name": "loaded_ts"
-        },
-        {
-          "name": "provider"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "run_control",
-      "fields": [
-        {
-          "name": "run_control_id"
-        },
-        {
-          "name": "run_name"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "certified_by"
-        },
-        {
-          "name": "certified_ts"
-        },
-        {
-          "name": "created_by"
-        },
-        {
-          "name": "cutoff_ts"
-        },
-        {
-          "name": "notes"
-        },
-        {
-          "name": "run_version_id"
-        },
-        {
-          "name": "status"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "report_registry",
-      "fields": [
-        {
-          "name": "report_id"
-        },
-        {
-          "name": "report_code"
-        },
-        {
-          "name": "report_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "frequency"
-        },
-        {
-          "name": "jurisdiction_code"
-        },
-        {
-          "name": "regulator_code"
+          "name": "regulatory_framework"
         }
       ]
     },
@@ -2832,19 +2916,145 @@
     },
     {
       "layer": "L1",
-      "tableName": "reporting_entity_dim",
+      "tableName": "country_dim",
       "fields": [
         {
-          "name": "reporting_entity_id"
+          "name": "country_code"
         },
         {
-          "name": "entity_code"
+          "name": "country_name"
         },
         {
-          "name": "entity_name"
+          "name": "is_active"
         },
         {
-          "name": "legal_entity_id"
+          "name": "region_code"
+        },
+        {
+          "name": "basel_country_risk_weight"
+        },
+        {
+          "name": "is_developed_market"
+        },
+        {
+          "name": "is_fatf_high_risk"
+        },
+        {
+          "name": "is_ofac_sanctioned"
+        },
+        {
+          "name": "iso_alpha_3"
+        },
+        {
+          "name": "iso_numeric"
+        },
+        {
+          "name": "jurisdiction_id"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "region_dim",
+      "fields": [
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "region_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "is_active_flag"
+        },
+        {
+          "name": "region_group_code"
+        },
+        {
+          "name": "source_system_id"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "currency_dim",
+      "fields": [
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "currency_name"
+        },
+        {
+          "name": "currency_symbol"
+        },
+        {
+          "name": "is_active"
+        },
+        {
+          "name": "iso_numeric"
+        },
+        {
+          "name": "minor_unit_decimals"
+        },
+        {
+          "name": "is_g10_currency"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "industry_dim",
+      "fields": [
+        {
+          "name": "industry_id"
+        },
+        {
+          "name": "industry_code"
+        },
+        {
+          "name": "industry_name"
+        },
+        {
+          "name": "industry_level"
+        },
+        {
+          "name": "industry_standard"
+        },
+        {
+          "name": "parent_industry_id"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "regulatory_capital_basis_dim",
+      "fields": [
+        {
+          "name": "regulatory_capital_basis_id"
+        },
+        {
+          "name": "basis_code"
+        },
+        {
+          "name": "basis_name"
         },
         {
           "name": "created_ts"
@@ -2856,7 +3066,7 @@
           "name": "active_flag"
         },
         {
-          "name": "consolidation_basis"
+          "name": "description"
         },
         {
           "name": "effective_from_date"
@@ -2865,34 +3075,19 @@
           "name": "effective_to_date"
         },
         {
-          "name": "functional_currency_code"
-        },
-        {
-          "name": "is_current"
-        },
+          "name": "jurisdiction_code"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "regulatory_jurisdiction",
+      "fields": [
         {
           "name": "jurisdiction_code"
         },
         {
-          "name": "reporting_entity_code"
-        },
-        {
-          "name": "reporting_entity_name"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "model_registry_dim",
-      "fields": [
-        {
-          "name": "model_id"
-        },
-        {
-          "name": "model_code"
-        },
-        {
-          "name": "model_name"
+          "name": "jurisdiction_name"
         },
         {
           "name": "created_ts"
@@ -2901,175 +3096,16 @@
           "name": "updated_ts"
         },
         {
-          "name": "documentation_url"
+          "name": "is_active"
         },
         {
-          "name": "effective_from_date"
+          "name": "jurisdiction_id"
         },
         {
-          "name": "effective_to_date"
+          "name": "primary_regulator"
         },
         {
-          "name": "is_current"
-        },
-        {
-          "name": "model_type"
-        },
-        {
-          "name": "model_version"
-        },
-        {
-          "name": "owner_org_unit_id"
-        },
-        {
-          "name": "regulatory_approved_flag"
-        },
-        {
-          "name": "validation_status"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "rule_registry",
-      "fields": [
-        {
-          "name": "rule_id"
-        },
-        {
-          "name": "rule_code"
-        },
-        {
-          "name": "rule_name"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "approved_by"
-        },
-        {
-          "name": "approved_ts"
-        },
-        {
-          "name": "effective_from_date"
-        },
-        {
-          "name": "effective_to_date"
-        },
-        {
-          "name": "input_variables"
-        },
-        {
-          "name": "output_variable"
-        },
-        {
-          "name": "rule_expression"
-        },
-        {
-          "name": "rule_type"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "validation_check_registry",
-      "fields": [
-        {
-          "name": "check_id"
-        },
-        {
-          "name": "check_name"
-        },
-        {
-          "name": "check_type"
-        },
-        {
-          "name": "check_rule_id"
-        },
-        {
-          "name": "target_table"
-        },
-        {
-          "name": "target_column"
-        },
-        {
-          "name": "severity"
-        },
-        {
-          "name": "owner_id"
-        },
-        {
-          "name": "active_flag"
-        },
-        {
-          "name": "validation_check_id"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "reconciliation_control",
-      "fields": [
-        {
-          "name": "reconciliation_control_id"
-        },
-        {
-          "name": "control_name"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        },
-        {
-          "name": "actual_value"
-        },
-        {
-          "name": "check_name"
-        },
-        {
-          "name": "check_type"
-        },
-        {
-          "name": "executed_ts"
-        },
-        {
-          "name": "expected_value"
-        },
-        {
-          "name": "owner_id"
-        },
-        {
-          "name": "recon_id"
-        },
-        {
-          "name": "remediation_ticket_id"
-        },
-        {
-          "name": "report_code"
-        },
-        {
-          "name": "run_version_id"
-        },
-        {
-          "name": "status"
-        },
-        {
-          "name": "tolerance_value"
-        },
-        {
-          "name": "variance_value"
+          "name": "regulatory_framework"
         }
       ]
     },
@@ -3204,28 +3240,73 @@
     },
     {
       "layer": "L1",
-      "tableName": "rating_mapping",
+      "tableName": "model_registry_dim",
       "fields": [
         {
-          "name": "rating_mapping_id"
+          "name": "model_id"
         },
         {
-          "name": "rating_scale_id"
+          "name": "model_code"
         },
         {
-          "name": "rating_source_id"
-        },
-        {
-          "name": "external_rating"
-        },
-        {
-          "name": "internal_grade_id"
+          "name": "model_name"
         },
         {
           "name": "created_ts"
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "documentation_url"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "is_current"
+        },
+        {
+          "name": "model_type"
+        },
+        {
+          "name": "model_version"
+        },
+        {
+          "name": "owner_org_unit_id"
+        },
+        {
+          "name": "regulatory_approved_flag"
+        },
+        {
+          "name": "validation_status"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "rule_registry",
+      "fields": [
+        {
+          "name": "rule_id"
+        },
+        {
+          "name": "rule_code"
+        },
+        {
+          "name": "rule_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "active_flag"
         },
         {
           "name": "approved_by"
@@ -3240,40 +3321,28 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_current"
+          "name": "input_variables"
         },
         {
-          "name": "mapping_method"
+          "name": "output_variable"
         },
         {
-          "name": "model_id"
+          "name": "rule_expression"
         },
         {
-          "name": "rating_grade_code"
-        },
-        {
-          "name": "source_rating_code"
-        },
-        {
-          "name": "source_system_id"
+          "name": "rule_type"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "scenario_dim",
+      "tableName": "reconciliation_control",
       "fields": [
         {
-          "name": "scenario_id"
+          "name": "reconciliation_control_id"
         },
         {
-          "name": "scenario_code"
-        },
-        {
-          "name": "scenario_name"
-        },
-        {
-          "name": "scenario_type"
+          "name": "control_name"
         },
         {
           "name": "source_system_id"
@@ -3285,76 +3354,67 @@
           "name": "updated_ts"
         },
         {
-          "name": "description"
+          "name": "actual_value"
         },
         {
-          "name": "is_active"
+          "name": "check_name"
         },
         {
-          "name": "regulatory_scenario_code"
+          "name": "check_type"
         },
         {
-          "name": "scenario_end_date"
+          "name": "executed_ts"
         },
         {
-          "name": "scenario_horizon_months"
+          "name": "expected_value"
         },
         {
-          "name": "scenario_start_date"
+          "name": "owner_id"
         },
         {
-          "name": "shock_parameters_json"
+          "name": "recon_id"
+        },
+        {
+          "name": "remediation_ticket_id"
+        },
+        {
+          "name": "report_code"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "status"
+        },
+        {
+          "name": "tolerance_value"
+        },
+        {
+          "name": "variance_value"
         }
       ]
     },
     {
       "layer": "L1",
-      "tableName": "lob_hierarchy_config",
+      "tableName": "report_registry",
       "fields": [
         {
-          "name": "hierarchy_id"
+          "name": "report_id"
         },
         {
-          "name": "hierarchy_name"
+          "name": "report_code"
         },
         {
-          "name": "hierarchy_type"
-        },
-        {
-          "name": "root_segment_id"
-        },
-        {
-          "name": "is_active"
+          "name": "report_name"
         },
         {
           "name": "created_ts"
         },
         {
           "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L1",
-      "tableName": "limit_assignment",
-      "fields": [
-        {
-          "name": "limit_assignment_id"
         },
         {
-          "name": "limit_rule_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "assigned_limit_amt"
+          "name": "active_flag"
         },
         {
           "name": "effective_from_date"
@@ -3363,7 +3423,82 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_active"
+          "name": "frequency"
+        },
+        {
+          "name": "jurisdiction_code"
+        },
+        {
+          "name": "regulator_code"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "run_control",
+      "fields": [
+        {
+          "name": "run_control_id"
+        },
+        {
+          "name": "run_name"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "certified_by"
+        },
+        {
+          "name": "certified_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "cutoff_ts"
+        },
+        {
+          "name": "notes"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "status"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "source_system_registry",
+      "fields": [
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "source_system_name"
+        },
+        {
+          "name": "data_domain"
+        },
+        {
+          "name": "ingestion_frequency"
+        },
+        {
+          "name": "system_owner"
+        },
+        {
+          "name": "active_flag"
         },
         {
           "name": "created_ts"
@@ -3375,22 +3510,220 @@
     },
     {
       "layer": "L1",
-      "tableName": "pipeline_stage_dim",
+      "tableName": "validation_check_registry",
       "fields": [
         {
-          "name": "pipeline_stage_code"
+          "name": "check_id"
         },
         {
-          "name": "stage_name"
+          "name": "check_name"
         },
         {
-          "name": "stage_order"
+          "name": "check_type"
         },
         {
-          "name": "is_active"
+          "name": "check_rule_id"
         },
         {
-          "name": "description"
+          "name": "target_table"
+        },
+        {
+          "name": "target_column"
+        },
+        {
+          "name": "severity"
+        },
+        {
+          "name": "owner_id"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "validation_check_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "metric_definition_dim",
+      "fields": [
+        {
+          "name": "metric_definition_id"
+        },
+        {
+          "name": "metric_code"
+        },
+        {
+          "name": "metric_name"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "calculation_rule_id"
+        },
+        {
+          "name": "definition_text"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "is_active_flag"
+        },
+        {
+          "name": "metric_domain"
+        },
+        {
+          "name": "periodicity_code"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "unit_of_measure"
+        },
+        {
+          "name": "version"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "internal_risk_rating_bucket_dim",
+      "fields": [
+        {
+          "name": "internal_risk_rating_bucket_code"
+        },
+        {
+          "name": "bucket_name"
+        },
+        {
+          "name": "rating_score_min"
+        },
+        {
+          "name": "rating_score_max"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "pricing_tier_dim",
+      "fields": [
+        {
+          "name": "pricing_tier_code"
+        },
+        {
+          "name": "tier_name"
+        },
+        {
+          "name": "tier_ordinal"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "metric_threshold",
+      "fields": [
+        {
+          "name": "threshold_id"
+        },
+        {
+          "name": "metric_definition_id"
+        },
+        {
+          "name": "threshold_type"
+        },
+        {
+          "name": "threshold_value"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "inner_threshold_pct"
+        },
+        {
+          "name": "last_threshold_updated_date"
+        },
+        {
+          "name": "limit_type"
+        },
+        {
+          "name": "limit_value"
+        },
+        {
+          "name": "lod1_sponsor"
+        },
+        {
+          "name": "lod2_sponsor"
+        },
+        {
+          "name": "metric_category"
+        },
+        {
+          "name": "metric_code"
+        },
+        {
+          "name": "metric_description"
+        },
+        {
+          "name": "metric_id_display"
+        },
+        {
+          "name": "metric_name"
+        },
+        {
+          "name": "metric_owner"
+        },
+        {
+          "name": "metric_threshold_id"
+        },
+        {
+          "name": "outer_threshold_pct"
+        },
+        {
+          "name": "report_deadline"
+        },
+        {
+          "name": "report_frequency"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -3927,63 +4260,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "facility_financial_snapshot",
-      "fields": [
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "noi_amt"
-        },
-        {
-          "name": "total_debt_service_amt"
-        },
-        {
-          "name": "revenue_amt"
-        },
-        {
-          "name": "operating_expense_amt"
-        },
-        {
-          "name": "ebitda_amt"
-        },
-        {
-          "name": "interest_expense_amt"
-        },
-        {
-          "name": "principal_payment_amt"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "reporting_period"
-        },
-        {
-          "name": "financial_snapshot_id"
-        },
-        {
-          "name": "dscr_value"
-        },
-        {
-          "name": "ltv_pct"
-        },
-        {
-          "name": "net_income_amt"
-        },
-        {
-          "name": "interest_rate_sensitivity_pct"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "facility_delinquency_snapshot",
       "fields": [
         {
@@ -4413,6 +4689,36 @@
     },
     {
       "layer": "L2",
+      "tableName": "stress_test_result",
+      "fields": [
+        {
+          "name": "result_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "result_description"
+        },
+        {
+          "name": "loss_amount"
+        },
+        {
+          "name": "capital_impact"
+        },
+        {
+          "name": "result_status"
+        },
+        {
+          "name": "scenario_type"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
       "tableName": "deal_pipeline_fact",
       "fields": [
         {
@@ -4575,6 +4881,27 @@
     },
     {
       "layer": "L2",
+      "tableName": "metric_threshold",
+      "fields": [
+        {
+          "name": "threshold_id"
+        },
+        {
+          "name": "metric_definition_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "threshold_value"
+        },
+        {
+          "name": "threshold_type"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
       "tableName": "exception_event",
       "fields": [
         {
@@ -4696,6 +5023,93 @@
         },
         {
           "name": "flag_trigger_value"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "data_quality_score_snapshot",
+      "fields": [
+        {
+          "name": "score_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "dimension_name"
+        },
+        {
+          "name": "completeness_pct"
+        },
+        {
+          "name": "validity_pct"
+        },
+        {
+          "name": "overall_score"
+        },
+        {
+          "name": "target_table"
+        },
+        {
+          "name": "issue_count"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "facility_financial_snapshot",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "noi_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "ebitda_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "principal_payment_amt"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "reporting_period"
+        },
+        {
+          "name": "financial_snapshot_id"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
         }
       ]
     },
@@ -4995,9 +5409,6 @@
           "name": "rwa_amt"
         },
         {
-          "name": "rwa_density_pct"
-        },
-        {
           "name": "capital_req_amt"
         },
         {
@@ -5008,6 +5419,9 @@
         },
         {
           "name": "hierarchy_id"
+        },
+        {
+          "name": "rwa_density_pct"
         }
       ]
     },
@@ -5097,12 +5511,6 @@
           "name": "expected_loss_amt"
         },
         {
-          "name": "rwa_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
           "name": "credit_limit_amt"
         },
         {
@@ -5122,6 +5530,12 @@
         },
         {
           "name": "industry_code"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         }
       ]
     },
@@ -5232,13 +5646,13 @@
           "name": "total_rwa_amt"
         },
         {
-          "name": "rwa_density_pct"
-        },
-        {
           "name": "created_ts"
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "rwa_density_pct"
         }
       ]
     },
@@ -6045,9 +6459,6 @@
           "name": "rwa_amt"
         },
         {
-          "name": "rwa_density_pct"
-        },
-        {
           "name": "avg_pd_pct"
         },
         {
@@ -6088,6 +6499,9 @@
         },
         {
           "name": "total_crm_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         }
       ]
     },
@@ -6684,12 +7098,6 @@
           "name": "expected_loss_amt"
         },
         {
-          "name": "rwa_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
           "name": "credit_limit_amt"
         },
         {
@@ -6727,6 +7135,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         }
       ]
     },
@@ -6909,16 +7323,16 @@
           "name": "expected_loss_amt"
         },
         {
-          "name": "rwa_amt"
-        },
-        {
-          "name": "rwa_density_pct"
-        },
-        {
           "name": "base_currency_code"
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "rwa_density_pct"
         }
       ]
     },

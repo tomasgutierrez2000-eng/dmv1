@@ -244,6 +244,14 @@ validations:
       levels_to_compare: ["facility", "counterparty", "business_segment"]
       tolerance_pct: 0.01
 
+# CATALOGUE OVERRIDES
+catalogue:
+  item_id: "MET-108"
+  abbreviation: "INT_EXP"
+  insight: "Funding cost burden reveals margin compression risk — rising interest expense relative to committed amounts signals tightening spreads or increased leverage."
+  rollup_strategy: "direct-sum"
+  primary_value_field: "interest_expense_amt"
+
 # METADATA
 tags: ["funding-cost", "interest", "margin", "profitability"]
 dashboard_pages: ["P3"]

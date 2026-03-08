@@ -9,24 +9,40 @@
         {
           "op": "*",
           "field": "committed_facility_amt",
-          "label": "Committed Amount",
-          "sample_value": 50000000,
+          "label": "Total committed amount of the facility",
+          "sample_value": 0,
           "source_table": "facility_master",
           "source_layer": "L1"
         },
         {
           "op": "*",
           "field": "bank_share_pct",
-          "label": "Bank Share %",
-          "sample_value": 60,
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
           "source_table": "facility_lender_allocation",
           "source_layer": "L1"
         },
         {
           "op": "*",
           "field": "cost_of_funds_pct",
-          "label": "Cost of Funds Rate",
-          "sample_value": 4.5,
+          "label": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "all_in_rate_pct",
+          "label": "All-in interest rate for fallback derivation",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "spread_bps",
+          "label": "Spread in basis points for fallback derivation",
+          "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
           "source_layer": "L2"
         }
@@ -38,7 +54,7 @@
     "worked_example_columns": [
       {
         "field": "committed_facility_amt",
-        "header": "Committed ($)",
+        "header": "Committed Facility ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
@@ -50,8 +66,20 @@
       },
       {
         "field": "cost_of_funds_pct",
-        "header": "CoF Rate (%)",
+        "header": "Cost Of Funds (%)",
         "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "all_in_rate_pct",
+        "header": "All In Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "spread_bps",
+        "header": "Spread (bps)",
+        "format": "number",
         "subtotal_fn": "none"
       },
       {

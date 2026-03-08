@@ -4,7 +4,7 @@
     "item_name": "Interest Expense",
     "abbreviation": "INT_EXP",
     "kind": "METRIC",
-    "definition": "Total interest cost incurred on funding sources attributable to the reporting unit during the period. At facility level, computed as the product of the committed amount, the bank's participation share, and the cost of funds rate. At higher rollup levels, aggregated as the sum of facility-level interest expense.",
+    "definition": "Total interest cost incurred on funding sources attributable to the reporting unit during the period. At facility level, computed as the product of the committed amount, the bank's participation share, and the cost of funds rate. At higher rollup levels, aggregated as the sum of facility-level interest expense.\n",
     "generic_formula": "committed_facility_amt × bank_share_pct × cost_of_funds_rate",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
@@ -16,7 +16,7 @@
     "regulatory_references": [
       "FR Y-14Q Schedule H"
     ],
-    "insight": "Funding cost burden and margin compression risk. Rising interest expense without corresponding income growth signals deteriorating net interest margin.",
+    "insight": "Funding cost burden reveals margin compression risk — rising interest expense relative to committed amounts signals tightening spreads or increased leverage.",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "ACTIVE",
@@ -30,23 +30,39 @@
         "field": "committed_facility_amt",
         "description": "Total committed amount of the facility",
         "data_type": "NUMERIC(20,4)",
-        "sample_value": "50000000"
+        "sample_value": ""
       },
       {
         "layer": "L1",
         "table": "facility_lender_allocation",
         "field": "bank_share_pct",
         "description": "Bank's participation share of the facility (%)",
-        "data_type": "NUMERIC(10,4)",
-        "sample_value": "60"
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
       },
       {
         "layer": "L2",
         "table": "facility_pricing_snapshot",
         "field": "cost_of_funds_pct",
-        "description": "Cost of funds rate for the facility (derived as all_in_rate minus spread)",
+        "description": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)",
         "data_type": "NUMERIC(10,6)",
-        "sample_value": "4.50"
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_pricing_snapshot",
+        "field": "all_in_rate_pct",
+        "description": "All-in interest rate for fallback derivation",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_pricing_snapshot",
+        "field": "spread_bps",
+        "description": "Spread in basis points for fallback derivation",
+        "data_type": "NUMERIC(10,4)",
+        "sample_value": ""
       }
     ],
     "level_definitions": [
@@ -549,207 +565,284 @@
     "demo_data": {
       "facilities": [
         {
-          "facility_id": "FAC-2024-00001",
-          "facility_name": "Meridian Holdings — Revolving Credit",
-          "counterparty_id": "CP-00001",
-          "counterparty_name": "Meridian Holdings Holdings LLC",
-          "lob_segment_id": "SEG-L3-LCB-A",
-          "desk_name": "Large Corporate Banking Desk Alpha",
-          "portfolio_name": "Large Corporate Banking",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 50000000,
-          "collateral_value": 40000000,
-          "ltv_pct": 80,
-          "bank_share_pct": 60,
-          "positions": [
-            {
-              "position_id": "POS-001-A",
-              "facility_id": "FAC-2024-00001",
-              "position_type": "Revolver Draw",
-              "balance_amount": 30000000,
-              "description": "Drawn portion of revolving facility"
-            },
-            {
-              "position_id": "POS-001-B",
-              "facility_id": "FAC-2024-00001",
-              "position_type": "Undrawn Commitment",
-              "balance_amount": 20000000,
-              "description": "Undrawn commitment"
-            }
-          ],
-          "extra_fields": {
-            "committed_facility_amt": 50000000,
-            "cost_of_funds_pct": 4.5,
-            "interest_expense_amt": 1350000
-          }
-        },
-        {
-          "facility_id": "FAC-2024-00031",
-          "facility_name": "Meridian Holdings — Investment Advisory",
-          "counterparty_id": "CP-00001",
-          "counterparty_name": "Meridian Holdings Holdings LLC",
-          "lob_segment_id": "SEG-L3-IA-A",
-          "desk_name": "Investment Advisory Desk Alpha",
-          "portfolio_name": "Investment Advisory",
-          "lob_name": "Wealth Management",
-          "committed_amt": 260000000,
-          "collateral_value": 208000000,
-          "ltv_pct": 80,
-          "bank_share_pct": 100,
-          "positions": [
-            {
-              "position_id": "POS-031-A",
-              "facility_id": "FAC-2024-00031",
-              "position_type": "Term Loan A",
-              "balance_amount": 160000000,
-              "description": "Senior secured term loan"
-            },
-            {
-              "position_id": "POS-031-B",
-              "facility_id": "FAC-2024-00031",
-              "position_type": "Term Loan B",
-              "balance_amount": 100000000,
-              "description": "Subordinated term loan"
-            }
-          ],
-          "extra_fields": {
-            "committed_facility_amt": 260000000,
-            "cost_of_funds_pct": 4.6,
-            "interest_expense_amt": 11960000
-          }
-        },
-        {
-          "facility_id": "FAC-2024-00002",
-          "facility_name": "Northbridge Energy — Bilateral Term",
-          "counterparty_id": "CP-00002",
-          "counterparty_name": "Northbridge Energy Holdings Ltd.",
-          "lob_segment_id": "SEG-L3-MMB-B",
-          "desk_name": "Middle Market Banking Desk Beta",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 87000000,
-          "collateral_value": 69600000,
-          "ltv_pct": 80,
-          "bank_share_pct": 55,
+          "committed_amt": 5000000000.0,
+          "collateral_value": 1602133334.0,
+          "ltv_pct": 312.08,
           "positions": [
             {
-              "position_id": "POS-002-A",
-              "facility_id": "FAC-2024-00002",
-              "position_type": "Term Loan",
-              "balance_amount": 87000000,
-              "description": "Bilateral term loan — fully drawn"
-            }
-          ],
-          "extra_fields": {
-            "committed_facility_amt": 87000000,
-            "cost_of_funds_pct": 4.51,
-            "interest_expense_amt": 2158035
-          }
-        },
-        {
-          "facility_id": "FAC-2024-00032",
-          "facility_name": "Northbridge Energy — Family Office",
-          "counterparty_id": "CP-00002",
-          "counterparty_name": "Northbridge Energy Holdings Ltd.",
-          "lob_segment_id": "SEG-L3-FOS-B",
-          "desk_name": "Family Office Services Desk Beta",
-          "portfolio_name": "Family Office Services",
-          "lob_name": "Wealth Management",
-          "committed_amt": 297000000,
-          "collateral_value": 237600000,
-          "ltv_pct": 80,
-          "bank_share_pct": 100,
-          "positions": [
-            {
-              "position_id": "POS-032-A",
-              "facility_id": "FAC-2024-00032",
-              "position_type": "Revolver Draw",
-              "balance_amount": 200000000,
-              "description": "Drawn portion"
+              "position_id": "P-10",
+              "facility_id": "F-10",
+              "position_type": "REV",
+              "balance_amount": 2100000000.0,
+              "description": "REV exposure"
             },
             {
-              "position_id": "POS-032-B",
-              "facility_id": "FAC-2024-00032",
-              "position_type": "Undrawn Commitment",
-              "balance_amount": 97000000,
-              "description": "Undrawn commitment"
+              "position_id": "P-415",
+              "facility_id": "F-10",
+              "position_type": "LOAN",
+              "balance_amount": 2050000000.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-820",
+              "facility_id": "F-10",
+              "position_type": "REV",
+              "balance_amount": 2150000000.0,
+              "description": "REV exposure"
+            },
+            {
+              "position_id": "P-1225",
+              "facility_id": "F-10",
+              "position_type": "LOAN",
+              "balance_amount": 2000000000.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-1630",
+              "facility_id": "F-10",
+              "position_type": "REV",
+              "balance_amount": 2080000000.0,
+              "description": "REV exposure"
             }
           ],
-          "extra_fields": {
-            "committed_facility_amt": 297000000,
-            "cost_of_funds_pct": 4.61,
-            "interest_expense_amt": 13691700
-          }
+          "interest_expense_amt": 5025000000.0,
+          "committed_facility_amt": 5000000000.0,
+          "bank_share_pct": 100.0,
+          "cost_of_funds_pct": 100.5,
+          "all_in_rate_pct": 5.4,
+          "spread_bps": 115
         },
         {
-          "facility_id": "FAC-2024-00003",
-          "facility_name": "Blue Harbor Logistics — Syndicated Term",
-          "counterparty_id": "CP-00003",
-          "counterparty_name": "Blue Harbor Logistics Holdings PLC",
-          "lob_segment_id": "SEG-L3-SBB-G",
-          "desk_name": "Small Business Banking Desk Gamma",
-          "portfolio_name": "Small Business Banking",
+          "facility_id": "F-71",
+          "facility_name": "Evergreen — USD TL-B 2029-C",
+          "counterparty_id": "CP-24",
+          "counterparty_name": "Evergreen Therapeutics Inc.",
+          "lob_segment_id": "SEG-71",
+          "desk_name": "Lease Up Industrial Desk",
+          "portfolio_name": "Industrial / Logistics",
           "lob_name": "Corporate Banking",
-          "committed_amt": 124000000,
-          "collateral_value": 99200000,
-          "ltv_pct": 80,
-          "bank_share_pct": 45,
+          "committed_amt": 83143770.0,
+          "collateral_value": 83808920.0,
+          "ltv_pct": 99.21,
           "positions": [
             {
-              "position_id": "POS-003-A",
-              "facility_id": "FAC-2024-00003",
-              "position_type": "Syndicated Term A",
-              "balance_amount": 80000000,
-              "description": "Senior syndicated tranche"
+              "position_id": "P-71",
+              "facility_id": "F-71",
+              "position_type": "REV",
+              "balance_amount": 33257508.0,
+              "description": "REV exposure"
             },
             {
-              "position_id": "POS-003-B",
-              "facility_id": "FAC-2024-00003",
-              "position_type": "Syndicated Term B",
-              "balance_amount": 44000000,
-              "description": "Mezzanine tranche"
+              "position_id": "P-476",
+              "facility_id": "F-71",
+              "position_type": "COMMIT",
+              "balance_amount": 37414697.0,
+              "description": "COMMIT exposure"
+            },
+            {
+              "position_id": "P-881",
+              "facility_id": "F-71",
+              "position_type": "LOAN",
+              "balance_amount": 41571885.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-1286",
+              "facility_id": "F-71",
+              "position_type": "REV",
+              "balance_amount": 45729074.0,
+              "description": "REV exposure"
+            },
+            {
+              "position_id": "P-1691",
+              "facility_id": "F-71",
+              "position_type": "COMMIT",
+              "balance_amount": 48223387.0,
+              "description": "COMMIT exposure"
             }
           ],
-          "extra_fields": {
-            "committed_facility_amt": 124000000,
-            "cost_of_funds_pct": 5.5,
-            "interest_expense_amt": 3069000
-          }
+          "interest_expense_amt": 62669616.6375,
+          "committed_facility_amt": 83143770.0,
+          "bank_share_pct": 75.0,
+          "cost_of_funds_pct": 100.5,
+          "all_in_rate_pct": 6.6,
+          "spread_bps": 185
         },
         {
-          "facility_id": "FAC-2024-00033",
-          "facility_name": "Blue Harbor Logistics — Margin Lending",
-          "counterparty_id": "CP-00003",
-          "counterparty_name": "Blue Harbor Logistics Holdings PLC",
-          "lob_segment_id": "SEG-L3-ML-G",
-          "desk_name": "Margin Lending Desk Gamma",
-          "portfolio_name": "Margin Lending",
-          "lob_name": "Wealth Management",
-          "committed_amt": 334000000,
-          "collateral_value": 267200000,
-          "ltv_pct": 80,
-          "bank_share_pct": 100,
+          "facility_id": "F-178",
+          "facility_name": "Precision Mach — EUR Revolver 2025-F",
+          "counterparty_id": "CP-52",
+          "counterparty_name": "Precision Machining Holdings GmbH",
+          "lob_segment_id": "SEG-178",
+          "desk_name": "Unknown",
+          "portfolio_name": "Family Office Services",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 32683468.0,
+          "collateral_value": 33380717.0,
+          "ltv_pct": 97.91,
           "positions": [
             {
-              "position_id": "POS-033-A",
-              "facility_id": "FAC-2024-00033",
-              "position_type": "Margin Loan",
-              "balance_amount": 250000000,
-              "description": "Securities-backed margin facility"
+              "position_id": "P-178",
+              "facility_id": "F-178",
+              "position_type": "LOAN",
+              "balance_amount": 15688065.0,
+              "description": "LOAN exposure"
             },
             {
-              "position_id": "POS-033-B",
-              "facility_id": "FAC-2024-00033",
-              "position_type": "Overcollateral Buffer",
-              "balance_amount": 84000000,
-              "description": "Additional margin buffer"
+              "position_id": "P-583",
+              "facility_id": "F-178",
+              "position_type": "REV",
+              "balance_amount": 16341734.0,
+              "description": "REV exposure"
+            },
+            {
+              "position_id": "P-988",
+              "facility_id": "F-178",
+              "position_type": "COMMIT",
+              "balance_amount": 16014899.0,
+              "description": "COMMIT exposure"
+            },
+            {
+              "position_id": "P-1393",
+              "facility_id": "F-178",
+              "position_type": "LOAN",
+              "balance_amount": 15361230.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-1798",
+              "facility_id": "F-178",
+              "position_type": "REV",
+              "balance_amount": 15688065.0,
+              "description": "REV exposure"
             }
           ],
-          "extra_fields": {
-            "committed_facility_amt": 334000000,
-            "cost_of_funds_pct": 5.5,
-            "interest_expense_amt": 18370000
-          }
+          "interest_expense_amt": 18722724.6438,
+          "committed_facility_amt": 32683468.0,
+          "bank_share_pct": 57.0,
+          "cost_of_funds_pct": 100.5,
+          "all_in_rate_pct": 7.4,
+          "spread_bps": 265
+        },
+        {
+          "facility_id": "F-275",
+          "facility_name": "Sapphire Tower — USD L/C 2030-D",
+          "counterparty_id": "CP-75",
+          "counterparty_name": "Sapphire Tower Development Corp.",
+          "lob_segment_id": "SEG-26",
+          "desk_name": "Inventory Finance Desk",
+          "portfolio_name": "Asset-Based Lending",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 4036363.0,
+          "collateral_value": 4014837.0,
+          "ltv_pct": 100.54,
+          "positions": [
+            {
+              "position_id": "P-275",
+              "facility_id": "F-275",
+              "position_type": "REV",
+              "balance_amount": 2220000.0,
+              "description": "REV exposure"
+            },
+            {
+              "position_id": "P-680",
+              "facility_id": "F-275",
+              "position_type": "COMMIT",
+              "balance_amount": 2623636.0,
+              "description": "COMMIT exposure"
+            },
+            {
+              "position_id": "P-1085",
+              "facility_id": "F-275",
+              "position_type": "LOAN",
+              "balance_amount": 3229090.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-1490",
+              "facility_id": "F-275",
+              "position_type": "REV",
+              "balance_amount": 3430909.0,
+              "description": "REV exposure"
+            },
+            {
+              "position_id": "P-1895",
+              "facility_id": "F-275",
+              "position_type": "COMMIT",
+              "balance_amount": 3309818.0,
+              "description": "COMMIT exposure"
+            }
+          ],
+          "interest_expense_amt": 973570.7556,
+          "committed_facility_amt": 4036363.0,
+          "bank_share_pct": 24.0,
+          "cost_of_funds_pct": 100.5,
+          "all_in_rate_pct": 9.12,
+          "spread_bps": 437
+        },
+        {
+          "facility_id": "F-400",
+          "facility_name": "Thames Valley — GBP L/C 2029-E",
+          "counterparty_id": "CP-99",
+          "counterparty_name": "Thames Valley Utilities PLC",
+          "lob_segment_id": "SEG-151",
+          "desk_name": "Unknown",
+          "portfolio_name": "Foreign Exchange",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 21844002.0,
+          "collateral_value": 21873126.0,
+          "ltv_pct": 99.87,
+          "positions": [
+            {
+              "position_id": "P-400",
+              "facility_id": "F-400",
+              "position_type": "LOAN",
+              "balance_amount": 10485121.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-805",
+              "facility_id": "F-400",
+              "position_type": "REV",
+              "balance_amount": 10922001.0,
+              "description": "REV exposure"
+            },
+            {
+              "position_id": "P-1210",
+              "facility_id": "F-400",
+              "position_type": "COMMIT",
+              "balance_amount": 10703561.0,
+              "description": "COMMIT exposure"
+            },
+            {
+              "position_id": "P-1615",
+              "facility_id": "F-400",
+              "position_type": "LOAN",
+              "balance_amount": 10266681.0,
+              "description": "LOAN exposure"
+            },
+            {
+              "position_id": "P-2020",
+              "facility_id": "F-400",
+              "position_type": "REV",
+              "balance_amount": 10485121.0,
+              "description": "REV exposure"
+            }
+          ],
+          "interest_expense_amt": 6366434.3829,
+          "committed_facility_amt": 21844002.0,
+          "bank_share_pct": 29.0,
+          "cost_of_funds_pct": 100.5,
+          "all_in_rate_pct": 6.38,
+          "spread_bps": 163
         }
       ]
     }

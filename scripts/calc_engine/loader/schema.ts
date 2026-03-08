@@ -169,6 +169,17 @@ export const metricDefinitionSchema: Record<string, any> = {
       type: 'array',
       items: { type: 'string' },
     },
+    catalogue: {
+      type: 'object',
+      properties: {
+        item_id: { type: 'string', minLength: 1 },
+        abbreviation: { type: 'string', minLength: 1 },
+        insight: { type: 'string' },
+        rollup_strategy: { type: 'string', minLength: 1 },
+        primary_value_field: { type: 'string', minLength: 1 },
+      },
+      additionalProperties: false,
+    },
   },
   additionalProperties: false,
 

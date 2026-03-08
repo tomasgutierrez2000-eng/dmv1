@@ -113,6 +113,20 @@ export interface OutputTarget {
   }>;
 }
 
+/** Optional overrides for catalogue auto-creation from YAML */
+export interface CatalogueOverrides {
+  /** Catalogue item_id override (default: metric_id) */
+  item_id?: string;
+  /** Short abbreviation for UI display (e.g. "INT_EXP") */
+  abbreviation?: string;
+  /** Business insight callout text */
+  insight?: string;
+  /** Rollup strategy override (bypasses auto-inference) */
+  rollup_strategy?: string;
+  /** Primary metric value field name in demo data */
+  primary_value_field?: string;
+}
+
 /** Complete metric definition parsed from YAML */
 export interface MetricDefinition {
   // Identification
@@ -155,6 +169,9 @@ export interface MetricDefinition {
   tags: string[];
   dashboard_pages: string[];
   legacy_metric_ids: string[];
+
+  // Catalogue overrides (optional YAML block)
+  catalogue?: CatalogueOverrides;
 
   // Computed at load time (not in YAML)
   _file_path?: string;

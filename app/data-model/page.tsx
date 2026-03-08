@@ -240,7 +240,7 @@ export default function DataModelPage() {
     }
   };
 
-  const handleAddField = async (layer: 'L1' | 'L2' | 'L3', tableName: string, field: { name: string; data_type?: string; pk_fk?: { is_pk: boolean; fk_target?: { layer: string; table: string; field: string } } }) => {
+  const handleAddField = async (layer: 'L1' | 'L2' | 'L3', tableName: string, field: { name: string; description?: string; data_type?: string; pk_fk?: { is_pk: boolean; fk_target?: { layer: string; table: string; field: string } } }) => {
     setActionLoading(true);
     setActionError(null);
     try {
@@ -304,7 +304,7 @@ export default function DataModelPage() {
     layer: 'L1' | 'L2' | 'L3',
     tableName: string,
     fieldName: string,
-    payload: { name: string; data_type?: string; pk_fk?: { is_pk: boolean } }
+    payload: { name: string; description?: string; data_type?: string; pk_fk?: { is_pk: boolean } }
   ) => {
     setActionLoading(true);
     setActionError(null);

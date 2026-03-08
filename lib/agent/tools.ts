@@ -372,7 +372,7 @@ async function handleQueryLiveData(
 
   try {
     // Dynamic require to avoid bundling pg when not needed
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line no-undef
     const { Pool } = require('pg') as typeof import('pg');
     const pool = new Pool({ connectionString: databaseUrl, statement_timeout: 10_000 });
 

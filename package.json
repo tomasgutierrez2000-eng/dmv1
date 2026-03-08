@@ -26,11 +26,18 @@
     "db:verify-scenarios": "tsx scripts/verify-cro-scenarios.ts",
     "sync:data-model": "tsx scripts/sync-data-model.ts",
     "export:data-model": "tsx scripts/export-data-model-excel.ts",
-    "validate": "tsx scripts/validate-data-model.ts"
+    "validate": "tsx scripts/validate-data-model.ts",
+    "calc:run": "tsx scripts/calc-engine/cli.ts run",
+    "calc:validate": "tsx scripts/calc-engine/cli.ts validate",
+    "calc:audit": "tsx scripts/calc-engine/cli.ts audit",
+    "calc:inspect": "tsx scripts/calc-engine/cli.ts inspect",
+    "calc:list": "tsx scripts/calc-engine/cli.ts list",
+    "calc:dag": "tsx scripts/calc-engine/cli.ts dag"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@google/genai": "^1.42.0",
+    "ajv": "^8.18.0",
     "dotenv": "^17.3.1",
     "exceljs": "^4.4.0",
     "framer-motion": "^11.0.0",
@@ -43,10 +50,13 @@
     "recharts": "^2.10.3",
     "sql.js": "^1.14.0",
     "xlsx": "^0.18.5",
+    "yaml": "^2.8.2",
+    "yargs": "^18.0.0",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@types/yargs": "^17.0.35",
     "@types/pg": "^8.16.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

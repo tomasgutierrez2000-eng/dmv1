@@ -1,0 +1,178 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition Template
+# Copy this file to metrics/{domain}/{METRIC_ID}.yaml
+# ═══════════════════════════════════════════════════════════════
+
+# IDENTIFICATION
+metric_id: "DOMAIN-NNN"
+name: "Metric Name"
+version: "1.0.0"
+owner: "team-name"
+status: DRAFT                      # ACTIVE | DRAFT | DEPRECATED | RETIRED
+effective_date: "2026-01-01"
+supersedes: null                   # Previous metric_id if replacing one
+
+# CLASSIFICATION
+domain: "exposure"                 # exposure | risk | limits | regulatory | stress
+sub_domain: "sub_category"
+metric_class: CALCULATED           # SOURCED | CALCULATED | HYBRID
+direction: NEUTRAL                 # HIGHER_BETTER | LOWER_BETTER | NEUTRAL
+unit_type: CURRENCY                # CURRENCY | PERCENTAGE | RATIO | COUNT | RATE | BPS | DAYS | INDEX | ORDINAL
+display_format: "$,.0f"            # d3-format string
+description: >
+  Business definition of this metric. Include purpose, usage context,
+  and any important caveats.
+
+# REGULATORY REFERENCES
+regulatory_references:
+  - framework: "Basel III"
+    section: ""
+    description: ""
+# - framework: "FR Y-14Q"
+#   schedule: ""
+# - framework: "CCAR"
+#   section: ""
+# - framework: "FR 2590"
+#   category: ""
+
+# SOURCE TABLES
+source_tables:
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: BASE                # BASE | INNER | LEFT | CROSS
+    fields:
+      - name: facility_id
+        role: JOIN_KEY             # MEASURE | DIMENSION | FILTER | JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = fes.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+
+# LEVEL FORMULAS
+# Each level must return: dimension_key (VARCHAR/BIGINT), metric_value (NUMERIC)
+# Bind parameters: :as_of_date, :base_currency, :prior_as_of_date, :run_id
+levels:
+  facility:
+    aggregation_type: RAW          # RAW | SUM | WEIGHTED_AVG | COUNT | COUNT_DISTINCT | MIN | MAX | MEDIAN | CUSTOM
+    formula_text: "Human-readable formula description"
+    formula_sql: |
+      SELECT
+        fes.facility_id AS dimension_key,
+        0 AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      WHERE fes.as_of_date = :as_of_date
+
+  counterparty:
+    aggregation_type: SUM
+    formula_text: "SUM(facility values) per counterparty"
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        SUM(0) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm ON fm.facility_id = fes.facility_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY fm.counterparty_id
+
+  desk:
+    aggregation_type: SUM
+    formula_text: "SUM per L3 desk segment"
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(0) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm ON fm.facility_id = fes.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY ebt.managed_segment_id
+
+  portfolio:
+    aggregation_type: SUM
+    formula_text: "SUM per L2 portfolio segment"
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(0) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm ON fm.facility_id = fes.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY ebt_l2.managed_segment_id
+
+  business_segment:
+    aggregation_type: SUM
+    formula_text: "SUM per L1 business segment"
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(0) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm ON fm.facility_id = fes.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY ebt_l1.managed_segment_id
+
+# DEPENDENCIES (metric_ids this metric reads from)
+depends_on: []
+
+# OUTPUT
+output:
+  table: metric_result
+# additional_tables:
+#   - schema: l3
+#     table: exposure_metric_cube
+#     column: gross_exposure_amt
+
+# VALIDATION RULES
+validations:
+  - rule_id: "DOMAIN-NNN-V01"
+    type: NOT_NULL
+    description: "No null metric values"
+    severity: ERROR
+
+  - rule_id: "DOMAIN-NNN-V02"
+    type: NON_NEGATIVE
+    description: "Values must be >= 0"
+    severity: ERROR
+
+# - rule_id: "DOMAIN-NNN-V03"
+#   type: RECONCILIATION
+#   description: "Cross-level totals must match"
+#   severity: ERROR
+#   params:
+#     levels_to_compare: [facility, counterparty, business_segment]
+#     tolerance_pct: 0.01
+
+# - rule_id: "DOMAIN-NNN-V04"
+#   type: PERIOD_OVER_PERIOD
+#   description: "Flag changes > 20% vs prior period"
+#   severity: WARNING
+#   params:
+#     max_change_pct: 20.0
+
+# METADATA
+tags: []
+dashboard_pages: []
+legacy_metric_ids: []

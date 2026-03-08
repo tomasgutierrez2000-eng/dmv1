@@ -1,1 +1,66 @@
-{}
+{
+  "MET-108": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "interest_expense_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "committed_facility_amt",
+          "label": "Committed Amount",
+          "sample_value": 50000000,
+          "source_table": "facility_master",
+          "source_layer": "L1"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank Share %",
+          "sample_value": 60,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L1"
+        },
+        {
+          "op": "*",
+          "field": "cost_of_funds_pct",
+          "label": "Cost of Funds Rate",
+          "sample_value": 4.5,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "committed_facility_amt × bank_share_pct × cost_of_funds_rate"
+    },
+    "worked_example_columns": [
+      {
+        "field": "committed_facility_amt",
+        "header": "Committed ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "cost_of_funds_pct",
+        "header": "CoF Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "interest_expense_amt",
+        "header": "Interest Expense ($)",
+        "format": "currency",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  }
+}

@@ -1,1 +1,757 @@
-[]
+[
+  {
+    "item_id": "MET-108",
+    "item_name": "Interest Expense",
+    "abbreviation": "INT_EXP",
+    "kind": "METRIC",
+    "definition": "Total interest cost incurred on funding sources attributable to the reporting unit during the period. At facility level, computed as the product of the committed amount, the bank's participation share, and the cost of funds rate. At higher rollup levels, aggregated as the sum of facility-level interest expense.",
+    "generic_formula": "committed_facility_amt × bank_share_pct × cost_of_funds_rate",
+    "data_type": "NUMERIC(20,4)",
+    "unit_type": "CURRENCY",
+    "direction": "LOWER_BETTER",
+    "metric_class": "CALCULATED",
+    "domain_ids": [
+      "profitability"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q Schedule H"
+    ],
+    "insight": "Funding cost burden and margin compression risk. Rising interest expense without corresponding income growth signals deteriorating net interest margin.",
+    "number_of_instances": 5,
+    "directly_displayed": false,
+    "status": "ACTIVE",
+    "executable_metric_id": "PROF-108",
+    "normalized_de_name": "Interest Expense",
+    "data_element_in_dm": "interest_expense_amt",
+    "ingredient_fields": [
+      {
+        "layer": "L1",
+        "table": "facility_master",
+        "field": "committed_facility_amt",
+        "description": "Total committed amount of the facility",
+        "data_type": "NUMERIC(20,4)",
+        "sample_value": "50000000"
+      },
+      {
+        "layer": "L1",
+        "table": "facility_lender_allocation",
+        "field": "bank_share_pct",
+        "description": "Bank's participation share of the facility (%)",
+        "data_type": "NUMERIC(10,4)",
+        "sample_value": "60"
+      },
+      {
+        "layer": "L2",
+        "table": "facility_pricing_snapshot",
+        "field": "cost_of_funds_pct",
+        "description": "Cost of funds rate for the facility (derived as all_in_rate minus spread)",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": "4.50"
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Interest Expense (facility)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "committed_facility_amt × bank_share_pct × cost_of_funds_rate",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — facility identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Total committed amount of the facility"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for grouping"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to business taxonomy for desk/portfolio/lob resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "Only include active facilities"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation share of the facility (%)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "as_of_date",
+            "description": "Snapshot date for pricing data"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "all_in_rate_pct",
+            "description": "All-in interest rate for fallback derivation"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "spread_bps",
+            "description": "Spread in basis points for fallback derivation"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business hierarchy node identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Parent node for hierarchy traversal"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth (L1=department, L2=portfolio, L3=desk)"
+          }
+        ]
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Interest Expense (counterparty)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "SUM(Facility Interest Expense) per counterparty",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — facility identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Total committed amount of the facility"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for grouping"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to business taxonomy for desk/portfolio/lob resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "Only include active facilities"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation share of the facility (%)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "as_of_date",
+            "description": "Snapshot date for pricing data"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "all_in_rate_pct",
+            "description": "All-in interest rate for fallback derivation"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "spread_bps",
+            "description": "Spread in basis points for fallback derivation"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business hierarchy node identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Parent node for hierarchy traversal"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth (L1=department, L2=portfolio, L3=desk)"
+          }
+        ]
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Interest Expense (desk)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "SUM(Facility Interest Expense) per L3 desk segment",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — facility identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Total committed amount of the facility"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for grouping"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to business taxonomy for desk/portfolio/lob resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "Only include active facilities"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation share of the facility (%)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "as_of_date",
+            "description": "Snapshot date for pricing data"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "all_in_rate_pct",
+            "description": "All-in interest rate for fallback derivation"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "spread_bps",
+            "description": "Spread in basis points for fallback derivation"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business hierarchy node identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Parent node for hierarchy traversal"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth (L1=department, L2=portfolio, L3=desk)"
+          }
+        ]
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Interest Expense (portfolio)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "SUM(Facility Interest Expense) per L2 portfolio segment",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — facility identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Total committed amount of the facility"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for grouping"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to business taxonomy for desk/portfolio/lob resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "Only include active facilities"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation share of the facility (%)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "as_of_date",
+            "description": "Snapshot date for pricing data"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "all_in_rate_pct",
+            "description": "All-in interest rate for fallback derivation"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "spread_bps",
+            "description": "Spread in basis points for fallback derivation"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business hierarchy node identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Parent node for hierarchy traversal"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth (L1=department, L2=portfolio, L3=desk)"
+          }
+        ]
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Interest Expense (lob)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "SUM(Facility Interest Expense) per L1 business segment (department)",
+        "source_references": [
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "Primary key — facility identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "committed_facility_amt",
+            "description": "Total committed amount of the facility"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty for grouping"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "FK to business taxonomy for desk/portfolio/lob resolution"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_master",
+            "field": "active_flag",
+            "description": "Only include active facilities"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L1",
+            "table": "facility_lender_allocation",
+            "field": "bank_share_pct",
+            "description": "Bank's participation share of the facility (%)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "facility_id",
+            "description": "FK to facility_master"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "as_of_date",
+            "description": "Snapshot date for pricing data"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "cost_of_funds_pct",
+            "description": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "all_in_rate_pct",
+            "description": "All-in interest rate for fallback derivation"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_pricing_snapshot",
+            "field": "spread_bps",
+            "description": "Spread in basis points for fallback derivation"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "Business hierarchy node identifier"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "Parent node for hierarchy traversal"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "tree_level",
+            "description": "Hierarchy depth (L1=department, L2=portfolio, L3=desk)"
+          }
+        ]
+      }
+    ],
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "FAC-2024-00001",
+          "facility_name": "Meridian Holdings — Revolving Credit",
+          "counterparty_id": "CP-00001",
+          "counterparty_name": "Meridian Holdings Holdings LLC",
+          "lob_segment_id": "SEG-L3-LCB-A",
+          "desk_name": "Large Corporate Banking Desk Alpha",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 50000000,
+          "collateral_value": 40000000,
+          "ltv_pct": 80,
+          "bank_share_pct": 60,
+          "positions": [
+            {
+              "position_id": "POS-001-A",
+              "facility_id": "FAC-2024-00001",
+              "position_type": "Revolver Draw",
+              "balance_amount": 30000000,
+              "description": "Drawn portion of revolving facility"
+            },
+            {
+              "position_id": "POS-001-B",
+              "facility_id": "FAC-2024-00001",
+              "position_type": "Undrawn Commitment",
+              "balance_amount": 20000000,
+              "description": "Undrawn commitment"
+            }
+          ],
+          "extra_fields": {
+            "committed_facility_amt": 50000000,
+            "cost_of_funds_pct": 4.5,
+            "interest_expense_amt": 1350000
+          }
+        },
+        {
+          "facility_id": "FAC-2024-00031",
+          "facility_name": "Meridian Holdings — Investment Advisory",
+          "counterparty_id": "CP-00001",
+          "counterparty_name": "Meridian Holdings Holdings LLC",
+          "lob_segment_id": "SEG-L3-IA-A",
+          "desk_name": "Investment Advisory Desk Alpha",
+          "portfolio_name": "Investment Advisory",
+          "lob_name": "Wealth Management",
+          "committed_amt": 260000000,
+          "collateral_value": 208000000,
+          "ltv_pct": 80,
+          "bank_share_pct": 100,
+          "positions": [
+            {
+              "position_id": "POS-031-A",
+              "facility_id": "FAC-2024-00031",
+              "position_type": "Term Loan A",
+              "balance_amount": 160000000,
+              "description": "Senior secured term loan"
+            },
+            {
+              "position_id": "POS-031-B",
+              "facility_id": "FAC-2024-00031",
+              "position_type": "Term Loan B",
+              "balance_amount": 100000000,
+              "description": "Subordinated term loan"
+            }
+          ],
+          "extra_fields": {
+            "committed_facility_amt": 260000000,
+            "cost_of_funds_pct": 4.6,
+            "interest_expense_amt": 11960000
+          }
+        },
+        {
+          "facility_id": "FAC-2024-00002",
+          "facility_name": "Northbridge Energy — Bilateral Term",
+          "counterparty_id": "CP-00002",
+          "counterparty_name": "Northbridge Energy Holdings Ltd.",
+          "lob_segment_id": "SEG-L3-MMB-B",
+          "desk_name": "Middle Market Banking Desk Beta",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 87000000,
+          "collateral_value": 69600000,
+          "ltv_pct": 80,
+          "bank_share_pct": 55,
+          "positions": [
+            {
+              "position_id": "POS-002-A",
+              "facility_id": "FAC-2024-00002",
+              "position_type": "Term Loan",
+              "balance_amount": 87000000,
+              "description": "Bilateral term loan — fully drawn"
+            }
+          ],
+          "extra_fields": {
+            "committed_facility_amt": 87000000,
+            "cost_of_funds_pct": 4.51,
+            "interest_expense_amt": 2158035
+          }
+        },
+        {
+          "facility_id": "FAC-2024-00032",
+          "facility_name": "Northbridge Energy — Family Office",
+          "counterparty_id": "CP-00002",
+          "counterparty_name": "Northbridge Energy Holdings Ltd.",
+          "lob_segment_id": "SEG-L3-FOS-B",
+          "desk_name": "Family Office Services Desk Beta",
+          "portfolio_name": "Family Office Services",
+          "lob_name": "Wealth Management",
+          "committed_amt": 297000000,
+          "collateral_value": 237600000,
+          "ltv_pct": 80,
+          "bank_share_pct": 100,
+          "positions": [
+            {
+              "position_id": "POS-032-A",
+              "facility_id": "FAC-2024-00032",
+              "position_type": "Revolver Draw",
+              "balance_amount": 200000000,
+              "description": "Drawn portion"
+            },
+            {
+              "position_id": "POS-032-B",
+              "facility_id": "FAC-2024-00032",
+              "position_type": "Undrawn Commitment",
+              "balance_amount": 97000000,
+              "description": "Undrawn commitment"
+            }
+          ],
+          "extra_fields": {
+            "committed_facility_amt": 297000000,
+            "cost_of_funds_pct": 4.61,
+            "interest_expense_amt": 13691700
+          }
+        },
+        {
+          "facility_id": "FAC-2024-00003",
+          "facility_name": "Blue Harbor Logistics — Syndicated Term",
+          "counterparty_id": "CP-00003",
+          "counterparty_name": "Blue Harbor Logistics Holdings PLC",
+          "lob_segment_id": "SEG-L3-SBB-G",
+          "desk_name": "Small Business Banking Desk Gamma",
+          "portfolio_name": "Small Business Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 124000000,
+          "collateral_value": 99200000,
+          "ltv_pct": 80,
+          "bank_share_pct": 45,
+          "positions": [
+            {
+              "position_id": "POS-003-A",
+              "facility_id": "FAC-2024-00003",
+              "position_type": "Syndicated Term A",
+              "balance_amount": 80000000,
+              "description": "Senior syndicated tranche"
+            },
+            {
+              "position_id": "POS-003-B",
+              "facility_id": "FAC-2024-00003",
+              "position_type": "Syndicated Term B",
+              "balance_amount": 44000000,
+              "description": "Mezzanine tranche"
+            }
+          ],
+          "extra_fields": {
+            "committed_facility_amt": 124000000,
+            "cost_of_funds_pct": 5.5,
+            "interest_expense_amt": 3069000
+          }
+        },
+        {
+          "facility_id": "FAC-2024-00033",
+          "facility_name": "Blue Harbor Logistics — Margin Lending",
+          "counterparty_id": "CP-00003",
+          "counterparty_name": "Blue Harbor Logistics Holdings PLC",
+          "lob_segment_id": "SEG-L3-ML-G",
+          "desk_name": "Margin Lending Desk Gamma",
+          "portfolio_name": "Margin Lending",
+          "lob_name": "Wealth Management",
+          "committed_amt": 334000000,
+          "collateral_value": 267200000,
+          "ltv_pct": 80,
+          "bank_share_pct": 100,
+          "positions": [
+            {
+              "position_id": "POS-033-A",
+              "facility_id": "FAC-2024-00033",
+              "position_type": "Margin Loan",
+              "balance_amount": 250000000,
+              "description": "Securities-backed margin facility"
+            },
+            {
+              "position_id": "POS-033-B",
+              "facility_id": "FAC-2024-00033",
+              "position_type": "Overcollateral Buffer",
+              "balance_amount": 84000000,
+              "description": "Additional margin buffer"
+            }
+          ],
+          "extra_fields": {
+            "committed_facility_amt": 334000000,
+            "cost_of_funds_pct": 5.5,
+            "interest_expense_amt": 18370000
+          }
+        }
+      ]
+    }
+  }
+]

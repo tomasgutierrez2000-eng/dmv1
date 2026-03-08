@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "domain_id": "profitability",
+    "domain_name": "Profitability",
+    "domain_description": "Revenue, cost, and margin metrics that measure the financial performance of lending activities including interest income, interest expense, fee income, and net interest margin.",
+    "icon": "dollar-sign",
+    "color": "#10b981",
+    "regulatory_relevance": ["FR Y-14Q Schedule H", "OCC Handbook Section 2020"],
+    "primary_stakeholders": ["CFO", "Treasury", "ALCO", "Business Line Heads"]
+  }
+]

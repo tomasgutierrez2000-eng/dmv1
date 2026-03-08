@@ -12,7 +12,9 @@ from .base import BaseCalculator
 if TYPE_CHECKING:
     from ..data_loader import DataLoader
 
-ACTIVE_FLAG_VALUE = "Y"
+# active_flag may be stored as boolean (PostgreSQL) or string "Y"/"N" (JSON sample data).
+# Normalize to a set of truthy representations for robust matching.
+_ACTIVE_TRUTHY = {"Y", "YES", "TRUE", "T", "1"}
 
 
 @register
@@ -60,8 +62,8 @@ class UndrawnExposureCalculator(BaseCalculator):
         fm_sub = fm[[c for c in cols if c in fm.columns]].drop_duplicates("facility_id")
 
         fac_sum = fac_sum.merge(fm_sub, on="facility_id", how="left")
-        fac_sum[active_col] = fac_sum[active_col].fillna("").astype(str).str.upper()
-        fac_sum = fac_sum[fac_sum[active_col] == ACTIVE_FLAG_VALUE].copy()
+        fac_sum[active_col] = fac_sum[active_col].fillna("").astype(str).str.upper().str.strip()
+        fac_sum = fac_sum[fac_sum[active_col].isin(_ACTIVE_TRUTHY)].copy()
 
         if bank_col and bank_col in fac_sum.columns:
             fac_sum[bank_col] = fac_sum[bank_col].fillna(1.0)

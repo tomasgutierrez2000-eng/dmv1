@@ -2,17 +2,19 @@
 """Generate demo_data for catalogue items from real L1/L2 data.
 
 Usage:
-  python -m scripts.calc-engine.generate_demo_data --metric DSCR
-  python -m scripts.calc-engine.generate_demo_data --metric LTV --count 5 --persist
-  python -m scripts.calc-engine.generate_demo_data --all --persist
-  python -m scripts.calc-engine.generate_demo_data --metric DSCR --output /tmp/dscr-demo.json
+  python -m scripts.calc_engine.generate_demo_data --metric DSCR
+  python -m scripts.calc_engine.generate_demo_data --metric LTV --count 5 --persist
+  python -m scripts.calc_engine.generate_demo_data --all --persist
+  python -m scripts.calc_engine.generate_demo_data --metric DSCR --output /tmp/dscr-demo.json
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+import tempfile
 from pathlib import Path
 import numpy as np
 
@@ -52,9 +54,18 @@ def load_catalogue() -> list[dict]:
 
 
 def save_catalogue(items: list[dict]) -> None:
-    with open(CATALOGUE_PATH, "w") as f:
-        json.dump(items, f, indent=2, ensure_ascii=False, cls=NumpyEncoder)
-    print(f"Catalogue saved: {CATALOGUE_PATH}")
+    """Atomic write: write to temp file then rename to avoid corruption on crash."""
+    fd, tmp_path = tempfile.mkstemp(
+        dir=CATALOGUE_PATH.parent, suffix=".tmp", prefix=".catalogue-"
+    )
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(items, f, indent=2, ensure_ascii=False, cls=NumpyEncoder)
+        os.replace(tmp_path, CATALOGUE_PATH)
+        print(f"Catalogue saved: {CATALOGUE_PATH}")
+    except BaseException:
+        os.unlink(tmp_path)
+        raise
 
 
 def find_item(catalogue: list[dict], item_id: str) -> dict | None:

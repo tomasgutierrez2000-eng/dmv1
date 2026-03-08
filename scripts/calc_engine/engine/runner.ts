@@ -208,7 +208,7 @@ export async function run(options: RunOptions): Promise<CalcRunSummary> {
       for (const err of healthErrors) {
         console.error(`    - ${err}`);
       }
-      console.error(`\n  Run the DDL script first: psql $DATABASE_URL -f scripts/calc-engine/ddl/calc-engine-tables.sql`);
+      console.error(`\n  Run the DDL script first: psql $DATABASE_URL -f scripts/calc_engine/ddl/calc-engine-tables.sql`);
       process.exit(1);
     }
     console.log(`  Database OK`);

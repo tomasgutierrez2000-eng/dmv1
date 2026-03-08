@@ -87,4 +87,22 @@ class LTVCalculator(BaseCalculator):
             / g["current_valuation_usd"].replace(0, float("nan"))
             * 100
         )
-        return g.rename(columns={"lob_segment_id": "segment_id"})[["segment_id", "segment_name", "ltv_pct"]]
+        return g.rename(columns={"lob_segment_id": "segment_id"})[
+            ["segment_id", "segment_name", "ltv_pct", "committed_facility_amt", "current_valuation_usd"]
+        ]
+
+    # ── Rollup hooks: re-derive ratio from summed numerator/denominator ──
+
+    def rollup_agg_spec(self) -> dict[str, tuple[str, str]]:
+        return {
+            "committed_facility_amt": ("committed_facility_amt", "sum"),
+            "current_valuation_usd": ("current_valuation_usd", "sum"),
+        }
+
+    def rollup_post_agg(self, df: pd.DataFrame) -> pd.DataFrame:
+        df["ltv_pct"] = (
+            df["committed_facility_amt"]
+            / df["current_valuation_usd"].replace(0, float("nan"))
+            * 100
+        )
+        return df

@@ -2,10 +2,10 @@
 """Run a metric calculation at a specified dimension.
 
 Usage:
-  python -m scripts.calc-engine.run_metric --metric C003 --dimension facility
-  python -m scripts.calc-engine.run_metric --metric DSCR --dimension counterparty
-  python -m scripts.calc-engine.run_metric --metric LTV --dimension desk --as-of-date 2025-01-31
-  python -m scripts.calc-engine.run_metric --list
+  python -m scripts.calc_engine.run_metric --metric C003 --dimension facility
+  python -m scripts.calc_engine.run_metric --metric DSCR --dimension counterparty
+  python -m scripts.calc_engine.run_metric --metric LTV --dimension desk --as-of-date 2025-01-31
+  python -m scripts.calc_engine.run_metric --list
 """
 
 import argparse

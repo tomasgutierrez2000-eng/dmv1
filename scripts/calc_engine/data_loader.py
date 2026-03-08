@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
 from .config import DATABASE_URL, SAMPLE_DATA_L1_PATH, SAMPLE_DATA_L2_PATH
+
+# Only allow valid PostgreSQL identifiers (letters, digits, underscores)
+_IDENT_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
 
 
 class DataLoader:
@@ -62,6 +66,8 @@ class DataLoader:
 
     def _load_from_db(self, layer: str, table: str) -> pd.DataFrame:
         schema = layer.lower()  # l1 or l2
+        if not _IDENT_RE.match(schema) or not _IDENT_RE.match(table):
+            raise ValueError(f"Invalid identifier: {schema}.{table}")
         conn = self._get_conn()
         query = f"SELECT * FROM {schema}.{table}"
         return pd.read_sql(query, conn)

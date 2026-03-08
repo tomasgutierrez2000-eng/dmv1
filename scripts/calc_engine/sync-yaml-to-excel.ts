@@ -5,7 +5,7 @@
  * Option C: YAML is source of truth. This script generates the business-facing
  * Excel file that getMergedMetrics() loads when present.
  *
- * Usage: npx tsx scripts/calc-engine/sync-yaml-to-excel.ts [--output path]
+ * Usage: npx tsx scripts/calc_engine/sync-yaml-to-excel.ts [--output path]
  *
  * Output format matches lib/metrics-from-excel.ts expectations:
  * - Sheet "Definitions, KPI,Calc& Insights"

@@ -131,7 +131,7 @@ A Claude Code `PostToolUse` hook (`.claude/hooks/post-db-change.sh`) automatical
 - Level definitions use `sourcing_type`: `Raw` (direct field), `Calc` (computed), `Agg` (aggregated), `Avg` (weighted average)
 
 ### Formula Storage — Option C (Hybrid)
-- **YAML** (`scripts/calc-engine/metrics/**/*.yaml`) = technical source of truth for the calc-engine (formula_sql, source_tables, validations)
+- **YAML** (`scripts/calc_engine/metrics/**/*.yaml`) = technical source of truth for the calc-engine (formula_sql, source_tables, validations)
 - **Excel** (`data/metrics_dimensions_filled.xlsx`) = business-facing view, generated from YAML via `npm run calc:sync:excel`
 - **Catalogue** (`data/metric-library/catalogue.json`) = UI/demo view, derived from YAML via `npm run calc:sync:catalogue`
 - Run `npm run calc:sync` after editing YAML to regenerate Excel and catalogue

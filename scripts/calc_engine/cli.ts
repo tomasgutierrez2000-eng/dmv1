@@ -3,7 +3,7 @@
  * GSIB Calculation Engine — CLI Entry Point
  *
  * Usage:
- *   npx tsx scripts/calc-engine/cli.ts <command> [options]
+ *   npx tsx scripts/calc_engine/cli.ts <command> [options]
  *
  * Commands:
  *   run       Execute metric calculations

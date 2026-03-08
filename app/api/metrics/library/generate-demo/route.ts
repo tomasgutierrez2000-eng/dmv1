@@ -1,16 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { exec } from 'child_process';
+import { NextRequest } from 'next/server';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { getCatalogueItems, upsertCatalogueItem } from '@/lib/metric-library/store';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
-function jsonSuccess(data: unknown, status = 200) {
-  return NextResponse.json(data, { status });
-}
-function jsonError(message: string, status = 500, details?: string) {
-  return NextResponse.json({ ok: false, error: message, ...(details ? { details } : {}) }, { status });
-}
-
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 /**
  * POST /api/metrics/library/generate-demo
@@ -25,15 +19,20 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { item_id, facility_count = 5, strategy = 'diverse', persist = false, force = false } = body;
 
-    if (!item_id) {
-      return jsonError('item_id is required', 400);
+    if (!item_id || typeof item_id !== 'string') {
+      return jsonError('item_id is required and must be a string', { status: 400 });
+    }
+
+    // Validate item_id format (alphanumeric, hyphens, underscores only)
+    if (!/^[A-Za-z0-9_-]+$/.test(item_id)) {
+      return jsonError('item_id contains invalid characters', { status: 400 });
     }
 
     // Find the catalogue item
     const items = getCatalogueItems({});
     const item = items.find((i) => i.item_id === item_id);
     if (!item) {
-      return jsonError(`Catalogue item not found: ${item_id}`, 404);
+      return jsonError(`Catalogue item not found: ${item_id}`, { status: 404 });
     }
 
     // Skip if already has demo data and not forcing
@@ -46,39 +45,44 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Run the Python generator
+    // Run the Python generator using execFile (no shell — prevents injection)
     const projectRoot = process.cwd();
     const args = [
-      '-m', 'scripts.calc-engine.generate_demo_data',
+      '-m', 'scripts.calc_engine.generate_demo_data',
       '--metric', item_id,
       '--count', String(facility_count),
       '--strategy', strategy,
     ];
 
-    const { stdout, stderr } = await execAsync(
-      `python3 ${args.map(a => `"${a}"`).join(' ')}`,
-      {
-        cwd: projectRoot,
-        timeout: 30_000,
-        env: { ...process.env, PYTHONPATH: projectRoot },
-      },
-    );
+    const { stdout, stderr } = await execFileAsync('python3', args, {
+      cwd: projectRoot,
+      timeout: 30_000,
+      env: { ...process.env, PYTHONPATH: projectRoot },
+    });
 
     if (stderr) {
       console.warn('[generate-demo] stderr:', stderr);
     }
 
-    // Parse the JSON output (Python prints JSON to stdout when no --output/--persist)
+    // Parse JSON from stdout — find the outermost JSON object via brace matching
     let result;
     try {
-      // Extract JSON from stdout (skip any diagnostic lines after the JSON)
-      const jsonMatch = stdout.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        return jsonError('Python generator produced no JSON output', 500, stderr || stdout);
+      const jsonStart = stdout.indexOf('{');
+      if (jsonStart === -1) {
+        return jsonError('Python generator produced no JSON output', { status: 500, details: stderr || stdout });
       }
-      result = JSON.parse(jsonMatch[0]);
+      let depth = 0;
+      let jsonEnd = -1;
+      for (let i = jsonStart; i < stdout.length; i++) {
+        if (stdout[i] === '{') depth++;
+        else if (stdout[i] === '}') { depth--; if (depth === 0) { jsonEnd = i + 1; break; } }
+      }
+      if (jsonEnd === -1) {
+        return jsonError('Incomplete JSON in Python generator output', { status: 500, details: stdout });
+      }
+      result = JSON.parse(stdout.slice(jsonStart, jsonEnd));
     } catch {
-      return jsonError('Failed to parse Python generator output', 500, stdout);
+      return jsonError('Failed to parse Python generator output', { status: 500, details: stdout });
     }
 
     // Persist if requested
@@ -95,6 +99,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    return jsonError(`Demo generation failed: ${message}`, 500);
+    return jsonError(`Demo generation failed: ${message}`);
   }
 }

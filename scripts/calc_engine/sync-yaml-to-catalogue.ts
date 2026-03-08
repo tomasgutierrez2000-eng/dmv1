@@ -8,7 +8,7 @@
  * Matching: catalogue item is updated when executable_metric_id or item_id
  * matches YAML metric_id, or when item_id matches a YAML legacy_metric_ids entry.
  *
- * Usage: npx tsx scripts/calc-engine/sync-yaml-to-catalogue.ts [--dry-run]
+ * Usage: npx tsx scripts/calc_engine/sync-yaml-to-catalogue.ts [--dry-run]
  */
 
 import path from 'path';

@@ -65,16 +65,6 @@ class DemoFacility:
 
 
 @dataclass
-class LevelResult:
-    """Result of a metric calculation at one rollup level."""
-
-    level: str  # facility, counterparty, desk, portfolio, lob
-    metric_id: str
-    data: Any  # pd.DataFrame
-    as_of_date: str
-
-
-@dataclass
 class GenerateDemoResult:
     ok: bool
     demo_data: dict | None = None

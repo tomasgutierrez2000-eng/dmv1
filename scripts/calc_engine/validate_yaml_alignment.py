@@ -2,7 +2,7 @@
 """Validate that Python calculators are aligned with YAML metric definitions.
 
 Usage:
-    python3 -m scripts.calc-engine.validate_yaml_alignment
+    python3 -m scripts.calc_engine.validate_yaml_alignment
 """
 
 import sys

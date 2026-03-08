@@ -1,6 +1,6 @@
 """YAML metric definition loader for the Python calc-engine.
 
-Mirrors the TS loader at scripts/calc-engine/loader/yaml-loader.ts.
+Mirrors the TS loader at scripts/calc_engine/loader/yaml-loader.ts.
 Reads metrics/**/*.yaml, parses, and returns typed definitions keyed by metric_id.
 """
 

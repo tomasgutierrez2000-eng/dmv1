@@ -114,6 +114,31 @@ class BaseCalculator(ABC):
             raise ValueError(f"Unknown dimension: {dimension}")
         return method(loader, as_of_date)
 
+    def rollup_columns(self) -> list[str]:
+        """Additional columns to carry through rollup aggregation.
+
+        Override to provide numerator/denominator columns for ratio re-derivation,
+        or weight columns for weighted averages. Default: empty (simple SUM).
+        """
+        return []
+
+    def rollup_agg_spec(self) -> dict[str, tuple[str, str]]:
+        """Aggregation spec for rollup: {output_col: (source_col, agg_func)}.
+
+        By default, sums the primary value column. Override for ratio metrics
+        to sum the numerator and denominator separately, then re-derive.
+        """
+        val_col = self.primary_value_column()
+        return {val_col: (val_col, "sum")}
+
+    def rollup_post_agg(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Post-aggregation hook: re-derive ratio columns after rollup.
+
+        Override for ratio metrics (e.g. LTV = committed / collateral * 100).
+        Default: no-op.
+        """
+        return df
+
     def _rollup_hierarchy(
         self,
         loader: DataLoader,
@@ -121,7 +146,11 @@ class BaseCalculator(ABC):
         from_level: str,
         to_level: str,
     ) -> pd.DataFrame:
-        """Generic rollup: aggregate desk->portfolio or portfolio->lob."""
+        """Generic rollup: aggregate desk->portfolio or portfolio->lob.
+
+        Uses rollup_agg_spec() for aggregation and rollup_post_agg() for
+        re-derivation. Subclasses override those hooks for ratio metrics.
+        """
         ebt = loader.load_table("L1", "enterprise_business_taxonomy")
         level_col = "tree_level" if "tree_level" in ebt.columns else "level"
         name_col = "segment_name" if "segment_name" in ebt.columns else "description"
@@ -153,10 +182,11 @@ class BaseCalculator(ABC):
             merged = merged.drop(columns=["segment_name"])
         merged = merged.merge(parent_nodes, on="parent_id", how="left")
 
-        val_col = self.primary_value_column()
+        agg_spec = self.rollup_agg_spec()
         result = (
             merged.groupby(["parent_id", "segment_name"], as_index=False)
-            .agg(**{val_col: (val_col, "sum")})
+            .agg(**agg_spec)
             .rename(columns={"parent_id": "segment_id"})
         )
+        result = self.rollup_post_agg(result)
         return result

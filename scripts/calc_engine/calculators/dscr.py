@@ -82,4 +82,18 @@ class DSCRCalculator(BaseCalculator):
             weight_total=("drawn_amount", "sum"),
         )
         g["dscr_value"] = g["weighted_sum"] / g["weight_total"].replace(0, float("nan"))
-        return g.rename(columns={"lob_segment_id": "segment_id"})[["segment_id", "segment_name", "dscr_value"]]
+        return g.rename(columns={"lob_segment_id": "segment_id"})[
+            ["segment_id", "segment_name", "dscr_value", "weighted_sum", "weight_total"]
+        ]
+
+    # ── Rollup hooks for weighted average at portfolio/lob ────
+
+    def rollup_agg_spec(self) -> dict[str, tuple[str, str]]:
+        return {
+            "weighted_sum": ("weighted_sum", "sum"),
+            "weight_total": ("weight_total", "sum"),
+        }
+
+    def rollup_post_agg(self, df: pd.DataFrame) -> pd.DataFrame:
+        df["dscr_value"] = df["weighted_sum"] / df["weight_total"].replace(0, float("nan"))
+        return df

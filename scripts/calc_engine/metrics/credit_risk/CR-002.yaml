@@ -132,8 +132,8 @@ levels:
       GROUP BY ebt_desk.managed_segment_id, ebt_desk.segment_name
 
   portfolio:
-    aggregation_type: SUM
-    formula_text: "SUM(ltv_pct) rollup from desk level via parent_segment_id"
+    aggregation_type: CUSTOM
+    formula_text: "SUM(committed) / SUM(collateral) * 100 rollup from desk level via parent_segment_id"
     formula_sql: |
       SELECT
         ebt_port.managed_segment_id::TEXT AS dimension_key,
@@ -158,8 +158,8 @@ levels:
       GROUP BY ebt_port.managed_segment_id, ebt_port.segment_name
 
   business_segment:
-    aggregation_type: SUM
-    formula_text: "SUM(ltv_pct) rollup from portfolio level via parent_segment_id"
+    aggregation_type: CUSTOM
+    formula_text: "SUM(committed) / SUM(collateral) * 100 rollup from portfolio level via parent_segment_id"
     formula_sql: |
       SELECT
         ebt_bseg.managed_segment_id::TEXT AS dimension_key,

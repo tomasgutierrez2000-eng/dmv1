@@ -64,7 +64,7 @@ export interface LoadResult {
 /**
  * Load all metric definitions from the metrics directory.
  *
- * @param metricsDir - Override directory (default: scripts/calc-engine/metrics/)
+ * @param metricsDir - Override directory (default: scripts/calc_engine/metrics/)
  * @returns Parsed and validated MetricDefinition[] + any errors
  */
 export function loadMetricDefinitions(metricsDir?: string): LoadResult {

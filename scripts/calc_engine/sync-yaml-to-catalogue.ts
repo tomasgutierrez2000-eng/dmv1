@@ -52,6 +52,110 @@ function aggregationToSourcing(agg: string): 'Raw' | 'Calc' | 'Agg' | 'Avg' {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Structured pseudocode generation from YAML source_tables + formula_sql
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Generate structured step-by-step pseudocode from the YAML metric definition.
+ *
+ * Produces numbered steps like:
+ *   1. LOAD  l2.collateral_snapshot  (cs)
+ *      WHERE cs.as_of_date = :as_of_date
+ *   2. JOIN  l1.facility_master  (fm)
+ *      ON    fm.facility_id = cs.facility_id
+ *      AND   fm.active_flag = 'Y'
+ *   3. GROUP BY cs.facility_id
+ *   4. COMPUTE
+ *      metric_value = SUM(current_valuation_usd) * ...
+ */
+function generateStructuredPseudocode(
+  metric: MetricDefinition,
+  yamlLevel: AggregationLevel,
+): string | null {
+  const formula = metric.levels[yamlLevel];
+  if (!formula?.formula_sql) return null;
+
+  const steps: string[] = [];
+  let stepNum = 1;
+
+  // Build source table steps (LOAD for BASE, JOIN/LEFT JOIN for others)
+  for (const st of metric.source_tables) {
+    const qualifiedName = `${st.schema}.${st.table}`;
+    const filterFields = st.fields.filter((f) => f.role === 'FILTER');
+    const filterLines = filterFields.map((f) => {
+      if (f.name === 'as_of_date') return `${st.alias}.as_of_date = :as_of_date`;
+      if (f.name === 'active_flag') return `${st.alias}.active_flag = 'Y'`;
+      if (f.name === 'is_current_flag') return `${st.alias}.is_current_flag = 'Y'`;
+      return `${st.alias}.${f.name} = <filter>`;
+    });
+
+    if (st.join_type === 'BASE') {
+      let line = `${stepNum}. LOAD  ${qualifiedName}  (${st.alias})`;
+      if (filterLines.length > 0) {
+        line += '\n   WHERE ' + filterLines.join('\n   AND   ');
+      }
+      steps.push(line);
+    } else {
+      const joinKeyword = st.join_type === 'LEFT' ? 'LEFT JOIN' : 'JOIN';
+      let line = `${stepNum}. ${joinKeyword}  ${qualifiedName}  (${st.alias})`;
+      if (st.join_on) {
+        line += '\n   ON    ' + st.join_on;
+      }
+      // Only add filters not already covered by join_on
+      const joinOnStr = st.join_on ?? '';
+      const extraFilters = filterLines.filter((fl) => {
+        const fieldName = fl.split('.').pop()?.split(' ')[0] ?? '';
+        return !joinOnStr.includes(fieldName);
+      });
+      if (extraFilters.length > 0) {
+        line += '\n   AND   ' + extraFilters.join('\n   AND   ');
+      }
+      steps.push(line);
+    }
+    stepNum++;
+  }
+
+  // Extract GROUP BY from the outermost query in formula_sql
+  // Only match GROUP BY that is NOT inside a subquery (parentheses)
+  const sql = formula.formula_sql;
+  let depth = 0;
+  let outermostGroupBy: string | null = null;
+  const lines = sql.split('\n');
+  for (const line of lines) {
+    for (const ch of line) {
+      if (ch === '(') depth++;
+      if (ch === ')') depth--;
+    }
+    if (depth === 0) {
+      const gbMatch = line.match(/^\s*GROUP\s+BY\s+(.+)/i);
+      if (gbMatch) {
+        outermostGroupBy = gbMatch[1].trim();
+      }
+    }
+  }
+  if (outermostGroupBy) {
+    steps.push(`${stepNum}. GROUP BY ${outermostGroupBy}`);
+    stepNum++;
+  }
+
+  // Extract SELECT ... AS metric_value expression for COMPUTE step
+  const selectMatch = sql.match(
+    /,\s*([\s\S]*?)\s+AS\s+metric_value/i
+  );
+  if (selectMatch) {
+    let expr = selectMatch[1].trim();
+    // Clean up multi-line whitespace but preserve structure
+    expr = expr.replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');
+    steps.push(`${stepNum}. COMPUTE\n   metric_value = ${expr}`);
+  } else {
+    // Fallback: use formula_text as the compute description
+    steps.push(`${stepNum}. COMPUTE\n   ${formula.formula_text.trim()}`);
+  }
+
+  return steps.join('\n');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Source references & level definitions
 // ═══════════════════════════════════════════════════════════════
 
@@ -89,7 +193,10 @@ function buildLevelDefinition(
 } {
   const formula = metric.levels[level];
   const sourcing = formula ? aggregationToSourcing(formula.aggregation_type) : 'Calc';
-  const levelLogic = formula?.formula_text ?? metric.description;
+  // Prefer structured pseudocode; fall back to formula_text or description
+  const levelLogic = generateStructuredPseudocode(metric, level)
+    ?? formula?.formula_text
+    ?? metric.description;
   const sourceRefs = buildSourceReferences(metric);
 
   return {

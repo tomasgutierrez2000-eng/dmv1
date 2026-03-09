@@ -20,7 +20,6 @@ import LevelStepWalkthrough from './LevelStepWalkthrough';
 import type { FlowStep } from './LevelStepWalkthrough';
 import { PositionTable, EntityTable } from './WorkedExampleTable';
 import GenericTableTraversalDemo from './GenericTableTraversalDemo';
-import GenericFormulaAnimation from './GenericFormulaAnimation';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * TAB DEFINITIONS
@@ -258,15 +257,6 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
           config={config.traversal_config}
           metricName={metricLabel}
           activeDimension={TAB_TO_ROLLUP[activeTab]}
-        />
-      )}
-
-      {/* Formula Animation — config-driven */}
-      {config.formula_decomposition.numerator.length > 0 && (
-        <GenericFormulaAnimation
-          config={config}
-          entities={entities}
-          rollupLevel={TAB_TO_ROLLUP[activeTab]}
         />
       )}
 

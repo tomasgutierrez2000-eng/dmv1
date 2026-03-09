@@ -9,7 +9,7 @@ import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 import IngredientFieldsTable from './IngredientFieldsTable';
 import LevelRollupTable from './LevelRollupTable';
-import CatalogueDeepDive from './CatalogueDeepDive';
+import PythonCalculatorSection from './PythonCalculatorSection';
 
 export default function CatalogueItemDetailView({ itemId }: { itemId: string }) {
   const [item, setItem] = useState<CatalogueItem | null>(null);
@@ -142,39 +142,13 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
           </div>
         </section>
 
-        {/* ── Section 5: Interactive Deep-Dive ── */}
+        {/* ── Section 5: Python Calculator ── */}
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
-            Deep-Dive: How This Metric Rolls Up
+            Python Calculator
           </h2>
           <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-800">
-            <CatalogueDeepDive item={item} />
-          </div>
-        </section>
-
-        {/* ── Section 6: Dashboard Preview Cards ── */}
-        <section>
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
-            Dashboard Outputs
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {item.level_definitions
-              .filter((ld) => ld.in_record)
-              .map((ld) => (
-                <div
-                  key={ld.level}
-                  className="bg-gray-900 rounded-lg border border-gray-800 p-4 hover:border-gray-700 transition-colors"
-                >
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
-                    {ld.level}
-                  </div>
-                  <div className="text-sm font-semibold text-gray-200 mb-2">
-                    {ld.dashboard_display_name}
-                  </div>
-                  <div className="text-3xl font-bold text-emerald-400 tabular-nums">—</div>
-                  <div className="text-[10px] text-gray-500 mt-1">Connect data source to display values</div>
-                </div>
-              ))}
+            <PythonCalculatorSection executableMetricId={item.executable_metric_id} />
           </div>
         </section>
 

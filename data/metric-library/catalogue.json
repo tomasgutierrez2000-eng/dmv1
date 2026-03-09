@@ -71,7 +71,7 @@
         "dashboard_display_name": "Interest Expense (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "committed_facility_amt × bank_share_pct × cost_of_funds_rate",
+        "level_logic": "1. LOAD  l1.facility_master  (fm)\n   WHERE fm.active_flag = 'Y'\n2. JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = fm.committed_facility_amt * fla.bank_share_pct / 100.0 * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0",
         "source_references": [
           {
             "layer": "L1",
@@ -170,7 +170,7 @@
         "dashboard_display_name": "Interest Expense (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM(Facility Interest Expense) per counterparty",
+        "level_logic": "1. LOAD  l1.facility_master  (fm)\n   WHERE fm.active_flag = 'Y'\n2. JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = SUM(fm.committed_facility_amt * fla.bank_share_pct / 100.0 * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L1",
@@ -269,7 +269,7 @@
         "dashboard_display_name": "Interest Expense (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM(Facility Interest Expense) per L3 desk segment",
+        "level_logic": "1. LOAD  l1.facility_master  (fm)\n   WHERE fm.active_flag = 'Y'\n2. JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fm.committed_facility_amt * fla.bank_share_pct / 100.0 * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L1",
@@ -368,7 +368,7 @@
         "dashboard_display_name": "Interest Expense (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM(Facility Interest Expense) per L2 portfolio segment",
+        "level_logic": "1. LOAD  l1.facility_master  (fm)\n   WHERE fm.active_flag = 'Y'\n2. JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fm.committed_facility_amt * fla.bank_share_pct / 100.0 * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L1",
@@ -467,7 +467,7 @@
         "dashboard_display_name": "Interest Expense (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM(Facility Interest Expense) per L1 business segment (department)",
+        "level_logic": "1. LOAD  l1.facility_master  (fm)\n   WHERE fm.active_flag = 'Y'\n2. JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fm.committed_facility_amt * fla.bank_share_pct / 100.0 * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L1",
@@ -895,7 +895,7 @@
         "dashboard_display_name": "Current Collateral Market Value (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "For each active facility, SUM current_valuation_usd across all collateral positions, weighted by the bank's current participation share. Formula: SUM(current_valuation_usd) * COALESCE(bank_share_pct, 100) / 100.\n",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l1.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.active_flag = 'Y'\n3. LEFT JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY cs.facility_id, fla.bank_share_pct\n6. COMPUTE\n   metric_value = SUM(cs.current_valuation_usd) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -982,7 +982,7 @@
         "dashboard_display_name": "Current Collateral Market Value (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM of bank-share-weighted facility collateral values per counterparty. Formula: SUM(facility_collateral_mv * COALESCE(bank_share_pct, 100) / 100) grouped by counterparty_id.\n",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l1.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.active_flag = 'Y'\n3. LEFT JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = SUM(fac_coll.facility_collateral_mv * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L2",
@@ -1069,7 +1069,7 @@
         "dashboard_display_name": "Current Collateral Market Value (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM of bank-share-weighted facility collateral values per L3 desk segment.\n",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l1.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.active_flag = 'Y'\n3. LEFT JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fac_coll.facility_collateral_mv * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L2",
@@ -1156,7 +1156,7 @@
         "dashboard_display_name": "Current Collateral Market Value (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM of bank-share-weighted facility collateral values per L2 portfolio segment. Traverses enterprise_business_taxonomy: L3 desk → L2 portfolio (parent_segment_id).\n",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l1.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.active_flag = 'Y'\n3. LEFT JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fac_coll.facility_collateral_mv * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L2",
@@ -1243,7 +1243,7 @@
         "dashboard_display_name": "Current Collateral Market Value (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "SUM of bank-share-weighted facility collateral values per L1 business segment. Traverses enterprise_business_taxonomy: L3 desk → L2 portfolio → L1 segment.\n",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l1.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.active_flag = 'Y'\n3. LEFT JOIN  l1.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fac_coll.facility_collateral_mv * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L2",

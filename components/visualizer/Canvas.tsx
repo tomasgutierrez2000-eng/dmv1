@@ -67,6 +67,7 @@ export default function Canvas() {
     expandedTables,
     expandedDomains,
     searchQuery,
+    searchMode,
     visibleLayers,
     filterCategories,
     filterRiskStripes,
@@ -108,12 +109,16 @@ export default function Canvas() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = table.name.toLowerCase().includes(query);
-        const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
-        if (!matchesName && !matchesField) return false;
+        if (searchMode === 'tables') {
+          if (!matchesName) return false;
+        } else {
+          const matchesField = table.fields.some((f) => f.name.toLowerCase().includes(query));
+          if (!matchesName && !matchesField) return false;
+        }
       }
       return true;
     });
-  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery]);
+  }, [model, visibleLayers, filterCategories, filterRiskStripes, l3CategoryExcluded, searchQuery, searchMode]);
 
   // When model loads, reset domain collapse state so all categories start expanded
   const prevModelRef = useRef<typeof model>(null);
@@ -351,11 +356,14 @@ export default function Canvas() {
       if (savedSearchPositionsRef.current) {
         const saved = savedSearchPositionsRef.current;
         savedSearchPositionsRef.current = null;
-        Object.entries(saved).forEach(([key, pos]) => {
-          if (pos && typeof pos.x === 'number' && typeof pos.y === 'number') {
-            setTablePosition(key, pos);
-          }
-        });
+        const valid = Object.fromEntries(
+          Object.entries(saved).filter(
+            ([, pos]) => pos && typeof pos.x === 'number' && typeof pos.y === 'number'
+          )
+        );
+        if (Object.keys(valid).length > 0) {
+          setTablePositionsBulk(valid);
+        }
       }
       return;
     }
@@ -366,15 +374,13 @@ export default function Canvas() {
       savedSearchPositionsRef.current = { ...useModelStore.getState().tablePositions };
     }
 
-    Object.entries(compactNarrowedPositions).forEach(([key, pos]) => {
-      setTablePosition(key, pos);
-    });
+    setTablePositionsBulk(compactNarrowedPositions);
 
     const positionsArray = Object.values(compactNarrowedPositions);
     setIsAnimating(true);
     runFitToView(positionsArray, positionsArray.length);
     setTimeout(() => setIsAnimating(false), 320);
-  }, [searchQuery, filtersNarrowing, model, visibleTables.length, compactNarrowedPositions, runFitToView, setTablePosition]);
+  }, [searchQuery, filtersNarrowing, model, visibleTables.length, compactNarrowedPositions, runFitToView, setTablePositionsBulk]);
 
   // O(1) lookup set for visible table keys (avoids O(N) .some() per relationship)
   const visibleTableKeys = useMemo(() => new Set(visibleTables.map((t) => t.key)), [visibleTables]);

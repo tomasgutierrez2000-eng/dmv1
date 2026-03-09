@@ -64,9 +64,10 @@ export interface CompactNarrowedLayoutOptions {
 }
 
 /**
- * Computes a compact grid layout for a set of tables so they appear grouped by category
+ * Computes a compact flow layout for a set of tables so they appear grouped by category
  * with no overlap. Used when the user searches or applies filters so visible tables
  * don't stay scattered at "separate ends" of the full layout.
+ * Categories flow left-to-right and wrap to new rows (spread out, not stacked vertically).
  * Returns positions keyed by table key; spacing guarantees no overlapping cards.
  */
 export function calculateCompactNarrowedLayout(
@@ -93,27 +94,52 @@ export function calculateCompactNarrowedLayout(
     byCategory.get(cat)!.push(t);
   });
 
-  let groupOffsetY = 0;
   const sortedCategories = Array.from(byCategory.entries()).sort(([a], [b]) => a.localeCompare(b));
+
+  // Flow layout: place categories left-to-right, wrap when row is full.
+  // Target row width fits ~3 category blocks so layout stays spread horizontally, not a tall vertical stack.
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1400;
+  const categoryGap = Math.round(stepX * 0.5);
+  const typicalCategoryWidth = 4 * stepX + categoryGap; // ~4 tables per category
+  const targetRowWidth = Math.max(viewportWidth * 1.1, typicalCategoryWidth * 3);
+
+  let currentX = 0;
+  let currentY = 0;
+  let maxYInRow = 0;
 
   for (const [, categoryTables] of sortedCategories) {
     const sorted = categoryTables.slice().sort((a, b) => a.name.localeCompare(b.name));
     const groupCols = sorted.length <= 4 ? sorted.length : Math.max(2, Math.ceil(Math.sqrt(sorted.length)));
     const groupRows = Math.max(1, Math.ceil(sorted.length / groupCols));
     const groupW = groupCols * stepX - hGap;
-    const startX = -groupW / 2;
+    const groupH = groupRows * stepY - vGap;
+
+    // Wrap to next row if this category would overflow
+    if (currentX > 0 && currentX + groupW + categoryGap > targetRowWidth) {
+      currentX = 0;
+      currentY = maxYInRow + vGap;
+      maxYInRow = currentY;
+    }
 
     sorted.forEach((table, idx) => {
       const col = idx % groupCols;
       const row = Math.floor(idx / groupCols);
       positions[table.key] = {
-        x: startX + col * stepX,
-        y: groupOffsetY + row * stepY,
+        x: currentX + col * stepX,
+        y: currentY + row * stepY,
       };
     });
 
-    groupOffsetY += groupRows * stepY + vGap;
+    maxYInRow = Math.max(maxYInRow, currentY + groupH);
+    currentX += groupW + categoryGap;
   }
+
+  // Center the layout horizontally (layout may be narrower than viewport)
+  const totalWidth = currentX - categoryGap;
+  const offsetX = -totalWidth / 2;
+  Object.keys(positions).forEach((key) => {
+    positions[key] = { ...positions[key], x: positions[key].x + offsetX };
+  });
 
   return positions;
 }

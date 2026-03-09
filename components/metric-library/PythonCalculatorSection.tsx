@@ -7,6 +7,9 @@ interface CalculatorSource {
   found: boolean;
   file: string | null;
   source: string | null;
+  type?: 'dedicated' | 'yaml';
+  genericFile?: string | null;
+  genericSource?: string | null;
 }
 
 interface RunResult {
@@ -135,12 +138,12 @@ export default function PythonCalculatorSection({
 
           {source && !sourceLoading && (
             <>
-              {source.found && source.source ? (
+              {source.found && source.source && source.type === 'dedicated' ? (
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <code className="text-xs text-gray-400 font-mono">{source.file}</code>
                     <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                      Calculator found
+                      Dedicated calculator
                     </span>
                   </div>
                   <div className="bg-black/40 rounded-lg border border-gray-800 overflow-x-auto">
@@ -149,14 +152,34 @@ export default function PythonCalculatorSection({
                     </pre>
                   </div>
                 </div>
+              ) : source.found && source.source && source.type === 'yaml' ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <code className="text-xs text-gray-400 font-mono">{source.file}</code>
+                    <span className="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">
+                      YAML-driven calculator
+                    </span>
+                  </div>
+                  <div className="bg-black/40 rounded-lg border border-gray-800 overflow-x-auto">
+                    <pre className="text-xs font-mono text-gray-300 p-4 leading-relaxed">
+                      <code>{addLineNumbers(source.source)}</code>
+                    </pre>
+                  </div>
+                  {source.genericFile && (
+                    <div className="text-xs text-gray-500 border-t border-gray-800 pt-3">
+                      Executed by the generic YAML calculator at{' '}
+                      <code className="text-gray-400">{source.genericFile}</code>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="text-center py-8">
                   <FileCode className="w-8 h-8 text-gray-600 mx-auto mb-2" />
                   <p className="text-sm text-gray-400">
-                    No Python calculator file found for metric <code className="text-purple-400">{executableMetricId}</code>.
+                    No calculator definition found for metric <code className="text-purple-400">{executableMetricId}</code>.
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    The metric is linked but no matching calculator class was found in <code className="text-gray-400">scripts/calc_engine/calculators/</code>.
+                    Add a YAML definition in <code className="text-gray-400">scripts/calc_engine/metrics/</code> or a dedicated calculator in <code className="text-gray-400">scripts/calc_engine/calculators/</code>.
                   </p>
                 </div>
               )}

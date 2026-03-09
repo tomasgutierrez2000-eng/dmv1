@@ -1,0 +1,176 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Country
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "REF-006"
+name: "Country"
+version: "1.0.0"
+owner: "credit-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "reference"
+sub_domain: "master-data"
+metric_class: SOURCED
+direction: NEUTRAL
+unit_type: COUNT
+display_format: ",.0f"
+description: >
+  Country of risk or booking location. Supports geographic concentration and
+  sovereign risk analysis.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l1
+    table: country_dim
+    alias: cd
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: country_name
+        role: MEASURE
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: >
+      Direct lookup of country_name from country_dim.
+    formula_sql: |
+      SELECT
+        fm.facility_id AS dimension_key,
+        cd.country_name AS metric_value
+      FROM l1.facility_master fm
+      INNER JOIN l1.country_dim cd
+        ON cd.facility_id = fm.facility_id
+      WHERE fm.active_flag = 'Y'
+  counterparty:
+    aggregation_type: RAW
+    formula_text: >
+      Read country_name per counterparty.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        cd.country_name AS metric_value
+      FROM l1.country_dim cd
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = cd.facility_id
+        AND fm.active_flag = 'Y'
+      WHERE cd.as_of_date = :as_of_date
+  desk:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level country_name per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fm.facility_id AS dimension_key,
+          cd.country_name AS metric_value
+        FROM l1.facility_master fm
+        INNER JOIN l1.country_dim cd
+          ON cd.facility_id = fm.facility_id
+        WHERE fm.active_flag = 'Y'
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level country_name per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fm.facility_id AS dimension_key,
+          cd.country_name AS metric_value
+        FROM l1.facility_master fm
+        INNER JOIN l1.country_dim cd
+          ON cd.facility_id = fm.facility_id
+        WHERE fm.active_flag = 'Y'
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level country_name per L1 business segment segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fm.facility_id AS dimension_key,
+          cd.country_name AS metric_value
+        FROM l1.facility_master fm
+        INNER JOIN l1.country_dim cd
+          ON cd.facility_id = fm.facility_id
+        WHERE fm.active_flag = 'Y'
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "REF-006-V01"
+    type: NOT_NULL
+    description: "No null country_name values"
+    severity: ERROR
+  - rule_id: "REF-006-V02"
+    type: NON_NEGATIVE
+    description: "country_name must be >= 0"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-017"
+  abbreviation: "C"
+  insight: >
+    Geographic risk concentration
+  rollup_strategy: "direct-sum"
+  primary_value_field: "country_name"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["reference", "master-data"]
+dashboard_pages: []
+legacy_metric_ids: []

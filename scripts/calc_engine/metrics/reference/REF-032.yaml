@@ -1,0 +1,120 @@
+metric_id: REF-032
+name: Effective Date Bucket
+version: 1.0.0
+owner: credit-risk
+status: DRAFT
+effective_date: '2026-01-01'
+supersedes: null
+domain: reference
+sub_domain: master-data
+metric_class: CALCULATED
+direction: NEUTRAL
+unit_type: ORDINAL
+display_format: s
+description: 'Capturing distirbution of facilities starting or liquidating in 90 day windows
+
+  '
+regulatory_references:
+- framework: Basel III
+  description: ''
+source_tables:
+- schema: l1
+  table: facility_master
+  alias: fm
+  join_type: BASE
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: effective_date
+    role: MEASURE
+  - name: active_flag
+    role: FILTER
+- schema: l1
+  table: enterprise_business_taxonomy
+  alias: ebt
+  join_type: LEFT
+  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  fields:
+  - name: managed_segment_id
+    role: DIMENSION
+  - name: parent_segment_id
+    role: DIMENSION
+levels:
+  facility:
+    aggregation_type: CUSTOM
+    formula_text: 'Calculated effective_date_bucket per facility.
+
+      '
+    formula_sql: "SELECT\n  fm.facility_id AS dimension_key,\n  CASE\n    WHEN fm.effective_date >= :as_of_date - INTERVAL\
+      \ '1 year' THEN 'Last 12 Months'\n    WHEN fm.effective_date >= :as_of_date - INTERVAL '3 years' THEN '1-3 Years'\n\
+      \    WHEN fm.effective_date >= :as_of_date - INTERVAL '5 years' THEN '3-5 Years'\n    ELSE '5+ Years'\n  END AS metric_value\n\
+      FROM l1.facility_master fm\nWHERE fm.active_flag = 'Y'"
+  counterparty:
+    aggregation_type: SUM
+    formula_text: 'SUM(facility-level effective_date_bucket) per counterparty.
+
+      '
+    formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
+      \    fm.facility_id AS dimension_key,\n    CASE\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '1 year' THEN\
+      \ 'Last 12 Months'\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '3 years' THEN '1-3 Years'\n      WHEN fm.effective_date\
+      \ >= :as_of_date - INTERVAL '5 years' THEN '3-5 Years'\n      ELSE '5+ Years'\n    END AS metric_value\n  FROM l1.facility_master\
+      \ fm\n  WHERE fm.active_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \  AND fm.active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+  desk:
+    aggregation_type: SUM
+    formula_text: 'SUM of facility-level effective_date_bucket per L3 desk segment.
+
+      '
+    formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
+      \    fm.facility_id AS dimension_key,\n    CASE\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '1 year' THEN\
+      \ 'Last 12 Months'\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '3 years' THEN '1-3 Years'\n      WHEN fm.effective_date\
+      \ >= :as_of_date - INTERVAL '5 years' THEN '3-5 Years'\n      ELSE '5+ Years'\n    END AS metric_value\n  FROM l1.facility_master\
+      \ fm\n  WHERE fm.active_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n\
+      GROUP BY ebt.managed_segment_id"
+  portfolio:
+    aggregation_type: SUM
+    formula_text: 'SUM of facility-level effective_date_bucket per L2 portfolio segment.
+
+      '
+    formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
+      \  SELECT\n    fm.facility_id AS dimension_key,\n    CASE\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '1\
+      \ year' THEN 'Last 12 Months'\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '3 years' THEN '1-3 Years'\n \
+      \     WHEN fm.effective_date >= :as_of_date - INTERVAL '5 years' THEN '3-5 Years'\n      ELSE '5+ Years'\n    END AS\
+      \ metric_value\n  FROM l1.facility_master fm\n  WHERE fm.active_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n\
+      \  ON fm.facility_id = fac.dimension_key\n  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n\
+      \  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id\
+      \ = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id"
+  business_segment:
+    aggregation_type: SUM
+    formula_text: 'SUM of facility-level effective_date_bucket per L1 business segment segment.
+
+      '
+    formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
+      \  SELECT\n    fm.facility_id AS dimension_key,\n    CASE\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '1\
+      \ year' THEN 'Last 12 Months'\n      WHEN fm.effective_date >= :as_of_date - INTERVAL '3 years' THEN '1-3 Years'\n \
+      \     WHEN fm.effective_date >= :as_of_date - INTERVAL '5 years' THEN '3-5 Years'\n      ELSE '5+ Years'\n    END AS\
+      \ metric_value\n  FROM l1.facility_master fm\n  WHERE fm.active_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n\
+      \  ON fm.facility_id = fac.dimension_key\n  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n\
+      \  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id\
+      \ = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n\
+      GROUP BY ebt_l1.managed_segment_id"
+depends_on: []
+output:
+  table: metric_result
+validations:
+- rule_id: REF-032-V01
+  type: NOT_NULL
+  description: No null effective_date_bucket values
+  severity: ERROR
+catalogue:
+  item_id: MET-106
+  abbreviation: EDB
+  insight: ''
+  rollup_strategy: direct-sum
+  primary_value_field: effective_date_bucket
+tags:
+- reference
+- master-data
+dashboard_pages: []
+legacy_metric_ids: []

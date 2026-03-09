@@ -278,7 +278,7 @@ validations:
       max_value: 999999999999        # sentinel — enforced via custom cross-metric comparison
 # ── CATALOGUE ───────────────────────────────────────────────
 catalogue:
-  item_id: "MET-001"
+  item_id: "MET-011"
   abbreviation: "COLL-MV"
   insight: >
     Shows the bank's share of current collateral market value securing the portfolio.

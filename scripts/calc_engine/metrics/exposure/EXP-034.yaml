@@ -1,0 +1,184 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Risk Mitigant Type
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-034"
+name: "Risk Mitigant Type"
+version: "1.0.0"
+owner: "credit-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "collateral"
+metric_class: HYBRID
+direction: NEUTRAL
+unit_type: ORDINAL
+display_format: "s"
+description: >
+  Parent group of risk mitigation or collateral asset type (e.g., cash,
+  aviation, guarantee). Used to assess recovery support mechanisms.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l1
+    table: risk_mitigant_master
+    alias: rmm
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: risk_mitigant_id
+        role: MEASURE
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: SUM
+    formula_text: >
+      SUM(risk_mitigant_id) per facility from risk_mitigant_master.
+    formula_sql: |
+      SELECT
+        rmm.facility_id AS dimension_key,
+        SUM(rmm.risk_mitigant_id) AS metric_value
+      FROM l1.risk_mitigant_master rmm
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = rmm.facility_id
+        AND fm.active_flag = 'Y'
+      
+      WHERE rmm.as_of_date = :as_of_date
+      GROUP BY rmm.facility_id
+  counterparty:
+    aggregation_type: RAW
+    formula_text: >
+      Read risk_mitigant_id per counterparty.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        rmm.risk_mitigant_id AS metric_value
+      FROM l1.risk_mitigant_master rmm
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = rmm.facility_id
+        AND fm.active_flag = 'Y'
+      WHERE rmm.as_of_date = :as_of_date
+  desk:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_mitigant_id per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          rmm.facility_id AS dimension_key,
+          SUM(rmm.risk_mitigant_id) AS metric_value
+        FROM l1.risk_mitigant_master rmm
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = rmm.facility_id
+          AND fm.active_flag = 'Y'
+      
+        WHERE rmm.as_of_date = :as_of_date
+        GROUP BY rmm.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_mitigant_id per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          rmm.facility_id AS dimension_key,
+          SUM(rmm.risk_mitigant_id) AS metric_value
+        FROM l1.risk_mitigant_master rmm
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = rmm.facility_id
+          AND fm.active_flag = 'Y'
+      
+        WHERE rmm.as_of_date = :as_of_date
+        GROUP BY rmm.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_mitigant_id per L1 business segment segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          rmm.facility_id AS dimension_key,
+          SUM(rmm.risk_mitigant_id) AS metric_value
+        FROM l1.risk_mitigant_master rmm
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = rmm.facility_id
+          AND fm.active_flag = 'Y'
+      
+        WHERE rmm.as_of_date = :as_of_date
+        GROUP BY rmm.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "EXP-034-V01"
+    type: NOT_NULL
+    description: "No null risk_mitigant_id values"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-077"
+  abbreviation: "RMT"
+  insight: >
+    Risk reduction via mitigants
+  rollup_strategy: "direct-sum"
+  primary_value_field: "risk_mitigant_id"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "collateral"]
+dashboard_pages: []
+legacy_metric_ids: []

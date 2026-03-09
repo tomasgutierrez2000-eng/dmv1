@@ -1,0 +1,160 @@
+metric_id: REF-001
+name: Number of Loans
+version: 1.0.0
+owner: credit-risk
+status: DRAFT
+effective_date: '2026-01-01'
+supersedes: null
+domain: reference
+sub_domain: master-data
+metric_class: HYBRID
+direction: NEUTRAL
+unit_type: COUNT
+display_format: ',.0f'
+description: |
+  Count of individual loans within portfolio or facility grouping. Supports exposure granularity analysis.
+regulatory_references:
+- framework: Basel III
+  description: ''
+source_tables:
+- schema: l2
+  table: facility_exposure_snapshot
+  alias: fes
+  join_type: BASE
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: as_of_date
+    role: FILTER
+  - name: number_of_loans
+    role: MEASURE
+- schema: l1
+  table: facility_master
+  alias: fm
+  join_type: INNER
+  join_on: fm.facility_id = fes.facility_id
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: counterparty_id
+    role: DIMENSION
+  - name: lob_segment_id
+    role: DIMENSION
+  - name: active_flag
+    role: FILTER
+- schema: l1
+  table: enterprise_business_taxonomy
+  alias: ebt
+  join_type: LEFT
+  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  fields:
+  - name: managed_segment_id
+    role: DIMENSION
+  - name: parent_segment_id
+    role: DIMENSION
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: |
+      Read number_of_loans from facility_exposure_snapshot for each facility.
+    formula_sql: |-
+      SELECT
+        fes.facility_id AS dimension_key,
+        COALESCE(fes.number_of_loans, 1) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.active_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
+  counterparty:
+    aggregation_type: SUM
+    formula_text: |
+      SUM of number_of_loans per counterparty.
+    formula_sql: |-
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.active_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: SUM
+    formula_text: |
+      SUM of number_of_loans per L3 desk segment.
+    formula_sql: |-
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: |
+      SUM of number_of_loans per L2 portfolio segment.
+    formula_sql: |-
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: |
+      SUM of number_of_loans per L1 business segment.
+    formula_sql: |-
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY ebt_l1.managed_segment_id
+depends_on: []
+output:
+  table: metric_result
+validations:
+- rule_id: REF-001-V01
+  type: NOT_NULL
+  description: No null number_of_loans values
+  severity: ERROR
+- rule_id: REF-001-V02
+  type: NON_NEGATIVE
+  description: number_of_loans must be >= 0
+  severity: ERROR
+catalogue:
+  item_id: MET-001
+  abbreviation: NOL
+  insight: |
+    Portfolio size
+  rollup_strategy: direct-sum
+  primary_value_field: number_of_loans
+tags:
+- reference
+- master-data
+dashboard_pages: []
+legacy_metric_ids: []

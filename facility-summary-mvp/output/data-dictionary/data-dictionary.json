@@ -72,7 +72,7 @@
           "description": "Ownership percentage",
           "category": "Counterparty",
           "why_required": "Supports consolidation and SCCL grouping rules",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "source_system_id",
@@ -339,14 +339,14 @@
           "description": "Unsecured LGD estimate",
           "category": "Counterparty",
           "why_required": "LGD without collateral",
-          "data_type": "DECIMAL(10,6)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "pd_annual",
           "description": "Annual probability of default",
           "category": "Counterparty",
           "why_required": "PD for IRB approach",
-          "data_type": "DECIMAL(10,6)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "regulatory_counterparty_type",
@@ -470,7 +470,7 @@
           "description": "Ownership percentage",
           "category": "Counterparty",
           "why_required": "Consolidation calculations",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "created_ts",
@@ -553,7 +553,7 @@
           "description": "Strength score (0-1)",
           "category": "Counterparty",
           "why_required": "Supports materiality thresholds for grouping",
-          "data_type": "DECIMAL(5,2)"
+          "data_type": "NUMERIC(5,2)"
         },
         {
           "name": "interdependence_type_code",
@@ -794,7 +794,7 @@
           "name": "participation_pct",
           "description": "Supports agreement-level pro-rata attribution.",
           "category": "Counterparty Participation",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "source_record_id",
@@ -904,7 +904,7 @@
           "name": "participation_pct",
           "description": "Avoids double counting and supports pro-rata attribution.",
           "category": "Counterparty Participation",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "role_priority_rank",
@@ -1123,7 +1123,7 @@
           "description": "Ownership percentage (if applicable)",
           "category": "SCCL Grouping",
           "why_required": "Supports consolidation logic",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "sccl_group_member_id",
@@ -1356,7 +1356,7 @@
           "description": "Committed limit",
           "category": "Facility",
           "why_required": "Used in unfunded exposure",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "origination_date",
@@ -1478,7 +1478,7 @@
           "description": "Total interest rate (benchmark + spread) as %",
           "category": "Facility",
           "why_required": "Page 7 Average Interest Base Rate",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "amortization_type",
@@ -1520,7 +1520,7 @@
           "description": "Credit spread above benchmark in basis points",
           "category": "Facility",
           "why_required": "Page 7 Average Spread",
-          "data_type": "DECIMAL(8,2)"
+          "data_type": "NUMERIC(8,2)"
         },
         {
           "name": "interest_rate_type",
@@ -1562,14 +1562,14 @@
           "description": "Interest rate ceiling for variable-rate facilities",
           "category": "Facility",
           "why_required": "Page 7 Interest Rate Cap",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "rate_floor_pct",
           "description": "Interest rate floor for variable-rate facilities",
           "category": "Facility",
           "why_required": "Risk-adjusted return",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "region_code",
@@ -1664,14 +1664,14 @@
           "description": "Bank share percentage of the facility",
           "category": "Facility",
           "why_required": "Tracks the bank percentage allocation for the facility",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "bank_commitment_amt",
           "description": "Bank commitment amount",
           "category": "Facility",
           "why_required": "Tracks the bank monetary commitment for the facility",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "allocation_role",
@@ -1989,7 +1989,7 @@
           "description": "Coupon rate for fixed income",
           "category": "Instrument",
           "why_required": "Interest rate",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "instrument_name",
@@ -2266,7 +2266,7 @@
           "description": "Original cost value",
           "category": "Collateral & CRM",
           "why_required": "Valuation/GL linkage",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "regulatory_eligible_flag",
@@ -2494,7 +2494,7 @@
           "description": "Haircut percentage",
           "category": "Collateral & CRM",
           "why_required": "Used to compute eligible value",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "jurisdiction_code",
@@ -2549,7 +2549,7 @@
           "description": "Volatility adjustment percentage",
           "category": "Collateral & CRM",
           "why_required": "Comprehensive approach support",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "created_ts",
@@ -2639,7 +2639,7 @@
           "description": "Pledged amount in collateral currency",
           "category": "Collateral & CRM",
           "why_required": "Supports collateral recognition and allocations",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "pledged_currency_code",
@@ -2779,14 +2779,14 @@
           "description": "Standard supervisory haircut",
           "category": "Collateral & CRM",
           "why_required": "Basel haircut",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "volatility_adjustment_pct",
           "description": "Volatility adjustment",
           "category": "Collateral & CRM",
           "why_required": "For comprehensive approach",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         }
       ]
     },
@@ -2981,7 +2981,7 @@
           "description": "Notional/covered amount",
           "category": "Collateral & CRM",
           "why_required": "Recognition and allocation calculations",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "maturity_date",
@@ -3002,7 +3002,7 @@
           "description": "Coverage percentage",
           "category": "Collateral & CRM",
           "why_required": "Determines effective covered exposure",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "governing_law_jurisdiction_id",
@@ -3182,7 +3182,7 @@
           "description": "Allocated amount of protection",
           "category": "Collateral & CRM",
           "why_required": "Supports allocation and recognition",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "allocated_currency_code",
@@ -3196,7 +3196,7 @@
           "description": "Allocation percentage",
           "category": "Collateral & CRM",
           "why_required": "Allocation transparency",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "anchor_id",
@@ -3615,7 +3615,7 @@
           "description": "Independent amount/IM",
           "category": "Netting & Margin",
           "why_required": "Supports margin requirements",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "margin_frequency",
@@ -3629,7 +3629,7 @@
           "description": "Minimum transfer amount",
           "category": "Netting & Margin",
           "why_required": "Operational CSA term",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "netting_set_id",
@@ -3643,7 +3643,7 @@
           "description": "Threshold amount",
           "category": "Netting & Margin",
           "why_required": "Margin threshold term",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "effective_start_date",
@@ -3730,7 +3730,7 @@
           "description": "Initial margin amount",
           "category": "Netting & Margin",
           "why_required": "Margin requirement metric",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "loaded_ts",
@@ -3765,7 +3765,7 @@
           "description": "Variation margin amount",
           "category": "Netting & Margin",
           "why_required": "Margin requirement metric",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "effective_start_date",
@@ -3865,7 +3865,7 @@
           "description": "Minimum transfer amount",
           "category": "Netting & Margin",
           "why_required": "CSA MTA",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "netting_agreement_type",
@@ -3892,7 +3892,7 @@
           "description": "Margin threshold",
           "category": "Netting & Margin",
           "why_required": "CSA threshold",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "effective_start_date",
@@ -4207,14 +4207,14 @@
           "description": "Warning threshold as percentage of limit amount",
           "category": "Limits & Thresholds",
           "why_required": "Triggers WARNING status when utilization exceeds this percentage",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "limit_amount_usd",
           "description": "Approved limit amount in USD",
           "category": "Limits & Thresholds",
           "why_required": "The limit value — set by credit policy; used as denominator for utilization %",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "limit_scope",
@@ -4242,7 +4242,7 @@
           "description": "Breach threshold as percentage of limit amount",
           "category": "Limits & Thresholds",
           "why_required": "Triggers BREACH status when utilization exceeds this percentage",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "risk_tier",
@@ -4289,7 +4289,7 @@
           "name": "threshold_value",
           "description": "",
           "category": "Limits & FX",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "created_ts",
@@ -4343,14 +4343,14 @@
           "description": "Lower bound in absolute dollar terms (optional)",
           "category": "Limits & Thresholds",
           "why_required": "Supports absolute-dollar-based thresholds",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "threshold_lower_pct",
           "description": "Lower bound of the utilization band (% of limit)",
           "category": "Limits & Thresholds",
           "why_required": "Defines where this status band begins",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "threshold_type",
@@ -4364,14 +4364,14 @@
           "description": "Upper bound in absolute dollar terms (optional)",
           "category": "Limits & Thresholds",
           "why_required": "Supports absolute-dollar-based thresholds",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "threshold_upper_pct",
           "description": "Upper bound of the utilization band (% of limit)",
           "category": "Limits & Thresholds",
           "why_required": "Defines where this status band ends",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         }
       ]
     },
@@ -4604,7 +4604,7 @@
           "description": "Ownership percentage",
           "category": "Legal Entity",
           "why_required": "For proportional consolidation",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "ultimate_parent_legal_entity_id",
@@ -5450,14 +5450,14 @@
           "description": "Downturn LGD assumption",
           "category": "Ratings",
           "why_required": "RWA and stress testing input",
-          "data_type": "DECIMAL(10,6)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "pd_12m",
           "description": "One-year probability of default",
           "category": "Ratings",
           "why_required": "Core risk model input and reporting",
-          "data_type": "DECIMAL(10,6)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "rating_grade_code",
@@ -5715,7 +5715,7 @@
           "description": "Probability of Default implied by this rating grade (annualized)",
           "category": "Ratings",
           "why_required": "Maps each rating grade to a PD for risk parameter enrichment; enables PD-based analytics without separate model lookup",
-          "data_type": "DECIMAL(10,6)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "rating_grade_id",
@@ -5736,7 +5736,7 @@
           "description": "Display label for the rating grade (e.g., \"AA\", \"BBB\", \"3\", \"CCC\")",
           "category": "Ratings",
           "why_required": "Human-readable rating value for dashboard display and tooltips",
-          "data_type": "DECIMAL(18,4)"
+          "data_type": "NUMERIC(18,4)"
         },
         {
           "name": "scale_type",
@@ -6070,7 +6070,7 @@
           "description": "Materiality threshold for past-due default tests",
           "category": "Default Rules",
           "why_required": "Prevents false defaults",
-          "data_type": "DECIMAL(18,2)"
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -6134,7 +6134,7 @@
           "description": "Credit conversion factor (if standardized)",
           "category": "Exposure Classification",
           "why_required": "Unfunded exposure calculation",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "off_balance_sheet_flag",
@@ -6395,7 +6395,7 @@
           "description": "Conversion rate",
           "category": "Market Data",
           "why_required": "Used to compute USD amounts from local currency",
-          "data_type": "DECIMAL(18,10)"
+          "data_type": "NUMERIC(18,10)"
         },
         {
           "name": "rate_type",
@@ -6521,7 +6521,7 @@
           "description": "Credit adjustment spread (bps)",
           "category": "Market Data",
           "why_required": "ISDA fallback spread",
-          "data_type": "DECIMAL(8,2)"
+          "data_type": "NUMERIC(8,2)"
         },
         {
           "name": "fallback_to_index_id",
@@ -7711,7 +7711,7 @@
           "description": "Allowed tolerance",
           "category": "Regulatory",
           "why_required": "Acceptable variance",
-          "data_type": "DECIMAL(10,4)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "transformation_rule",
@@ -8114,7 +8114,7 @@
           "description": "Observed control value",
           "category": "Run Control & Lineage",
           "why_required": "Evidence of control execution",
-          "data_type": "DECIMAL(18,4)"
+          "data_type": "NUMERIC(18,4)"
         },
         {
           "name": "check_name",
@@ -8142,7 +8142,7 @@
           "description": "Expected control value (count/sum/hash)",
           "category": "Run Control & Lineage",
           "why_required": "Defines control target",
-          "data_type": "DECIMAL(18,4)"
+          "data_type": "NUMERIC(18,4)"
         },
         {
           "name": "owner_id",
@@ -8191,14 +8191,14 @@
           "description": "Allowed tolerance",
           "category": "Run Control & Lineage",
           "why_required": "Defines pass/fail threshold",
-          "data_type": "DECIMAL(18,4)"
+          "data_type": "NUMERIC(18,4)"
         },
         {
           "name": "variance_value",
           "description": "Actual minus expected",
           "category": "Run Control & Lineage",
           "why_required": "Quantifies breach magnitude",
-          "data_type": "DECIMAL(18,4)"
+          "data_type": "NUMERIC(18,4)"
         }
       ]
     },
@@ -10444,6 +10444,11 @@
           "description": "",
           "category": "Facility snapshots",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "dpd_bucket_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -12700,6 +12705,11 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "tangible_net_worth_usd",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -12810,6 +12820,11 @@
               "field": "currency_code"
             }
           }
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
         }
       ]
     },
@@ -12937,216 +12952,91 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "org_unit_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "org_unit_dim",
-              "field": "org_unit_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "portfolio_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "product_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_product_taxonomy",
-              "field": "product_node_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "instrument_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "instrument_master",
-              "field": "instrument_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "netting_set_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "netting_set",
-              "field": "netting_set_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "country_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "country_dim",
-              "field": "country_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "exposure_type_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "gross_exposure_amt",
@@ -13200,31 +13090,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "attribution_pct",
@@ -13243,191 +13115,79 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "portfolio_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "product_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_product_taxonomy",
-              "field": "product_node_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "instrument_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "instrument_master",
-              "field": "instrument_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "model_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "model_registry_dim",
-              "field": "model_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rating_grade_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_grade_dim",
-              "field": "rating_grade_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "pd_pct",
@@ -13481,31 +13241,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rwa_density_pct",
@@ -13523,116 +13265,49 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "sccl_group_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "sccl_counterparty_group",
-              "field": "sccl_group_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "country_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "country_dim",
-              "field": "country_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "total_gross_exposure_amt",
@@ -13674,31 +13349,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "has_cross_entity_flag",
@@ -13800,31 +13457,13 @@
           "name": "region_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "region_dim",
-              "field": "region_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "industry_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "industry_dim",
-              "field": "industry_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "rwa_amt",
@@ -13835,6 +13474,11 @@
           "name": "rwa_density_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "total_cross_entity_exposure_usd",
+          "description": "",
+          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -13847,116 +13491,49 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "portfolio_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "outstanding_amt",
@@ -13998,16 +13575,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "attribution_pct",
@@ -14050,86 +13618,37 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "portfolio_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "total_gross_exposure_amt",
@@ -14177,16 +13696,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rwa_density_pct",
@@ -14204,166 +13714,73 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "crm_type_code",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "allocation_target_level",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "netting_set_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "netting_set",
-              "field": "netting_set_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "crm_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "collateral_asset_master",
-              "field": "collateral_asset_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "currency_code",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "crm_market_value_amt",
@@ -14405,46 +13822,19 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "risk_mitigant_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "risk_mitigant_master",
-              "field": "risk_mitigant_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "risk_mitigant_subtype_code",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "risk_mitigant_type_dim",
-              "field": "risk_mitigant_subtype_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "parent_group_code",
@@ -14463,101 +13853,43 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "portfolio_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "collateral_type_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "collateral_type",
-              "field": "collateral_type_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "collateral_market_value_amt",
@@ -14587,16 +13919,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "parent_group_code",
@@ -14615,86 +13938,37 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_ts",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "TIMESTAMP",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_definition_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_rule",
-              "field": "limit_rule_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_assignment_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_assignment",
-              "field": "limit_assignment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_currency_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "limit_amt",
@@ -14742,31 +14016,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "last_status_change_ts",
@@ -14821,71 +14077,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_ts",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "TIMESTAMP",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_assignment_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_assignment",
-              "field": "limit_assignment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_currency_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "utilized_amt",
@@ -14915,16 +14131,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -14937,141 +14144,61 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_ts",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "TIMESTAMP",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "TIMESTAMP"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_assignment_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_assignment",
-              "field": "limit_assignment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "contributor_level",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "portfolio_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "portfolio_dim",
-              "field": "portfolio_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "product_node_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_product_taxonomy",
-              "field": "product_node_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "org_unit_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "org_unit_dim",
-              "field": "org_unit_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "contribution_amt",
@@ -15095,31 +14222,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -15132,56 +14241,25 @@
           "name": "breach_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_assignment_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_assignment",
-              "field": "limit_assignment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "breach_ts",
@@ -15223,16 +14301,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -15245,86 +14314,37 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "credit_event_type_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "credit_event_type_dim",
-              "field": "credit_event_type_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "event_count",
@@ -15360,16 +14380,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -15381,16 +14392,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "impacted_facility_count",
@@ -15433,101 +14435,43 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rating_source_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_source",
-              "field": "rating_source_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "from_rating_grade_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_grade_dim",
-              "field": "rating_grade_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "to_rating_grade_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_grade_dim",
-              "field": "rating_grade_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "migration_count",
@@ -15545,16 +14489,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -15566,16 +14501,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -15588,71 +14514,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "default_exposure_amt",
@@ -15682,16 +14568,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -15703,16 +14580,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -15725,41 +14593,19 @@
           "name": "report_run_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "run_version_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "report_code",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "report_registry",
-              "field": "report_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "as_of_date",
@@ -15771,16 +14617,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "status_code",
@@ -15804,16 +14641,7 @@
           "name": "produced_by_system_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "source_system_registry",
-              "field": "source_system_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -15832,31 +14660,13 @@
           "name": "report_run_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L3",
-              "table": "report_run",
-              "field": "report_run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "cell_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "report_cell_definition",
-              "field": "cell_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "value_amt",
@@ -15868,16 +14678,7 @@
           "name": "currency_code",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "unit_code",
@@ -15895,16 +14696,7 @@
           "name": "calculation_rule_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rule_registry",
-              "field": "rule_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -15923,41 +14715,19 @@
           "name": "contribution_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "report_run_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L3",
-              "table": "report_run",
-              "field": "report_run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "cell_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "report_cell_definition",
-              "field": "cell_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "source_record_type_code",
@@ -15981,46 +14751,19 @@
           "name": "currency_code",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "rule_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rule_registry",
-              "field": "rule_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -16032,16 +14775,7 @@
           "name": "lob_node_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -16054,56 +14788,25 @@
           "name": "report_run_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L3",
-              "table": "report_run",
-              "field": "report_run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "cell_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "report_cell_definition",
-              "field": "cell_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rule_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rule_registry",
-              "field": "rule_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rule_version",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "status_code",
@@ -16158,56 +14861,25 @@
           "name": "validation_result_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "report_run_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L3",
-              "table": "report_run",
-              "field": "report_run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "validation_check_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "validation_check_registry",
-              "field": "validation_check_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "cell_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "report_cell_definition",
-              "field": "cell_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "severity_code",
@@ -16256,31 +14928,13 @@
           "name": "report_run_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L3",
-              "table": "report_run",
-              "field": "report_run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "position_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L2",
-              "table": "position",
-              "field": "position_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16292,136 +14946,55 @@
           "name": "legal_entity_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "instrument_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "instrument_master",
-              "field": "instrument_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "product_node_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_product_taxonomy",
-              "field": "product_node_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "country_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "country_dim",
-              "field": "country_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "currency_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "mdrm_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "regulatory_mapping",
-              "field": "mdrm_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "mapped_schedule_code",
@@ -16457,31 +15030,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "fr2590_category_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "fr2590_category_dim",
-              "field": "fr2590_category_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         }
       ]
     },
@@ -16494,101 +15049,43 @@
           "name": "report_run_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L3",
-              "table": "report_run",
-              "field": "report_run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "product_node_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_product_taxonomy",
-              "field": "product_node_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "country_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "country_dim",
-              "field": "country_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "total_amount_amt",
@@ -16618,31 +15115,13 @@
           "name": "lob_node_id",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "fr2590_category_code",
           "description": "",
           "category": "FR 2590 Helper Artifacts",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "fr2590_category_dim",
-              "field": "fr2590_category_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         }
       ]
     },
@@ -16655,101 +15134,43 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "facility_count",
@@ -16905,106 +15326,43 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "period_start_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "period_end_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "periodicity_code",
@@ -17101,6 +15459,11 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "return_on_rwa_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
         }
       ]
     },
@@ -17113,76 +15476,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "avg_spread_bps",
@@ -17267,76 +15585,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "total_overdue_amt",
@@ -17439,86 +15712,37 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "allocation_dim_type",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "allocation_dim_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "region_dim",
-              "field": "region_code"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "allocation_dim_name",
@@ -17591,76 +15815,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "pipeline_stage_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "pipeline_stage_dim",
-              "field": "pipeline_stage_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "deal_count",
@@ -17715,61 +15894,25 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "avg_internal_risk_rating",
@@ -17872,76 +16015,31 @@
           "name": "kpi_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "metric_definition_dim",
-              "field": "metric_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "prior_as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "current_value",
@@ -17977,31 +16075,13 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -18020,41 +16100,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "metric_id",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "metric_definition_dim",
-              "field": "metric_code"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "metric_name",
@@ -18180,16 +16238,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -18208,36 +16257,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "highlight_seq",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "INTEGER"
         },
         {
           "name": "highlight_category",
@@ -18279,16 +16311,7 @@
           "name": "source_metric_id",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "metric_definition_dim",
-              "field": "metric_code"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -18307,41 +16330,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_name",
@@ -18359,16 +16360,7 @@
           "name": "parent_counterparty_id",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "parent_counterparty_name",
@@ -18380,61 +16372,25 @@
           "name": "legal_entity_id",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "country_code",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "country_dim",
-              "field": "country_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "region_code",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "region_dim",
-              "field": "region_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "industry_code",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "industry_dim",
-              "field": "industry_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "industry_name",
@@ -18566,31 +16522,13 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -18619,61 +16557,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "risk_tier_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "limit_status_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "counterparty_count",
@@ -18715,16 +16623,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -18743,86 +16642,43 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "risk_tier_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "limit_status_code",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "counterparty_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "movement_type",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "prior_limit_status_code",
@@ -18859,46 +16715,25 @@
           "name": "run_version_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Data Quality",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "dimension_type",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "dimension_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "dimension_name",
@@ -18965,41 +16800,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Legal Entity Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Legal Entity Analytics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Legal Entity Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_name",
@@ -19077,16 +16890,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Legal Entity Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -19115,36 +16919,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Data Quality",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "attribute_name",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(500)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(500)"
         },
         {
           "name": "data_quality_score_pct",
@@ -19193,41 +16980,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Data Quality",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "legal_entity_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "data_quality_score_pct",
@@ -19264,41 +17029,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "scenario_name",
@@ -19388,16 +17131,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -19416,66 +17150,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "scenario_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "scenario_dim",
-              "field": "scenario_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "breach_seq",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "INTEGER"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_name",
@@ -19530,41 +17229,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "metric_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "metric_definition_dim",
-              "field": "metric_code"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "metric_name",
@@ -19606,16 +17283,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -19634,46 +17302,25 @@
           "name": "run_version_id",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "timeline_month",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "timeline_type",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(255)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "facility_count",
@@ -19697,16 +17344,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -19725,41 +17363,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "amendment_type_code",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "amendment_type_dim",
-              "field": "amendment_type_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "amendment_type_name",
@@ -19771,16 +17387,7 @@
           "name": "amendment_status_code",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "amendment_status_dim",
-              "field": "amendment_status_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "amendment_status_name",
@@ -19817,56 +17424,25 @@
           "name": "run_version_id",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "amendment_event_id",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L2",
-              "table": "amendment_event",
-              "field": "amendment_event_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "credit_agreement_id",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "credit_agreement_master",
-              "field": "credit_agreement_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "obligor_name",
@@ -19878,16 +17454,7 @@
           "name": "amendment_type_code",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "amendment_type_dim",
-              "field": "amendment_type_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "amendment_description",
@@ -19917,16 +17484,7 @@
           "name": "amendment_status_code",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "amendment_status_dim",
-              "field": "amendment_status_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "amendment_aging_days",
@@ -19951,41 +17509,19 @@
           "name": "run_version_id",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "DATE"
         },
         {
           "name": "facility_id",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "facility_type",
@@ -20033,16 +17569,7 @@
           "name": "counterparty_id",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_name",
@@ -20174,7 +17701,7 @@
           "name": "facility_active_flag",
           "description": "Propagates L1 facility_master.active_flag for snapshot-level filtering (Y/N)",
           "category": "Facility Analytics",
-          "data_type": "CHAR(1)"
+          "data_type": "BOOLEAN"
         },
         {
           "name": "maturity_date_bucket",
@@ -20204,22 +17731,18 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
           "description": "",
           "category": "Facility Analytics",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "is_deteriorated",
+          "description": "",
+          "data_type": "CHAR(1)"
         }
       ]
     },
@@ -20232,61 +17755,25 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "fccr_value",
@@ -20328,16 +17815,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -20356,61 +17834,25 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "deteriorated_deal_count",
@@ -20482,16 +17924,7 @@
           "name": "base_currency_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -20510,71 +17943,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rating_bucket_code",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "rating_bucket_name",
@@ -20617,71 +18010,31 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "run_control",
-              "field": "run_version_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "date_dim",
-              "field": "calendar_date"
-            }
-          }
+          "data_type": "DATE"
         },
         {
           "name": "hierarchy_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "lob_hierarchy_config",
-              "field": "hierarchy_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "lob_node_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "enterprise_business_taxonomy",
-              "field": "managed_segment_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rank_order",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
+          "data_type": "INTEGER"
         },
         {
           "name": "contributor_type",
@@ -20693,16 +18046,7 @@
           "name": "counterparty_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "counterparty_name",
@@ -20828,140 +18172,13 @@
       ]
     },
     {
-      "name": "facility_financial_calc",
+      "name": "calc_audit_log",
       "layer": "L3",
-      "category": "Facility Analytics",
+      "category": "Uncategorized",
       "fields": [
         {
-          "name": "facility_id",
+          "name": "audit_id",
           "description": "",
-          "why_required": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "as_of_date",
-          "description": "",
-          "why_required": "",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "dscr_value",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(12,6)"
-        },
-        {
-          "name": "ltv_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "net_income_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "interest_rate_sensitivity_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "why_required": "",
-          "data_type": "TIMESTAMP"
-        }
-      ]
-    },
-    {
-      "name": "facility_exposure_calc",
-      "layer": "L3",
-      "category": "Exposure & Risk Metrics",
-      "fields": [
-        {
-          "name": "facility_id",
-          "description": "",
-          "why_required": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "as_of_date",
-          "description": "",
-          "why_required": "",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "net_exposure_usd",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "coverage_ratio_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "days_until_maturity",
-          "description": "",
-          "why_required": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "rwa_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "number_of_loans",
-          "description": "",
-          "why_required": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "number_of_facilities",
-          "description": "",
-          "why_required": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "why_required": "",
-          "data_type": "TIMESTAMP"
-        }
-      ]
-    },
-    {
-      "name": "data_quality_score_snapshot",
-      "layer": "L3",
-      "category": "Data Quality",
-      "fields": [
-        {
-          "name": "score_id",
-          "description": "",
-          "why_required": "",
           "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
@@ -20969,112 +18186,330 @@
           }
         },
         {
-          "name": "as_of_date",
+          "name": "run_id",
           "description": "",
-          "why_required": "",
-          "data_type": "DATE"
+          "data_type": "VARCHAR(64)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L3",
+              "table": "calc_run",
+              "field": "run_id"
+            }
+          }
         },
         {
-          "name": "target_table",
+          "name": "metric_id",
           "description": "",
-          "why_required": "",
-          "data_type": "VARCHAR(100)"
+          "data_type": "VARCHAR(64)"
         },
         {
-          "name": "source_system_id",
+          "name": "metric_version",
           "description": "",
-          "why_required": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "completeness_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "validity_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "overall_score",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "dimension_id",
-          "description": "",
-          "why_required": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "dimension_name",
-          "description": "",
-          "why_required": "",
-          "data_type": "VARCHAR(200)"
-        },
-        {
-          "name": "dq_score_id",
-          "description": "",
-          "why_required": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "dq_score_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "impact_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "impacted_report_codes",
-          "description": "",
-          "why_required": "",
           "data_type": "VARCHAR(20)"
         },
         {
-          "name": "issue_count",
+          "name": "aggregation_level",
           "description": "",
-          "why_required": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "reconciliation_break_count",
-          "description": "",
-          "why_required": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "score_dimension",
-          "description": "",
-          "why_required": "",
           "data_type": "VARCHAR(30)"
         },
         {
-          "name": "created_ts",
+          "name": "status",
           "description": "",
-          "why_required": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "started_at",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "completed_at",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "duration_ms",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "rows_returned",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "rows_written",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "sql_executed",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "sql_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "source_tables",
+          "description": "",
+          "data_type": "text[]"
+        },
+        {
+          "name": "source_row_counts",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "bind_params",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "error_message",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "error_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "error_detail",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "dependency_chain",
+          "description": "",
+          "data_type": "text[]"
+        }
+      ]
+    },
+    {
+      "name": "calc_run",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "run_id",
+          "description": "",
+          "data_type": "VARCHAR(64)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "prior_as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "data_type": "VARCHAR(10)"
+        },
+        {
+          "name": "mode",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "status",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "metrics_requested",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "metrics_succeeded",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "metrics_failed",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "metrics_skipped",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "total_rows_written",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "started_at",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "completed_at",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "duration_ms",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "triggered_by",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "cli_args",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "engine_version",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "git_sha",
+          "description": "",
+          "data_type": "VARCHAR(40)"
+        },
+        {
+          "name": "error_summary",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "config_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        }
+      ]
+    },
+    {
+      "name": "calc_validation_result",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "validation_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_id",
+          "description": "",
+          "data_type": "VARCHAR(64)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L3",
+              "table": "calc_run",
+              "field": "run_id"
+            }
+          }
+        },
+        {
+          "name": "metric_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "rule_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "rule_type",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "severity",
+          "description": "",
+          "data_type": "VARCHAR(10)"
+        },
+        {
+          "name": "status",
+          "description": "",
+          "data_type": "VARCHAR(10)"
+        },
+        {
+          "name": "aggregation_level",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "dimension_key",
+          "description": "",
+          "data_type": "VARCHAR(128)"
+        },
+        {
+          "name": "expected_value",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "actual_value",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "tolerance",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "message",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "detail",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "checked_at",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
     },
     {
-      "name": "stress_test_result",
+      "name": "metric_result",
       "layer": "L3",
-      "category": "Stress Testing",
+      "category": "Uncategorized",
       "fields": [
         {
           "name": "result_id",
           "description": "",
-          "why_required": "",
           "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
@@ -21082,93 +18517,92 @@
           }
         },
         {
-          "name": "scenario_id",
+          "name": "run_id",
           "description": "",
-          "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L3",
+              "table": "calc_run",
+              "field": "run_id"
+            }
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
           "description": "",
-          "why_required": "",
           "data_type": "DATE"
         },
         {
-          "name": "portfolio_id",
+          "name": "metric_id",
           "description": "",
-          "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
-          "name": "loss_amount",
+          "name": "metric_version",
           "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
+          "data_type": "VARCHAR(20)"
         },
         {
-          "name": "pnl_impact",
+          "name": "aggregation_level",
           "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "capital_impact_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "execution_date",
-          "description": "",
-          "why_required": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "expected_loss_usd",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "result_description",
-          "description": "",
-          "why_required": "",
-          "data_type": "VARCHAR(2000)"
-        },
-        {
-          "name": "result_status",
-          "description": "",
-          "why_required": "",
           "data_type": "VARCHAR(30)"
         },
         {
-          "name": "scenario_type",
+          "name": "dimension_key",
           "description": "",
-          "why_required": "",
-          "data_type": "VARCHAR(50)"
+          "data_type": "VARCHAR(128)"
         },
         {
-          "name": "stress_test_result_id",
+          "name": "dimension_label",
           "description": "",
-          "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(500)"
         },
         {
-          "name": "total_breaches",
+          "name": "metric_value",
           "description": "",
-          "why_required": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "unit_type",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "display_format",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "data_type": "VARCHAR(10)"
+        },
+        {
+          "name": "scenario_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "formula_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "source_row_count",
+          "description": "",
           "data_type": "INTEGER"
-        },
-        {
-          "name": "total_exposure_usd",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "created_ts",
           "description": "",
-          "why_required": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -22454,6 +19888,30 @@
       "to_layer": "L1",
       "to_table": "scenario_dim",
       "to_field": "scenario_id"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "calc_audit_log",
+      "from_field": "run_id",
+      "to_layer": "L3",
+      "to_table": "calc_run",
+      "to_field": "run_id"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "calc_validation_result",
+      "from_field": "run_id",
+      "to_layer": "L3",
+      "to_table": "calc_run",
+      "to_field": "run_id"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "metric_result",
+      "from_field": "run_id",
+      "to_layer": "L3",
+      "to_table": "calc_run",
+      "to_field": "run_id"
     },
     {
       "from_table": "control_relationship",
@@ -25225,14 +22683,6 @@
     },
     {
       "from_layer": "L3",
-      "from_table": "exposure_metric_cube",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
       "from_table": "risk_metric_cube",
       "from_field": "product_node_id",
       "to_layer": "L1",
@@ -25249,27 +22699,11 @@
     },
     {
       "from_layer": "L3",
-      "from_table": "risk_metric_cube",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
       "from_table": "counterparty_exposure_summary",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "counterparty_exposure_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
     },
     {
       "from_layer": "L3",
@@ -25314,34 +22748,10 @@
     {
       "from_layer": "L3",
       "from_table": "limit_current_state",
-      "from_field": "limit_assignment_id",
-      "to_layer": "L1",
-      "to_table": "limit_assignment",
-      "to_field": "limit_assignment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "limit_current_state",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "limit_current_state",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "limit_utilization_timeseries",
-      "from_field": "limit_assignment_id",
-      "to_layer": "L1",
-      "to_table": "limit_assignment",
-      "to_field": "limit_assignment_id"
     },
     {
       "from_layer": "L3",
@@ -25350,14 +22760,6 @@
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "limit_attribution_summary",
-      "from_field": "limit_assignment_id",
-      "to_layer": "L1",
-      "to_table": "limit_assignment",
-      "to_field": "limit_assignment_id"
     },
     {
       "from_layer": "L3",
@@ -25374,22 +22776,6 @@
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "limit_attribution_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "limit_breach_fact",
-      "from_field": "limit_assignment_id",
-      "to_layer": "L1",
-      "to_table": "limit_assignment",
-      "to_field": "limit_assignment_id"
     },
     {
       "from_layer": "L3",
@@ -25466,26 +22852,10 @@
     {
       "from_layer": "L3",
       "from_table": "lob_exposure_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_exposure_summary",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_profitability_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
     },
     {
       "from_layer": "L3",
@@ -25498,26 +22868,10 @@
     {
       "from_layer": "L3",
       "from_table": "lob_pricing_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_pricing_summary",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_delinquency_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
     },
     {
       "from_layer": "L3",
@@ -25530,14 +22884,6 @@
     {
       "from_layer": "L3",
       "from_table": "lob_profitability_allocation_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_profitability_allocation_summary",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
@@ -25546,34 +22892,10 @@
     {
       "from_layer": "L3",
       "from_table": "deal_pipeline_stage_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "deal_pipeline_stage_summary",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "deal_pipeline_stage_summary",
-      "from_field": "pipeline_stage_code",
-      "to_layer": "L1",
-      "to_table": "pipeline_stage_dim",
-      "to_field": "pipeline_stage_code"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_credit_quality_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
     },
     {
       "from_layer": "L3",
@@ -25602,26 +22924,10 @@
     {
       "from_layer": "L3",
       "from_table": "lob_risk_ratio_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_risk_ratio_summary",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_deterioration_summary",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
     },
     {
       "from_layer": "L3",
@@ -25634,26 +22940,10 @@
     {
       "from_layer": "L3",
       "from_table": "lob_rating_distribution",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_rating_distribution",
       "from_field": "lob_node_id",
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L3",
-      "from_table": "lob_top_contributors",
-      "from_field": "hierarchy_id",
-      "to_layer": "L1",
-      "to_table": "lob_hierarchy_config",
-      "to_field": "hierarchy_id"
     },
     {
       "from_layer": "L3",

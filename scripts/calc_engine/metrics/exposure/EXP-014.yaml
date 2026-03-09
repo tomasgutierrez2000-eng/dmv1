@@ -1,0 +1,225 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Debt Service Coverage Ratio (DSCR)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-014"
+name: "Debt Service Coverage Ratio (DSCR)"
+version: "1.0.0"
+owner: "market-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "risk-metrics"
+metric_class: CALCULATED
+direction: HIGHER_BETTER
+unit_type: PERCENTAGE
+display_format: ".2f"
+description: >
+  Net Operating Income divided by Total Debt Service. Measures borrower's
+  ability to meet debt obligations from operating cash flow, providing
+  insight into covenant compliance and credit resilience.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: facility_financial_snapshot
+    alias: ffs
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: noi_amt
+        role: MEASURE
+      - name: total_debt_service_amt
+        role: MEASURE
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date"
+    fields:
+      - name: drawn_amount
+        role: MEASURE
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = ffs.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: |
+      Compute DSCR = noi_amt / total_debt_service_amt per facility.
+    formula_sql: |
+      SELECT
+        ffs.facility_id AS dimension_key,
+        ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      WHERE ffs.as_of_date = :as_of_date
+  counterparty:
+    aggregation_type: CUSTOM
+    formula_text: |
+      Exposure-weighted average DSCR per counterparty:
+      SUM(dscr * drawn_amount) / SUM(drawn_amount).
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
+             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
+        END AS metric_value
+      FROM (
+        SELECT
+          ffs.facility_id,
+          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
+          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+        FROM l2.facility_financial_snapshot ffs
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = ffs.facility_id
+          AND fes.as_of_date = ffs.as_of_date
+        WHERE ffs.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.facility_id
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: CUSTOM
+    formula_text: |
+      Exposure-weighted average DSCR per L3 desk segment:
+      SUM(dscr * drawn_amount) / SUM(drawn_amount).
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
+             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
+        END AS metric_value
+      FROM (
+        SELECT
+          ffs.facility_id,
+          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
+          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+        FROM l2.facility_financial_snapshot ffs
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = ffs.facility_id
+          AND fes.as_of_date = ffs.as_of_date
+        WHERE ffs.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: CUSTOM
+    formula_text: |
+      Exposure-weighted average DSCR per L2 portfolio segment:
+      SUM(dscr * drawn_amount) / SUM(drawn_amount).
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
+             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
+        END AS metric_value
+      FROM (
+        SELECT
+          ffs.facility_id,
+          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
+          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+        FROM l2.facility_financial_snapshot ffs
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = ffs.facility_id
+          AND fes.as_of_date = ffs.as_of_date
+        WHERE ffs.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: CUSTOM
+    formula_text: |
+      Exposure-weighted average DSCR per L1 business segment:
+      SUM(dscr * drawn_amount) / SUM(drawn_amount).
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
+             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
+        END AS metric_value
+      FROM (
+        SELECT
+          ffs.facility_id,
+          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
+          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+        FROM l2.facility_financial_snapshot ffs
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = ffs.facility_id
+          AND fes.as_of_date = ffs.as_of_date
+        WHERE ffs.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "EXP-014-V01"
+    type: NOT_NULL
+    description: "No null DSCR values"
+    severity: ERROR
+  - rule_id: "EXP-014-V02"
+    type: NON_NEGATIVE
+    description: "DSCR must be >= 0"
+    severity: WARNING
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-028"
+  abbreviation: "DSCR"
+  insight: >
+    Risk of default due to insufficient cash flow
+  rollup_strategy: "weighted-avg"
+  primary_value_field: "dscr_value"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "risk-metrics"]
+dashboard_pages: []
+legacy_metric_ids: []

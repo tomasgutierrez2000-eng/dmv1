@@ -1,0 +1,173 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Line of Business  L1
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "REF-019"
+name: "Line of Business  L1"
+version: "1.0.0"
+owner: "credit-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "reference"
+sub_domain: "master-data"
+metric_class: SOURCED
+direction: NEUTRAL
+unit_type: ORDINAL
+display_format: "s"
+description: >
+  Level 1 Line of Business hierarchy. Enables top-level organizational risk
+  aggregation, representing the Department (e.g. Commercial Real Estate,
+  Corporate Banking)
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: parent
+        role: MEASURE
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: >
+      Direct lookup of parent from enterprise_business_taxonomy.
+    formula_sql: |
+      SELECT
+        fm.facility_id AS dimension_key,
+        ebt.parent AS metric_value
+      FROM l1.facility_master fm
+      INNER JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.facility_id = fm.facility_id
+      WHERE fm.active_flag = 'Y'
+  counterparty:
+    aggregation_type: RAW
+    formula_text: >
+      Read parent per counterparty.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        ebt.parent AS metric_value
+      FROM l1.enterprise_business_taxonomy ebt
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = ebt.facility_id
+        AND fm.active_flag = 'Y'
+      WHERE ebt.as_of_date = :as_of_date
+  desk:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level parent per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fm.facility_id AS dimension_key,
+          ebt.parent AS metric_value
+        FROM l1.facility_master fm
+        INNER JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.facility_id = fm.facility_id
+        WHERE fm.active_flag = 'Y'
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level parent per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fm.facility_id AS dimension_key,
+          ebt.parent AS metric_value
+        FROM l1.facility_master fm
+        INNER JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.facility_id = fm.facility_id
+        WHERE fm.active_flag = 'Y'
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level parent per L1 business segment segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fm.facility_id AS dimension_key,
+          ebt.parent AS metric_value
+        FROM l1.facility_master fm
+        INNER JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.facility_id = fm.facility_id
+        WHERE fm.active_flag = 'Y'
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "REF-019-V01"
+    type: NOT_NULL
+    description: "No null parent values"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-054"
+  abbreviation: "LOBL"
+  insight: >
+    Organizational risk reporting
+  rollup_strategy: "direct-sum"
+  primary_value_field: "parent"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["reference", "master-data"]
+dashboard_pages: []
+legacy_metric_ids: []

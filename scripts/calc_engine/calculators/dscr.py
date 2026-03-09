@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 @register
 class DSCRCalculator(BaseCalculator):
-    metric_id = "CR-001"
-    catalogue_id = "DSCR"
+    metric_id = "EXP-014"
+    catalogue_id = "MET-028"
     name = "Debt Service Coverage Ratio"
     _legacy_ids = ["C003"]
 

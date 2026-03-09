@@ -1,0 +1,193 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Risk Rating Status - External (e.g. Downgrade, Upgrade, Stable)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "RSK-004"
+name: "Risk Rating Status - External (e.g. Downgrade, Upgrade, Stable)"
+version: "1.0.0"
+owner: "credit-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "risk"
+sub_domain: "credit-ratings"
+metric_class: CALCULATED
+direction: NEUTRAL
+unit_type: ORDINAL
+display_format: "s"
+description: >
+  Derived directional indicator reflecting movement in external credit agency
+  rating and changes month over month, which depicts the month-over-month change
+  reflecting an upgrade (e.g. A to AA), downgrade (e.g., B+ to B-) or stable
+  (remaing constant month over month), as compared to prior month reporting
+  periods. Note when this is displayed at an aggregated Line of Business or
+  portfolio level, it is determined by the month-over-month change of the
+  average rating at this level. Supports benchmarking against market perception
+  and helps validate internal risk assessment trends.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: counterparty_rating_observation
+    alias: cro
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: risk_rating_status
+        role: MEASURE
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = cro.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: >
+      Read risk_rating_status from counterparty_rating_observation for each
+      facility as-of reporting date.
+    formula_sql: |
+      SELECT
+        cro.facility_id AS dimension_key,
+        cro.risk_rating_status AS metric_value
+      FROM l2.counterparty_rating_observation cro
+      WHERE cro.as_of_date = :as_of_date
+  counterparty:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_rating_status per counterparty.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cro.facility_id AS dimension_key,
+          cro.risk_rating_status AS metric_value
+        FROM l2.counterparty_rating_observation cro
+        WHERE cro.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_rating_status per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cro.facility_id AS dimension_key,
+          cro.risk_rating_status AS metric_value
+        FROM l2.counterparty_rating_observation cro
+        WHERE cro.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_rating_status per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cro.facility_id AS dimension_key,
+          cro.risk_rating_status AS metric_value
+        FROM l2.counterparty_rating_observation cro
+        WHERE cro.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level risk_rating_status per L1 business segment segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cro.facility_id AS dimension_key,
+          cro.risk_rating_status AS metric_value
+        FROM l2.counterparty_rating_observation cro
+        WHERE cro.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "RSK-004-V01"
+    type: NOT_NULL
+    description: "No null risk_rating_status values"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-071"
+  abbreviation: "RRSE"
+  insight: >
+    External risk dynamics monitoring
+  rollup_strategy: "direct-sum"
+  primary_value_field: "risk_rating_status"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["risk", "credit-ratings"]
+dashboard_pages: []
+legacy_metric_ids: []

@@ -19,8 +19,8 @@ _ACTIVE_TRUTHY = {"Y", "YES", "TRUE", "T", "1"}
 
 @register
 class UndrawnExposureCalculator(BaseCalculator):
-    metric_id = "EXP-002"
-    catalogue_id = "UE"
+    metric_id = "EXP-017"
+    catalogue_id = "MET-033"
     name = "Undrawn Exposure"
     _legacy_ids = ["C114"]
 

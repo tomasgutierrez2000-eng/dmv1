@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 @register
 class LTVCalculator(BaseCalculator):
-    metric_id = "CR-002"
-    catalogue_id = "LTV"
+    metric_id = "RSK-009"
+    catalogue_id = "MET-109"
     name = "Loan-to-Value Ratio"
     _legacy_ids = ["C005"]
 

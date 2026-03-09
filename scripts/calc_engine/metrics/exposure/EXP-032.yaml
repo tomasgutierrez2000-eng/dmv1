@@ -1,0 +1,232 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Collateral Market Value at Origination ($)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-032"
+name: "Collateral Market Value at Origination ($)"
+version: "1.0.0"
+owner: "credit-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "collateral"
+metric_class: HYBRID
+direction: NEUTRAL
+unit_type: CURRENCY
+display_format: "$,.0f"
+description: >
+  Original Appriased Value of pledged collateral securing exposure in USD.
+  Supports recovery analysis and secured lending assessment.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: collateral_snapshot
+    alias: cs
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: original_valuation_usd
+        role: MEASURE
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = cs.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: SUM
+    formula_text: >
+      SUM(original_valuation_usd) per facility from collateral_snapshot. Weighted
+      by bank share percentage.
+    formula_sql: |
+      SELECT
+        cs.facility_id AS dimension_key,
+        SUM(cs.original_valuation_usd
+          * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
+      FROM l2.collateral_snapshot cs
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = cs.facility_id
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.facility_lender_allocation fla
+        ON fla.facility_id = cs.facility_id
+        AND fla.is_current_flag = 'Y'
+      WHERE cs.as_of_date = :as_of_date
+      GROUP BY cs.facility_id
+  counterparty:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level original_valuation_usd per counterparty.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cs.facility_id AS dimension_key,
+          SUM(cs.original_valuation_usd
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
+        FROM l2.collateral_snapshot cs
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = cs.facility_id
+          AND fm.active_flag = 'Y'
+        LEFT JOIN l1.facility_lender_allocation fla
+          ON fla.facility_id = cs.facility_id
+          AND fla.is_current_flag = 'Y'
+        WHERE cs.as_of_date = :as_of_date
+        GROUP BY cs.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level original_valuation_usd per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cs.facility_id AS dimension_key,
+          SUM(cs.original_valuation_usd
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
+        FROM l2.collateral_snapshot cs
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = cs.facility_id
+          AND fm.active_flag = 'Y'
+        LEFT JOIN l1.facility_lender_allocation fla
+          ON fla.facility_id = cs.facility_id
+          AND fla.is_current_flag = 'Y'
+        WHERE cs.as_of_date = :as_of_date
+        GROUP BY cs.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level original_valuation_usd per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cs.facility_id AS dimension_key,
+          SUM(cs.original_valuation_usd
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
+        FROM l2.collateral_snapshot cs
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = cs.facility_id
+          AND fm.active_flag = 'Y'
+        LEFT JOIN l1.facility_lender_allocation fla
+          ON fla.facility_id = cs.facility_id
+          AND fla.is_current_flag = 'Y'
+        WHERE cs.as_of_date = :as_of_date
+        GROUP BY cs.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level original_valuation_usd per L1 business segment
+      segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          cs.facility_id AS dimension_key,
+          SUM(cs.original_valuation_usd
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
+        FROM l2.collateral_snapshot cs
+        INNER JOIN l1.facility_master fm
+          ON fm.facility_id = cs.facility_id
+          AND fm.active_flag = 'Y'
+        LEFT JOIN l1.facility_lender_allocation fla
+          ON fla.facility_id = cs.facility_id
+          AND fla.is_current_flag = 'Y'
+        WHERE cs.as_of_date = :as_of_date
+        GROUP BY cs.facility_id
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "EXP-032-V01"
+    type: NOT_NULL
+    description: "No null original_valuation_usd values"
+    severity: ERROR
+  - rule_id: "EXP-032-V02"
+    type: NON_NEGATIVE
+    description: "original_valuation_usd must be >= 0"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-075"
+  abbreviation: "CMVA"
+  insight: >
+    Amount of credit risk mitigated
+  rollup_strategy: "direct-sum"
+  primary_value_field: "original_valuation_usd"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "collateral"]
+dashboard_pages: []
+legacy_metric_ids: []

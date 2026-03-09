@@ -1,0 +1,107 @@
+metric_id: REF-033
+name: Facility Active Flag
+version: 1.0.0
+owner: credit-risk
+status: DRAFT
+effective_date: '2026-01-01'
+supersedes: null
+domain: reference
+sub_domain: master-data
+metric_class: CALCULATED
+direction: NEUTRAL
+unit_type: ORDINAL
+display_format: s
+description: 'Boolean indicator to depict when a Facility is currently active in the reporting period (e.g., Facility Status
+  is not Canceled or Closed)
+
+  '
+regulatory_references:
+- framework: Basel III
+  description: ''
+source_tables:
+- schema: l1
+  table: facility_master
+  alias: fm
+  join_type: BASE
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: active_flag
+    role: MEASURE
+- schema: l1
+  table: enterprise_business_taxonomy
+  alias: ebt
+  join_type: LEFT
+  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  fields:
+  - name: managed_segment_id
+    role: DIMENSION
+  - name: parent_segment_id
+    role: DIMENSION
+levels:
+  facility:
+    aggregation_type: CUSTOM
+    formula_text: 'Calculated facility_active_flag per facility.
+
+      '
+    formula_sql: "SELECT\n  fm.facility_id AS dimension_key,\n  fm.active_flag AS metric_value\nFROM l1.facility_master fm\n\
+      WHERE fm.is_current_flag = 'Y'"
+  counterparty:
+    aggregation_type: SUM
+    formula_text: 'SUM(facility-level facility_active_flag) per counterparty.
+
+      '
+    formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
+      \    fm.facility_id AS dimension_key,\n    fm.active_flag AS metric_value\n  FROM l1.facility_master fm\n  WHERE fm.is_current_flag\
+      \ = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.active_flag = 'Y'\n\
+      GROUP BY fm.counterparty_id"
+  desk:
+    aggregation_type: SUM
+    formula_text: 'SUM of facility-level facility_active_flag per L3 desk segment.
+
+      '
+    formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
+      \    fm.facility_id AS dimension_key,\n    fm.active_flag AS metric_value\n  FROM l1.facility_master fm\n  WHERE fm.is_current_flag\
+      \ = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.active_flag = 'Y'\n\
+      LEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
+  portfolio:
+    aggregation_type: SUM
+    formula_text: 'SUM of facility-level facility_active_flag per L2 portfolio segment.
+
+      '
+    formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
+      \  SELECT\n    fm.facility_id AS dimension_key,\n    fm.active_flag AS metric_value\n  FROM l1.facility_master fm\n\
+      \  WHERE fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY\
+      \ ebt_l2.managed_segment_id"
+  business_segment:
+    aggregation_type: SUM
+    formula_text: 'SUM of facility-level facility_active_flag per L1 business segment segment.
+
+      '
+    formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
+      \  SELECT\n    fm.facility_id AS dimension_key,\n    fm.active_flag AS metric_value\n  FROM l1.facility_master fm\n\
+      \  WHERE fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN\
+      \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
+depends_on: []
+output:
+  table: metric_result
+validations:
+- rule_id: REF-033-V01
+  type: NOT_NULL
+  description: No null facility_active_flag values
+  severity: ERROR
+catalogue:
+  item_id: MET-107
+  abbreviation: FAF
+  insight: ''
+  rollup_strategy: direct-sum
+  primary_value_field: facility_active_flag
+tags:
+- reference
+- master-data
+dashboard_pages: []
+legacy_metric_ids: []

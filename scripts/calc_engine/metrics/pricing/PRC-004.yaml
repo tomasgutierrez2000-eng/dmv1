@@ -1,0 +1,186 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Fee Rate (%)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "PRC-004"
+name: "Fee Rate (%)"
+version: "1.0.0"
+owner: "market-risk"
+status: DRAFT
+effective_date: "2026-01-01"
+supersedes: null
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "pricing"
+sub_domain: "facility-pricing"
+metric_class: CALCULATED
+direction: NEUTRAL
+unit_type: PERCENTAGE
+display_format: ".2f"
+description: >
+  Fee percentage applied to committed or undrawn exposure. Calculated KPI
+  supporting pricing adequacy and revenue optimization analysis.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: ""
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: facility_pricing_snapshot
+    alias: fps
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: fee_rate_pct
+        role: MEASURE
+  - schema: l1
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = fps.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Fee Income / Average Balance
+    formula_sql: |
+      SELECT
+        fps.facility_id AS dimension_key,
+        fps.fee_rate_pct AS metric_value
+      FROM l2.facility_pricing_snapshot fps
+      WHERE fps.as_of_date = :as_of_date
+  counterparty:
+    aggregation_type: WEIGHTED_AVG
+    formula_text: >
+      Exposure-weighted average of fee_rate_pct across counterparty facilities.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        AVG(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fps.facility_id AS dimension_key,
+          fps.fee_rate_pct AS metric_value
+        FROM l2.facility_pricing_snapshot fps
+        WHERE fps.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: WEIGHTED_AVG
+    formula_text: >
+      AVG of facility-level fee_rate_pct per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        AVG(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fps.facility_id AS dimension_key,
+          fps.fee_rate_pct AS metric_value
+        FROM l2.facility_pricing_snapshot fps
+        WHERE fps.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+      GROUP BY ebt.managed_segment_id
+  portfolio:
+    aggregation_type: WEIGHTED_AVG
+    formula_text: >
+      AVG of facility-level fee_rate_pct per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        AVG(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fps.facility_id AS dimension_key,
+          fps.fee_rate_pct AS metric_value
+        FROM l2.facility_pricing_snapshot fps
+        WHERE fps.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      GROUP BY ebt_l2.managed_segment_id
+  business_segment:
+    aggregation_type: SUM
+    formula_text: >
+      SUM of facility-level fee_rate_pct per L1 business segment segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fps.facility_id AS dimension_key,
+          fps.fee_rate_pct AS metric_value
+        FROM l2.facility_pricing_snapshot fps
+        WHERE fps.as_of_date = :as_of_date
+      ) fac
+      INNER JOIN l1.facility_master fm
+        ON fm.facility_id = fac.dimension_key
+        AND fm.active_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "PRC-004-V01"
+    type: NOT_NULL
+    description: "No null fee_rate_pct values"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-042"
+  abbreviation: "FR"
+  insight: >
+    Fee income and pricing structure
+  rollup_strategy: "weighted-avg"
+  primary_value_field: "fee_rate_pct"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["pricing", "facility-pricing"]
+dashboard_pages: []
+legacy_metric_ids: []

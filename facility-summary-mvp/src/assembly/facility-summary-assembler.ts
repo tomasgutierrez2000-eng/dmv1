@@ -235,7 +235,7 @@ export const assembleFacilitySummary = (
     const amendmentAging =
       amendmentStartDate !== null ? daysBetween(amendmentStartDate, TODAY) : null;
 
-    const isActive = facility.active_flag === 'Y';
+    const isActive = facility.is_active_flag;
 
     // Enrichment: Pricing
     const pricingSnapshots = pricingByFacility.get(facility.facility_id) ?? [];

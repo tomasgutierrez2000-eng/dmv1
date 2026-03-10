@@ -168,7 +168,7 @@ export interface DemoEntity {
   /** Optional sub-positions for position-level drill-down. */
   positions?: Array<{
     position_id: string;
-    position_type: string;
+    product_code: string;
     balance_amount: number;
     description: string;
   }>;

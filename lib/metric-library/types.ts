@@ -63,7 +63,7 @@ export interface LevelDefinition {
 export interface DemoPosition {
   position_id: string;
   facility_id: string;
-  position_type: string;
+  product_code: string;
   balance_amount: number;
   description: string;
 }

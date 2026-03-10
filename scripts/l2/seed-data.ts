@@ -1061,7 +1061,7 @@ export function getL2SeedValue(
       if (columnName === 'as_of_date') return AS_OF;
       if (columnName === 'facility_id') return fid(idx);
       if (columnName === 'instrument_id') return fid(idx);
-      if (columnName === 'position_type') return posType(idx);
+      if (columnName === 'product_code') return posType(idx);
       if (columnName === 'balance_amount') return drawn(idx);
       if (columnName === 'currency_code') return currency(idx);
       if (columnName === 'source_system_id') return fid(idx);
@@ -1327,7 +1327,6 @@ export function getL2SeedValue(
       if (columnName === 'prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
       if (columnName === 'rate_cap_pct') return pick([12.00, 10.00, 12.00, 10.00, 14.00, 9.00, 12.00, 10.00, 12.00, 8.00], fid(idx) - 1);
       if (columnName === 'rate_index_code') return pick(['SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR', 'SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR'], fid(idx) - 1);
-      if (columnName === 'pricing_tier') return String((idx % 10) + 1);
       break;
 
     // ═══════════════════════════════════════════════════════════════════

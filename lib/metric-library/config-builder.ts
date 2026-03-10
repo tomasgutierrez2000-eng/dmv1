@@ -526,7 +526,7 @@ export function demoFacilityToEntity(
     fields,
     positions: f.positions?.map(p => ({
       position_id: p.position_id,
-      position_type: p.position_type,
+      product_code: p.product_code,
       balance_amount: p.balance_amount,
       description: p.description,
     })),

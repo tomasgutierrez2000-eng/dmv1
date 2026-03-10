@@ -157,6 +157,7 @@ export const generateL1Data = (): L1Data => {
       is_parent_flag: isParent,
       pd_annual: ratingToPd(rating),
       lgd_unsecured: ratingToLgd(rating),
+      revenue_amt: roundTo(50 + ((i * 41) % 950), 2),
     };
     counterparties.push(counterparty);
   }
@@ -250,7 +251,8 @@ export const generateL1Data = (): L1Data => {
       lob_l3_name: lobL3,
       region_code: pick(REGIONS, i),
       industry_code: pick(INDUSTRIES, i + 3).id,
-      active_flag: isActive ? 'Y' : 'N',
+      is_active_flag: isActive,
+      revenue_amt: isActive ? roundTo(10 + ((i * 29) % 490), 2) : null,
     });
   }
 

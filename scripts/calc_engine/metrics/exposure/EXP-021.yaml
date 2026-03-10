@@ -28,22 +28,22 @@ regulatory_references:
     description: ""
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l2
-    table: facility_exposure_snapshot
-    alias: fes
+  - schema: l3
+    table: facility_detail_snapshot
+    alias: fds
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: facility_utilization_status
+      - name: utilization_status_code
         role: MEASURE
   - schema: l1
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = fes.facility_id"
+    join_on: "fm.facility_id = fds.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -51,7 +51,7 @@ source_tables:
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -68,71 +68,71 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      Calculated facility_utilization_status per facility.
+      Calculated utilization_status_code per facility.
     formula_sql: |
       SELECT
-        fes.facility_id AS dimension_key,
-        fes.facility_utilization_status AS metric_value
-      FROM l2.facility_exposure_snapshot fes
-      WHERE fes.as_of_date = :as_of_date
+        fds.facility_id AS dimension_key,
+        fds.utilization_status_code AS metric_value
+      FROM l3.facility_detail_snapshot fds
+      WHERE fds.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM(facility-level facility_utilization_status) per counterparty.
+      SUM(facility-level utilization_status_code) per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_utilization_status AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.utilization_status_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level facility_utilization_status per L3 desk segment.
+      SUM of facility-level utilization_status_code per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_utilization_status AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.utilization_status_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level facility_utilization_status per L2 portfolio segment.
+      SUM of facility-level utilization_status_code per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_utilization_status AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.utilization_status_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -141,7 +141,7 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level facility_utilization_status per L1 business segment
+      SUM of facility-level utilization_status_code per L1 business segment
       segment.
     formula_sql: |
       SELECT
@@ -149,14 +149,14 @@ levels:
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_utilization_status AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.utilization_status_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -173,7 +173,7 @@ output:
 validations:
   - rule_id: "EXP-021-V01"
     type: NOT_NULL
-    description: "No null facility_utilization_status values"
+    description: "No null utilization_status_code values"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
@@ -182,7 +182,7 @@ catalogue:
   insight: >
     Risk of limit exhaustion
   rollup_strategy: "direct-sum"
-  primary_value_field: "facility_utilization_status"
+  primary_value_field: "utilization_status_code"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["exposure", "risk-metrics"]
 dashboard_pages: []

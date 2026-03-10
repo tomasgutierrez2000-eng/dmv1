@@ -50,7 +50,7 @@ source_tables:
       - name: lob_segment_id
         role: DIMENSION
         description: "FK to business taxonomy for desk/portfolio/lob resolution"
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
         description: "Only include active facilities"
 
@@ -123,7 +123,7 @@ levels:
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
         AND fps.as_of_date = :as_of_date
-      WHERE fm.active_flag = true
+      WHERE fm.is_active_flag = true
 
   counterparty:
     aggregation_type: SUM
@@ -142,7 +142,7 @@ levels:
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
         AND fps.as_of_date = :as_of_date
-      WHERE fm.active_flag = true
+      WHERE fm.is_active_flag = true
       GROUP BY fm.counterparty_id
 
   desk:
@@ -164,7 +164,7 @@ levels:
         AND fps.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
-      WHERE fm.active_flag = true
+      WHERE fm.is_active_flag = true
       GROUP BY ebt.managed_segment_id
 
   portfolio:
@@ -188,7 +188,7 @@ levels:
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      WHERE fm.active_flag = true
+      WHERE fm.is_active_flag = true
       GROUP BY ebt_l2.managed_segment_id
 
   business_segment:
@@ -214,7 +214,7 @@ levels:
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      WHERE fm.active_flag = true
+      WHERE fm.is_active_flag = true
       GROUP BY ebt_l1.managed_segment_id
 
 # DEPENDENCIES

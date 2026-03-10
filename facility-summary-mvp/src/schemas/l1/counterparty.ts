@@ -9,4 +9,5 @@ export interface Counterparty {
   is_parent_flag: boolean;
   pd_annual: number;
   lgd_unsecured: number;
+  revenue_amt: number | null;
 }

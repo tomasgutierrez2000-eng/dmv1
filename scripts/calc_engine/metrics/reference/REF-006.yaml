@@ -58,7 +58,7 @@ levels:
       FROM l1.facility_master fm
       INNER JOIN l1.country_dim cd
         ON cd.facility_id = fm.facility_id
-      WHERE fm.active_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: RAW
     formula_text: >
@@ -70,7 +70,7 @@ levels:
       FROM l1.country_dim cd
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = cd.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE cd.as_of_date = :as_of_date
   desk:
     aggregation_type: SUM
@@ -87,11 +87,11 @@ levels:
         FROM l1.facility_master fm
         INNER JOIN l1.country_dim cd
           ON cd.facility_id = fm.facility_id
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
@@ -110,11 +110,11 @@ levels:
         FROM l1.facility_master fm
         INNER JOIN l1.country_dim cd
           ON cd.facility_id = fm.facility_id
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -135,11 +135,11 @@ levels:
         FROM l1.facility_master fm
         INNER JOIN l1.country_dim cd
           ON cd.facility_id = fm.facility_id
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

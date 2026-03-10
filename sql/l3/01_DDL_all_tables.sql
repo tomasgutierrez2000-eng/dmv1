@@ -38,14 +38,14 @@ CREATE TABLE IF NOT EXISTS l3.exposure_metric_cube (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: org_unit_id → L1.org_unit_dim.org_unit_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: facility_id → L1.facility_master.facility_id
-    -- FK: instrument_id → L1.instrument_master.instrument_id
-    -- FK: netting_set_id → L1.netting_set.netting_set_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- FK: instrument_id → L2.instrument_master.instrument_id
+    -- FK: netting_set_id → L2.netting_set.netting_set_id
     -- FK: country_code → L1.country_dim.country_code
     -- FK: currency_code → L1.currency_dim.currency_code
     -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate by as_of_date)
@@ -82,12 +82,12 @@ CREATE TABLE IF NOT EXISTS l3.risk_metric_cube (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: facility_id → L1.facility_master.facility_id
-    -- FK: instrument_id → L1.instrument_master.instrument_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- FK: instrument_id → L2.instrument_master.instrument_id
     -- FK: currency_code → L1.currency_dim.currency_code
     -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate)
     -- FK: model_id → L1.model_registry_dim.model_id
@@ -137,8 +137,8 @@ CREATE TABLE IF NOT EXISTS l3.counterparty_exposure_summary (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
     -- FK: sccl_group_id → L1.sccl_counterparty_group.sccl_group_id (nullable)
     -- FK: country_code → L1.country_dim.country_code
     -- FK: base_currency_code → L1.currency_dim.currency_code
@@ -173,9 +173,9 @@ CREATE TABLE IF NOT EXISTS l3.facility_exposure_summary (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: facility_id → L1.facility_master.facility_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS l3.portfolio_summary (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
@@ -234,10 +234,10 @@ CREATE TABLE IF NOT EXISTS l3.crm_allocation_summary (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: facility_id → L1.facility_master.facility_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: netting_set_id → L1.netting_set.netting_set_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: netting_set_id → L2.netting_set.netting_set_id
     -- FK: crm_id → L1.collateral_asset_master.collateral_asset_id OR L1.crm_protection_master.protection_id (by crm_type_code)
     -- FK: currency_code → L1.currency_dim.currency_code
     -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate)
@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS l3.collateral_portfolio_valuation (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: collateral_type_id → L1.collateral_type.collateral_type_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
@@ -297,7 +297,7 @@ CREATE TABLE IF NOT EXISTS l3.limit_current_state (
     PRIMARY KEY (run_version_id, as_of_ts, legal_entity_id, limit_assignment_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: limit_definition_id → L1.limit_rule.limit_rule_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
     -- FK: limit_currency_code → L1.currency_dim.currency_code
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS l3.limit_utilization_timeseries (
     PRIMARY KEY (run_version_id, as_of_ts, legal_entity_id, limit_assignment_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
     -- FK: limit_currency_code → L1.currency_dim.currency_code
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
@@ -345,10 +345,10 @@ CREATE TABLE IF NOT EXISTS l3.limit_attribution_summary (
     PRIMARY KEY (run_version_id, as_of_ts, legal_entity_id, limit_assignment_id, contributor_level)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
-    -- FK: facility_id → L1.facility_master.facility_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
     -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
     -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: org_unit_id → L1.org_unit_dim.org_unit_id
@@ -372,7 +372,7 @@ CREATE TABLE IF NOT EXISTS l3.limit_breach_fact (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
 -- T12: credit_event_summary (Credit Events & Performance)
@@ -399,9 +399,9 @@ CREATE TABLE IF NOT EXISTS l3.credit_event_summary (
     PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, credit_event_type_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: facility_id → L1.facility_master.facility_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: facility_id → L2.facility_master.facility_id
     -- FK: credit_event_type_id → L1.credit_event_type_dim.credit_event_type_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
@@ -423,8 +423,8 @@ CREATE TABLE IF NOT EXISTS l3.rating_migration_summary (
     PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, counterparty_id, rating_source_id, from_rating_grade_id, to_rating_grade_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
     -- FK: rating_source_id → L1.rating_source.rating_source_id
     -- FK: from_rating_grade_id → L1.rating_grade_dim.rating_grade_id
     -- FK: to_rating_grade_id → L1.rating_grade_dim.rating_grade_id
@@ -448,9 +448,9 @@ CREATE TABLE IF NOT EXISTS l3.default_loss_recovery_summary (
     PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, counterparty_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: facility_id → L1.facility_master.facility_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: facility_id → L2.facility_master.facility_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
 
@@ -574,10 +574,10 @@ CREATE TABLE IF NOT EXISTS l3.fr2590_position_snapshot (
 );
     -- FK: report_run_id → L3.report_run.report_run_id
     -- FK: position_id → L2.position.position_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id (nullable)
-    -- FK: facility_id → L1.facility_master.facility_id (nullable)
-    -- FK: instrument_id → L1.instrument_master.instrument_id (nullable)
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id (nullable)
+    -- FK: facility_id → L2.facility_master.facility_id (nullable)
+    -- FK: instrument_id → L2.instrument_master.instrument_id (nullable)
     -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: country_code → L1.country_dim.country_code
     -- FK: currency_code → L1.currency_dim.currency_code
@@ -604,8 +604,8 @@ CREATE TABLE IF NOT EXISTS l3.fr2590_counterparty_aggregate (
     PRIMARY KEY (report_run_id, counterparty_id, legal_entity_id, as_of_date)
 );
     -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
     -- FK: country_code → L1.country_dim.country_code
     -- FK: base_currency_code → L1.currency_dim.currency_code
@@ -651,7 +651,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_exposure_summary (
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
     -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T23: lob_profitability_summary (LoB Summary)
@@ -843,7 +843,7 @@ CREATE TABLE IF NOT EXISTS l3.kpi_period_summary (
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: prior_as_of_date → L1.date_dim.calendar_date
     -- FK: scenario_id → L1.scenario_dim.scenario_id (nullable)
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id (nullable)
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id (nullable)
     -- FK: base_currency_code → L1.currency_dim.currency_code (nullable)
     -- FK: run_version_id → L1.run_control.run_version_id
 
@@ -940,9 +940,9 @@ CREATE TABLE IF NOT EXISTS l3.counterparty_detail_snapshot (
     PRIMARY KEY (run_version_id, as_of_date, counterparty_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
-    -- FK: parent_counterparty_id → L1.counterparty.counterparty_id (nullable)
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
+    -- FK: parent_counterparty_id → L2.counterparty.counterparty_id (nullable)
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: country_code → L1.country_dim.country_code
     -- FK: region_code → L1.region_dim.region_code
     -- FK: industry_code → L1.industry_dim.industry_code
@@ -967,7 +967,7 @@ CREATE TABLE IF NOT EXISTS l3.limit_tier_status_matrix (
     PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, risk_tier_code, limit_status_code)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T34: limit_counterparty_movement (Limits & Appetite)
@@ -986,8 +986,8 @@ CREATE TABLE IF NOT EXISTS l3.limit_counterparty_movement (
     PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, risk_tier_code, limit_status_code, counterparty_id, movement_type)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
 
 -- T35: data_quality_score_summary (Data Quality)
 CREATE TABLE IF NOT EXISTS l3.data_quality_score_summary (
@@ -1032,7 +1032,7 @@ CREATE TABLE IF NOT EXISTS l3.legal_entity_risk_profile (
     PRIMARY KEY (run_version_id, as_of_date, legal_entity_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
 
 -- T37: data_quality_attribute_score (Data Quality)
@@ -1062,7 +1062,7 @@ CREATE TABLE IF NOT EXISTS l3.data_quality_trend (
     PRIMARY KEY (run_version_id, as_of_date)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L1.legal_entity.legal_entity_id
+    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
 
 -- T39: stress_test_result_summary (Stress Testing)
 CREATE TABLE IF NOT EXISTS l3.stress_test_result_summary (
@@ -1182,7 +1182,7 @@ CREATE TABLE IF NOT EXISTS l3.amendment_detail (
 );
     -- FK: run_version_id → L1.run_control.run_version_id
     -- FK: amendment_event_id → L2.amendment_event.amendment_event_id
-    -- FK: credit_agreement_id → L1.credit_agreement_master.credit_agreement_id
+    -- FK: credit_agreement_id → L2.credit_agreement_master.credit_agreement_id
     -- FK: amendment_type_code → L1.amendment_type_dim.amendment_type_code
     -- FK: amendment_status_code → L1.amendment_status_dim.amendment_status_code
 
@@ -1226,13 +1226,26 @@ CREATE TABLE IF NOT EXISTS l3.facility_detail_snapshot (
     effective_date_bucket                         VARCHAR(20),
     bank_share_pct                                NUMERIC(10,4),
     base_currency_code                            VARCHAR(30),
+    risk_rating_tier_code                         VARCHAR(20),
+    utilization_status_code                        VARCHAR(20),
+    pricing_tier_code                             VARCHAR(20),
+    dpd_bucket_code                               VARCHAR(20),
+    origination_bucket_code                       VARCHAR(20),
+    maturity_bucket_id                            BIGINT,
+    is_deteriorated                               CHAR(1),
     created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (run_version_id, as_of_date, facility_id)
 );
     -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: facility_id → L1.facility_master.facility_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
     -- FK: base_currency_code → L1.currency_dim.currency_code
+    -- FK: risk_rating_tier_code → L1.risk_rating_tier_dim.tier_code
+    -- FK: utilization_status_code → L1.utilization_status_dim.utilization_status_code
+    -- FK: pricing_tier_code → L1.pricing_tier_dim.pricing_tier_code
+    -- FK: dpd_bucket_code → L1.dpd_bucket_dim.dpd_bucket_code
+    -- FK: origination_bucket_code → L1.origination_date_bucket_dim.origination_bucket_code
+    -- FK: maturity_bucket_id → L1.maturity_bucket_dim.maturity_bucket_id
 
 -- T46: lob_risk_ratio_summary (LoB Summary)
 CREATE TABLE IF NOT EXISTS l3.lob_risk_ratio_summary (
@@ -1322,7 +1335,7 @@ CREATE TABLE IF NOT EXISTS l3.lob_top_contributors (
     -- FK: as_of_date → L1.date_dim.calendar_date
     -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
     -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: counterparty_id → L1.counterparty.counterparty_id
+    -- FK: counterparty_id → L2.counterparty.counterparty_id
 
 -- T50: metric_value_fact (Dashboard consumption — pre-calculated metric values by level)
 CREATE TABLE IF NOT EXISTS l3.metric_value_fact (
@@ -1427,4 +1440,29 @@ CREATE TABLE IF NOT EXISTS l3.stress_test_result (
     -- FK: scenario_id → l1.scenario_dim(scenario_id)
     -- FK: portfolio_id → l1.portfolio_dim(portfolio_id)
 );
+
+-- T55: facility_risk_calc (Calculated Overlay for L2.facility_risk_snapshot)
+CREATE TABLE IF NOT EXISTS l3.facility_risk_calc (
+    facility_id                                   VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    ead_amt                                       NUMERIC(20,4),
+    expected_loss_amt                             NUMERIC(20,4),
+    rwa_amt                                       NUMERIC(20,4),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (facility_id, as_of_date)
+);
+    -- FK: facility_id → L2.facility_master.facility_id
+    -- Overlay grain matches L2.facility_risk_snapshot (facility_id, as_of_date)
+
+-- T56: netting_set_exposure_calc (Calculated Overlay for L2.netting_set_exposure_snapshot)
+CREATE TABLE IF NOT EXISTS l3.netting_set_exposure_calc (
+    netting_set_id                                VARCHAR(64) NOT NULL,
+    as_of_date                                    DATE NOT NULL,
+    netted_exposure_amount                        NUMERIC(20,4),
+    netting_benefit_amt                           NUMERIC(20,4),
+    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (netting_set_id, as_of_date)
+);
+    -- FK: netting_set_id → L2.netting_set.netting_set_id
+    -- Overlay grain matches L2.netting_set_exposure_snapshot (netting_set_id, as_of_date)
 

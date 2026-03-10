@@ -247,7 +247,7 @@ const _REMOVED_SEED_METRICS: L3Metric[] = [
   SUM(p.unfunded_amount) * fm.bank_share AS undrawn_exposure
 FROM facility_master fm
 JOIN positions p ON p.facility_id = fm.facility_id
-WHERE fm.facility_active_flag = 'Y'
+WHERE fm.is_active_flag = 'Y'
 GROUP BY fm.facility_id, fm.bank_share`,
     description: 'Committed but not yet drawn portion of credit exposure in USD. Reflects contingent funding risk — the maximum additional drawdown the bank may be called upon to fund.',
     displayFormat: '$,.0f',
@@ -256,7 +256,7 @@ GROUP BY fm.facility_id, fm.bank_share`,
       { layer: 'L2', table: 'positions', field: 'unfunded_amount', description: 'Unfunded/undrawn amount per position' },
       { layer: 'L2', table: 'positions', field: 'position_id', description: 'Position identifier for iteration' },
       { layer: 'L1', table: 'facility_master', field: 'facility_id', description: 'Primary key — grain of calculation' },
-      { layer: 'L1', table: 'facility_master', field: 'facility_active_flag', description: 'Active facility filter' },
+      { layer: 'L1', table: 'facility_master', field: 'is_active_flag', description: 'Active facility filter' },
       { layer: 'L1', table: 'facility_master', field: 'bank_share', description: "Bank's participation share (0.0-1.0)" },
       { layer: 'L1', table: 'facility_master', field: 'counterparty_id', description: 'FK to counterparty — grouping key' },
       { layer: 'L1', table: 'facility_master', field: 'lob_segment_id', description: 'FK to business taxonomy — desk/portfolio/lob rollup' },
@@ -279,7 +279,7 @@ GROUP BY fm.facility_id, fm.bank_share`,
   SUM(p.unfunded_amount) * fm.bank_share AS undrawn_exposure
 FROM facility_master fm
 JOIN positions p ON p.facility_id = fm.facility_id
-WHERE fm.facility_active_flag = 'Y'
+WHERE fm.is_active_flag = 'Y'
 GROUP BY fm.facility_id, fm.bank_share`,
       },
       counterparty: {
@@ -291,7 +291,7 @@ FROM (
   SELECT fm2.facility_id, SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
   FROM facility_master fm2
   JOIN positions p ON p.facility_id = fm2.facility_id
-  WHERE fm2.facility_active_flag = 'Y'
+  WHERE fm2.is_active_flag = 'Y'
   GROUP BY fm2.facility_id, fm2.bank_share
 ) fac_ue
 JOIN facility_master fm ON fm.facility_id = fac_ue.facility_id
@@ -309,7 +309,7 @@ FROM (
          SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
   FROM facility_master fm2
   JOIN positions p ON p.facility_id = fm2.facility_id
-  WHERE fm2.facility_active_flag = 'Y'
+  WHERE fm2.is_active_flag = 'Y'
   GROUP BY fm2.facility_id, fm2.lob_segment_id, fm2.bank_share
 ) fac_ue
 JOIN enterprise_business_taxonomy ebt
@@ -326,7 +326,7 @@ FROM (
          SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
   FROM facility_master fm2
   JOIN positions p ON p.facility_id = fm2.facility_id
-  WHERE fm2.facility_active_flag = 'Y'
+  WHERE fm2.is_active_flag = 'Y'
   GROUP BY fm2.facility_id, fm2.lob_segment_id, fm2.bank_share
 ) fac_ue
 JOIN enterprise_business_taxonomy ebt_l3
@@ -345,7 +345,7 @@ FROM (
          SUM(p.unfunded_amount) * fm2.bank_share AS undrawn_exposure
   FROM facility_master fm2
   JOIN positions p ON p.facility_id = fm2.facility_id
-  WHERE fm2.facility_active_flag = 'Y'
+  WHERE fm2.is_active_flag = 'Y'
   GROUP BY fm2.facility_id, fm2.lob_segment_id, fm2.bank_share
 ) fac_ue
 JOIN enterprise_business_taxonomy ebt_l3
@@ -373,7 +373,7 @@ GROUP BY ebt_l1.managed_segment_id`,
       },
       {
         id: 'src-facility', layer: 'L1', table: 'facility_master', field: 'facility_id',
-        fields: ['facility_id', 'bank_share', 'facility_active_flag', 'counterparty_id', 'lob_segment_id'],
+        fields: ['facility_id', 'bank_share', 'is_active_flag', 'counterparty_id', 'lob_segment_id'],
         description: 'Facility master — bank share, active flag, hierarchy keys',
         sampleValue: 'F-201',
       },
@@ -393,7 +393,7 @@ GROUP BY ebt_l1.managed_segment_id`,
         id: 'calc-fac', layer: 'transform', table: '', field: 'facility_undrawn_exposure',
         formula: 'SUM(unfunded_amount per position) * bank_share',
         description: 'Aggregate position unfunded amounts and apply bank share',
-        filterCriteria: 'WHERE facility_active_flag = Y AND MAX(as_of_date)',
+        filterCriteria: 'WHERE is_active_flag = Y AND MAX(as_of_date)',
       },
       {
         id: 'calc-rollup', layer: 'transform', table: '', field: 'rollup_undrawn_exposure',

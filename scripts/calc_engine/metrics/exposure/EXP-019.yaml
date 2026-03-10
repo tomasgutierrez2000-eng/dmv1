@@ -42,7 +42,7 @@ source_tables:
     role: DIMENSION
   - name: lob_segment_id
     role: DIMENSION
-  - name: active_flag
+  - name: is_active_flag
     role: FILTER
 - schema: l1
   table: enterprise_business_taxonomy
@@ -61,7 +61,7 @@ levels:
 
       '
     formula_sql: "SELECT\n  fes.facility_id AS dimension_key,\n  fes.committed_amount AS metric_value\nFROM l2.facility_exposure_snapshot\
-      \ fes\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fes.facility_id\n  AND fm.active_flag = 'Y'\nWHERE fes.as_of_date\
+      \ fes\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fes.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fes.as_of_date\
       \ = :as_of_date"
   counterparty:
     aggregation_type: RAW
@@ -70,9 +70,9 @@ levels:
       '
     formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
       \    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.active_flag = 'Y'\n \
+      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
       \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+      \  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
   desk:
     aggregation_type: SUM
     formula_text: 'SUM of facility-level limit_amt per L3 desk segment.
@@ -80,9 +80,9 @@ levels:
       '
     formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
       \    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.active_flag = 'Y'\n \
+      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
       \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n\
+      \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n\
       GROUP BY ebt.managed_segment_id"
   portfolio:
     aggregation_type: SUM
@@ -91,9 +91,9 @@ levels:
       '
     formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
       \  SELECT\n    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.active_flag = 'Y'\n \
+      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
       \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
+      \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY\
       \ ebt_l2.managed_segment_id"
   business_segment:
@@ -103,9 +103,9 @@ levels:
       '
     formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
       \  SELECT\n    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.active_flag = 'Y'\n \
+      \ fes\n  INNER JOIN l1.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
       \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
+      \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN\
       \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
 depends_on: []

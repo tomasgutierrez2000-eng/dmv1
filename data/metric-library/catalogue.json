@@ -33860,7 +33860,88 @@
       }
     ],
     "demo_data": {
-      "facilities": []
+      "facilities": [
+        {
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1500000000.0,
+          "collateral_value": 0.0,
+          "ltv_pct": 0.0,
+          "positions": [],
+          "metric_value": 331.1258,
+          "committed_facility_amt": 1500000000.0
+        },
+        {
+          "facility_id": "F-7",
+          "facility_name": "Pinnacle Healthcare — Bilateral Term",
+          "counterparty_id": "CP-7",
+          "counterparty_name": "Pinnacle Healthcare Systems Corp.",
+          "lob_segment_id": "SEG-7",
+          "desk_name": "Strategic Relationship Management Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 3000000000.0,
+          "collateral_value": 0.0,
+          "ltv_pct": 0.0,
+          "positions": [],
+          "metric_value": 4081.6327,
+          "committed_facility_amt": 3000000000.0
+        },
+        {
+          "facility_id": "F-18",
+          "facility_name": "Quantum — USD Term Loan 2027-B",
+          "counterparty_id": "CP-12",
+          "counterparty_name": "Quantum Signal Communications Corp.",
+          "lob_segment_id": "SEG-18",
+          "desk_name": "Unknown",
+          "portfolio_name": "Specialized Industries",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 2104939352.0,
+          "collateral_value": 0.0,
+          "ltv_pct": 0.0,
+          "positions": [],
+          "metric_value": 493.4211,
+          "committed_facility_amt": 2104939352.0
+        },
+        {
+          "facility_id": "F-96",
+          "facility_name": "Nova Clin — GBP L/C 2028-D",
+          "counterparty_id": "CP-29",
+          "counterparty_name": "Nova Clinical Research Ltd.",
+          "lob_segment_id": "SEG-96",
+          "desk_name": "Construction Data Center Desk",
+          "portfolio_name": "Data Center",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 12425362.0,
+          "collateral_value": 0.0,
+          "ltv_pct": 0.0,
+          "positions": [],
+          "metric_value": 496.6889,
+          "committed_facility_amt": 12425362.0
+        },
+        {
+          "facility_id": "F-143",
+          "facility_name": "Heritage Mutual — USD Revolver 2030-A",
+          "counterparty_id": "CP-45",
+          "counterparty_name": "Heritage Mutual Insurance Co.",
+          "lob_segment_id": "SEG-143",
+          "desk_name": "Rates Trading Desk",
+          "portfolio_name": "Fixed Income (Rates, Credit)",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 412451902.0,
+          "collateral_value": 0.0,
+          "ltv_pct": 0.0,
+          "positions": [],
+          "metric_value": 503.3557,
+          "committed_facility_amt": 412451902.0
+        }
+      ]
     }
   }
 ]

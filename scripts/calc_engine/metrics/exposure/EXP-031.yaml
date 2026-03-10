@@ -37,7 +37,7 @@ source_tables:
         role: FILTER
       - name: revenue_amt
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -74,10 +74,10 @@ levels:
         SUM(ffs.revenue_amt
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
       FROM l2.facility_financial_snapshot ffs
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = ffs.facility_id
         AND fla.is_current_flag = 'Y'
       WHERE ffs.as_of_date = :as_of_date
@@ -96,16 +96,16 @@ levels:
           SUM(ffs.revenue_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_financial_snapshot ffs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = ffs.facility_id
           AND fla.is_current_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
         GROUP BY ffs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -123,16 +123,16 @@ levels:
           SUM(ffs.revenue_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_financial_snapshot ffs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = ffs.facility_id
           AND fla.is_current_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
         GROUP BY ffs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -152,16 +152,16 @@ levels:
           SUM(ffs.revenue_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_financial_snapshot ffs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = ffs.facility_id
           AND fla.is_current_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
         GROUP BY ffs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -183,16 +183,16 @@ levels:
           SUM(ffs.revenue_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_financial_snapshot ffs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = ffs.facility_id
           AND fla.is_current_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
         GROUP BY ffs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

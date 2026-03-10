@@ -39,7 +39,7 @@ source_tables:
         role: FILTER
       - name: external_risk_rating
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -85,7 +85,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         pos.external_risk_rating AS metric_value
       FROM l2.position pos
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = pos.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE pos.as_of_date = :as_of_date
@@ -104,7 +104,7 @@ levels:
         FROM l2.position pos
         WHERE pos.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -125,7 +125,7 @@ levels:
         FROM l2.position pos
         WHERE pos.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -148,7 +148,7 @@ levels:
         FROM l2.position pos
         WHERE pos.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

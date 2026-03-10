@@ -1,4 +1,3 @@
-"""Calculator implementations — import all to auto-register."""
+"""Calculator implementations — import generic to auto-register all YAML metrics."""
 
-from . import dscr, interest_expense, ltv, undrawn_exposure  # noqa: F401
-from . import generic  # noqa: F401  — auto-registers all remaining YAML metrics
+from . import generic  # noqa: F401  — auto-registers all YAML metrics

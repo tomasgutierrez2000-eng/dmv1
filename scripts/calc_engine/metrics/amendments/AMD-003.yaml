@@ -54,7 +54,7 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         atd.amendment_type_code AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       INNER JOIN l1.amendment_type_dim atd
         ON atd.facility_id = fm.facility_id
       WHERE fm.is_active_flag = 'Y'
@@ -70,12 +70,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           atd.amendment_type_code AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.amendment_type_dim atd
           ON atd.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -91,12 +91,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           atd.amendment_type_code AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.amendment_type_dim atd
           ON atd.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -114,12 +114,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           atd.amendment_type_code AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.amendment_type_dim atd
           ON atd.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -139,12 +139,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           atd.amendment_type_code AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.amendment_type_dim atd
           ON atd.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

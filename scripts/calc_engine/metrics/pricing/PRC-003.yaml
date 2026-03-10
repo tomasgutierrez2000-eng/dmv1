@@ -28,7 +28,7 @@ source_tables:
     role: FILTER
   - name: pricing_exception_flag
     role: MEASURE
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
@@ -62,7 +62,7 @@ levels:
         fps.facility_id AS dimension_key,
         CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1.0 ELSE 0.0 END AS metric_value
       FROM l2.facility_pricing_snapshot fps
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
@@ -78,7 +78,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
@@ -96,7 +96,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
@@ -115,7 +115,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
@@ -136,7 +136,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date

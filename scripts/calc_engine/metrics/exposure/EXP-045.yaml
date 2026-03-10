@@ -30,7 +30,7 @@ source_tables:
     role: MEASURE
   - name: gross_exposure_usd
     role: MEASURE
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
@@ -64,7 +64,7 @@ levels:
         fes.facility_id AS dimension_key,
         fes.rwa_amt / NULLIF(fes.gross_exposure_usd, 0) * 100.0 AS metric_value
       FROM l2.facility_exposure_snapshot fes
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
@@ -84,12 +84,12 @@ levels:
           fes.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -109,12 +109,12 @@ levels:
           fes.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -136,12 +136,12 @@ levels:
           fes.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -165,12 +165,12 @@ levels:
           fes.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

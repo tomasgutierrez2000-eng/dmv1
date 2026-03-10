@@ -54,7 +54,7 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         ebt.parent AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       INNER JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.facility_id = fm.facility_id
       WHERE fm.is_active_flag = 'Y'
@@ -67,7 +67,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         ebt.parent AS metric_value
       FROM l1.enterprise_business_taxonomy ebt
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = ebt.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE ebt.as_of_date = :as_of_date
@@ -83,12 +83,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           ebt.parent AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.enterprise_business_taxonomy ebt
           ON ebt.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -106,12 +106,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           ebt.parent AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.enterprise_business_taxonomy ebt
           ON ebt.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -131,12 +131,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           ebt.parent AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         INNER JOIN l1.enterprise_business_taxonomy ebt
           ON ebt.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

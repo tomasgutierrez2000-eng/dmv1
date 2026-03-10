@@ -17,7 +17,7 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: BASE
@@ -49,7 +49,7 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         1 AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: COUNT
@@ -62,10 +62,10 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -80,10 +80,10 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -100,10 +100,10 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -122,10 +122,10 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

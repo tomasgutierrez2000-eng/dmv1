@@ -36,7 +36,7 @@ source_tables:
         role: FILTER
       - name: operating_expense_amt
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -82,7 +82,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         ffs.operating_expense_amt AS metric_value
       FROM l2.facility_financial_snapshot ffs
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE ffs.as_of_date = :as_of_date
@@ -101,7 +101,7 @@ levels:
         FROM l2.facility_financial_snapshot ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -122,7 +122,7 @@ levels:
         FROM l2.facility_financial_snapshot ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -145,7 +145,7 @@ levels:
         FROM l2.facility_financial_snapshot ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

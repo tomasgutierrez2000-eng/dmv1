@@ -48,7 +48,7 @@ source_tables:
     fields:
       - name: drawn_amount
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -106,7 +106,7 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       GROUP BY fm.counterparty_id
   desk:
@@ -131,7 +131,7 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -158,7 +158,7 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -187,7 +187,7 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id

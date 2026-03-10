@@ -73,7 +73,7 @@ levels:
       SELECT
         fes.facility_id AS dimension_key,
         fes.days_until_maturity AS metric_value
-      FROM l2.facility_exposure_snapshot fes
+      FROM l3.facility_exposure_calc fes
       WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
@@ -87,7 +87,7 @@ levels:
         SELECT
           fes.facility_id AS dimension_key,
           fes.days_until_maturity AS metric_value
-        FROM l2.facility_exposure_snapshot fes
+        FROM l3.facility_exposure_calc fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -106,7 +106,7 @@ levels:
         SELECT
           fes.facility_id AS dimension_key,
           fes.days_until_maturity AS metric_value
-        FROM l2.facility_exposure_snapshot fes
+        FROM l3.facility_exposure_calc fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -127,7 +127,7 @@ levels:
         SELECT
           fes.facility_id AS dimension_key,
           fes.days_until_maturity AS metric_value
-        FROM l2.facility_exposure_snapshot fes
+        FROM l3.facility_exposure_calc fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -150,7 +150,7 @@ levels:
         SELECT
           fes.facility_id AS dimension_key,
           fes.days_until_maturity AS metric_value
-        FROM l2.facility_exposure_snapshot fes
+        FROM l3.facility_exposure_calc fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

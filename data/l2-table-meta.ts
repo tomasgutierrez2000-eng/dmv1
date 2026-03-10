@@ -54,6 +54,7 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'facility_profitability_snapshot', scd: 'Snapshot', category: 'Financial Metrics' },
   { name: 'limit_contribution_snapshot', scd: 'Snapshot', category: 'Limits' },
   { name: 'limit_utilization_event', scd: 'Snapshot', category: 'Limits' },
+  { name: 'limit_assignment_snapshot', scd: 'Snapshot', category: 'Limits' },
   { name: 'counterparty_rating_observation', scd: 'Snapshot', category: 'Ratings' },
   { name: 'financial_metric_observation', scd: 'Snapshot', category: 'Metrics' },
   { name: 'counterparty_financial_snapshot', scd: 'Snapshot', category: 'Financial Metrics' },

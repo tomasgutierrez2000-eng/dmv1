@@ -1227,6 +1227,8 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_risk_calc" (
     "ead_amt" NUMERIC(20,4),
     "expected_loss_amt" NUMERIC(20,4),
     "rwa_amt" NUMERIC(20,4),
+    "exposure_at_default" NUMERIC(20,4),
+    "lgd_estimate" NUMERIC(20,4),
     "created_ts" TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
@@ -1239,4 +1241,94 @@ CREATE TABLE IF NOT EXISTS "l3"."netting_set_exposure_calc" (
     "netting_benefit_amt" NUMERIC(20,4),
     "created_ts" TIMESTAMP,
     PRIMARY KEY ("netting_set_id", "as_of_date")
+);
+
+-- facility_exposure_calc (Exposure & Risk Metrics)
+-- Calculated overlay for l2.facility_exposure_snapshot
+CREATE TABLE IF NOT EXISTS "l3"."facility_exposure_calc" (
+    "facility_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "number_of_loans" INTEGER,
+    "number_of_facilities" INTEGER,
+    "days_until_maturity" INTEGER,
+    "rwa_amt" NUMERIC(20,4),
+    "utilization_status_code" VARCHAR(20),
+    "risk_rating_tier_code" VARCHAR(20),
+    "limit_status_code" VARCHAR(20),
+    "coverage_ratio_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+-- facility_financial_calc (Facility Analytics)
+-- Calculated overlay for l2.facility_financial_snapshot
+CREATE TABLE IF NOT EXISTS "l3"."facility_financial_calc" (
+    "facility_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "dscr_value" NUMERIC(12,6),
+    "ltv_pct" NUMERIC(10,6),
+    "net_income_amt" NUMERIC(20,4),
+    "total_debt_service_amt" NUMERIC(20,4),
+    "revenue_amt" NUMERIC(20,4),
+    "interest_expense_amt" NUMERIC(20,4),
+    "interest_income_amt" NUMERIC(20,4),
+    "avg_earning_assets_amt" NUMERIC(20,4),
+    "fee_rate_pct" NUMERIC(10,6),
+    "interest_rate_sensitivity_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+-- counterparty_rating_calc (Credit Events & Performance)
+-- Calculated overlay for l2.counterparty_rating_observation
+CREATE TABLE IF NOT EXISTS "l3"."counterparty_rating_calc" (
+    "counterparty_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "rating_type" VARCHAR(30),
+    "risk_rating_change_steps" INTEGER,
+    "rating_change_status_code" VARCHAR(20),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("counterparty_id", "as_of_date", "rating_type")
+);
+
+-- facility_pricing_calc (Facility Analytics)
+-- Calculated overlay for l2.facility_pricing_snapshot
+CREATE TABLE IF NOT EXISTS "l3"."facility_pricing_calc" (
+    "facility_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "pricing_exception_flag" BOOLEAN,
+    "exception_status_code" VARCHAR(20),
+    "pricing_tier_code" VARCHAR(20),
+    "fee_rate_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+-- deal_pipeline_calc (Business Segment Summary)
+-- Calculated overlay for l2.deal_pipeline_fact
+CREATE TABLE IF NOT EXISTS "l3"."deal_pipeline_calc" (
+    "deal_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "expected_tenor_months" NUMERIC(10,2),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("deal_id", "as_of_date")
+);
+
+-- collateral_calc (Credit Risk Mitigation (CRM))
+-- Calculated overlay for l2.collateral_snapshot
+CREATE TABLE IF NOT EXISTS "l3"."collateral_calc" (
+    "collateral_asset_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "allocated_amount_usd" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("collateral_asset_id", "as_of_date")
+);
+
+-- cash_flow_calc (Cash Flows)
+-- Calculated overlay for l2.cash_flow
+CREATE TABLE IF NOT EXISTS "l3"."cash_flow_calc" (
+    "cash_flow_id" BIGINT NOT NULL,
+    "contractual_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("cash_flow_id")
 );

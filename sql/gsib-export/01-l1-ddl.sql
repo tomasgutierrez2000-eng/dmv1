@@ -1012,3 +1012,36 @@ CREATE TABLE IF NOT EXISTS "l1"."origination_date_bucket_dim" (
     "active_flag" BOOLEAN,
     PRIMARY KEY ("origination_bucket_code")
 );
+
+-- limit_status_dim (Limits & Thresholds)
+CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
+    "limit_status_code" VARCHAR(20) NOT NULL,
+    "status_name" VARCHAR(200),
+    "description" VARCHAR(500),
+    "severity_ordinal" INTEGER,
+    "display_order" INTEGER,
+    "active_flag" BOOLEAN,
+    PRIMARY KEY ("limit_status_code")
+);
+
+-- exception_status_dim (Facility)
+CREATE TABLE IF NOT EXISTS "l1"."exception_status_dim" (
+    "exception_status_code" VARCHAR(20) NOT NULL,
+    "status_name" VARCHAR(200),
+    "description" VARCHAR(500),
+    "requires_approval_flag" BOOLEAN,
+    "display_order" INTEGER,
+    "active_flag" BOOLEAN,
+    PRIMARY KEY ("exception_status_code")
+);
+
+-- rating_change_status_dim (Ratings)
+CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
+    "rating_change_status_code" VARCHAR(20) NOT NULL,
+    "status_name" VARCHAR(200),
+    "description" VARCHAR(500),
+    "direction" VARCHAR(20),
+    "display_order" INTEGER,
+    "active_flag" BOOLEAN,
+    PRIMARY KEY ("rating_change_status_code")
+);

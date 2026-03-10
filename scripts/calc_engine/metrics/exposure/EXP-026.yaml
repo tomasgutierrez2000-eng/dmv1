@@ -72,7 +72,7 @@ levels:
       SELECT
         ffs.facility_id AS dimension_key,
         ffs.ltv_pct AS metric_value
-      FROM l2.facility_financial_snapshot ffs
+      FROM l3.facility_financial_calc ffs
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
@@ -86,7 +86,7 @@ levels:
         SELECT
           ffs.facility_id AS dimension_key,
           ffs.ltv_pct AS metric_value
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -105,7 +105,7 @@ levels:
         SELECT
           ffs.facility_id AS dimension_key,
           ffs.ltv_pct AS metric_value
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -126,7 +126,7 @@ levels:
         SELECT
           ffs.facility_id AS dimension_key,
           ffs.ltv_pct AS metric_value
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -149,7 +149,7 @@ levels:
         SELECT
           ffs.facility_id AS dimension_key,
           ffs.ltv_pct AS metric_value
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

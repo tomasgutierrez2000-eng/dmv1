@@ -72,7 +72,7 @@ levels:
       SELECT
         cefl.facility_id AS dimension_key,
         cefl.exposure_at_default AS metric_value
-      FROM l2.credit_event_facility_link cefl
+      FROM l3.facility_risk_calc cefl
       WHERE cefl.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
@@ -86,7 +86,7 @@ levels:
         SELECT
           cefl.facility_id AS dimension_key,
           cefl.exposure_at_default AS metric_value
-        FROM l2.credit_event_facility_link cefl
+        FROM l3.facility_risk_calc cefl
         WHERE cefl.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -105,7 +105,7 @@ levels:
         SELECT
           cefl.facility_id AS dimension_key,
           cefl.exposure_at_default AS metric_value
-        FROM l2.credit_event_facility_link cefl
+        FROM l3.facility_risk_calc cefl
         WHERE cefl.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -126,7 +126,7 @@ levels:
         SELECT
           cefl.facility_id AS dimension_key,
           cefl.exposure_at_default AS metric_value
-        FROM l2.credit_event_facility_link cefl
+        FROM l3.facility_risk_calc cefl
         WHERE cefl.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -149,7 +149,7 @@ levels:
         SELECT
           cefl.facility_id AS dimension_key,
           cefl.exposure_at_default AS metric_value
-        FROM l2.credit_event_facility_link cefl
+        FROM l3.facility_risk_calc cefl
         WHERE cefl.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

@@ -17,8 +17,8 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l2
-  table: facility_financial_snapshot
+- schema: l3
+  table: facility_financial_calc
   alias: ffs
   join_type: BASE
   fields:
@@ -63,7 +63,7 @@ levels:
       SELECT
         ffs.facility_id AS dimension_key,
         ffs.ebitda_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value
-      FROM l2.facility_financial_snapshot ffs
+      FROM l3.facility_financial_calc ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
@@ -83,7 +83,7 @@ levels:
           ffs.facility_id,
           ffs.ebitda_amt AS numerator_val,
           ffs.total_debt_service_amt AS denominator_val
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -108,7 +108,7 @@ levels:
           ffs.facility_id,
           ffs.ebitda_amt AS numerator_val,
           ffs.total_debt_service_amt AS denominator_val
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -135,7 +135,7 @@ levels:
           ffs.facility_id,
           ffs.ebitda_amt AS numerator_val,
           ffs.total_debt_service_amt AS denominator_val
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -164,7 +164,7 @@ levels:
           ffs.facility_id,
           ffs.ebitda_amt AS numerator_val,
           ffs.total_debt_service_amt AS denominator_val
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'

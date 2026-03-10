@@ -102,7 +102,7 @@ levels:
         fprs.facility_id AS dimension_key,
         SUM(fprs.interest_income_amt
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-      FROM l2.facility_profitability_snapshot fprs
+      FROM l3.facility_financial_calc fprs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
@@ -124,7 +124,7 @@ levels:
           fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -149,7 +149,7 @@ levels:
           fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -177,7 +177,7 @@ levels:
           fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -207,7 +207,7 @@ levels:
           fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'

@@ -71,7 +71,7 @@ levels:
       SELECT
         fprs.facility_id AS dimension_key,
         fprs.avg_earning_assets_amt AS metric_value
-      FROM l2.facility_profitability_snapshot fprs
+      FROM l3.facility_financial_calc fprs
       WHERE fprs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: WEIGHTED_AVG
@@ -86,7 +86,7 @@ levels:
         SELECT
           fprs.facility_id AS dimension_key,
           fprs.avg_earning_assets_amt AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         WHERE fprs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -105,7 +105,7 @@ levels:
         SELECT
           fprs.facility_id AS dimension_key,
           fprs.avg_earning_assets_amt AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         WHERE fprs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -126,7 +126,7 @@ levels:
         SELECT
           fprs.facility_id AS dimension_key,
           fprs.avg_earning_assets_amt AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         WHERE fprs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -150,7 +150,7 @@ levels:
         SELECT
           fprs.facility_id AS dimension_key,
           fprs.avg_earning_assets_amt AS metric_value
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         WHERE fprs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

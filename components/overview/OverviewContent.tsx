@@ -74,6 +74,7 @@ export default function OverviewContent() {
                   {[
                     { href: '/architecture', icon: Layers, label: 'Pipeline', desc: 'End-to-end data pipeline' },
                     { href: '/architecture/overview', icon: Map, label: 'Data Model Overview', desc: 'Tables, relationships & flow' },
+                    { href: '/architecture/reference-data', icon: Database, label: 'Reference Data', desc: 'L1 tables & live database contents' },
                   ].map((item) => (
                     <Link
                       key={item.href}

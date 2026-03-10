@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTriangle, X, Shield, Type, Columns3 } from 'lucide-react';
+import { Database, Search, Filter, ChevronRight, ChevronDown, Layers, AlertTriangle, X, Shield, Type, Columns3, Maximize2 } from 'lucide-react';
 import type { RiskStripe } from '../../types/model';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
@@ -84,6 +84,7 @@ export default function Sidebar() {
     setSelectedTable,
     sidebarOpen,
     setSidebarOpen,
+    setRequestFitToView,
   } = useModelStore();
 
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
@@ -95,6 +96,18 @@ export default function Sidebar() {
       setExpandedCategories(new Set(model.categories || []));
     }
   }, [searchQuery, model]);
+
+  // Same logic as Canvas: filters that narrow the visible set (used for Fit to view button)
+  const filtersNarrowing = useMemo(
+    () =>
+      filterCategories.size > 0 ||
+      filterRiskStripes.size > 0 ||
+      !visibleLayers.L1 ||
+      !visibleLayers.L2 ||
+      !visibleLayers.L3 ||
+      l3CategoryExcluded.size > 0,
+    [filterCategories, filterRiskStripes, visibleLayers, l3CategoryExcluded]
+  );
 
   // Detect whether model has any risk stripes set
   const hasRiskStripes = useMemo(() => {
@@ -385,10 +398,29 @@ export default function Sidebar() {
             </button>
           )}
         </div>
-        {searchQuery && (
-          <p className="text-[12px] text-gray-400 mt-1.5 px-0.5">
-            {filteredTables.length} result{filteredTables.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
-          </p>
+        {(searchQuery || filtersNarrowing) && (
+          <div className="flex items-center justify-between gap-2 mt-1.5 px-0.5">
+            <p className="text-[12px] text-gray-400">
+              {searchQuery ? (
+                <span>
+                  {filteredTables.length} result{filteredTables.length !== 1 ? 's' : ''} for &quot;{searchQuery}&quot;
+                </span>
+              ) : (
+                <span>{filteredTables.length} table{filteredTables.length !== 1 ? 's' : ''} match filters</span>
+              )}
+            </p>
+            {filteredTables.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setRequestFitToView()}
+                className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+                aria-label="Fit results to view"
+              >
+                <Maximize2 className="w-3 h-3" />
+                Fit to view
+              </button>
+            )}
+          </div>
         )}
       </div>
 

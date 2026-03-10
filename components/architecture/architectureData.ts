@@ -340,7 +340,7 @@ const canonicalModel: ArchStage = {
           { label: 'Type', value: 'Read-only' },
           { label: 'Change freq', value: 'Slow (days–months)' },
         ],
-        link: '/data-model',
+        link: '/architecture/reference-data',
       },
     },
     {

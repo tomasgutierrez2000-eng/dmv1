@@ -87,28 +87,17 @@ function parseArgs(): CliArgs {
 
 function chainToTables(chain: ReturnType<typeof buildL1Chain>): TableData[] {
   const tables: TableData[] = [];
+  const push = (table: string, rows: Record<string, unknown>[]) => {
+    if (rows.length > 0) tables.push({ table, rows });
+  };
 
-  if (chain.counterparties.length > 0) {
-    tables.push({ table: 'l1.counterparty', rows: chain.counterparties });
-  }
-  if (chain.agreements.length > 0) {
-    tables.push({ table: 'l1.credit_agreement_master', rows: chain.agreements });
-  }
-  if (chain.facilities.length > 0) {
-    tables.push({ table: 'l1.facility_master', rows: chain.facilities });
-  }
-  if (chain.hierarchies && chain.hierarchies.length > 0) {
-    tables.push({ table: 'l1.counterparty_hierarchy', rows: chain.hierarchies });
-  }
-  if (chain.collateral_assets && chain.collateral_assets.length > 0) {
-    tables.push({ table: 'l1.collateral_asset_master', rows: chain.collateral_assets });
-  }
-  if (chain.limit_rules && chain.limit_rules.length > 0) {
-    tables.push({ table: 'l1.limit_rule', rows: chain.limit_rules });
-  }
-  if (chain.facility_lender_allocations && chain.facility_lender_allocations.length > 0) {
-    tables.push({ table: 'l1.facility_lender_allocation', rows: chain.facility_lender_allocations });
-  }
+  push('l1.counterparty', chain.counterparties as unknown as SqlRow[]);
+  push('l1.credit_agreement_master', chain.agreements as unknown as SqlRow[]);
+  push('l1.facility_master', chain.facilities as unknown as SqlRow[]);
+  if (chain.hierarchies) push('l1.counterparty_hierarchy', chain.hierarchies as unknown as SqlRow[]);
+  if (chain.collateral_assets) push('l1.collateral_asset_master', chain.collateral_assets as unknown as SqlRow[]);
+  if (chain.limit_rules) push('l1.limit_rule', chain.limit_rules as unknown as SqlRow[]);
+  if (chain.facility_lender_allocations) push('l1.facility_lender_allocation', chain.facility_lender_allocations as unknown as SqlRow[]);
 
   return tables;
 }

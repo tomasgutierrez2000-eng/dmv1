@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY scripts/calc_engine/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt fastapi uvicorn[standard]
+
+# Copy calc engine source
+COPY scripts/calc_engine/ scripts/calc_engine/
+
+# Copy sample data (fallback when DATABASE_URL not set)
+COPY scripts/l1/output/sample-data.json scripts/l1/output/sample-data.json
+COPY scripts/l2/output/sample-data.json scripts/l2/output/sample-data.json
+
+# Copy catalogue for metric lookups
+COPY data/metric-library/catalogue.json data/metric-library/catalogue.json
+
+ENV PYTHONPATH=/app
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["uvicorn", "scripts.calc_engine.server:app", "--host", "0.0.0.0", "--port", "8080"]

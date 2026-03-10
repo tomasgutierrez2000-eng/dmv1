@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-10T07:07:54.973Z",
+  "createdAt": "2026-03-10T09:15:01.642Z",
   "tables": [
     {
       "layer": "L1",
@@ -21,10 +21,10 @@
           "name": "active_flag"
         },
         {
-          "name": "is_financial_institution"
+          "name": "is_financial_institution_flag"
         },
         {
-          "name": "is_sovereign"
+          "name": "is_sovereign_flag"
         },
         {
           "name": "regulatory_counterparty_class"
@@ -168,7 +168,7 @@
           "name": "created_ts"
         },
         {
-          "name": "is_primary"
+          "name": "is_primary_flag"
         },
         {
           "name": "updated_ts"
@@ -282,10 +282,10 @@
           "name": "hqla_level"
         },
         {
-          "name": "is_eligible_crm"
+          "name": "is_eligible_crm_flag"
         },
         {
-          "name": "is_financial_collateral"
+          "name": "is_financial_collateral_flag"
         },
         {
           "name": "minimum_holding_period_days"
@@ -555,7 +555,7 @@
           "name": "functional_currency_code"
         },
         {
-          "name": "is_current"
+          "name": "is_current_flag"
         },
         {
           "name": "jurisdiction_code"
@@ -600,7 +600,7 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_current"
+          "name": "is_current_flag"
         },
         {
           "name": "lob_segment_id"
@@ -867,7 +867,7 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_current"
+          "name": "is_current_flag"
         },
         {
           "name": "lgd_downturn"
@@ -930,7 +930,7 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_current"
+          "name": "is_current_flag"
         },
         {
           "name": "mapping_method"
@@ -1215,7 +1215,7 @@
           "name": "description"
         },
         {
-          "name": "is_active"
+          "name": "is_active_flag"
         },
         {
           "name": "regulatory_scenario_code"
@@ -1308,10 +1308,10 @@
           "name": "index_family"
         },
         {
-          "name": "is_bmu_compliant"
+          "name": "is_bmu_compliant_flag"
         },
         {
-          "name": "is_fallback_rate"
+          "name": "is_fallback_rate_flag"
         },
         {
           "name": "publication_source"
@@ -1359,7 +1359,7 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_reconciliation_account"
+          "name": "is_reconciliation_account_flag"
         },
         {
           "name": "legal_entity_id"
@@ -1416,22 +1416,22 @@
           "name": "fiscal_month"
         },
         {
-          "name": "is_weekend"
+          "name": "is_weekend_flag"
         },
         {
-          "name": "is_month_end"
+          "name": "is_month_end_flag"
         },
         {
-          "name": "is_quarter_end"
+          "name": "is_quarter_end_flag"
         },
         {
-          "name": "is_year_end"
+          "name": "is_year_end_flag"
         },
         {
-          "name": "is_us_business_day"
+          "name": "is_us_business_day_flag"
         },
         {
-          "name": "is_us_bank_holiday"
+          "name": "is_us_bank_holiday_flag"
         },
         {
           "name": "date_day"
@@ -1473,7 +1473,7 @@
           "name": "timezone_code"
         },
         {
-          "name": "is_dst"
+          "name": "is_dst_flag"
         },
         {
           "name": "created_ts"
@@ -1551,7 +1551,7 @@
           "name": "fiscal_year"
         },
         {
-          "name": "is_period_end"
+          "name": "is_period_end_flag"
         },
         {
           "name": "period_end_date"
@@ -1575,7 +1575,7 @@
           "name": "country_name"
         },
         {
-          "name": "is_active"
+          "name": "is_active_flag"
         },
         {
           "name": "region_code"
@@ -1584,13 +1584,13 @@
           "name": "basel_country_risk_weight"
         },
         {
-          "name": "is_developed_market"
+          "name": "is_developed_market_flag"
         },
         {
-          "name": "is_fatf_high_risk"
+          "name": "is_fatf_high_risk_flag"
         },
         {
-          "name": "is_ofac_sanctioned"
+          "name": "is_ofac_sanctioned_flag"
         },
         {
           "name": "iso_alpha_3"
@@ -1647,7 +1647,7 @@
           "name": "currency_symbol"
         },
         {
-          "name": "is_active"
+          "name": "is_active_flag"
         },
         {
           "name": "iso_numeric"
@@ -1656,7 +1656,7 @@
           "name": "minor_unit_decimals"
         },
         {
-          "name": "is_g10_currency"
+          "name": "is_g10_currency_flag"
         }
       ]
     },
@@ -1746,7 +1746,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "is_active"
+          "name": "is_active_flag"
         },
         {
           "name": "jurisdiction_id"
@@ -1917,7 +1917,7 @@
           "name": "effective_to_date"
         },
         {
-          "name": "is_current"
+          "name": "is_current_flag"
         },
         {
           "name": "model_type"
@@ -3441,36 +3441,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "stress_test_result",
-      "fields": [
-        {
-          "name": "result_id"
-        },
-        {
-          "name": "scenario_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "result_description"
-        },
-        {
-          "name": "loss_amount"
-        },
-        {
-          "name": "capital_impact"
-        },
-        {
-          "name": "result_status"
-        },
-        {
-          "name": "scenario_type"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "deal_pipeline_fact",
       "fields": [
         {
@@ -3633,27 +3603,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "metric_threshold",
-      "fields": [
-        {
-          "name": "threshold_id"
-        },
-        {
-          "name": "metric_definition_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "threshold_value"
-        },
-        {
-          "name": "threshold_type"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "exception_event",
       "fields": [
         {
@@ -3775,36 +3724,6 @@
         },
         {
           "name": "flag_trigger_value"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
-      "tableName": "data_quality_score_snapshot",
-      "fields": [
-        {
-          "name": "score_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "dimension_name"
-        },
-        {
-          "name": "completeness_pct"
-        },
-        {
-          "name": "validity_pct"
-        },
-        {
-          "name": "overall_score"
-        },
-        {
-          "name": "target_table"
-        },
-        {
-          "name": "issue_count"
         }
       ]
     },
@@ -4083,31 +4002,31 @@
           "name": "internal_risk_rating"
         },
         {
-          "name": "is_affiliated"
+          "name": "is_affiliated_flag"
         },
         {
-          "name": "is_central_counterparty"
+          "name": "is_central_counterparty_flag"
         },
         {
-          "name": "is_financial_institution"
+          "name": "is_financial_institution_flag"
         },
         {
-          "name": "is_insider"
+          "name": "is_insider_flag"
         },
         {
-          "name": "is_multilateral_dev_bank"
+          "name": "is_multilateral_dev_bank_flag"
         },
         {
           "name": "is_parent_flag"
         },
         {
-          "name": "is_public_sector_entity"
+          "name": "is_public_sector_entity_flag"
         },
         {
-          "name": "is_regulated_entity"
+          "name": "is_regulated_entity_flag"
         },
         {
-          "name": "is_sovereign"
+          "name": "is_sovereign_flag"
         },
         {
           "name": "lei_code"
@@ -4176,7 +4095,7 @@
           "name": "institution_id"
         },
         {
-          "name": "is_reporting_entity"
+          "name": "is_reporting_entity_flag"
         },
         {
           "name": "lei_code"
@@ -4239,10 +4158,10 @@
           "name": "instrument_type"
         },
         {
-          "name": "is_callable"
+          "name": "is_callable_flag"
         },
         {
-          "name": "is_convertible"
+          "name": "is_convertible_flag"
         },
         {
           "name": "issue_date"
@@ -4512,10 +4431,10 @@
           "name": "governing_law"
         },
         {
-          "name": "is_bankruptcy_remote"
+          "name": "is_bankruptcy_remote_flag"
         },
         {
-          "name": "is_enforceable"
+          "name": "is_enforceable_flag"
         },
         {
           "name": "legal_entity_id"
@@ -7953,7 +7872,7 @@
           "name": "created_ts"
         },
         {
-          "name": "is_deteriorated"
+          "name": "is_deteriorated_flag"
         },
         {
           "name": "risk_rating_tier_code"

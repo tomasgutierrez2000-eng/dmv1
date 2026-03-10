@@ -58,7 +58,6 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'financial_metric_observation', scd: 'Snapshot', category: 'Metrics' },
   { name: 'counterparty_financial_snapshot', scd: 'Snapshot', category: 'Financial Metrics' },
   { name: 'facility_risk_snapshot', scd: 'Snapshot', category: 'Risk Monitoring' },
-  { name: 'data_quality_score_snapshot', scd: 'Snapshot', category: 'Data Quality' },
 
   // ── Events ──
   { name: 'cash_flow', scd: 'Event', category: 'Cash Flows' },
@@ -67,7 +66,6 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'credit_event', scd: 'Event', category: 'Credit Events' },
   { name: 'credit_event_facility_link', scd: 'Event', category: 'Credit Events' },
   { name: 'stress_test_breach', scd: 'Event', category: 'Stress Testing' },
-  { name: 'stress_test_result', scd: 'Event', category: 'Stress Testing' },
   { name: 'deal_pipeline_fact', scd: 'Event', category: 'Deal Pipeline' },
   { name: 'exception_event', scd: 'Event', category: 'Exceptions' },
   { name: 'risk_flag', scd: 'Event', category: 'Risk Monitoring' },

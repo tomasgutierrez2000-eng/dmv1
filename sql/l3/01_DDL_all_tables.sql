@@ -1256,6 +1256,9 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_exposure_calc" (
     "risk_rating_tier_code" VARCHAR(20),
     "limit_status_code" VARCHAR(20),
     "coverage_ratio_pct" NUMERIC(10,6),
+    "utilization_pct" NUMERIC(10,6),
+    "undrawn_amt" NUMERIC(20,4),
+    "net_exposure_amt" NUMERIC(20,4),
     "created_ts" TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
@@ -1266,6 +1269,7 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_financial_calc" (
     "facility_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
     "dscr_value" NUMERIC(12,6),
+    "dscr" NUMERIC(10,6),
     "ltv_pct" NUMERIC(10,6),
     "net_income_amt" NUMERIC(20,4),
     "total_debt_service_amt" NUMERIC(20,4),
@@ -1275,6 +1279,8 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_financial_calc" (
     "avg_earning_assets_amt" NUMERIC(20,4),
     "fee_rate_pct" NUMERIC(10,6),
     "interest_rate_sensitivity_pct" NUMERIC(10,6),
+    "interest_coverage_ratio" NUMERIC(10,6),
+    "debt_yield_pct" NUMERIC(10,6),
     "created_ts" TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
@@ -1331,4 +1337,46 @@ CREATE TABLE IF NOT EXISTS "l3"."cash_flow_calc" (
     "contractual_amt" NUMERIC(20,4),
     "created_ts" TIMESTAMP,
     PRIMARY KEY ("cash_flow_id")
+);
+
+-- data_quality_score_snapshot (Data Quality)
+CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_snapshot" (
+    "table_name" VARCHAR(100) NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "completeness_score_pct" NUMERIC(10,6),
+    "accuracy_score_pct" NUMERIC(10,6),
+    "timeliness_score_pct" NUMERIC(10,6),
+    "overall_dq_score_pct" NUMERIC(10,6),
+    "total_row_count" INTEGER,
+    "null_field_count" INTEGER,
+    "anomaly_count" INTEGER,
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("table_name", "as_of_date")
+);
+
+-- stress_test_result (Stress Testing)
+CREATE TABLE IF NOT EXISTS "l3"."stress_test_result" (
+    "stress_test_result_id" BIGSERIAL NOT NULL,
+    "position_id" BIGINT,
+    "facility_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "scenario_id" BIGINT,
+    "as_of_date" DATE,
+    "stressed_exposure_amt" NUMERIC(20,4),
+    "stressed_expected_loss" NUMERIC(20,4),
+    "capital_impact_pct" NUMERIC(10,6),
+    "currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("stress_test_result_id")
+);
+
+-- gl_account_balance_calc (General Ledger)
+CREATE TABLE IF NOT EXISTS "l3"."gl_account_balance_calc" (
+    "ledger_account_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "ending_balance_net_amt" NUMERIC(20,4),
+    "period_net_activity_amt" NUMERIC(20,4),
+    "balance_change_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("ledger_account_id", "as_of_date")
 );

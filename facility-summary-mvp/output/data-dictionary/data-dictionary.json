@@ -248,6 +248,15 @@
           "description": "Member counterparty id",
           "category": "SCCL Grouping",
           "why_required": "Defines membership",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          },
           "data_type": "BIGINT"
         },
         {
@@ -326,7 +335,12 @@
           "why_required": "Parent instrument",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "instrument_master",
+              "field": "instrument_id"
+            }
           },
           "data_type": "BIGINT"
         },
@@ -1289,6 +1303,15 @@
           "description": "Underlying legal entity id",
           "category": "Legal Entity",
           "why_required": "Links reporting entity to legal entity master",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "legal_entity",
+              "field": "legal_entity_id"
+            }
+          },
           "data_type": "BIGINT"
         },
         {
@@ -3126,7 +3149,7 @@
         },
         {
           "name": "account_type",
-          "description": "ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE",
+          "description": "ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE, CONTRA",
           "category": "General Ledger",
           "why_required": "BS vs IS classification",
           "data_type": "VARCHAR(50)"
@@ -5605,225 +5628,6 @@
           "data_type": "BOOLEAN"
         }
       ]
-    },
-    {
-      "name": "limit_status_dim",
-      "layer": "L1",
-      "category": "Limits & Thresholds",
-      "fields": [
-        {
-          "name": "limit_status_code",
-          "description": "Unique code for limit utilization status",
-          "category": "Limits & Thresholds",
-          "why_required": "Unique code for limit utilization status",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "status_name",
-          "description": "Display name for the limit status",
-          "category": "Limits & Thresholds",
-          "why_required": "Display name for the limit status",
-          "data_type": "VARCHAR(200)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "description",
-          "description": "Detailed description of the status",
-          "category": "Limits & Thresholds",
-          "why_required": "Detailed description of the status",
-          "data_type": "VARCHAR(500)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "severity_ordinal",
-          "description": "Numeric severity ranking",
-          "category": "Limits & Thresholds",
-          "why_required": "Numeric severity ranking",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "display_order",
-          "description": "UI display order",
-          "category": "Limits & Thresholds",
-          "why_required": "UI display order",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "active_flag",
-          "description": "Whether this status is currently active",
-          "category": "Limits & Thresholds",
-          "why_required": "Whether this status is currently active",
-          "data_type": "BOOLEAN",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        }
-      ]
-    },
-    {
-      "name": "exception_status_dim",
-      "layer": "L1",
-      "category": "Facility",
-      "fields": [
-        {
-          "name": "exception_status_code",
-          "description": "Unique code for pricing exception status",
-          "category": "Facility",
-          "why_required": "Unique code for pricing exception status",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "status_name",
-          "description": "Display name for the exception status",
-          "category": "Facility",
-          "why_required": "Display name for the exception status",
-          "data_type": "VARCHAR(200)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "description",
-          "description": "Detailed description of the status",
-          "category": "Facility",
-          "why_required": "Detailed description of the status",
-          "data_type": "VARCHAR(500)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "requires_approval_flag",
-          "description": "Whether this status requires approval",
-          "category": "Facility",
-          "why_required": "Whether this status requires approval",
-          "data_type": "BOOLEAN",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "display_order",
-          "description": "UI display order",
-          "category": "Facility",
-          "why_required": "UI display order",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "active_flag",
-          "description": "Whether this status is currently active",
-          "category": "Facility",
-          "why_required": "Whether this status is currently active",
-          "data_type": "BOOLEAN",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        }
-      ]
-    },
-    {
-      "name": "rating_change_status_dim",
-      "layer": "L1",
-      "category": "Ratings",
-      "fields": [
-        {
-          "name": "rating_change_status_code",
-          "description": "Unique code for rating change direction",
-          "category": "Ratings",
-          "why_required": "Unique code for rating change direction",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "status_name",
-          "description": "Display name for the rating change status",
-          "category": "Ratings",
-          "why_required": "Display name for the rating change status",
-          "data_type": "VARCHAR(200)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "description",
-          "description": "Detailed description of the change status",
-          "category": "Ratings",
-          "why_required": "Detailed description of the change status",
-          "data_type": "VARCHAR(500)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "direction",
-          "description": "Direction of change: positive, negative, neutral",
-          "category": "Ratings",
-          "why_required": "Direction of change: positive, negative, neutral",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "display_order",
-          "description": "UI display order",
-          "category": "Ratings",
-          "why_required": "UI display order",
-          "data_type": "INTEGER",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "active_flag",
-          "description": "Whether this status is currently active",
-          "category": "Ratings",
-          "why_required": "Whether this status is currently active",
-          "data_type": "BOOLEAN",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        }
-      ]
     }
   ],
   "L2": [
@@ -5893,13 +5697,31 @@
           "name": "currency_code",
           "description": "",
           "category": "Position & exposure",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "source_system_id",
           "description": "",
           "category": "Position & exposure",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "accrued_interest_amt",
@@ -6038,7 +5860,16 @@
           "name": "product_node_id",
           "description": "",
           "category": "Position Core",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_product_taxonomy",
+              "field": "product_node_id"
+            }
+          }
         },
         {
           "name": "product_code",
@@ -6372,7 +6203,16 @@
           "name": "exposure_type_id",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "exposure_type_dim",
+              "field": "exposure_type_id"
+            }
+          }
         },
         {
           "name": "counterparty_id",
@@ -6401,7 +6241,16 @@
           "name": "currency_code",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "attributed_exposure_usd",
@@ -6485,7 +6334,16 @@
           "name": "exposure_type_id",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "exposure_type_dim",
+              "field": "exposure_type_id"
+            }
+          }
         },
         {
           "name": "drawn_amount",
@@ -6511,7 +6369,16 @@
           "name": "source_system_id",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "counterparty_id",
@@ -6522,7 +6389,10 @@
         },
         {
           "name": "coverage_ratio_pct",
-          "description": "",
+          "description": "Coverage ratio (collateral / exposure)",
+          "category": "Exposure",
+          "why_required": "Page 2 KPI: Coverage Ratio",
+          "simplification_note": "L2 review addition",
           "data_type": "NUMERIC(10,4)"
         },
         {
@@ -6611,33 +6481,47 @@
         {
           "name": "number_of_loans",
           "description": "",
+          "category": "Exposure & collateral snapshots",
           "data_type": "INTEGER"
         },
         {
           "name": "number_of_facilities",
           "description": "",
+          "category": "Exposure & collateral snapshots",
           "data_type": "INTEGER"
         },
         {
           "name": "days_until_maturity",
           "description": "",
+          "category": "Exposure & collateral snapshots",
           "data_type": "INTEGER"
         },
         {
           "name": "limit_status_code",
           "description": "",
+          "category": "Exposure & collateral snapshots",
           "data_type": "VARCHAR(50)"
         },
         {
           "name": "rwa_amt",
           "description": "",
+          "category": "Exposure & collateral snapshots",
           "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "internal_risk_rating_bucket_code",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "internal_risk_rating_bucket_dim",
+              "field": "internal_risk_rating_bucket_code"
+            }
+          }
         },
         {
           "name": "total_collateral_mv_usd",
@@ -6702,6 +6586,15 @@
           "description": "Netting set base currency",
           "category": "Exposure",
           "why_required": "FX context",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          },
           "data_type": "VARCHAR(20)"
         },
         {
@@ -6806,6 +6699,15 @@
           "category": "Business Segment Attribution",
           "why_required": "Business Segment target",
           "simplification_note": "L2 review new table",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_business_taxonomy",
+              "field": "managed_segment_id"
+            }
+          },
           "data_type": "BIGINT"
         },
         {
@@ -6907,7 +6809,16 @@
           "name": "source_system_id",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "allocated_amount_usd",
@@ -7036,6 +6947,15 @@
           "description": "Cash flow currency",
           "category": "Cash Flows",
           "why_required": "FX context",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          },
           "data_type": "VARCHAR(20)"
         },
         {
@@ -7100,6 +7020,13 @@
           "description": "Position identifier (nullable)",
           "category": "Cash Flows",
           "why_required": "Links to originating position",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "maturity_bucket_id",
+          "description": "Maturity bucket identifier for tenor classification",
+          "category": "Cash Flows",
+          "why_required": "Links to maturity bucketing for liquidity analysis",
           "data_type": "BIGINT"
         }
       ]
@@ -7292,7 +7219,16 @@
           "name": "rate_index_id",
           "description": "",
           "category": "Facility snapshots",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "interest_rate_index_dim",
+              "field": "rate_index_id"
+            }
+          }
         },
         {
           "name": "all_in_rate_pct",
@@ -7366,6 +7302,7 @@
         {
           "name": "pricing_exception_flag",
           "description": "",
+          "category": "Facility snapshots",
           "data_type": "BOOLEAN"
         },
         {
@@ -7379,6 +7316,13 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "pricing_tier",
+          "description": "Pricing tier/category",
+          "category": "Financial Metrics",
+          "why_required": "Links to pricing tier dimension for rate bucketing",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -7430,7 +7374,16 @@
           "name": "ledger_account_id",
           "description": "",
           "category": "Facility snapshots",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "ledger_account_dim",
+              "field": "ledger_account_id"
+            }
+          }
         },
         {
           "name": "allocated_equity_amt",
@@ -7497,7 +7450,12 @@
           "simplification_note": "L2 review new table",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_rule",
+              "field": "limit_rule_id"
+            }
           },
           "data_type": "BIGINT"
         },
@@ -7540,7 +7498,16 @@
           "name": "currency_code",
           "description": "",
           "category": "Limits",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "contribution_amount_usd",
@@ -7589,7 +7556,12 @@
           "simplification_note": "FK renamed: limit_definition → limit_rule",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_rule",
+              "field": "limit_rule_id"
+            }
           },
           "data_type": "BIGINT"
         },
@@ -7787,13 +7759,31 @@
           "name": "amendment_type_code",
           "description": "",
           "category": "Events & amendments",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "amendment_type_dim",
+              "field": "amendment_type_code"
+            }
+          }
         },
         {
           "name": "amendment_status_code",
           "description": "",
           "category": "Events & amendments",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "amendment_status_dim",
+              "field": "amendment_status_code"
+            }
+          }
         },
         {
           "name": "effective_date",
@@ -7938,7 +7928,16 @@
           "name": "default_definition_id",
           "description": "",
           "category": "Credit events",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "default_definition_dim",
+              "field": "default_definition_id"
+            }
+          }
         },
         {
           "name": "as_of_date",
@@ -8082,7 +8081,16 @@
           "name": "scenario_id",
           "description": "",
           "category": "Stress test & pipeline",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "scenario_dim",
+              "field": "scenario_id"
+            }
+          }
         },
         {
           "name": "as_of_date",
@@ -8096,7 +8104,16 @@
           "name": "limit_rule_id",
           "description": "",
           "category": "Stress test & pipeline",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_rule",
+              "field": "limit_rule_id"
+            }
+          }
         },
         {
           "name": "counterparty_id",
@@ -8232,6 +8249,15 @@
           "description": "Deal currency code",
           "category": "Deal Pipeline",
           "why_required": "FX context",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          },
           "data_type": "VARCHAR(20)"
         },
         {
@@ -8382,13 +8408,31 @@
           "category": "Ratings",
           "why_required": "Core linkage for standardized rating analytics: crosswalk between internal and external scales, migration tracking via rating_notch delta, color coding, IG/non-IG segmentation",
           "simplification_note": "NEW: Enables standardized rating comparison via rating_notch join.",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "rating_grade_dim",
+              "field": "rating_grade_id"
+            }
+          },
           "data_type": "BIGINT"
         },
         {
           "name": "rating_source_id",
           "description": "",
           "category": "Ratings & metrics",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "rating_source",
+              "field": "rating_source_id"
+            }
+          }
         },
         {
           "name": "is_internal_flag",
@@ -8516,7 +8560,16 @@
           "name": "metric_definition_id",
           "description": "",
           "category": "Ratings & metrics",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "metric_definition_dim",
+              "field": "metric_definition_id"
+            }
+          }
         },
         {
           "name": "value",
@@ -8528,7 +8581,16 @@
           "name": "context_id",
           "description": "",
           "category": "Ratings & metrics",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "context_dim",
+              "field": "context_id"
+            }
+          }
         },
         {
           "name": "credit_agreement_id",
@@ -8942,6 +9004,7 @@
         {
           "name": "total_debt_service_amt",
           "description": "",
+          "category": "L2",
           "data_type": "NUMERIC(18,2)"
         },
         {
@@ -9001,21 +9064,25 @@
         {
           "name": "dscr_value",
           "description": "",
+          "category": "L2",
           "data_type": "NUMERIC(12,6)"
         },
         {
           "name": "ltv_pct",
           "description": "",
+          "category": "L2",
           "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "net_income_amt",
           "description": "",
+          "category": "L2",
           "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "interest_rate_sensitivity_pct",
           "description": "",
+          "category": "L2",
           "data_type": "NUMERIC(10,6)"
         }
       ]
@@ -9066,7 +9133,16 @@
           "name": "currency_code",
           "description": "",
           "category": "Uncategorized",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "revenue_amt",
@@ -9237,11 +9313,13 @@
         {
           "name": "expected_loss_amt",
           "description": "",
+          "why_required": "",
           "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "rwa_amt",
           "description": "",
+          "why_required": "",
           "data_type": "NUMERIC(18,2)"
         },
         {
@@ -9260,7 +9338,16 @@
           "name": "currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "expected_loss_rate_pct",
@@ -9413,19 +9500,46 @@
           "name": "country_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "country_dim",
+              "field": "country_code"
+            }
+          }
         },
         {
           "name": "entity_type_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "entity_type_dim",
+              "field": "entity_type_code"
+            }
+          }
         },
         {
           "name": "industry_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "industry_dim",
+              "field": "industry_id"
+            }
+          }
         },
         {
           "name": "basel_asset_class",
@@ -9652,7 +9766,16 @@
           "name": "country_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "country_dim",
+              "field": "country_code"
+            }
+          }
         },
         {
           "name": "active_flag",
@@ -9765,13 +9888,31 @@
           "name": "country_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "country_dim",
+              "field": "country_code"
+            }
+          }
         },
         {
           "name": "currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "active_flag",
@@ -9926,7 +10067,16 @@
           "name": "currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "agreement_type",
@@ -10033,7 +10183,16 @@
           "name": "currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "facility_name",
@@ -10075,7 +10234,16 @@
           "name": "portfolio_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "portfolio_dim",
+              "field": "portfolio_id"
+            }
+          }
         },
         {
           "name": "industry_code",
@@ -10087,25 +10255,61 @@
           "name": "lob_segment_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_business_taxonomy",
+              "field": "managed_segment_id"
+            }
+          }
         },
         {
           "name": "product_node_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "enterprise_product_taxonomy",
+              "field": "product_node_id"
+            }
+          }
         },
         {
           "name": "rate_index_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "interest_rate_index_dim",
+              "field": "rate_index_id"
+            }
+          }
         },
         {
           "name": "ledger_account_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "ledger_account_dim",
+              "field": "ledger_account_id"
+            }
+          }
         },
         {
           "name": "created_ts",
@@ -10242,6 +10446,7 @@
         {
           "name": "revenue_amt",
           "description": "",
+          "why_required": "",
           "data_type": "NUMERIC(18,2)"
         }
       ]
@@ -10901,7 +11106,16 @@
           "name": "collateral_type_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "collateral_type",
+              "field": "collateral_type_id"
+            }
+          }
         },
         {
           "name": "counterparty_id",
@@ -10922,13 +11136,31 @@
           "name": "country_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "country_dim",
+              "field": "country_code"
+            }
+          }
         },
         {
           "name": "currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "legal_entity_id",
@@ -11125,7 +11357,16 @@
           "name": "source_system_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "link_type_code",
@@ -11190,7 +11431,16 @@
           "name": "crm_type_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "crm_type_dim",
+              "field": "crm_type_code"
+            }
+          }
         },
         {
           "name": "beneficiary_legal_entity_id",
@@ -11211,7 +11461,16 @@
           "name": "currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "notional_amount",
@@ -11428,7 +11687,16 @@
           "name": "risk_mitigant_subtype_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "risk_mitigant_type_dim",
+              "field": "risk_mitigant_subtype_code"
+            }
+          }
         },
         {
           "name": "collateral_asset_id",
@@ -11948,7 +12216,16 @@
           "name": "source_system_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "interdependence_strength_score",
@@ -12043,7 +12320,16 @@
           "name": "counterparty_role_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "counterparty_role_dim",
+              "field": "counterparty_role_code"
+            }
+          }
         },
         {
           "name": "is_primary_flag",
@@ -12144,7 +12430,16 @@
           "name": "counterparty_role_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "counterparty_role_dim",
+              "field": "counterparty_role_code"
+            }
+          }
         },
         {
           "name": "is_primary_flag",
@@ -12322,13 +12617,31 @@
           "name": "from_currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "to_currency_code",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "rate",
@@ -12482,126 +12795,14 @@
       ]
     },
     {
-      "name": "limit_assignment_snapshot",
+      "name": "gl_journal_entry",
       "layer": "L2",
-      "category": "Limits",
+      "category": "General Ledger",
       "fields": [
         {
-          "name": "facility_id",
-          "description": "Facility receiving the limit assignment",
-          "category": "Limits",
-          "why_required": "Facility receiving the limit assignment",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "limit_rule_id",
-          "description": "Reference to the limit rule definition",
-          "category": "Limits",
-          "why_required": "Reference to the limit rule definition",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "as_of_date",
-          "description": "Snapshot date",
-          "category": "Limits",
-          "why_required": "Snapshot date",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "limit_amt",
-          "description": "Assigned limit amount",
-          "category": "Limits",
-          "why_required": "Assigned limit amount",
-          "data_type": "NUMERIC(20,4)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "assigned_date",
-          "description": "Date limit was assigned",
-          "category": "Limits",
-          "why_required": "Date limit was assigned",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "expiry_date",
-          "description": "Date limit expires",
-          "category": "Limits",
-          "why_required": "Date limit expires",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "status_code",
-          "description": "Current status of the limit assignment",
-          "category": "Limits",
-          "why_required": "Current status of the limit assignment",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "currency_code",
-          "description": "Currency of the limit amount",
-          "category": "Limits",
-          "why_required": "Currency of the limit amount",
-          "data_type": "VARCHAR(20)"
-        },
-        {
-          "name": "created_ts",
-          "description": "Record creation timestamp",
-          "category": "Limits",
-          "why_required": "Record creation timestamp",
-          "data_type": "TIMESTAMP",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "updated_ts",
-          "description": "Record last update timestamp",
-          "category": "Limits",
-          "why_required": "Record last update timestamp",
-          "data_type": "TIMESTAMP",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false
-          }
-        }
-      ]
-    },
-    {
-      "name": "data_quality_score_snapshot",
-      "layer": "L2",
-      "category": "Uncategorized",
-      "fields": [
-        {
-          "name": "score_id",
-          "description": "",
+          "name": "journal_entry_id",
+          "description": "Surrogate primary key",
+          "why_required": "Unique identifier for each GL posting",
           "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
@@ -12609,126 +12810,223 @@
           }
         },
         {
-          "name": "as_of_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "dimension_name",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "completeness_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "validity_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "overall_score",
-          "description": "",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
-          "name": "target_table",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "issue_count",
-          "description": "",
-          "data_type": "INTEGER"
-        }
-      ]
-    },
-    {
-      "name": "metric_threshold",
-      "layer": "L2",
-      "category": "Uncategorized",
-      "fields": [
-        {
-          "name": "threshold_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "metric_definition_id",
-          "description": "",
+          "name": "journal_batch_id",
+          "description": "Groups related DR/CR lines in a single posting batch",
+          "why_required": "Correlates balanced journal entries",
           "data_type": "BIGINT"
         },
         {
-          "name": "as_of_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "threshold_value",
-          "description": "",
-          "data_type": "NUMERIC(18,4)"
-        },
-        {
-          "name": "threshold_type",
-          "description": "",
-          "data_type": "VARCHAR(50)"
-        }
-      ]
-    },
-    {
-      "name": "stress_test_result",
-      "layer": "L2",
-      "category": "Uncategorized",
-      "fields": [
-        {
-          "name": "result_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "scenario_id",
-          "description": "",
+          "name": "ledger_account_id",
+          "description": "GL account reference",
+          "why_required": "Links posting to chart of accounts",
           "data_type": "BIGINT"
         },
         {
-          "name": "as_of_date",
-          "description": "",
+          "name": "transaction_date",
+          "description": "Business date of the transaction",
+          "why_required": "Transaction timing",
           "data_type": "DATE"
         },
         {
-          "name": "result_description",
-          "description": "",
+          "name": "posting_date",
+          "description": "Date posted to GL (audit trail)",
+          "why_required": "GSIB audit trail - may differ from transaction_date",
+          "data_type": "DATE"
+        },
+        {
+          "name": "transaction_code",
+          "description": "Transaction type code (e.g. LOAN_ADV, INT_ACCR)",
+          "why_required": "Categorizes the journal entry type",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "transaction_desc",
+          "description": "Free-text description of the journal entry",
+          "why_required": "Human-readable context",
           "data_type": "VARCHAR(500)"
         },
         {
-          "name": "loss_amount",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
+          "name": "dr_cr_indicator",
+          "description": "Debit/Credit indicator (DR or CR)",
+          "why_required": "Direction of the posting",
+          "data_type": "VARCHAR(30)"
         },
         {
-          "name": "capital_impact",
-          "description": "",
-          "data_type": "NUMERIC(18,2)"
+          "name": "transaction_amt",
+          "description": "Amount in transaction currency (always positive)",
+          "why_required": "Monetary value of the posting",
+          "data_type": "NUMERIC(20,4)"
         },
         {
-          "name": "result_status",
-          "description": "",
-          "data_type": "VARCHAR(50)"
+          "name": "transaction_currency_code",
+          "description": "Currency of the transaction amount",
+          "why_required": "Multi-currency support",
+          "data_type": "VARCHAR(30)"
         },
         {
-          "name": "scenario_type",
-          "description": "",
-          "data_type": "VARCHAR(50)"
+          "name": "reporting_currency_amt",
+          "description": "Amount converted to reporting currency (USD)",
+          "why_required": "Standardized reporting amount",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "position_id",
+          "description": "Links to position (Transaction_Reference)",
+          "why_required": "Risk-to-finance reconciliation",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "Client/counterparty reference",
+          "why_required": "Counterparty attribution",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_id",
+          "description": "Facility reference (nullable)",
+          "why_required": "Facility-level attribution",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "product_code",
+          "description": "Product code from source",
+          "why_required": "Product classification",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "lob_segment_id",
+          "description": "Business line (maps to enterprise_business_taxonomy)",
+          "why_required": "LoB attribution",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "org_unit_id",
+          "description": "Operational org/cost center",
+          "why_required": "Cost center attribution",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "source_system_id",
+          "description": "Source system reference",
+          "why_required": "Data provenance",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "created_ts",
+          "description": "Row creation timestamp",
+          "why_required": "Audit trail",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "Row update timestamp",
+          "why_required": "Audit trail",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "gl_account_balance_snapshot",
+      "layer": "L2",
+      "category": "General Ledger",
+      "fields": [
+        {
+          "name": "ledger_account_id",
+          "description": "GL account reference",
+          "why_required": "Identifies the GL account",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Period-end date",
+          "why_required": "Snapshot temporal key",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "begin_balance_dr_amt",
+          "description": "Opening debit balance",
+          "why_required": "Period opening state",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "begin_balance_cr_amt",
+          "description": "Opening credit balance",
+          "why_required": "Period opening state",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "period_activity_dr_amt",
+          "description": "Total debit activity during period",
+          "why_required": "Period movement tracking",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "period_activity_cr_amt",
+          "description": "Total credit activity during period",
+          "why_required": "Period movement tracking",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ending_balance_dr_amt",
+          "description": "Closing debit balance",
+          "why_required": "Period end state",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ending_balance_cr_amt",
+          "description": "Closing credit balance",
+          "why_required": "Period end state",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "currency_code",
+          "description": "Account currency",
+          "why_required": "Multi-currency support",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "reporting_currency_amt",
+          "description": "Ending balance in reporting currency",
+          "why_required": "Standardized reporting",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lob_segment_id",
+          "description": "Business line attribution",
+          "why_required": "LoB rollup",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "org_unit_id",
+          "description": "Operational org attribution",
+          "why_required": "Cost center rollup",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "source_system_id",
+          "description": "Source system reference",
+          "why_required": "Data provenance",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "created_ts",
+          "description": "Row creation timestamp",
+          "why_required": "Audit trail",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "Row update timestamp",
+          "why_required": "Audit trail",
+          "data_type": "TIMESTAMP"
         }
       ]
     }
@@ -17975,6 +18273,13 @@
             "is_pk": true,
             "is_composite": false
           }
+        },
+        {
+          "name": "is_deteriorated",
+          "description": "Whether the facility has deteriorated in the current period",
+          "category": "Facility Analytics",
+          "why_required": "Flags deteriorating facilities for watchlist",
+          "data_type": "BOOLEAN"
         }
       ]
     },
@@ -18952,6 +19257,308 @@
           "data_type": "TIMESTAMP"
         }
       ]
+    },
+    {
+      "name": "gl_account_balance_calc",
+      "layer": "L3",
+      "category": "General Ledger",
+      "fields": [
+        {
+          "name": "ledger_account_id",
+          "description": "GL account reference",
+          "why_required": "Same grain as L2 snapshot",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Period-end date",
+          "why_required": "Same grain as L2 snapshot",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "ending_balance_net_amt",
+          "description": "Net ending balance (DR - CR)",
+          "why_required": "Derived: ending_balance_dr_amt - ending_balance_cr_amt",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "period_net_activity_amt",
+          "description": "Net period activity (DR - CR)",
+          "why_required": "Derived: period_activity_dr_amt - period_activity_cr_amt",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "balance_change_pct",
+          "description": "Period-over-period balance change %",
+          "why_required": "Derived: (ending_net - begin_net) / abs(begin_net) * 100",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "created_ts",
+          "description": "Row creation timestamp",
+          "why_required": "Audit trail",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "facility_financial_calc",
+      "layer": "L3",
+      "category": "Facility Analytics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to facility_master",
+          "category": "Facility Analytics",
+          "data_type": "BIGINT",
+          "is_pk": true
+        },
+        {
+          "name": "as_of_date",
+          "description": "Calculation date",
+          "category": "Facility Analytics",
+          "data_type": "DATE",
+          "is_pk": true
+        },
+        {
+          "name": "dscr",
+          "description": "Debt service coverage ratio",
+          "category": "Facility Analytics",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "Loan-to-value percentage",
+          "category": "Facility Analytics",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "Net income amount",
+          "category": "Facility Analytics",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_coverage_ratio",
+          "description": "Interest coverage ratio",
+          "category": "Facility Analytics",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "debt_yield_pct",
+          "description": "Debt yield percentage",
+          "category": "Facility Analytics",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Facility Analytics",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "facility_exposure_calc",
+      "layer": "L3",
+      "category": "Exposure & Risk Metrics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to facility_master",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "BIGINT",
+          "is_pk": true
+        },
+        {
+          "name": "as_of_date",
+          "description": "Calculation date",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "DATE",
+          "is_pk": true
+        },
+        {
+          "name": "utilization_pct",
+          "description": "Facility utilization percentage",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "undrawn_amt",
+          "description": "Undrawn amount",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "coverage_ratio_pct",
+          "description": "Coverage ratio percentage",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "net_exposure_amt",
+          "description": "Net exposure amount",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Exposure & Risk Metrics",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "data_quality_score_snapshot",
+      "layer": "L3",
+      "category": "Data Quality",
+      "fields": [
+        {
+          "name": "table_name",
+          "description": "Table being scored",
+          "category": "Data Quality",
+          "data_type": "VARCHAR(100)",
+          "is_pk": true
+        },
+        {
+          "name": "as_of_date",
+          "description": "Score date",
+          "category": "Data Quality",
+          "data_type": "DATE",
+          "is_pk": true
+        },
+        {
+          "name": "completeness_score_pct",
+          "description": "Completeness score",
+          "category": "Data Quality",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "accuracy_score_pct",
+          "description": "Accuracy score",
+          "category": "Data Quality",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "timeliness_score_pct",
+          "description": "Timeliness score",
+          "category": "Data Quality",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "overall_dq_score_pct",
+          "description": "Overall DQ score",
+          "category": "Data Quality",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "total_row_count",
+          "description": "Total rows in table",
+          "category": "Data Quality",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "null_field_count",
+          "description": "Count of null fields",
+          "category": "Data Quality",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "anomaly_count",
+          "description": "Count of anomalies",
+          "category": "Data Quality",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Data Quality",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "stress_test_result",
+      "layer": "L3",
+      "category": "Stress Testing",
+      "fields": [
+        {
+          "name": "stress_test_result_id",
+          "description": "Primary key",
+          "category": "Stress Testing",
+          "data_type": "BIGINT",
+          "is_pk": true
+        },
+        {
+          "name": "position_id",
+          "description": "FK to position",
+          "category": "Stress Testing",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_id",
+          "description": "FK to facility_master",
+          "category": "Stress Testing",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "FK to counterparty",
+          "category": "Stress Testing",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "scenario_id",
+          "description": "FK to scenario_dim",
+          "category": "Stress Testing",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "Result date",
+          "category": "Stress Testing",
+          "data_type": "DATE"
+        },
+        {
+          "name": "stressed_exposure_amt",
+          "description": "Stressed exposure amount",
+          "category": "Stress Testing",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "stressed_expected_loss",
+          "description": "Stressed expected loss",
+          "category": "Stress Testing",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "capital_impact_pct",
+          "description": "Capital impact percentage",
+          "category": "Stress Testing",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "currency_code",
+          "description": "Currency code",
+          "category": "Stress Testing",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Stress Testing",
+          "data_type": "TIMESTAMP"
+        }
+      ]
     }
   ],
   "relationships": [
@@ -19078,6 +19685,14 @@
     {
       "from_layer": "L1",
       "from_table": "instrument_identifier",
+      "from_field": "instrument_id",
+      "to_layer": "L2",
+      "to_table": "instrument_master",
+      "to_field": "instrument_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "instrument_identifier",
       "from_field": "source_system_id",
       "to_layer": "L1",
       "to_table": "source_system_registry",
@@ -19157,11 +19772,27 @@
     },
     {
       "from_layer": "L1",
+      "from_table": "reporting_entity_dim",
+      "from_field": "legal_entity_id",
+      "to_layer": "L2",
+      "to_table": "legal_entity",
+      "to_field": "legal_entity_id"
+    },
+    {
+      "from_layer": "L1",
       "from_table": "run_control",
       "from_field": "source_system_id",
       "to_layer": "L1",
       "to_table": "source_system_registry",
       "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "sccl_counterparty_group_member",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
     },
     {
       "from_layer": "L1",
@@ -19198,6 +19829,22 @@
     {
       "from_layer": "L2",
       "from_table": "amendment_event",
+      "from_field": "amendment_status_code",
+      "to_layer": "L1",
+      "to_table": "amendment_status_dim",
+      "to_field": "amendment_status_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "amendment_event",
+      "from_field": "amendment_type_code",
+      "to_layer": "L1",
+      "to_table": "amendment_type_dim",
+      "to_field": "amendment_type_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "amendment_event",
       "from_field": "credit_agreement_id",
       "to_layer": "L2",
       "to_table": "credit_agreement_master",
@@ -19214,6 +19861,14 @@
     {
       "from_layer": "L2",
       "from_table": "cash_flow",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "cash_flow",
       "from_field": "facility_id",
       "to_layer": "L2",
       "to_table": "facility_master",
@@ -19222,10 +19877,34 @@
     {
       "from_layer": "L2",
       "from_table": "collateral_asset_master",
+      "from_field": "collateral_type_id",
+      "to_layer": "L1",
+      "to_table": "collateral_type",
+      "to_field": "collateral_type_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "collateral_asset_master",
       "from_field": "counterparty_id",
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "collateral_asset_master",
+      "from_field": "country_code",
+      "to_layer": "L1",
+      "to_table": "country_dim",
+      "to_field": "country_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "collateral_asset_master",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
     },
     {
       "from_layer": "L2",
@@ -19245,11 +19924,27 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "collateral_link",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "collateral_snapshot",
       "from_field": "collateral_asset_id",
       "to_layer": "L2",
       "to_table": "collateral_asset_master",
       "to_field": "collateral_asset_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "collateral_snapshot",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
     },
     {
       "from_layer": "L2",
@@ -19269,11 +19964,43 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "counterparty",
+      "from_field": "country_code",
+      "to_layer": "L1",
+      "to_table": "country_dim",
+      "to_field": "country_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "counterparty",
+      "from_field": "entity_type_code",
+      "to_layer": "L1",
+      "to_table": "entity_type_dim",
+      "to_field": "entity_type_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "counterparty",
+      "from_field": "industry_id",
+      "to_layer": "L1",
+      "to_table": "industry_dim",
+      "to_field": "industry_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "counterparty_financial_snapshot",
       "from_field": "counterparty_id",
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "counterparty_financial_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
     },
     {
       "from_layer": "L2",
@@ -19309,11 +20036,35 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "counterparty_rating_observation",
+      "from_field": "rating_grade_id",
+      "to_layer": "L1",
+      "to_table": "rating_grade_dim",
+      "to_field": "rating_grade_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "counterparty_rating_observation",
+      "from_field": "rating_source_id",
+      "to_layer": "L1",
+      "to_table": "rating_source",
+      "to_field": "rating_source_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "credit_agreement_counterparty_participation",
       "from_field": "counterparty_id",
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "credit_agreement_counterparty_participation",
+      "from_field": "counterparty_role_code",
+      "to_layer": "L1",
+      "to_table": "counterparty_role_dim",
+      "to_field": "counterparty_role_code"
     },
     {
       "from_layer": "L2",
@@ -19334,6 +20085,14 @@
     {
       "from_layer": "L2",
       "from_table": "credit_agreement_master",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "credit_agreement_master",
       "from_field": "lender_legal_entity_id",
       "to_layer": "L2",
       "to_table": "legal_entity",
@@ -19346,6 +20105,14 @@
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "credit_event",
+      "from_field": "default_definition_id",
+      "to_layer": "L1",
+      "to_table": "default_definition_dim",
+      "to_field": "default_definition_id"
     },
     {
       "from_layer": "L2",
@@ -19373,6 +20140,22 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "crm_protection_master",
+      "from_field": "crm_type_code",
+      "to_layer": "L1",
+      "to_table": "crm_type_dim",
+      "to_field": "crm_type_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "crm_protection_master",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "csa_master",
       "from_field": "counterparty_id",
       "to_layer": "L2",
@@ -19389,6 +20172,14 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "deal_pipeline_fact",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "economic_interdependence_relationship",
       "from_field": "counterparty_id_1",
       "to_layer": "L2",
@@ -19402,6 +20193,14 @@
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "economic_interdependence_relationship",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
     },
     {
       "from_layer": "L2",
@@ -19429,11 +20228,35 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "exposure_counterparty_attribution",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "exposure_counterparty_attribution",
+      "from_field": "exposure_type_id",
+      "to_layer": "L1",
+      "to_table": "exposure_type_dim",
+      "to_field": "exposure_type_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "facility_counterparty_participation",
       "from_field": "counterparty_id",
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_counterparty_participation",
+      "from_field": "counterparty_role_code",
+      "to_layer": "L1",
+      "to_table": "counterparty_role_dim",
+      "to_field": "counterparty_role_code"
     },
     {
       "from_layer": "L2",
@@ -19470,10 +20293,34 @@
     {
       "from_layer": "L2",
       "from_table": "facility_exposure_snapshot",
+      "from_field": "exposure_type_id",
+      "to_layer": "L1",
+      "to_table": "exposure_type_dim",
+      "to_field": "exposure_type_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_exposure_snapshot",
       "from_field": "facility_id",
       "to_layer": "L2",
       "to_table": "facility_master",
       "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_exposure_snapshot",
+      "from_field": "internal_risk_rating_bucket_code",
+      "to_layer": "L1",
+      "to_table": "internal_risk_rating_bucket_dim",
+      "to_field": "internal_risk_rating_bucket_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_exposure_snapshot",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
     },
     {
       "from_layer": "L2",
@@ -19509,6 +20356,14 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "facility_lob_attribution",
+      "from_field": "lob_segment_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_business_taxonomy",
+      "to_field": "managed_segment_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "facility_master",
       "from_field": "counterparty_id",
       "to_layer": "L2",
@@ -19525,11 +20380,67 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "facility_master",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_master",
+      "from_field": "ledger_account_id",
+      "to_layer": "L1",
+      "to_table": "ledger_account_dim",
+      "to_field": "ledger_account_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_master",
+      "from_field": "lob_segment_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_business_taxonomy",
+      "to_field": "managed_segment_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_master",
+      "from_field": "portfolio_id",
+      "to_layer": "L1",
+      "to_table": "portfolio_dim",
+      "to_field": "portfolio_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_master",
+      "from_field": "product_node_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_product_taxonomy",
+      "to_field": "product_node_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_master",
+      "from_field": "rate_index_id",
+      "to_layer": "L1",
+      "to_table": "interest_rate_index_dim",
+      "to_field": "rate_index_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "facility_pricing_snapshot",
       "from_field": "facility_id",
       "to_layer": "L2",
       "to_table": "facility_master",
       "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_pricing_snapshot",
+      "from_field": "rate_index_id",
+      "to_layer": "L1",
+      "to_table": "interest_rate_index_dim",
+      "to_field": "rate_index_id"
     },
     {
       "from_layer": "L2",
@@ -19541,6 +20452,14 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "facility_profitability_snapshot",
+      "from_field": "ledger_account_id",
+      "to_layer": "L1",
+      "to_table": "ledger_account_dim",
+      "to_field": "ledger_account_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "facility_risk_snapshot",
       "from_field": "counterparty_id",
       "to_layer": "L2",
@@ -19550,10 +20469,26 @@
     {
       "from_layer": "L2",
       "from_table": "facility_risk_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_risk_snapshot",
       "from_field": "facility_id",
       "to_layer": "L2",
       "to_table": "facility_master",
       "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "financial_metric_observation",
+      "from_field": "context_id",
+      "to_layer": "L1",
+      "to_table": "context_dim",
+      "to_field": "context_id"
     },
     {
       "from_layer": "L2",
@@ -19570,6 +20505,54 @@
       "to_layer": "L2",
       "to_table": "facility_master",
       "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "financial_metric_observation",
+      "from_field": "metric_definition_id",
+      "to_layer": "L1",
+      "to_table": "metric_definition_dim",
+      "to_field": "metric_definition_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "fx_rate",
+      "from_field": "from_currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "fx_rate",
+      "from_field": "to_currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "instrument_master",
+      "from_field": "country_code",
+      "to_layer": "L1",
+      "to_table": "country_dim",
+      "to_field": "country_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "instrument_master",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "legal_entity",
+      "from_field": "country_code",
+      "to_layer": "L1",
+      "to_table": "country_dim",
+      "to_field": "country_code"
     },
     {
       "from_layer": "L2",
@@ -19597,11 +20580,35 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "limit_contribution_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_contribution_snapshot",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "limit_utilization_event",
       "from_field": "counterparty_id",
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_utilization_event",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id"
     },
     {
       "from_layer": "L2",
@@ -19630,6 +20637,14 @@
     {
       "from_layer": "L2",
       "from_table": "netting_set_exposure_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "netting_set_exposure_snapshot",
       "from_field": "netting_set_id",
       "to_layer": "L2",
       "to_table": "netting_set",
@@ -19650,6 +20665,14 @@
       "to_layer": "L2",
       "to_table": "netting_set",
       "to_field": "netting_set_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
     },
     {
       "from_layer": "L2",
@@ -19666,6 +20689,22 @@
       "to_layer": "L2",
       "to_table": "instrument_master",
       "to_field": "instrument_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "product_node_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_product_taxonomy",
+      "to_field": "product_node_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "position",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
     },
     {
       "from_layer": "L2",
@@ -19733,451 +20772,19 @@
     },
     {
       "from_layer": "L2",
-      "from_table": "stress_test_breach",
-      "from_field": "counterparty_id",
-      "to_layer": "L2",
-      "to_table": "counterparty",
-      "to_field": "counterparty_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "instrument_identifier",
-      "from_field": "instrument_id",
-      "to_layer": "L2",
-      "to_table": "instrument_master",
-      "to_field": "instrument_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "reporting_entity_dim",
-      "from_field": "legal_entity_id",
-      "to_layer": "L2",
-      "to_table": "legal_entity",
-      "to_field": "legal_entity_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "sccl_counterparty_group_member",
-      "from_field": "counterparty_id",
-      "to_layer": "L2",
-      "to_table": "counterparty",
-      "to_field": "counterparty_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "amendment_event",
-      "from_field": "amendment_status_code",
-      "to_layer": "L1",
-      "to_table": "amendment_status_dim",
-      "to_field": "amendment_status_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "amendment_event",
-      "from_field": "amendment_type_code",
-      "to_layer": "L1",
-      "to_table": "amendment_type_dim",
-      "to_field": "amendment_type_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "cash_flow",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "collateral_asset_master",
-      "from_field": "collateral_type_id",
-      "to_layer": "L1",
-      "to_table": "collateral_type",
-      "to_field": "collateral_type_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "collateral_asset_master",
-      "from_field": "country_code",
-      "to_layer": "L1",
-      "to_table": "country_dim",
-      "to_field": "country_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "collateral_asset_master",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "collateral_link",
-      "from_field": "source_system_id",
-      "to_layer": "L1",
-      "to_table": "source_system_registry",
-      "to_field": "source_system_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "collateral_snapshot",
-      "from_field": "source_system_id",
-      "to_layer": "L1",
-      "to_table": "source_system_registry",
-      "to_field": "source_system_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "counterparty",
-      "from_field": "country_code",
-      "to_layer": "L1",
-      "to_table": "country_dim",
-      "to_field": "country_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "counterparty",
-      "from_field": "entity_type_code",
-      "to_layer": "L1",
-      "to_table": "entity_type_dim",
-      "to_field": "entity_type_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "counterparty",
-      "from_field": "industry_id",
-      "to_layer": "L1",
-      "to_table": "industry_dim",
-      "to_field": "industry_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "counterparty_financial_snapshot",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "counterparty_rating_observation",
-      "from_field": "rating_grade_id",
-      "to_layer": "L1",
-      "to_table": "rating_grade_dim",
-      "to_field": "rating_grade_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "counterparty_rating_observation",
-      "from_field": "rating_source_id",
-      "to_layer": "L1",
-      "to_table": "rating_source",
-      "to_field": "rating_source_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "credit_agreement_counterparty_participation",
-      "from_field": "counterparty_role_code",
-      "to_layer": "L1",
-      "to_table": "counterparty_role_dim",
-      "to_field": "counterparty_role_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "credit_agreement_master",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "credit_event",
-      "from_field": "default_definition_id",
-      "to_layer": "L1",
-      "to_table": "default_definition_dim",
-      "to_field": "default_definition_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "crm_protection_master",
-      "from_field": "crm_type_code",
-      "to_layer": "L1",
-      "to_table": "crm_type_dim",
-      "to_field": "crm_type_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "crm_protection_master",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "deal_pipeline_fact",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "economic_interdependence_relationship",
-      "from_field": "source_system_id",
-      "to_layer": "L1",
-      "to_table": "source_system_registry",
-      "to_field": "source_system_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "exposure_counterparty_attribution",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "exposure_counterparty_attribution",
-      "from_field": "exposure_type_id",
-      "to_layer": "L1",
-      "to_table": "exposure_type_dim",
-      "to_field": "exposure_type_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_counterparty_participation",
-      "from_field": "counterparty_role_code",
-      "to_layer": "L1",
-      "to_table": "counterparty_role_dim",
-      "to_field": "counterparty_role_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_exposure_snapshot",
-      "from_field": "exposure_type_id",
-      "to_layer": "L1",
-      "to_table": "exposure_type_dim",
-      "to_field": "exposure_type_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_exposure_snapshot",
-      "from_field": "internal_risk_rating_bucket_code",
-      "to_layer": "L1",
-      "to_table": "internal_risk_rating_bucket_dim",
-      "to_field": "internal_risk_rating_bucket_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_exposure_snapshot",
-      "from_field": "source_system_id",
-      "to_layer": "L1",
-      "to_table": "source_system_registry",
-      "to_field": "source_system_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_lob_attribution",
-      "from_field": "lob_segment_id",
-      "to_layer": "L1",
-      "to_table": "enterprise_business_taxonomy",
-      "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_master",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_master",
-      "from_field": "ledger_account_id",
-      "to_layer": "L1",
-      "to_table": "ledger_account_dim",
-      "to_field": "ledger_account_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_master",
-      "from_field": "lob_segment_id",
-      "to_layer": "L1",
-      "to_table": "enterprise_business_taxonomy",
-      "to_field": "managed_segment_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_master",
-      "from_field": "portfolio_id",
-      "to_layer": "L1",
-      "to_table": "portfolio_dim",
-      "to_field": "portfolio_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_master",
-      "from_field": "product_node_id",
-      "to_layer": "L1",
-      "to_table": "enterprise_product_taxonomy",
-      "to_field": "product_node_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_master",
-      "from_field": "rate_index_id",
-      "to_layer": "L1",
-      "to_table": "interest_rate_index_dim",
-      "to_field": "rate_index_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_pricing_snapshot",
-      "from_field": "rate_index_id",
-      "to_layer": "L1",
-      "to_table": "interest_rate_index_dim",
-      "to_field": "rate_index_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_profitability_snapshot",
-      "from_field": "ledger_account_id",
-      "to_layer": "L1",
-      "to_table": "ledger_account_dim",
-      "to_field": "ledger_account_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_risk_snapshot",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "financial_metric_observation",
-      "from_field": "context_id",
-      "to_layer": "L1",
-      "to_table": "context_dim",
-      "to_field": "context_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "financial_metric_observation",
-      "from_field": "metric_definition_id",
-      "to_layer": "L1",
-      "to_table": "metric_definition_dim",
-      "to_field": "metric_definition_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "fx_rate",
-      "from_field": "from_currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "fx_rate",
-      "from_field": "to_currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "instrument_master",
-      "from_field": "country_code",
-      "to_layer": "L1",
-      "to_table": "country_dim",
-      "to_field": "country_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "instrument_master",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "legal_entity",
-      "from_field": "country_code",
-      "to_layer": "L1",
-      "to_table": "country_dim",
-      "to_field": "country_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "limit_contribution_snapshot",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "limit_contribution_snapshot",
-      "from_field": "limit_rule_id",
-      "to_layer": "L1",
-      "to_table": "limit_rule",
-      "to_field": "limit_rule_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "limit_utilization_event",
-      "from_field": "limit_rule_id",
-      "to_layer": "L1",
-      "to_table": "limit_rule",
-      "to_field": "limit_rule_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "netting_set_exposure_snapshot",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "position",
-      "from_field": "currency_code",
-      "to_layer": "L1",
-      "to_table": "currency_dim",
-      "to_field": "currency_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "position",
-      "from_field": "product_node_id",
-      "to_layer": "L1",
-      "to_table": "enterprise_product_taxonomy",
-      "to_field": "product_node_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "position",
-      "from_field": "source_system_id",
-      "to_layer": "L1",
-      "to_table": "source_system_registry",
-      "to_field": "source_system_id"
-    },
-    {
-      "from_layer": "L2",
       "from_table": "risk_mitigant_master",
       "from_field": "risk_mitigant_subtype_code",
       "to_layer": "L1",
       "to_table": "risk_mitigant_type_dim",
       "to_field": "risk_mitigant_subtype_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "stress_test_breach",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
     },
     {
       "from_layer": "L2",
@@ -22805,30 +23412,115 @@
     },
     {
       "from_layer": "L2",
-      "from_table": "limit_assignment_snapshot",
+      "from_table": "gl_journal_entry",
+      "from_field": "ledger_account_id",
+      "to_layer": "L1",
+      "to_table": "ledger_account_dim",
+      "to_field": "ledger_account_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "transaction_currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "position_id",
+      "to_layer": "L2",
+      "to_table": "position",
+      "to_field": "position_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
       "from_field": "facility_id",
       "to_layer": "L2",
       "to_table": "facility_master",
-      "to_field": "facility_id",
-      "type": "FK"
+      "to_field": "facility_id"
     },
     {
       "from_layer": "L2",
-      "from_table": "limit_assignment_snapshot",
-      "from_field": "limit_rule_id",
+      "from_table": "gl_journal_entry",
+      "from_field": "lob_segment_id",
       "to_layer": "L1",
-      "to_table": "limit_rule",
-      "to_field": "limit_rule_id",
-      "type": "FK"
+      "to_table": "enterprise_business_taxonomy",
+      "to_field": "managed_segment_id"
     },
     {
       "from_layer": "L2",
-      "from_table": "limit_assignment_snapshot",
+      "from_table": "gl_journal_entry",
+      "from_field": "org_unit_id",
+      "to_layer": "L1",
+      "to_table": "org_unit_dim",
+      "to_field": "org_unit_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
+      "from_field": "ledger_account_id",
+      "to_layer": "L1",
+      "to_table": "ledger_account_dim",
+      "to_field": "ledger_account_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
       "from_field": "currency_code",
       "to_layer": "L1",
       "to_table": "currency_dim",
-      "to_field": "currency_code",
-      "type": "FK"
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
+      "from_field": "lob_segment_id",
+      "to_layer": "L1",
+      "to_table": "enterprise_business_taxonomy",
+      "to_field": "managed_segment_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
+      "from_field": "org_unit_id",
+      "to_layer": "L1",
+      "to_table": "org_unit_dim",
+      "to_field": "org_unit_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "gl_account_balance_calc",
+      "from_field": "ledger_account_id",
+      "to_layer": "L1",
+      "to_table": "ledger_account_dim",
+      "to_field": "ledger_account_id"
     }
   ],
   "derivation_dag": {}

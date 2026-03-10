@@ -34,14 +34,14 @@ export interface ParsedTable {
 export function parseDDL(sql: string, schema: 'l1' | 'l2' | 'l3'): ParsedTable[] {
   const tables: ParsedTable[] = [];
   const tableRegex = new RegExp(
-    `CREATE TABLE IF NOT EXISTS ${schema}\\.(\\w+)\\s*\\(([\\s\\S]*?)\\);`,
+    `CREATE TABLE IF NOT EXISTS (?:"${schema}"|${schema})\\.(?:"(\\w+)"|(\\w+))\\s*\\(([\\s\\S]*?)\\);`,
     'g',
   );
 
   let match: RegExpExecArray | null;
   while ((match = tableRegex.exec(sql)) !== null) {
-    const tableName = match[1];
-    const body = match[2];
+    const tableName = match[1] || match[2];
+    const body = match[3];
 
     // Parse separate PRIMARY KEY clause
     const pkMatch = body.match(/PRIMARY KEY\s*\(([^)]+)\)/);
@@ -83,9 +83,9 @@ export function parseDDL(sql: string, schema: 'l1' | 'l2' | 'l3'): ParsedTable[]
       if (trimmed.startsWith('PRIMARY KEY')) continue;
       if (trimmed.startsWith('CONSTRAINT')) continue;
 
-      // Column pattern: name TYPE [NOT NULL] [DEFAULT ...] [PRIMARY KEY] [CHECK (...)]
+      // Column pattern: "name" TYPE or name TYPE [NOT NULL] [DEFAULT ...] [PRIMARY KEY] [CHECK (...)]
       const colMatch = trimmed.match(
-        /^(\w+)\s+([\w]+(?:\(\d+(?:,\s*\d+)?\))?)\s*(.*?)(?:,\s*)?$/,
+        /^"?(\w+)"?\s+([\w]+(?:\(\d+(?:,\s*\d+)?\))?)\s*(.*?)(?:,\s*)?$/,
       );
       if (!colMatch) continue;
 

@@ -77,12 +77,19 @@ export const L3_TABLES: L3TableDef[] = [
   // T55-T56: Additional calculated overlay tables (derived fields split from L2 snapshots)
   { id: 'T55', name: 'facility_risk_calc',                  category: 'Exposure & Risk Metrics',                 tier: 1 },
   { id: 'T56', name: 'netting_set_exposure_calc',           category: 'Exposure & Risk Metrics',                 tier: 1 },
-  // T57-T62: Layer reassignment overlay tables (derived fields split from L2 per architecture review)
+  // T57-T61: Layer reassignment overlay tables (derived fields split from L2 per architecture review)
   { id: 'T57', name: 'counterparty_rating_calc',            category: 'Credit Events & Performance',             tier: 1 },
   { id: 'T58', name: 'facility_pricing_calc',               category: 'Facility Analytics',                      tier: 1 },
   { id: 'T59', name: 'deal_pipeline_calc',                  category: 'Business Segment Summary',                tier: 1 },
   { id: 'T60', name: 'collateral_calc',                     category: 'Credit Risk Mitigation (CRM)',            tier: 1 },
   { id: 'T61', name: 'cash_flow_calc',                      category: 'Cash Flows',                              tier: 1 },
+  // T62: GL calculated overlay (derived fields split from L2 gl_account_balance_snapshot)
+  { id: 'T62', name: 'gl_account_balance_calc',             category: 'General Ledger',                          tier: 1 },
+  // T63-T66: Calculation engine infrastructure tables
+  { id: 'T63', name: 'calc_run',                             category: 'Calculation Engine',                      tier: 1 },
+  { id: 'T64', name: 'calc_audit_log',                       category: 'Calculation Engine',                      tier: 1 },
+  { id: 'T65', name: 'calc_validation_result',               category: 'Calculation Engine',                      tier: 1 },
+  { id: 'T66', name: 'metric_result',                        category: 'Calculation Engine',                      tier: 1 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

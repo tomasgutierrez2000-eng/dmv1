@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "domain_id": "amendments",
+    "domain_name": "Amendments & Events",
+    "description": "Metrics related to loan amendments, modifications, and restructurings",
+    "color": "#F57C00",
+    "icon": "FileText"
+  },
+  {
+    "domain_id": "capital",
+    "domain_name": "Capital & RWA",
+    "description": "Metrics related to capital adequacy and regulatory capital requirements",
+    "color": "#1976D2",
+    "icon": "DollarSign"
+  },
+  {
+    "domain_id": "exposure",
+    "domain_name": "Exposure & Risk",
+    "description": "Metrics related to credit exposure, concentration, and risk quantification",
+    "color": "#D32F2F",
+    "icon": "AlertTriangle"
+  },
+  {
+    "domain_id": "pricing",
+    "domain_name": "Pricing & Spreads",
+    "description": "Metrics related to loan pricing, spreads, and interest rate dynamics",
+    "color": "#7B1FA2",
+    "icon": "BarChart"
+  },
+  {
+    "domain_id": "profitability",
+    "domain_name": "Profitability & Returns",
+    "description": "Metrics related to net interest income, fees, and return on assets",
+    "color": "#2E7D32",
+    "icon": "TrendingUp"
+  },
+  {
+    "domain_id": "reference",
+    "domain_name": "Reference & Master Data",
+    "description": "Metrics related to data quality, completeness, and master data integrity",
+    "color": "#455A64",
+    "icon": "Database"
+  },
+  {
+    "domain_id": "risk",
+    "domain_name": "Risk & Monitoring",
+    "description": "Metrics related to risk flags, ratings, delinquency, and portfolio health",
+    "color": "#E64A19",
+    "icon": "Shield"
+  }
+]

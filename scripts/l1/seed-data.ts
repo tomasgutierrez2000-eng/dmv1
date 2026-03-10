@@ -1585,10 +1585,12 @@ const EBT_PARENTS: string[] = [
 const EBT_PARENT_LEAVES: string[] = ['N', 'N', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y', 'Y'];
 const EBT_TREE_LEVELS: number[] = [0, 1, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 1, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 1, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 1, 2, 3, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 1, 2, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 1, 2, 3, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 3, 2, 3, 3, 2, 3, 3, 1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3];
 
-export const PRODUCT_CODES = ['REV', 'TL', 'BL', 'ABL', 'TLB', 'L/C', 'BRIDGE', 'CP', 'TRADE', 'MM'];
+// First 10 leaf product codes from enterprise_product_taxonomy (IDs 1-10)
+// Full 3-level hierarchy (123 nodes) is in sql/gsib-export/03-l1-seed.sql
+export const PRODUCT_CODES = ['TLA', 'TLB', 'DDTL', 'ABL_TL', 'BILAT_TL', 'SYND_TL', 'CLUB_TL', 'ACQ_TL', 'RCF', 'MCR'];
 export const PRODUCT_NAMES = [
-  'Revolving Credit', 'Term Loan', 'Bridge Loan', 'Asset-Based Lending', 'Term Loan B',
-  'Letters of Credit', 'Bridge Facility', 'Commercial Paper', 'Trade Finance', 'Money Market',
+  'Term Loan A', 'Term Loan B', 'Delayed Draw Term Loan', 'Asset-Based Term Loan', 'Bilateral Term Loan',
+  'Syndicated Term Loan', 'Club Deal Term Loan', 'Acquisition Term Loan', 'Revolving Credit Facility', 'Multi-Currency Revolver',
 ];
 
 export const RATE_INDEX_CODES = ['SOFR', 'SOFR-90', 'EURIBOR', 'SONIA', 'FF', 'PRIME', 'CDOR', 'BBSW', 'HIBOR', 'SOR'];
@@ -2265,21 +2267,23 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
 
     /* ──────────── enterprise_product_taxonomy ──────────── */
+    // Generator produces first 10 rows (leaf nodes 1-10, all tree_level=3).
+    // Full 123-node hierarchy (5 tiers + 18 types + 100 leaves) is in 03-l1-seed.sql.
     case 'enterprise_product_taxonomy':
       if (columnName === 'product_code') return PRODUCT_CODES[idx];
       if (columnName === 'product_name') return PRODUCT_NAMES[idx];
-      if (columnName === 'parent_node_id') return idx < 3 ? null : (idx < 6 ? 1 : 2);
+      if (columnName === 'parent_node_id') return idx < 8 ? 1011 : 1012; // nodes 1-8 → TL type, 9-10 → REV type
       if (columnName === 'change_event') return 'INITIAL_LOAD';
-      if (columnName === 'comments') return 'Loaded from product taxonomy';
+      if (columnName === 'comments') return 'Leaf product code';
       if (columnName === 'description') return PRODUCT_NAMES[idx];
-      if (columnName === 'long_description') return `${PRODUCT_NAMES[idx]} product type`;
-      if (columnName === 'fr2590_category_code') return String((idx % 10) + 1);
-      if (columnName === 'parent') return idx < 3 ? 'ROOT' : (idx < 6 ? PRODUCT_CODES[0] : PRODUCT_CODES[1]);
-      if (columnName === 'parent_leaf') return idx >= 6 ? 'Y' : 'N';
+      if (columnName === 'long_description') return `${PRODUCT_NAMES[idx]} leaf product`;
+      if (columnName === 'fr2590_category_code') return idx < 8 ? '1' : '2'; // TL=C&I Term, REV=C&I Revolving
+      if (columnName === 'parent') return idx < 8 ? 'TL' : 'REV';
+      if (columnName === 'parent_leaf') return 'Y';
       if (columnName === 'requestor') return 'Enterprise Data Office';
       if (columnName === 'status') return 'ACTIVE';
       if (columnName === 'substatus') return 0;
-      if (columnName === 'tree_level') return idx < 3 ? 1 : (idx < 6 ? 2 : 3);
+      if (columnName === 'tree_level') return 3;
       break;
 
     /* ──────────── portfolio_dim ──────────── */

@@ -50,19 +50,37 @@ DIMENSION_TO_FACT_COLUMN: dict[str, str] = {
 }
 
 
+def _find_value_column(df: pd.DataFrame, primary_value_col: str | None = None) -> str | None:
+    """Find the metric value column in a calculator result DataFrame.
+
+    Priority: explicit primary_value_col > 'metric_value' > first numeric _usd/_amt/_pct column.
+    """
+    if primary_value_col and primary_value_col in df.columns:
+        return primary_value_col
+    if "metric_value" in df.columns:
+        return "metric_value"
+    # Fall back to first numeric column matching common suffixes
+    for col in df.columns:
+        if col.endswith(("_usd", "_amt", "_pct", "_value", "_ratio")):
+            if pd.api.types.is_numeric_dtype(df[col]):
+                return col
+    return None
+
+
 def _build_rows(
     metric_id: str,
     dimension: str,
     as_of_date: str,
     run_version: str,
     df: pd.DataFrame,
+    primary_value_col: str | None = None,
 ) -> list[tuple[Any, ...]]:
     """Convert a calculator DataFrame into metric_value_fact rows."""
     agg_level, src_col = DIMENSION_MAP[dimension]
     fact_col = DIMENSION_TO_FACT_COLUMN[dimension]
 
     rows: list[tuple[Any, ...]] = []
-    val_col = "metric_value"
+    val_col = _find_value_column(df, primary_value_col)
 
     # Find the dimension key column in the DataFrame
     key_col: str | None = None
@@ -72,13 +90,22 @@ def _build_rows(
             break
 
     for _, row in df.iterrows():
-        value = row.get(val_col)
+        value = row.get(val_col) if val_col else None
         if value is not None and pd.notna(value):
             value = float(value)
         else:
             value = None
 
-        dim_key = str(row[key_col]) if key_col and pd.notna(row.get(key_col)) else None
+        raw_key = row[key_col] if key_col and pd.notna(row.get(key_col)) else None
+        # Convert float IDs (e.g. 1.0) to int strings for BIGINT columns
+        if raw_key is not None:
+            try:
+                f = float(raw_key)
+                dim_key = str(int(f)) if f == int(f) else str(raw_key)
+            except (ValueError, TypeError):
+                dim_key = str(raw_key)
+        else:
+            dim_key = None
 
         # Build the 13-column tuple matching metric_value_fact INSERT order
         fact_row = [
@@ -166,7 +193,8 @@ def main():
                     result = calc.run(loader, args.as_of_date, dim)
                     if result.empty:
                         continue
-                    rows = _build_rows(mid, dim, args.as_of_date, args.run_version, result)
+                    pvc = calc.primary_value_column() if hasattr(calc, "primary_value_column") else None
+                    rows = _build_rows(mid, dim, args.as_of_date, args.run_version, result, pvc)
                     all_rows.extend(rows)
                     calc_count += 1
                 except Exception as e:
@@ -196,13 +224,14 @@ def main():
         cur = conn.cursor()
         cur.execute("CREATE SCHEMA IF NOT EXISTS l3;")
 
-        # Delete existing rows for this run_version + as_of_date
+        # Delete only the metrics we're about to re-insert
+        metric_ids_to_delete = list({r[2] for r in all_rows})  # column index 2 = metric_id
         cur.execute(
-            "DELETE FROM l3.metric_value_fact WHERE run_version_id = %s AND as_of_date = %s",
-            (args.run_version, args.as_of_date),
+            "DELETE FROM l3.metric_value_fact WHERE run_version_id = %s AND as_of_date = %s AND metric_id = ANY(%s)",
+            (args.run_version, args.as_of_date, metric_ids_to_delete),
         )
         deleted = cur.rowcount
-        print(f"Deleted {deleted} existing rows for ({args.run_version}, {args.as_of_date}).")
+        print(f"Deleted {deleted} existing rows for {metric_ids_to_delete}.")
 
         insert_sql = """
             INSERT INTO l3.metric_value_fact (

@@ -5,7 +5,7 @@
     "abbreviation": "INT_EXP",
     "kind": "METRIC",
     "definition": "Total interest cost incurred on funding sources attributable to the reporting unit during the period. At facility level, computed as the product of the committed amount, the bank's participation share, and the cost of funds rate. At higher rollup levels, aggregated as the sum of facility-level interest expense.\n",
-    "generic_formula": "For each active facility:\n1. Join position -> position_detail, SUM(funded_amount) per facility\n2. Multiply by bank_share_pct / 100 from facility_lender_allocation\n3. Multiply by COALESCE(cost_of_funds_pct, all_in_rate_pct - spread_bps/100) / 100\n   from facility_pricing_snapshot\n",
+    "generic_formula": "For each active facility:\n1. Look up the total funded amount from position details\n2. Adjust for the bank’s ownership share (bank_share_pct; defaults to 100% if not set)\n3. Multiply by the cost-of-funds rate (if unavailable, derive it as all-in rate minus credit spread)\nResult = Funded Amount × Bank Share % × Cost of Funds Rate\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
@@ -16,7 +16,7 @@
     "regulatory_references": [
       "FR Y-14Q Schedule H"
     ],
-    "insight": "Funding cost burden reveals margin compression risk \u2014 rising interest expense relative to committed amounts signals tightening spreads or increased leverage.",
+    "insight": "Funding cost burden reveals margin compression risk — rising interest expense relative to committed amounts signals tightening spreads or increased leverage.",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "ACTIVE",
@@ -71,7 +71,7 @@
         "dashboard_display_name": "Interest Expense (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n6. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n8. COMPUTE\n   metric_value = fac.funded_amount_sum * COALESCE(fla.bank_share_pct, 100.0) / 100.0 * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0",
+        "level_logic": "1. Start with all positions as of the reporting date\n2. Look up the funded amount from position details\n3. Match each position to its active facility\n4. Look up the bank’s ownership share (defaults to 100% if not set)\n5. Look up the cost-of-funds rate from pricing (if unavailable, derive as all-in rate minus spread)\n6. Result = Funded Amount × Bank Share % × Cost of Funds Rate",
         "source_references": [
           {
             "layer": "L2",
@@ -206,7 +206,7 @@
         "dashboard_display_name": "Interest Expense (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n6. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n8. GROUP BY fcp.counterparty_id\n9. COMPUTE\n   metric_value = SUM(fac_ie.metric_value * COALESCE(fcp.participation_pct, 1.0))",
+        "level_logic": "1. Compute Interest Expense at facility level (see above)\n2. Group facilities by counterparty\n3. Weight each facility’s value by the counterparty’s participation share (defaults to 100%)\n4. Result = Sum of (Facility Interest Expense × Participation %)",
         "source_references": [
           {
             "layer": "L2",
@@ -341,7 +341,7 @@
         "dashboard_display_name": "Interest Expense (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n6. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n8. GROUP BY ebt.managed_segment_id\n9. COMPUTE\n   metric_value = SUM(fac_ie.metric_value)",
+        "level_logic": "1. Compute Interest Expense at facility level\n2. Map each facility to its desk via business segment hierarchy\n3. Result = Sum of all facility-level Interest Expense within the desk",
         "source_references": [
           {
             "layer": "L2",
@@ -476,7 +476,7 @@
         "dashboard_display_name": "Interest Expense (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n6. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n8. GROUP BY ebt_l2.managed_segment_id\n9. COMPUTE\n   metric_value = SUM(fac_ie.metric_value)",
+        "level_logic": "1. Compute Interest Expense at facility level\n2. Map each facility to its portfolio via business segment hierarchy\n3. Result = Sum of all facility-level Interest Expense within the portfolio",
         "source_references": [
           {
             "layer": "L2",
@@ -611,7 +611,7 @@
         "dashboard_display_name": "Interest Expense (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. LEFT JOIN  l2.facility_pricing_snapshot  (fps)\n   ON    fps.facility_id = fm.facility_id AND fps.as_of_date = :as_of_date\n6. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n7. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n8. GROUP BY ebt_l1.managed_segment_id\n9. COMPUTE\n   metric_value = SUM(fac_ie.metric_value)",
+        "level_logic": "1. Compute Interest Expense at facility level\n2. Map each facility to its line of business via business segment hierarchy\n3. Result = Sum of all facility-level Interest Expense within the LOB",
         "source_references": [
           {
             "layer": "L2",
@@ -746,98 +746,98 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 4982400.0,
-          "funded_amt": 10380000000.0,
-          "bank_share_pct": 100.0,
+          "interest_expense_amt": 4982400,
+          "funded_amt": 10380000000,
+          "bank_share_pct": 100,
           "cost_of_funds_pct": 0.05,
-          "committed_facility_amt": 5000000000.0
+          "committed_facility_amt": 5000000000
         },
         {
           "facility_id": "F-251",
-          "facility_name": "Horizon Home \u2014 USD L/C 2029-C",
+          "facility_name": "Horizon Home — USD L/C 2029-C",
           "counterparty_id": "CP-69",
           "counterparty_name": "Horizon Home Furnishings Inc.",
           "lob_segment_id": "SEG-3",
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 23824817.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 23824817,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 0.0,
-          "funded_amt": 76239415.0,
-          "bank_share_pct": 55.0,
-          "cost_of_funds_pct": 0.0,
-          "committed_facility_amt": 23824817.0
+          "interest_expense_amt": 0,
+          "funded_amt": 76239415,
+          "bank_share_pct": 55,
+          "cost_of_funds_pct": 0,
+          "committed_facility_amt": 23824817
         },
         {
           "facility_id": "F-353",
-          "facility_name": "Catalyst Chem \u2014 USD Revolver 2030-F",
+          "facility_name": "Catalyst Chem — USD Revolver 2030-F",
           "counterparty_id": "CP-90",
           "counterparty_name": "Catalyst Chemical Holdings Inc.",
           "lob_segment_id": "SEG-104",
           "desk_name": "Medical Office Buildings Desk",
           "portfolio_name": "Healthcare Real Estate",
           "lob_name": "Corporate Banking",
-          "committed_amt": 73907486.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 73907486,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 48935.0331,
-          "funded_amt": 178856115.0,
-          "bank_share_pct": 57.0,
+          "funded_amt": 178856115,
+          "bank_share_pct": 57,
           "cost_of_funds_pct": 0.05,
-          "committed_facility_amt": 73907486.0
+          "committed_facility_amt": 73907486
         },
         {
           "facility_id": "F-5001",
-          "facility_name": "Meridian Energy \u2014 USD Revolver 2026",
+          "facility_name": "Meridian Energy — USD Revolver 2026",
           "counterparty_id": "CP-1001",
           "counterparty_name": "Meridian Energy Holdings LLC",
           "lob_segment_id": "SEG-3",
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 1000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 3120.0,
-          "funded_amt": 650000000.0,
-          "bank_share_pct": 1.0,
+          "interest_expense_amt": 3120,
+          "funded_amt": 650000000,
+          "bank_share_pct": 1,
           "cost_of_funds_pct": 0.05,
-          "committed_facility_amt": 1000000000.0
+          "committed_facility_amt": 1000000000
         },
         {
           "facility_id": "F-9422",
-          "facility_name": "Maple \u2014 CAD Revolver 2028-A",
+          "facility_name": "Maple — CAD Revolver 2028-A",
           "counterparty_id": "CP-3321",
           "counterparty_name": "Maple Street Grocery Holdings",
           "lob_segment_id": "SEG-211",
           "desk_name": "Direct Auto Lending Desk",
           "portfolio_name": "Auto Loans",
           "lob_name": "Corporate Banking",
-          "committed_amt": 122462108.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 122462108,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 364.4472,
-          "funded_amt": 75926507.0,
-          "bank_share_pct": 1.0,
+          "funded_amt": 75926507,
+          "bank_share_pct": 1,
           "cost_of_funds_pct": 0.05,
-          "committed_facility_amt": 122462108.0
+          "committed_facility_amt": 122462108
         }
       ]
     }
@@ -848,7 +848,7 @@
     "abbreviation": "CE",
     "kind": "METRIC",
     "definition": "Total approved committed credit amount in USD representing contractual lending capacity.\n",
-    "generic_formula": "For each active facility: committed_facility_amt * bank_share_pct / 100. bank_share_pct sourced from facility_lender_allocation (aggregated per facility).\n",
+    "generic_formula": "For each active facility:\n1. Take the total committed amount from the facility record\n2. Adjust for the bank’s ownership share (bank_share_pct; defaults to 100% if not set)\nResult = Committed Amount × Bank Share %\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
@@ -882,7 +882,7 @@
         "dashboard_display_name": "Committed Exposure ($) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = fm.committed_facility_amt * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
+        "level_logic": "1. Start with all active facilities\n2. Look up the bank’s ownership share (defaults to 100% if not set)\n3. Result = Committed Amount × Bank Share %",
         "source_references": [
           {
             "layer": "L2",
@@ -957,7 +957,7 @@
         "dashboard_display_name": "Committed Exposure ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fcp.counterparty_id\n6. COMPUTE\n   metric_value = SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0))",
+        "level_logic": "1. Compute Committed Exposure at facility level (see above)\n2. Group facilities by counterparty\n3. Weight each facility’s value by the counterparty’s participation share (defaults to 100%)\n4. Result = Sum of (Facility Committed Exposure × Participation %)",
         "source_references": [
           {
             "layer": "L2",
@@ -1032,7 +1032,7 @@
         "dashboard_display_name": "Committed Exposure ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Committed Exposure at facility level\n2. Map each facility to its desk via business segment hierarchy\n3. Result = Sum of all facility-level Committed Exposure within the desk",
         "source_references": [
           {
             "layer": "L2",
@@ -1107,7 +1107,7 @@
         "dashboard_display_name": "Committed Exposure ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Committed Exposure at facility level\n2. Map each facility to its portfolio via business segment hierarchy\n3. Result = Sum of all facility-level Committed Exposure within the portfolio",
         "source_references": [
           {
             "layer": "L2",
@@ -1182,7 +1182,7 @@
         "dashboard_display_name": "Committed Exposure ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n3. LEFT JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Committed Exposure at facility level\n2. Map each facility to its line of business via business segment hierarchy\n3. Result = Sum of all facility-level Committed Exposure within the LOB",
         "source_references": [
           {
             "layer": "L2",
@@ -1257,88 +1257,88 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "committed_exposure_usd": 5000000000.0,
-          "committed_facility_amt": 5000000000.0,
-          "bank_share_pct": 100.0
+          "committed_exposure_usd": 5000000000,
+          "committed_facility_amt": 5000000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-194",
-          "facility_name": "Ironworks \u2014 USD L/C 2025-E",
+          "facility_name": "Ironworks — USD L/C 2025-E",
           "counterparty_id": "CP-56",
           "counterparty_name": "Ironworks Steel Manufacturing Inc.",
           "lob_segment_id": "SEG-194",
           "desk_name": "Multi-Asset Funds Desk",
           "portfolio_name": "Retail / Mutual Funds",
           "lob_name": "Corporate Banking",
-          "committed_amt": 20021593.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 20021593,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 6607125.69,
-          "committed_facility_amt": 20021593.0,
-          "bank_share_pct": 33.0
+          "committed_facility_amt": 20021593,
+          "bank_share_pct": 33
         },
         {
           "facility_id": "F-241",
-          "facility_name": "Summit Apparel \u2014 USD Revolver 2025-A",
+          "facility_name": "Summit Apparel — USD Revolver 2025-A",
           "counterparty_id": "CP-67",
           "counterparty_name": "Summit Apparel & Sportswear Inc.",
           "lob_segment_id": "SEG-241",
           "desk_name": "Non-Core Credit Desk",
           "portfolio_name": "Legacy Portfolios",
           "lob_name": "Corporate Banking",
-          "committed_amt": 57312906.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 57312906,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 40119034.2,
-          "committed_facility_amt": 57312906.0,
-          "bank_share_pct": 70.0
+          "committed_facility_amt": 57312906,
+          "bank_share_pct": 70
         },
         {
           "facility_id": "F-5701",
-          "facility_name": "Mortgage \u2014 Retail Mortgage Borrower 1",
+          "facility_name": "Mortgage — Retail Mortgage Borrower 1",
           "counterparty_id": "CP-1701",
           "counterparty_name": "Retail Mortgage Borrower 1",
           "lob_segment_id": "SEG-3",
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "committed_exposure_usd": 2000.0,
-          "committed_facility_amt": 200000.0,
-          "bank_share_pct": 1.0
+          "committed_exposure_usd": 2000,
+          "committed_facility_amt": 200000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9584",
-          "facility_name": "Peace \u2014 CAD Revolver 2029-A",
+          "facility_name": "Peace — CAD Revolver 2029-A",
           "counterparty_id": "CP-3389",
           "counterparty_name": "Peace River Bitumen Holdings Inc.",
           "lob_segment_id": "SEG-123",
           "desk_name": "Follow-On Equity Desk",
           "portfolio_name": "Equity Capital Markets (ECM)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 120476777.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 120476777,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 1204767.77,
-          "committed_facility_amt": 120476777.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 120476777,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -1349,7 +1349,7 @@
     "abbreviation": "UE",
     "kind": "METRIC",
     "definition": "Committed but not yet drawn portion of credit exposure in USD. Reflects contingent funding risk.\n",
-    "generic_formula": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(unfunded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n",
+    "generic_formula": "For each active facility as of the reporting date:\n1. Look up the unfunded (undrawn) amount from position details\n2. Adjust for the bank’s ownership share (bank_share_pct; defaults to 100% if not set)\nResult = Unfunded Amount × Bank Share %\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
@@ -1383,7 +1383,7 @@
         "dashboard_display_name": "Undrawn Exposure ($) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY pos.facility_id, fla.bank_share_pct\n8. COMPUTE\n   metric_value = SUM(COALESCE(pdtl.unfunded_amount, 0)) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
+        "level_logic": "1. Start with all positions as of the reporting date\n2. Look up the unfunded (undrawn) amount from position details\n3. Match each position to its active facility\n4. Look up the bank’s ownership share (defaults to 100% if not set)\n5. Result = Unfunded Amount × Bank Share %",
         "source_references": [
           {
             "layer": "L2",
@@ -1488,7 +1488,7 @@
         "dashboard_display_name": "Undrawn Exposure ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY fcp.counterparty_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0))",
+        "level_logic": "1. Compute Undrawn Exposure at facility level (see above)\n2. Group facilities by counterparty\n3. Weight each facility’s value by the counterparty’s participation share (defaults to 100%)\n4. Result = Sum of (Facility Undrawn Exposure × Participation %)",
         "source_references": [
           {
             "layer": "L2",
@@ -1593,7 +1593,7 @@
         "dashboard_display_name": "Undrawn Exposure ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Undrawn Exposure at facility level\n2. Map each facility to its desk via business segment hierarchy\n3. Result = Sum of all facility-level Undrawn Exposure within the desk",
         "source_references": [
           {
             "layer": "L2",
@@ -1698,7 +1698,7 @@
         "dashboard_display_name": "Undrawn Exposure ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt_l2.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Undrawn Exposure at facility level\n2. Map each facility to its portfolio via business segment hierarchy\n3. Result = Sum of all facility-level Undrawn Exposure within the portfolio",
         "source_references": [
           {
             "layer": "L2",
@@ -1803,7 +1803,7 @@
         "dashboard_display_name": "Undrawn Exposure ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt_l1.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Undrawn Exposure at facility level\n2. Map each facility to its line of business via business segment hierarchy\n3. Result = Sum of all facility-level Undrawn Exposure within the LOB",
         "source_references": [
           {
             "layer": "L2",
@@ -1908,88 +1908,88 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": 14620000000.0,
-          "unfunded_amt": 14620000000.0,
-          "bank_share_pct": 100.0
+          "undrawn_exposure_usd": 14620000000,
+          "unfunded_amt": 14620000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-79",
-          "facility_name": "Solaris \u2014 USD Bridge 2025-D",
+          "facility_name": "Solaris — USD Bridge 2025-D",
           "counterparty_id": "CP-26",
           "counterparty_name": "Solaris Genomics Holdings Inc.",
           "lob_segment_id": "SEG-79",
           "desk_name": "Construction Hospitality Desk",
           "portfolio_name": "Hospitality",
           "lob_name": "Corporate Banking",
-          "committed_amt": 6868931.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 6868931,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 3159708.03,
-          "unfunded_amt": 13737861.0,
-          "bank_share_pct": 23.0
+          "unfunded_amt": 13737861,
+          "bank_share_pct": 23
         },
         {
           "facility_id": "F-321",
-          "facility_name": "Midwest Freight \u2014 USD Revolver 2028-A",
+          "facility_name": "Midwest Freight — USD Revolver 2028-A",
           "counterparty_id": "CP-85",
           "counterparty_name": "Midwest Freight Services Inc.",
           "lob_segment_id": "SEG-72",
           "desk_name": "Construction Industrial Desk",
           "portfolio_name": "Industrial / Logistics",
           "lob_name": "Corporate Banking",
-          "committed_amt": 58958165.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 58958165,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": 87995061.0,
-          "unfunded_amt": 117326748.0,
-          "bank_share_pct": 75.0
+          "undrawn_exposure_usd": 87995061,
+          "unfunded_amt": 117326748,
+          "bank_share_pct": 75
         },
         {
           "facility_id": "F-5255",
-          "facility_name": "Harborview CRE \u2014 Property 5",
+          "facility_name": "Harborview CRE — Property 5",
           "counterparty_id": "CP-1251",
           "counterparty_name": "Harborview CRE Partners",
           "lob_segment_id": "SEG-3",
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 105000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 105000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": 367500.0,
-          "unfunded_amt": 36750000.0,
-          "bank_share_pct": 1.0
+          "undrawn_exposure_usd": 367500,
+          "unfunded_amt": 36750000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-5701",
-          "facility_name": "Mortgage \u2014 Retail Mortgage Borrower 1",
+          "facility_name": "Mortgage — Retail Mortgage Borrower 1",
           "counterparty_id": "CP-1701",
           "counterparty_name": "Retail Mortgage Borrower 1",
           "lob_segment_id": "SEG-3",
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": 700.0,
-          "unfunded_amt": 70000.0,
-          "bank_share_pct": 1.0
+          "undrawn_exposure_usd": 700,
+          "unfunded_amt": 70000,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -2000,7 +2000,7 @@
     "abbreviation": "OE",
     "kind": "METRIC",
     "definition": "Portion of committed exposure currently available and not yet drawn. Used to assess funding deployment and credit capacity usage.\n",
-    "generic_formula": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(funded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n",
+    "generic_formula": "For each active facility as of the reporting date:\n1. Look up the funded (outstanding/drawn) amount from position details\n2. Adjust for the bank’s ownership share (bank_share_pct; defaults to 100% if not set)\nResult = Funded Amount × Bank Share %\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "NEUTRAL",
@@ -2034,7 +2034,7 @@
         "dashboard_display_name": "Outstanding Exposure ($) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY pos.facility_id, fla.bank_share_pct\n8. COMPUTE\n   metric_value = SUM(COALESCE(pdtl.funded_amount, 0)) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
+        "level_logic": "1. Start with all positions as of the reporting date\n2. Look up the funded (outstanding/drawn) amount from position details\n3. Match each position to its active facility\n4. Look up the bank’s ownership share (defaults to 100% if not set)\n5. Result = Funded Amount × Bank Share %",
         "source_references": [
           {
             "layer": "L2",
@@ -2139,7 +2139,7 @@
         "dashboard_display_name": "Outstanding Exposure ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY fcp.counterparty_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0))",
+        "level_logic": "1. Compute Outstanding Exposure at facility level (see above)\n2. Group facilities by counterparty\n3. Weight each facility’s value by the counterparty’s participation share (defaults to 100%)\n4. Result = Sum of (Facility Outstanding Exposure × Participation %)",
         "source_references": [
           {
             "layer": "L2",
@@ -2244,7 +2244,7 @@
         "dashboard_display_name": "Outstanding Exposure ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Outstanding Exposure at facility level\n2. Map each facility to its desk via business segment hierarchy\n3. Result = Sum of all facility-level Outstanding Exposure within the desk",
         "source_references": [
           {
             "layer": "L2",
@@ -2349,7 +2349,7 @@
         "dashboard_display_name": "Outstanding Exposure ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt_l2.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Outstanding Exposure at facility level\n2. Map each facility to its portfolio via business segment hierarchy\n3. Result = Sum of all facility-level Outstanding Exposure within the portfolio",
         "source_references": [
           {
             "layer": "L2",
@@ -2454,7 +2454,7 @@
         "dashboard_display_name": "Outstanding Exposure ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.as_of_date = :as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n5. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt_l1.managed_segment_id\n8. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Outstanding Exposure at facility level\n2. Map each facility to its line of business via business segment hierarchy\n3. Result = Sum of all facility-level Outstanding Exposure within the LOB",
         "source_references": [
           {
             "layer": "L2",
@@ -2559,88 +2559,88 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "outstanding_exposure_usd": 10380000000.0,
-          "funded_amt": 10380000000.0,
-          "bank_share_pct": 100.0
+          "outstanding_exposure_usd": 10380000000,
+          "funded_amt": 10380000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-353",
-          "facility_name": "Catalyst Chem \u2014 USD Revolver 2030-F",
+          "facility_name": "Catalyst Chem — USD Revolver 2030-F",
           "counterparty_id": "CP-90",
           "counterparty_name": "Catalyst Chemical Holdings Inc.",
           "lob_segment_id": "SEG-104",
           "desk_name": "Medical Office Buildings Desk",
           "portfolio_name": "Healthcare Real Estate",
           "lob_name": "Corporate Banking",
-          "committed_amt": 73907486.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 73907486,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 101947985.55,
-          "funded_amt": 178856115.0,
-          "bank_share_pct": 57.0
+          "funded_amt": 178856115,
+          "bank_share_pct": 57
         },
         {
           "facility_id": "F-5701",
-          "facility_name": "Mortgage \u2014 Retail Mortgage Borrower 1",
+          "facility_name": "Mortgage — Retail Mortgage Borrower 1",
           "counterparty_id": "CP-1701",
           "counterparty_name": "Retail Mortgage Borrower 1",
           "lob_segment_id": "SEG-3",
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "outstanding_exposure_usd": 1300.0,
-          "funded_amt": 130000.0,
-          "bank_share_pct": 1.0
+          "outstanding_exposure_usd": 1300,
+          "funded_amt": 130000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9467",
-          "facility_name": "Rio \u2014 MXN Revolver 2026-A",
+          "facility_name": "Rio — MXN Revolver 2026-A",
           "counterparty_id": "CP-3340",
           "counterparty_name": "Rio Grande Mining Corp.",
           "lob_segment_id": "SEG-6",
           "desk_name": "Public Company Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1052236926.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 1052236926,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 6523868.94,
-          "funded_amt": 652386894.0,
-          "bank_share_pct": 1.0
+          "funded_amt": 652386894,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9543",
-          "facility_name": "Rhein-Ruhr \u2014 EUR Term Loan 2028-B",
+          "facility_name": "Rhein-Ruhr — EUR Term Loan 2028-B",
           "counterparty_id": "CP-3371",
           "counterparty_name": "Rhein-Ruhr Automotive Components GmbH",
           "lob_segment_id": "SEG-82",
           "desk_name": "Urban Self-Storage Desk",
           "portfolio_name": "Self-Storage",
           "lob_name": "Corporate Banking",
-          "committed_amt": 127553516.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 127553516,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 765321.1,
-          "funded_amt": 76532110.0,
-          "bank_share_pct": 1.0
+          "funded_amt": 76532110,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -2651,7 +2651,7 @@
     "abbreviation": "II",
     "kind": "METRIC",
     "definition": "Total interest earned on outstanding exposures during the reporting period.\n",
-    "generic_formula": "SUM(interest_income_amt) per facility from facility_profitability_snapshot.\nWeighted by bank_share_pct from facility_lender_allocation.\n",
+    "generic_formula": "For each active facility as of the reporting date:\n1. Look up the interest income amount from the profitability snapshot\n2. Adjust for the bank’s ownership share (bank_share_pct; defaults to 100% if not set)\nResult = Interest Income Amount × Bank Share %\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
@@ -2685,7 +2685,7 @@
         "dashboard_display_name": "Interest Income (facility)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n4. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY fprs.facility_id\n7. COMPUTE\n   metric_value = SUM(fprs.interest_income_amt * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
+        "level_logic": "1. Start with the profitability snapshot as of the reporting date\n2. Match each record to its active facility\n3. Look up the bank’s ownership share (defaults to 100% if not set)\n4. Result = Interest Income Amount × Bank Share %",
         "source_references": [
           {
             "layer": "L2",
@@ -2772,7 +2772,7 @@
         "dashboard_display_name": "Interest Income (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n4. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY fcp.counterparty_id\n7. COMPUTE\n   metric_value = SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0))",
+        "level_logic": "1. Compute Interest Income at facility level (see above)\n2. Group facilities by counterparty\n3. Weight each facility’s value by the counterparty’s participation share (defaults to 100%)\n4. Result = Sum of (Facility Interest Income × Participation %)",
         "source_references": [
           {
             "layer": "L2",
@@ -2859,7 +2859,7 @@
         "dashboard_display_name": "Interest Income (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n4. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Interest Income at facility level\n2. Map each facility to its desk via business segment hierarchy\n3. Result = Sum of all facility-level Interest Income within the desk",
         "source_references": [
           {
             "layer": "L2",
@@ -2946,7 +2946,7 @@
         "dashboard_display_name": "Interest Income (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n4. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Interest Income at facility level\n2. Map each facility to its portfolio via business segment hierarchy\n3. Result = Sum of all facility-level Interest Income within the portfolio",
         "source_references": [
           {
             "layer": "L2",
@@ -3033,7 +3033,7 @@
         "dashboard_display_name": "Interest Income (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n4. JOIN  l2.facility_counterparty_participation  (fcp)\n   ON    fcp.facility_id = fm.facility_id\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. Compute Interest Income at facility level\n2. Map each facility to its line of business via business segment hierarchy\n3. Result = Sum of all facility-level Interest Income within the LOB",
         "source_references": [
           {
             "layer": "L2",
@@ -3120,83 +3120,83 @@
       "facilities": [
         {
           "facility_id": "F-4",
-          "facility_name": "Silverton Financial \u2014 Bridge Facility",
+          "facility_name": "Silverton Financial — Bridge Facility",
           "counterparty_id": "CP-4",
           "counterparty_name": "Silverton Financial Group",
           "lob_segment_id": "SEG-4",
           "desk_name": "Domestic Large-Cap Corporates Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 2500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 0.0,
-          "bank_share_pct": 100.0
+          "interest_income_amt": 0,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 141440000.0,
-          "bank_share_pct": 100.0
+          "interest_income_amt": 141440000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-384",
-          "facility_name": "Great Lakes PL \u2014 USD L/C 2026-E",
+          "facility_name": "Great Lakes PL — USD L/C 2026-E",
           "counterparty_id": "CP-96",
           "counterparty_name": "Great Lakes Power & Light Corp.",
           "lob_segment_id": "SEG-135",
           "desk_name": "Infrastructure Funds Coverage Desk",
           "portfolio_name": "Sponsor Coverage",
           "lob_name": "Corporate Banking",
-          "committed_amt": 164974198.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 164974198,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 5384758.0,
-          "bank_share_pct": 28.0
+          "interest_income_amt": 5384758,
+          "bank_share_pct": 28
         },
         {
           "facility_id": "F-9571",
-          "facility_name": "Zurich \u2014 CHF Revolver 2029-A",
+          "facility_name": "Zurich — CHF Revolver 2029-A",
           "counterparty_id": "CP-3384",
           "counterparty_name": "Zurich Capital Partners Fund III AG",
           "lob_segment_id": "SEG-111",
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 415365813.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 415365813,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 26098472.0,
-          "bank_share_pct": 1.0
+          "interest_income_amt": 26098472,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9637",
-          "facility_name": "Appalachian \u2014 USD Revolver 2029-A",
+          "facility_name": "Appalachian — USD Revolver 2029-A",
           "counterparty_id": "CP-3414",
           "counterparty_name": "Appalachian Natural Gas Partners LP",
           "lob_segment_id": "SEG-176",
           "desk_name": "Discretionary Portfolio Management Deks",
           "portfolio_name": "Investment Advisory",
           "lob_name": "Corporate Banking",
-          "committed_amt": 182226869.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 182226869,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 5756547.0,
-          "bank_share_pct": 1.0
+          "interest_income_amt": 5756547,
+          "bank_share_pct": 1
         }
       ]
     }

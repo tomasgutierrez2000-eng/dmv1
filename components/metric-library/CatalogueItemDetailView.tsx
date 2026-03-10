@@ -10,6 +10,7 @@ import { LibraryPageLoading, LibraryError } from './LibraryStates';
 import IngredientFieldsTable from './IngredientFieldsTable';
 import LevelRollupTable from './LevelRollupTable';
 import PythonCalculatorSection from './PythonCalculatorSection';
+import CatalogueDeepDive from './CatalogueDeepDive';
 
 export default function CatalogueItemDetailView({ itemId }: { itemId: string }) {
   const [item, setItem] = useState<CatalogueItem | null>(null);
@@ -142,7 +143,17 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
           </div>
         </section>
 
-        {/* ── Section 5: Python Calculator ── */}
+        {/* ── Section 5: Interactive Demo ── */}
+        <section>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
+            Interactive Demo
+          </h2>
+          <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-800">
+            <CatalogueDeepDive item={item} />
+          </div>
+        </section>
+
+        {/* ── Section 6: Python Calculator ── */}
         <section>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
             Python Calculator

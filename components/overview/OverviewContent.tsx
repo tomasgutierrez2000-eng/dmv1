@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Network, MessageCircle, BookOpen, Library, History, Activity, Target, Telescope, Cpu, Columns3, GitBranch } from 'lucide-react';
+import { Database, Layers, BarChart3, FileText, ArrowRight, Play, Network, MessageCircle, BookOpen, Library, History, Activity, Target, Telescope, Cpu, Columns3, GitBranch, Map } from 'lucide-react';
 import FacilitySummaryWalkthrough from '@/components/walkthroughs/FacilitySummaryWalkthrough';
 
 export default function OverviewContent() {
@@ -59,20 +59,46 @@ export default function OverviewContent() {
               </div>
             </div>
 
-            {/* Other nav items */}
-            {[
-              { href: '/architecture', icon: Layers, label: 'Architecture', bg: 'bg-teal-600', hover: 'hover:bg-teal-500' },
-              { href: '/metrics/library', icon: Library, label: 'Metrics', bg: 'bg-violet-600', hover: 'hover:bg-violet-500' },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${item.bg} ${item.hover} text-white rounded-lg text-xs font-medium transition-colors flex flex-col items-center justify-center gap-1.5 py-2.5 px-2 text-center`}
+            {/* Architecture — hover/focus dropdown */}
+            <div className="relative group">
+              <button
+                type="button"
+                aria-haspopup="true"
+                className="bg-teal-600 group-hover:bg-teal-500 group-focus-within:bg-teal-500 text-white rounded-lg text-xs font-medium transition-colors flex flex-col items-center justify-center gap-1.5 py-2.5 px-2 text-center cursor-pointer h-full w-full"
               >
-                <item.icon className="w-4 h-4" />
-                <span className="leading-tight">{item.label}</span>
-              </Link>
-            ))}
+                <Layers className="w-4 h-4" />
+                <span className="leading-tight">Architecture</span>
+              </button>
+              <div className="absolute top-full left-0 right-0 pt-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-150">
+                <div className="bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
+                  {[
+                    { href: '/architecture', icon: Layers, label: 'Pipeline', desc: 'End-to-end data pipeline' },
+                    { href: '/architecture/overview', icon: Map, label: 'Data Model Overview', desc: 'Tables, relationships & flow' },
+                  ].map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-slate-700 transition-colors"
+                    >
+                      <item.icon className="w-3.5 h-3.5 text-teal-400 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <div className="text-xs font-medium text-white">{item.label}</div>
+                        <div className="text-[10px] text-slate-400">{item.desc}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Metrics */}
+            <Link
+              href="/metrics/library"
+              className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg text-xs font-medium transition-colors flex flex-col items-center justify-center gap-1.5 py-2.5 px-2 text-center"
+            >
+              <Library className="w-4 h-4" />
+              <span className="leading-tight">Metrics</span>
+            </Link>
 
             {/* Data Elements — hover dropdown */}
             <div className="relative group">

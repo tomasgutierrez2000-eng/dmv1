@@ -146,6 +146,44 @@ A Claude Code `PostToolUse` hook (`.claude/hooks/post-db-change.sh`) automatical
 - **After ANY database schema change** (CREATE/ALTER/DROP TABLE, adding columns, loading DDL), the hook auto-syncs the data dictionary. If the hook doesn't fire, manually run `npm run db:introspect`.
 - **Never skip introspection** after schema changes — the visualizer, exporter, and validation all read from the data dictionary, not directly from PostgreSQL.
 - **After introspection**, verify the `/data-elements` page reflects the changes.
+- **Capital DB auto-sync:** The hook also runs `npm run db:sync-capital --yes` to propagate schema changes to `postgres_capital` (see below).
+
+### Capital Metrics Database (`postgres_capital`)
+A separate database on the same GCP Cloud SQL instance for capital metrics development. Contains a full copy of the main `postgres` database plus capital-specific extensions.
+
+**Connection:** Same host/port as main DB, database name = `postgres_capital`
+```
+postgresql://postgres:<password>@localhost:5433/postgres_capital
+```
+
+**Capital-specific additions (migration `sql/migrations/002-capital-metrics.sql`):**
+
+| Layer | Table | Purpose |
+|-------|-------|---------|
+| L1 | `basel_exposure_type_dim` | Basel III exposure classes (Corporate, Sovereign, Bank, Retail, etc.) |
+| L1 | `regulatory_capital_requirement` | Fed-published capital requirements per GSIB per effective date |
+| L2 | `capital_position_snapshot` | Entity-level capital ratios from Y-9C/Call Reports (quarterly) |
+| L3 | `facility_rwa_calc` | Dual-approach RWA amounts (strict L3 convention — derived from L2 risk weights) |
+| L3 | `capital_binding_constraint` | Entity-level binding constraint analysis (CET1, Tier1, SLR, TLAC) |
+| L3 | `facility_capital_consumption` | Per-facility capital allocation (top-down from entity binding constraint) |
+| L3 | `counterparty_capital_consumption` | Counterparty-level rollup |
+| L3 | `desk_capital_consumption` | Desk/org-unit-level rollup |
+| L3 | `portfolio_capital_consumption` | Portfolio-level rollup (primary view per spec) |
+| L3 | `segment_capital_consumption` | Business segment/LOB rollup |
+
+**Field additions on existing tables:**
+- `l2.facility_master` + `legal_entity_id`, `profit_center_code`
+- `l2.facility_risk_snapshot` + `risk_weight_std_pct`, `risk_weight_erba_pct`, `defaulted_flag`, `basel_exposure_type_id`
+
+**Auto-sync:** The PostToolUse hook runs `npm run db:sync-capital --yes` after any DDL change on main. The sync script (`scripts/sync-capital-db.ts`) compares schemas, applies new tables/columns from main to capital, and preserves capital-specific additions.
+
+**Manual sync:** `npm run db:sync-capital` (dry-run) or `npm run db:sync-capital -- --yes` (auto-apply)
+
+**Applying capital changes to main:** When satisfied with the capital schema, run the migration against main:
+```bash
+psql -d postgres -f sql/migrations/002-capital-metrics.sql
+psql -d postgres -f sql/migrations/002a-capital-metrics-seed.sql
+```
 
 ## Database Recon Indicators (Visualizer)
 The visualizer shows live reconciliation between the data dictionary and PostgreSQL:

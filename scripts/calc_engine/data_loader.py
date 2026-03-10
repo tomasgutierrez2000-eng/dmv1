@@ -56,6 +56,21 @@ class DataLoader:
             self._conn.close()
             self._conn = None
 
+    def query(self, sql: str, params: dict | None = None) -> pd.DataFrame | None:
+        """Execute raw SQL against PostgreSQL. Returns None if not in DB mode.
+
+        Converts :named bind parameters to psycopg2's %(name)s format.
+        """
+        if not self._use_db:
+            return None
+        conn = self._get_conn()
+        adapted_sql = re.sub(r":([a-z_]+)\b", r"%(\1)s", sql)
+        try:
+            return pd.read_sql(adapted_sql, conn, params=params or {})
+        except Exception:
+            conn.rollback()
+            raise
+
     # ── PostgreSQL ──────────────────────────────────────────────
 
     def _get_conn(self):
@@ -70,7 +85,11 @@ class DataLoader:
             raise ValueError(f"Invalid identifier: {schema}.{table}")
         conn = self._get_conn()
         query = f"SELECT * FROM {schema}.{table}"
-        return pd.read_sql(query, conn)
+        try:
+            return pd.read_sql(query, conn)
+        except Exception:
+            conn.rollback()
+            raise
 
     def _list_db_tables(self) -> list[str]:
         conn = self._get_conn()

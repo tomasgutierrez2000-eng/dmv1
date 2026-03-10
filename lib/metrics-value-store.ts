@@ -34,8 +34,8 @@ export interface MetricValueRow {
  */
 export async function getMetricValueRowsFromDb(params: {
   level: ConsumptionLevel;
-  runVersion: string;
-  asOfDate: string;
+  runVersion?: string;
+  asOfDate?: string;
   metricId?: string;
 }): Promise<MetricValueRow[] | null> {
   const databaseUrl = process.env.DATABASE_URL;
@@ -46,23 +46,31 @@ export async function getMetricValueRowsFromDb(params: {
     await client.connect();
     try {
       const { level, runVersion, asOfDate, metricId } = params;
-      const values: unknown[] = [level, runVersion, asOfDate];
-      const sql = metricId
-        ? `
-          SELECT run_version_id, as_of_date, metric_id, variant_id, aggregation_level,
-                 facility_id, counterparty_id, desk_id, portfolio_id, lob_id,
-                 value, unit, display_format
-          FROM l3.metric_value_fact
-          WHERE aggregation_level = $1 AND run_version_id = $2 AND as_of_date = $3 AND metric_id = $4
-        `
-        : `
-          SELECT run_version_id, as_of_date, metric_id, variant_id, aggregation_level,
-                 facility_id, counterparty_id, desk_id, portfolio_id, lob_id,
-                 value, unit, display_format
-          FROM l3.metric_value_fact
-          WHERE aggregation_level = $1 AND run_version_id = $2 AND as_of_date = $3
-        `;
-      if (metricId) values.push(metricId);
+      const conditions: string[] = ['aggregation_level = $1'];
+      const values: unknown[] = [level];
+
+      if (runVersion && runVersion !== 'default') {
+        values.push(runVersion);
+        conditions.push(`run_version_id = $${values.length}`);
+      }
+      if (asOfDate) {
+        values.push(asOfDate);
+        conditions.push(`as_of_date = $${values.length}`);
+      }
+      if (metricId) {
+        values.push(metricId);
+        conditions.push(`metric_id = $${values.length}`);
+      }
+
+      const sql = `
+        SELECT run_version_id, as_of_date, metric_id, variant_id, aggregation_level,
+               facility_id, counterparty_id, desk_id, portfolio_id, lob_id,
+               value, unit, display_format
+        FROM l3.metric_value_fact
+        WHERE ${conditions.join(' AND ')}
+        ORDER BY as_of_date DESC
+        LIMIT 5000
+      `;
       const res = await client.query(sql, values);
       return (res.rows as MetricValueRow[]) ?? [];
     } finally {

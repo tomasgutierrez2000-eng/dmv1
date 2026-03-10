@@ -82,6 +82,109 @@ def run_metric(req: RunRequest):
         loader.close()
 
 
+class PopulateRequest(BaseModel):
+    as_of_date: Optional[str] = None
+    run_version: str = Field(default="RUN_MVP_001")
+    metric_id: Optional[str] = None
+    dimension: Optional[str] = None
+
+
+@app.post("/populate")
+def populate_l3(req: PopulateRequest):
+    """Run calculators and INSERT results into l3.metric_value_fact."""
+    from .populate_l3 import _build_rows, DIMENSIONS, DIMENSION_MAP
+
+    if req.dimension and req.dimension not in VALID_DIMENSIONS:
+        raise HTTPException(400, f"dimension must be one of: {', '.join(sorted(VALID_DIMENSIONS))}")
+
+    as_of_date = req.as_of_date or DEFAULT_AS_OF_DATE
+    dims = [req.dimension] if req.dimension else list(DIMENSIONS)
+
+    # Determine calculators to run
+    if req.metric_id:
+        calc = get_calculator(req.metric_id)
+        if calc is None:
+            raise HTTPException(422, detail={"error": f"No calculator found for: {req.metric_id}"})
+        calcs = [{"metric_id": calc.metric_id, "calculator": calc}]
+    else:
+        calcs = []
+        for entry in list_calculators():
+            calc = get_calculator(entry["metric_id"])
+            if calc:
+                calcs.append({"metric_id": entry["metric_id"], "calculator": calc})
+
+    loader = DataLoader()
+    all_rows: list[tuple] = []
+    errors: list[dict] = []
+    calc_count = 0
+
+    try:
+        for entry in calcs:
+            calc = entry["calculator"]
+            mid = entry["metric_id"]
+            for dim in dims:
+                try:
+                    result = calc.run(loader, as_of_date, dim)
+                    if result.empty:
+                        continue
+                    rows = _build_rows(mid, dim, as_of_date, req.run_version, result)
+                    all_rows.extend(rows)
+                    calc_count += 1
+                except Exception as e:
+                    errors.append({"metric_id": mid, "dimension": dim, "error": str(e)})
+    finally:
+        loader.close()
+
+    # Write to PostgreSQL
+    from .config import DATABASE_URL
+    if not DATABASE_URL:
+        return JSONResponse({
+            "ok": True,
+            "dry_run": True,
+            "row_count": len(all_rows),
+            "calc_count": calc_count,
+            "error_count": len(errors),
+            "errors": errors[:10],
+        })
+
+    import psycopg2
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor()
+        cur.execute("CREATE SCHEMA IF NOT EXISTS l3;")
+        cur.execute(
+            "DELETE FROM l3.metric_value_fact WHERE run_version_id = %s AND as_of_date = %s",
+            (req.run_version, as_of_date),
+        )
+        deleted = cur.rowcount
+
+        insert_sql = """
+            INSERT INTO l3.metric_value_fact (
+                run_version_id, as_of_date, metric_id, variant_id, aggregation_level,
+                facility_id, counterparty_id, desk_id, portfolio_id, lob_id,
+                "value", unit, display_format
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cur.executemany(insert_sql, all_rows)
+        conn.commit()
+
+        return JSONResponse({
+            "ok": True,
+            "inserted": len(all_rows),
+            "deleted": deleted,
+            "calc_count": calc_count,
+            "error_count": len(errors),
+            "run_version": req.run_version,
+            "as_of_date": as_of_date,
+            "errors": errors[:10],
+        })
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
 def _sanitize_floats(obj: Any) -> Any:
     """Replace NaN/Inf float values with None for JSON serialization."""
     if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):

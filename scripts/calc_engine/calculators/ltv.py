@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from ..registry import register
-from .base import BaseCalculator
+from .base import BaseCalculator, filter_by_date
 
 if TYPE_CHECKING:
     from ..data_loader import DataLoader
@@ -30,10 +30,10 @@ class LTVCalculator(BaseCalculator):
         }
 
     def facility_level(self, loader: DataLoader, as_of_date: str) -> pd.DataFrame:
-        fm = loader.load_table("L1", "facility_master")
+        fm = loader.load_table("L2", "facility_master")
         cs = loader.load_table("L2", "collateral_snapshot")
 
-        cs_latest = cs[cs["as_of_date"] == as_of_date].copy()
+        cs_latest = filter_by_date(cs, "as_of_date", as_of_date).copy()
         # Aggregate collateral per facility (a facility may have multiple collateral assets)
         coll = cs_latest.groupby("facility_id", as_index=False).agg(
             current_valuation_usd=("current_valuation_usd", "sum")
@@ -51,7 +51,7 @@ class LTVCalculator(BaseCalculator):
 
     def counterparty_level(self, loader: DataLoader, as_of_date: str) -> pd.DataFrame:
         fac = self.facility_level(loader, as_of_date)
-        fm = loader.load_table("L1", "facility_master")[["facility_id", "counterparty_id"]]
+        fm = loader.load_table("L2", "facility_master")[["facility_id", "counterparty_id"]]
         j = fac.merge(fm, on="facility_id", how="left")
         g = j.groupby("counterparty_id", as_index=False).agg(
             committed_facility_amt=("committed_facility_amt", "sum"),
@@ -66,7 +66,7 @@ class LTVCalculator(BaseCalculator):
 
     def desk_level(self, loader: DataLoader, as_of_date: str) -> pd.DataFrame:
         fac = self.facility_level(loader, as_of_date)
-        fm = loader.load_table("L1", "facility_master")[["facility_id", "lob_segment_id"]]
+        fm = loader.load_table("L2", "facility_master")[["facility_id", "lob_segment_id"]]
         ebt = loader.load_table("L1", "enterprise_business_taxonomy")
 
         level_col = "tree_level" if "tree_level" in ebt.columns else "level"

@@ -56,7 +56,7 @@ levels:
         rmtd.facility_id AS dimension_key,
         SUM(rmtd.risk_mitigant_subtype_code) AS metric_value
       FROM l1.risk_mitigant_type_dim rmtd
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = rmtd.facility_id
         AND fm.is_active_flag = 'Y'
       
@@ -71,7 +71,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         rmtd.risk_mitigant_subtype_code AS metric_value
       FROM l1.risk_mitigant_type_dim rmtd
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = rmtd.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE rmtd.as_of_date = :as_of_date
@@ -88,14 +88,14 @@ levels:
           rmtd.facility_id AS dimension_key,
           SUM(rmtd.risk_mitigant_subtype_code) AS metric_value
         FROM l1.risk_mitigant_type_dim rmtd
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = rmtd.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE rmtd.as_of_date = :as_of_date
         GROUP BY rmtd.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -114,14 +114,14 @@ levels:
           rmtd.facility_id AS dimension_key,
           SUM(rmtd.risk_mitigant_subtype_code) AS metric_value
         FROM l1.risk_mitigant_type_dim rmtd
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = rmtd.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE rmtd.as_of_date = :as_of_date
         GROUP BY rmtd.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -143,14 +143,14 @@ levels:
           rmtd.facility_id AS dimension_key,
           SUM(rmtd.risk_mitigant_subtype_code) AS metric_value
         FROM l1.risk_mitigant_type_dim rmtd
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = rmtd.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE rmtd.as_of_date = :as_of_date
         GROUP BY rmtd.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

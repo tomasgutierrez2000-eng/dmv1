@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from ..registry import register
-from .base import BaseCalculator
+from .base import BaseCalculator, filter_by_date
 
 if TYPE_CHECKING:
     from ..data_loader import DataLoader
@@ -31,7 +31,7 @@ class DSCRCalculator(BaseCalculator):
 
     def facility_level(self, loader: DataLoader, as_of_date: str) -> pd.DataFrame:
         ffs = loader.load_table("L2", "facility_financial_snapshot")
-        ffs = ffs[ffs["as_of_date"] == as_of_date].copy()
+        ffs = filter_by_date(ffs, "as_of_date", as_of_date).copy()
         ffs["dscr_value"] = (
             ffs["noi_amt"] / ffs["total_debt_service_amt"].replace(0, float("nan"))
         )
@@ -39,9 +39,9 @@ class DSCRCalculator(BaseCalculator):
 
     def counterparty_level(self, loader: DataLoader, as_of_date: str) -> pd.DataFrame:
         fac = self.facility_level(loader, as_of_date)
-        fm = loader.load_table("L1", "facility_master")[["facility_id", "counterparty_id"]]
+        fm = loader.load_table("L2", "facility_master")[["facility_id", "counterparty_id"]]
         fes = loader.load_table("L2", "facility_exposure_snapshot")
-        fes = fes[fes["as_of_date"] == as_of_date][["facility_id", "drawn_amount"]].drop_duplicates("facility_id")
+        fes = filter_by_date(fes, "as_of_date", as_of_date)[["facility_id", "drawn_amount"]].drop_duplicates("facility_id")
 
         j = fac.merge(fm, on="facility_id").merge(fes, on="facility_id", how="left")
         j["drawn_amount"] = j["drawn_amount"].fillna(0)
@@ -56,9 +56,9 @@ class DSCRCalculator(BaseCalculator):
 
     def desk_level(self, loader: DataLoader, as_of_date: str) -> pd.DataFrame:
         fac = self.facility_level(loader, as_of_date)
-        fm = loader.load_table("L1", "facility_master")[["facility_id", "lob_segment_id"]]
+        fm = loader.load_table("L2", "facility_master")[["facility_id", "lob_segment_id"]]
         fes = loader.load_table("L2", "facility_exposure_snapshot")
-        fes = fes[fes["as_of_date"] == as_of_date][["facility_id", "drawn_amount"]].drop_duplicates("facility_id")
+        fes = filter_by_date(fes, "as_of_date", as_of_date)[["facility_id", "drawn_amount"]].drop_duplicates("facility_id")
         ebt = loader.load_table("L1", "enterprise_business_taxonomy")
 
         level_col = "tree_level" if "tree_level" in ebt.columns else "level"

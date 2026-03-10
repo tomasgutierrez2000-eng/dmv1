@@ -27,7 +27,7 @@ regulatory_references:
     description: ""
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
+  - schema: l2
     table: facility_counterparty_participation
     alias: fcp
     join_type: BASE
@@ -56,8 +56,8 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         fcp.allocation_pct AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_counterparty_participation fcp
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_counterparty_participation fcp
         ON fcp.facility_id = fm.facility_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
@@ -68,8 +68,8 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         fcp.allocation_pct AS metric_value
-      FROM l1.facility_counterparty_participation fcp
-      INNER JOIN l1.facility_master fm
+      FROM l2.facility_counterparty_participation fcp
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fcp.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fcp.as_of_date = :as_of_date
@@ -85,12 +85,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           fcp.allocation_pct AS metric_value
-        FROM l1.facility_master fm
-        INNER JOIN l1.facility_counterparty_participation fcp
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_counterparty_participation fcp
           ON fcp.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -108,12 +108,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           fcp.allocation_pct AS metric_value
-        FROM l1.facility_master fm
-        INNER JOIN l1.facility_counterparty_participation fcp
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_counterparty_participation fcp
           ON fcp.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -133,12 +133,12 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           fcp.allocation_pct AS metric_value
-        FROM l1.facility_master fm
-        INNER JOIN l1.facility_counterparty_participation fcp
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_counterparty_participation fcp
           ON fcp.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

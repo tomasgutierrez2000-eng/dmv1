@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -10,6 +11,21 @@ import pandas as pd
 if TYPE_CHECKING:
     from ..data_loader import DataLoader
     from ..yaml_loader import MetricDefinitionYAML
+
+
+def coerce_date(as_of_date: str) -> datetime.date:
+    """Convert an as_of_date string to datetime.date for column comparison."""
+    return datetime.date.fromisoformat(as_of_date)
+
+
+def filter_by_date(df: pd.DataFrame, col: str, as_of_date: str) -> pd.DataFrame:
+    """Filter a DataFrame where col == as_of_date, handling date type mismatches."""
+    if col not in df.columns:
+        return df
+    sample = df[col].dropna().iloc[0] if len(df) > 0 and df[col].notna().any() else None
+    if isinstance(sample, (datetime.date, datetime.datetime)):
+        return df[df[col] == coerce_date(as_of_date)]
+    return df[df[col] == as_of_date]
 
 
 class BaseCalculator(ABC):

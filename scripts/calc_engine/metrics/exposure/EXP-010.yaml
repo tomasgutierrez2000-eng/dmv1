@@ -30,7 +30,7 @@ source_tables:
     role: MEASURE
   - name: delinquent_payment_flag
     role: MEASURE
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
@@ -64,7 +64,7 @@ levels:
         fds.facility_id AS dimension_key,
         CASE WHEN fds.days_past_due > 0 THEN 1.0 ELSE 0.0 END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
@@ -80,7 +80,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
@@ -98,7 +98,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
@@ -117,7 +117,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
@@ -138,7 +138,7 @@ levels:
                   / COUNT(*) * 100.0
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date

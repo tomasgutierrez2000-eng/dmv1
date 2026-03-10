@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-041"
 name: "Interest Income"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "treasury"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -19,10 +19,19 @@ unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
   Total interest earned on outstanding exposures during the reporting period.
+  Sources from facility_profitability_snapshot.interest_income_amt (ETL'd from
+  core banking, includes proper accrual and day-count per ASC 310-20).
+  Bank-share-adjusted via facility_lender_allocation.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-  - framework: "Basel III"
-    description: ""
+  - framework: "FR Y-9C"
+    schedule: "HI"
+    description: "Item 1.a — Interest and fee income on loans. Includes amortized origination fees per ASC 310-20."
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Field 38 captures interest rate at facility level. Income = rate x utilized exposure."
+  - framework: "CCAR/DFAST"
+    description: "PPNR projection input — interest income on loan portfolio drives net interest income."
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -36,7 +45,7 @@ source_tables:
         role: FILTER
       - name: interest_income_amt
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -50,6 +59,27 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = fm.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's participation share of the facility (%)"
+  - schema: l2
+    table: facility_counterparty_participation
+    alias: fcp
+    join_type: INNER
+    join_on: "fcp.facility_id = fm.facility_id"
+    fields:
+      - name: counterparty_id
+        role: DIMENSION
+      - name: participation_pct
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -64,105 +94,100 @@ source_tables:
 levels:
   facility:
     aggregation_type: SUM
-    formula_text: >
+    formula_text: |
       SUM(interest_income_amt) per facility from facility_profitability_snapshot.
-      Weighted by bank share percentage.
+      Weighted by bank_share_pct from facility_lender_allocation.
     formula_sql: |
       SELECT
         fprs.facility_id AS dimension_key,
         SUM(fprs.interest_income_amt
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
       FROM l2.facility_profitability_snapshot fprs
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fprs.facility_id
-        AND fla.is_current_flag = 'Y'
       WHERE fprs.as_of_date = :as_of_date
       GROUP BY fprs.facility_id
   counterparty:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level interest_income_amt per counterparty.
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each counterparty, sum facility-level interest income weighted
+      by participation_pct from facility_counterparty_participation.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        fcp.counterparty_id AS dimension_key,
+        SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0)) AS metric_value
       FROM (
         SELECT
-          fprs.facility_id AS dimension_key,
+          fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fprs.facility_id
-          AND fla.is_current_flag = 'Y'
         WHERE fprs.as_of_date = :as_of_date
         GROUP BY fprs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+      INNER JOIN l2.facility_counterparty_participation fcp
+        ON fcp.facility_id = fac.facility_id
+      GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level interest_income_amt per L3 desk segment.
+    formula_text: |
+      SUM of facility-level interest income per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fprs.facility_id AS dimension_key,
+          fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fprs.facility_id
-          AND fla.is_current_flag = 'Y'
         WHERE fprs.as_of_date = :as_of_date
         GROUP BY fprs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level interest_income_amt per L2 portfolio segment.
+    formula_text: |
+      SUM of facility-level interest income per L2 portfolio segment.
+      Traverses L3 -> L2 via parent_segment_id.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fprs.facility_id AS dimension_key,
+          fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fprs.facility_id
-          AND fla.is_current_flag = 'Y'
         WHERE fprs.as_of_date = :as_of_date
         GROUP BY fprs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -170,30 +195,29 @@ levels:
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level interest_income_amt per L1 business segment segment.
+    formula_text: |
+      SUM of facility-level interest income per L1 business segment.
+      Traverses L3 -> L2 -> L1 via parent_segment_id chain.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fprs.facility_id AS dimension_key,
+          fprs.facility_id,
           SUM(fprs.interest_income_amt
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
-        LEFT JOIN l1.facility_lender_allocation fla
+        LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fprs.facility_id
-          AND fla.is_current_flag = 'Y'
         WHERE fprs.as_of_date = :as_of_date
         GROUP BY fprs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -216,15 +240,23 @@ validations:
     type: NON_NEGATIVE
     description: "interest_income_amt must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-041-V03"
+    type: RECONCILIATION
+    description: "SUM(facility) must equal SUM(counterparty) and SUM(business_segment)"
+    severity: ERROR
+    params:
+      levels_to_compare: ["facility", "counterparty", "business_segment"]
+      tolerance_pct: 0.01
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-087"
   abbreviation: "II"
   insight: >
-    Core revenue generation from lending activities
+    Core revenue from lending — bank-share-adjusted interest income
+    from outstanding loan portfolio. FR Y-9C Schedule HI Item 1.a.
   rollup_strategy: "direct-sum"
   primary_value_field: "interest_income_amt"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["interest", "revenue", "profitability", "fr-y9c"]
 dashboard_pages: []
 legacy_metric_ids: []

@@ -28,7 +28,7 @@ source_tables:
     role: FILTER
   - name: risk_weight_pct
     role: MEASURE
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
@@ -82,12 +82,12 @@ levels:
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = frs.facility_id
           AND fes.as_of_date = frs.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = frs.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE frs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -110,12 +110,12 @@ levels:
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = frs.facility_id
           AND fes.as_of_date = frs.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = frs.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE frs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -140,12 +140,12 @@ levels:
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = frs.facility_id
           AND fes.as_of_date = frs.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = frs.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE frs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -172,12 +172,12 @@ levels:
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = frs.facility_id
           AND fes.as_of_date = frs.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = frs.facility_id
           AND fm.is_active_flag = 'Y'
         WHERE frs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

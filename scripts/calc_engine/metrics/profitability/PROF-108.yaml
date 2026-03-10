@@ -1,18 +1,16 @@
 # ═══════════════════════════════════════════════════════════════
-# Interest Expense — PROF-108
-# Funding cost burden at facility level, summed through rollup hierarchy
+# GSIB Metric Definition
+# Interest Expense — Funded Basis
 # ═══════════════════════════════════════════════════════════════
-
-# IDENTIFICATION
+# ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "PROF-108"
 name: "Interest Expense"
-version: "1.0.0"
+version: "2.0.0"
 owner: "treasury"
 status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
-
-# CLASSIFICATION
+# ── CLASSIFICATION ────────────────────────────────────────────
 domain: "profitability"
 sub_domain: "funding_cost"
 metric_class: CALCULATED
@@ -20,53 +18,67 @@ direction: LOWER_BETTER
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Total interest cost incurred on funding sources attributable to the reporting
-  unit during the period. At facility level, computed as the product of the
-  committed amount, the bank's participation share, and the cost of funds rate.
-  At higher rollup levels, aggregated as the sum of facility-level interest expense.
-
-# REGULATORY REFERENCES
+  Annualized interest cost on drawn/funded exposure. Computed as
+  SUM(funded_amount) * bank_share_pct * cost_of_funds_pct at facility level.
+  Uses funded basis (actual drawn amounts from position_detail) rather than
+  committed basis, aligning with FR Y-9C Schedule HI Item 2.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-  - framework: "FR Y-14Q"
-    schedule: "H"
-    description: "Interest expense reporting per Schedule H"
-
-# SOURCE TABLES
+  - framework: "FR Y-9C"
+    schedule: "HI"
+    description: "Item 2 — Interest expense by funding type. Reports actual interest cost on borrowings."
+  - framework: "CCAR/DFAST"
+    description: "PPNR projection input — interest expense on funded positions drives net interest income."
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
+  - schema: l2
+    table: position
+    alias: pos
+    join_type: BASE
+    fields:
+      - name: position_id
+        role: JOIN_KEY
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+  - schema: l2
+    table: position_detail
+    alias: pdtl
+    join_type: INNER
+    join_on: "pdtl.position_id = pos.position_id"
+    fields:
+      - name: position_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: funded_amount
+        role: MEASURE
+  - schema: l2
     table: facility_master
     alias: fm
-    join_type: BASE
+    join_type: INNER
+    join_on: "fm.facility_id = pos.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
-        description: "Primary key — facility identifier"
-      - name: committed_facility_amt
-        role: MEASURE
-        description: "Total committed amount of the facility"
       - name: counterparty_id
         role: DIMENSION
-        description: "FK to counterparty for grouping"
       - name: lob_segment_id
         role: DIMENSION
-        description: "FK to business taxonomy for desk/portfolio/lob resolution"
       - name: is_active_flag
         role: FILTER
-        description: "Only include active facilities"
-
-  - schema: l1
+  - schema: l2
     table: facility_lender_allocation
     alias: fla
-    join_type: INNER
+    join_type: LEFT
     join_on: "fla.facility_id = fm.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
-        description: "FK to facility_master"
       - name: bank_share_pct
         role: MEASURE
         description: "Bank's participation share of the facility (%)"
-
   - schema: l2
     table: facility_pricing_snapshot
     alias: fps
@@ -75,20 +87,27 @@ source_tables:
     fields:
       - name: facility_id
         role: JOIN_KEY
-        description: "FK to facility_master"
       - name: as_of_date
         role: FILTER
-        description: "Snapshot date for pricing data"
       - name: cost_of_funds_pct
         role: MEASURE
-        description: "Cost of funds rate (may be NULL; derived from all_in_rate - spread)"
+        description: "FTP / internal transfer price. Fallback: all_in_rate_pct - spread_bps/100"
       - name: all_in_rate_pct
         role: MEASURE
         description: "All-in interest rate for fallback derivation"
       - name: spread_bps
         role: MEASURE
-        description: "Spread in basis points for fallback derivation"
-
+        description: "Credit spread in basis points for fallback derivation"
+  - schema: l2
+    table: facility_counterparty_participation
+    alias: fcp
+    join_type: INNER
+    join_on: "fcp.facility_id = fm.facility_id"
+    fields:
+      - name: counterparty_id
+        role: DIMENSION
+      - name: participation_pct
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -97,162 +116,244 @@ source_tables:
     fields:
       - name: managed_segment_id
         role: DIMENSION
-        description: "Business hierarchy node identifier"
       - name: parent_segment_id
         role: DIMENSION
-        description: "Parent node for hierarchy traversal"
-      - name: tree_level
-        role: DIMENSION
-        description: "Hierarchy depth (L1=department, L2=portfolio, L3=desk)"
-
-# LEVEL FORMULAS
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: "committed_facility_amt × bank_share_pct × cost_of_funds_rate"
+    formula_text: |
+      For each active facility:
+      1. Join position -> position_detail, SUM(funded_amount) per facility
+      2. Multiply by bank_share_pct / 100 from facility_lender_allocation
+      3. Multiply by COALESCE(cost_of_funds_pct, all_in_rate_pct - spread_bps/100) / 100
+         from facility_pricing_snapshot
     formula_sql: |
       SELECT
-        fm.facility_id AS dimension_key,
-        fm.committed_facility_amt
-          * fla.bank_share_pct / 100.0
+        fac.facility_id AS dimension_key,
+        fac.funded_amount_sum
+          * COALESCE(fla.bank_share_pct, 100.0) / 100.0
           * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
           AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
+      FROM (
+        SELECT
+          pos.facility_id,
+          SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_amount_sum
+        FROM l2.position pos
+        INNER JOIN l2.position_detail pdtl
+          ON pdtl.position_id = pos.position_id
+          AND pdtl.as_of_date = pos.as_of_date
+        WHERE pos.as_of_date = :as_of_date
+        GROUP BY pos.facility_id
+      ) fac
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
         AND fps.as_of_date = :as_of_date
-      WHERE fm.is_active_flag = true
-
   counterparty:
-    aggregation_type: SUM
-    formula_text: "SUM(Facility Interest Expense) per counterparty"
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each counterparty, sum facility-level interest expense weighted
+      by participation_pct from facility_counterparty_participation.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(
-          fm.committed_facility_amt
-          * fla.bank_share_pct / 100.0
-          * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
-        ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
-        ON fla.facility_id = fm.facility_id
-      LEFT JOIN l2.facility_pricing_snapshot fps
-        ON fps.facility_id = fm.facility_id
-        AND fps.as_of_date = :as_of_date
-      WHERE fm.is_active_flag = true
-      GROUP BY fm.counterparty_id
-
+        fcp.counterparty_id AS dimension_key,
+        SUM(fac_ie.metric_value * COALESCE(fcp.participation_pct, 1.0)) AS metric_value
+      FROM (
+        SELECT
+          fac.facility_id,
+          fac.funded_amount_sum
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
+            AS metric_value
+        FROM (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_amount_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) fac
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fac.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        LEFT JOIN l2.facility_pricing_snapshot fps
+          ON fps.facility_id = fm.facility_id
+          AND fps.as_of_date = :as_of_date
+      ) fac_ie
+      INNER JOIN l2.facility_counterparty_participation fcp
+        ON fcp.facility_id = fac_ie.facility_id
+      GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
-    formula_text: "SUM(Facility Interest Expense) per L3 desk segment"
+    formula_text: |
+      SUM of facility-level interest expense per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(
-          fm.committed_facility_amt
-          * fla.bank_share_pct / 100.0
-          * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
-        ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
-        ON fla.facility_id = fm.facility_id
-      LEFT JOIN l2.facility_pricing_snapshot fps
-        ON fps.facility_id = fm.facility_id
-        AND fps.as_of_date = :as_of_date
+        SUM(fac_ie.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fac.facility_id,
+          fac.funded_amount_sum
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
+            AS metric_value
+        FROM (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_amount_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) fac
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fac.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        LEFT JOIN l2.facility_pricing_snapshot fps
+          ON fps.facility_id = fm.facility_id
+          AND fps.as_of_date = :as_of_date
+      ) fac_ie
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac_ie.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
-      WHERE fm.is_active_flag = true
       GROUP BY ebt.managed_segment_id
-
   portfolio:
     aggregation_type: SUM
-    formula_text: "SUM(Facility Interest Expense) per L2 portfolio segment"
+    formula_text: |
+      SUM of facility-level interest expense per L2 portfolio segment.
+      Traverses L3 -> L2 via parent_segment_id.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(
-          fm.committed_facility_amt
-          * fla.bank_share_pct / 100.0
-          * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
-        ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
-        ON fla.facility_id = fm.facility_id
-      LEFT JOIN l2.facility_pricing_snapshot fps
-        ON fps.facility_id = fm.facility_id
-        AND fps.as_of_date = :as_of_date
+        SUM(fac_ie.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fac.facility_id,
+          fac.funded_amount_sum
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
+            AS metric_value
+        FROM (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_amount_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) fac
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fac.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        LEFT JOIN l2.facility_pricing_snapshot fps
+          ON fps.facility_id = fm.facility_id
+          AND fps.as_of_date = :as_of_date
+      ) fac_ie
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac_ie.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      WHERE fm.is_active_flag = true
       GROUP BY ebt_l2.managed_segment_id
-
   business_segment:
     aggregation_type: SUM
-    formula_text: "SUM(Facility Interest Expense) per L1 business segment (department)"
+    formula_text: |
+      SUM of facility-level interest expense per L1 business segment.
+      Traverses L3 -> L2 -> L1 via parent_segment_id chain.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(
-          fm.committed_facility_amt
-          * fla.bank_share_pct / 100.0
-          * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
-        ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
-        ON fla.facility_id = fm.facility_id
-      LEFT JOIN l2.facility_pricing_snapshot fps
-        ON fps.facility_id = fm.facility_id
-        AND fps.as_of_date = :as_of_date
+        SUM(fac_ie.metric_value) AS metric_value
+      FROM (
+        SELECT
+          fac.facility_id,
+          fac.funded_amount_sum
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
+            AS metric_value
+        FROM (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_amount_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) fac
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fac.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        LEFT JOIN l2.facility_pricing_snapshot fps
+          ON fps.facility_id = fm.facility_id
+          AND fps.as_of_date = :as_of_date
+      ) fac_ie
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac_ie.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      WHERE fm.is_active_flag = true
       GROUP BY ebt_l1.managed_segment_id
-
-# DEPENDENCIES
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
-
-# OUTPUT
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
-
-# VALIDATION RULES
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
   - rule_id: "PROF-108-V01"
     type: NOT_NULL
     description: "No null interest expense values"
     severity: ERROR
-
   - rule_id: "PROF-108-V02"
     type: NON_NEGATIVE
     description: "Interest expense must be >= 0"
     severity: ERROR
-
   - rule_id: "PROF-108-V03"
     type: RECONCILIATION
-    description: "Sum of facility-level values must equal counterparty/desk/portfolio/business_segment totals"
+    description: "SUM(facility) must equal SUM(counterparty) and SUM(business_segment)"
     severity: ERROR
     params:
       levels_to_compare: ["facility", "counterparty", "business_segment"]
       tolerance_pct: 0.01
-
-# CATALOGUE OVERRIDES
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-108"
   abbreviation: "INT_EXP"
-  insight: "Funding cost burden reveals margin compression risk — rising interest expense relative to committed amounts signals tightening spreads or increased leverage."
+  insight: >
+    Funding cost burden on drawn exposure — rising interest expense
+    relative to funded amounts signals tightening spreads or increased leverage.
+    FR Y-9C Schedule HI Item 2.
   rollup_strategy: "direct-sum"
   primary_value_field: "interest_expense_amt"
-
-# METADATA
-tags: ["funding-cost", "interest", "margin", "profitability"]
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["funding-cost", "interest", "margin", "profitability", "fr-y9c"]
 dashboard_pages: ["P3"]
 legacy_metric_ids: ["MET-108"]

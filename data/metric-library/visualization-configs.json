@@ -8,11 +8,11 @@
       "numerator": [
         {
           "op": "*",
-          "field": "committed_facility_amt",
-          "label": "Total committed amount of the facility",
+          "field": "funded_amount",
+          "label": "funded_amount",
           "sample_value": 0,
-          "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_table": "position_detail",
+          "source_layer": "L2"
         },
         {
           "op": "*",
@@ -20,12 +20,12 @@
           "label": "Bank's participation share of the facility (%)",
           "sample_value": 0,
           "source_table": "facility_lender_allocation",
-          "source_layer": "L1"
+          "source_layer": "L2"
         },
         {
           "op": "*",
           "field": "cost_of_funds_pct",
-          "label": "Cost of funds rate (may be NULL; derived from all_in_rate - spread)",
+          "label": "FTP / internal transfer price. Fallback: all_in_rate_pct - spread_bps/100",
           "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
           "source_layer": "L2"
@@ -41,22 +41,30 @@
         {
           "op": "*",
           "field": "spread_bps",
-          "label": "Spread in basis points for fallback derivation",
+          "label": "Credit spread in basis points for fallback derivation",
           "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "committed_facility_amt × bank_share_pct × cost_of_funds_rate"
+      "formula_display": "For each active facility:\n1. Join position -> position_detail, SUM(funded_amount) per facility\n2. Multiply by bank_share_pct / 100 from facility_lender_allocation\n3. Multiply by COALESCE(cost_of_funds_pct, all_in_rate_pct - spread_bps/100) / 100\n   from facility_pricing_snapshot\n"
     },
     "worked_example_columns": [
       {
-        "field": "committed_facility_amt",
-        "header": "Committed Facility ($)",
-        "format": "currency",
-        "subtotal_fn": "sum"
+        "field": "funded_amount",
+        "header": "Funded Amount",
+        "format": "number",
+        "subtotal_fn": "none"
       },
       {
         "field": "bank_share_pct",
@@ -80,6 +88,12 @@
         "field": "spread_bps",
         "header": "Spread (bps)",
         "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
         "subtotal_fn": "none"
       },
       {
@@ -380,7 +394,7 @@
   "MET-012": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "committed_facility_amt"
+      "primary_value": "committed_exposure_usd"
     },
     "formula_decomposition": {
       "numerator": [
@@ -390,20 +404,54 @@
           "label": "committed_facility_amt",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each Distinct([Facility ID]), WHEN IS(MAX(AS_OF_DATE) AND [Facility_Active_Flag]=\"Y\", THEN [Committed_Facility_Amt]*[Bank_Share] == [Committed Exposure, Bank Share portion only]\n"
+      "formula_display": "For each active facility: committed_facility_amt * bank_share_pct / 100. bank_share_pct sourced from facility_lender_allocation (aggregated per facility).\n"
     },
     "worked_example_columns": [
       {
         "field": "committed_facility_amt",
         "header": "Committed Facility ($)",
         "format": "currency",
-        "subtotal_fn": "sum",
-        "is_result": true
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_exposure_usd",
+        "header": "Committed Exposure Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -450,7 +498,7 @@
           "label": "allocation_pct",
           "sample_value": 0,
           "source_table": "facility_counterparty_participation",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -871,10 +919,10 @@
         {
           "op": "*",
           "field": "bank_share_pct",
-          "label": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
           "sample_value": 0,
-          "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
         },
         {
           "op": "*",
@@ -882,12 +930,12 @@
           "label": "participation_pct",
           "sample_value": 0,
           "source_table": "facility_counterparty_participation",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each active facility:\n1. Join position → position_detail on position_id (both as_of_date filtered)\n2. SUM(unfunded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 1.0) for bank-share-adjusted exposure\n"
+      "formula_display": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(unfunded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n"
     },
     "worked_example_columns": [
       {
@@ -920,7 +968,7 @@
   "MET-034": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "funded_amount"
+      "primary_value": "outstanding_exposure_usd"
     },
     "formula_decomposition": {
       "numerator": [
@@ -931,19 +979,53 @@
           "sample_value": 0,
           "source_table": "position_detail",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each Distinct([Facility ID]), WHEN IS(MAX(AS_OF_DATE) AND [Facility_Active_Flag]=\"Y\", THEN Lookup [Position_ID] within Positions table WHEN IS([Facility_ID]) FOR each [Facility_ID] SUM(ARRAY{[funded_amount]} for each [Position_ID]}) * [Bank_Share] == [Facility Oustanding Exposure, Bank Share Only]\n"
+      "formula_display": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(funded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n"
     },
     "worked_example_columns": [
       {
         "field": "funded_amount",
         "header": "Funded Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "outstanding_exposure_usd",
+        "header": "Outstanding Exposure Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -1016,27 +1098,27 @@
   "MET-040": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "facility_utilization_status"
+      "primary_value": "utilization_status_code"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "facility_utilization_status",
-          "label": "facility_utilization_status",
+          "field": "utilization_status_code",
+          "label": "utilization_status_code",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_detail_snapshot",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated facility_utilization_status per facility.\n"
+      "formula_display": "Calculated utilization_status_code per facility.\n"
     },
     "worked_example_columns": [
       {
-        "field": "facility_utilization_status",
-        "header": "Facility Utilization Status",
+        "field": "utilization_status_code",
+        "header": "Utilization Status Code",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -1691,11 +1773,27 @@
           "sample_value": 0,
           "source_table": "facility_profitability_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "SUM(interest_income_amt) per facility from facility_profitability_snapshot. Weighted by bank share percentage.\n"
+      "formula_display": "SUM(interest_income_amt) per facility from facility_profitability_snapshot.\nWeighted by bank_share_pct from facility_lender_allocation.\n"
     },
     "worked_example_columns": [
       {
@@ -1704,6 +1802,18 @@
         "format": "currency",
         "subtotal_fn": "sum",
         "is_result": true
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -2122,27 +2232,27 @@
   "MET-066": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "pricing_tier"
+      "primary_value": "pricing_tier_code"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "pricing_tier",
-          "label": "pricing_tier",
+          "field": "pricing_tier_code",
+          "label": "pricing_tier_code",
           "sample_value": 0,
-          "source_table": "facility_pricing_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_detail_snapshot",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read pricing_tier from facility_pricing_snapshot for each facility as-of reporting date.\n"
+      "formula_display": "Read pricing_tier_code from facility_detail_snapshot for each facility as-of reporting date.\n"
     },
     "worked_example_columns": [
       {
-        "field": "pricing_tier",
-        "header": "Pricing Tier",
+        "field": "pricing_tier_code",
+        "header": "Pricing Tier Code",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -2162,7 +2272,7 @@
           "label": "interest_rate_spread_bps",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2288,7 +2398,7 @@
           "label": "counterparty_id",
           "sample_value": 0,
           "source_table": "counterparty",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2318,7 +2428,7 @@
           "label": "legal_name",
           "sample_value": 0,
           "source_table": "counterparty",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2378,7 +2488,7 @@
           "label": "credit_agreement_id",
           "sample_value": 0,
           "source_table": "credit_agreement_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2438,7 +2548,7 @@
           "label": "origination_date",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2474,7 +2584,7 @@
           "label": "facility_name",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2554,27 +2664,27 @@
   "MET-047": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "active_flag"
+      "primary_value": "is_active_flag"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "active_flag",
-          "label": "active_flag",
+          "field": "is_active_flag",
+          "label": "is_active_flag",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of active_flag from facility_master.\n"
+      "formula_display": "Direct lookup of is_active_flag from facility_master.\n"
     },
     "worked_example_columns": [
       {
-        "field": "active_flag",
-        "header": "Active Flag",
+        "field": "is_active_flag",
+        "header": "Is Active Flag",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -2600,7 +2710,7 @@
           "label": "legal_name",
           "sample_value": 0,
           "source_table": "counterparty",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2780,7 +2890,7 @@
           "label": "maturity_date",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2810,7 +2920,7 @@
           "label": "origination_date",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2840,7 +2950,7 @@
           "label": "counterparty_id",
           "sample_value": 0,
           "source_table": "counterparty",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2900,7 +3010,7 @@
           "label": "region_code",
           "sample_value": 0,
           "source_table": "counterparty",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -3050,7 +3160,7 @@
           "label": "effective_date",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -3086,7 +3196,7 @@
           "label": "effective_date",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -3112,7 +3222,7 @@
   "MET-107": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "is_active_flag"
+      "primary_value": "facility_is_active_flag"
     },
     "formula_decomposition": {
       "numerator": [
@@ -3122,23 +3232,23 @@
           "label": "is_active_flag",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated is_active_flag per facility.\n"
+      "formula_display": "Calculated facility_is_active_flag per facility.\n"
     },
     "worked_example_columns": [
       {
         "field": "is_active_flag",
-        "header": "Active Flag",
+        "header": "Is Active Flag",
         "format": "number",
         "subtotal_fn": "none"
       },
       {
-        "field": "is_active_flag",
-        "header": "Facility Active Flag",
+        "field": "facility_is_active_flag",
+        "header": "Facility Is Active Flag",
         "format": "number",
         "is_result": true,
         "subtotal_fn": "sum"
@@ -3406,7 +3516,7 @@
           "label": "Bank's participation percentage from current allocation record",
           "sample_value": 0,
           "source_table": "facility_lender_allocation",
-          "source_layer": "L1"
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -3442,7 +3552,7 @@
           "label": "committed_facility_amt",
           "sample_value": 0,
           "source_table": "facility_master",
-          "source_layer": "L1"
+          "source_layer": "L2"
         },
         {
           "op": "*",

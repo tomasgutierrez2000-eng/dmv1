@@ -20,10 +20,10 @@ export const LOAD_ORDER: string[] = [
   'l1.currency_dim',
   'l1.metric_threshold',
 
-  // L1 reference data (parents first)
-  'l1.counterparty',
+  // L1/L2 reference data (parents first)
+  'l2.counterparty',
   'l1.credit_agreement_master',
-  'l1.facility_master',
+  'l2.facility_master',
   'l1.counterparty_hierarchy',
   'l1.sccl_counterparty_group',
   'l1.sccl_counterparty_group_member',
@@ -32,8 +32,8 @@ export const LOAD_ORDER: string[] = [
   'l1.collateral_link',
   'l1.limit_rule',
   'l1.limit_threshold',
-  'l1.facility_lender_allocation',
-  'l1.facility_counterparty_participation',
+  'l2.facility_lender_allocation',
+  'l2.facility_counterparty_participation',
   'l1.credit_agreement_counterparty_participation',
   'l1.crm_protection_master',
   'l1.protection_link',

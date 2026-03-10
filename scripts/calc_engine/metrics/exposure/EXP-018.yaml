@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Oustanding Exposure ($)
+# Outstanding Exposure ($) — Utilized/Funded Exposure
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-018"
-name: "Oustanding Exposure ($)"
-version: "1.0.0"
+name: "Outstanding Exposure ($)"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,30 +18,51 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Portion of committed exposure currently available and not yet drawn. Used to
-  assess funding deployment and credit capacity usage.
+  Bank-share-adjusted funded (drawn) exposure amount. Represents
+  the portion of committed credit currently utilized by the borrower.
+  Maps to FR Y-14Q Field 25 (Utilized Exposure Global, MDRM G075).
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Field 25 — Utilized Exposure Global (MDRM G075). Reports BHC's pro-rata drawn amount."
   - framework: "Basel III"
-    description: ""
+    description: "OB (outstanding balance) in EAD formula: EAD = OB + LEQ*(C-OB)."
+  - framework: "CCAR/DFAST"
+    description: "OB(i) — outstanding balance at start of projection in EAD formula."
+  - framework: "FR Y-9C"
+    schedule: "HC"
+    description: "Item 4 — Loans and leases held for investment."
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: position_detail
-    alias: pd
+    table: position
+    alias: pos
     join_type: BASE
     fields:
+      - name: position_id
+        role: JOIN_KEY
       - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+  - schema: l2
+    table: position_detail
+    alias: pdtl
+    join_type: INNER
+    join_on: "pdtl.position_id = pos.position_id"
+    fields:
+      - name: position_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
       - name: funded_amount
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = pd.facility_id"
+    join_on: "fm.facility_id = pos.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -51,6 +72,27 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = fm.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's participation share of the facility (%)"
+  - schema: l2
+    table: facility_counterparty_participation
+    alias: fcp
+    join_type: INNER
+    join_on: "fcp.facility_id = fm.facility_id"
+    fields:
+      - name: counterparty_id
+        role: DIMENSION
+      - name: participation_pct
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -65,76 +107,116 @@ source_tables:
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: >
-      For each Distinct([Facility ID]), WHEN IS(MAX(AS_OF_DATE) AND
-      [Facility_Active_Flag]="Y", THEN Lookup [Position_ID] within Positions table
-      WHEN IS([Facility_ID]) FOR each [Facility_ID] SUM(ARRAY{[funded_amount]} for
-      each [Position_ID]}) * [Bank_Share] == [Facility Oustanding Exposure, Bank
-      Share Only]
+    formula_text: |
+      For each active facility:
+      1. Join position -> position_detail on position_id (both as_of_date filtered)
+      2. SUM(funded_amount) across all positions for the facility
+      3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation
     formula_sql: |
       SELECT
-        pd.facility_id AS dimension_key,
-        pd.funded_amount AS metric_value
-      FROM l2.position_detail pd
-      WHERE pd.as_of_date = :as_of_date
+        pos.facility_id AS dimension_key,
+        SUM(COALESCE(pdtl.funded_amount, 0))
+          * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+      FROM l2.position pos
+      INNER JOIN l2.position_detail pdtl
+        ON pdtl.position_id = pos.position_id
+        AND pdtl.as_of_date = pos.as_of_date
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = pos.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = fm.facility_id
+      WHERE pos.as_of_date = :as_of_date
+      GROUP BY pos.facility_id, fla.bank_share_pct
   counterparty:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level funded_amount per counterparty.
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each counterparty, sum facility-level outstanding exposure weighted
+      by participation_pct from facility_counterparty_participation.
+      Uses contractual pro-rata basis per FR Y-14Q requirements.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        fcp.counterparty_id AS dimension_key,
+        SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0)) AS metric_value
       FROM (
         SELECT
-          pd.facility_id AS dimension_key,
-          pd.funded_amount AS metric_value
-        FROM l2.position_detail pd
-        WHERE pd.as_of_date = :as_of_date
+          pos.facility_id,
+          SUM(COALESCE(pdtl.funded_amount, 0))
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.position pos
+        INNER JOIN l2.position_detail pdtl
+          ON pdtl.position_id = pos.position_id
+          AND pdtl.as_of_date = pos.as_of_date
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = pos.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        WHERE pos.as_of_date = :as_of_date
+        GROUP BY pos.facility_id, fla.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+      INNER JOIN l2.facility_counterparty_participation fcp
+        ON fcp.facility_id = fac.facility_id
+      GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level funded_amount per L3 desk segment.
+    formula_text: |
+      SUM of facility-level outstanding exposure per L3 desk segment.
+      Joins facility_master.lob_segment_id to enterprise_business_taxonomy.managed_segment_id.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pd.facility_id AS dimension_key,
-          pd.funded_amount AS metric_value
-        FROM l2.position_detail pd
-        WHERE pd.as_of_date = :as_of_date
+          pos.facility_id,
+          SUM(COALESCE(pdtl.funded_amount, 0))
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.position pos
+        INNER JOIN l2.position_detail pdtl
+          ON pdtl.position_id = pos.position_id
+          AND pdtl.as_of_date = pos.as_of_date
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = pos.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        WHERE pos.as_of_date = :as_of_date
+        GROUP BY pos.facility_id, fla.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level funded_amount per L2 portfolio segment.
+    formula_text: |
+      SUM of facility-level outstanding exposure per L2 portfolio segment.
+      Traverses L3 -> L2 via parent_segment_id.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pd.facility_id AS dimension_key,
-          pd.funded_amount AS metric_value
-        FROM l2.position_detail pd
-        WHERE pd.as_of_date = :as_of_date
+          pos.facility_id,
+          SUM(COALESCE(pdtl.funded_amount, 0))
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.position pos
+        INNER JOIN l2.position_detail pdtl
+          ON pdtl.position_id = pos.position_id
+          AND pdtl.as_of_date = pos.as_of_date
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = pos.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        WHERE pos.as_of_date = :as_of_date
+        GROUP BY pos.facility_id, fla.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -142,22 +224,32 @@ levels:
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level funded_amount per L1 business segment segment.
+    formula_text: |
+      SUM of facility-level outstanding exposure per L1 business segment.
+      Traverses L3 -> L2 -> L1 via parent_segment_id chain.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pd.facility_id AS dimension_key,
-          pd.funded_amount AS metric_value
-        FROM l2.position_detail pd
-        WHERE pd.as_of_date = :as_of_date
+          pos.facility_id,
+          SUM(COALESCE(pdtl.funded_amount, 0))
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.position pos
+        INNER JOIN l2.position_detail pdtl
+          ON pdtl.position_id = pos.position_id
+          AND pdtl.as_of_date = pos.as_of_date
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = pos.facility_id
+          AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
+        WHERE pos.as_of_date = :as_of_date
+        GROUP BY pos.facility_id, fla.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -174,21 +266,29 @@ output:
 validations:
   - rule_id: "EXP-018-V01"
     type: NOT_NULL
-    description: "No null funded_amount values"
+    description: "No null outstanding_exposure values"
     severity: ERROR
   - rule_id: "EXP-018-V02"
     type: NON_NEGATIVE
-    description: "funded_amount must be >= 0"
+    description: "Outstanding exposure must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-018-V03"
+    type: RECONCILIATION
+    description: "SUM(facility) must equal SUM(counterparty) and SUM(business_segment)"
+    severity: ERROR
+    params:
+      levels_to_compare: ["facility", "counterparty", "business_segment"]
+      tolerance_pct: 0.01
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-034"
   abbreviation: "OE"
   insight: >
-    Efficiency of credit usage
+    Current credit deployment — bank-share-adjusted drawn exposure
+    representing actual funding at risk. FR Y-14Q Field 25.
   rollup_strategy: "direct-sum"
-  primary_value_field: "funded_amount"
+  primary_value_field: "outstanding_exposure_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "fr-y14q", "ccar"]
 dashboard_pages: []
 legacy_metric_ids: []

@@ -17,7 +17,7 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l1
+- schema: l2
   table: counterparty
   alias: cp
   join_type: BASE
@@ -45,8 +45,8 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         1 AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.counterparty cp
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
         ON cp.counterparty_id = fm.counterparty_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
@@ -61,12 +61,12 @@ levels:
         SELECT
           fm.facility_id,
           cp.counterparty_id
-        FROM l1.facility_master fm
-        INNER JOIN l1.counterparty cp
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -82,12 +82,12 @@ levels:
         SELECT
           fm.facility_id,
           cp.counterparty_id
-        FROM l1.facility_master fm
-        INNER JOIN l1.counterparty cp
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -105,12 +105,12 @@ levels:
         SELECT
           fm.facility_id,
           cp.counterparty_id
-        FROM l1.facility_master fm
-        INNER JOIN l1.counterparty cp
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -130,12 +130,12 @@ levels:
         SELECT
           fm.facility_id,
           cp.counterparty_id
-        FROM l1.facility_master fm
-        INNER JOIN l1.counterparty cp
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

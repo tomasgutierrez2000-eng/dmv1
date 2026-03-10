@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-004"
 name: "Committed Exposure ($)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,15 +18,21 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Total approved committed credit amount in USD representing contractual lending
-  capacity.
+  Bank-share-adjusted total approved committed credit amount in USD.
+  Represents the BHC's pro-rata contractual lending capacity per facility.
+  Maps to FR Y-14Q Field 24 (Committed Exposure Global, MDRM G074).
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Field 24 — Committed Exposure Global (MDRM G074). Reports BHC's pro-rata share."
   - framework: "Basel III"
-    description: ""
+    description: "Total commitment in EAD formula: EAD = OB + LEQ*(C-OB)"
+  - framework: "CCAR/DFAST"
+    description: "C(i) — committed balance at start of projection in EAD formula"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: BASE
@@ -36,6 +42,31 @@ source_tables:
       - name: is_active_flag
         role: FILTER
       - name: committed_facility_amt
+        role: MEASURE
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+  - schema: l2
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = fm.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's participation share of the facility (%)"
+  - schema: l2
+    table: facility_counterparty_participation
+    alias: fcp
+    join_type: LEFT
+    join_on: "fcp.facility_id = fm.facility_id"
+    fields:
+      - name: counterparty_id
+        role: DIMENSION
+      - name: participation_pct
         role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
@@ -52,77 +83,89 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      For each Distinct([Facility ID]), WHEN IS(MAX(AS_OF_DATE) AND
-      [Facility_Active_Flag]="Y", THEN [Committed_Facility_Amt]*[Bank_Share] ==
-      [Committed Exposure, Bank Share portion only]
+      For each active facility: committed_facility_amt * bank_share_pct / 100.
+      bank_share_pct sourced from facility_lender_allocation (aggregated per facility).
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,
-        fm.committed_facility_amt AS metric_value
-      FROM l1.facility_master fm
+        fm.committed_facility_amt
+          * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+      FROM l2.facility_master fm
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = fm.facility_id
       WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level committed_facility_amt per counterparty.
+      SUM of facility-level committed exposure weighted by participation_pct
+      from facility_counterparty_participation. Uses contractual pro-rata basis
+      per FR Y-14Q requirements.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        fcp.counterparty_id AS dimension_key,
+        SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0)) AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          fm.committed_facility_amt AS metric_value
-        FROM l1.facility_master fm
+          fm.facility_id,
+          fm.committed_facility_amt
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.facility_master fm
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+      INNER JOIN l2.facility_counterparty_participation fcp
+        ON fcp.facility_id = fac.facility_id
+      GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level committed_facility_amt per L3 desk segment.
+      SUM of facility-level committed exposure per L3 desk segment.
+      Joins facility_master.lob_segment_id to enterprise_business_taxonomy.managed_segment_id.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          fm.committed_facility_amt AS metric_value
-        FROM l1.facility_master fm
+          fm.facility_id,
+          fm.committed_facility_amt
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.facility_master fm
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level committed_facility_amt per L2 portfolio segment.
+      SUM of facility-level committed exposure per L2 portfolio segment.
+      Traverses L3 -> L2 via parent_segment_id.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          fm.committed_facility_amt AS metric_value
-        FROM l1.facility_master fm
+          fm.facility_id,
+          fm.committed_facility_amt
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.facility_master fm
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -131,23 +174,25 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level committed_facility_amt per L1 business segment
-      segment.
+      SUM of facility-level committed exposure per L1 business segment.
+      Traverses L3 -> L2 -> L1 via parent_segment_id chain.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          fm.committed_facility_amt AS metric_value
-        FROM l1.facility_master fm
+          fm.facility_id,
+          fm.committed_facility_amt
+            * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
+        FROM l2.facility_master fm
+        LEFT JOIN l2.facility_lender_allocation fla
+          ON fla.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -170,15 +215,23 @@ validations:
     type: NON_NEGATIVE
     description: "committed_facility_amt must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-004-V03"
+    type: RECONCILIATION
+    description: "SUM(facility) must equal SUM(counterparty) and SUM(business_segment)"
+    severity: ERROR
+    params:
+      levels_to_compare: ["facility", "counterparty", "business_segment"]
+      tolerance_pct: 0.01
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-012"
   abbreviation: "CE"
   insight: >
-    Max credit exposure allowed
+    Max credit exposure allowed — bank-share-adjusted contractual lending capacity.
+    FR Y-14Q Field 24 (Committed Exposure Global).
   rollup_strategy: "direct-sum"
-  primary_value_field: "committed_facility_amt"
+  primary_value_field: "committed_exposure_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "fr-y14q", "ccar"]
 dashboard_pages: []
 legacy_metric_ids: []

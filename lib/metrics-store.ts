@@ -69,9 +69,8 @@ function readYamlMetricStubs(): L3Metric[] {
   const metricsDir = path.join(getProjectRoot(), 'scripts', 'calc_engine', 'metrics');
   if (!fs.existsSync(metricsDir)) return [];
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   let parseYaml: ((s: string) => Record<string, unknown>) | null = null;
-  try { parseYaml = require('yaml').parse; } catch { /* yaml not available */ }
+  try { parseYaml = require('yaml').parse; } catch { /* yaml not available */ } // eslint-disable-line
 
   const PAGE_MAP: Record<string, DashboardPage> = {
     exposure: 'P1', capital: 'P1', risk: 'P2',

@@ -122,6 +122,10 @@ function l2ToTables(l2Data: ReturnType<typeof generateL2Data>): TableData[] {
     ['l2.stress_test_breach', l2Data.stress_test_breach],
     ['l2.deal_pipeline_fact', l2Data.deal_pipeline_fact],
     ['l2.data_quality_score_snapshot', l2Data.data_quality_score_snapshot],
+    ['l2.facility_financial_snapshot', l2Data.facility_financial_snapshot],
+    ['l2.counterparty_financial_snapshot', l2Data.counterparty_financial_snapshot],
+    ['l2.facility_credit_approval', l2Data.facility_credit_approval],
+    ['l2.facility_risk_snapshot', l2Data.facility_risk_snapshot],
   ];
 
   for (const [table, rows] of mapping) {

@@ -123,6 +123,43 @@ export function validateScenario(
     }
   }
 
+  // Facility financial snapshots
+  for (const ffs of (l2Data.facility_financial_snapshot ?? [])) {
+    if (!facilityIds.has(ffs.facility_id)) {
+      errors.push(`Facility financial snapshot: facility_id ${ffs.facility_id} not in L1`);
+    }
+    if (!counterpartyIds.has(ffs.counterparty_id)) {
+      errors.push(`Facility financial snapshot: counterparty_id ${ffs.counterparty_id} not in L1`);
+    }
+  }
+
+  // Counterparty financial snapshots
+  for (const cfs of (l2Data.counterparty_financial_snapshot ?? [])) {
+    if (!counterpartyIds.has(cfs.counterparty_id)) {
+      errors.push(`Counterparty financial snapshot: counterparty_id ${cfs.counterparty_id} not in L1`);
+    }
+  }
+
+  // Facility credit approvals
+  for (const fca of (l2Data.facility_credit_approval ?? [])) {
+    if (!facilityIds.has(fca.facility_id)) {
+      errors.push(`Facility credit approval: facility_id ${fca.facility_id} not in L1`);
+    }
+    if (fca.counterparty_id && !counterpartyIds.has(fca.counterparty_id)) {
+      errors.push(`Facility credit approval: counterparty_id ${fca.counterparty_id} not in L1`);
+    }
+  }
+
+  // Facility risk snapshots
+  for (const frs of (l2Data.facility_risk_snapshot ?? [])) {
+    if (!facilityIds.has(frs.facility_id)) {
+      errors.push(`Facility risk snapshot: facility_id ${frs.facility_id} not in L1`);
+    }
+    if (!counterpartyIds.has(frs.counterparty_id)) {
+      errors.push(`Facility risk snapshot: counterparty_id ${frs.counterparty_id} not in L1`);
+    }
+  }
+
   // ── 3. Financial Consistency ──
 
   for (const exp of (l2Data.facility_exposure_snapshot ?? [])) {
@@ -177,6 +214,44 @@ export function validateScenario(
     evtPKs.add(evt.credit_event_id);
   }
 
+  // Facility financial snapshots: composite PK (facility_id, as_of_date)
+  const ffsPKs = new Set<string>();
+  for (const ffs of (l2Data.facility_financial_snapshot ?? [])) {
+    const pk = `${ffs.facility_id}|${ffs.as_of_date}`;
+    if (ffsPKs.has(pk)) {
+      errors.push(`Duplicate facility_financial_snapshot PK: facility=${ffs.facility_id}, date=${ffs.as_of_date}`);
+    }
+    ffsPKs.add(pk);
+  }
+
+  // Facility risk snapshots: composite PK (facility_id, as_of_date)
+  const frsPKs = new Set<string>();
+  for (const frs of (l2Data.facility_risk_snapshot ?? [])) {
+    const pk = `${frs.facility_id}|${frs.as_of_date}`;
+    if (frsPKs.has(pk)) {
+      errors.push(`Duplicate facility_risk_snapshot PK: facility=${frs.facility_id}, date=${frs.as_of_date}`);
+    }
+    frsPKs.add(pk);
+  }
+
+  // Counterparty financial snapshots: single PK (financial_snapshot_id)
+  const cfsPKs = new Set<number>();
+  for (const cfs of (l2Data.counterparty_financial_snapshot ?? [])) {
+    if (cfsPKs.has(cfs.financial_snapshot_id)) {
+      errors.push(`Duplicate counterparty_financial_snapshot PK: ${cfs.financial_snapshot_id}`);
+    }
+    cfsPKs.add(cfs.financial_snapshot_id);
+  }
+
+  // Facility credit approvals: single PK (approval_id)
+  const fcaPKs = new Set<number>();
+  for (const fca of (l2Data.facility_credit_approval ?? [])) {
+    if (fcaPKs.has(fca.approval_id)) {
+      errors.push(`Duplicate facility_credit_approval PK: ${fca.approval_id}`);
+    }
+    fcaPKs.add(fca.approval_id);
+  }
+
   // ── 5. Data Completeness ──
 
   if (chain.counterparties.length === 0) {
@@ -229,7 +304,11 @@ export function validateScenario(
     (l2Data.facility_delinquency_snapshot?.length ?? 0) +
     ((l2Data as Record<string, unknown[]>).facility_pricing_snapshot?.length ?? 0) +
     (l2Data.limit_contribution_snapshot?.length ?? 0) +
-    (l2Data.data_quality_score_snapshot?.length ?? 0);
+    (l2Data.data_quality_score_snapshot?.length ?? 0) +
+    (l2Data.facility_financial_snapshot?.length ?? 0) +
+    (l2Data.counterparty_financial_snapshot?.length ?? 0) +
+    (l2Data.facility_credit_approval?.length ?? 0) +
+    (l2Data.facility_risk_snapshot?.length ?? 0);
 
   const totalInserts = chain.counterparties.length +
     chain.agreements.length +

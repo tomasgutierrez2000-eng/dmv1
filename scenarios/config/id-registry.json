@@ -1,26 +1,28 @@
 {
   "version": 1,
   "nextId": {
-    "counterparty": 2900,
-    "credit_agreement_master": 2360,
-    "facility_master": 8444,
+    "counterparty": 3160,
+    "credit_agreement_master": 2620,
+    "facility_master": 9044,
     "counterparty_hierarchy": 5001,
     "sccl_counterparty_group": 5100,
     "sccl_counterparty_group_member": 5100,
     "control_relationship": 5100,
-    "collateral_asset_master": 50345,
-    "limit_rule": 5118,
+    "collateral_asset_master": 50377,
+    "limit_rule": 5122,
     "limit_threshold": 5100,
-    "credit_event": 5409,
+    "credit_event": 5455,
     "credit_event_facility_link": 5200,
-    "risk_flag": 8233,
+    "risk_flag": 8903,
     "amendment_event": 5100,
     "amendment_change_detail": 5100,
     "exception_event": 5100,
-    "stress_test_result": 5136,
+    "stress_test_result": 5144,
     "stress_test_breach": 5100,
-    "deal_pipeline_fact": 5280,
-    "limit_utilization_event": 5100
+    "deal_pipeline_fact": 5320,
+    "limit_utilization_event": 5100,
+    "counterparty_financial_snapshot": 10781,
+    "facility_credit_approval": 10601
   },
   "allocations": [
     {
@@ -110,1087 +112,1535 @@
     {
       "table": "counterparty",
       "scenarioId": "S19",
-      "startId": 2770,
-      "endId": 2774,
+      "startId": 3030,
+      "endId": 3034,
       "count": 5
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S19",
-      "startId": 2230,
-      "endId": 2234,
+      "startId": 2490,
+      "endId": 2494,
       "count": 5
     },
     {
       "table": "facility_master",
       "scenarioId": "S19",
-      "startId": 8144,
-      "endId": 8158,
+      "startId": 8744,
+      "endId": 8758,
       "count": 15
     },
     {
       "table": "credit_event",
       "scenarioId": "S19",
-      "startId": 5386,
-      "endId": 5387,
+      "startId": 5432,
+      "endId": 5433,
       "count": 2
     },
     {
       "table": "risk_flag",
       "scenarioId": "S19",
-      "startId": 7898,
-      "endId": 7907,
+      "startId": 8568,
+      "endId": 8577,
       "count": 10
     },
     {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S19",
+      "startId": 10391,
+      "endId": 10405,
+      "count": 15
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S19",
+      "startId": 10301,
+      "endId": 10315,
+      "count": 15
+    },
+    {
       "table": "counterparty",
       "scenarioId": "S20",
-      "startId": 2775,
-      "endId": 2778,
+      "startId": 3035,
+      "endId": 3038,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S20",
-      "startId": 2235,
-      "endId": 2238,
+      "startId": 2495,
+      "endId": 2498,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S20",
-      "startId": 8159,
-      "endId": 8166,
+      "startId": 8759,
+      "endId": 8766,
       "count": 8
     },
     {
       "table": "risk_flag",
       "scenarioId": "S20",
-      "startId": 7908,
-      "endId": 7915,
+      "startId": 8578,
+      "endId": 8585,
+      "count": 8
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S20",
+      "startId": 10406,
+      "endId": 10417,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S20",
+      "startId": 10316,
+      "endId": 10323,
       "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S21",
-      "startId": 2779,
-      "endId": 2781,
+      "startId": 3039,
+      "endId": 3041,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S21",
-      "startId": 2239,
-      "endId": 2241,
+      "startId": 2499,
+      "endId": 2501,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S21",
-      "startId": 8167,
-      "endId": 8175,
+      "startId": 8767,
+      "endId": 8775,
       "count": 9
     },
     {
       "table": "credit_event",
       "scenarioId": "S21",
-      "startId": 5388,
-      "endId": 5388,
+      "startId": 5434,
+      "endId": 5434,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S21",
-      "startId": 7916,
-      "endId": 7921,
+      "startId": 8586,
+      "endId": 8591,
       "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S21",
+      "startId": 10418,
+      "endId": 10426,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S21",
+      "startId": 10324,
+      "endId": 10332,
+      "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S22",
-      "startId": 2782,
-      "endId": 2784,
+      "startId": 3042,
+      "endId": 3044,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S22",
-      "startId": 2242,
-      "endId": 2244,
+      "startId": 2502,
+      "endId": 2504,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S22",
-      "startId": 8176,
-      "endId": 8181,
+      "startId": 8776,
+      "endId": 8781,
       "count": 6
     },
     {
       "table": "credit_event",
       "scenarioId": "S22",
-      "startId": 5389,
-      "endId": 5389,
+      "startId": 5435,
+      "endId": 5435,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S22",
-      "startId": 7922,
-      "endId": 7927,
+      "startId": 8592,
+      "endId": 8597,
+      "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S22",
+      "startId": 10427,
+      "endId": 10435,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S22",
+      "startId": 10333,
+      "endId": 10338,
       "count": 6
     },
     {
       "table": "counterparty",
       "scenarioId": "S23",
-      "startId": 2785,
-      "endId": 2787,
+      "startId": 3045,
+      "endId": 3047,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S23",
-      "startId": 2245,
-      "endId": 2247,
+      "startId": 2505,
+      "endId": 2507,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S23",
-      "startId": 8182,
-      "endId": 8190,
+      "startId": 8782,
+      "endId": 8790,
       "count": 9
     },
     {
       "table": "credit_event",
       "scenarioId": "S23",
-      "startId": 5390,
-      "endId": 5391,
+      "startId": 5436,
+      "endId": 5437,
       "count": 2
     },
     {
       "table": "risk_flag",
       "scenarioId": "S23",
-      "startId": 7928,
-      "endId": 7936,
+      "startId": 8598,
+      "endId": 8606,
+      "count": 9
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S23",
+      "startId": 10436,
+      "endId": 10444,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S23",
+      "startId": 10339,
+      "endId": 10347,
       "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S24",
-      "startId": 2788,
-      "endId": 2793,
+      "startId": 3048,
+      "endId": 3053,
       "count": 6
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S24",
-      "startId": 2248,
-      "endId": 2253,
+      "startId": 2508,
+      "endId": 2513,
       "count": 6
     },
     {
       "table": "facility_master",
       "scenarioId": "S24",
-      "startId": 8191,
-      "endId": 8202,
+      "startId": 8791,
+      "endId": 8802,
       "count": 12
     },
     {
       "table": "risk_flag",
       "scenarioId": "S24",
-      "startId": 7937,
-      "endId": 7954,
+      "startId": 8607,
+      "endId": 8624,
       "count": 18
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S24",
+      "startId": 10445,
+      "endId": 10462,
+      "count": 18
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S24",
+      "startId": 10348,
+      "endId": 10359,
+      "count": 12
     },
     {
       "table": "counterparty",
       "scenarioId": "S25",
-      "startId": 2794,
-      "endId": 2798,
+      "startId": 3054,
+      "endId": 3058,
       "count": 5
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S25",
-      "startId": 2254,
-      "endId": 2258,
+      "startId": 2514,
+      "endId": 2518,
       "count": 5
     },
     {
       "table": "facility_master",
       "scenarioId": "S25",
-      "startId": 8203,
-      "endId": 8212,
+      "startId": 8803,
+      "endId": 8812,
       "count": 10
     },
     {
       "table": "credit_event",
       "scenarioId": "S25",
-      "startId": 5392,
-      "endId": 5392,
+      "startId": 5438,
+      "endId": 5438,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S25",
-      "startId": 7955,
-      "endId": 7964,
+      "startId": 8625,
+      "endId": 8634,
+      "count": 10
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S25",
+      "startId": 10463,
+      "endId": 10477,
+      "count": 15
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S25",
+      "startId": 10360,
+      "endId": 10369,
       "count": 10
     },
     {
       "table": "counterparty",
       "scenarioId": "S26",
-      "startId": 2799,
-      "endId": 2802,
+      "startId": 3059,
+      "endId": 3062,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S26",
-      "startId": 2259,
-      "endId": 2262,
+      "startId": 2519,
+      "endId": 2522,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S26",
-      "startId": 8213,
-      "endId": 8224,
+      "startId": 8813,
+      "endId": 8824,
       "count": 12
     },
     {
       "table": "limit_rule",
       "scenarioId": "S26",
-      "startId": 5116,
-      "endId": 5116,
+      "startId": 5120,
+      "endId": 5120,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S26",
-      "startId": 7965,
-      "endId": 7972,
+      "startId": 8635,
+      "endId": 8642,
       "count": 8
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S26",
+      "startId": 10478,
+      "endId": 10489,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S26",
+      "startId": 10370,
+      "endId": 10381,
+      "count": 12
     },
     {
       "table": "counterparty",
       "scenarioId": "S27",
-      "startId": 2803,
-      "endId": 2805,
+      "startId": 3063,
+      "endId": 3065,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S27",
-      "startId": 2263,
-      "endId": 2265,
+      "startId": 2523,
+      "endId": 2525,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S27",
-      "startId": 8225,
-      "endId": 8233,
+      "startId": 8825,
+      "endId": 8833,
       "count": 9
     },
     {
       "table": "limit_rule",
       "scenarioId": "S27",
-      "startId": 5117,
-      "endId": 5117,
+      "startId": 5121,
+      "endId": 5121,
       "count": 1
     },
     {
       "table": "credit_event",
       "scenarioId": "S27",
-      "startId": 5393,
-      "endId": 5393,
+      "startId": 5439,
+      "endId": 5439,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S27",
-      "startId": 7973,
-      "endId": 7978,
+      "startId": 8643,
+      "endId": 8648,
       "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S27",
+      "startId": 10490,
+      "endId": 10498,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S27",
+      "startId": 10382,
+      "endId": 10390,
+      "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S28",
-      "startId": 2806,
-      "endId": 2809,
+      "startId": 3066,
+      "endId": 3069,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S28",
-      "startId": 2266,
-      "endId": 2269,
+      "startId": 2526,
+      "endId": 2529,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S28",
-      "startId": 8234,
-      "endId": 8241,
+      "startId": 8834,
+      "endId": 8841,
       "count": 8
     },
     {
       "table": "collateral_asset_master",
       "scenarioId": "S28",
-      "startId": 50329,
-      "endId": 50336,
+      "startId": 50361,
+      "endId": 50368,
       "count": 8
     },
     {
       "table": "credit_event",
       "scenarioId": "S28",
-      "startId": 5394,
-      "endId": 5395,
+      "startId": 5440,
+      "endId": 5441,
       "count": 2
     },
     {
       "table": "risk_flag",
       "scenarioId": "S28",
-      "startId": 7979,
-      "endId": 7986,
+      "startId": 8649,
+      "endId": 8656,
+      "count": 8
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S28",
+      "startId": 10499,
+      "endId": 10510,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S28",
+      "startId": 10391,
+      "endId": 10398,
       "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S29",
-      "startId": 2810,
-      "endId": 2814,
+      "startId": 3070,
+      "endId": 3074,
       "count": 5
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S29",
-      "startId": 2270,
-      "endId": 2274,
+      "startId": 2530,
+      "endId": 2534,
       "count": 5
     },
     {
       "table": "facility_master",
       "scenarioId": "S29",
-      "startId": 8242,
-      "endId": 8251,
+      "startId": 8842,
+      "endId": 8851,
       "count": 10
     },
     {
       "table": "risk_flag",
       "scenarioId": "S29",
-      "startId": 7987,
-      "endId": 7996,
+      "startId": 8657,
+      "endId": 8666,
       "count": 10
     },
     {
       "table": "deal_pipeline_fact",
       "scenarioId": "S29",
-      "startId": 5260,
-      "endId": 5269,
+      "startId": 5300,
+      "endId": 5309,
+      "count": 10
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S29",
+      "startId": 10511,
+      "endId": 10525,
+      "count": 15
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S29",
+      "startId": 10399,
+      "endId": 10408,
       "count": 10
     },
     {
       "table": "counterparty",
       "scenarioId": "S30",
-      "startId": 2815,
-      "endId": 2818,
+      "startId": 3075,
+      "endId": 3078,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S30",
-      "startId": 2275,
-      "endId": 2278,
+      "startId": 2535,
+      "endId": 2538,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S30",
-      "startId": 8252,
-      "endId": 8259,
+      "startId": 8852,
+      "endId": 8859,
       "count": 8
     },
     {
       "table": "risk_flag",
       "scenarioId": "S30",
-      "startId": 7997,
-      "endId": 8004,
+      "startId": 8667,
+      "endId": 8674,
       "count": 8
     },
     {
       "table": "stress_test_result",
       "scenarioId": "S30",
-      "startId": 5132,
-      "endId": 5132,
+      "startId": 5140,
+      "endId": 5140,
       "count": 1
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S30",
+      "startId": 10526,
+      "endId": 10537,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S30",
+      "startId": 10409,
+      "endId": 10416,
+      "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S31",
-      "startId": 2819,
-      "endId": 2821,
+      "startId": 3079,
+      "endId": 3081,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S31",
-      "startId": 2279,
-      "endId": 2281,
+      "startId": 2539,
+      "endId": 2541,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S31",
-      "startId": 8260,
-      "endId": 8265,
+      "startId": 8860,
+      "endId": 8865,
       "count": 6
     },
     {
       "table": "credit_event",
       "scenarioId": "S31",
-      "startId": 5396,
-      "endId": 5396,
+      "startId": 5442,
+      "endId": 5442,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S31",
-      "startId": 8005,
-      "endId": 8010,
+      "startId": 8675,
+      "endId": 8680,
+      "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S31",
+      "startId": 10538,
+      "endId": 10546,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S31",
+      "startId": 10417,
+      "endId": 10422,
       "count": 6
     },
     {
       "table": "counterparty",
       "scenarioId": "S32",
-      "startId": 2822,
-      "endId": 2825,
+      "startId": 3082,
+      "endId": 3085,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S32",
-      "startId": 2282,
-      "endId": 2285,
+      "startId": 2542,
+      "endId": 2545,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S32",
-      "startId": 8266,
-      "endId": 8273,
+      "startId": 8866,
+      "endId": 8873,
       "count": 8
     },
     {
       "table": "risk_flag",
       "scenarioId": "S32",
-      "startId": 8011,
-      "endId": 8022,
+      "startId": 8681,
+      "endId": 8692,
       "count": 12
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S32",
+      "startId": 10547,
+      "endId": 10558,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S32",
+      "startId": 10423,
+      "endId": 10430,
+      "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S33",
-      "startId": 2826,
-      "endId": 2828,
+      "startId": 3086,
+      "endId": 3088,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S33",
-      "startId": 2286,
-      "endId": 2288,
+      "startId": 2546,
+      "endId": 2548,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S33",
-      "startId": 8274,
-      "endId": 8282,
+      "startId": 8874,
+      "endId": 8882,
       "count": 9
     },
     {
       "table": "risk_flag",
       "scenarioId": "S33",
-      "startId": 8023,
-      "endId": 8028,
+      "startId": 8693,
+      "endId": 8698,
       "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S33",
+      "startId": 10559,
+      "endId": 10567,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S33",
+      "startId": 10431,
+      "endId": 10439,
+      "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S34",
-      "startId": 2829,
-      "endId": 2832,
+      "startId": 3089,
+      "endId": 3092,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S34",
-      "startId": 2289,
-      "endId": 2292,
+      "startId": 2549,
+      "endId": 2552,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S34",
-      "startId": 8283,
-      "endId": 8290,
+      "startId": 8883,
+      "endId": 8890,
       "count": 8
     },
     {
       "table": "credit_event",
       "scenarioId": "S34",
-      "startId": 5397,
-      "endId": 5397,
+      "startId": 5443,
+      "endId": 5443,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S34",
-      "startId": 8029,
-      "endId": 8040,
+      "startId": 8699,
+      "endId": 8710,
       "count": 12
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S34",
+      "startId": 10568,
+      "endId": 10579,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S34",
+      "startId": 10440,
+      "endId": 10447,
+      "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S35",
-      "startId": 2833,
-      "endId": 2835,
+      "startId": 3093,
+      "endId": 3095,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S35",
-      "startId": 2293,
-      "endId": 2295,
+      "startId": 2553,
+      "endId": 2555,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S35",
-      "startId": 8291,
-      "endId": 8299,
+      "startId": 8891,
+      "endId": 8899,
       "count": 9
     },
     {
       "table": "credit_event",
       "scenarioId": "S35",
-      "startId": 5398,
-      "endId": 5398,
+      "startId": 5444,
+      "endId": 5444,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S35",
-      "startId": 8041,
-      "endId": 8046,
+      "startId": 8711,
+      "endId": 8716,
       "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S35",
+      "startId": 10580,
+      "endId": 10588,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S35",
+      "startId": 10448,
+      "endId": 10456,
+      "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S36",
-      "startId": 2836,
-      "endId": 2838,
+      "startId": 3096,
+      "endId": 3098,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S36",
-      "startId": 2296,
-      "endId": 2298,
+      "startId": 2556,
+      "endId": 2558,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S36",
-      "startId": 8300,
-      "endId": 8308,
+      "startId": 8900,
+      "endId": 8908,
       "count": 9
     },
     {
       "table": "collateral_asset_master",
       "scenarioId": "S36",
-      "startId": 50337,
-      "endId": 50344,
+      "startId": 50369,
+      "endId": 50376,
       "count": 8
     },
     {
       "table": "credit_event",
       "scenarioId": "S36",
-      "startId": 5399,
-      "endId": 5399,
+      "startId": 5445,
+      "endId": 5445,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S36",
-      "startId": 8047,
-      "endId": 8055,
+      "startId": 8717,
+      "endId": 8725,
+      "count": 9
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S36",
+      "startId": 10589,
+      "endId": 10597,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S36",
+      "startId": 10457,
+      "endId": 10465,
       "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S37",
-      "startId": 2839,
-      "endId": 2841,
+      "startId": 3099,
+      "endId": 3101,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S37",
-      "startId": 2299,
-      "endId": 2301,
+      "startId": 2559,
+      "endId": 2561,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S37",
-      "startId": 8309,
-      "endId": 8314,
+      "startId": 8909,
+      "endId": 8914,
       "count": 6
     },
     {
       "table": "risk_flag",
       "scenarioId": "S37",
-      "startId": 8056,
-      "endId": 8061,
+      "startId": 8726,
+      "endId": 8731,
+      "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S37",
+      "startId": 10598,
+      "endId": 10606,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S37",
+      "startId": 10466,
+      "endId": 10471,
       "count": 6
     },
     {
       "table": "counterparty",
       "scenarioId": "S38",
-      "startId": 2842,
-      "endId": 2844,
+      "startId": 3102,
+      "endId": 3104,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S38",
-      "startId": 2302,
-      "endId": 2304,
+      "startId": 2562,
+      "endId": 2564,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S38",
-      "startId": 8315,
-      "endId": 8323,
+      "startId": 8915,
+      "endId": 8923,
       "count": 9
     },
     {
       "table": "credit_event",
       "scenarioId": "S38",
-      "startId": 5400,
-      "endId": 5402,
+      "startId": 5446,
+      "endId": 5448,
       "count": 3
     },
     {
       "table": "risk_flag",
       "scenarioId": "S38",
-      "startId": 8062,
-      "endId": 8070,
+      "startId": 8732,
+      "endId": 8740,
+      "count": 9
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S38",
+      "startId": 10607,
+      "endId": 10615,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S38",
+      "startId": 10472,
+      "endId": 10480,
       "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S39",
-      "startId": 2845,
-      "endId": 2848,
+      "startId": 3105,
+      "endId": 3108,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S39",
-      "startId": 2305,
-      "endId": 2308,
+      "startId": 2565,
+      "endId": 2568,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S39",
-      "startId": 8324,
-      "endId": 8335,
+      "startId": 8924,
+      "endId": 8935,
       "count": 12
     },
     {
       "table": "risk_flag",
       "scenarioId": "S39",
-      "startId": 8071,
-      "endId": 8078,
+      "startId": 8741,
+      "endId": 8748,
       "count": 8
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S39",
+      "startId": 10616,
+      "endId": 10627,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S39",
+      "startId": 10481,
+      "endId": 10492,
+      "count": 12
     },
     {
       "table": "counterparty",
       "scenarioId": "S40",
-      "startId": 2849,
-      "endId": 2853,
+      "startId": 3109,
+      "endId": 3113,
       "count": 5
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S40",
-      "startId": 2309,
-      "endId": 2313,
+      "startId": 2569,
+      "endId": 2573,
       "count": 5
     },
     {
       "table": "facility_master",
       "scenarioId": "S40",
-      "startId": 8336,
-      "endId": 8345,
+      "startId": 8936,
+      "endId": 8945,
       "count": 10
     },
     {
       "table": "risk_flag",
       "scenarioId": "S40",
-      "startId": 8079,
-      "endId": 8093,
+      "startId": 8749,
+      "endId": 8763,
       "count": 15
     },
     {
       "table": "stress_test_result",
       "scenarioId": "S40",
-      "startId": 5133,
-      "endId": 5133,
+      "startId": 5141,
+      "endId": 5141,
       "count": 1
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S40",
+      "startId": 10628,
+      "endId": 10642,
+      "count": 15
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S40",
+      "startId": 10493,
+      "endId": 10502,
+      "count": 10
     },
     {
       "table": "counterparty",
       "scenarioId": "S41",
-      "startId": 2854,
-      "endId": 2858,
+      "startId": 3114,
+      "endId": 3118,
       "count": 5
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S41",
-      "startId": 2314,
-      "endId": 2318,
+      "startId": 2574,
+      "endId": 2578,
       "count": 5
     },
     {
       "table": "facility_master",
       "scenarioId": "S41",
-      "startId": 8346,
-      "endId": 8355,
+      "startId": 8946,
+      "endId": 8955,
       "count": 10
     },
     {
       "table": "risk_flag",
       "scenarioId": "S41",
-      "startId": 8094,
-      "endId": 8108,
+      "startId": 8764,
+      "endId": 8778,
       "count": 15
     },
     {
       "table": "deal_pipeline_fact",
       "scenarioId": "S41",
-      "startId": 5270,
-      "endId": 5279,
+      "startId": 5310,
+      "endId": 5319,
+      "count": 10
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S41",
+      "startId": 10643,
+      "endId": 10657,
+      "count": 15
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S41",
+      "startId": 10503,
+      "endId": 10512,
       "count": 10
     },
     {
       "table": "counterparty",
       "scenarioId": "S42",
-      "startId": 2859,
-      "endId": 2861,
+      "startId": 3119,
+      "endId": 3121,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S42",
-      "startId": 2319,
-      "endId": 2321,
+      "startId": 2579,
+      "endId": 2581,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S42",
-      "startId": 8356,
-      "endId": 8364,
+      "startId": 8956,
+      "endId": 8964,
       "count": 9
     },
     {
       "table": "credit_event",
       "scenarioId": "S42",
-      "startId": 5403,
-      "endId": 5403,
+      "startId": 5449,
+      "endId": 5449,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S42",
-      "startId": 8109,
-      "endId": 8114,
+      "startId": 8779,
+      "endId": 8784,
       "count": 6
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S42",
+      "startId": 10658,
+      "endId": 10666,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S42",
+      "startId": 10513,
+      "endId": 10521,
+      "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S43",
-      "startId": 2862,
-      "endId": 2865,
+      "startId": 3122,
+      "endId": 3125,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S43",
-      "startId": 2322,
-      "endId": 2325,
+      "startId": 2582,
+      "endId": 2585,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S43",
-      "startId": 8365,
-      "endId": 8372,
+      "startId": 8965,
+      "endId": 8972,
       "count": 8
     },
     {
       "table": "credit_event",
       "scenarioId": "S43",
-      "startId": 5404,
-      "endId": 5404,
+      "startId": 5450,
+      "endId": 5450,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S43",
-      "startId": 8115,
-      "endId": 8126,
+      "startId": 8785,
+      "endId": 8796,
       "count": 12
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S43",
+      "startId": 10667,
+      "endId": 10678,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S43",
+      "startId": 10522,
+      "endId": 10529,
+      "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S44",
-      "startId": 2866,
-      "endId": 2868,
+      "startId": 3126,
+      "endId": 3128,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S44",
-      "startId": 2326,
-      "endId": 2328,
+      "startId": 2586,
+      "endId": 2588,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S44",
-      "startId": 8373,
-      "endId": 8381,
+      "startId": 8973,
+      "endId": 8981,
       "count": 9
     },
     {
       "table": "credit_event",
       "scenarioId": "S44",
-      "startId": 5405,
-      "endId": 5406,
+      "startId": 5451,
+      "endId": 5452,
       "count": 2
     },
     {
       "table": "risk_flag",
       "scenarioId": "S44",
-      "startId": 8127,
-      "endId": 8135,
+      "startId": 8797,
+      "endId": 8805,
+      "count": 9
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S44",
+      "startId": 10679,
+      "endId": 10687,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S44",
+      "startId": 10530,
+      "endId": 10538,
       "count": 9
     },
     {
       "table": "counterparty",
       "scenarioId": "S45",
-      "startId": 2869,
-      "endId": 2871,
+      "startId": 3129,
+      "endId": 3131,
       "count": 3
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S45",
-      "startId": 2329,
-      "endId": 2331,
+      "startId": 2589,
+      "endId": 2591,
       "count": 3
     },
     {
       "table": "facility_master",
       "scenarioId": "S45",
-      "startId": 8382,
-      "endId": 8387,
+      "startId": 8982,
+      "endId": 8987,
       "count": 6
     },
     {
       "table": "credit_event",
       "scenarioId": "S45",
-      "startId": 5407,
-      "endId": 5407,
+      "startId": 5453,
+      "endId": 5453,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S45",
-      "startId": 8136,
-      "endId": 8144,
+      "startId": 8806,
+      "endId": 8814,
       "count": 9
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S45",
+      "startId": 10688,
+      "endId": 10696,
+      "count": 9
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S45",
+      "startId": 10539,
+      "endId": 10544,
+      "count": 6
     },
     {
       "table": "counterparty",
       "scenarioId": "S46",
-      "startId": 2872,
-      "endId": 2877,
+      "startId": 3132,
+      "endId": 3137,
       "count": 6
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S46",
-      "startId": 2332,
-      "endId": 2337,
+      "startId": 2592,
+      "endId": 2597,
       "count": 6
     },
     {
       "table": "facility_master",
       "scenarioId": "S46",
-      "startId": 8388,
-      "endId": 8399,
+      "startId": 8988,
+      "endId": 8999,
       "count": 12
     },
     {
       "table": "risk_flag",
       "scenarioId": "S46",
-      "startId": 8145,
-      "endId": 8162,
+      "startId": 8815,
+      "endId": 8832,
       "count": 18
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S46",
+      "startId": 10697,
+      "endId": 10714,
+      "count": 18
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S46",
+      "startId": 10545,
+      "endId": 10556,
+      "count": 12
     },
     {
       "table": "counterparty",
       "scenarioId": "S47",
-      "startId": 2878,
-      "endId": 2881,
+      "startId": 3138,
+      "endId": 3141,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S47",
-      "startId": 2338,
-      "endId": 2341,
+      "startId": 2598,
+      "endId": 2601,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S47",
-      "startId": 8400,
-      "endId": 8407,
+      "startId": 9000,
+      "endId": 9007,
       "count": 8
     },
     {
       "table": "risk_flag",
       "scenarioId": "S47",
-      "startId": 8163,
-      "endId": 8174,
+      "startId": 8833,
+      "endId": 8844,
       "count": 12
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S47",
+      "startId": 10715,
+      "endId": 10726,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S47",
+      "startId": 10557,
+      "endId": 10564,
+      "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S48",
-      "startId": 2882,
-      "endId": 2887,
+      "startId": 3142,
+      "endId": 3147,
       "count": 6
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S48",
-      "startId": 2342,
-      "endId": 2347,
+      "startId": 2602,
+      "endId": 2607,
       "count": 6
     },
     {
       "table": "facility_master",
       "scenarioId": "S48",
-      "startId": 8408,
-      "endId": 8419,
+      "startId": 9008,
+      "endId": 9019,
       "count": 12
     },
     {
       "table": "risk_flag",
       "scenarioId": "S48",
-      "startId": 8175,
-      "endId": 8192,
+      "startId": 8845,
+      "endId": 8862,
       "count": 18
     },
     {
       "table": "stress_test_result",
       "scenarioId": "S48",
-      "startId": 5134,
-      "endId": 5134,
+      "startId": 5142,
+      "endId": 5142,
       "count": 1
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S48",
+      "startId": 10727,
+      "endId": 10744,
+      "count": 18
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S48",
+      "startId": 10565,
+      "endId": 10576,
+      "count": 12
     },
     {
       "table": "counterparty",
       "scenarioId": "S49",
-      "startId": 2888,
-      "endId": 2891,
+      "startId": 3148,
+      "endId": 3151,
       "count": 4
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S49",
-      "startId": 2348,
-      "endId": 2351,
+      "startId": 2608,
+      "endId": 2611,
       "count": 4
     },
     {
       "table": "facility_master",
       "scenarioId": "S49",
-      "startId": 8420,
-      "endId": 8427,
+      "startId": 9020,
+      "endId": 9027,
       "count": 8
     },
     {
       "table": "credit_event",
       "scenarioId": "S49",
-      "startId": 5408,
-      "endId": 5408,
+      "startId": 5454,
+      "endId": 5454,
       "count": 1
     },
     {
       "table": "risk_flag",
       "scenarioId": "S49",
-      "startId": 8193,
-      "endId": 8200,
+      "startId": 8863,
+      "endId": 8870,
+      "count": 8
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S49",
+      "startId": 10745,
+      "endId": 10756,
+      "count": 12
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S49",
+      "startId": 10577,
+      "endId": 10584,
       "count": 8
     },
     {
       "table": "counterparty",
       "scenarioId": "S50",
-      "startId": 2892,
-      "endId": 2899,
+      "startId": 3152,
+      "endId": 3159,
       "count": 8
     },
     {
       "table": "credit_agreement_master",
       "scenarioId": "S50",
-      "startId": 2352,
-      "endId": 2359,
+      "startId": 2612,
+      "endId": 2619,
       "count": 8
     },
     {
       "table": "facility_master",
       "scenarioId": "S50",
-      "startId": 8428,
-      "endId": 8443,
+      "startId": 9028,
+      "endId": 9043,
       "count": 16
     },
     {
       "table": "risk_flag",
       "scenarioId": "S50",
-      "startId": 8201,
-      "endId": 8232,
+      "startId": 8871,
+      "endId": 8902,
       "count": 32
     },
     {
       "table": "stress_test_result",
       "scenarioId": "S50",
-      "startId": 5135,
-      "endId": 5135,
+      "startId": 5143,
+      "endId": 5143,
       "count": 1
+    },
+    {
+      "table": "counterparty_financial_snapshot",
+      "scenarioId": "S50",
+      "startId": 10757,
+      "endId": 10780,
+      "count": 24
+    },
+    {
+      "table": "facility_credit_approval",
+      "scenarioId": "S50",
+      "startId": 10585,
+      "endId": 10600,
+      "count": 16
     }
   ]
 }

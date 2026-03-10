@@ -79,7 +79,12 @@ async function checkCurrentState(client: pg.Client) {
     { schema: 'l2', table: 'stress_test_result' },
     { schema: 'l2', table: 'facility_delinquency_snapshot' },
     { schema: 'l2', table: 'deal_pipeline_fact' },
+    { schema: 'l2', table: 'facility_financial_snapshot' },
+    { schema: 'l2', table: 'counterparty_financial_snapshot' },
+    { schema: 'l2', table: 'facility_credit_approval' },
+    { schema: 'l2', table: 'facility_risk_snapshot' },
     { schema: 'l1', table: 'facility_lender_allocation' },
+    { schema: 'l1', table: 'metric_threshold' },
   ];
 
   for (const t of tables) {
@@ -169,6 +174,10 @@ async function loadFactorySQL(client: pg.Client) {
       "DELETE FROM l2.limit_utilization_event WHERE limit_rule_id >= 5100",
       "DELETE FROM l2.exposure_counterparty_attribution WHERE facility_id >= 5744",
       "DELETE FROM l2.data_quality_score_snapshot WHERE counterparty_id >= 1730",
+      "DELETE FROM l2.facility_financial_snapshot WHERE facility_id >= 5744",
+      "DELETE FROM l2.counterparty_financial_snapshot WHERE counterparty_id >= 1730",
+      "DELETE FROM l2.facility_credit_approval WHERE facility_id >= 5744",
+      "DELETE FROM l2.facility_risk_snapshot WHERE facility_id >= 5744",
       "DELETE FROM l2.facility_exposure_snapshot WHERE facility_id >= 5744",
       // L1 children
       "DELETE FROM l1.facility_lender_allocation WHERE facility_id >= 5744",
@@ -258,6 +267,10 @@ async function verifyData(client: pg.Client) {
     { label: 'Factory exposures', query: 'SELECT COUNT(*) as cnt FROM l2.facility_exposure_snapshot WHERE facility_id >= 5744' },
     { label: 'Factory risk flags', query: 'SELECT COUNT(*) as cnt FROM l2.risk_flag WHERE risk_flag_id >= 5218' },
     { label: 'Factory credit events', query: 'SELECT COUNT(*) as cnt FROM l2.credit_event WHERE counterparty_id >= 1730' },
+    { label: 'Factory financial snapshots', query: 'SELECT COUNT(*) as cnt FROM l2.facility_financial_snapshot WHERE facility_id >= 5744' },
+    { label: 'Factory cp financials', query: 'SELECT COUNT(*) as cnt FROM l2.counterparty_financial_snapshot WHERE counterparty_id >= 1730' },
+    { label: 'Factory credit approvals', query: 'SELECT COUNT(*) as cnt FROM l2.facility_credit_approval WHERE facility_id >= 5744' },
+    { label: 'Factory risk snapshots', query: 'SELECT COUNT(*) as cnt FROM l2.facility_risk_snapshot WHERE facility_id >= 5744' },
   ];
 
   for (const c of counts) {

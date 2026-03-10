@@ -39,6 +39,11 @@ export default function DbStatusDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [exactLoading, setExactLoading] = useState(false);
 
+  // Database selector
+  const [databases, setDatabases] = useState<{ id: string; label: string }[]>([]);
+  const [selectedDb, setSelectedDb] = useState<string>('');
+  const [dbListLoaded, setDbListLoaded] = useState(false);
+
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLayer, setFilterLayer] = useState<string>('all');
@@ -49,20 +54,43 @@ export default function DbStatusDashboard() {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   const fetchStatus = useCallback(async (exact = false) => {
-    const url = exact ? '/api/db-status?exact=true' : '/api/db-status';
+    const params = new URLSearchParams();
+    if (exact) params.set('exact', 'true');
+    if (selectedDb) params.set('db', selectedDb);
+    const qs = params.toString();
+    const url = `/api/db-status${qs ? `?${qs}` : ''}`;
     const res = await fetch(url);
     const json = await res.json();
     if (!res.ok) throw new Error(json.error ?? 'Failed to fetch');
     return json as DbStatusResult;
+  }, [selectedDb]);
+
+  // Fetch available databases on mount
+  useEffect(() => {
+    fetch('/api/db-status?list=true')
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => {
+        if (json?.databases) {
+          setDatabases(json.databases);
+          if (json.databases.length > 0) {
+            setSelectedDb(json.databases[0].id);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setDbListLoaded(true));
   }, []);
 
-  // Initial load
+  // Fetch data whenever selectedDb changes, or once db list is loaded (even if empty)
   useEffect(() => {
+    if (!dbListLoaded) return;
+    setLoading(true);
+    setError(null);
     fetchStatus()
       .then(setData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [fetchStatus]);
+  }, [fetchStatus, dbListLoaded]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -185,6 +213,19 @@ export default function DbStatusDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {databases.length > 1 && (
+              <select
+                value={selectedDb}
+                onChange={(e) => setSelectedDb(e.target.value)}
+                className="px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {databases.map((db) => (
+                  <option key={db.id} value={db.id}>
+                    {db.label}
+                  </option>
+                ))}
+              </select>
+            )}
             <button
               onClick={handleExactCounts}
               disabled={exactLoading || !data?.connected}
@@ -320,7 +361,12 @@ function ConnectionBanner({ data, error }: { data: DbStatusResult | null; error:
       <div className="flex items-center gap-3 p-4 rounded-lg bg-emerald-50 border border-emerald-200 mb-4">
         <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
         <div>
-          <p className="text-sm font-medium text-emerald-800">Connected to PostgreSQL</p>
+          <p className="text-sm font-medium text-emerald-800">
+            Connected to PostgreSQL
+            {data.databaseLabel && (
+              <span className="font-normal text-emerald-600"> ({data.databaseLabel})</span>
+            )}
+          </p>
           <p className="text-xs text-emerald-600">
             {data.summary.totalTablesInDb} tables found in database
           </p>

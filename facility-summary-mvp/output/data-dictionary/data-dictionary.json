@@ -5845,11 +5845,9 @@
           "data_type": "VARCHAR(100)"
         },
         {
-          "name": "trading_banking_book_flag",
-          "description": "Trading vs Banking Book indicator",
-          "category": "Position Core",
-          "why_required": "Regulatory classification",
-          "data_type": "BOOLEAN"
+          "name": "trading_banking_book_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "ultimate_parent_id",
@@ -7062,16 +7060,7 @@
           "name": "credit_status_code",
           "description": "",
           "category": "Facility snapshots",
-          "data_type": "VARCHAR(30)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "credit_status_dim",
-              "field": "credit_status_code"
-            }
-          }
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "days_past_due",
@@ -7906,15 +7895,6 @@
           "description": "Credit event type",
           "category": "Credit Events",
           "why_required": "Event type classification",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "credit_event_type_dim",
-              "field": "credit_event_type_code"
-            }
-          },
           "data_type": "VARCHAR(30)"
         },
         {
@@ -12811,7 +12791,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -12823,7 +12803,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -12962,6 +12942,15 @@
           "description": "",
           "category": "Exposure & Risk Metrics",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "exposure_metric_cube_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -12974,7 +12963,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -12986,7 +12975,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -13112,6 +13101,15 @@
           "name": "rwa_density_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "risk_metric_cube_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13124,7 +13122,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -13136,7 +13134,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -13338,6 +13336,15 @@
           "name": "total_cross_entity_exposure_usd",
           "description": "",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "counterparty_exposure_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13350,7 +13357,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -13362,7 +13369,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -13465,6 +13472,15 @@
           "description": "",
           "category": "Exposure & Risk Metrics",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "facility_exposure_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13477,7 +13493,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -13489,7 +13505,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Exposure & Risk Metrics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -13561,6 +13577,15 @@
           "name": "rwa_density_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "portfolio_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13573,7 +13598,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -13585,7 +13610,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -13700,6 +13725,15 @@
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "crm_allocation_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13712,7 +13746,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -13724,7 +13758,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -13785,6 +13819,15 @@
           "description": "",
           "category": "Credit Risk Mitigation (CRM)",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "collateral_portfolio_valuation_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13797,7 +13840,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_ts",
@@ -13924,6 +13967,15 @@
           "description": "",
           "category": "Limits & Appetite",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "limit_current_state_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -13936,7 +13988,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_ts",
@@ -13991,6 +14043,15 @@
           "description": "",
           "category": "Limits & Appetite",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "limit_utilization_timeseries_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14003,7 +14064,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_ts",
@@ -14088,6 +14149,15 @@
           "description": "",
           "category": "Limits & Appetite",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "limit_attribution_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14106,7 +14176,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "limit_assignment_id",
@@ -14161,6 +14231,15 @@
           "description": "",
           "category": "Limits & Appetite",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "limit_breach_fact_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14173,7 +14252,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -14282,6 +14361,15 @@
           "description": "",
           "category": "Credit Events & Performance",
           "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "credit_event_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14294,7 +14382,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -14361,6 +14449,15 @@
           "description": "",
           "category": "Credit Events & Performance",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "rating_migration_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14373,7 +14470,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Credit Events & Performance",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -14440,6 +14537,15 @@
           "description": "",
           "category": "Credit Events & Performance",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "default_loss_recovery_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14458,7 +14564,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "report_code",
@@ -14476,7 +14582,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "status_code",
@@ -14507,6 +14613,15 @@
           "description": "",
           "category": "Regulatory Reporting Output",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "report_run_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14562,6 +14677,15 @@
           "description": "",
           "category": "Regulatory Reporting Output",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "report_cell_value_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14622,7 +14746,7 @@
           "name": "rule_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
@@ -14635,6 +14759,15 @@
           "description": "",
           "category": "Regulatory Reporting Output",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "report_cell_contribution_fact_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14659,7 +14792,7 @@
           "name": "rule_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rule_version",
@@ -14708,6 +14841,15 @@
           "description": "",
           "category": "Regulatory Reporting Output",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "report_cell_rule_execution_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14775,6 +14917,15 @@
           "description": "",
           "category": "Regulatory Reporting Output",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "report_validation_result_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14896,6 +15047,15 @@
           "description": "",
           "category": "FR 2590 Helper Artifacts",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "fr2590_position_snapshot_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14981,6 +15141,15 @@
           "description": "",
           "category": "FR 2590 Helper Artifacts",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "fr2590_counterparty_aggregate_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -14993,7 +15162,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15017,7 +15186,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -15173,6 +15342,15 @@
           "name": "rwa_density_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lob_exposure_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15185,7 +15363,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15323,6 +15501,15 @@
           "name": "return_on_rwa_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lob_profitability_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15335,7 +15522,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15432,6 +15619,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_pricing_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15444,7 +15640,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15559,6 +15755,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_delinquency_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15571,7 +15776,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15662,6 +15867,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_profitability_allocation_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15674,7 +15888,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15741,6 +15955,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "deal_pipeline_stage_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15753,7 +15976,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -15862,6 +16085,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lob_credit_quality_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15892,7 +16124,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "legal_entity_id",
@@ -15940,13 +16172,22 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "created_ts",
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "kpi_period_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -15959,7 +16200,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16104,6 +16345,15 @@
           "description": "",
           "category": "Executive Dashboard",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "risk_appetite_metric_state_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16116,7 +16366,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Executive Dashboard",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16177,6 +16427,15 @@
           "description": "",
           "category": "Executive Dashboard",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "executive_highlight_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16189,7 +16448,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Counterparty Analytics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16404,6 +16663,15 @@
           "name": "rwa_density_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "counterparty_detail_snapshot_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16416,7 +16684,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16489,6 +16757,15 @@
           "description": "",
           "category": "Limits & Appetite",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "limit_tier_status_matrix_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16501,7 +16778,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Limits & Appetite",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16562,6 +16839,15 @@
           "description": "",
           "category": "Limits & Appetite",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "limit_counterparty_movement_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16574,7 +16860,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16647,6 +16933,15 @@
           "description": "",
           "category": "Data Quality",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "data_quality_score_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16659,7 +16954,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Legal Entity Analytics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16766,6 +17061,15 @@
           "name": "rwa_density_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "legal_entity_risk_profile_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16778,7 +17082,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16827,6 +17131,15 @@
           "description": "",
           "category": "Data Quality",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "data_quality_attribute_score_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16839,7 +17152,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Data Quality",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16876,6 +17189,15 @@
           "description": "",
           "category": "Data Quality",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "data_quality_trend_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -16888,7 +17210,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -16900,7 +17222,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "scenario_name",
@@ -16997,6 +17319,15 @@
           "description": "",
           "category": "Stress Testing",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "stress_test_result_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17009,7 +17340,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17021,7 +17352,7 @@
           "name": "scenario_id",
           "description": "",
           "category": "Stress Testing",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "breach_seq",
@@ -17076,6 +17407,15 @@
           "description": "",
           "category": "Stress Testing",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "stress_test_breach_detail_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17088,7 +17428,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Regulatory Reporting Output",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17149,6 +17489,15 @@
           "description": "",
           "category": "Regulatory Reporting Output",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "regulatory_compliance_state_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17161,7 +17510,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17210,6 +17559,15 @@
           "description": "",
           "category": "Facility Analytics",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "facility_timeline_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17222,7 +17580,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17271,6 +17629,15 @@
           "description": "",
           "category": "Amendment Analytics",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "amendment_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17283,7 +17650,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Amendment Analytics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17356,6 +17723,15 @@
           "description": "",
           "category": "Amendment Analytics",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "amendment_detail_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17368,7 +17744,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Facility Analytics",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17638,6 +18014,15 @@
           "description": "",
           "why_required": "",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_detail_snapshot_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17650,7 +18035,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17717,6 +18102,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_risk_ratio_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17729,7 +18123,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17826,6 +18220,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_deterioration_summary_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17838,7 +18241,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17893,6 +18296,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_rating_distribution_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17905,7 +18317,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "Business Segment Summary",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -17972,6 +18384,15 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "lob_top_contributors_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -17984,7 +18405,7 @@
           "name": "run_version_id",
           "description": "",
           "category": "L3",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -18063,6 +18484,15 @@
           "description": "",
           "category": "L3",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "metric_value_fact_sk",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -18083,16 +18513,7 @@
         {
           "name": "run_id",
           "description": "",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L3",
-              "table": "calc_run",
-              "field": "run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "metric_id",
@@ -18203,7 +18624,7 @@
         {
           "name": "run_version_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -18319,16 +18740,7 @@
         {
           "name": "run_id",
           "description": "",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L3",
-              "table": "calc_run",
-              "field": "run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "metric_id",
@@ -18338,7 +18750,7 @@
         {
           "name": "rule_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "rule_type",
@@ -18414,21 +18826,12 @@
         {
           "name": "run_id",
           "description": "",
-          "data_type": "VARCHAR(64)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L3",
-              "table": "calc_run",
-              "field": "run_id"
-            }
-          }
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "run_version_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "as_of_date",
@@ -18483,7 +18886,7 @@
         {
           "name": "scenario_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "formula_hash",
@@ -19147,14 +19550,6 @@
     {
       "from_layer": "L2",
       "from_table": "credit_event",
-      "from_field": "credit_event_type_code",
-      "to_layer": "L1",
-      "to_table": "credit_event_type_dim",
-      "to_field": "credit_event_type_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "credit_event",
       "from_field": "default_definition_id",
       "to_layer": "L1",
       "to_table": "default_definition_dim",
@@ -19327,14 +19722,6 @@
       "to_layer": "L2",
       "to_table": "facility_master",
       "to_field": "facility_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_delinquency_snapshot",
-      "from_field": "credit_status_code",
-      "to_layer": "L1",
-      "to_table": "credit_status_dim",
-      "to_field": "credit_status_code"
     },
     {
       "from_layer": "L2",
@@ -19674,14 +20061,6 @@
     },
     {
       "from_layer": "L2",
-      "from_table": "metric_threshold",
-      "from_field": "metric_definition_id",
-      "to_layer": "L1",
-      "to_table": "metric_definition_dim",
-      "to_field": "metric_definition_id"
-    },
-    {
-      "from_layer": "L2",
       "from_table": "netting_agreement",
       "from_field": "counterparty_id",
       "to_layer": "L2",
@@ -19866,11 +20245,19 @@
     },
     {
       "from_layer": "L2",
-      "from_table": "stress_test_result",
-      "from_field": "scenario_id",
+      "from_table": "credit_event",
+      "from_field": "credit_event_type_code",
       "to_layer": "L1",
-      "to_table": "scenario_dim",
-      "to_field": "scenario_id"
+      "to_table": "credit_event_type_dim",
+      "to_field": "credit_event_type_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_delinquency_snapshot",
+      "from_field": "credit_status_code",
+      "to_layer": "L1",
+      "to_table": "credit_status_dim",
+      "to_field": "credit_status_code"
     },
     {
       "from_layer": "L3",
@@ -20322,14 +20709,6 @@
     },
     {
       "from_table": "stress_test_breach",
-      "from_field": "stress_test_result_id",
-      "to_table": "stress_test_result",
-      "to_field": "stress_test_result_id",
-      "from_layer": "L2",
-      "to_layer": "L2"
-    },
-    {
-      "from_table": "stress_test_breach",
       "from_field": "lob_segment_id",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id",
@@ -20362,33 +20741,9 @@
     },
     {
       "from_table": "exception_event",
-      "from_field": "metric_threshold_id",
-      "to_table": "metric_threshold",
-      "to_field": "metric_threshold_id",
-      "from_layer": "L2",
-      "to_layer": "L2"
-    },
-    {
-      "from_table": "exception_event",
       "from_field": "lob_segment_id",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id",
-      "from_layer": "L2",
-      "to_layer": "L1"
-    },
-    {
-      "from_table": "stress_test_result",
-      "from_field": "portfolio_id",
-      "to_table": "portfolio_dim",
-      "to_field": "portfolio_id",
-      "from_layer": "L2",
-      "to_layer": "L1"
-    },
-    {
-      "from_table": "data_quality_score_snapshot",
-      "from_field": "source_system_id",
-      "to_table": "source_system_registry",
-      "to_field": "source_system_id",
       "from_layer": "L2",
       "to_layer": "L1"
     },

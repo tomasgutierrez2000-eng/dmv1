@@ -65,7 +65,11 @@ export default function PythonCalculatorSection({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ metric_id: executableMetricId, dimension }),
     })
-      .then((r) => r.json())
+      .then(async (r) => {
+        const text = await r.text();
+        if (!text) throw new Error(`Empty response (HTTP ${r.status})`);
+        try { return JSON.parse(text); } catch { throw new Error(text.slice(0, 200)); }
+      })
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setRunResult(data.data ?? data);

@@ -24,6 +24,7 @@
     "db:load-gsib": "tsx scripts/load-gsib-export.ts",
     "db:verify-gsib": "tsx scripts/verify-gsib-load.ts",
     "db:verify-scenarios": "tsx scripts/verify-cro-scenarios.ts",
+    "db:migrate": "tsx scripts/migrate-database.ts",
     "db:introspect": "tsx scripts/introspect-db.ts",
     "sync:all": "tsx scripts/sync-all.ts",
     "sync:data-model": "tsx scripts/sync-data-model.ts",

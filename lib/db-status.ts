@@ -201,7 +201,7 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
   const client = new pg.default.Client({
     connectionString: process.env.DATABASE_URL,
     connectionTimeoutMillis: 5000,
-    ssl: process.env.DATABASE_URL.includes('neon') ? { rejectUnauthorized: false } : undefined,
+    ssl: process.env.DATABASE_URL.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
   });
 
   try {

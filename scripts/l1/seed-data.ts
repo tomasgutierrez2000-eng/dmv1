@@ -1769,8 +1769,9 @@ export const LEDGER_ACCOUNT_NAMES = [
   'Commercial Loans', 'Revolvers Drawn', 'Term Loans', 'Commitments', 'Unfunded Revolvers',
   'Letters of Credit', 'Derivatives Receivable', 'Collateral Held', 'Allowance', 'Interest Receivable',
 ];
-const ACCOUNT_CATEGORIES = ['ASSET', 'ASSET', 'ASSET', 'OFF_BALANCE_SHEET', 'OFF_BALANCE_SHEET', 'OFF_BALANCE_SHEET', 'ASSET', 'ASSET', 'CONTRA_ASSET', 'ASSET'];
-const ACCOUNT_TYPES = ['LOAN', 'LOAN', 'LOAN', 'COMMITMENT', 'COMMITMENT', 'CONTINGENT', 'DERIVATIVE', 'COLLATERAL', 'ALLOWANCE', 'ACCRUAL'];
+const ACCOUNT_CATEGORIES = ['LOAN_RECEIVABLE', 'LOAN_RECEIVABLE', 'LOAN_RECEIVABLE', 'COMMITMENT', 'COMMITMENT', 'CONTINGENT', 'DERIVATIVE_ASSET', 'COLLATERAL', 'PROVISION', 'ACCRUAL'];
+const ACCOUNT_TYPES = ['ASSET', 'ASSET', 'ASSET', 'LIABILITY', 'LIABILITY', 'LIABILITY', 'ASSET', 'ASSET', 'ASSET', 'ASSET'];
+const IS_BALANCE_SHEET = [true, true, true, false, false, false, true, true, true, true];
 const REG_REPORT_CODES = ['FFIEC031_SC_C', 'FFIEC031_SC_C', 'FFIEC031_SC_C', 'FFIEC031_SC_L', 'FFIEC031_SC_L', 'FFIEC031_SC_L', 'FFIEC031_SC_Q', 'FFIEC031_SC_R', 'FFIEC031_SC_C', 'FFIEC031_SC_C'];
 
 export const JURISDICTION_CODES = ['US_FED', 'US_STATE', 'EU', 'UK', 'CH', 'SG', 'HK', 'JP', 'CA', 'AU'];
@@ -2378,6 +2379,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'account_name') return LEDGER_ACCOUNT_NAMES[idx];
       if (columnName === 'account_category') return ACCOUNT_CATEGORIES[idx];
       if (columnName === 'account_type') return ACCOUNT_TYPES[idx];
+      if (columnName === 'is_balance_sheet_flag') return IS_BALANCE_SHEET[idx];
       if (columnName === 'active_flag') return 'Y';
       if (columnName === 'currency_code') return 'USD';
       if (columnName === 'effective_from_date') return '2020-01-01';

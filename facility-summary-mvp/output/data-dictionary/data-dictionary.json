@@ -3149,10 +3149,10 @@
         },
         {
           "name": "account_type",
-          "description": "ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE, CONTRA",
+          "description": "ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE",
           "category": "General Ledger",
           "why_required": "BS vs IS classification",
-          "data_type": "VARCHAR(50)"
+          "data_type": "VARCHAR(20)"
         },
         {
           "name": "active_flag",
@@ -3223,6 +3223,13 @@
           "category": "General Ledger",
           "why_required": "Lineage",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "is_balance_sheet_flag",
+          "description": "Y/N — whether this account appears on the balance sheet",
+          "category": "General Ledger",
+          "why_required": "BS vs P&L classification",
+          "data_type": "BOOLEAN"
         }
       ]
     },

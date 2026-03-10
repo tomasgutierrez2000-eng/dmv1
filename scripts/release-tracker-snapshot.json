@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-10T09:15:01.642Z",
+  "createdAt": "2026-03-10T18:09:56.413Z",
   "tables": [
     {
       "layer": "L1",
@@ -1375,6 +1375,9 @@
         },
         {
           "name": "source_system_id"
+        },
+        {
+          "name": "is_balance_sheet_flag"
         }
       ]
     },
@@ -2556,7 +2559,7 @@
           "name": "position_currency"
         },
         {
-          "name": "trading_banking_book_flag"
+          "name": "trading_banking_book_code"
         },
         {
           "name": "ultimate_parent_id"
@@ -5437,6 +5440,9 @@
         },
         {
           "name": "attribution_pct"
+        },
+        {
+          "name": "exposure_metric_cube_sk"
         }
       ]
     },
@@ -5515,6 +5521,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "risk_metric_cube_sk"
         }
       ]
     },
@@ -5632,6 +5641,9 @@
         },
         {
           "name": "total_cross_entity_exposure_usd"
+        },
+        {
+          "name": "counterparty_exposure_summary_sk"
         }
       ]
     },
@@ -5698,6 +5710,9 @@
         },
         {
           "name": "amendment_status_code"
+        },
+        {
+          "name": "facility_exposure_summary_sk"
         }
       ]
     },
@@ -5749,6 +5764,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "portfolio_summary_sk"
         }
       ]
     },
@@ -5821,6 +5839,9 @@
         },
         {
           "name": "parent_group_code"
+        },
+        {
+          "name": "crm_allocation_summary_sk"
         }
       ]
     },
@@ -5866,6 +5887,9 @@
         },
         {
           "name": "parent_group_code"
+        },
+        {
+          "name": "collateral_portfolio_valuation_sk"
         }
       ]
     },
@@ -5938,6 +5962,9 @@
         },
         {
           "name": "utilization_tier_code"
+        },
+        {
+          "name": "limit_current_state_sk"
         }
       ]
     },
@@ -5974,6 +6001,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "limit_utilization_timeseries_sk"
         }
       ]
     },
@@ -6025,6 +6055,9 @@
         },
         {
           "name": "hierarchy_id"
+        },
+        {
+          "name": "limit_attribution_summary_sk"
         }
       ]
     },
@@ -6064,6 +6097,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "limit_breach_fact_sk"
         }
       ]
     },
@@ -6127,6 +6163,9 @@
         },
         {
           "name": "estimated_exposure_impact_amt"
+        },
+        {
+          "name": "credit_event_summary_sk"
         }
       ]
     },
@@ -6169,6 +6208,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "rating_migration_summary_sk"
         }
       ]
     },
@@ -6211,6 +6253,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "default_loss_recovery_summary_sk"
         }
       ]
     },
@@ -6247,6 +6292,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_run_sk"
         }
       ]
     },
@@ -6277,6 +6325,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_cell_value_sk"
         }
       ]
     },
@@ -6316,6 +6367,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "report_cell_contribution_fact_sk"
         }
       ]
     },
@@ -6355,6 +6409,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_cell_rule_execution_sk"
         }
       ]
     },
@@ -6391,6 +6448,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_validation_result_sk"
         }
       ]
     },
@@ -6454,6 +6514,9 @@
         },
         {
           "name": "fr2590_category_code"
+        },
+        {
+          "name": "fr2590_position_snapshot_sk"
         }
       ]
     },
@@ -6499,6 +6562,9 @@
         },
         {
           "name": "fr2590_category_code"
+        },
+        {
+          "name": "fr2590_counterparty_aggregate_sk"
         }
       ]
     },
@@ -6598,6 +6664,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "lob_exposure_summary_sk"
         }
       ]
     },
@@ -6676,6 +6745,9 @@
         },
         {
           "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "lob_profitability_summary_sk"
         }
       ]
     },
@@ -6733,6 +6805,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "lob_pricing_summary_sk"
         }
       ]
     },
@@ -6799,6 +6874,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "lob_delinquency_summary_sk"
         }
       ]
     },
@@ -6853,6 +6931,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "lob_profitability_allocation_summary_sk"
         }
       ]
     },
@@ -6895,6 +6976,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "deal_pipeline_stage_summary_sk"
         }
       ]
     },
@@ -6958,6 +7042,9 @@
         },
         {
           "name": "doi_pct"
+        },
+        {
+          "name": "lob_credit_quality_summary_sk"
         }
       ]
     },
@@ -7003,6 +7090,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "kpi_period_summary_sk"
         }
       ]
     },
@@ -7084,6 +7174,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "risk_appetite_metric_state_sk"
         }
       ]
     },
@@ -7123,6 +7216,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "executive_highlight_summary_sk"
         }
       ]
     },
@@ -7240,6 +7336,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "counterparty_detail_snapshot_sk"
         }
       ]
     },
@@ -7285,6 +7384,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "limit_tier_status_matrix_sk"
         }
       ]
     },
@@ -7324,6 +7426,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "limit_counterparty_movement_sk"
         }
       ]
     },
@@ -7369,6 +7474,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "data_quality_score_summary_sk"
         }
       ]
     },
@@ -7432,6 +7540,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "legal_entity_risk_profile_sk"
         }
       ]
     },
@@ -7465,6 +7576,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "data_quality_attribute_score_sk"
         }
       ]
     },
@@ -7492,6 +7606,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "data_quality_trend_sk"
         }
       ]
     },
@@ -7555,6 +7672,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "stress_test_result_summary_sk"
         }
       ]
     },
@@ -7597,6 +7717,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "stress_test_breach_detail_sk"
         }
       ]
     },
@@ -7636,6 +7759,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "regulatory_compliance_state_sk"
         }
       ]
     },
@@ -7669,6 +7795,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "facility_timeline_summary_sk"
         }
       ]
     },
@@ -7702,6 +7831,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "amendment_summary_sk"
         }
       ]
     },
@@ -7747,6 +7879,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "amendment_detail_sk"
         }
       ]
     },
@@ -7891,6 +8026,9 @@
         },
         {
           "name": "maturity_bucket_id"
+        },
+        {
+          "name": "facility_detail_snapshot_sk"
         }
       ]
     },
@@ -7933,6 +8071,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_risk_ratio_summary_sk"
         }
       ]
     },
@@ -7990,6 +8131,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_deterioration_summary_sk"
         }
       ]
     },
@@ -8026,6 +8170,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_rating_distribution_sk"
         }
       ]
     },
@@ -8068,6 +8215,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_top_contributors_sk"
         }
       ]
     },
@@ -8116,6 +8266,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "metric_value_fact_sk"
         }
       ]
     },

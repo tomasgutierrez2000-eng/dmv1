@@ -38,7 +38,7 @@ source_tables:
         role: FILTER
       - name: tangible_net_worth_usd
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -84,7 +84,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         cfs.tangible_net_worth_usd AS metric_value
       FROM l2.counterparty_financial_snapshot cfs
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = cfs.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE cfs.as_of_date = :as_of_date
@@ -103,7 +103,7 @@ levels:
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -124,7 +124,7 @@ levels:
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -148,7 +148,7 @@ levels:
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

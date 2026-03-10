@@ -38,7 +38,7 @@ source_tables:
         role: FILTER
       - name: days_until_maturity
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -90,7 +90,7 @@ levels:
         FROM l2.facility_exposure_snapshot fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -109,7 +109,7 @@ levels:
         FROM l2.facility_exposure_snapshot fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -130,7 +130,7 @@ levels:
         FROM l2.facility_exposure_snapshot fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -153,7 +153,7 @@ levels:
         FROM l2.facility_exposure_snapshot fes
         WHERE fes.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

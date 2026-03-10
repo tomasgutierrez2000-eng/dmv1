@@ -74,7 +74,7 @@ levels:
         WHERE ces.as_of_date = :as_of_date
         GROUP BY ces.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -95,7 +95,7 @@ levels:
         WHERE ces.as_of_date = :as_of_date
         GROUP BY ces.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -118,7 +118,7 @@ levels:
         WHERE ces.as_of_date = :as_of_date
         GROUP BY ces.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -143,7 +143,7 @@ levels:
         WHERE ces.as_of_date = :as_of_date
         GROUP BY ces.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

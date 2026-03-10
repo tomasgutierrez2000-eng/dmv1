@@ -38,7 +38,7 @@ source_tables:
         role: FILTER
       - name: expected_loss_rate_pct
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -93,7 +93,7 @@ levels:
         WHERE frs.as_of_date = :as_of_date
         GROUP BY frs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -114,7 +114,7 @@ levels:
         WHERE frs.as_of_date = :as_of_date
         GROUP BY frs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -137,7 +137,7 @@ levels:
         WHERE frs.as_of_date = :as_of_date
         GROUP BY frs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -163,7 +163,7 @@ levels:
         WHERE frs.as_of_date = :as_of_date
         GROUP BY frs.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

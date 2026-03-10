@@ -28,7 +28,7 @@ source_tables:
     role: FILTER
   - name: effective_date
     role: MEASURE
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
@@ -61,7 +61,7 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         EXTRACT(EPOCH FROM fm.effective_date)::BIGINT AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: MAX
@@ -71,7 +71,7 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       WHERE fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
@@ -82,7 +82,7 @@ levels:
       SELECT
         ebt.managed_segment_id AS dimension_key,
         MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       WHERE fm.is_active_flag = 'Y'
@@ -95,7 +95,7 @@ levels:
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -110,7 +110,7 @@ levels:
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

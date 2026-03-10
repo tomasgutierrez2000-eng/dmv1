@@ -50,7 +50,7 @@ source_tables:
         role: FILTER
       - name: unfunded_amount
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -66,7 +66,7 @@ source_tables:
         role: FILTER
       - name: bank_share_pct
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_counterparty_participation
     alias: fcp
     join_type: INNER
@@ -104,7 +104,7 @@ levels:
       INNER JOIN l2.position_detail pdtl
         ON pdtl.position_id = pos.position_id
         AND pdtl.as_of_date = pos.as_of_date
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = pos.facility_id
         AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
       WHERE pos.as_of_date = :as_of_date
@@ -127,13 +127,13 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_counterparty_participation fcp
+      INNER JOIN l2.facility_counterparty_participation fcp
         ON fcp.facility_id = fac.facility_id
       GROUP BY fcp.counterparty_id
   desk:
@@ -153,13 +153,13 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -181,13 +181,13 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -211,13 +211,13 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id

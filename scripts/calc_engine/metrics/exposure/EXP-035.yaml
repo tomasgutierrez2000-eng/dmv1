@@ -30,7 +30,7 @@ source_tables:
     role: MEASURE
   - name: total_assets_amt
     role: MEASURE
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
@@ -64,7 +64,7 @@ levels:
         fm.facility_id AS dimension_key,
         cfs.net_income_amt / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
       FROM l2.counterparty_financial_snapshot cfs
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.counterparty_id = cfs.counterparty_id
         AND fm.is_active_flag = 'Y'
       WHERE cfs.as_of_date = :as_of_date
@@ -96,7 +96,7 @@ levels:
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.counterparty_id = fac.counterparty_id
         AND fm.is_active_flag = 'Y'
       INNER JOIN l2.facility_exposure_snapshot fes_w
@@ -123,7 +123,7 @@ levels:
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.counterparty_id = fac.counterparty_id
         AND fm.is_active_flag = 'Y'
       INNER JOIN l2.facility_exposure_snapshot fes_w
@@ -152,7 +152,7 @@ levels:
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.counterparty_id = fac.counterparty_id
         AND fm.is_active_flag = 'Y'
       INNER JOIN l2.facility_exposure_snapshot fes_w

@@ -53,7 +53,7 @@ source_tables:
       - name: current_valuation_usd
         role: MEASURE
         description: "Current market value of the collateral asset in USD"
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -67,7 +67,7 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
-  - schema: l1
+  - schema: l2
     table: facility_lender_allocation
     alias: fla
     join_type: LEFT
@@ -108,10 +108,10 @@ levels:
         SUM(cs.current_valuation_usd)
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0            AS metric_value
       FROM l2.collateral_snapshot cs
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = cs.facility_id
        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = cs.facility_id
        AND fla.is_current_flag = 'Y'
       WHERE cs.as_of_date = :as_of_date
@@ -129,7 +129,7 @@ levels:
           fac_coll.facility_collateral_mv
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0
         )                                                           AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       INNER JOIN (
         SELECT
           cs_inner.facility_id,
@@ -139,7 +139,7 @@ levels:
         GROUP BY cs_inner.facility_id
       ) fac_coll
         ON fac_coll.facility_id = fm.facility_id
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
        AND fla.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
@@ -155,7 +155,7 @@ levels:
           fac_coll.facility_collateral_mv
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0
         )                                                           AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       INNER JOIN (
         SELECT
           cs_inner.facility_id,
@@ -165,7 +165,7 @@ levels:
         GROUP BY cs_inner.facility_id
       ) fac_coll
         ON fac_coll.facility_id = fm.facility_id
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
        AND fla.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -184,7 +184,7 @@ levels:
           fac_coll.facility_collateral_mv
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0
         )                                                           AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       INNER JOIN (
         SELECT
           cs_inner.facility_id,
@@ -194,7 +194,7 @@ levels:
         GROUP BY cs_inner.facility_id
       ) fac_coll
         ON fac_coll.facility_id = fm.facility_id
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
        AND fla.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -215,7 +215,7 @@ levels:
           fac_coll.facility_collateral_mv
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0
         )                                                           AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       INNER JOIN (
         SELECT
           cs_inner.facility_id,
@@ -225,7 +225,7 @@ levels:
         GROUP BY cs_inner.facility_id
       ) fac_coll
         ON fac_coll.facility_id = fm.facility_id
-      LEFT JOIN l1.facility_lender_allocation fla
+      LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
        AND fla.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

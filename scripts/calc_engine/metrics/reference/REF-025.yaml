@@ -37,7 +37,7 @@ source_tables:
         role: FILTER
       - name: product_id
         role: MEASURE
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
@@ -72,7 +72,7 @@ levels:
         fes.facility_id AS dimension_key,
         SUM(fes.product_id) AS metric_value
       FROM l2.facility_exposure_snapshot fes
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
       
@@ -91,14 +91,14 @@ levels:
           fes.facility_id AS dimension_key,
           SUM(fes.product_id) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE fes.as_of_date = :as_of_date
         GROUP BY fes.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -115,14 +115,14 @@ levels:
           fes.facility_id AS dimension_key,
           SUM(fes.product_id) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE fes.as_of_date = :as_of_date
         GROUP BY fes.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -141,14 +141,14 @@ levels:
           fes.facility_id AS dimension_key,
           SUM(fes.product_id) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE fes.as_of_date = :as_of_date
         GROUP BY fes.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -169,14 +169,14 @@ levels:
           fes.facility_id AS dimension_key,
           SUM(fes.product_id) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l1.facility_master fm
+        INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
       
         WHERE fes.as_of_date = :as_of_date
         GROUP BY fes.facility_id
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

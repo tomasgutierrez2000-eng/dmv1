@@ -27,7 +27,7 @@ regulatory_references:
     description: ""
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: BASE
@@ -58,7 +58,7 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         fm.is_active_flag AS metric_value
-      FROM l1.facility_master fm
+      FROM l2.facility_master fm
       WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
@@ -69,8 +69,8 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         fm.is_active_flag AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_master fm
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fm.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fm.as_of_date = :as_of_date
@@ -86,11 +86,11 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           fm.is_active_flag AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
@@ -108,11 +108,11 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           fm.is_active_flag AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
@@ -132,11 +132,11 @@ levels:
         SELECT
           fm.facility_id AS dimension_key,
           fm.is_active_flag AS metric_value
-        FROM l1.facility_master fm
+        FROM l2.facility_master fm
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
-      INNER JOIN l1.facility_master fm
+      INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3

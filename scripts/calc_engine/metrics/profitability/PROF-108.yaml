@@ -33,7 +33,7 @@ regulatory_references:
 
 # SOURCE TABLES
 source_tables:
-  - schema: l1
+  - schema: l2
     table: facility_master
     alias: fm
     join_type: BASE
@@ -54,7 +54,7 @@ source_tables:
         role: FILTER
         description: "Only include active facilities"
 
-  - schema: l1
+  - schema: l2
     table: facility_lender_allocation
     alias: fla
     join_type: INNER
@@ -117,8 +117,8 @@ levels:
           * fla.bank_share_pct / 100.0
           * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
           AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
@@ -136,8 +136,8 @@ levels:
           * fla.bank_share_pct / 100.0
           * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
         ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
@@ -156,8 +156,8 @@ levels:
           * fla.bank_share_pct / 100.0
           * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
         ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
@@ -178,8 +178,8 @@ levels:
           * fla.bank_share_pct / 100.0
           * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
         ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id
@@ -202,8 +202,8 @@ levels:
           * fla.bank_share_pct / 100.0
           * COALESCE(fps.cost_of_funds_pct, fps.all_in_rate_pct - fps.spread_bps / 100.0) / 100.0
         ) AS metric_value
-      FROM l1.facility_master fm
-      INNER JOIN l1.facility_lender_allocation fla
+      FROM l2.facility_master fm
+      INNER JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
       LEFT JOIN l2.facility_pricing_snapshot fps
         ON fps.facility_id = fm.facility_id

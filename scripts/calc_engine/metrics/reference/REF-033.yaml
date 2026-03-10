@@ -19,7 +19,7 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: BASE
@@ -44,7 +44,7 @@ levels:
     formula_text: 'Calculated facility_is_active_flag per facility.
 
       '
-    formula_sql: "SELECT\n  fm.facility_id AS dimension_key,\n  fm.is_active_flag AS metric_value\nFROM l1.facility_master fm\n\
+    formula_sql: "SELECT\n  fm.facility_id AS dimension_key,\n  fm.is_active_flag AS metric_value\nFROM l2.facility_master fm\n\
       WHERE fm.is_current_flag = 'Y'"
   counterparty:
     aggregation_type: SUM
@@ -52,8 +52,8 @@ levels:
 
       '
     formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
-      \    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l1.facility_master fm\n  WHERE fm.is_current_flag\
-      \ = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\n\
+      \    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l2.facility_master fm\n  WHERE fm.is_current_flag\
+      \ = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\n\
       GROUP BY fm.counterparty_id"
   desk:
     aggregation_type: SUM
@@ -61,8 +61,8 @@ levels:
 
       '
     formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
-      \    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l1.facility_master fm\n  WHERE fm.is_current_flag\
-      \ = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\n\
+      \    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l2.facility_master fm\n  WHERE fm.is_current_flag\
+      \ = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
   portfolio:
     aggregation_type: SUM
@@ -70,8 +70,8 @@ levels:
 
       '
     formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
-      \  SELECT\n    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l1.facility_master fm\n\
-      \  WHERE fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \  SELECT\n    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l2.facility_master fm\n\
+      \  WHERE fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
       \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY\
       \ ebt_l2.managed_segment_id"
@@ -81,8 +81,8 @@ levels:
 
       '
     formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
-      \  SELECT\n    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l1.facility_master fm\n\
-      \  WHERE fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \  SELECT\n    fm.facility_id AS dimension_key,\n    fm.is_active_flag AS metric_value\n  FROM l2.facility_master fm\n\
+      \  WHERE fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
       \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN\
       \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"

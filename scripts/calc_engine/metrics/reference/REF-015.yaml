@@ -19,7 +19,7 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l1
+- schema: l2
   table: facility_master
   alias: fm
   join_type: BASE
@@ -55,7 +55,7 @@ levels:
 
       '
     formula_sql: "SELECT\n  fm.facility_id AS dimension_key,\n  CASE WHEN COUNT(DISTINCT cacp.counterparty_id) > 1 THEN 1\
-      \ ELSE 0 END AS metric_value\nFROM l1.facility_master fm\nLEFT JOIN l1.credit_agreement_counterparty_participation cacp\n\
+      \ ELSE 0 END AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN l1.credit_agreement_counterparty_participation cacp\n\
       \  ON cacp.credit_agreement_id = fm.credit_agreement_id\n  AND cacp.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n\
       GROUP BY fm.facility_id"
   counterparty:
@@ -65,9 +65,9 @@ levels:
       '
     formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
       \    fm.facility_id AS dimension_key,\n    CASE WHEN COUNT(DISTINCT cacp.counterparty_id) > 1 THEN 1 ELSE 0 END AS metric_value\n\
-      \  FROM l1.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n    ON cacp.credit_agreement_id\
+      \  FROM l2.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n    ON cacp.credit_agreement_id\
       \ = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n  GROUP BY fm.facility_id\n\
-      ) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP\
+      ) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP\
       \ BY fm.counterparty_id"
   desk:
     aggregation_type: SUM
@@ -76,9 +76,9 @@ levels:
       '
     formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
       \    fm.facility_id AS dimension_key,\n    CASE WHEN COUNT(DISTINCT cacp.counterparty_id) > 1 THEN 1 ELSE 0 END AS metric_value\n\
-      \  FROM l1.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n    ON cacp.credit_agreement_id\
+      \  FROM l2.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n    ON cacp.credit_agreement_id\
       \ = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n  GROUP BY fm.facility_id\n\
-      ) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN\
+      ) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN\
       \ l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
   portfolio:
     aggregation_type: SUM
@@ -87,9 +87,9 @@ levels:
       '
     formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
       \  SELECT\n    fm.facility_id AS dimension_key,\n    CASE WHEN COUNT(DISTINCT cacp.counterparty_id) > 1 THEN 1 ELSE\
-      \ 0 END AS metric_value\n  FROM l1.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n\
+      \ 0 END AS metric_value\n  FROM l2.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n\
       \    ON cacp.credit_agreement_id = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag\
-      \ = 'Y'\n  GROUP BY fm.facility_id\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \ = 'Y'\n  GROUP BY fm.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
       \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY\
       \ ebt_l2.managed_segment_id"
@@ -100,9 +100,9 @@ levels:
       '
     formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
       \  SELECT\n    fm.facility_id AS dimension_key,\n    CASE WHEN COUNT(DISTINCT cacp.counterparty_id) > 1 THEN 1 ELSE\
-      \ 0 END AS metric_value\n  FROM l1.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n\
+      \ 0 END AS metric_value\n  FROM l2.facility_master fm\n  LEFT JOIN l1.credit_agreement_counterparty_participation cacp\n\
       \    ON cacp.credit_agreement_id = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag\
-      \ = 'Y'\n  GROUP BY fm.facility_id\n) fac\nINNER JOIN l1.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
+      \ = 'Y'\n  GROUP BY fm.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
       \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN\
       \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"

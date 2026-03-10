@@ -31,8 +31,8 @@ def generate_demo_data(
     """
     try:
         # ── Load base tables ────────────────────────────────────
-        fm = loader.load_table("L1", "facility_master")
-        cp = loader.load_table("L1", "counterparty")
+        fm = loader.load_table("L2", "facility_master")
+        cp = loader.load_table("L2", "counterparty")
         ebt = loader.load_table("L1", "enterprise_business_taxonomy")
 
         # ── Build lookups ───────────────────────────────────────

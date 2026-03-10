@@ -147,6 +147,16 @@ A Claude Code `PostToolUse` hook (`.claude/hooks/post-db-change.sh`) automatical
 - **Never skip introspection** after schema changes — the visualizer, exporter, and validation all read from the data dictionary, not directly from PostgreSQL.
 - **After introspection**, verify the `/data-elements` page reflects the changes.
 
+## Database Recon Indicators (Visualizer)
+The visualizer shows live reconciliation between the data dictionary and PostgreSQL:
+- **Non-blocking overlay:** Visualizer loads instantly from DD, then fetches `/api/db-status` async to overlay status dots
+- **Status dots on TableNode:** Green (has data), Amber (empty), Red hollow (not in DB), Orange (orphan — in DB but not in DD)
+- **Field-level drift:** `lib/db-status.ts` queries `information_schema.columns` and compares against DD fields to detect `in_dd_not_in_db`, `in_db_not_in_dd`, `type_mismatch`
+- **SyncStatusBanner** (`components/visualizer/SyncStatusBanner.tsx`): Summary bar at top of visualizer — green/amber/gray, links to `/db-status`, dismissible
+- **Detail panel drift section:** When a table has field drift, the detail panel shows color-coded badges (red=missing in DB, blue=extra in DB, orange=type mismatch)
+- **Store:** `dbStatusMap` (keyed by `"L1.table_name"`), `dbStatusSummary`, `dbStatusConnected` in `store/modelStore.ts`
+- **Without `DATABASE_URL`:** All tables show red "not in DB" dots, banner shows "Database not connected"
+
 ## Important Patterns
 - **Metric storage priority:** Excel (`metrics_dimensions_filled.xlsx`) > JSON (`metrics-custom.json`) > seed metrics — merged via `getMergedMetrics()`
 - **Schema bundle** (`/api/schema/bundle`): unified DataDictionary + L3 Tables + L3 Metrics (metrics list = `getMergedMetrics()` so agent and calculation see the same set). Supports `?summary=true` for token-efficient agent prompts

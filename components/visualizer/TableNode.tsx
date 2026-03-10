@@ -34,9 +34,10 @@ export default function TableNode({
   selectedField,
   onFieldSelect,
 }: TableNodeProps) {
-  const { tableSize, viewMode, fieldDisplayMode, model, zoom, layoutMode } = useModelStore();
+  const { tableSize, viewMode, fieldDisplayMode, model, zoom, layoutMode, dbStatusMap } = useModelStore();
   const colors = layerColors[table.layer as keyof typeof layerColors] ?? layerColors.L1;
   const categoryColor = getCategoryColor(table.category);
+  const dbStatus = dbStatusMap[table.key];
   
   // Calculate relationship counts if not provided
   const relCounts = relationshipCounts || (model ? {
@@ -152,6 +153,22 @@ export default function TableNode({
     }
   };
 
+  // DB status dot styling
+  const statusDot = dbStatus ? (() => {
+    switch (dbStatus.status) {
+      case 'has_data': return { fill: '#10b981', stroke: 'none', label: `In DB (${dbStatus.rowCount?.toLocaleString()} rows)` };
+      case 'empty': return { fill: '#f59e0b', stroke: 'none', label: 'In DB (empty)' };
+      case 'not_in_db': return { fill: 'none', stroke: '#ef4444', label: 'Not in database' };
+      case 'not_in_dd': return { fill: '#f97316', stroke: 'none', label: 'Orphan (not in data dictionary)' };
+      default: return null;
+    }
+  })() : null;
+  const driftCount = dbStatus?.fieldDrift?.length ?? 0;
+  const statusTitle = [
+    statusDot?.label,
+    driftCount > 0 ? `${driftCount} field ${driftCount === 1 ? 'mismatch' : 'mismatches'}` : null,
+  ].filter(Boolean).join(' \u00b7 ');
+
   // All fields are now always visible and scrollable
 
   // ─── OVERVIEW MODE: SVG header/footer + scrollable foreignObject for fields ───
@@ -220,6 +237,33 @@ export default function TableNode({
           >
             {table.layer}
           </text>
+          {/* DB status indicator */}
+          {statusDot && (
+            <g>
+              <circle
+                cx={TABLE_WIDTH - OV.PAD_X - 40}
+                cy={OV.HEADER_H / 2}
+                r={3}
+                fill={statusDot.fill}
+                stroke={statusDot.stroke || 'none'}
+                strokeWidth={statusDot.fill === 'none' ? 1.5 : 0}
+                opacity="0.9"
+              >
+                <title>{statusTitle}</title>
+              </circle>
+              {driftCount > 0 && (
+                <text
+                  x={TABLE_WIDTH - OV.PAD_X - 48}
+                  y={OV.HEADER_H / 2 + 3}
+                  fill="#fbbf24" fontSize={8} fontWeight="bold"
+                  fontFamily="system-ui, -apple-system, sans-serif"
+                >
+                  <title>{`${driftCount} field ${driftCount === 1 ? 'mismatch' : 'mismatches'}`}</title>
+                  !
+                </text>
+              )}
+            </g>
+          )}
 
           {/* Scrollable field list (foreignObject so we can use overflow-y) */}
           <foreignObject
@@ -446,6 +490,21 @@ export default function TableNode({
               )}
             </div>
             <div className={`flex items-center ${isCompact ? 'space-x-1' : 'space-x-2'} flex-shrink-0`}>
+              {/* DB status dot */}
+              {statusDot && (
+                <div className="flex items-center gap-0.5" title={statusTitle}>
+                  <div
+                    className={`${isCompact ? 'w-1.5 h-1.5' : 'w-2 h-2'} rounded-full`}
+                    style={{
+                      backgroundColor: statusDot.fill !== 'none' ? statusDot.fill : 'transparent',
+                      border: statusDot.fill === 'none' ? `1.5px solid ${statusDot.stroke}` : 'none',
+                    }}
+                  />
+                  {driftCount > 0 && (
+                    <span className="text-[9px] font-bold text-yellow-300 leading-none">!</span>
+                  )}
+                </div>
+              )}
               <div
                 className={`${isCompact ? 'w-1.5 h-1.5' : 'w-2 h-2'} rounded-full shadow-sm`}
                 style={{ backgroundColor: categoryColor.color }}

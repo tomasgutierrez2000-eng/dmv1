@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { X, Key, Link2, Database, FileText, Table2, ChevronRight, MousePointerClick, Calculator, XCircle } from 'lucide-react';
+import { X, Key, Link2, Database, FileText, Table2, ChevronRight, MousePointerClick, Calculator, XCircle, AlertTriangle } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
 import { layerColors } from '../../utils/colors';
 import type { Field } from '../../types/model';
@@ -72,6 +72,7 @@ export default function DetailPanel() {
     setSelectedSampleDataCell,
     clearSelection,
     uploadedSampleData,
+    dbStatusMap,
   } = useModelStore();
 
   const [sampleData, setSampleData] = useState<SampleDataState>(null);
@@ -512,6 +513,41 @@ export default function DetailPanel() {
                 ))}
               </div>
             </div>
+
+            {/* Field Drift — shows mismatches between data dictionary and database */}
+            {table && dbStatusMap[table.key]?.fieldDrift?.length > 0 && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/80 overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-amber-200/80 bg-amber-100/60">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
+                  <h4 className="text-sm font-semibold text-amber-800 uppercase tracking-wider">
+                    Field Drift ({dbStatusMap[table.key].fieldDrift.length})
+                  </h4>
+                </div>
+                <div className="px-3 py-2 space-y-1.5">
+                  {dbStatusMap[table.key].fieldDrift.map((d) => (
+                    <div key={`${d.field}-${d.issue}`} className="flex items-start gap-2 text-xs">
+                      <span className={`inline-block px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
+                        d.issue === 'in_dd_not_in_db' ? 'bg-red-100 text-red-700' :
+                        d.issue === 'in_db_not_in_dd' ? 'bg-blue-100 text-blue-700' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                        {d.issue === 'in_dd_not_in_db' ? 'Missing in DB' :
+                         d.issue === 'in_db_not_in_dd' ? 'Extra in DB' :
+                         'Type mismatch'}
+                      </span>
+                      <span className="font-mono text-gray-800">{d.field}</span>
+                      {d.issue === 'type_mismatch' && d.ddType && d.dbType && (
+                        <span className="text-gray-500">
+                          DD: <span className="font-mono text-orange-600">{d.ddType}</span>
+                          {' \u2192 '}
+                          DB: <span className="font-mono text-orange-600">{d.dbType}</span>
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* L3: Derivation panel when user clicks a column value */}
             {table.layer === 'L3' && selectedSampleDataCell && (

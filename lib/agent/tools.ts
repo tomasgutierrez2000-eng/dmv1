@@ -12,9 +12,7 @@ import {
   findTableInBundle,
 } from '@/lib/schema-bundle';
 import { metricsByPage, getMetric } from '@/data/l3-metrics';
-import type { CalculationDimension, DashboardPage } from '@/data/l3-metrics';
-import { getMetricById } from '@/lib/metrics-calculation/registry';
-import { runMetricCalculation } from '@/lib/metrics-calculation/engine';
+import type { DashboardPage } from '@/data/l3-metrics';
 
 const LAYER_ENUM = ['L1', 'L2', 'L3'] as const;
 const PAGE_ENUM = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'] as const;
@@ -156,17 +154,17 @@ export const TOOL_DECLARATIONS: FunctionDeclaration[] = [
   {
     name: 'compute_metric_value',
     description:
-      'Calculate an L3 metric value using the metrics calculation engine',
+      'Retrieve pre-calculated L3 metric values from l3.metric_value_fact',
     parameters: {
       type: Type.OBJECT,
       properties: {
         metricId: {
           type: Type.STRING,
-          description: 'Metric ID (e.g. C001)',
+          description: 'Metric ID (e.g. C001, EXP-014)',
         },
         dimension: {
           type: Type.STRING,
-          description: 'Calculation dimension: facility, counterparty, L1, L2, or L3',
+          description: 'Aggregation level: facility, counterparty, desk, portfolio, or lob',
         },
       },
       required: ['metricId'],
@@ -403,32 +401,50 @@ async function handleComputeMetricValue(
     return { error: 'metricId is required.' };
   }
 
-  const metric = getMetricById(metricId);
-  if (!metric) {
-    return {
-      error: `Metric not found: ${metricId}.`,
-      hint: 'Use get_metrics_by_page or search_tables_or_metrics to find valid metric IDs.',
-    };
-  }
-
-  const dimension = (String(args.dimension ?? 'facility').trim()) as CalculationDimension;
-  const validDimensions = ['facility', 'counterparty', 'L1', 'L2', 'L3'];
+  const dimension = String(args.dimension ?? 'facility').trim();
+  const validDimensions = ['facility', 'counterparty', 'desk', 'portfolio', 'lob'];
   if (!validDimensions.includes(dimension)) {
     return {
       error: `Invalid dimension: ${dimension}. Must be one of: ${validDimensions.join(', ')}`,
     };
   }
 
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    return { error: 'DATABASE_URL not configured.' };
+  }
+
   try {
-    const result = await runMetricCalculation({
-      metric,
-      dimension,
-      asOfDate: null,
-    });
-    return result as unknown as Record<string, unknown>;
+    const pg = await import('pg');
+    const client = new pg.Client({ connectionString: databaseUrl });
+    await client.connect();
+    try {
+      const res = await client.query(
+        `SELECT * FROM l3.metric_value_fact
+         WHERE metric_id = $1 AND aggregation_level = $2
+         ORDER BY as_of_date DESC LIMIT 200`,
+        [metricId, dimension]
+      );
+      if (!res.rows || res.rows.length === 0) {
+        return {
+          ok: false,
+          error: `No pre-calculated values found for ${metricId} at ${dimension} level.`,
+          hint: 'Run python3 -m scripts.calc_engine.populate_l3 to populate L3 data.',
+        };
+      }
+      return {
+        ok: true,
+        metric_id: metricId,
+        dimension,
+        row_count: res.rows.length,
+        rows: res.rows,
+      };
+    } finally {
+      await client.end();
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    return { error: `Metric calculation failed: ${message}` };
+    return { error: `Failed to read metric values: ${message}` };
   }
 }
 

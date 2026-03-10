@@ -1,9 +1,9 @@
 """Generic YAML-driven calculator — auto-registers all YAML metrics without dedicated calculators.
 
 Instead of hand-coding a Python calculator for every metric, this module reads the
-YAML formula_sql definitions and executes them via an in-memory SQLite database.
-Source DataFrames are loaded via the DataLoader, pushed into SQLite, then the YAML
-SQL is executed at each rollup level.
+YAML formula_sql definitions and executes them.  When DATABASE_URL is set the SQL
+runs directly against PostgreSQL; otherwise it falls back to an in-memory SQLite
+database populated from sample-data JSON via the DataLoader.
 """
 
 from __future__ import annotations
@@ -39,13 +39,11 @@ def _adapt_sql_for_sqlite(sql: str, as_of_date: str) -> str:
 
 
 class GenericYAMLCalculator(BaseCalculator):
-    """Calculator that executes YAML formula_sql against loaded DataFrames via SQLite.
+    """Calculator that executes YAML formula_sql.
 
-    For each rollup level (facility, counterparty, desk, portfolio, business_segment),
-    this calculator:
-      1. Loads the source tables declared in the YAML into an in-memory SQLite DB
-      2. Adapts the YAML formula_sql for SQLite (strips schema prefixes, binds params)
-      3. Executes the SQL and returns the result as a DataFrame
+    When DATABASE_URL is set, executes directly against PostgreSQL (the YAML SQL
+    already uses PostgreSQL-compatible schema prefixes and bind parameters).
+    Falls back to an in-memory SQLite database populated via the DataLoader.
     """
 
     def _load_tables_to_sqlite(
@@ -68,7 +66,11 @@ class GenericYAMLCalculator(BaseCalculator):
     def _execute_level(
         self, loader: DataLoader, as_of_date: str, level_name: str
     ) -> pd.DataFrame:
-        """Execute the YAML formula_sql for a given rollup level via SQLite."""
+        """Execute the YAML formula_sql for a given rollup level.
+
+        Tries PostgreSQL-direct execution first (if DATABASE_URL is set),
+        falls back to in-memory SQLite with loaded DataFrames.
+        """
         empty = pd.DataFrame(columns=["dimension_key", "metric_value"])
 
         if not self._yaml_def:
@@ -78,6 +80,17 @@ class GenericYAMLCalculator(BaseCalculator):
         if not level_def or not level_def.formula_sql:
             return empty
 
+        # Try PostgreSQL-direct execution first
+        try:
+            result = loader.query(
+                level_def.formula_sql, params={"as_of_date": as_of_date}
+            )
+            if result is not None:
+                return result if not result.empty else empty
+        except Exception:
+            pass  # Fall through to SQLite
+
+        # Fallback: existing SQLite approach
         sql = _adapt_sql_for_sqlite(level_def.formula_sql, as_of_date)
         conn = sqlite3.connect(":memory:")
         try:

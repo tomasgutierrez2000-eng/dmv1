@@ -1,0 +1,66 @@
+# S32: India Fintech Rapid Growth
+#
+# Story: The bank onboards 4 Indian fintech companies as new
+# relationships. Fast revenue growth masks operational risks.
+# Facilities ramp from zero to $350M committed in 90 days.
+# Data quality scores are low — incomplete financial reporting
+# and missing collateral documentation.
+#
+# Dashboard signal: New relationship onboarding with rapid
+# ramp-up, data quality concerns, and emerging market risk.
+
+scenario_id: "S32"
+name: "India Fintech Rapid Growth"
+type: DATA_QUALITY
+narrative: "4 Indian fintech new relationships ramp to $350M in 90 days with poor data quality scores"
+
+counterparties:
+  - legal_name: "Mumbai Digital Payments Ltd."
+    country: IN
+    industry_id: 1      # Financial Services
+    rating_tier: HY_HIGH
+    story_arc: NEW_RELATIONSHIP
+    size: MID
+  - legal_name: "Bangalore Lending Platform Pvt. Ltd."
+    country: IN
+    industry_id: 1
+    rating_tier: HY_MID
+    story_arc: NEW_RELATIONSHIP
+    size: SMALL
+  - legal_name: "Delhi InsurTech Solutions Ltd."
+    country: IN
+    industry_id: 1
+    rating_tier: HY_HIGH
+    story_arc: GROWING
+    size: SMALL
+  - legal_name: "Chennai Microfinance Holdings Ltd."
+    country: IN
+    industry_id: 1
+    rating_tier: HY_MID
+    story_arc: NEW_RELATIONSHIP
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: DATA_QUALITY_LOW
+      severity: HIGH
+      description: "Missing financial statements and incomplete collateral docs for 3 of 4 names"
+    - code: RAPID_ONBOARDING
+      severity: MEDIUM
+      description: "4 new relationships onboarded in 90 days — KYC review pending"
+    - code: EMERGING_MARKET_RISK
+      severity: MEDIUM
+      description: "India exposure growing faster than country limit allocation"
+
+verification:
+  min_rows: 8
+  key_assertion: "Indian fintech relationships show rapid growth with data quality and onboarding flags"

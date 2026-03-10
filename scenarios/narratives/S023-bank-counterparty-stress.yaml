@@ -1,0 +1,68 @@
+# S23: Bank Counterparty Contagion
+#
+# Story: A mid-tier European bank faces liquidity stress, triggering
+# interbank exposure concerns. The bank holds $1.4B in credit lines
+# and derivative settlements with this counterparty. CDS spreads
+# widen 200bps in a week. Cross-default clauses could cascade.
+#
+# Dashboard signal: Financial institution counterparty with spiking
+# CDS, interbank exposure concentration, and cross-default risk.
+
+scenario_id: "S23"
+name: "Bank Counterparty Contagion"
+type: EVENT_CASCADE
+narrative: "European bank liquidity crisis triggers $1.4B interbank exposure review with cross-default cascade risk"
+
+counterparties:
+  - legal_name: "Rheinische Landesbank AG"
+    country: DE
+    industry_id: 1      # Financial Services
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Nordic Credit Union Holding AB"
+    country: GB
+    industry_id: 1
+    rating_tier: IG_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Zurich Private Banking Corp."
+    country: CH
+    industry_id: 1
+    rating_tier: IG_HIGH
+    story_arc: STABLE_IG
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: CROSS_DEFAULT
+      date: "2024-12-18"
+      description: "Cross-default clause triggered by Rheinische missed margin call"
+      severity: HIGH
+    - type: DOWNGRADE
+      date: "2025-01-05"
+      description: "Moody's downgrades Rheinische from Baa1 to Ba1"
+      severity: HIGH
+  risk_flags:
+    - code: COUNTERPARTY_CONCENTRATION
+      severity: HIGH
+      description: "Single FI counterparty exceeds 3% of total portfolio"
+    - code: CROSS_DEFAULT_RISK
+      severity: HIGH
+      description: "Cross-default provisions in 3 facilities may cascade"
+    - code: CDS_SPREAD_SPIKE
+      severity: MEDIUM
+      description: "CDS spread widened 200bps in 7 trading days"
+
+verification:
+  min_rows: 9
+  key_assertion: "European bank counterparty shows cascading events with cross-default and concentration flags"

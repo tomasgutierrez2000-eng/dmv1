@@ -1,0 +1,69 @@
+# S29: Consumer Goods Pipeline Surge
+#
+# Story: A wave of M&A activity in consumer staples creates
+# an unprecedented pipeline of 8 new facilities totaling $2.1B
+# in commitments. The origination team has 5 deals in underwriting
+# and 3 in credit approval — all targeting Q1 close. Portfolio
+# concentration risk in consumer sector intensifies.
+#
+# Dashboard signal: Deal pipeline spike with multiple
+# facilities moving through approval stages simultaneously.
+
+scenario_id: "S29"
+name: "Consumer Goods Pipeline Surge"
+type: PIPELINE_SPIKE
+narrative: "M&A-driven pipeline surge — 8 new consumer facilities totaling $2.1B targeting Q1 close"
+
+counterparties:
+  - legal_name: "Heritage Foods International Inc."
+    country: US
+    industry_id: 6      # Consumer/Retail
+    rating_tier: IG_MID
+    story_arc: GROWING
+    size: LARGE
+  - legal_name: "Sunrise Beverage Group LLC"
+    country: US
+    industry_id: 6
+    rating_tier: IG_LOW
+    story_arc: NEW_RELATIONSHIP
+    size: MID
+  - legal_name: "Euro Packaged Foods SA"
+    country: FR
+    industry_id: 6
+    rating_tier: IG_MID
+    story_arc: GROWING
+    size: MID
+  - legal_name: "Asia Pacific Consumer Brands Pte Ltd"
+    country: SG
+    industry_id: 6
+    rating_tier: IG_LOW
+    story_arc: NEW_RELATIONSHIP
+    size: MID
+  - legal_name: "Andean Natural Products SA"
+    country: BR
+    industry_id: 6
+    rating_tier: HY_HIGH
+    story_arc: NEW_RELATIONSHIP
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: PIPELINE_CONCENTRATION
+      severity: HIGH
+      description: "8 consumer sector facilities in pipeline — $2.1B total commitment"
+    - code: SECTOR_CONCENTRATION
+      severity: MEDIUM
+      description: "Consumer sector would reach 18% of portfolio if all close"
+
+verification:
+  min_rows: 10
+  key_assertion: "Consumer sector pipeline shows surge of new facilities with concentration risk"

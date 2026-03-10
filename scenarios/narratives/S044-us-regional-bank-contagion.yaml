@@ -1,0 +1,69 @@
+# S44: US Regional Bank Contagion
+#
+# Story: Deposit outflows at 3 US regional banks trigger
+# interbank credit line draws. The bank has $900M in
+# unsecured interbank exposure. CDS spreads spike, ratings
+# agencies place all 3 on review for downgrade. Cross-default
+# provisions create systemic linkage between the exposures.
+#
+# Dashboard signal: Financial institution counterparty stress
+# with deposit-driven liquidity concerns and cross-default risk.
+
+scenario_id: "S44"
+name: "US Regional Bank Contagion"
+type: EVENT_CASCADE
+narrative: "3 US regional banks face deposit outflows — $900M interbank exposure with cross-default linkage"
+
+counterparties:
+  - legal_name: "First Pacific Valley Bancorp"
+    country: US
+    industry_id: 1      # Financial Services
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Great Plains National Bank"
+    country: US
+    industry_id: 1
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Southeastern Community Bancshares Inc."
+    country: US
+    industry_id: 1
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-08"
+      description: "Moody's places 3 regional banks on review for downgrade"
+      severity: HIGH
+    - type: CROSS_DEFAULT
+      date: "2025-01-05"
+      description: "First Pacific triggers cross-default after failing to meet capital ratio"
+      severity: HIGH
+  risk_flags:
+    - code: COUNTERPARTY_CONCENTRATION
+      severity: HIGH
+      description: "3 correlated FI exposures totaling $900M in unsecured lines"
+    - code: DEPOSIT_OUTFLOW_RISK
+      severity: HIGH
+      description: "Regional bank deposit outflows exceeding 15% of total deposits"
+    - code: CROSS_DEFAULT_RISK
+      severity: HIGH
+      description: "Cross-default provisions link 3 regional bank exposures"
+
+verification:
+  min_rows: 9
+  key_assertion: "US regional banks show contagion risk with deposit outflows and cross-default cascade"

@@ -1,0 +1,67 @@
+# S30: Materials Sector Stress Test
+#
+# Story: The bank runs a severe recession stress test on its
+# materials and mining portfolio. Commodity prices drop 40%,
+# demand falls 25%, and 4 borrowers face cash flow shortfalls.
+# Stress losses exceed the $500M threshold, triggering a breach
+# of the bank's stress capital buffer.
+#
+# Dashboard signal: Stress test results show materials sector
+# losses breaching capital buffer with multiple counterparty failures.
+
+scenario_id: "S30"
+name: "Materials Sector Stress Test"
+type: STRESS_TEST
+narrative: "Severe recession scenario: commodity crash stresses 4 mining/materials borrowers, breaching $500M capital buffer"
+
+counterparties:
+  - legal_name: "Rio Grande Mining Corp."
+    country: MX
+    industry_id: 9      # Materials
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Kimberley Resources Ltd."
+    country: AU
+    industry_id: 9
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Norsk Metall AS"
+    country: GB
+    industry_id: 9
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Guangdong Rare Earth Processing Co."
+    country: HK
+    industry_id: 9
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: STRESS_TEST_BREACH
+      severity: HIGH
+      description: "Materials sector stress losses exceed $500M capital buffer"
+    - code: COMMODITY_PRICE_SENSITIVITY
+      severity: HIGH
+      description: "40% commodity price decline scenario shows portfolio vulnerability"
+
+stress_test:
+  scenario_name: "Severe Recession - Commodity Crash"
+  loss_threshold_amt: 500000000
+
+verification:
+  min_rows: 8
+  key_assertion: "Materials sector stress test shows capital buffer breach under severe recession"

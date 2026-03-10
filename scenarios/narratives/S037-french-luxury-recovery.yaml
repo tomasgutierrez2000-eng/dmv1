@@ -1,0 +1,57 @@
+# S37: French Luxury Goods Recovery
+#
+# Story: After a year of Chinese demand weakness, 3 French luxury
+# goods companies show early recovery signals. Utilization drops
+# as cash flow improves. The bank downgrades risk flags and
+# considers increasing committed facilities. A positive story
+# amidst broader market stress.
+#
+# Dashboard signal: Recovery trend — declining utilization,
+# improving credit metrics, risk flags being resolved.
+
+scenario_id: "S37"
+name: "French Luxury Goods Recovery"
+type: BREACH_RESOLUTION
+narrative: "3 French luxury firms recover after China demand weakness — utilization declining, flags resolving"
+
+counterparties:
+  - legal_name: "Maison Beaumont Luxe SA"
+    country: FR
+    industry_id: 6      # Consumer
+    rating_tier: IG_MID
+    story_arc: RECOVERING
+    size: LARGE
+  - legal_name: "Provence Haute Couture Group SAS"
+    country: FR
+    industry_id: 6
+    rating_tier: IG_LOW
+    story_arc: RECOVERING
+    size: MID
+  - legal_name: "Lyon Artisan Leather Works SA"
+    country: FR
+    industry_id: 5      # Manufacturing
+    rating_tier: IG_LOW
+    story_arc: RECOVERING
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: RECOVERY_TREND
+      severity: LOW
+      description: "Utilization declining 5-10% per month as cash flows normalize"
+    - code: FLAG_RESOLUTION
+      severity: LOW
+      description: "Previous sector stress flags being resolved — China demand recovering"
+
+verification:
+  min_rows: 6
+  key_assertion: "French luxury firms show recovery trend with declining utilization and flag resolution"

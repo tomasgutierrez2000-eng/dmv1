@@ -1,0 +1,89 @@
+# S19: Oil & Gas Sector Downgrade
+#
+# Story: A wave of credit downgrades across the oil & gas sector
+# hits 5 counterparties in the bank's energy portfolio. Moody's
+# places the sector on negative outlook, causing covenant reviews
+# on $1.8B of committed exposure. Rating divergence emerges as
+# internal risk assessment lags behind external agency actions.
+#
+# Dashboard signal: The CRO sees sector-wide deterioration in energy
+# names, rising risk flags, and increasing utilization as stressed
+# borrowers draw down revolvers.
+
+scenario_id: "S19"
+name: "Oil & Gas Sector Downgrade"
+type: DETERIORATION_TREND
+narrative: "Sector-wide rating downgrade hits 5 O&G counterparties, triggering covenant reviews on $1.8B exposure"
+
+counterparties:
+  - legal_name: "Deepwater Drilling Holdings LP"
+    country: US
+    industry_id: 4       # Energy
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Arctic Exploration Corp."
+    country: CA
+    industry_id: 4
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Gulf Refining Partners LLC"
+    country: US
+    industry_id: 4
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Prairie Shale Resources Inc."
+    country: US
+    industry_id: 4
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+  - legal_name: "Oceanic LNG Transport Ltd."
+    country: GB
+    industry_id: 4
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-15"
+      description: "Moody's places O&G sector on negative outlook"
+      severity: HIGH
+    - type: COVENANT_REVIEW
+      date: "2025-01-10"
+      description: "Covenant compliance review triggered by rating action"
+      severity: MEDIUM
+  risk_flags:
+    - code: SECTOR_CONCENTRATION
+      severity: HIGH
+      description: "Energy sector exposure exceeds 15% of portfolio"
+    - code: RATING_MIGRATION_ADVERSE
+      severity: MEDIUM
+      description: "Multiple counterparty downgrades in 30-day window"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BBB-"
+      moodys: "Baa3"
+    ratings_after:
+      sp: "BB+"
+      moodys: "Ba1"
+
+verification:
+  min_rows: 15
+  key_assertion: "All 5 counterparties show deteriorating utilization trend and rating migration"

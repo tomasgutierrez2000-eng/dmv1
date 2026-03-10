@@ -1,0 +1,72 @@
+# S41: Energy Transition — Green Lending Growth
+#
+# Story: The bank is aggressively building its green/sustainable
+# lending portfolio. 5 renewable energy companies onboard with
+# $1.8B in new commitments. Fast growth creates pipeline
+# concentration and data quality challenges as ESG scoring
+# frameworks are still being established.
+#
+# Dashboard signal: Pipeline surge in green lending with
+# new relationship onboarding and ESG data gaps.
+
+scenario_id: "S41"
+name: "Energy Transition Green Lending"
+type: PIPELINE_SPIKE
+narrative: "5 renewable energy firms onboard with $1.8B commitments — green lending pipeline surge with ESG data gaps"
+
+counterparties:
+  - legal_name: "Atlantic Offshore Wind Partners LP"
+    country: US
+    industry_id: 9      # Utilities/Energy
+    rating_tier: IG_LOW
+    story_arc: NEW_RELATIONSHIP
+    size: LARGE
+  - legal_name: "Nordic Solar Energy Holding AB"
+    country: GB
+    industry_id: 9
+    rating_tier: IG_MID
+    story_arc: GROWING
+    size: MID
+  - legal_name: "Sahara Green Hydrogen SA"
+    country: FR
+    industry_id: 4      # Energy
+    rating_tier: HY_HIGH
+    story_arc: NEW_RELATIONSHIP
+    size: MID
+  - legal_name: "Chile Lithium Battery Corp."
+    country: BR
+    industry_id: 9
+    rating_tier: HY_HIGH
+    story_arc: NEW_RELATIONSHIP
+    size: SMALL
+  - legal_name: "Rajasthan Solar Farm Pvt Ltd"
+    country: IN
+    industry_id: 9
+    rating_tier: HY_MID
+    story_arc: NEW_RELATIONSHIP
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: PIPELINE_CONCENTRATION
+      severity: MEDIUM
+      description: "$1.8B green lending pipeline — 5 new relationships in 90 days"
+    - code: DATA_QUALITY_LOW
+      severity: MEDIUM
+      description: "ESG scoring frameworks incomplete — 3 counterparties missing sustainability metrics"
+    - code: RAPID_ONBOARDING
+      severity: LOW
+      description: "Green lending growth target driving accelerated onboarding"
+
+verification:
+  min_rows: 10
+  key_assertion: "Green energy pipeline shows rapid growth with ESG data quality gaps"

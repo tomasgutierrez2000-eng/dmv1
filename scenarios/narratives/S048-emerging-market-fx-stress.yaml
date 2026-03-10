@@ -1,0 +1,81 @@
+# S48: Emerging Market FX Stress Test
+#
+# Story: A coordinated EM currency crisis (BRL -25%, INR -15%,
+# MXN -20%) stress-tests the bank's cross-border portfolio.
+# USD-denominated debt service becomes unsustainable for 6
+# EM borrowers. Stress losses total $780M across 3 countries.
+#
+# Dashboard signal: EM stress test shows FX-amplified losses
+# across Brazil, India, and Mexico portfolios.
+
+scenario_id: "S48"
+name: "Emerging Market FX Stress"
+type: STRESS_TEST
+narrative: "Coordinated EM currency crisis — BRL/INR/MXN depreciation creates $780M stress losses across 6 borrowers"
+
+counterparties:
+  - legal_name: "Rio Industrial Conglomerate SA"
+    country: BR
+    industry_id: 5      # Manufacturing
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Mumbai Infrastructure Holdings Ltd."
+    country: IN
+    industry_id: 8      # Transportation
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Guadalajara Textiles SA de CV"
+    country: MX
+    industry_id: 5
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "São Paulo Telecom Holdings SA"
+    country: BR
+    industry_id: 8      # Telecom
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Pune Pharmaceutical Ltd."
+    country: IN
+    industry_id: 3      # Healthcare
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+  - legal_name: "Monterrey Steel Works SA de CV"
+    country: MX
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: STRESS_TEST_BREACH
+      severity: HIGH
+      description: "EM FX stress losses total $780M — exceeding $600M threshold"
+    - code: FX_EXPOSURE_AMPLIFICATION
+      severity: HIGH
+      description: "BRL -25%, INR -15%, MXN -20% amplify USD-equivalent exposure"
+    - code: COUNTRY_CONCENTRATION
+      severity: HIGH
+      description: "Correlated EM risk across Brazil, India, Mexico"
+
+stress_test:
+  scenario_name: "Coordinated EM Currency Crisis"
+  loss_threshold_amt: 600000000
+
+verification:
+  min_rows: 12
+  key_assertion: "EM portfolio stress test shows FX-amplified losses breaching threshold across 3 countries"

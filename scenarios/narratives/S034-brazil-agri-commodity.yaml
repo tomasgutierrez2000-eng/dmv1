@@ -1,0 +1,71 @@
+# S34: Brazil Agricultural Commodity Exposure
+#
+# Story: Drought conditions in Brazil devastate soy and corn
+# yields. 4 agribusiness borrowers face revenue shortfalls
+# and covenant pressure. The bank's Brazil country exposure
+# approaches the $2B limit as FX depreciation inflates
+# USD-equivalent exposure.
+#
+# Dashboard signal: Brazil country concentration risk with
+# agricultural sector stress and FX-amplified exposure growth.
+
+scenario_id: "S34"
+name: "Brazil Agricultural Commodity Stress"
+type: EXPOSURE_BREACH
+narrative: "Brazil drought hits 4 agribusiness borrowers — country exposure nears $2B limit as BRL weakens"
+
+counterparties:
+  - legal_name: "Cerrado Agronegócios SA"
+    country: BR
+    industry_id: 6      # Consumer/Agri
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Amazonia Soy Export Ltda."
+    country: BR
+    industry_id: 6
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Pantanal Cattle & Grain Corp."
+    country: BR
+    industry_id: 6
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "São Paulo Sugar Refining SA"
+    country: BR
+    industry_id: 6
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: COVENANT_REVIEW
+      date: "2024-12-30"
+      description: "DSCR covenant review triggered — crop yield 40% below forecast"
+      severity: HIGH
+  risk_flags:
+    - code: COUNTRY_CONCENTRATION
+      severity: HIGH
+      description: "Brazil exposure approaching $2B country limit"
+    - code: FX_EXPOSURE_AMPLIFICATION
+      severity: MEDIUM
+      description: "BRL depreciation inflates USD-equivalent exposure by 15%"
+    - code: AGRICULTURAL_STRESS
+      severity: HIGH
+      description: "Drought conditions — soy/corn yields 40% below forecast"
+
+verification:
+  min_rows: 8
+  key_assertion: "Brazil agri borrowers show stress with country concentration and FX amplification"

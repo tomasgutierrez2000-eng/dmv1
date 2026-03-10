@@ -1,0 +1,62 @@
+# S42: Swiss PE Portfolio Leverage Concerns
+#
+# Story: 3 Swiss-domiciled PE funds have subscription-line
+# and NAV-backed facilities with the bank totaling $1.6B.
+# Rising interest rates compress fund valuations, and LP
+# capital calls are being delayed. Leverage ratios are
+# approaching covenant limits across all 3 funds.
+#
+# Dashboard signal: PE fund leverage approaching covenant
+# limits with NAV compression and delayed capital calls.
+
+scenario_id: "S42"
+name: "Swiss PE Portfolio Leverage"
+type: LEVERAGED_FINANCE
+narrative: "3 Swiss PE funds face NAV compression — leverage ratios approaching covenants on $1.6B exposure"
+
+counterparties:
+  - legal_name: "Zurich Capital Partners Fund III AG"
+    country: CH
+    industry_id: 1      # Financial Services
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Geneva Growth Equity AG"
+    country: CH
+    industry_id: 1
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Bern Mezzanine Credit Fund Sàrl"
+    country: CH
+    industry_id: 1
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: COVENANT_REVIEW
+      date: "2024-12-15"
+      description: "Quarterly leverage covenant test — all 3 funds within 5% of breach"
+      severity: HIGH
+  risk_flags:
+    - code: LEVERAGE_EXCESSIVE
+      severity: HIGH
+      description: "PE fund leverage ratios within 5% of covenant limits"
+    - code: NAV_COMPRESSION
+      severity: MEDIUM
+      description: "Fund NAVs declining 10-15% from rate-driven valuation adjustments"
+
+verification:
+  min_rows: 9
+  key_assertion: "Swiss PE funds show leverage concerns with NAV compression and covenant pressure"

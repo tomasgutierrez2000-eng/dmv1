@@ -1,0 +1,67 @@
+# S26: Utilities Regulatory Capital Near-Miss
+#
+# Story: The bank's utilities portfolio sits at 94% of the
+# SCCL limit for a single counterparty group. A new $150M
+# facility approval would breach the limit. The deal team
+# is pressuring credit risk for approval before quarter-end.
+#
+# Dashboard signal: Near-miss on regulatory limit with
+# approval pipeline creating imminent breach risk.
+
+scenario_id: "S26"
+name: "Utilities Regulatory Near-Miss"
+type: REGULATORY_NEAR_MISS
+narrative: "Utilities portfolio at 94% of SCCL limit — pending $150M facility would breach regulatory threshold"
+
+counterparties:
+  - legal_name: "Continental Power Generation Corp."
+    country: US
+    industry_id: 9      # Utilities
+    rating_tier: IG_MID
+    story_arc: STABLE_IG
+    size: LARGE
+  - legal_name: "Atlantic Wind Energy Partners LP"
+    country: US
+    industry_id: 9
+    rating_tier: IG_LOW
+    story_arc: GROWING
+    size: MID
+  - legal_name: "Ontario Hydro Distribution Inc."
+    country: CA
+    industry_id: 9
+    rating_tier: IG_HIGH
+    story_arc: STABLE_IG
+    size: MID
+  - legal_name: "Southern Grid Infrastructure LLC"
+    country: US
+    industry_id: 9
+    rating_tier: IG_MID
+    story_arc: STABLE_IG
+    size: SMALL
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: LIMIT_NEAR_MISS
+      severity: HIGH
+      description: "SCCL utilization at 94% — pending deal would trigger breach"
+    - code: APPROVAL_PIPELINE_RISK
+      severity: MEDIUM
+      description: "$150M facility awaiting credit committee — would push over limit"
+
+limit:
+  type: SCCL
+  threshold_pct: 25
+  current_utilization_pct: 94
+
+verification:
+  min_rows: 12
+  key_assertion: "Utilities portfolio near SCCL limit with pending deal creating breach risk"

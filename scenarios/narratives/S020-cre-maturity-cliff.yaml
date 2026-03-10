@@ -1,0 +1,62 @@
+# S20: CRE Maturity Cliff
+#
+# Story: A cluster of 4 commercial real estate borrowers face
+# maturing facilities within Q1 2025. Office and retail properties
+# have declined in value, making refinancing difficult. The bank
+# faces $1.2B of CRE maturities with weakening collateral coverage.
+#
+# Dashboard signal: The CRO sees a maturity wall in CRE,
+# with collateral values declining and refinancing risk elevated.
+
+scenario_id: "S20"
+name: "CRE Maturity Cliff"
+type: MATURITY_WALL
+narrative: "4 CRE borrowers face $1.2B maturing facilities in Q1 2025 with declining property values"
+
+counterparties:
+  - legal_name: "Pinnacle Office Properties REIT"
+    country: US
+    industry_id: 10      # Real Estate
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Crosstown Retail Centers LP"
+    country: US
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Lakeshore Multifamily Holdings Inc."
+    country: US
+    industry_id: 10
+    rating_tier: IG_LOW
+    story_arc: STEADY_HY
+    size: MID
+  - legal_name: "Westfield Mixed-Use Development LLC"
+    country: US
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: MATURITY_CONCENTRATION
+      severity: HIGH
+      description: "CRE maturity wall — $1.2B due in Q1 2025"
+    - code: COLLATERAL_COVERAGE_DECLINE
+      severity: MEDIUM
+      description: "CRE property values declining, LTV rising"
+
+verification:
+  min_rows: 8
+  key_assertion: "4 CRE borrowers with maturing facilities show stressed utilization and adverse risk flags"

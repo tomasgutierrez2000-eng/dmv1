@@ -1,0 +1,57 @@
+# S33: Singapore Trade Finance Deterioration
+#
+# Story: 3 Singapore-based commodity trading houses face margin
+# pressure as global trade volumes contract. Letters of credit
+# and trade finance facilities see rising utilization as
+# working capital cycles elongate. One borrower's trade
+# receivables are aging past 120 days.
+#
+# Dashboard signal: Trade finance utilization rising with
+# aging receivables and working capital deterioration.
+
+scenario_id: "S33"
+name: "Singapore Trade Finance Deterioration"
+type: DETERIORATION_TREND
+narrative: "3 Singapore commodity traders face margin pressure — trade finance utilization rising with aging receivables"
+
+counterparties:
+  - legal_name: "Straits Commodity Trading Pte Ltd"
+    country: SG
+    industry_id: 9      # Materials/Commodities
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Raffles Palm Oil Trading Corp."
+    country: SG
+    industry_id: 9
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Lion City Metals Exchange Pte Ltd"
+    country: SG
+    industry_id: 9
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: TRADE_FINANCE_STRESS
+      severity: HIGH
+      description: "Trade finance utilization up 35% as working capital cycles elongate"
+    - code: RECEIVABLES_AGING
+      severity: MEDIUM
+      description: "Trade receivables aging past 120 days for Raffles Palm Oil"
+
+verification:
+  min_rows: 9
+  key_assertion: "Singapore commodity traders show deteriorating trade finance metrics"

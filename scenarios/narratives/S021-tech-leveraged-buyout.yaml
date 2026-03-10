@@ -1,0 +1,61 @@
+# S21: Tech Leveraged Buyout Stress
+#
+# Story: A PE-backed technology firm took on $2.5B of leveraged debt
+# to fund an acquisition. Integration issues and revenue shortfalls
+# are pushing covenant metrics to the edge. The bank holds $800M
+# across term loans and a revolver that is being drawn aggressively.
+#
+# Dashboard signal: Large leveraged exposure with deteriorating
+# coverage ratios and aggressive revolver draws.
+
+scenario_id: "S21"
+name: "Tech Leveraged Buyout Stress"
+type: LEVERAGED_FINANCE
+narrative: "PE-backed tech firm's $2.5B LBO faces integration headwinds, aggressive revolver draws on $800M bank exposure"
+
+counterparties:
+  - legal_name: "NexGen Software Holdings LLC"
+    country: US
+    industry_id: 2      # Technology
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "NexGen Software Operating Co."
+    country: US
+    industry_id: 2
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Apex Capital Partners Fund VII"
+    country: US
+    industry_id: 1      # Financial Services (PE sponsor)
+    rating_tier: IG_MID
+    story_arc: STABLE_IG
+    size: LARGE
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: COVENANT_REVIEW
+      date: "2024-12-20"
+      description: "Leverage ratio covenant test triggered at 6.8x vs 6.5x limit"
+      severity: HIGH
+  risk_flags:
+    - code: LEVERAGE_EXCESSIVE
+      severity: HIGH
+      description: "Total leverage exceeds 6.5x EBITDA covenant threshold"
+    - code: REVOLVER_DRAW_SPIKE
+      severity: MEDIUM
+      description: "Revolver utilization increased 40% in 60 days"
+
+verification:
+  min_rows: 9
+  key_assertion: "Tech LBO shows aggressive draws, covenant pressure, and leverage flags"

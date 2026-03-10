@@ -1,0 +1,65 @@
+# S36: Middle East Real Estate Overbuilding
+#
+# Story: Dubai and Abu Dhabi real estate developers face
+# oversupply as luxury residential and commercial projects
+# complete simultaneously. Occupancy rates drop below 60%,
+# rental income collapses, and property valuations decline 20%.
+# The bank has $800M CRE exposure concentrated in 3 developers.
+#
+# Dashboard signal: CRE concentration in Middle East with
+# declining valuations and collateral coverage erosion.
+
+scenario_id: "S36"
+name: "Middle East Real Estate Overbuilding"
+type: COLLATERAL_DECLINE
+narrative: "Dubai/Abu Dhabi oversupply hits 3 developers — property values down 20%, $800M CRE exposure"
+
+counterparties:
+  - legal_name: "Emirates Tower Development PJSC"
+    country: AE
+    industry_id: 10     # Real Estate
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Gulf Hospitality Properties LLC"
+    country: AE
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Abu Dhabi Commercial Estates Co."
+    country: AE
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: COLLATERAL_SHORTFALL
+      date: "2024-12-20"
+      description: "Independent valuation shows 20% decline in commercial property portfolio"
+      severity: HIGH
+  risk_flags:
+    - code: CRE_OVERBUILDING
+      severity: HIGH
+      description: "Dubai CRE oversupply — occupancy below 60% across portfolio"
+    - code: COLLATERAL_COVERAGE_DECLINE
+      severity: HIGH
+      description: "Property valuations down 20%, LTV ratios breaching covenants"
+    - code: GEOGRAPHIC_CONCENTRATION
+      severity: MEDIUM
+      description: "UAE CRE exposure concentrated in 3 related developers"
+
+verification:
+  min_rows: 9
+  key_assertion: "Middle East CRE developers show collateral decline with overbuilding stress"

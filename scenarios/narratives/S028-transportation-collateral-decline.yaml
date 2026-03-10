@@ -1,0 +1,72 @@
+# S28: Transportation Fleet Collateral Decline
+#
+# Story: An airline and shipping conglomerate pledged $1.8B in
+# aircraft and vessel collateral. Post-pandemic fleet revaluation
+# shows 30% decline in aircraft values and 25% decline in vessel
+# values. LTV ratios breach covenant thresholds, triggering
+# margin calls and additional collateral posting requirements.
+#
+# Dashboard signal: Collateral coverage declining across
+# transportation names with LTV covenant breaches.
+
+scenario_id: "S28"
+name: "Transportation Fleet Collateral Decline"
+type: COLLATERAL_DECLINE
+narrative: "Airline and shipping fleet collateral drops 25-30%, triggering LTV covenant breaches on $1.8B exposure"
+
+counterparties:
+  - legal_name: "TransPacific Airlines Holdings Corp."
+    country: US
+    industry_id: 8      # Transportation
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Global Maritime Shipping Ltd."
+    country: GB
+    industry_id: 8
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Nordic Cargo Logistics AS"
+    country: GB
+    industry_id: 8
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Desert Air Leasing LLC"
+    country: AE
+    industry_id: 8
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: COLLATERAL_SHORTFALL
+      date: "2024-12-15"
+      description: "Fleet revaluation shows 30% decline — LTV covenant breached"
+      severity: HIGH
+    - type: MARGIN_CALL
+      date: "2025-01-10"
+      description: "Additional collateral posting required — $250M shortfall"
+      severity: MEDIUM
+  risk_flags:
+    - code: COLLATERAL_COVERAGE_DECLINE
+      severity: HIGH
+      description: "Fleet collateral values declined 25-30% in 90 days"
+    - code: LTV_COVENANT_BREACH
+      severity: HIGH
+      description: "LTV ratios above 85% covenant threshold on 3 facilities"
+
+verification:
+  min_rows: 8
+  key_assertion: "Transportation collateral shows declining fleet values with LTV covenant breaches"

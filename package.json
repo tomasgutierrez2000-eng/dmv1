@@ -25,6 +25,7 @@
     "db:verify-gsib": "tsx scripts/verify-gsib-load.ts",
     "db:verify-scenarios": "tsx scripts/verify-cro-scenarios.ts",
     "db:introspect": "tsx scripts/introspect-db.ts",
+    "sync:all": "tsx scripts/sync-all.ts",
     "sync:data-model": "tsx scripts/sync-data-model.ts",
     "export:data-model": "tsx scripts/export-data-model-excel.ts",
     "validate": "tsx scripts/validate-data-model.ts",

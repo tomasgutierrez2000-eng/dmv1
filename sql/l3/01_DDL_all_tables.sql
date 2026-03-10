@@ -1,1468 +1,1142 @@
--- ============================================================
--- L3 Data Model DDL - All 54 Tables (T01-T50 original + T51-T54 convention alignment)
--- Auto-generated from L3_Complete_Updated.xlsx
+-- L3 Data Model DDL
+-- Generated from data dictionary (viz cache)
 -- Target: PostgreSQL
--- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS l3;
+SET search_path TO l1, l2, l3, public;
 
--- T1: exposure_metric_cube (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS l3.exposure_metric_cube (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    org_unit_id                                   VARCHAR(64) NOT NULL,
-    portfolio_id                                  VARCHAR(64) NOT NULL,
-    product_node_id                               VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    facility_id                                   VARCHAR(64),
-    instrument_id                                 VARCHAR(64),
-    netting_set_id                                VARCHAR(64),
-    country_code                                  VARCHAR(30) NOT NULL,
-    currency_code                                 VARCHAR(30) NOT NULL,
-    base_currency_code                            VARCHAR(30),
-    exposure_type_code                            VARCHAR(30) NOT NULL,
-    gross_exposure_amt                            NUMERIC(20,4),
-    net_exposure_amt                              NUMERIC(20,4),
-    drawn_amt                                     NUMERIC(20,4),
-    undrawn_amt                                   NUMERIC(20,4),
-    ead_amt                                       NUMERIC(20,4),
-    secured_amt                                   NUMERIC(20,4),
-    unsecured_residual_amt                        NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    hierarchy_id                                  VARCHAR(64),
-    attribution_pct                               NUMERIC(10,6),
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id, legal_entity_id, org_unit_id, portfolio_id, product_node_id, counterparty_id, country_code, currency_code, exposure_type_code)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: org_unit_id → L1.org_unit_dim.org_unit_id
-    -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: instrument_id → L2.instrument_master.instrument_id
-    -- FK: netting_set_id → L2.netting_set.netting_set_id
-    -- FK: country_code → L1.country_dim.country_code
-    -- FK: currency_code → L1.currency_dim.currency_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate by as_of_date)
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
 
--- T2: risk_metric_cube (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS l3.risk_metric_cube (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    portfolio_id                                  VARCHAR(64) NOT NULL,
-    product_node_id                               VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    facility_id                                   VARCHAR(64),
-    instrument_id                                 VARCHAR(64),
-    currency_code                                 VARCHAR(30),
-    base_currency_code                            VARCHAR(30),
-    model_id                                      VARCHAR(64),
-    rating_grade_id                               VARCHAR(64),
-    pd_pct                                        NUMERIC(10,6),
-    lgd_pct                                       NUMERIC(10,6),
-    ead_amt                                       NUMERIC(20,4),
-    expected_loss_amt                             NUMERIC(20,4),
-    risk_weight_pct                               NUMERIC(10,6),
-    rwa_amt                                       NUMERIC(20,4),
-    rwa_density_pct                               NUMERIC(10,6),
-    capital_req_amt                               NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    hierarchy_id                                  VARCHAR(64),
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id, legal_entity_id, portfolio_id, product_node_id, counterparty_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: instrument_id → L2.instrument_master.instrument_id
-    -- FK: currency_code → L1.currency_dim.currency_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate)
-    -- FK: model_id → L1.model_registry_dim.model_id
-    -- FK: rating_grade_id → L1.rating_grade_dim.rating_grade_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-
--- T3: counterparty_exposure_summary (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS l3.counterparty_exposure_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    sccl_group_id                                 VARCHAR(64),
-    country_code                                  VARCHAR(30),
-    base_currency_code                            VARCHAR(30),
-    total_gross_exposure_amt                      NUMERIC(20,4),
-    total_net_exposure_amt                        NUMERIC(20,4),
-    total_ead_amt                                 NUMERIC(20,4),
-    secured_amt                                   NUMERIC(20,4),
-    unsecured_residual_amt                        NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    hierarchy_id                                  VARCHAR(64),
-    has_cross_entity_flag                         BOOLEAN,
-    cross_entity_exposure_amt                     NUMERIC(20,4),
-    cross_entity_entity_count                     INTEGER,
-    is_parent_flag                                BOOLEAN,
-    total_committed_amt                           NUMERIC(20,4),
-    total_outstanding_amt                         NUMERIC(20,4),
-    prior_period_gross_exposure_amt               NUMERIC(20,4),
-    exposure_change_pct                           NUMERIC(10,6),
-    avg_pd_pct                                    NUMERIC(10,6),
-    avg_lgd_pct                                   NUMERIC(10,6),
-    expected_loss_amt                             NUMERIC(20,4),
-    rwa_amt                                       NUMERIC(20,4),
-    rwa_density_pct                               NUMERIC(10,6),
-    credit_limit_amt                              NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    headroom_amt                                  NUMERIC(20,4),
-    risk_tier_code                                VARCHAR(30),
-    limit_status_code                             VARCHAR(30),
-    region_code                                   VARCHAR(30),
-    industry_code                                 VARCHAR(30),
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id, legal_entity_id, counterparty_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: sccl_group_id → L1.sccl_counterparty_group.sccl_group_id (nullable)
-    -- FK: country_code → L1.country_dim.country_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: region_code → L1.region_dim.region_code
-    -- FK: industry_code → L1.industry_dim.industry_code
-
--- T4: facility_exposure_summary (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS l3.facility_exposure_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    facility_id                                   VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64),
-    portfolio_id                                  VARCHAR(64),
-    base_currency_code                            VARCHAR(30),
-    outstanding_amt                               NUMERIC(20,4),
-    undrawn_commitment_amt                        NUMERIC(20,4),
-    ead_amt                                       NUMERIC(20,4),
-    secured_amt                                   NUMERIC(20,4),
-    unsecured_residual_amt                        NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    attribution_pct                               NUMERIC(10,6),
-    is_syndicated_flag                            BOOLEAN,
-    has_amendment_flag                            BOOLEAN,
-    amendment_type_code                           VARCHAR(30),
-    amendment_status_code                         VARCHAR(30),
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id, legal_entity_id, facility_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T5: portfolio_summary (Exposure & Risk Metrics)
-CREATE TABLE IF NOT EXISTS l3.portfolio_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    portfolio_id                                  VARCHAR(64) NOT NULL,
-    base_currency_code                            VARCHAR(30),
-    total_gross_exposure_amt                      NUMERIC(20,4),
-    total_ead_amt                                 NUMERIC(20,4),
-    total_expected_loss_amt                       NUMERIC(20,4),
-    avg_pd_pct                                    NUMERIC(10,6),
-    avg_lgd_pct                                   NUMERIC(10,6),
-    total_rwa_amt                                 NUMERIC(20,4),
-    rwa_density_pct                               NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id, legal_entity_id, portfolio_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T6: crm_allocation_summary (Credit Risk Mitigation (CRM))
-CREATE TABLE IF NOT EXISTS l3.crm_allocation_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64),
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    crm_type_code                                 VARCHAR(30) NOT NULL,
-    allocation_target_level                       VARCHAR(255) NOT NULL,
-    facility_id                                   VARCHAR(64),
-    counterparty_id                               VARCHAR(64),
-    netting_set_id                                VARCHAR(64),
-    crm_id                                        VARCHAR(64) NOT NULL,
-    currency_code                                 VARCHAR(30),
-    base_currency_code                            VARCHAR(30),
-    crm_market_value_amt                          NUMERIC(20,4),
-    haircut_pct                                   NUMERIC(10,6),
-    crm_recognized_amt                            NUMERIC(20,4),
-    allocated_amt                                 NUMERIC(20,4),
-    allocation_method_code                        VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    risk_mitigant_id                              VARCHAR(64),
-    risk_mitigant_subtype_code                    VARCHAR(30),
-    parent_group_code                             VARCHAR(30),
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, crm_type_code, allocation_target_level, crm_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: netting_set_id → L2.netting_set.netting_set_id
-    -- FK: crm_id → L1.collateral_asset_master.collateral_asset_id OR L1.crm_protection_master.protection_id (by crm_type_code)
-    -- FK: currency_code → L1.currency_dim.currency_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code  to L1.fx_rate)
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: risk_mitigant_id → L1.risk_mitigant_master.risk_mitigant_id
-    -- FK: risk_mitigant_subtype_code → L1.risk_mitigant_type_dim.risk_mitigant_subtype_code
-
--- T7: collateral_portfolio_valuation (Credit Risk Mitigation (CRM))
-CREATE TABLE IF NOT EXISTS l3.collateral_portfolio_valuation (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64),
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    portfolio_id                                  VARCHAR(64) NOT NULL,
-    collateral_type_id                            VARCHAR(64) NOT NULL,
-    base_currency_code                            VARCHAR(30),
-    collateral_market_value_amt                   NUMERIC(20,4),
-    collateral_recognized_amt                     NUMERIC(20,4),
-    asset_count                                   INTEGER,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    parent_group_code                             VARCHAR(30),
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, portfolio_id, collateral_type_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: collateral_type_id → L1.collateral_type.collateral_type_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T8: limit_current_state (Limits & Appetite)
-CREATE TABLE IF NOT EXISTS l3.limit_current_state (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_ts                                      TIMESTAMP NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    limit_definition_id                           VARCHAR(64),
-    limit_assignment_id                           VARCHAR(64) NOT NULL,
-    limit_currency_code                           VARCHAR(30),
-    limit_amt                                     NUMERIC(20,4),
-    utilized_amt                                  NUMERIC(20,4),
-    available_amt                                 NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    status_code                                   VARCHAR(30),
-    last_breach_ts                                TIMESTAMP,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    hierarchy_id                                  VARCHAR(64),
-    last_status_change_ts                         TIMESTAMP,
-    status_last_changed_event_id                  VARCHAR(64),
-    classification_code                           VARCHAR(30),
-    velocity_30d_pct                              NUMERIC(10,6),
-    velocity_90d_pct                              NUMERIC(10,6),
-    prior_period_status_code                      VARCHAR(30),
-    utilization_tier_code                         VARCHAR(30),
-    PRIMARY KEY (run_version_id, as_of_ts, legal_entity_id, limit_assignment_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: limit_definition_id → L1.limit_rule.limit_rule_id
-    -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
-    -- FK: limit_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- NOTE: status_last_changed_event_id references a real-time event log (not materialised in this DDL)
-
--- T9: limit_utilization_timeseries (Limits & Appetite)
-CREATE TABLE IF NOT EXISTS l3.limit_utilization_timeseries (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_ts                                      TIMESTAMP NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    limit_assignment_id                           VARCHAR(64) NOT NULL,
-    limit_currency_code                           VARCHAR(30),
-    utilized_amt                                  NUMERIC(20,4),
-    available_amt                                 NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    PRIMARY KEY (run_version_id, as_of_ts, legal_entity_id, limit_assignment_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
-    -- FK: limit_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T10: limit_attribution_summary (Limits & Appetite)
-CREATE TABLE IF NOT EXISTS l3.limit_attribution_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_ts                                      TIMESTAMP NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    limit_assignment_id                           VARCHAR(64) NOT NULL,
-    contributor_level                             VARCHAR(255) NOT NULL,
-    facility_id                                   VARCHAR(64),
-    counterparty_id                               VARCHAR(64),
-    portfolio_id                                  VARCHAR(64),
-    product_node_id                               VARCHAR(64),
-    org_unit_id                                   VARCHAR(64),
-    contribution_amt                              NUMERIC(20,4),
-    contribution_pct                              NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    hierarchy_id                                  VARCHAR(64),
-    PRIMARY KEY (run_version_id, as_of_ts, legal_entity_id, limit_assignment_id, contributor_level)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: portfolio_id → L1.portfolio_dim.portfolio_id
-    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: org_unit_id → L1.org_unit_dim.org_unit_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-
--- T11: limit_breach_fact (Limits & Appetite)
-CREATE TABLE IF NOT EXISTS l3.limit_breach_fact (
-    breach_id                                     VARCHAR(64) NOT NULL,
-    run_version_id                                VARCHAR(64),
-    limit_assignment_id                           VARCHAR(64),
-    legal_entity_id                               VARCHAR(64),
-    breach_ts                                     TIMESTAMP,
-    severity_code                                 VARCHAR(30),
-    breach_amount                                 NUMERIC(20,4),
-    status_code                                   VARCHAR(30),
-    resolved_ts                                   TIMESTAMP,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    PRIMARY KEY (breach_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: limit_assignment_id → L1.limit_assignment.limit_assignment_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T12: credit_event_summary (Credit Events & Performance)
-CREATE TABLE IF NOT EXISTS l3.credit_event_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64),
-    facility_id                                   VARCHAR(64),
-    credit_event_type_id                          VARCHAR(64) NOT NULL,
-    event_count                                   INTEGER,
-    default_flag                                  BOOLEAN,
-    charge_off_amt                                NUMERIC(20,4),
-    recovery_amt                                  NUMERIC(20,4),
-    net_loss_amt                                  NUMERIC(20,4),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    impacted_facility_count                       INTEGER,
-    event_summary_text                            TEXT,
-    event_short_name                              VARCHAR(500),
-    event_risk_rating                             VARCHAR(255),
-    estimated_exposure_impact_amt                 NUMERIC(20,4),
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, credit_event_type_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: credit_event_type_id → L1.credit_event_type_dim.credit_event_type_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T13: rating_migration_summary (Credit Events & Performance)
-CREATE TABLE IF NOT EXISTS l3.rating_migration_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    rating_source_id                              VARCHAR(64) NOT NULL,
-    from_rating_grade_id                          VARCHAR(64) NOT NULL,
-    to_rating_grade_id                            VARCHAR(64) NOT NULL,
-    migration_count                               INTEGER,
-    exposure_at_migration_amt                     NUMERIC(20,4),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, counterparty_id, rating_source_id, from_rating_grade_id, to_rating_grade_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: rating_source_id → L1.rating_source.rating_source_id
-    -- FK: from_rating_grade_id → L1.rating_grade_dim.rating_grade_id
-    -- FK: to_rating_grade_id → L1.rating_grade_dim.rating_grade_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T14: default_loss_recovery_summary (Credit Events & Performance)
-CREATE TABLE IF NOT EXISTS l3.default_loss_recovery_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    facility_id                                   VARCHAR(64),
-    default_exposure_amt                          NUMERIC(20,4),
-    charge_off_amt                                NUMERIC(20,4),
-    recovery_amt                                  NUMERIC(20,4),
-    realized_lgd_pct                              NUMERIC(10,6),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, counterparty_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T15: report_run (Regulatory Reporting Output)
-CREATE TABLE IF NOT EXISTS l3.report_run (
-    report_run_id                                 VARCHAR(64) NOT NULL,
-    run_version_id                                VARCHAR(64),
-    report_code                                   VARCHAR(30),
-    as_of_date                                    DATE,
-    scenario_id                                   VARCHAR(64),
-    status_code                                   VARCHAR(30),
-    started_ts                                    TIMESTAMP,
-    completed_ts                                  TIMESTAMP,
-    produced_by_system_id                         VARCHAR(64),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (report_run_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: report_code → L1.report_registry.report_code OR L1.regulatory_report_dim.report_code
-    -- FK: scenario_id → L1.scenario_dim.scenario_id (nullable)
-    -- FK: produced_by_system_id → L1.source_system_registry.source_system_id
-
--- T16: report_cell_value (Regulatory Reporting Output)
-CREATE TABLE IF NOT EXISTS l3.report_cell_value (
-    report_run_id                                 VARCHAR(64) NOT NULL,
-    cell_id                                       VARCHAR(64) NOT NULL,
-    value_amt                                     NUMERIC(20,4),
-    currency_code                                 VARCHAR(30),
-    unit_code                                     VARCHAR(30),
-    value_precision                               VARCHAR(255),
-    calculation_rule_id                           VARCHAR(64),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (report_run_id, cell_id)
-);
-    -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: cell_id → L1.report_cell_definition.cell_id (recommended new L1 table)
-    -- FK: currency_code → L1.currency_dim.currency_code (nullable)
-    -- FK: calculation_rule_id → L1.rule_registry.rule_id (recommended) OR reference to L1.regulatory_mapping
-
--- T17: report_cell_contribution_fact (Regulatory Reporting Output)
-CREATE TABLE IF NOT EXISTS l3.report_cell_contribution_fact (
-    contribution_id                               VARCHAR(64) NOT NULL,
-    report_run_id                                 VARCHAR(64),
-    cell_id                                       VARCHAR(64),
-    source_record_type_code                       VARCHAR(30),
-    source_record_id                              VARCHAR(64),
-    contribution_amt                              NUMERIC(20,4),
-    currency_code                                 VARCHAR(30),
-    base_currency_code                            VARCHAR(30),
-    rule_id                                       VARCHAR(64),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    PRIMARY KEY (contribution_id)
-);
-    -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: cell_id → L1.report_cell_definition.cell_id (recommended new L1 table)
-    -- FK: currency_code → L1.currency_dim.currency_code (nullable)
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: rule_id → L1.rule_registry.rule_id (recommended) OR reference to L1.regulatory_mapping
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T18: report_cell_rule_execution (Regulatory Reporting Output)
-CREATE TABLE IF NOT EXISTS l3.report_cell_rule_execution (
-    report_run_id                                 VARCHAR(64) NOT NULL,
-    cell_id                                       VARCHAR(64) NOT NULL,
-    rule_id                                       VARCHAR(64) NOT NULL,
-    rule_version                                  VARCHAR(255) NOT NULL,
-    status_code                                   VARCHAR(30),
-    started_ts                                    TIMESTAMP,
-    ended_ts                                      TIMESTAMP,
-    input_record_count                            INTEGER,
-    output_value_amt                              NUMERIC(20,4),
-    error_message                                 VARCHAR(255),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (report_run_id, cell_id, rule_id, rule_version)
-);
-    -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: cell_id → L1.report_cell_definition.cell_id (recommended new L1 table)
-    -- FK: rule_id → L1.rule_registry.rule_id (recommended)
-
--- T19: report_validation_result (Regulatory Reporting Output)
-CREATE TABLE IF NOT EXISTS l3.report_validation_result (
-    validation_result_id                          VARCHAR(64) NOT NULL,
-    report_run_id                                 VARCHAR(64),
-    validation_check_id                           VARCHAR(64),
-    cell_id                                       VARCHAR(64),
-    severity_code                                 VARCHAR(30),
-    result_flag                                   BOOLEAN,
-    threshold_value                               NUMERIC(12,6),
-    observed_value                                NUMERIC(12,6),
-    message                                       VARCHAR(255),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (validation_result_id)
-);
-    -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: validation_check_id → L1.validation_check_registry.validation_check_id (recommended)
-    -- FK: cell_id → L1.report_cell_definition.cell_id (nullable)
-
--- T20: fr2590_position_snapshot (FR 2590 Helper Artifacts)
-CREATE TABLE IF NOT EXISTS l3.fr2590_position_snapshot (
-    report_run_id                                 VARCHAR(64) NOT NULL,
-    position_id                                   VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE,
-    legal_entity_id                               VARCHAR(64),
-    counterparty_id                               VARCHAR(64),
-    facility_id                                   VARCHAR(64),
-    instrument_id                                 VARCHAR(64),
-    product_node_id                               VARCHAR(64),
-    country_code                                  VARCHAR(30),
-    currency_code                                 VARCHAR(30),
-    base_currency_code                            VARCHAR(30),
-    mdrm_id                                       VARCHAR(64),
-    mapped_schedule_code                          VARCHAR(30),
-    mapped_line_id                                VARCHAR(64),
-    mapped_column_id                              VARCHAR(64),
-    amount_amt                                    NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    fr2590_category_code                          VARCHAR(30),
-    PRIMARY KEY (report_run_id, position_id)
-);
-    -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: position_id → L2.position.position_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id (nullable)
-    -- FK: facility_id → L2.facility_master.facility_id (nullable)
-    -- FK: instrument_id → L2.instrument_master.instrument_id (nullable)
-    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: country_code → L1.country_dim.country_code
-    -- FK: currency_code → L1.currency_dim.currency_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: mdrm_id → L1.regulatory_mapping.mdrm_id (or equivalent)
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: fr2590_category_code → L1.fr2590_category_dim.fr2590_category_code
-
--- T21: fr2590_counterparty_aggregate (FR 2590 Helper Artifacts)
-CREATE TABLE IF NOT EXISTS l3.fr2590_counterparty_aggregate (
-    report_run_id                                 VARCHAR(64) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    product_node_id                               VARCHAR(64),
-    country_code                                  VARCHAR(30),
-    base_currency_code                            VARCHAR(30),
-    total_amount_amt                              NUMERIC(20,4),
-    rank_within_entity                            VARCHAR(255),
-    is_top_counterparty_flag                      BOOLEAN,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    lob_node_id                                   VARCHAR(64),
-    fr2590_category_code                          VARCHAR(30),
-    PRIMARY KEY (report_run_id, counterparty_id, legal_entity_id, as_of_date)
-);
-    -- FK: report_run_id → L3.report_run.report_run_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: product_node_id → L1.enterprise_product_taxonomy.product_node_id
-    -- FK: country_code → L1.country_dim.country_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: fr2590_category_code → L1.fr2590_category_dim.fr2590_category_code
-
--- T22: lob_exposure_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_exposure_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    legal_entity_id                               VARCHAR(64),
-    base_currency_code                            VARCHAR(30),
-    facility_count                                INTEGER,
-    counterparty_count                            INTEGER,
-    gross_exposure_amt                            NUMERIC(20,4),
-    net_exposure_amt                              NUMERIC(20,4),
-    drawn_amt                                     NUMERIC(20,4),
-    undrawn_amt                                   NUMERIC(20,4),
-    ead_amt                                       NUMERIC(20,4),
-    expected_loss_amt                             NUMERIC(20,4),
-    rwa_amt                                       NUMERIC(20,4),
-    rwa_density_pct                               NUMERIC(10,6),
-    avg_pd_pct                                    NUMERIC(10,6),
-    avg_lgd_pct                                   NUMERIC(10,6),
-    limit_amt                                     NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    breach_count                                  INTEGER,
-    npl_exposure_amt                              NUMERIC(20,4),
-    npl_ratio_pct                                 NUMERIC(10,6),
-    prior_period_gross_exposure_amt               NUMERIC(20,4),
-    exposure_change_pct                           NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    result_status_code                            VARCHAR(30),
-    scenario_scope_desc                           TEXT,
-    coverage_ratio_pct                            NUMERIC(10,6),
-    total_crm_amt                                 NUMERIC(20,4),
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id, scenario_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T23: lob_profitability_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_profitability_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    base_currency_code                            VARCHAR(30),
-    period_start_date                             DATE,
-    period_end_date                               DATE,
-    periodicity_code                              VARCHAR(30),
-    total_revenue_amt                             NUMERIC(20,4),
-    net_income_amt                                NUMERIC(20,4),
-    net_interest_income_amt                       NUMERIC(20,4),
-    avg_earning_assets_amt                        NUMERIC(20,4),
-    avg_total_assets_amt                          NUMERIC(20,4),
-    allocated_equity_amt                          NUMERIC(20,4),
-    nim_pct                                       NUMERIC(10,6),
-    roa_pct                                       NUMERIC(10,6),
-    roe_pct                                       NUMERIC(10,6),
-    prior_period_total_revenue_amt                NUMERIC(20,4),
-    revenue_change_pct                            NUMERIC(10,6),
-    prior_period_net_income_amt                   NUMERIC(20,4),
-    net_income_change_pct                         NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_ts                                    TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: period_start_date → L1.date_dim.calendar_date
-    -- FK: period_end_date → L1.date_dim.calendar_date
-
--- T24: lob_pricing_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_pricing_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    base_currency_code                            VARCHAR(30),
-    avg_spread_bps                                NUMERIC(10,4),
-    avg_base_rate_pct                             NUMERIC(10,6),
-    avg_all_in_rate_pct                           NUMERIC(10,6),
-    internal_spread_threshold_bps                 NUMERIC(10,4),
-    spread_vs_threshold_bps                       NUMERIC(10,4),
-    below_threshold_facility_count                INTEGER,
-    documented_exception_count                    INTEGER,
-    prior_period_avg_spread_bps                   NUMERIC(10,4),
-    avg_spread_change_bps                         NUMERIC(10,4),
-    weighted_avg_fee_rate_pct                     NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_ts                                    TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T25: lob_delinquency_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_delinquency_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    base_currency_code                            VARCHAR(30),
-    total_overdue_amt                             NUMERIC(20,4),
-    delinquent_facility_count                     INTEGER,
-    delinquent_counterparty_count                 INTEGER,
-    total_outstanding_exposure_amt                NUMERIC(20,4),
-    delinquency_rate_pct                          NUMERIC(10,6),
-    prior_period_total_overdue_amt                NUMERIC(20,4),
-    overdue_change_pct                            NUMERIC(10,6),
-    prior_period_delinquency_rate_pct             NUMERIC(10,6),
-    delinquency_rate_change_pct                   NUMERIC(10,6),
-    delinquent_loan_count                         INTEGER,
-    overdue_amt_0_30                              NUMERIC(20,4),
-    overdue_amt_31_60                             NUMERIC(20,4),
-    overdue_amt_61_90_plus                        NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_ts                                    TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T26: lob_profitability_allocation_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_profitability_allocation_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    allocation_dim_type                           VARCHAR(255) NOT NULL,
-    allocation_dim_id                             VARCHAR(64),
-    allocation_dim_name                           VARCHAR(500),
-    allocation_pct                                NUMERIC(10,6),
-    exposure_amt                                  NUMERIC(20,4),
-    total_revenue_amt                             NUMERIC(20,4),
-    net_income_amt                                NUMERIC(20,4),
-    roe_pct                                       NUMERIC(10,6),
-    roa_pct                                       NUMERIC(10,6),
-    nim_pct                                       NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_ts                                    TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id, allocation_dim_type)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: allocation_dim_id → L1.region_dim.region_code (if REGION)
-
--- T27: deal_pipeline_stage_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.deal_pipeline_stage_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    pipeline_stage_code                           VARCHAR(30) NOT NULL,
-    deal_count                                    INTEGER,
-    expected_exposure_amt                         NUMERIC(20,4),
-    expected_collateral_value_amt                 NUMERIC(20,4),
-    avg_expected_spread_bps                       NUMERIC(10,4),
-    avg_expected_coverage_ratio                   VARCHAR(255),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_ts                                    TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id, pipeline_stage_code)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: pipeline_stage_code → L1.pipeline_stage_dim.pipeline_stage_code
-
--- T28: lob_credit_quality_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_credit_quality_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    avg_internal_risk_rating                      VARCHAR(255),
-    prior_period_avg_internal_risk_rating         VARCHAR(255),
-    avg_internal_risk_rating_change               VARCHAR(255),
-    dscr_value                                    NUMERIC(12,6),
-    dcsr_value                                    NUMERIC(12,6),
-    rwa_density_pct                               NUMERIC(10,6),
-    rating_downgrade_count                        INTEGER,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_ts                                    TIMESTAMP,
-    external_downgrade_count                      INTEGER,
-    internal_downgrade_count                      INTEGER,
-    criticized_portfolio_count                    INTEGER,
-    criticized_exposure_amt                       NUMERIC(20,4),
-    deteriorated_deal_count                       INTEGER,
-    doi_pct                                       NUMERIC(10,6),
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T29: kpi_period_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.kpi_period_summary (
-    kpi_code                                      VARCHAR(30),
-    as_of_date                                    DATE NOT NULL,
-    prior_as_of_date                              DATE,
-    scenario_id                                   VARCHAR(64),
-    legal_entity_id                               VARCHAR(64),
-    current_value                                 NUMERIC(12,6),
-    prior_value                                   NUMERIC(12,6),
-    change_value                                  NUMERIC(12,6),
-    change_pct                                    NUMERIC(10,6),
-    unit_of_measure                               VARCHAR(255),
-    base_currency_code                            VARCHAR(30),
-    run_version_id                                VARCHAR(64) NOT NULL,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (as_of_date, run_version_id)
-);
-    -- FK: kpi_code → L1.metric_definition_dim.metric_code
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: prior_as_of_date → L1.date_dim.calendar_date
-    -- FK: scenario_id → L1.scenario_dim.scenario_id (nullable)
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id (nullable)
-    -- FK: base_currency_code → L1.currency_dim.currency_code (nullable)
-    -- FK: run_version_id → L1.run_control.run_version_id
-
--- T30: risk_appetite_metric_state (Executive Dashboard)
-CREATE TABLE IF NOT EXISTS l3.risk_appetite_metric_state (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    metric_id                                     VARCHAR(64) NOT NULL,
-    metric_name                                   VARCHAR(500),
-    metric_description                            TEXT,
-    metric_classification                         VARCHAR(255),
-    limit_type_code                               VARCHAR(30),
-    current_value                                 NUMERIC(12,6),
-    limit_value                                   NUMERIC(12,6),
-    inner_threshold_value                         NUMERIC(12,6),
-    outer_threshold_value                         NUMERIC(12,6),
-    utilization_pct                               NUMERIC(10,6),
-    status_code                                   VARCHAR(30),
-    velocity_30d_pct                              NUMERIC(10,6),
-    velocity_90d_pct                              NUMERIC(10,6),
-    immediate_action_text                         TEXT,
-    report_frequency_code                         VARCHAR(30),
-    report_deadline_date                          DATE,
-    metric_owner                                  VARCHAR(255),
-    first_lod_sponsor                             VARCHAR(255),
-    second_lod_sponsor                            VARCHAR(255),
-    last_metric_updated_ts                        TIMESTAMP,
-    last_threshold_updated_ts                     TIMESTAMP,
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, metric_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: metric_id → L1.metric_definition_dim.metric_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T31: executive_highlight_summary (Executive Dashboard)
-CREATE TABLE IF NOT EXISTS l3.executive_highlight_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    highlight_seq                                 INTEGER NOT NULL,
-    highlight_category                            VARCHAR(255),
-    highlight_text                                TEXT,
-    driver_text                                   TEXT,
-    action_required_text                          TEXT,
-    icon_code                                     VARCHAR(30),
-    severity_code                                 VARCHAR(30),
-    source_metric_id                              VARCHAR(64),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, highlight_seq)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: source_metric_id → L1.metric_definition_dim.metric_code (nullable)
-
--- T32: counterparty_detail_snapshot (Counterparty Analytics)
-CREATE TABLE IF NOT EXISTS l3.counterparty_detail_snapshot (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    counterparty_name                             VARCHAR(500),
-    is_parent_flag                                BOOLEAN,
-    parent_counterparty_id                        VARCHAR(64),
-    parent_counterparty_name                      VARCHAR(500),
-    legal_entity_id                               VARCHAR(64),
-    country_code                                  VARCHAR(30),
-    region_code                                   VARCHAR(30),
-    industry_code                                 VARCHAR(30),
-    industry_name                                 VARCHAR(500),
-    internal_risk_rating                          VARCHAR(255),
-    external_risk_rating                          VARCHAR(255),
-    counterparty_type                             VARCHAR(255),
-    total_gross_exposure_amt                      NUMERIC(20,4),
-    total_net_exposure_amt                        NUMERIC(20,4),
-    total_committed_amt                           NUMERIC(20,4),
-    total_outstanding_amt                         NUMERIC(20,4),
-    pd_pct                                        NUMERIC(10,6),
-    lgd_pct                                       NUMERIC(10,6),
-    expected_loss_amt                             NUMERIC(20,4),
-    rwa_amt                                       NUMERIC(20,4),
-    rwa_density_pct                               NUMERIC(10,6),
-    credit_limit_amt                              NUMERIC(20,4),
-    utilized_amt                                  NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    headroom_amt                                  NUMERIC(20,4),
-    risk_tier_code                                VARCHAR(30),
-    limit_status_code                             VARCHAR(30),
-    facility_count                                INTEGER,
-    crm_type                                      VARCHAR(255),
-    prior_period_gross_exposure_amt               NUMERIC(20,4),
-    exposure_change_pct                           NUMERIC(10,6),
-    base_currency_code                            VARCHAR(30),
-    lob_node_id                                   VARCHAR(64),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, counterparty_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: parent_counterparty_id → L2.counterparty.counterparty_id (nullable)
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: country_code → L1.country_dim.country_code
-    -- FK: region_code → L1.region_dim.region_code
-    -- FK: industry_code → L1.industry_dim.industry_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T33: limit_tier_status_matrix (Limits & Appetite)
-CREATE TABLE IF NOT EXISTS l3.limit_tier_status_matrix (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    risk_tier_code                                VARCHAR(30) NOT NULL,
-    limit_status_code                             VARCHAR(30) NOT NULL,
-    counterparty_count                            INTEGER,
-    prior_period_counterparty_count               INTEGER,
-    counterparty_count_change                     VARCHAR(255),
-    total_utilized_exposure_amt                   NUMERIC(20,4),
-    total_headroom_amt                            NUMERIC(20,4),
-    risk_score                                    VARCHAR(255),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, risk_tier_code, limit_status_code)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T34: limit_counterparty_movement (Limits & Appetite)
-CREATE TABLE IF NOT EXISTS l3.limit_counterparty_movement (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    risk_tier_code                                VARCHAR(30) NOT NULL,
-    limit_status_code                             VARCHAR(30) NOT NULL,
-    counterparty_id                               VARCHAR(64) NOT NULL,
-    movement_type                                 VARCHAR(255) NOT NULL,
-    prior_limit_status_code                       VARCHAR(30),
-    counterparty_name                             VARCHAR(500),
-    gross_exposure_amt                            NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id, risk_tier_code, limit_status_code, counterparty_id, movement_type)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-
--- T35: data_quality_score_summary (Data Quality)
-CREATE TABLE IF NOT EXISTS l3.data_quality_score_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    dimension_type                                VARCHAR(255) NOT NULL,
-    dimension_id                                  VARCHAR(64) NOT NULL,
-    dimension_name                                VARCHAR(500),
-    data_quality_score_pct                        NUMERIC(10,6),
-    prior_period_dq_score_pct                     NUMERIC(10,6),
-    dq_score_change_pct                           NUMERIC(10,6),
-    total_dq_issues                               VARCHAR(255),
-    reconciliation_break_count                    INTEGER,
-    prior_period_recon_break_count                INTEGER,
-    leading_issue_type                            VARCHAR(255),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, dimension_type, dimension_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-
--- T36: legal_entity_risk_profile (Legal Entity Analytics)
-CREATE TABLE IF NOT EXISTS l3.legal_entity_risk_profile (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64) NOT NULL,
-    legal_entity_name                             VARCHAR(500),
-    le_classification                             VARCHAR(255),
-    gross_exposure_amt                            NUMERIC(20,4),
-    net_exposure_amt                              NUMERIC(20,4),
-    has_cross_entity_flag                         BOOLEAN,
-    cross_entity_exposure_amt                     NUMERIC(20,4),
-    facility_count                                INTEGER,
-    liquidity_ratio_pct                           NUMERIC(10,6),
-    utilization_pct                               NUMERIC(10,6),
-    avg_pd_pct                                    NUMERIC(10,6),
-    avg_lgd_pct                                   NUMERIC(10,6),
-    expected_loss_amt                             NUMERIC(20,4),
-    rwa_amt                                       NUMERIC(20,4),
-    rwa_density_pct                               NUMERIC(10,6),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, legal_entity_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T37: data_quality_attribute_score (Data Quality)
-CREATE TABLE IF NOT EXISTS l3.data_quality_attribute_score (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    attribute_name                                VARCHAR(500) NOT NULL,
-    data_quality_score_pct                        NUMERIC(10,6),
-    dq_issue_count                                INTEGER,
-    impact_pct                                    NUMERIC(10,6),
-    impacted_reports                              VARCHAR(255),
-    rank_order                                    INTEGER,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, attribute_name)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-
--- T38: data_quality_trend (Data Quality)
-CREATE TABLE IF NOT EXISTS l3.data_quality_trend (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    legal_entity_id                               VARCHAR(64),
-    data_quality_score_pct                        NUMERIC(10,6),
-    reconciliation_break_count                    INTEGER,
-    total_dq_issues                               VARCHAR(255),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: legal_entity_id → L2.legal_entity.legal_entity_id
-
--- T39: stress_test_result_summary (Stress Testing)
-CREATE TABLE IF NOT EXISTS l3.stress_test_result_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    scenario_name                                 VARCHAR(500),
-    scenario_type                                 VARCHAR(255),
-    scenario_description                          TEXT,
-    scope_description                             TEXT,
-    total_exposure_amt                            NUMERIC(20,4),
-    expected_loss_amt                             NUMERIC(20,4),
-    capital_impact_pct                            NUMERIC(10,6),
-    total_breach_count                            INTEGER,
-    critical_breach_count                         INTEGER,
-    high_breach_count                             INTEGER,
-    moderate_breach_count                         INTEGER,
-    low_breach_count                              INTEGER,
-    result_status_code                            VARCHAR(30),
-    last_tested_date                              DATE,
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T40: stress_test_breach_detail (Stress Testing)
-CREATE TABLE IF NOT EXISTS l3.stress_test_breach_detail (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    scenario_id                                   VARCHAR(64) NOT NULL,
-    breach_seq                                    INTEGER NOT NULL,
-    lob_node_id                                   VARCHAR(64),
-    lob_name                                      VARCHAR(500),
-    breach_severity                               VARCHAR(255),
-    control_description                           TEXT,
-    control_owner_name                            VARCHAR(500),
-    exception_description                         TEXT,
-    expected_loss_amt                             NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, scenario_id, breach_seq)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: scenario_id → L1.scenario_dim.scenario_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T41: regulatory_compliance_state (Regulatory Reporting Output)
-CREATE TABLE IF NOT EXISTS l3.regulatory_compliance_state (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    metric_id                                     VARCHAR(64) NOT NULL,
-    metric_name                                   VARCHAR(500),
-    current_value                                 NUMERIC(12,6),
-    regulatory_threshold                          VARCHAR(255),
-    variance_value                                NUMERIC(12,6),
-    compliance_status                             VARCHAR(255),
-    prior_period_value                            NUMERIC(12,6),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, metric_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: metric_id → L1.metric_definition_dim.metric_code
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T42: facility_timeline_summary (Facility Analytics)
-CREATE TABLE IF NOT EXISTS l3.facility_timeline_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    timeline_month                                VARCHAR(255) NOT NULL,
-    timeline_type                                 VARCHAR(255) NOT NULL,
-    facility_count                                INTEGER,
-    total_exposure_amt                            NUMERIC(20,4),
-    cumulative_exposure_change_amt                NUMERIC(20,4),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, timeline_month, timeline_type)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T43: amendment_summary (Amendment Analytics)
-CREATE TABLE IF NOT EXISTS l3.amendment_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    amendment_type_code                           VARCHAR(30) NOT NULL,
-    amendment_type_name                           VARCHAR(500),
-    amendment_status_code                         VARCHAR(30) NOT NULL,
-    amendment_status_name                         VARCHAR(500),
-    credit_agreement_count                        INTEGER,
-    total_exposure_amt                            NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, amendment_type_code, amendment_status_code)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: amendment_type_code → L1.amendment_type_dim.amendment_type_code
-    -- FK: amendment_status_code → L1.amendment_status_dim.amendment_status_code
-
--- T44: amendment_detail (Amendment Analytics)
-CREATE TABLE IF NOT EXISTS l3.amendment_detail (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    amendment_event_id                            VARCHAR(64) NOT NULL,
-    credit_agreement_id                           VARCHAR(64),
-    obligor_name                                  VARCHAR(500),
-    amendment_type_code                           VARCHAR(30),
-    amendment_description                         TEXT,
-    original_value                                NUMERIC(12,6),
-    amended_value                                 NUMERIC(12,6),
-    amendment_start_date                          DATE,
-    amendment_status_code                         VARCHAR(30),
-    amendment_aging_days                          VARCHAR(255),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, amendment_event_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: amendment_event_id → L2.amendment_event.amendment_event_id
-    -- FK: credit_agreement_id → L2.credit_agreement_master.credit_agreement_id
-    -- FK: amendment_type_code → L1.amendment_type_dim.amendment_type_code
-    -- FK: amendment_status_code → L1.amendment_status_dim.amendment_status_code
-
--- T45: facility_detail_snapshot (Facility Analytics)
-CREATE TABLE IF NOT EXISTS l3.facility_detail_snapshot (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    facility_id                                   VARCHAR(64) NOT NULL,
-    facility_type                                 VARCHAR(255),
-    facility_purpose_desc                         TEXT,
-    lob_l1_name                                   VARCHAR(500),
-    lob_l2_name                                   VARCHAR(500),
-    portfolio_name                                VARCHAR(500),
-    product_name                                  VARCHAR(500),
-    region_name                                   VARCHAR(500),
-    counterparty_id                               VARCHAR(64),
-    counterparty_name                             VARCHAR(500),
-    committed_amt                                 NUMERIC(20,4),
-    utilized_amt                                  NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    coverage_ratio_pct                            NUMERIC(10,6),
-    effective_date                                DATE,
-    maturity_date                                 DATE,
-    days_remaining                                VARCHAR(255),
-    facility_duration_days                        VARCHAR(255),
-    status_code                                   VARCHAR(30),
-    is_syndicated_flag                            BOOLEAN,
-    interest_rate_pct                             NUMERIC(10,6),
-    rate_type                                     VARCHAR(255),
-    all_in_rate_pct                               NUMERIC(10,6),
-    interest_rate_spread_bps                      NUMERIC(10,4),
-    interest_rate_index                           VARCHAR(255),
-    rate_cap_pct                                  NUMERIC(10,6),
-    payment_frequency                             VARCHAR(255),
-    prepayment_penalty_desc                       TEXT,
-    has_amendment_flag                            BOOLEAN,
-    amendment_count                               INTEGER,
-    facility_active_flag                          CHAR(1) CHECK (facility_active_flag IN ('Y','N')),
-    maturity_date_bucket                          VARCHAR(20),
-    origination_date_bucket                       VARCHAR(20),
-    effective_date_bucket                         VARCHAR(20),
-    bank_share_pct                                NUMERIC(10,4),
-    base_currency_code                            VARCHAR(30),
-    risk_rating_tier_code                         VARCHAR(20),
-    utilization_status_code                        VARCHAR(20),
-    pricing_tier_code                             VARCHAR(20),
-    dpd_bucket_code                               VARCHAR(20),
-    origination_bucket_code                       VARCHAR(20),
-    maturity_bucket_id                            BIGINT,
-    is_deteriorated                               CHAR(1),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, facility_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-    -- FK: risk_rating_tier_code → L1.risk_rating_tier_dim.tier_code
-    -- FK: utilization_status_code → L1.utilization_status_dim.utilization_status_code
-    -- FK: pricing_tier_code → L1.pricing_tier_dim.pricing_tier_code
-    -- FK: dpd_bucket_code → L1.dpd_bucket_dim.dpd_bucket_code
-    -- FK: origination_bucket_code → L1.origination_date_bucket_dim.origination_bucket_code
-    -- FK: maturity_bucket_id → L1.maturity_bucket_dim.maturity_bucket_id
-
--- T46: lob_risk_ratio_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_risk_ratio_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    fccr_value                                    NUMERIC(12,6),
-    lcr_pct                                       NUMERIC(10,6),
-    capital_adequacy_ratio_pct                    NUMERIC(10,6),
-    tangible_net_worth_amt                        NUMERIC(20,4),
-    cash_interest_expense_amt                     NUMERIC(20,4),
-    exception_rate_pct                            NUMERIC(10,6),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T47: lob_deterioration_summary (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_deterioration_summary (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    deteriorated_deal_count                       INTEGER,
-    deteriorated_deal_exposure_amt                NUMERIC(20,4),
-    deteriorated_deal_pct                         NUMERIC(10,6),
-    criticized_portfolio_count                    INTEGER,
-    criticized_exposure_amt                       NUMERIC(20,4),
-    doi_pct                                       NUMERIC(10,6),
-    internal_downgrade_count                      INTEGER,
-    external_downgrade_count                      INTEGER,
-    total_rating_change_count                     INTEGER,
-    prior_period_deteriorated_count               INTEGER,
-    deterioration_change_pct                      NUMERIC(10,6),
-    base_currency_code                            VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: base_currency_code → L1.currency_dim.currency_code
-
--- T48: lob_rating_distribution (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_rating_distribution (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    rating_bucket_code                            VARCHAR(30) NOT NULL,
-    rating_bucket_name                            VARCHAR(500),
-    counterparty_count                            INTEGER,
-    exposure_amt                                  NUMERIC(20,4),
-    bucket_pct                                    NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id, rating_bucket_code)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-
--- T49: lob_top_contributors (LoB Summary)
-CREATE TABLE IF NOT EXISTS l3.lob_top_contributors (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    hierarchy_id                                  VARCHAR(64) NOT NULL,
-    lob_node_id                                   VARCHAR(64) NOT NULL,
-    rank_order                                    INTEGER NOT NULL,
-    contributor_type                              VARCHAR(255),
-    counterparty_id                               VARCHAR(64),
-    counterparty_name                             VARCHAR(500),
-    exposure_amt                                  NUMERIC(20,4),
-    utilization_pct                               NUMERIC(10,6),
-    contribution_pct                              NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (run_version_id, as_of_date, hierarchy_id, lob_node_id, rank_order)
-);
-    -- FK: run_version_id → L1.run_control.run_version_id
-    -- FK: as_of_date → L1.date_dim.calendar_date
-    -- FK: hierarchy_id → L1.lob_hierarchy_config.hierarchy_id
-    -- FK: lob_node_id → L1.enterprise_business_taxonomy.managed_segment_id
-    -- FK: counterparty_id → L2.counterparty.counterparty_id
-
--- T50: metric_value_fact (Dashboard consumption — pre-calculated metric values by level)
-CREATE TABLE IF NOT EXISTS l3.metric_value_fact (
-    run_version_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    metric_id                                     VARCHAR(64) NOT NULL,
-    variant_id                                    VARCHAR(64),
-    aggregation_level                             VARCHAR(30) NOT NULL,
-    facility_id                                   VARCHAR(64),
-    counterparty_id                               VARCHAR(64),
-    desk_id                                       VARCHAR(64),
-    portfolio_id                                  VARCHAR(64),
-    lob_id                                        VARCHAR(64),
-    value                                         NUMERIC(20,6),
-    unit                                          VARCHAR(30),
-    display_format                                VARCHAR(64),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-CREATE UNIQUE INDEX IF NOT EXISTS uq_metric_value_fact ON l3.metric_value_fact (run_version_id, as_of_date, metric_id, COALESCE(variant_id, ''), aggregation_level, COALESCE(facility_id, ''), COALESCE(counterparty_id, ''), COALESCE(desk_id, ''), COALESCE(portfolio_id, ''), COALESCE(lob_id, ''));
-CREATE INDEX IF NOT EXISTS ix_metric_value_fact_lookup ON l3.metric_value_fact (metric_id, aggregation_level, as_of_date, run_version_id);
-
--- ============================================================
--- T51-T54: Convention alignment tables
--- T51-T52: Calculated overlay tables (derived fields split from L2 snapshots)
--- T53-T54: Promoted from L2 (entirely computed tables)
--- ============================================================
-
--- T51: facility_financial_calc (Facility Analytics)
--- Derived financial metrics split from l2.facility_financial_snapshot.
--- Same grain (facility_id, as_of_date); FK back to L2 source.
-CREATE TABLE IF NOT EXISTS l3.facility_financial_calc (
-    facility_id                                   BIGINT NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    dscr_value                                    NUMERIC(12,6),
-    ltv_pct                                       NUMERIC(10,6),
-    net_income_amt                                NUMERIC(18,2),
-    interest_rate_sensitivity_pct                 NUMERIC(10,6),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (facility_id, as_of_date)
-    -- FK: facility_id, as_of_date → l2.facility_financial_snapshot(facility_id, as_of_date)
+-- exposure_metric_cube (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."exposure_metric_cube" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "org_unit_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "product_node_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "facility_id" VARCHAR(64),
+    "instrument_id" VARCHAR(64),
+    "netting_set_id" VARCHAR(64),
+    "country_code" VARCHAR(30),
+    "currency_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "exposure_type_code" VARCHAR(30),
+    "gross_exposure_amt" NUMERIC(20,4),
+    "net_exposure_amt" NUMERIC(20,4),
+    "drawn_amt" NUMERIC(20,4),
+    "undrawn_amt" NUMERIC(20,4),
+    "ead_amt" NUMERIC(20,4),
+    "secured_amt" NUMERIC(20,4),
+    "unsecured_residual_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "hierarchy_id" VARCHAR(64),
+    "attribution_pct" NUMERIC(10,6)
 );
 
--- T52: facility_exposure_calc (Exposure & Risk Metrics)
--- Derived exposure metrics split from l2.facility_exposure_snapshot.
--- Same grain (facility_id, as_of_date); FK back to L2 source.
-CREATE TABLE IF NOT EXISTS l3.facility_exposure_calc (
-    facility_id                                   BIGINT NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    net_exposure_usd                              NUMERIC(18,2),
-    coverage_ratio_pct                            NUMERIC(10,4),
-    days_until_maturity                           INTEGER,
-    rwa_amt                                       NUMERIC(18,2),
-    number_of_loans                               INTEGER,
-    number_of_facilities                          INTEGER,
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (facility_id, as_of_date)
-    -- FK: facility_id, as_of_date → l2.facility_exposure_snapshot(facility_id, as_of_date)
+-- risk_metric_cube (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."risk_metric_cube" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "product_node_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "facility_id" VARCHAR(64),
+    "instrument_id" VARCHAR(64),
+    "currency_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "model_id" VARCHAR(64),
+    "rating_grade_id" VARCHAR(64),
+    "pd_pct" NUMERIC(10,6),
+    "lgd_pct" NUMERIC(10,6),
+    "ead_amt" NUMERIC(20,4),
+    "expected_loss_amt" NUMERIC(20,4),
+    "risk_weight_pct" NUMERIC(10,6),
+    "rwa_amt" NUMERIC(20,4),
+    "capital_req_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "hierarchy_id" VARCHAR(64),
+    "rwa_density_pct" NUMERIC(10,6)
 );
 
--- T53: data_quality_score_snapshot (Data Quality)
--- Promoted from L2: all metrics (dq_score_pct, issue_count, etc.) are calculated.
-CREATE TABLE IF NOT EXISTS l3.data_quality_score_snapshot (
-    score_id                                      BIGINT NOT NULL PRIMARY KEY,
-    as_of_date                                    DATE NOT NULL,
-    target_table                                  VARCHAR(100),
-    source_system_id                              BIGINT,
-    completeness_pct                              NUMERIC(10,4),
-    validity_pct                                  NUMERIC(10,4),
-    overall_score                                 NUMERIC(10,4),
-    dimension_id                                  BIGINT,
-    dimension_name                                VARCHAR(200),
-    dq_score_id                                   BIGINT,
-    dq_score_pct                                  NUMERIC(10,4),
-    impact_pct                                    NUMERIC(10,4),
-    impacted_report_codes                         VARCHAR(20),
-    issue_count                                   INTEGER,
-    reconciliation_break_count                    INTEGER,
-    score_dimension                               VARCHAR(30),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    -- FK: source_system_id → l1.source_system_registry(source_system_id)
+-- counterparty_exposure_summary (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."counterparty_exposure_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "sccl_group_id" VARCHAR(64),
+    "country_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "total_gross_exposure_amt" NUMERIC(20,4),
+    "total_net_exposure_amt" NUMERIC(20,4),
+    "total_ead_amt" NUMERIC(20,4),
+    "secured_amt" NUMERIC(20,4),
+    "unsecured_residual_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "hierarchy_id" VARCHAR(64),
+    "has_cross_entity_flag" BOOLEAN,
+    "cross_entity_exposure_amt" NUMERIC(20,4),
+    "cross_entity_entity_count" INTEGER,
+    "is_parent_flag" BOOLEAN,
+    "total_committed_amt" NUMERIC(20,4),
+    "total_outstanding_amt" NUMERIC(20,4),
+    "prior_period_gross_exposure_amt" NUMERIC(20,4),
+    "exposure_change_pct" NUMERIC(10,6),
+    "avg_pd_pct" NUMERIC(10,6),
+    "avg_lgd_pct" NUMERIC(10,6),
+    "expected_loss_amt" NUMERIC(20,4),
+    "credit_limit_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "headroom_amt" NUMERIC(20,4),
+    "risk_tier_code" VARCHAR(30),
+    "limit_status_code" VARCHAR(30),
+    "region_code" VARCHAR(30),
+    "industry_code" VARCHAR(30),
+    "rwa_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6),
+    "total_cross_entity_exposure_usd" NUMERIC(18,2)
 );
 
--- T54: stress_test_result (Stress Testing)
--- Promoted from L2: all measures are scenario-model derived outputs.
-CREATE TABLE IF NOT EXISTS l3.stress_test_result (
-    result_id                                     BIGINT NOT NULL PRIMARY KEY,
-    scenario_id                                   BIGINT NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    portfolio_id                                  BIGINT,
-    loss_amount                                   NUMERIC(18,2),
-    pnl_impact                                    NUMERIC(18,2),
-    capital_impact_pct                            NUMERIC(10,4),
-    execution_date                                DATE,
-    expected_loss_usd                             NUMERIC(18,2),
-    result_description                            VARCHAR(2000),
-    result_status                                 VARCHAR(30),
-    scenario_type                                 VARCHAR(50),
-    stress_test_result_id                         BIGINT,
-    total_breaches                                INTEGER,
-    total_exposure_usd                            NUMERIC(18,2),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    -- FK: scenario_id → l1.scenario_dim(scenario_id)
-    -- FK: portfolio_id → l1.portfolio_dim(portfolio_id)
+-- facility_exposure_summary (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."facility_exposure_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "facility_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "outstanding_amt" NUMERIC(20,4),
+    "undrawn_commitment_amt" NUMERIC(20,4),
+    "ead_amt" NUMERIC(20,4),
+    "secured_amt" NUMERIC(20,4),
+    "unsecured_residual_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "attribution_pct" NUMERIC(10,6),
+    "is_syndicated_flag" BOOLEAN,
+    "has_amendment_flag" BOOLEAN,
+    "amendment_type_code" VARCHAR(30),
+    "amendment_status_code" VARCHAR(30)
 );
 
--- T55: facility_risk_calc (Calculated Overlay for L2.facility_risk_snapshot)
-CREATE TABLE IF NOT EXISTS l3.facility_risk_calc (
-    facility_id                                   VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    ead_amt                                       NUMERIC(20,4),
-    expected_loss_amt                             NUMERIC(20,4),
-    rwa_amt                                       NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (facility_id, as_of_date)
+-- portfolio_summary (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."portfolio_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "total_gross_exposure_amt" NUMERIC(20,4),
+    "total_ead_amt" NUMERIC(20,4),
+    "total_expected_loss_amt" NUMERIC(20,4),
+    "avg_pd_pct" NUMERIC(10,6),
+    "avg_lgd_pct" NUMERIC(10,6),
+    "total_rwa_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "rwa_density_pct" NUMERIC(10,6)
 );
-    -- FK: facility_id → L2.facility_master.facility_id
-    -- Overlay grain matches L2.facility_risk_snapshot (facility_id, as_of_date)
 
--- T56: netting_set_exposure_calc (Calculated Overlay for L2.netting_set_exposure_snapshot)
-CREATE TABLE IF NOT EXISTS l3.netting_set_exposure_calc (
-    netting_set_id                                VARCHAR(64) NOT NULL,
-    as_of_date                                    DATE NOT NULL,
-    netted_exposure_amount                        NUMERIC(20,4),
-    netting_benefit_amt                           NUMERIC(20,4),
-    created_ts                                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (netting_set_id, as_of_date)
+-- crm_allocation_summary (Credit Risk Mitigation (CRM))
+CREATE TABLE IF NOT EXISTS "l3"."crm_allocation_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "crm_type_code" VARCHAR(30),
+    "allocation_target_level" VARCHAR(255),
+    "facility_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "netting_set_id" VARCHAR(64),
+    "crm_id" VARCHAR(64),
+    "currency_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "crm_market_value_amt" NUMERIC(20,4),
+    "haircut_pct" NUMERIC(10,6),
+    "crm_recognized_amt" NUMERIC(20,4),
+    "allocated_amt" NUMERIC(20,4),
+    "allocation_method_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "risk_mitigant_id" VARCHAR(64),
+    "risk_mitigant_subtype_code" VARCHAR(30),
+    "parent_group_code" VARCHAR(30)
 );
-    -- FK: netting_set_id → L2.netting_set.netting_set_id
-    -- Overlay grain matches L2.netting_set_exposure_snapshot (netting_set_id, as_of_date)
 
+-- collateral_portfolio_valuation (Credit Risk Mitigation (CRM))
+CREATE TABLE IF NOT EXISTS "l3"."collateral_portfolio_valuation" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "collateral_type_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "collateral_market_value_amt" NUMERIC(20,4),
+    "collateral_recognized_amt" NUMERIC(20,4),
+    "asset_count" INTEGER,
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "parent_group_code" VARCHAR(30)
+);
+
+-- limit_current_state (Limits & Appetite)
+CREATE TABLE IF NOT EXISTS "l3"."limit_current_state" (
+    "run_version_id" VARCHAR(64),
+    "as_of_ts" TIMESTAMP,
+    "legal_entity_id" VARCHAR(64),
+    "limit_definition_id" VARCHAR(64),
+    "limit_assignment_id" VARCHAR(64),
+    "limit_currency_code" VARCHAR(30),
+    "limit_amt" NUMERIC(20,4),
+    "utilized_amt" NUMERIC(20,4),
+    "available_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "status_code" VARCHAR(30),
+    "last_breach_ts" TIMESTAMP,
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "hierarchy_id" VARCHAR(64),
+    "last_status_change_ts" TIMESTAMP,
+    "status_last_changed_event_id" VARCHAR(64),
+    "classification_code" VARCHAR(30),
+    "velocity_30d_pct" NUMERIC(10,6),
+    "velocity_90d_pct" NUMERIC(10,6),
+    "prior_period_status_code" VARCHAR(30),
+    "utilization_tier_code" VARCHAR(30)
+);
+
+-- limit_utilization_timeseries (Limits & Appetite)
+CREATE TABLE IF NOT EXISTS "l3"."limit_utilization_timeseries" (
+    "run_version_id" VARCHAR(64),
+    "as_of_ts" TIMESTAMP,
+    "legal_entity_id" VARCHAR(64),
+    "limit_assignment_id" VARCHAR(64),
+    "limit_currency_code" VARCHAR(30),
+    "utilized_amt" NUMERIC(20,4),
+    "available_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64)
+);
+
+-- limit_attribution_summary (Limits & Appetite)
+CREATE TABLE IF NOT EXISTS "l3"."limit_attribution_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_ts" TIMESTAMP,
+    "legal_entity_id" VARCHAR(64),
+    "limit_assignment_id" VARCHAR(64),
+    "contributor_level" VARCHAR(255),
+    "facility_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "product_node_id" VARCHAR(64),
+    "org_unit_id" VARCHAR(64),
+    "contribution_amt" NUMERIC(20,4),
+    "contribution_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "hierarchy_id" VARCHAR(64)
+);
+
+-- limit_breach_fact (Limits & Appetite)
+CREATE TABLE IF NOT EXISTS "l3"."limit_breach_fact" (
+    "breach_id" VARCHAR(64),
+    "run_version_id" VARCHAR(64),
+    "limit_assignment_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "breach_ts" TIMESTAMP,
+    "severity_code" VARCHAR(30),
+    "breach_amount" NUMERIC(20,4),
+    "status_code" VARCHAR(30),
+    "resolved_ts" TIMESTAMP,
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64)
+);
+
+-- credit_event_summary (Credit Events & Performance)
+CREATE TABLE IF NOT EXISTS "l3"."credit_event_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "facility_id" VARCHAR(64),
+    "credit_event_type_id" VARCHAR(64),
+    "event_count" INTEGER,
+    "default_flag" BOOLEAN,
+    "charge_off_amt" NUMERIC(20,4),
+    "recovery_amt" NUMERIC(20,4),
+    "net_loss_amt" NUMERIC(20,4),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "impacted_facility_count" INTEGER,
+    "event_summary_text" TEXT,
+    "event_short_name" VARCHAR(500),
+    "event_risk_rating" VARCHAR(255),
+    "estimated_exposure_impact_amt" NUMERIC(20,4)
+);
+
+-- rating_migration_summary (Credit Events & Performance)
+CREATE TABLE IF NOT EXISTS "l3"."rating_migration_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "rating_source_id" VARCHAR(64),
+    "from_rating_grade_id" VARCHAR(64),
+    "to_rating_grade_id" VARCHAR(64),
+    "migration_count" INTEGER,
+    "exposure_at_migration_amt" NUMERIC(20,4),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64)
+);
+
+-- default_loss_recovery_summary (Credit Events & Performance)
+CREATE TABLE IF NOT EXISTS "l3"."default_loss_recovery_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "facility_id" VARCHAR(64),
+    "default_exposure_amt" NUMERIC(20,4),
+    "charge_off_amt" NUMERIC(20,4),
+    "recovery_amt" NUMERIC(20,4),
+    "realized_lgd_pct" NUMERIC(10,6),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64)
+);
+
+-- report_run (Regulatory Reporting Output)
+CREATE TABLE IF NOT EXISTS "l3"."report_run" (
+    "report_run_id" VARCHAR(64),
+    "run_version_id" VARCHAR(64),
+    "report_code" VARCHAR(30),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "status_code" VARCHAR(30),
+    "started_ts" TIMESTAMP,
+    "completed_ts" TIMESTAMP,
+    "produced_by_system_id" VARCHAR(64),
+    "created_ts" TIMESTAMP
+);
+
+-- report_cell_value (Regulatory Reporting Output)
+CREATE TABLE IF NOT EXISTS "l3"."report_cell_value" (
+    "report_run_id" VARCHAR(64),
+    "cell_id" VARCHAR(64),
+    "value_amt" NUMERIC(20,4),
+    "currency_code" VARCHAR(30),
+    "unit_code" VARCHAR(30),
+    "value_precision" VARCHAR(255),
+    "calculation_rule_id" VARCHAR(64),
+    "created_ts" TIMESTAMP
+);
+
+-- report_cell_contribution_fact (Regulatory Reporting Output)
+CREATE TABLE IF NOT EXISTS "l3"."report_cell_contribution_fact" (
+    "contribution_id" VARCHAR(64),
+    "report_run_id" VARCHAR(64),
+    "cell_id" VARCHAR(64),
+    "source_record_type_code" VARCHAR(30),
+    "source_record_id" VARCHAR(64),
+    "contribution_amt" NUMERIC(20,4),
+    "currency_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "rule_id" VARCHAR(64),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64)
+);
+
+-- report_cell_rule_execution (Regulatory Reporting Output)
+CREATE TABLE IF NOT EXISTS "l3"."report_cell_rule_execution" (
+    "report_run_id" VARCHAR(64),
+    "cell_id" VARCHAR(64),
+    "rule_id" VARCHAR(64),
+    "rule_version" VARCHAR(255),
+    "status_code" VARCHAR(30),
+    "started_ts" TIMESTAMP,
+    "ended_ts" TIMESTAMP,
+    "input_record_count" INTEGER,
+    "output_value_amt" NUMERIC(20,4),
+    "error_message" VARCHAR(255),
+    "created_ts" TIMESTAMP
+);
+
+-- report_validation_result (Regulatory Reporting Output)
+CREATE TABLE IF NOT EXISTS "l3"."report_validation_result" (
+    "validation_result_id" VARCHAR(64),
+    "report_run_id" VARCHAR(64),
+    "validation_check_id" VARCHAR(64),
+    "cell_id" VARCHAR(64),
+    "severity_code" VARCHAR(30),
+    "result_flag" BOOLEAN,
+    "threshold_value" NUMERIC(12,6),
+    "observed_value" NUMERIC(12,6),
+    "message" VARCHAR(255),
+    "created_ts" TIMESTAMP
+);
+
+-- fr2590_position_snapshot (FR 2590 Helper Artifacts)
+CREATE TABLE IF NOT EXISTS "l3"."fr2590_position_snapshot" (
+    "report_run_id" VARCHAR(64),
+    "position_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "facility_id" VARCHAR(64),
+    "instrument_id" VARCHAR(64),
+    "product_node_id" VARCHAR(64),
+    "country_code" VARCHAR(30),
+    "currency_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "mdrm_id" VARCHAR(64),
+    "mapped_schedule_code" VARCHAR(30),
+    "mapped_line_id" VARCHAR(64),
+    "mapped_column_id" VARCHAR(64),
+    "amount_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "fr2590_category_code" VARCHAR(30)
+);
+
+-- fr2590_counterparty_aggregate (FR 2590 Helper Artifacts)
+CREATE TABLE IF NOT EXISTS "l3"."fr2590_counterparty_aggregate" (
+    "report_run_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "product_node_id" VARCHAR(64),
+    "country_code" VARCHAR(30),
+    "base_currency_code" VARCHAR(30),
+    "total_amount_amt" NUMERIC(20,4),
+    "rank_within_entity" VARCHAR(255),
+    "is_top_counterparty_flag" BOOLEAN,
+    "created_ts" TIMESTAMP,
+    "lob_node_id" VARCHAR(64),
+    "fr2590_category_code" VARCHAR(30)
+);
+
+-- lob_exposure_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_exposure_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "facility_count" INTEGER,
+    "counterparty_count" INTEGER,
+    "gross_exposure_amt" NUMERIC(20,4),
+    "net_exposure_amt" NUMERIC(20,4),
+    "drawn_amt" NUMERIC(20,4),
+    "undrawn_amt" NUMERIC(20,4),
+    "ead_amt" NUMERIC(20,4),
+    "expected_loss_amt" NUMERIC(20,4),
+    "rwa_amt" NUMERIC(20,4),
+    "avg_pd_pct" NUMERIC(10,6),
+    "avg_lgd_pct" NUMERIC(10,6),
+    "limit_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "breach_count" INTEGER,
+    "npl_exposure_amt" NUMERIC(20,4),
+    "npl_ratio_pct" NUMERIC(10,6),
+    "prior_period_gross_exposure_amt" NUMERIC(20,4),
+    "exposure_change_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    "result_status_code" VARCHAR(30),
+    "scenario_scope_desc" TEXT,
+    "coverage_ratio_pct" NUMERIC(10,6),
+    "total_crm_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6)
+);
+
+-- lob_profitability_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_profitability_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "period_start_date" DATE,
+    "period_end_date" DATE,
+    "periodicity_code" VARCHAR(30),
+    "total_revenue_amt" NUMERIC(20,4),
+    "net_income_amt" NUMERIC(20,4),
+    "net_interest_income_amt" NUMERIC(20,4),
+    "avg_earning_assets_amt" NUMERIC(20,4),
+    "avg_total_assets_amt" NUMERIC(20,4),
+    "allocated_equity_amt" NUMERIC(20,4),
+    "nim_pct" NUMERIC(10,6),
+    "roa_pct" NUMERIC(10,6),
+    "roe_pct" NUMERIC(10,6),
+    "prior_period_total_revenue_amt" NUMERIC(20,4),
+    "revenue_change_pct" NUMERIC(10,6),
+    "prior_period_net_income_amt" NUMERIC(20,4),
+    "net_income_change_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    "return_on_rwa_pct" NUMERIC(10,6)
+);
+
+-- lob_pricing_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_pricing_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "avg_spread_bps" NUMERIC(10,4),
+    "avg_base_rate_pct" NUMERIC(10,6),
+    "avg_all_in_rate_pct" NUMERIC(10,6),
+    "internal_spread_threshold_bps" NUMERIC(10,4),
+    "spread_vs_threshold_bps" NUMERIC(10,4),
+    "below_threshold_facility_count" INTEGER,
+    "documented_exception_count" INTEGER,
+    "prior_period_avg_spread_bps" NUMERIC(10,4),
+    "avg_spread_change_bps" NUMERIC(10,4),
+    "weighted_avg_fee_rate_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP
+);
+
+-- lob_delinquency_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_delinquency_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "base_currency_code" VARCHAR(30),
+    "total_overdue_amt" NUMERIC(20,4),
+    "delinquent_facility_count" INTEGER,
+    "delinquent_counterparty_count" INTEGER,
+    "total_outstanding_exposure_amt" NUMERIC(20,4),
+    "delinquency_rate_pct" NUMERIC(10,6),
+    "prior_period_total_overdue_amt" NUMERIC(20,4),
+    "overdue_change_pct" NUMERIC(10,6),
+    "prior_period_delinquency_rate_pct" NUMERIC(10,6),
+    "delinquency_rate_change_pct" NUMERIC(10,6),
+    "delinquent_loan_count" INTEGER,
+    "overdue_amt_0_30" NUMERIC(20,4),
+    "overdue_amt_31_60" NUMERIC(20,4),
+    "overdue_amt_61_90_plus" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP
+);
+
+-- lob_profitability_allocation_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_profitability_allocation_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "allocation_dim_type" VARCHAR(255),
+    "allocation_dim_id" VARCHAR(64),
+    "allocation_dim_name" VARCHAR(500),
+    "allocation_pct" NUMERIC(10,6),
+    "exposure_amt" NUMERIC(20,4),
+    "total_revenue_amt" NUMERIC(20,4),
+    "net_income_amt" NUMERIC(20,4),
+    "roe_pct" NUMERIC(10,6),
+    "roa_pct" NUMERIC(10,6),
+    "nim_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP
+);
+
+-- deal_pipeline_stage_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."deal_pipeline_stage_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "pipeline_stage_code" VARCHAR(30),
+    "deal_count" INTEGER,
+    "expected_exposure_amt" NUMERIC(20,4),
+    "expected_collateral_value_amt" NUMERIC(20,4),
+    "avg_expected_spread_bps" NUMERIC(10,4),
+    "avg_expected_coverage_ratio" VARCHAR(255),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP
+);
+
+-- lob_credit_quality_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_credit_quality_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "avg_internal_risk_rating" VARCHAR(255),
+    "prior_period_avg_internal_risk_rating" VARCHAR(255),
+    "avg_internal_risk_rating_change" VARCHAR(255),
+    "dscr_value" NUMERIC(12,6),
+    "dcsr_value" NUMERIC(12,6),
+    "rwa_density_pct" NUMERIC(10,6),
+    "rating_downgrade_count" INTEGER,
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    "external_downgrade_count" INTEGER,
+    "internal_downgrade_count" INTEGER,
+    "criticized_portfolio_count" INTEGER,
+    "criticized_exposure_amt" NUMERIC(20,4),
+    "deteriorated_deal_count" INTEGER,
+    "doi_pct" NUMERIC(10,6)
+);
+
+-- kpi_period_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."kpi_period_summary" (
+    "kpi_code" VARCHAR(30),
+    "as_of_date" DATE,
+    "prior_as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "legal_entity_id" VARCHAR(64),
+    "current_value" NUMERIC(12,6),
+    "prior_value" NUMERIC(12,6),
+    "change_value" NUMERIC(12,6),
+    "change_pct" NUMERIC(10,6),
+    "unit_of_measure" VARCHAR(255),
+    "base_currency_code" VARCHAR(30),
+    "run_version_id" VARCHAR(64),
+    "created_ts" TIMESTAMP
+);
+
+-- risk_appetite_metric_state (Executive Dashboard)
+CREATE TABLE IF NOT EXISTS "l3"."risk_appetite_metric_state" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "metric_id" VARCHAR(64),
+    "metric_name" VARCHAR(500),
+    "metric_description" TEXT,
+    "metric_classification" VARCHAR(255),
+    "limit_type_code" VARCHAR(30),
+    "current_value" NUMERIC(12,6),
+    "limit_value" NUMERIC(12,6),
+    "inner_threshold_value" NUMERIC(12,6),
+    "outer_threshold_value" NUMERIC(12,6),
+    "utilization_pct" NUMERIC(10,6),
+    "status_code" VARCHAR(30),
+    "velocity_30d_pct" NUMERIC(10,6),
+    "velocity_90d_pct" NUMERIC(10,6),
+    "immediate_action_text" TEXT,
+    "report_frequency_code" VARCHAR(30),
+    "report_deadline_date" DATE,
+    "metric_owner" VARCHAR(255),
+    "first_lod_sponsor" VARCHAR(255),
+    "second_lod_sponsor" VARCHAR(255),
+    "last_metric_updated_ts" TIMESTAMP,
+    "last_threshold_updated_ts" TIMESTAMP,
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- executive_highlight_summary (Executive Dashboard)
+CREATE TABLE IF NOT EXISTS "l3"."executive_highlight_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "highlight_seq" INTEGER,
+    "highlight_category" VARCHAR(255),
+    "highlight_text" TEXT,
+    "driver_text" TEXT,
+    "action_required_text" TEXT,
+    "icon_code" VARCHAR(30),
+    "severity_code" VARCHAR(30),
+    "source_metric_id" VARCHAR(64),
+    "created_ts" TIMESTAMP
+);
+
+-- counterparty_detail_snapshot (Counterparty Analytics)
+CREATE TABLE IF NOT EXISTS "l3"."counterparty_detail_snapshot" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "counterparty_id" VARCHAR(64),
+    "counterparty_name" VARCHAR(500),
+    "is_parent_flag" BOOLEAN,
+    "parent_counterparty_id" VARCHAR(64),
+    "parent_counterparty_name" VARCHAR(500),
+    "legal_entity_id" VARCHAR(64),
+    "country_code" VARCHAR(30),
+    "region_code" VARCHAR(30),
+    "industry_code" VARCHAR(30),
+    "industry_name" VARCHAR(500),
+    "internal_risk_rating" VARCHAR(255),
+    "external_risk_rating" VARCHAR(255),
+    "counterparty_type" VARCHAR(255),
+    "total_gross_exposure_amt" NUMERIC(20,4),
+    "total_net_exposure_amt" NUMERIC(20,4),
+    "total_committed_amt" NUMERIC(20,4),
+    "total_outstanding_amt" NUMERIC(20,4),
+    "pd_pct" NUMERIC(10,6),
+    "lgd_pct" NUMERIC(10,6),
+    "expected_loss_amt" NUMERIC(20,4),
+    "credit_limit_amt" NUMERIC(20,4),
+    "utilized_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "headroom_amt" NUMERIC(20,4),
+    "risk_tier_code" VARCHAR(30),
+    "limit_status_code" VARCHAR(30),
+    "facility_count" INTEGER,
+    "crm_type" VARCHAR(255),
+    "prior_period_gross_exposure_amt" NUMERIC(20,4),
+    "exposure_change_pct" NUMERIC(10,6),
+    "base_currency_code" VARCHAR(30),
+    "lob_node_id" VARCHAR(64),
+    "created_ts" TIMESTAMP,
+    "rwa_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6)
+);
+
+-- limit_tier_status_matrix (Limits & Appetite)
+CREATE TABLE IF NOT EXISTS "l3"."limit_tier_status_matrix" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "risk_tier_code" VARCHAR(30),
+    "limit_status_code" VARCHAR(30),
+    "counterparty_count" INTEGER,
+    "prior_period_counterparty_count" INTEGER,
+    "counterparty_count_change" VARCHAR(255),
+    "total_utilized_exposure_amt" NUMERIC(20,4),
+    "total_headroom_amt" NUMERIC(20,4),
+    "risk_score" VARCHAR(255),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- limit_counterparty_movement (Limits & Appetite)
+CREATE TABLE IF NOT EXISTS "l3"."limit_counterparty_movement" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "risk_tier_code" VARCHAR(30),
+    "limit_status_code" VARCHAR(30),
+    "counterparty_id" VARCHAR(64),
+    "movement_type" VARCHAR(255),
+    "prior_limit_status_code" VARCHAR(30),
+    "counterparty_name" VARCHAR(500),
+    "gross_exposure_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP
+);
+
+-- data_quality_score_summary (Data Quality)
+CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "dimension_type" VARCHAR(255),
+    "dimension_id" VARCHAR(64),
+    "dimension_name" VARCHAR(500),
+    "data_quality_score_pct" NUMERIC(10,6),
+    "prior_period_dq_score_pct" NUMERIC(10,6),
+    "dq_score_change_pct" NUMERIC(10,6),
+    "total_dq_issues" VARCHAR(255),
+    "reconciliation_break_count" INTEGER,
+    "prior_period_recon_break_count" INTEGER,
+    "leading_issue_type" VARCHAR(255),
+    "created_ts" TIMESTAMP
+);
+
+-- legal_entity_risk_profile (Legal Entity Analytics)
+CREATE TABLE IF NOT EXISTS "l3"."legal_entity_risk_profile" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "legal_entity_name" VARCHAR(500),
+    "le_classification" VARCHAR(255),
+    "gross_exposure_amt" NUMERIC(20,4),
+    "net_exposure_amt" NUMERIC(20,4),
+    "has_cross_entity_flag" BOOLEAN,
+    "cross_entity_exposure_amt" NUMERIC(20,4),
+    "facility_count" INTEGER,
+    "liquidity_ratio_pct" NUMERIC(10,6),
+    "utilization_pct" NUMERIC(10,6),
+    "avg_pd_pct" NUMERIC(10,6),
+    "avg_lgd_pct" NUMERIC(10,6),
+    "expected_loss_amt" NUMERIC(20,4),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "rwa_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6)
+);
+
+-- data_quality_attribute_score (Data Quality)
+CREATE TABLE IF NOT EXISTS "l3"."data_quality_attribute_score" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "attribute_name" VARCHAR(500),
+    "data_quality_score_pct" NUMERIC(10,6),
+    "dq_issue_count" INTEGER,
+    "impact_pct" NUMERIC(10,6),
+    "impacted_reports" VARCHAR(255),
+    "rank_order" INTEGER,
+    "created_ts" TIMESTAMP
+);
+
+-- data_quality_trend (Data Quality)
+CREATE TABLE IF NOT EXISTS "l3"."data_quality_trend" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "legal_entity_id" VARCHAR(64),
+    "data_quality_score_pct" NUMERIC(10,6),
+    "reconciliation_break_count" INTEGER,
+    "total_dq_issues" VARCHAR(255),
+    "created_ts" TIMESTAMP
+);
+
+-- stress_test_result_summary (Stress Testing)
+CREATE TABLE IF NOT EXISTS "l3"."stress_test_result_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "scenario_name" VARCHAR(500),
+    "scenario_type" VARCHAR(255),
+    "scenario_description" TEXT,
+    "scope_description" TEXT,
+    "total_exposure_amt" NUMERIC(20,4),
+    "expected_loss_amt" NUMERIC(20,4),
+    "capital_impact_pct" NUMERIC(10,6),
+    "total_breach_count" INTEGER,
+    "critical_breach_count" INTEGER,
+    "high_breach_count" INTEGER,
+    "moderate_breach_count" INTEGER,
+    "low_breach_count" INTEGER,
+    "result_status_code" VARCHAR(30),
+    "last_tested_date" DATE,
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- stress_test_breach_detail (Stress Testing)
+CREATE TABLE IF NOT EXISTS "l3"."stress_test_breach_detail" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "scenario_id" VARCHAR(64),
+    "breach_seq" INTEGER,
+    "lob_node_id" VARCHAR(64),
+    "lob_name" VARCHAR(500),
+    "breach_severity" VARCHAR(255),
+    "control_description" TEXT,
+    "control_owner_name" VARCHAR(500),
+    "exception_description" TEXT,
+    "expected_loss_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP
+);
+
+-- regulatory_compliance_state (Regulatory Reporting Output)
+CREATE TABLE IF NOT EXISTS "l3"."regulatory_compliance_state" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "metric_id" VARCHAR(64),
+    "metric_name" VARCHAR(500),
+    "current_value" NUMERIC(12,6),
+    "regulatory_threshold" VARCHAR(255),
+    "variance_value" NUMERIC(12,6),
+    "compliance_status" VARCHAR(255),
+    "prior_period_value" NUMERIC(12,6),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- facility_timeline_summary (Facility Analytics)
+CREATE TABLE IF NOT EXISTS "l3"."facility_timeline_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "timeline_month" VARCHAR(255),
+    "timeline_type" VARCHAR(255),
+    "facility_count" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "cumulative_exposure_change_amt" NUMERIC(20,4),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- amendment_summary (Amendment Analytics)
+CREATE TABLE IF NOT EXISTS "l3"."amendment_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "amendment_type_code" VARCHAR(30),
+    "amendment_type_name" VARCHAR(500),
+    "amendment_status_code" VARCHAR(30),
+    "amendment_status_name" VARCHAR(500),
+    "credit_agreement_count" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP
+);
+
+-- amendment_detail (Amendment Analytics)
+CREATE TABLE IF NOT EXISTS "l3"."amendment_detail" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "amendment_event_id" VARCHAR(64),
+    "credit_agreement_id" VARCHAR(64),
+    "obligor_name" VARCHAR(500),
+    "amendment_type_code" VARCHAR(30),
+    "amendment_description" TEXT,
+    "original_value" NUMERIC(12,6),
+    "amended_value" NUMERIC(12,6),
+    "amendment_start_date" DATE,
+    "amendment_status_code" VARCHAR(30),
+    "amendment_aging_days" VARCHAR(255),
+    "created_ts" TIMESTAMP
+);
+
+-- facility_detail_snapshot (Facility Analytics)
+CREATE TABLE IF NOT EXISTS "l3"."facility_detail_snapshot" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "facility_id" VARCHAR(64),
+    "facility_type" VARCHAR(255),
+    "facility_purpose_desc" TEXT,
+    "lob_l1_name" VARCHAR(500),
+    "lob_l2_name" VARCHAR(500),
+    "portfolio_name" VARCHAR(500),
+    "product_name" VARCHAR(500),
+    "region_name" VARCHAR(500),
+    "counterparty_id" VARCHAR(64),
+    "counterparty_name" VARCHAR(500),
+    "committed_amt" NUMERIC(20,4),
+    "utilized_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "coverage_ratio_pct" NUMERIC(10,6),
+    "effective_date" DATE,
+    "maturity_date" DATE,
+    "days_remaining" VARCHAR(255),
+    "facility_duration_days" VARCHAR(255),
+    "status_code" VARCHAR(30),
+    "is_syndicated_flag" BOOLEAN,
+    "interest_rate_pct" NUMERIC(10,6),
+    "rate_type" VARCHAR(255),
+    "all_in_rate_pct" NUMERIC(10,6),
+    "interest_rate_spread_bps" NUMERIC(10,4),
+    "interest_rate_index" VARCHAR(255),
+    "rate_cap_pct" NUMERIC(10,6),
+    "payment_frequency" VARCHAR(255),
+    "prepayment_penalty_desc" TEXT,
+    "has_amendment_flag" BOOLEAN,
+    "amendment_count" INTEGER,
+    "facility_active_flag" BOOLEAN,
+    "maturity_date_bucket" VARCHAR(20),
+    "origination_date_bucket" VARCHAR(20),
+    "effective_date_bucket" VARCHAR(20),
+    "bank_share_pct" NUMERIC(10,4),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "is_deteriorated" VARCHAR(64),
+    "risk_rating_tier_code" VARCHAR(20),
+    "utilization_status_code" VARCHAR(20),
+    "pricing_tier_code" VARCHAR(20),
+    "dpd_bucket_code" VARCHAR(20),
+    "origination_bucket_code" VARCHAR(20),
+    "maturity_bucket_id" BIGINT
+);
+
+-- lob_risk_ratio_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_risk_ratio_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "fccr_value" NUMERIC(12,6),
+    "lcr_pct" NUMERIC(10,6),
+    "capital_adequacy_ratio_pct" NUMERIC(10,6),
+    "tangible_net_worth_amt" NUMERIC(20,4),
+    "cash_interest_expense_amt" NUMERIC(20,4),
+    "exception_rate_pct" NUMERIC(10,6),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- lob_deterioration_summary (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_deterioration_summary" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "deteriorated_deal_count" INTEGER,
+    "deteriorated_deal_exposure_amt" NUMERIC(20,4),
+    "deteriorated_deal_pct" NUMERIC(10,6),
+    "criticized_portfolio_count" INTEGER,
+    "criticized_exposure_amt" NUMERIC(20,4),
+    "doi_pct" NUMERIC(10,6),
+    "internal_downgrade_count" INTEGER,
+    "external_downgrade_count" INTEGER,
+    "total_rating_change_count" INTEGER,
+    "prior_period_deteriorated_count" INTEGER,
+    "deterioration_change_pct" NUMERIC(10,6),
+    "base_currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP
+);
+
+-- lob_rating_distribution (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_rating_distribution" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "rating_bucket_code" VARCHAR(30),
+    "rating_bucket_name" VARCHAR(500),
+    "counterparty_count" INTEGER,
+    "exposure_amt" NUMERIC(20,4),
+    "bucket_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP
+);
+
+-- lob_top_contributors (Business Segment Summary)
+CREATE TABLE IF NOT EXISTS "l3"."lob_top_contributors" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "hierarchy_id" VARCHAR(64),
+    "lob_node_id" VARCHAR(64),
+    "rank_order" INTEGER,
+    "contributor_type" VARCHAR(255),
+    "counterparty_id" VARCHAR(64),
+    "counterparty_name" VARCHAR(500),
+    "exposure_amt" NUMERIC(20,4),
+    "utilization_pct" NUMERIC(10,6),
+    "contribution_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP
+);
+
+-- metric_value_fact (Dashboard Consumption)
+CREATE TABLE IF NOT EXISTS "l3"."metric_value_fact" (
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "metric_id" VARCHAR(64),
+    "variant_id" VARCHAR(64),
+    "aggregation_level" VARCHAR(30),
+    "facility_id" VARCHAR(64),
+    "counterparty_id" VARCHAR(64),
+    "desk_id" VARCHAR(64),
+    "portfolio_id" VARCHAR(64),
+    "lob_id" VARCHAR(64),
+    "value" NUMERIC(20,6),
+    "unit" VARCHAR(30),
+    "display_format" VARCHAR(64),
+    "created_ts" TIMESTAMP
+);
+
+-- calc_audit_log (Uncategorized)
+CREATE TABLE IF NOT EXISTS "l3"."calc_audit_log" (
+    "audit_id" BIGINT NOT NULL,
+    "run_id" VARCHAR(64),
+    "metric_id" VARCHAR(64),
+    "metric_version" VARCHAR(20),
+    "aggregation_level" VARCHAR(30),
+    "status" VARCHAR(20),
+    "started_at" TIMESTAMP,
+    "completed_at" TIMESTAMP,
+    "duration_ms" BIGINT,
+    "rows_returned" INTEGER,
+    "rows_written" INTEGER,
+    "sql_executed" TEXT,
+    "sql_hash" VARCHAR(64),
+    "source_tables" text[],
+    "source_row_counts" VARCHAR(64),
+    "bind_params" VARCHAR(64),
+    "error_message" TEXT,
+    "error_code" VARCHAR(30),
+    "error_detail" TEXT,
+    "dependency_chain" text[],
+    PRIMARY KEY ("audit_id")
+);
+
+-- calc_run (Uncategorized)
+CREATE TABLE IF NOT EXISTS "l3"."calc_run" (
+    "run_id" VARCHAR(64) NOT NULL,
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "prior_as_of_date" DATE,
+    "base_currency_code" VARCHAR(10),
+    "mode" VARCHAR(20),
+    "status" VARCHAR(20),
+    "metrics_requested" INTEGER,
+    "metrics_succeeded" INTEGER,
+    "metrics_failed" INTEGER,
+    "metrics_skipped" INTEGER,
+    "total_rows_written" BIGINT,
+    "started_at" TIMESTAMP,
+    "completed_at" TIMESTAMP,
+    "duration_ms" BIGINT,
+    "triggered_by" VARCHAR(200),
+    "cli_args" TEXT,
+    "engine_version" VARCHAR(30),
+    "git_sha" VARCHAR(40),
+    "error_summary" TEXT,
+    "config_snapshot" VARCHAR(64),
+    PRIMARY KEY ("run_id")
+);
+
+-- calc_validation_result (Uncategorized)
+CREATE TABLE IF NOT EXISTS "l3"."calc_validation_result" (
+    "validation_id" BIGINT NOT NULL,
+    "run_id" VARCHAR(64),
+    "metric_id" VARCHAR(64),
+    "rule_id" VARCHAR(64),
+    "rule_type" VARCHAR(30),
+    "severity" VARCHAR(10),
+    "status" VARCHAR(10),
+    "aggregation_level" VARCHAR(30),
+    "dimension_key" VARCHAR(128),
+    "expected_value" NUMERIC(20,6),
+    "actual_value" NUMERIC(20,6),
+    "tolerance" NUMERIC(20,6),
+    "message" TEXT,
+    "detail" VARCHAR(64),
+    "checked_at" TIMESTAMP,
+    PRIMARY KEY ("validation_id")
+);
+
+-- metric_result (Uncategorized)
+CREATE TABLE IF NOT EXISTS "l3"."metric_result" (
+    "result_id" BIGINT NOT NULL,
+    "run_id" VARCHAR(64),
+    "run_version_id" VARCHAR(64),
+    "as_of_date" DATE,
+    "metric_id" VARCHAR(64),
+    "metric_version" VARCHAR(20),
+    "aggregation_level" VARCHAR(30),
+    "dimension_key" VARCHAR(128),
+    "dimension_label" VARCHAR(500),
+    "metric_value" NUMERIC(20,6),
+    "unit_type" VARCHAR(30),
+    "display_format" VARCHAR(64),
+    "base_currency_code" VARCHAR(10),
+    "scenario_id" VARCHAR(64),
+    "formula_hash" VARCHAR(64),
+    "source_row_count" INTEGER,
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("result_id")
+);
+
+-- facility_risk_calc (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."facility_risk_calc" (
+    "facility_id" VARCHAR(64) NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "ead_amt" NUMERIC(20,4),
+    "expected_loss_amt" NUMERIC(20,4),
+    "rwa_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+-- netting_set_exposure_calc (Exposure & Risk Metrics)
+CREATE TABLE IF NOT EXISTS "l3"."netting_set_exposure_calc" (
+    "netting_set_id" VARCHAR(64) NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "netted_exposure_amount" NUMERIC(20,4),
+    "netting_benefit_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP,
+    PRIMARY KEY ("netting_set_id", "as_of_date")
+);

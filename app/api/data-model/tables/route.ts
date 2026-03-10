@@ -8,11 +8,8 @@ import {
   type DataDictionaryTable,
   type DataDictionaryField,
   type DataDictionaryRelationship,
-  layerToSchema,
 } from '@/lib/data-dictionary';
-import { generateL3Ddl, generateLayerDdl } from '@/lib/ddl-generator';
-import path from 'path';
-import fs from 'fs';
+import { postMutationSync } from '@/lib/data-model-sync';
 
 /** Request body for adding a table. */
 interface AddTableBody {
@@ -120,20 +117,14 @@ export async function POST(request: NextRequest) {
     };
     writeDataDictionary(updated);
 
-    // Write DDL file for the layer so SQL stays in sync
-    const sqlDir = path.join(process.cwd(), 'sql', layerToSchema(layer));
-    if (!fs.existsSync(sqlDir)) {
-      fs.mkdirSync(sqlDir, { recursive: true });
-    }
-    const ddlPath = path.join(sqlDir, '01_DDL_all_tables.sql');
-    const ddlContent =
-      layer === 'L3' ? generateL3Ddl(updated) : generateLayerDdl(updated, layer);
-    fs.writeFileSync(ddlPath, ddlContent, 'utf-8');
+    // Sync: DDL files → PostgreSQL → introspect round-trip
+    const syncResult = await postMutationSync(updated, { kind: 'add-table', layer, tableName });
 
     return NextResponse.json({
       success: true,
       message: `Table "${tableName}" added to ${layer}.`,
       tableKey: `${layer}.${tableName}`,
+      sync: { ddlFiles: syncResult.ddlFilesWritten.length, dbApplied: syncResult.dbApplied, ...(syncResult.dbError && { dbError: syncResult.dbError }) },
     });
   } catch (error) {
     console.error('Add table error:', error);

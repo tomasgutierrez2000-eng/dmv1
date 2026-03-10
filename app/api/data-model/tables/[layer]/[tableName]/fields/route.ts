@@ -3,14 +3,11 @@ import {
   readDataDictionary,
   writeDataDictionary,
   findTable,
-  layerToSchema,
   type DataDictionary,
   type DataDictionaryField,
   type DataDictionaryRelationship,
 } from '@/lib/data-dictionary';
-import { generateL3Ddl, generateLayerDdl } from '@/lib/ddl-generator';
-import path from 'path';
-import fs from 'fs';
+import { postMutationSync } from '@/lib/data-model-sync';
 
 type Layer = 'L1' | 'L2' | 'L3';
 
@@ -107,18 +104,14 @@ export async function POST(
     };
     writeDataDictionary(updated);
 
-    const sqlDir = path.join(process.cwd(), 'sql', layerToSchema(layer));
-    const ddlPath = path.join(sqlDir, '01_DDL_all_tables.sql');
-    if (fs.existsSync(sqlDir)) {
-      const ddlContent =
-        layer === 'L3' ? generateL3Ddl(updated) : generateLayerDdl(updated, layer);
-      fs.writeFileSync(ddlPath, ddlContent, 'utf-8');
-    }
+    // Sync: DDL files → PostgreSQL → introspect round-trip
+    const syncResult = await postMutationSync(updated, { kind: 'add-field', layer, tableName, fieldName });
 
     return NextResponse.json({
       success: true,
       message: `Field "${fieldName}" added to ${layer}.${tableName}.`,
       fieldName,
+      sync: { ddlFiles: syncResult.ddlFilesWritten.length, dbApplied: syncResult.dbApplied, ...(syncResult.dbError && { dbError: syncResult.dbError }) },
     });
   } catch (error) {
     console.error('Add field error:', error);

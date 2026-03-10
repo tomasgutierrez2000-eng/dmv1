@@ -13,6 +13,7 @@ import KeyboardShortcutsPanel from '../../components/visualizer/KeyboardShortcut
 import L3SampleDataStrip from '../../components/visualizer/L3SampleDataStrip';
 import VisualizerTour from '../../components/visualizer/VisualizerTour';
 import { getTourCompleted } from '../../components/visualizer/VisualizerTour';
+import SyncStatusBanner from '../../components/visualizer/SyncStatusBanner';
 import { Loader, AlertCircle, Database, ArrowRight, FlaskConical } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
 import type { DataModel } from '../../types/model';
@@ -20,7 +21,7 @@ import liquidityCapitalModel from '../../data/liquidity-capital-model.json';
 import { mergeModels } from '../../utils/mergeModels';
 
 export default function VisualizerPage() {
-  const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, setSidebarOpen, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
+  const { model, setModel, setTablePositionsBulk, setTablePositionsReplace, setSidebarOpen, setDbStatus, layoutMode, tableSize, visibleLayers, viewMode } = useModelStore();
   const [, forceUpdate] = useState(0);
   const tourClosed = useCallback(() => forceUpdate((n) => n + 1), []);
   const tourOpenSidebar = useCallback(() => setSidebarOpen(true), [setSidebarOpen]);
@@ -38,6 +39,18 @@ export default function VisualizerPage() {
       else setTablePositionsBulk(positions);
     }
   }, [result, setModel, setTablePositionsBulk, setTablePositionsReplace, layoutMode, tableSize, visibleLayers, viewMode]);
+
+  // Non-blocking: fetch DB status overlay once model is loaded
+  useEffect(() => {
+    if (!model) return;
+    fetch('/api/db-status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (json?.data) setDbStatus(json.data);
+        else if (json?.tables) setDbStatus(json); // direct shape fallback
+      })
+      .catch(() => {}); // silent — DB status is best-effort
+  }, [model, setDbStatus]);
 
   const handleFileSelect = async (file: File | null) => {
     if (file) {
@@ -110,6 +123,7 @@ export default function VisualizerPage() {
     <div className="h-screen flex flex-col bg-gray-50 text-gray-900 overflow-hidden">
       {/* Toolbar */}
       <Toolbar />
+      {model && <SyncStatusBanner />}
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">

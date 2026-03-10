@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { DataModel, TablePosition, RiskStripe } from '../types/model';
+import type { TableDbStatus, DbStatusSummary, DbStatusResult } from '../lib/db-status';
 
 /**
  * Single store for visualizer: data, view (zoom/pan), selection, filters, UI.
@@ -11,6 +12,11 @@ interface ModelStore {
   model: DataModel | null;
   /** Uploaded sample data (tableKey -> { columns, rows }). Overrides API sample data when set. */
   uploadedSampleData: Record<string, { columns: string[]; rows: unknown[][] }>;
+
+  // Database status (non-blocking overlay)
+  dbStatusMap: Record<string, TableDbStatus>;
+  dbStatusSummary: DbStatusSummary | null;
+  dbStatusConnected: boolean;
 
   // View state
   zoom: number;
@@ -55,6 +61,7 @@ interface ModelStore {
   
   // Actions
   setModel: (model: DataModel | null) => void;
+  setDbStatus: (result: DbStatusResult) => void;
   setUploadedSampleData: (tableKey: string, data: { columns: string[]; rows: unknown[][] } | null) => void;
   setUploadedSampleDataBulk: (data: Record<string, { columns: string[]; rows: unknown[][] }>) => void;
   clearUploadedSampleData: () => void;
@@ -105,6 +112,9 @@ export const useModelStore = create<ModelStore>((set) => ({
   // Initial state
   model: null,
   uploadedSampleData: {},
+  dbStatusMap: {},
+  dbStatusSummary: null,
+  dbStatusConnected: false,
   zoom: 0.4,
   pan: { x: 0, y: 0 },
   tablePositions: {},
@@ -137,6 +147,13 @@ export const useModelStore = create<ModelStore>((set) => ({
   
   // Actions
   setModel: (model) => set({ model }),
+  setDbStatus: (result) => {
+    const map: Record<string, TableDbStatus> = {};
+    for (const t of result.tables) {
+      map[`${t.layer}.${t.name}`] = t;
+    }
+    set({ dbStatusMap: map, dbStatusSummary: result.summary, dbStatusConnected: result.connected });
+  },
   setUploadedSampleData: (tableKey, data) =>
     set((state) => ({
       uploadedSampleData: data

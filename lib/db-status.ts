@@ -9,6 +9,15 @@ import { readDataDictionary, type DataDictionary } from '@/lib/data-dictionary';
 
 export type TableStatus = 'has_data' | 'empty' | 'not_in_db' | 'not_in_dd';
 
+export type FieldDriftType = 'in_dd_not_in_db' | 'in_db_not_in_dd' | 'type_mismatch';
+
+export interface FieldDrift {
+  field: string;
+  issue: FieldDriftType;
+  ddType?: string;
+  dbType?: string;
+}
+
 export interface TableDbStatus {
   name: string;
   layer: 'L1' | 'L2' | 'L3';
@@ -18,6 +27,7 @@ export interface TableDbStatus {
   status: TableStatus;
   rowCount: number | null;
   estimatedRowCount: boolean;
+  fieldDrift: FieldDrift[];
 }
 
 export interface DbStatusSummary {
@@ -27,6 +37,8 @@ export interface DbStatusSummary {
   tablesEmpty: number;
   tablesNotInDb: number;
   tablesNotInDd: number;
+  tablesWithFieldDrift: number;
+  totalFieldDrifts: number;
 }
 
 export interface DbStatusResult {
@@ -51,6 +63,14 @@ const ROW_COUNTS_QUERY = `
   FROM pg_stat_user_tables
   WHERE schemaname IN ('l1', 'l2', 'l3')
   ORDER BY schemaname, relname
+`;
+
+const COLUMNS_QUERY = `
+  SELECT table_schema, table_name, column_name, data_type,
+         character_maximum_length, numeric_precision, numeric_scale
+  FROM information_schema.columns
+  WHERE table_schema IN ('l1', 'l2', 'l3')
+  ORDER BY table_schema, table_name, ordinal_position
 `;
 
 /** Sanitize identifier: only allow alphanumeric and underscores (pg_tables values are safe, but be defensive). */
@@ -79,18 +99,53 @@ function schemaToLayer(schema: string): 'L1' | 'L2' | 'L3' {
   return 'L3';
 }
 
+interface DdTableInfo {
+  layer: 'L1' | 'L2' | 'L3';
+  category: string;
+  fieldCount: number;
+  fields: Map<string, string>; // fieldName → data_type (or '' if unset)
+}
+
 function flattenDd(dd: DataDictionary) {
-  const map = new Map<string, { layer: 'L1' | 'L2' | 'L3'; category: string; fieldCount: number }>();
+  const map = new Map<string, DdTableInfo>();
   for (const layer of ['L1', 'L2', 'L3'] as const) {
     for (const table of dd[layer]) {
+      const fields = new Map<string, string>();
+      for (const f of table.fields) {
+        fields.set(f.name, f.data_type ?? '');
+      }
       map.set(`${layer}.${table.name}`, {
         layer,
         category: table.category,
         fieldCount: table.fields.length,
+        fields,
       });
     }
   }
   return map;
+}
+
+/** Format a PostgreSQL information_schema type into a comparable display string. */
+function formatPgColumnType(row: { data_type: string; character_maximum_length?: number | null; numeric_precision?: number | null; numeric_scale?: number | null }): string {
+  const dt = row.data_type?.toUpperCase() ?? '';
+  if (dt === 'CHARACTER VARYING' || dt === 'VARCHAR') {
+    return row.character_maximum_length ? `VARCHAR(${row.character_maximum_length})` : 'VARCHAR';
+  }
+  if (dt === 'NUMERIC' || dt === 'DECIMAL') {
+    if (row.numeric_precision != null && row.numeric_scale != null) {
+      return `NUMERIC(${row.numeric_precision},${row.numeric_scale})`;
+    }
+    if (row.numeric_precision != null) return `NUMERIC(${row.numeric_precision})`;
+    return 'NUMERIC';
+  }
+  if (dt === 'INTEGER') return 'INTEGER';
+  if (dt === 'BIGINT') return 'BIGINT';
+  if (dt === 'SMALLINT') return 'SMALLINT';
+  if (dt === 'BOOLEAN') return 'BOOLEAN';
+  if (dt === 'DATE') return 'DATE';
+  if (dt === 'TEXT') return 'TEXT';
+  if (dt.includes('TIMESTAMP')) return 'TIMESTAMP';
+  return dt || 'UNKNOWN';
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
@@ -114,6 +169,7 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
         status: 'not_in_db',
         rowCount: null,
         estimatedRowCount: false,
+        fieldDrift: [],
       });
     }
     return {
@@ -127,6 +183,8 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
         tablesEmpty: 0,
         tablesNotInDb: ddMap.size,
         tablesNotInDd: 0,
+        tablesWithFieldDrift: 0,
+        totalFieldDrifts: 0,
       },
       tables,
     };
@@ -149,12 +207,13 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
   try {
     await client.connect();
 
-    // Query DB tables and row counts in parallel
-    const [tablesResult, countsResult] = await Promise.all([
+    // Query DB tables, row counts, and columns in parallel
+    const [tablesResult, countsResult, columnsResult] = await Promise.all([
       client.query(TABLES_QUERY),
       options?.exact
         ? null // we'll do exact counts after we know what tables exist
         : client.query(ROW_COUNTS_QUERY),
+      client.query(COLUMNS_QUERY),
     ]);
 
     // Build set of DB tables
@@ -188,6 +247,17 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
       }
     }
 
+    // Build DB columns map: "L1.table_name" → Map<columnName, displayType>
+    const dbColumns = new Map<string, Map<string, string>>();
+    for (const row of columnsResult.rows) {
+      const key = `${schemaToLayer(row.table_schema)}.${row.table_name}`;
+      if (!dbColumns.has(key)) dbColumns.set(key, new Map());
+      dbColumns.get(key)!.set(
+        row.column_name,
+        formatPgColumnType(row)
+      );
+    }
+
     // Build results: merge DD + DB
     const tables: TableDbStatus[] = [];
     const allKeys = new Set([...ddMap.keys(), ...dbTables]);
@@ -211,6 +281,30 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
         status = 'empty';
       }
 
+      // Compute field drift for tables that exist in both DD and DB
+      const fieldDrift: FieldDrift[] = [];
+      if (inDd && inDb && ddInfo) {
+        const dbCols = dbColumns.get(key) ?? new Map<string, string>();
+        // Fields in DD but not in DB
+        for (const [fieldName, ddType] of ddInfo.fields) {
+          if (!dbCols.has(fieldName)) {
+            fieldDrift.push({ field: fieldName, issue: 'in_dd_not_in_db', ddType: ddType || undefined });
+          } else {
+            // Both exist — check type mismatch
+            const dbType = dbCols.get(fieldName)!;
+            if (ddType && dbType && ddType.toUpperCase() !== dbType.toUpperCase()) {
+              fieldDrift.push({ field: fieldName, issue: 'type_mismatch', ddType, dbType });
+            }
+          }
+        }
+        // Fields in DB but not in DD
+        for (const [colName, dbType] of dbCols) {
+          if (!ddInfo.fields.has(colName)) {
+            fieldDrift.push({ field: colName, issue: 'in_db_not_in_dd', dbType });
+          }
+        }
+      }
+
       tables.push({
         name,
         layer: layer as 'L1' | 'L2' | 'L3',
@@ -220,6 +314,7 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
         status,
         rowCount: inDb ? (count ?? 0) : null,
         estimatedRowCount: inDb ? estimated : false,
+        fieldDrift,
       });
     }
 
@@ -235,6 +330,8 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
       tablesEmpty: tables.filter((t) => t.status === 'empty').length,
       tablesNotInDb: tables.filter((t) => t.status === 'not_in_db').length,
       tablesNotInDd: tables.filter((t) => t.status === 'not_in_dd').length,
+      tablesWithFieldDrift: tables.filter((t) => t.fieldDrift.length > 0).length,
+      totalFieldDrifts: tables.reduce((sum, t) => sum + t.fieldDrift.length, 0),
     };
 
     return { connected: true, databaseUrl: true, timestamp, summary, tables };

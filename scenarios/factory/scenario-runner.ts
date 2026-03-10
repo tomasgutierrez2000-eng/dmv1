@@ -21,6 +21,7 @@ import {
   emitScenarioSql,
   emitCombinedSql,
   type TableData,
+  type SqlRow,
 } from './sql-emitter';
 
 /* ────────────────── CLI Argument Parsing ────────────────── */

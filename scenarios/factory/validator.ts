@@ -227,7 +227,7 @@ export function validateScenario(
     (l2Data.counterparty_rating_observation?.length ?? 0) +
     (l2Data.collateral_snapshot?.length ?? 0) +
     (l2Data.facility_delinquency_snapshot?.length ?? 0) +
-    (l2Data.facility_pricing_snapshot?.length ?? 0) +
+    ((l2Data as Record<string, unknown[]>).facility_pricing_snapshot?.length ?? 0) +
     (l2Data.limit_contribution_snapshot?.length ?? 0) +
     (l2Data.data_quality_score_snapshot?.length ?? 0);
 

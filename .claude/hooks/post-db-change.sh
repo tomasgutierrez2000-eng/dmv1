@@ -35,8 +35,8 @@ done
 
 # If a DB-modifying command was detected, run introspection
 if [ "$MATCHED" = true ]; then
-  # Don't re-trigger if we just ran introspection
-  if echo "$CMD" | grep -q "db:introspect"; then
+  # Don't re-trigger if we just ran introspection or full sync
+  if echo "$CMD" | grep -qE "db:introspect|sync:all"; then
     exit 0
   fi
 

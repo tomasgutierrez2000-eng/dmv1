@@ -113,6 +113,28 @@ export function buildDropColumn(
   return `ALTER TABLE ${quoteId(schema)}.${quoteId(tableName)} DROP COLUMN IF EXISTS ${quoteId(fieldName)};`;
 }
 
+/** Build ALTER TABLE RENAME COLUMN. */
+export function buildRenameColumn(
+  layer: 'L1' | 'L2' | 'L3',
+  tableName: string,
+  oldName: string,
+  newName: string,
+): string {
+  const schema = layerToSchema(layer);
+  return `ALTER TABLE ${quoteId(schema)}.${quoteId(tableName)} RENAME COLUMN ${quoteId(oldName)} TO ${quoteId(newName)};`;
+}
+
+/** Build ALTER TABLE ALTER COLUMN TYPE. */
+export function buildAlterColumnType(
+  layer: 'L1' | 'L2' | 'L3',
+  tableName: string,
+  fieldName: string,
+  newType: string,
+): string {
+  const schema = layerToSchema(layer);
+  return `ALTER TABLE ${quoteId(schema)}.${quoteId(tableName)} ALTER COLUMN ${quoteId(fieldName)} TYPE ${newType} USING ${quoteId(fieldName)}::${newType};`;
+}
+
 /** Generate full DDL file content for a layer from data dictionary. */
 export function generateLayerDdl(
   dd: DataDictionary,

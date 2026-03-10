@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Search, ChevronLeft, Database, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw } from 'lucide-react';
 import type { DataDictionary, DataDictionaryTable } from '@/lib/data-dictionary';
+import type { DbStatusResult, TableStatus } from '@/lib/db-status';
 import { flattenTables, getDistinctCategories, tableMatchesSearch, countPKs, countFKs } from '@/lib/data-elements/utils';
 import StatsBar from './StatsBar';
 import TableCard from './TableCard';
@@ -26,6 +27,9 @@ export default function DataElementsMainView() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // DB status (secondary, non-blocking)
+  const [dbStatusMap, setDbStatusMap] = useState<Map<string, { status: TableStatus; rowCount: number | null }>>(new Map());
 
   // Search: URL is source of truth for filtering; transient state for responsive input
   const searchQuery = searchParams.get('q') ?? '';
@@ -136,6 +140,21 @@ export default function DataElementsMainView() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Secondary: fetch DB status (non-blocking, silent on failure)
+  useEffect(() => {
+    fetch('/api/db-status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((result: DbStatusResult | null) => {
+        if (!result?.tables) return;
+        const m = new Map<string, { status: TableStatus; rowCount: number | null }>();
+        for (const t of result.tables) {
+          m.set(`${t.layer}.${t.name}`, { status: t.status, rowCount: t.rowCount });
+        }
+        setDbStatusMap(m);
+      })
+      .catch(() => {});
+  }, []);
 
   // Cmd+K shortcut
   useEffect(() => {
@@ -424,9 +443,17 @@ export default function DataElementsMainView() {
                   ) : null}
                 </p>
                 <div className="grid gap-3">
-                  {paged.map((table) => (
-                    <TableCard key={`${table.layer}.${table.name}`} table={table} />
-                  ))}
+                  {paged.map((table) => {
+                    const dbInfo = dbStatusMap.get(`${table.layer}.${table.name}`);
+                    return (
+                      <TableCard
+                        key={`${table.layer}.${table.name}`}
+                        table={table}
+                        dbStatus={dbInfo?.status}
+                        dbRowCount={dbInfo?.rowCount}
+                      />
+                    );
+                  })}
                 </div>
 
                 {/* Pagination */}

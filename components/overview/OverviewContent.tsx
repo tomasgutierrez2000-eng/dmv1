@@ -88,6 +88,7 @@ export default function OverviewContent() {
                 <div className="bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
                   {[
                     { href: '/data-elements', icon: Columns3, label: 'Data Elements', desc: 'Tables, fields & FKs' },
+                    { href: '/db-status', icon: Database, label: 'DB Status', desc: 'Connection & row counts' },
                     { href: '/taxonomy', icon: GitBranch, label: 'Enterprise Taxonomy', desc: 'Business hierarchy' },
                   ].map((item) => (
                     <Link

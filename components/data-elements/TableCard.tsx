@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { Key, Link2, Columns3 } from 'lucide-react';
 import type { DataDictionaryTable } from '@/lib/data-dictionary';
+import type { TableStatus } from '@/lib/db-status';
 import { countPKs, countFKs } from '@/lib/data-elements/utils';
+import StatusBadge from '@/components/db-status/StatusBadge';
 import { LayerBadge } from './badges';
 
 const HOVER_BORDER: Record<string, string> = {
@@ -12,7 +14,15 @@ const HOVER_BORDER: Record<string, string> = {
   L3: 'hover:border-emerald-200',
 };
 
-export default function TableCard({ table }: { table: DataDictionaryTable }) {
+export default function TableCard({
+  table,
+  dbStatus,
+  dbRowCount,
+}: {
+  table: DataDictionaryTable;
+  dbStatus?: TableStatus | null;
+  dbRowCount?: number | null;
+}) {
   const pkCount = countPKs(table);
   const fkCount = countFKs(table);
 
@@ -25,6 +35,7 @@ export default function TableCard({ table }: { table: DataDictionaryTable }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <LayerBadge layer={table.layer} />
+            {dbStatus && <StatusBadge status={dbStatus} rowCount={dbRowCount} compact />}
             <h2 className="text-base font-bold text-gray-900 font-mono truncate">{table.name}</h2>
           </div>
           <p className="text-sm text-gray-500 mb-2">{table.category}</p>

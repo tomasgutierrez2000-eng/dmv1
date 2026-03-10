@@ -17,8 +17,8 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l2
-  table: facility_profitability_snapshot
+- schema: l3
+  table: facility_financial_calc
   alias: fprs
   join_type: BASE
   fields:
@@ -66,7 +66,7 @@ levels:
         fprs.facility_id AS dimension_key,
         (COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0))
           / NULLIF(fprs.avg_earning_assets_amt, 0) * 100.0 AS metric_value
-      FROM l2.facility_profitability_snapshot fprs
+      FROM l3.facility_financial_calc fprs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
@@ -86,7 +86,7 @@ levels:
           fprs.facility_id,
           COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
           fprs.avg_earning_assets_amt AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -111,7 +111,7 @@ levels:
           fprs.facility_id,
           COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
           fprs.avg_earning_assets_amt AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -138,7 +138,7 @@ levels:
           fprs.facility_id,
           COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
           fprs.avg_earning_assets_amt AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -167,7 +167,7 @@ levels:
           fprs.facility_id,
           COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
           fprs.avg_earning_assets_amt AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
+        FROM l3.facility_financial_calc fprs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fprs.facility_id
           AND fm.is_active_flag = 'Y'

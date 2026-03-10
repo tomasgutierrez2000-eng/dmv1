@@ -117,8 +117,8 @@
           "field": "number_of_loans",
           "label": "number_of_loans",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_exposure_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -253,6 +253,14 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -263,6 +271,12 @@
       {
         "field": "allocated_equity_amt",
         "header": "Allocated Equity ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
@@ -303,6 +317,14 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -313,6 +335,12 @@
       {
         "field": "net_income_amt",
         "header": "Net Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
@@ -1331,24 +1359,24 @@
           "field": "interest_income_amt",
           "label": "interest_income_amt",
           "sample_value": 0,
-          "source_table": "facility_profitability_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_financial_calc",
+          "source_layer": "L3"
         },
         {
           "op": "*",
           "field": "interest_expense_amt",
           "label": "interest_expense_amt",
           "sample_value": 0,
-          "source_table": "facility_profitability_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_financial_calc",
+          "source_layer": "L3"
         },
         {
           "op": "*",
           "field": "avg_earning_assets_amt",
           "label": "avg_earning_assets_amt",
           "sample_value": 0,
-          "source_table": "facility_profitability_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_financial_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -2013,16 +2041,16 @@
           "field": "ebitda_amt",
           "label": "ebitda_amt",
           "sample_value": 0,
-          "source_table": "facility_financial_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_financial_calc",
+          "source_layer": "L3"
         },
         {
           "op": "*",
           "field": "total_debt_service_amt",
           "label": "total_debt_service_amt",
           "sample_value": 0,
-          "source_table": "facility_financial_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_financial_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -2153,8 +2181,8 @@
           "field": "pricing_exception_flag",
           "label": "pricing_exception_flag",
           "sample_value": 0,
-          "source_table": "facility_pricing_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_pricing_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -2219,8 +2247,8 @@
           "field": "pricing_exception_status",
           "label": "pricing_exception_status",
           "sample_value": 0,
-          "source_table": "facility_pricing_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_pricing_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],

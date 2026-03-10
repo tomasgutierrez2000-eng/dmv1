@@ -753,15 +753,15 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 196800000.0,
-          "funded_amt": 4100000000.0,
-          "bank_share_pct": 100.0,
+          "interest_expense_amt": 196800000,
+          "funded_amt": 4100000000,
+          "bank_share_pct": 100,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 5000000000.0
+          "committed_facility_amt": 5000000000
         },
         {
           "facility_id": "F-251",
@@ -772,15 +772,15 @@
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 23824817.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 23824817,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 0.0,
-          "funded_amt": 18583357.0,
-          "bank_share_pct": 55.0,
-          "cost_of_funds_pct": 0.0,
-          "committed_facility_amt": 23824817.0
+          "interest_expense_amt": 0,
+          "funded_amt": 18583357,
+          "bank_share_pct": 55,
+          "cost_of_funds_pct": 0,
+          "committed_facility_amt": 23824817
         },
         {
           "facility_id": "F-360",
@@ -791,15 +791,15 @@
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 66895846.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 66895846,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 1604858.1101,
-          "funded_amt": 98336894.0,
-          "bank_share_pct": 34.0,
+          "funded_amt": 98336894,
+          "bank_share_pct": 34,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 66895846.0
+          "committed_facility_amt": 66895846
         },
         {
           "facility_id": "F-9441",
@@ -810,15 +810,15 @@
           "desk_name": "Government Agencies Desk",
           "portfolio_name": "Agencies & GSEs",
           "lob_name": "Corporate Banking",
-          "committed_amt": 790069670.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 790069670,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 219955.3963,
-          "funded_amt": 458240409.0,
-          "bank_share_pct": 1.0,
+          "funded_amt": 458240409,
+          "bank_share_pct": 1,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 790069670.0
+          "committed_facility_amt": 790069670
         },
         {
           "facility_id": "F-9422",
@@ -829,15 +829,15 @@
           "desk_name": "Direct Auto Lending Desk",
           "portfolio_name": "Auto Loans",
           "lob_name": "Corporate Banking",
-          "committed_amt": 122462108.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 122462108,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 36444.7234,
-          "funded_amt": 75926507.0,
-          "bank_share_pct": 1.0,
+          "funded_amt": 75926507,
+          "bank_share_pct": 1,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 122462108.0
+          "committed_facility_amt": 122462108
         }
       ]
     }
@@ -1264,13 +1264,13 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "committed_exposure_usd": 5000000000.0,
-          "committed_facility_amt": 5000000000.0,
-          "bank_share_pct": 100.0
+          "committed_exposure_usd": 5000000000,
+          "committed_facility_amt": 5000000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-194",
@@ -1281,13 +1281,13 @@
           "desk_name": "Multi-Asset Funds Desk",
           "portfolio_name": "Retail / Mutual Funds",
           "lob_name": "Corporate Banking",
-          "committed_amt": 20021593.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 20021593,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 6607125.69,
-          "committed_facility_amt": 20021593.0,
-          "bank_share_pct": 33.0
+          "committed_facility_amt": 20021593,
+          "bank_share_pct": 33
         },
         {
           "facility_id": "F-241",
@@ -1298,13 +1298,13 @@
           "desk_name": "Non-Core Credit Desk",
           "portfolio_name": "Legacy Portfolios",
           "lob_name": "Corporate Banking",
-          "committed_amt": 57312906.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 57312906,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 40119034.2,
-          "committed_facility_amt": 57312906.0,
-          "bank_share_pct": 70.0
+          "committed_facility_amt": 57312906,
+          "bank_share_pct": 70
         },
         {
           "facility_id": "F-5701",
@@ -1315,13 +1315,13 @@
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "committed_exposure_usd": 2000.0,
-          "committed_facility_amt": 200000.0,
-          "bank_share_pct": 1.0
+          "committed_exposure_usd": 2000,
+          "committed_facility_amt": 200000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9584",
@@ -1332,13 +1332,13 @@
           "desk_name": "Follow-On Equity Desk",
           "portfolio_name": "Equity Capital Markets (ECM)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 120476777.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 120476777,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 1204767.77,
-          "committed_facility_amt": 120476777.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 120476777,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -1945,14 +1945,14 @@
           "desk_name": "Domestic Large-Cap Corporates Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 2500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": 2499620000.0,
-          "committed_facility_amt": 2500000000.0,
-          "funded_amt": 380000.0,
-          "bank_share_pct": 100.0
+          "undrawn_exposure_usd": 2499620000,
+          "committed_facility_amt": 2500000000,
+          "funded_amt": 380000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-6",
@@ -1963,14 +1963,14 @@
           "desk_name": "Public Company Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 1500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": -435000000.0,
-          "committed_facility_amt": 1500000000.0,
-          "funded_amt": 2370000000.0,
-          "bank_share_pct": 50.0
+          "undrawn_exposure_usd": -435000000,
+          "committed_facility_amt": 1500000000,
+          "funded_amt": 2370000000,
+          "bank_share_pct": 50
         },
         {
           "facility_id": "F-376",
@@ -1981,14 +1981,14 @@
           "desk_name": "High Yield DCM Desk",
           "portfolio_name": "Debt Capital Markets (DCM)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 123968774.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 123968774,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 3409140.9,
-          "committed_facility_amt": 123968774.0,
-          "funded_amt": 117770336.0,
-          "bank_share_pct": 55.0
+          "committed_facility_amt": 123968774,
+          "funded_amt": 117770336,
+          "bank_share_pct": 55
         },
         {
           "facility_id": "F-9408",
@@ -1999,14 +1999,14 @@
           "desk_name": "Private Credit Desk",
           "portfolio_name": "Alternatives (Private Credit, PE, Real Assets)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 186863612.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 186863612,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 710081.73,
-          "committed_facility_amt": 186863612.0,
-          "funded_amt": 115855439.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 186863612,
+          "funded_amt": 115855439,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9483",
@@ -2017,14 +2017,14 @@
           "desk_name": "Industrials & Manufacturing Desk",
           "portfolio_name": "Specialized Industries",
           "lob_name": "Corporate Banking",
-          "committed_amt": 26910114.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 26910114,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 148005.63,
-          "committed_facility_amt": 26910114.0,
-          "funded_amt": 12109551.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 26910114,
+          "funded_amt": 12109551,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -2601,13 +2601,13 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "outstanding_exposure_usd": 4100000000.0,
-          "funded_amt": 4100000000.0,
-          "bank_share_pct": 100.0
+          "outstanding_exposure_usd": 4100000000,
+          "funded_amt": 4100000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-360",
@@ -2618,13 +2618,13 @@
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 66895846.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 66895846,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 33434543.96,
-          "funded_amt": 98336894.0,
-          "bank_share_pct": 34.0
+          "funded_amt": 98336894,
+          "bank_share_pct": 34
         },
         {
           "facility_id": "F-5701",
@@ -2635,13 +2635,13 @@
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "outstanding_exposure_usd": 1300.0,
-          "funded_amt": 130000.0,
-          "bank_share_pct": 1.0
+          "outstanding_exposure_usd": 1300,
+          "funded_amt": 130000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9457",
@@ -2652,13 +2652,13 @@
           "desk_name": "Asset Disposition Desk",
           "portfolio_name": "Wind-Down Units",
           "lob_name": "Corporate Banking",
-          "committed_amt": 795728544.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 795728544,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 4615225.56,
-          "funded_amt": 461522556.0,
-          "bank_share_pct": 1.0
+          "funded_amt": 461522556,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9543",
@@ -2669,13 +2669,13 @@
           "desk_name": "Urban Self-Storage Desk",
           "portfolio_name": "Self-Storage",
           "lob_name": "Corporate Banking",
-          "committed_amt": 127553516.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 127553516,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 765321.1,
-          "funded_amt": 76532110.0,
-          "bank_share_pct": 1.0
+          "funded_amt": 76532110,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -3162,12 +3162,12 @@
           "desk_name": "Domestic Large-Cap Corporates Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 2500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 0.0,
-          "bank_share_pct": 100.0
+          "interest_income_amt": 0,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-10",
@@ -3178,12 +3178,12 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 141440000.0,
-          "bank_share_pct": 100.0
+          "interest_income_amt": 141440000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-384",
@@ -3194,12 +3194,12 @@
           "desk_name": "Infrastructure Funds Coverage Desk",
           "portfolio_name": "Sponsor Coverage",
           "lob_name": "Corporate Banking",
-          "committed_amt": 164974198.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 164974198,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 5384758.0,
-          "bank_share_pct": 28.0
+          "interest_income_amt": 5384758,
+          "bank_share_pct": 28
         },
         {
           "facility_id": "F-9571",
@@ -3210,12 +3210,12 @@
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 415365813.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 415365813,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 26098472.0,
-          "bank_share_pct": 1.0
+          "interest_income_amt": 26098472,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9637",
@@ -3226,12 +3226,12 @@
           "desk_name": "Discretionary Portfolio Management Deks",
           "portfolio_name": "Investment Advisory",
           "lob_name": "Corporate Banking",
-          "committed_amt": 182226869.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 182226869,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 5756547.0,
-          "bank_share_pct": 1.0
+          "interest_income_amt": 5756547,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -4455,7 +4455,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = fprs.allocated_equity_amt / NULLIF(fes.rwa_amt, 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = fprs.allocated_equity_amt / NULLIF(fec.rwa_amt, 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -4478,6 +4478,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4524,7 +4530,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY fm.counterparty_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -4547,6 +4553,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4593,7 +4605,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -4616,6 +4628,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4662,7 +4680,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -4685,6 +4703,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4731,7 +4755,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -4754,6 +4778,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4848,7 +4878,7 @@
         "dashboard_display_name": "Return on RWA (%) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = ffs.net_income_amt / NULLIF(fes.rwa_amt, 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = ffs.net_income_amt / NULLIF(fec.rwa_amt, 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -4871,6 +4901,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4917,7 +4953,7 @@
         "dashboard_display_name": "Return on RWA (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY fm.counterparty_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -4940,6 +4976,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -4986,7 +5028,7 @@
         "dashboard_display_name": "Return on RWA (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -5009,6 +5051,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -5055,7 +5103,7 @@
         "dashboard_display_name": "Return on RWA (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -5078,6 +5126,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -5124,7 +5178,7 @@
         "dashboard_display_name": "Return on RWA (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
             "layer": "L2",
@@ -5147,6 +5201,12 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
+            "field": "rwa_amt",
+            "description": "rwa_amt"
+          },
+          {
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "rwa_amt",
             "description": "rwa_amt"
           },
@@ -13360,35 +13420,35 @@
         "dashboard_display_name": "Net Interest Margin (%) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = (COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0)) / NULLIF(fprs.avg_earning_assets_amt, 0) * 100.0",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = (COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0)) / NULLIF(fprs.avg_earning_assets_amt, 0) * 100.0",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -13435,35 +13495,35 @@
         "dashboard_display_name": "Net Interest Margin (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -13510,35 +13570,35 @@
         "dashboard_display_name": "Net Interest Margin (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -13585,35 +13645,35 @@
         "dashboard_display_name": "Net Interest Margin (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -13660,35 +13720,35 @@
         "dashboard_display_name": "Net Interest Margin (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_profitability_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -18567,7 +18627,7 @@
         "dashboard_display_name": "Risk Weighted Average (%) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = fes.rwa_amt / NULLIF(fes.gross_exposure_usd, 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = fec.rwa_amt / NULLIF(fes.gross_exposure_usd, 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -19315,29 +19375,29 @@
         "dashboard_display_name": "Fixed Cost Coverage Ratio (%) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = ffs.ebitda_amt / NULLIF(ffs.total_debt_service_amt, 0)",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = ffs.ebitda_amt / NULLIF(ffs.total_debt_service_amt, 0)",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "ebitda_amt",
             "description": "ebitda_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "total_debt_service_amt",
             "description": "total_debt_service_amt"
           },
@@ -19384,29 +19444,29 @@
         "dashboard_display_name": "Fixed Cost Coverage Ratio (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "ebitda_amt",
             "description": "ebitda_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "total_debt_service_amt",
             "description": "total_debt_service_amt"
           },
@@ -19453,29 +19513,29 @@
         "dashboard_display_name": "Fixed Cost Coverage Ratio (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "ebitda_amt",
             "description": "ebitda_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "total_debt_service_amt",
             "description": "total_debt_service_amt"
           },
@@ -19522,29 +19582,29 @@
         "dashboard_display_name": "Fixed Cost Coverage Ratio (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "ebitda_amt",
             "description": "ebitda_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "total_debt_service_amt",
             "description": "total_debt_service_amt"
           },
@@ -19591,29 +19651,29 @@
         "dashboard_display_name": "Fixed Cost Coverage Ratio (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
+        "level_logic": "1. LOAD  l3.facility_financial_calc  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "ebitda_amt",
             "description": "ebitda_amt"
           },
           {
-            "layer": "L2",
-            "table": "facility_financial_snapshot",
+            "layer": "L3",
+            "table": "facility_financial_calc",
             "field": "total_debt_service_amt",
             "description": "total_debt_service_amt"
           },
@@ -20765,23 +20825,23 @@
         "dashboard_display_name": "Exception Rate (%) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1.0 ELSE 0.0 END",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1.0 ELSE 0.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
@@ -20828,23 +20888,23 @@
         "dashboard_display_name": "Exception Rate (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
@@ -20891,23 +20951,23 @@
         "dashboard_display_name": "Exception Rate (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
@@ -20954,23 +21014,23 @@
         "dashboard_display_name": "Exception Rate (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
@@ -21017,23 +21077,23 @@
         "dashboard_display_name": "Exception Rate (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(*) = 0 THEN NULL ELSE SUM(CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1 ELSE 0 END)::FLOAT / COUNT(*) * 100.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
@@ -21475,29 +21535,29 @@
         "dashboard_display_name": "Pricing Exception Status (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1.0 ELSE 0.0 END",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1.0 ELSE 0.0 END",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_status",
             "description": "pricing_exception_status"
           },
@@ -21544,29 +21604,29 @@
         "dashboard_display_name": "Pricing Exception Status (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_status",
             "description": "pricing_exception_status"
           },
@@ -21613,29 +21673,29 @@
         "dashboard_display_name": "Pricing Exception Status (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_status",
             "description": "pricing_exception_status"
           },
@@ -21682,29 +21742,29 @@
         "dashboard_display_name": "Pricing Exception Status (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_status",
             "description": "pricing_exception_status"
           },
@@ -21751,29 +21811,29 @@
         "dashboard_display_name": "Pricing Exception Status (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l3.facility_pricing_calc  (fps)\n   WHERE fps.as_of_date = :as_of_date\n   AND   fps.pricing_exception_flag = <filter>\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_flag",
             "description": "pricing_exception_flag"
           },
           {
-            "layer": "L2",
-            "table": "facility_pricing_snapshot",
+            "layer": "L3",
+            "table": "facility_pricing_calc",
             "field": "pricing_exception_status",
             "description": "pricing_exception_status"
           },
@@ -23160,23 +23220,23 @@
         "dashboard_display_name": "Number of Loans (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = COALESCE(fes.number_of_loans, 1)",
+        "level_logic": "1. LOAD  l3.facility_exposure_calc  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = COALESCE(fes.number_of_loans, 1)",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "number_of_loans",
             "description": "number_of_loans"
           },
@@ -23223,23 +23283,23 @@
         "dashboard_display_name": "Number of Loans (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
+        "level_logic": "1. LOAD  l3.facility_exposure_calc  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "number_of_loans",
             "description": "number_of_loans"
           },
@@ -23286,23 +23346,23 @@
         "dashboard_display_name": "Number of Loans (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
+        "level_logic": "1. LOAD  l3.facility_exposure_calc  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "number_of_loans",
             "description": "number_of_loans"
           },
@@ -23349,23 +23409,23 @@
         "dashboard_display_name": "Number of Loans (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
+        "level_logic": "1. LOAD  l3.facility_exposure_calc  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "number_of_loans",
             "description": "number_of_loans"
           },
@@ -23412,23 +23472,23 @@
         "dashboard_display_name": "Number of Loans (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
+        "level_logic": "1. LOAD  l3.facility_exposure_calc  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fes.number_of_loans, 1))",
         "source_references": [
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L2",
-            "table": "facility_exposure_snapshot",
+            "layer": "L3",
+            "table": "facility_exposure_calc",
             "field": "number_of_loans",
             "description": "number_of_loans"
           },

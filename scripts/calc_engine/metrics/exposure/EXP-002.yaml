@@ -73,7 +73,7 @@ levels:
       SELECT
         cf.facility_id AS dimension_key,
         cf.contractual_amt AS metric_value
-      FROM l2.cash_flow cf
+      FROM l3.cash_flow_calc cf
       WHERE cf.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
@@ -87,7 +87,7 @@ levels:
         SELECT
           cf.facility_id AS dimension_key,
           cf.contractual_amt AS metric_value
-        FROM l2.cash_flow cf
+        FROM l3.cash_flow_calc cf
         WHERE cf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -106,7 +106,7 @@ levels:
         SELECT
           cf.facility_id AS dimension_key,
           cf.contractual_amt AS metric_value
-        FROM l2.cash_flow cf
+        FROM l3.cash_flow_calc cf
         WHERE cf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -127,7 +127,7 @@ levels:
         SELECT
           cf.facility_id AS dimension_key,
           cf.contractual_amt AS metric_value
-        FROM l2.cash_flow cf
+        FROM l3.cash_flow_calc cf
         WHERE cf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -150,7 +150,7 @@ levels:
         SELECT
           cf.facility_id AS dimension_key,
           cf.contractual_amt AS metric_value
-        FROM l2.cash_flow cf
+        FROM l3.cash_flow_calc cf
         WHERE cf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

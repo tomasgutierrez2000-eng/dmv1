@@ -62,8 +62,10 @@ levels:
     formula_sql: |-
       SELECT
         fes.facility_id AS dimension_key,
-        fes.rwa_amt / NULLIF(fes.gross_exposure_usd, 0) * 100.0 AS metric_value
+        fec.rwa_amt / NULLIF(fes.gross_exposure_usd, 0) * 100.0 AS metric_value
       FROM l2.facility_exposure_snapshot fes
+      LEFT JOIN l3.facility_exposure_calc fec
+        ON fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -81,9 +83,11 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.rwa_amt AS numerator_val,
+          fec.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
+      LEFT JOIN l3.facility_exposure_calc fec
+        ON fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
@@ -106,9 +110,11 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.rwa_amt AS numerator_val,
+          fec.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
+      LEFT JOIN l3.facility_exposure_calc fec
+        ON fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
@@ -133,9 +139,11 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.rwa_amt AS numerator_val,
+          fec.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
+      LEFT JOIN l3.facility_exposure_calc fec
+        ON fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'
@@ -162,9 +170,11 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.rwa_amt AS numerator_val,
+          fec.rwa_amt AS numerator_val,
           fes.gross_exposure_usd AS denominator_val
         FROM l2.facility_exposure_snapshot fes
+      LEFT JOIN l3.facility_exposure_calc fec
+        ON fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fes.facility_id
           AND fm.is_active_flag = 'Y'

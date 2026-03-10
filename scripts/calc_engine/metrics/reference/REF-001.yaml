@@ -17,8 +17,8 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l2
-  table: facility_exposure_snapshot
+- schema: l3
+  table: facility_exposure_calc
   alias: fes
   join_type: BASE
   fields:
@@ -61,7 +61,7 @@ levels:
       SELECT
         fes.facility_id AS dimension_key,
         COALESCE(fes.number_of_loans, 1) AS metric_value
-      FROM l2.facility_exposure_snapshot fes
+      FROM l3.facility_exposure_calc fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -74,7 +74,7 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l2.facility_exposure_snapshot fes
+      FROM l3.facility_exposure_calc fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -88,7 +88,7 @@ levels:
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l2.facility_exposure_snapshot fes
+      FROM l3.facility_exposure_calc fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -104,7 +104,7 @@ levels:
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l2.facility_exposure_snapshot fes
+      FROM l3.facility_exposure_calc fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -122,7 +122,7 @@ levels:
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l2.facility_exposure_snapshot fes
+      FROM l3.facility_exposure_calc fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'

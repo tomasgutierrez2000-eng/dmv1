@@ -5635,6 +5635,225 @@
           "data_type": "BOOLEAN"
         }
       ]
+    },
+    {
+      "name": "limit_status_dim",
+      "layer": "L1",
+      "category": "Limits & Thresholds",
+      "fields": [
+        {
+          "name": "limit_status_code",
+          "description": "Unique code for limit utilization status",
+          "category": "Limits & Thresholds",
+          "why_required": "Unique code for limit utilization status",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "status_name",
+          "description": "Display name for the limit status",
+          "category": "Limits & Thresholds",
+          "why_required": "Display name for the limit status",
+          "data_type": "VARCHAR(200)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "description",
+          "description": "Detailed description of the status",
+          "category": "Limits & Thresholds",
+          "why_required": "Detailed description of the status",
+          "data_type": "VARCHAR(500)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "severity_ordinal",
+          "description": "Numeric severity ranking",
+          "category": "Limits & Thresholds",
+          "why_required": "Numeric severity ranking",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "display_order",
+          "description": "UI display order",
+          "category": "Limits & Thresholds",
+          "why_required": "UI display order",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "active_flag",
+          "description": "Whether this status is currently active",
+          "category": "Limits & Thresholds",
+          "why_required": "Whether this status is currently active",
+          "data_type": "BOOLEAN",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "exception_status_dim",
+      "layer": "L1",
+      "category": "Facility",
+      "fields": [
+        {
+          "name": "exception_status_code",
+          "description": "Unique code for pricing exception status",
+          "category": "Facility",
+          "why_required": "Unique code for pricing exception status",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "status_name",
+          "description": "Display name for the exception status",
+          "category": "Facility",
+          "why_required": "Display name for the exception status",
+          "data_type": "VARCHAR(200)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "description",
+          "description": "Detailed description of the status",
+          "category": "Facility",
+          "why_required": "Detailed description of the status",
+          "data_type": "VARCHAR(500)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "requires_approval_flag",
+          "description": "Whether this status requires approval",
+          "category": "Facility",
+          "why_required": "Whether this status requires approval",
+          "data_type": "BOOLEAN",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "display_order",
+          "description": "UI display order",
+          "category": "Facility",
+          "why_required": "UI display order",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "active_flag",
+          "description": "Whether this status is currently active",
+          "category": "Facility",
+          "why_required": "Whether this status is currently active",
+          "data_type": "BOOLEAN",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "rating_change_status_dim",
+      "layer": "L1",
+      "category": "Ratings",
+      "fields": [
+        {
+          "name": "rating_change_status_code",
+          "description": "Unique code for rating change direction",
+          "category": "Ratings",
+          "why_required": "Unique code for rating change direction",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "status_name",
+          "description": "Display name for the rating change status",
+          "category": "Ratings",
+          "why_required": "Display name for the rating change status",
+          "data_type": "VARCHAR(200)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "description",
+          "description": "Detailed description of the change status",
+          "category": "Ratings",
+          "why_required": "Detailed description of the change status",
+          "data_type": "VARCHAR(500)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "direction",
+          "description": "Direction of change: positive, negative, neutral",
+          "category": "Ratings",
+          "why_required": "Direction of change: positive, negative, neutral",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "display_order",
+          "description": "UI display order",
+          "category": "Ratings",
+          "why_required": "UI display order",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "active_flag",
+          "description": "Whether this status is currently active",
+          "category": "Ratings",
+          "why_required": "Whether this status is currently active",
+          "data_type": "BOOLEAN",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
     }
   ],
   "L2": [
@@ -6174,6 +6393,17 @@
           "description": "",
           "category": "Position & exposure",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "RWA density percentage (source system output)",
+          "category": "Position Detail",
+          "why_required": "RWA density percentage (source system output)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -6395,14 +6625,6 @@
           "data_type": "BIGINT"
         },
         {
-          "name": "coverage_ratio_pct",
-          "description": "Coverage ratio (collateral / exposure)",
-          "category": "Exposure",
-          "why_required": "Page 2 KPI: Coverage Ratio",
-          "simplification_note": "L2 review addition",
-          "data_type": "NUMERIC(10,4)"
-        },
-        {
           "name": "currency_code",
           "description": "Original currency code",
           "category": "Exposure",
@@ -6481,36 +6703,6 @@
         },
         {
           "name": "undrawn_commitment_amt",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "number_of_loans",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "number_of_facilities",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "days_until_maturity",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "limit_status_code",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "VARCHAR(50)"
-        },
-        {
-          "name": "rwa_amt",
           "description": "",
           "category": "Exposure & collateral snapshots",
           "data_type": "NUMERIC(18,2)"
@@ -7298,12 +7490,6 @@
           "category": "Financial Metrics",
           "why_required": "Rate index classification",
           "data_type": "VARCHAR(20)"
-        },
-        {
-          "name": "pricing_exception_flag",
-          "description": "",
-          "category": "Facility snapshots",
-          "data_type": "BOOLEAN"
         },
         {
           "name": "fee_rate_pct",
@@ -8995,12 +9181,6 @@
           "data_type": "NUMERIC(18,2)"
         },
         {
-          "name": "total_debt_service_amt",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
           "name": "revenue_amt",
           "description": "",
           "category": "L2",
@@ -9053,30 +9233,6 @@
           "description": "",
           "category": "L2",
           "data_type": "BIGINT"
-        },
-        {
-          "name": "dscr_value",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(12,6)"
-        },
-        {
-          "name": "ltv_pct",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "net_income_amt",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "interest_rate_sensitivity_pct",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(10,6)"
         }
       ]
     },
@@ -9231,6 +9387,17 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "allocated_equity_amt",
+          "description": "Allocated equity amount from balance sheet",
+          "category": "Financial Metrics",
+          "why_required": "Allocated equity amount from balance sheet",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
         }
       ]
     },
@@ -9299,18 +9466,6 @@
         },
         {
           "name": "ead_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "expected_loss_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "rwa_amt",
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(18,2)"
@@ -9677,6 +9832,39 @@
           "description": "",
           "why_required": "",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "fees_income_amt",
+          "description": "Fee income amount for the counterparty",
+          "category": "Business Entity",
+          "why_required": "Fee income amount for the counterparty",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "pd_pct",
+          "description": "Probability of default percentage (at counterparty level)",
+          "category": "Business Entity",
+          "why_required": "Probability of default percentage (at counterparty level)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "lgd_pct",
+          "description": "Loss given default percentage (at counterparty level)",
+          "category": "Business Entity",
+          "why_required": "Loss given default percentage (at counterparty level)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
         },
         {
           "name": "updated_ts",
@@ -10435,12 +10623,6 @@
           "description": "",
           "why_required": "",
           "data_type": "BOOLEAN"
-        },
-        {
-          "name": "revenue_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
         }
       ]
     },
@@ -12784,6 +12966,138 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "limit_assignment_snapshot",
+      "layer": "L2",
+      "category": "Limits",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "Facility receiving the limit assignment",
+          "category": "Limits",
+          "why_required": "Facility receiving the limit assignment",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "limit_rule_id",
+          "description": "Reference to the limit rule definition",
+          "category": "Limits",
+          "why_required": "Reference to the limit rule definition",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_rule",
+              "field": "limit_rule_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot date",
+          "category": "Limits",
+          "why_required": "Snapshot date",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "limit_amt",
+          "description": "Assigned limit amount",
+          "category": "Limits",
+          "why_required": "Assigned limit amount",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "assigned_date",
+          "description": "Date limit was assigned",
+          "category": "Limits",
+          "why_required": "Date limit was assigned",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "expiry_date",
+          "description": "Date limit expires",
+          "category": "Limits",
+          "why_required": "Date limit expires",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "status_code",
+          "description": "Current status of the limit assignment",
+          "category": "Limits",
+          "why_required": "Current status of the limit assignment",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "currency_code",
+          "description": "Currency of the limit amount",
+          "category": "Limits",
+          "why_required": "Currency of the limit amount",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Limits",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "updated_ts",
+          "description": "Record last update timestamp",
+          "category": "Limits",
+          "why_required": "Record last update timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
         }
       ]
     }
@@ -18956,6 +19270,28 @@
           "data_type": "NUMERIC(20,4)"
         },
         {
+          "name": "exposure_at_default",
+          "description": "Estimated/modeled EAD (moved from L2)",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Estimated/modeled EAD (moved from L2)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "lgd_estimate",
+          "description": "Model-derived LGD estimate in $ (moved from L2, fixed from VARCHAR to NUMERIC)",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Model-derived LGD estimate in $ (moved from L2, fixed from VARCHAR to NUMERIC)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
           "name": "created_ts",
           "description": "",
           "why_required": "",
@@ -19005,6 +19341,638 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "facility_exposure_calc",
+      "layer": "L3",
+      "category": "Exposure & Risk Metrics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to source L2 facility_exposure_snapshot",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "FK to source L2 facility_exposure_snapshot",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot date matching source L2 row",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Snapshot date matching source L2 row",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "number_of_loans",
+          "description": "Aggregate count of loans under facility",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Aggregate count of loans under facility",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "number_of_facilities",
+          "description": "Aggregate count of sub-facilities",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Aggregate count of sub-facilities",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "days_until_maturity",
+          "description": "Calculated days from as_of_date to maturity_date",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Calculated days from as_of_date to maturity_date",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "rwa_amt",
+          "description": "Risk-weighted asset amount (EAD × risk_weight)",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Risk-weighted asset amount (EAD × risk_weight)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "utilization_status_code",
+          "description": "Calculated utilization bucket from drawn/committed ratio",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Calculated utilization bucket from drawn/committed ratio",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "utilization_status_dim",
+              "field": "utilization_status_code"
+            }
+          }
+        },
+        {
+          "name": "risk_rating_tier_code",
+          "description": "Calculated risk rating tier assignment",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Calculated risk rating tier assignment",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "risk_rating_tier_dim",
+              "field": "tier_code"
+            }
+          }
+        },
+        {
+          "name": "limit_status_code",
+          "description": "Calculated limit utilization status",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Calculated limit utilization status",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_status_dim",
+              "field": "limit_status_code"
+            }
+          }
+        },
+        {
+          "name": "coverage_ratio_pct",
+          "description": "Calculated coverage ratio (drawn / committed)",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Calculated coverage ratio (drawn / committed)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Exposure & Risk Metrics",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "facility_financial_calc",
+      "layer": "L3",
+      "category": "Facility Analytics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to source L2 facility_financial_snapshot",
+          "category": "Facility Analytics",
+          "why_required": "FK to source L2 facility_financial_snapshot",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot date matching source L2 row",
+          "category": "Facility Analytics",
+          "why_required": "Snapshot date matching source L2 row",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "dscr_value",
+          "description": "Debt Service Coverage Ratio (EBITDA / Debt Service)",
+          "category": "Facility Analytics",
+          "why_required": "Debt Service Coverage Ratio (EBITDA / Debt Service)",
+          "data_type": "NUMERIC(12,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "ltv_pct",
+          "description": "Loan-to-Value ratio (loan / collateral)",
+          "category": "Facility Analytics",
+          "why_required": "Loan-to-Value ratio (loan / collateral)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "net_income_amt",
+          "description": "Calculated net income (revenue - expenses)",
+          "category": "Facility Analytics",
+          "why_required": "Calculated net income (revenue - expenses)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "Total debt service (principal + interest)",
+          "category": "Facility Analytics",
+          "why_required": "Total debt service (principal + interest)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "revenue_amt",
+          "description": "Revenue amount (moved from L2)",
+          "category": "Facility Analytics",
+          "why_required": "Revenue amount (moved from L2)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "Calculated interest expense",
+          "category": "Facility Analytics",
+          "why_required": "Calculated interest expense",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "interest_income_amt",
+          "description": "Calculated interest income",
+          "category": "Facility Analytics",
+          "why_required": "Calculated interest income",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "avg_earning_assets_amt",
+          "description": "Average earning assets (aggregated)",
+          "category": "Facility Analytics",
+          "why_required": "Average earning assets (aggregated)",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "fee_rate_pct",
+          "description": "Fee rate percentage (derived)",
+          "category": "Facility Analytics",
+          "why_required": "Fee rate percentage (derived)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "Interest rate sensitivity measure",
+          "category": "Facility Analytics",
+          "why_required": "Interest rate sensitivity measure",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Facility Analytics",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "counterparty_rating_calc",
+      "layer": "L3",
+      "category": "Credit Events & Performance",
+      "fields": [
+        {
+          "name": "counterparty_id",
+          "description": "FK to source L2 counterparty",
+          "category": "Credit Events & Performance",
+          "why_required": "FK to source L2 counterparty",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Rating observation date",
+          "category": "Credit Events & Performance",
+          "why_required": "Rating observation date",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "rating_type",
+          "description": "Type of rating (internal/external)",
+          "category": "Credit Events & Performance",
+          "why_required": "Type of rating (internal/external)",
+          "data_type": "VARCHAR(30)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "risk_rating_change_steps",
+          "description": "Number of rating notches changed",
+          "category": "Credit Events & Performance",
+          "why_required": "Number of rating notches changed",
+          "data_type": "INTEGER",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "rating_change_status_code",
+          "description": "Calculated rating change direction",
+          "category": "Credit Events & Performance",
+          "why_required": "Calculated rating change direction",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "rating_change_status_dim",
+              "field": "rating_change_status_code"
+            }
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Credit Events & Performance",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "facility_pricing_calc",
+      "layer": "L3",
+      "category": "Facility Analytics",
+      "fields": [
+        {
+          "name": "facility_id",
+          "description": "FK to source L2 facility_pricing_snapshot",
+          "category": "Facility Analytics",
+          "why_required": "FK to source L2 facility_pricing_snapshot",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot date matching source L2 row",
+          "category": "Facility Analytics",
+          "why_required": "Snapshot date matching source L2 row",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "pricing_exception_flag",
+          "description": "Whether facility has a pricing exception",
+          "category": "Facility Analytics",
+          "why_required": "Whether facility has a pricing exception",
+          "data_type": "BOOLEAN",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "exception_status_code",
+          "description": "Calculated exception status assignment",
+          "category": "Facility Analytics",
+          "why_required": "Calculated exception status assignment",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "exception_status_dim",
+              "field": "exception_status_code"
+            }
+          }
+        },
+        {
+          "name": "pricing_tier_code",
+          "description": "Calculated pricing tier assignment",
+          "category": "Facility Analytics",
+          "why_required": "Calculated pricing tier assignment",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "pricing_tier_dim",
+              "field": "pricing_tier_code"
+            }
+          }
+        },
+        {
+          "name": "fee_rate_pct",
+          "description": "Fee rate percentage (derived)",
+          "category": "Facility Analytics",
+          "why_required": "Fee rate percentage (derived)",
+          "data_type": "NUMERIC(10,6)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Facility Analytics",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "deal_pipeline_calc",
+      "layer": "L3",
+      "category": "Business Segment Summary",
+      "fields": [
+        {
+          "name": "deal_id",
+          "description": "FK to source L2 deal_pipeline_fact",
+          "category": "Business Segment Summary",
+          "why_required": "FK to source L2 deal_pipeline_fact",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Calculation date",
+          "category": "Business Segment Summary",
+          "why_required": "Calculation date",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "expected_tenor_months",
+          "description": "Calculated expected tenor in months",
+          "category": "Business Segment Summary",
+          "why_required": "Calculated expected tenor in months",
+          "data_type": "NUMERIC(10,2)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Business Segment Summary",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "collateral_calc",
+      "layer": "L3",
+      "category": "Credit Risk Mitigation (CRM)",
+      "fields": [
+        {
+          "name": "collateral_asset_id",
+          "description": "FK to source L2 collateral_snapshot",
+          "category": "Credit Risk Mitigation (CRM)",
+          "why_required": "FK to source L2 collateral_snapshot",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "collateral_asset_master",
+              "field": "collateral_asset_id"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Calculation date",
+          "category": "Credit Risk Mitigation (CRM)",
+          "why_required": "Calculation date",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "allocated_amount_usd",
+          "description": "Calculated proportional allocation amount in USD",
+          "category": "Credit Risk Mitigation (CRM)",
+          "why_required": "Calculated proportional allocation amount in USD",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Credit Risk Mitigation (CRM)",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "cash_flow_calc",
+      "layer": "L3",
+      "category": "Cash Flows",
+      "fields": [
+        {
+          "name": "cash_flow_id",
+          "description": "FK to source L2 cash_flow",
+          "category": "Cash Flows",
+          "why_required": "FK to source L2 cash_flow",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "contractual_amt",
+          "description": "Projected/modeled cash flow amount",
+          "category": "Cash Flows",
+          "why_required": "Projected/modeled cash flow amount",
+          "data_type": "NUMERIC(20,4)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Cash Flows",
+          "why_required": "Record creation timestamp",
+          "data_type": "TIMESTAMP",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false
+          }
         }
       ]
     }
@@ -22857,6 +23825,132 @@
       "to_layer": "L1",
       "to_table": "maturity_bucket_dim",
       "to_field": "maturity_bucket_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_assignment_snapshot",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_assignment_snapshot",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_assignment_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_exposure_calc",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_exposure_calc",
+      "from_field": "utilization_status_code",
+      "to_layer": "L1",
+      "to_table": "utilization_status_dim",
+      "to_field": "utilization_status_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_exposure_calc",
+      "from_field": "risk_rating_tier_code",
+      "to_layer": "L1",
+      "to_table": "risk_rating_tier_dim",
+      "to_field": "tier_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_exposure_calc",
+      "from_field": "limit_status_code",
+      "to_layer": "L1",
+      "to_table": "limit_status_dim",
+      "to_field": "limit_status_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_financial_calc",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "counterparty_rating_calc",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "counterparty_rating_calc",
+      "from_field": "rating_change_status_code",
+      "to_layer": "L1",
+      "to_table": "rating_change_status_dim",
+      "to_field": "rating_change_status_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_pricing_calc",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_pricing_calc",
+      "from_field": "exception_status_code",
+      "to_layer": "L1",
+      "to_table": "exception_status_dim",
+      "to_field": "exception_status_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "facility_pricing_calc",
+      "from_field": "pricing_tier_code",
+      "to_layer": "L1",
+      "to_table": "pricing_tier_dim",
+      "to_field": "pricing_tier_code",
+      "type": "FK"
+    },
+    {
+      "from_layer": "L3",
+      "from_table": "collateral_calc",
+      "from_field": "collateral_asset_id",
+      "to_layer": "L2",
+      "to_table": "collateral_asset_master",
+      "to_field": "collateral_asset_id",
+      "type": "FK"
     }
   ],
   "derivation_dag": {}

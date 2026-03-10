@@ -36,6 +36,14 @@ source_tables:
   fields:
   - name: rwa_amt
     role: MEASURE
+- schema: l3
+  table: facility_exposure_calc
+  alias: fec
+  join_type: LEFT
+  join_on: fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
+  fields:
+  - name: rwa_amt
+    role: MEASURE
 - schema: l2
   table: facility_master
   alias: fm
@@ -68,7 +76,7 @@ levels:
     formula_sql: |-
       SELECT
         fprs.facility_id AS dimension_key,
-        fprs.allocated_equity_amt / NULLIF(fes.rwa_amt, 0) * 100.0 AS metric_value
+        fprs.allocated_equity_amt / NULLIF(fec.rwa_amt, 0) * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fprs.facility_id
@@ -91,7 +99,7 @@ levels:
         SELECT
           fprs.facility_id,
           fprs.allocated_equity_amt AS numerator_val,
-          fes.rwa_amt AS denominator_val
+          fec.rwa_amt AS denominator_val
         FROM l2.facility_profitability_snapshot fprs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = fprs.facility_id
@@ -119,7 +127,7 @@ levels:
         SELECT
           fprs.facility_id,
           fprs.allocated_equity_amt AS numerator_val,
-          fes.rwa_amt AS denominator_val
+          fec.rwa_amt AS denominator_val
         FROM l2.facility_profitability_snapshot fprs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = fprs.facility_id
@@ -149,7 +157,7 @@ levels:
         SELECT
           fprs.facility_id,
           fprs.allocated_equity_amt AS numerator_val,
-          fes.rwa_amt AS denominator_val
+          fec.rwa_amt AS denominator_val
         FROM l2.facility_profitability_snapshot fprs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = fprs.facility_id
@@ -181,7 +189,7 @@ levels:
         SELECT
           fprs.facility_id,
           fprs.allocated_equity_amt AS numerator_val,
-          fes.rwa_amt AS denominator_val
+          fec.rwa_amt AS denominator_val
         FROM l2.facility_profitability_snapshot fprs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = fprs.facility_id

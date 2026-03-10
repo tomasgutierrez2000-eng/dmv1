@@ -1,5 +1,5 @@
 /**
- * L3 Table manifest — 56 tables from the SQL generation package.
+ * L3 Table manifest — 61 tables from the SQL generation package.
  * Matches sql/l3/01_DDL_all_tables.sql and execution order in 06_ORCHESTRATOR.sql.
  * T51-T52: Calculated overlay tables (derived fields split from L2 snapshots).
  * T53-T54: Promoted from L2 (entirely computed tables).
@@ -77,6 +77,12 @@ export const L3_TABLES: L3TableDef[] = [
   // T55-T56: Additional calculated overlay tables (derived fields split from L2 snapshots)
   { id: 'T55', name: 'facility_risk_calc',                  category: 'Exposure & Risk Metrics',                 tier: 1 },
   { id: 'T56', name: 'netting_set_exposure_calc',           category: 'Exposure & Risk Metrics',                 tier: 1 },
+  // T57-T62: Layer reassignment overlay tables (derived fields split from L2 per architecture review)
+  { id: 'T57', name: 'counterparty_rating_calc',            category: 'Credit Events & Performance',             tier: 1 },
+  { id: 'T58', name: 'facility_pricing_calc',               category: 'Facility Analytics',                      tier: 1 },
+  { id: 'T59', name: 'deal_pipeline_calc',                  category: 'Business Segment Summary',                tier: 1 },
+  { id: 'T60', name: 'collateral_calc',                     category: 'Credit Risk Mitigation (CRM)',            tier: 1 },
+  { id: 'T61', name: 'cash_flow_calc',                      category: 'Cash Flows',                              tier: 1 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

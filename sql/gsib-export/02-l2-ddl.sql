@@ -296,6 +296,21 @@ CREATE TABLE IF NOT EXISTS "l2"."limit_utilization_event" (
     PRIMARY KEY ("limit_rule_id", "as_of_date")
 );
 
+-- limit_assignment_snapshot (Limits)
+CREATE TABLE IF NOT EXISTS "l2"."limit_assignment_snapshot" (
+    "facility_id" BIGINT NOT NULL,
+    "limit_rule_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "limit_amt" NUMERIC(20,4),
+    "assigned_date" DATE,
+    "expiry_date" DATE,
+    "status_code" VARCHAR(20),
+    "currency_code" VARCHAR(20),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("facility_id", "limit_rule_id", "as_of_date")
+);
+
 -- amendment_change_detail (Amendments)
 CREATE TABLE IF NOT EXISTS "l2"."amendment_change_detail" (
     "change_detail_id" BIGINT NOT NULL,

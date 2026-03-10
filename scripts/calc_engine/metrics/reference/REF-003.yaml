@@ -74,7 +74,7 @@ levels:
       SELECT
         dpf.facility_id AS dimension_key,
         dpf.expected_tenor_months AS metric_value
-      FROM l2.deal_pipeline_fact dpf
+      FROM l3.deal_pipeline_calc dpf
       WHERE dpf.as_of_date = :as_of_date
   counterparty:
     aggregation_type: WEIGHTED_AVG
@@ -89,7 +89,7 @@ levels:
         SELECT
           dpf.facility_id AS dimension_key,
           dpf.expected_tenor_months AS metric_value
-        FROM l2.deal_pipeline_fact dpf
+        FROM l3.deal_pipeline_calc dpf
         WHERE dpf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -108,7 +108,7 @@ levels:
         SELECT
           dpf.facility_id AS dimension_key,
           dpf.expected_tenor_months AS metric_value
-        FROM l2.deal_pipeline_fact dpf
+        FROM l3.deal_pipeline_calc dpf
         WHERE dpf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -129,7 +129,7 @@ levels:
         SELECT
           dpf.facility_id AS dimension_key,
           dpf.expected_tenor_months AS metric_value
-        FROM l2.deal_pipeline_fact dpf
+        FROM l3.deal_pipeline_calc dpf
         WHERE dpf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -152,7 +152,7 @@ levels:
         SELECT
           dpf.facility_id AS dimension_key,
           dpf.expected_tenor_months AS metric_value
-        FROM l2.deal_pipeline_fact dpf
+        FROM l3.deal_pipeline_calc dpf
         WHERE dpf.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

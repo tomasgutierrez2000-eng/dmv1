@@ -82,7 +82,7 @@ levels:
       SELECT
         ffs.facility_id AS dimension_key,
         ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value
-      FROM l2.facility_financial_snapshot ffs
+      FROM l3.facility_financial_calc ffs
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -100,7 +100,7 @@ levels:
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
           COALESCE(fes.drawn_amount, 0) AS drawn_amount
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
@@ -125,7 +125,7 @@ levels:
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
           COALESCE(fes.drawn_amount, 0) AS drawn_amount
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
@@ -152,7 +152,7 @@ levels:
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
           COALESCE(fes.drawn_amount, 0) AS drawn_amount
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
@@ -181,7 +181,7 @@ levels:
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
           COALESCE(fes.drawn_amount, 0) AS drawn_amount
-        FROM l2.facility_financial_snapshot ffs
+        FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date

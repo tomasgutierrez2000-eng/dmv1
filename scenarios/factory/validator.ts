@@ -123,40 +123,114 @@ export function validateScenario(
     }
   }
 
-  // Facility financial snapshots
-  for (const ffs of (l2Data.facility_financial_snapshot ?? [])) {
-    if (!facilityIds.has(ffs.facility_id)) {
-      errors.push(`Facility financial snapshot: facility_id ${ffs.facility_id} not in L1`);
-    }
-    if (!counterpartyIds.has(ffs.counterparty_id)) {
-      errors.push(`Facility financial snapshot: counterparty_id ${ffs.counterparty_id} not in L1`);
-    }
-  }
-
-  // Counterparty financial snapshots
-  for (const cfs of (l2Data.counterparty_financial_snapshot ?? [])) {
-    if (!counterpartyIds.has(cfs.counterparty_id)) {
-      errors.push(`Counterparty financial snapshot: counterparty_id ${cfs.counterparty_id} not in L1`);
-    }
-  }
-
-  // Facility credit approvals
-  for (const fca of (l2Data.facility_credit_approval ?? [])) {
-    if (!facilityIds.has(fca.facility_id)) {
-      errors.push(`Facility credit approval: facility_id ${fca.facility_id} not in L1`);
-    }
-    if (fca.counterparty_id && !counterpartyIds.has(fca.counterparty_id)) {
-      errors.push(`Facility credit approval: counterparty_id ${fca.counterparty_id} not in L1`);
+  // Facility pricing snapshots
+  for (const fp of (l2Data.facility_pricing_snapshot ?? [])) {
+    if (!facilityIds.has(fp.facility_id)) {
+      errors.push(`Facility pricing: facility_id ${fp.facility_id} not in L1`);
     }
   }
 
   // Facility risk snapshots
-  for (const frs of (l2Data.facility_risk_snapshot ?? [])) {
-    if (!facilityIds.has(frs.facility_id)) {
-      errors.push(`Facility risk snapshot: facility_id ${frs.facility_id} not in L1`);
+  for (const fr of (l2Data.facility_risk_snapshot ?? [])) {
+    if (!facilityIds.has(fr.facility_id)) {
+      errors.push(`Facility risk: facility_id ${fr.facility_id} not in L1`);
     }
-    if (!counterpartyIds.has(frs.counterparty_id)) {
-      errors.push(`Facility risk snapshot: counterparty_id ${frs.counterparty_id} not in L1`);
+    if (!counterpartyIds.has(fr.counterparty_id)) {
+      errors.push(`Facility risk: counterparty_id ${fr.counterparty_id} not in L1`);
+    }
+  }
+
+  // Facility financial snapshots
+  for (const ff of (l2Data.facility_financial_snapshot ?? [])) {
+    if (!facilityIds.has(ff.facility_id)) {
+      errors.push(`Facility financial: facility_id ${ff.facility_id} not in L1`);
+    }
+  }
+
+  // Positions
+  for (const pos of (l2Data.position ?? [])) {
+    if (!facilityIds.has(pos.facility_id)) {
+      errors.push(`Position ${pos.position_id}: facility_id ${pos.facility_id} not in L1`);
+    }
+    if (!counterpartyIds.has(pos.counterparty_id)) {
+      errors.push(`Position ${pos.position_id}: counterparty_id ${pos.counterparty_id} not in L1`);
+    }
+  }
+
+  // Position details → position FK
+  const positionIds = new Set((l2Data.position ?? []).map(p => p.position_id));
+  for (const pd of (l2Data.position_detail ?? [])) {
+    if (!positionIds.has(pd.position_id)) {
+      errors.push(`Position detail ${pd.position_detail_id}: position_id ${pd.position_id} not in generated positions`);
+    }
+  }
+
+  // Cash flows
+  for (const cf of (l2Data.cash_flow ?? [])) {
+    if (!facilityIds.has(cf.facility_id)) {
+      errors.push(`Cash flow ${cf.cash_flow_id}: facility_id ${cf.facility_id} not in L1`);
+    }
+    if (!counterpartyIds.has(cf.counterparty_id)) {
+      errors.push(`Cash flow ${cf.cash_flow_id}: counterparty_id ${cf.counterparty_id} not in L1`);
+    }
+  }
+
+  // LOB attribution
+  for (const la of (l2Data.facility_lob_attribution ?? [])) {
+    if (!facilityIds.has(la.facility_id)) {
+      errors.push(`LOB attribution ${la.attribution_id}: facility_id ${la.facility_id} not in L1`);
+    }
+  }
+
+  // Counterparty financial snapshots
+  for (const cpf of (l2Data.counterparty_financial_snapshot ?? [])) {
+    if (!counterpartyIds.has(cpf.counterparty_id)) {
+      errors.push(`CP financial ${cpf.financial_snapshot_id}: counterparty_id ${cpf.counterparty_id} not in L1`);
+    }
+  }
+
+  // Facility profitability
+  for (const fp of (l2Data.facility_profitability_snapshot ?? [])) {
+    if (!facilityIds.has(fp.facility_id)) {
+      errors.push(`Facility profitability: facility_id ${fp.facility_id} not in L1`);
+    }
+  }
+
+  // Amendment change details → amendment FK
+  const amendmentIds = new Set((l2Data.amendment_event ?? []).map(a => a.amendment_id));
+  for (const acd of (l2Data.amendment_change_detail ?? [])) {
+    if (!amendmentIds.has(acd.amendment_id)) {
+      errors.push(`Amendment detail ${acd.change_detail_id}: amendment_id ${acd.amendment_id} not in generated amendments`);
+    }
+  }
+
+  // Exception events
+  for (const ee of (l2Data.exception_event ?? [])) {
+    if (!facilityIds.has(ee.facility_id)) {
+      errors.push(`Exception ${ee.exception_id}: facility_id ${ee.facility_id} not in L1`);
+    }
+    if (!counterpartyIds.has(ee.counterparty_id)) {
+      errors.push(`Exception ${ee.exception_id}: counterparty_id ${ee.counterparty_id} not in L1`);
+    }
+  }
+
+  // Credit approvals
+  for (const ca of (l2Data.facility_credit_approval ?? [])) {
+    if (!facilityIds.has(ca.facility_id)) {
+      errors.push(`Credit approval ${ca.approval_id}: facility_id ${ca.facility_id} not in L1`);
+    }
+    if (!counterpartyIds.has(ca.counterparty_id)) {
+      errors.push(`Credit approval ${ca.approval_id}: counterparty_id ${ca.counterparty_id} not in L1`);
+    }
+  }
+
+  // Financial metric observations
+  for (const fmo of (l2Data.financial_metric_observation ?? [])) {
+    if (!counterpartyIds.has(fmo.counterparty_id)) {
+      errors.push(`Metric observation ${fmo.observation_id}: counterparty_id ${fmo.counterparty_id} not in L1`);
+    }
+    if (!facilityIds.has(fmo.facility_id)) {
+      errors.push(`Metric observation ${fmo.observation_id}: facility_id ${fmo.facility_id} not in L1`);
     }
   }
 
@@ -214,42 +288,43 @@ export function validateScenario(
     evtPKs.add(evt.credit_event_id);
   }
 
-  // Facility financial snapshots: composite PK (facility_id, as_of_date)
-  const ffsPKs = new Set<string>();
-  for (const ffs of (l2Data.facility_financial_snapshot ?? [])) {
-    const pk = `${ffs.facility_id}|${ffs.as_of_date}`;
-    if (ffsPKs.has(pk)) {
-      errors.push(`Duplicate facility_financial_snapshot PK: facility=${ffs.facility_id}, date=${ffs.as_of_date}`);
+  // Facility pricing: composite PK (facility_id, as_of_date)
+  const pricingPKs = new Set<string>();
+  for (const fp of (l2Data.facility_pricing_snapshot ?? [])) {
+    const pk = `${fp.facility_id}|${fp.as_of_date}`;
+    if (pricingPKs.has(pk)) {
+      errors.push(`Duplicate facility_pricing PK: facility=${fp.facility_id}, date=${fp.as_of_date}`);
     }
-    ffsPKs.add(pk);
+    pricingPKs.add(pk);
   }
 
-  // Facility risk snapshots: composite PK (facility_id, as_of_date)
-  const frsPKs = new Set<string>();
-  for (const frs of (l2Data.facility_risk_snapshot ?? [])) {
-    const pk = `${frs.facility_id}|${frs.as_of_date}`;
-    if (frsPKs.has(pk)) {
-      errors.push(`Duplicate facility_risk_snapshot PK: facility=${frs.facility_id}, date=${frs.as_of_date}`);
+  // Facility risk: composite PK (facility_id, as_of_date)
+  const riskPKs = new Set<string>();
+  for (const fr of (l2Data.facility_risk_snapshot ?? [])) {
+    const pk = `${fr.facility_id}|${fr.as_of_date}`;
+    if (riskPKs.has(pk)) {
+      errors.push(`Duplicate facility_risk PK: facility=${fr.facility_id}, date=${fr.as_of_date}`);
     }
-    frsPKs.add(pk);
+    riskPKs.add(pk);
   }
 
-  // Counterparty financial snapshots: single PK (financial_snapshot_id)
-  const cfsPKs = new Set<number>();
-  for (const cfs of (l2Data.counterparty_financial_snapshot ?? [])) {
-    if (cfsPKs.has(cfs.financial_snapshot_id)) {
-      errors.push(`Duplicate counterparty_financial_snapshot PK: ${cfs.financial_snapshot_id}`);
+  // Facility financial: composite PK (facility_id, as_of_date)
+  const finPKs = new Set<string>();
+  for (const ff of (l2Data.facility_financial_snapshot ?? [])) {
+    const pk = `${ff.facility_id}|${ff.as_of_date}`;
+    if (finPKs.has(pk)) {
+      errors.push(`Duplicate facility_financial PK: facility=${ff.facility_id}, date=${ff.as_of_date}`);
     }
-    cfsPKs.add(cfs.financial_snapshot_id);
+    finPKs.add(pk);
   }
 
-  // Facility credit approvals: single PK (approval_id)
-  const fcaPKs = new Set<number>();
-  for (const fca of (l2Data.facility_credit_approval ?? [])) {
-    if (fcaPKs.has(fca.approval_id)) {
-      errors.push(`Duplicate facility_credit_approval PK: ${fca.approval_id}`);
+  // Position: single PK (position_id)
+  const posPKs = new Set<number>();
+  for (const pos of (l2Data.position ?? [])) {
+    if (posPKs.has(pos.position_id)) {
+      errors.push(`Duplicate position PK: ${pos.position_id}`);
     }
-    fcaPKs.add(fca.approval_id);
+    posPKs.add(pos.position_id);
   }
 
   // ── 5. Data Completeness ──
@@ -302,13 +377,20 @@ export function validateScenario(
     (l2Data.counterparty_rating_observation?.length ?? 0) +
     (l2Data.collateral_snapshot?.length ?? 0) +
     (l2Data.facility_delinquency_snapshot?.length ?? 0) +
-    ((l2Data as Record<string, unknown[]>).facility_pricing_snapshot?.length ?? 0) +
-    (l2Data.limit_contribution_snapshot?.length ?? 0) +
-    (l2Data.data_quality_score_snapshot?.length ?? 0) +
+    (l2Data.facility_pricing_snapshot?.length ?? 0) +
+    (l2Data.facility_risk_snapshot?.length ?? 0) +
     (l2Data.facility_financial_snapshot?.length ?? 0) +
     (l2Data.counterparty_financial_snapshot?.length ?? 0) +
-    (l2Data.facility_credit_approval?.length ?? 0) +
-    (l2Data.facility_risk_snapshot?.length ?? 0);
+    (l2Data.facility_profitability_snapshot?.length ?? 0) +
+    (l2Data.facility_lob_attribution?.length ?? 0) +
+    (l2Data.position?.length ?? 0) +
+    (l2Data.position_detail?.length ?? 0) +
+    (l2Data.cash_flow?.length ?? 0) +
+    (l2Data.netting_set_exposure_snapshot?.length ?? 0) +
+    (l2Data.financial_metric_observation?.length ?? 0) +
+    (l2Data.metric_threshold?.length ?? 0) +
+    (l2Data.limit_contribution_snapshot?.length ?? 0) +
+    (l2Data.data_quality_score_snapshot?.length ?? 0);
 
   const totalInserts = chain.counterparties.length +
     chain.agreements.length +

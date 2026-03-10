@@ -122,10 +122,22 @@ function l2ToTables(l2Data: ReturnType<typeof generateL2Data>): TableData[] {
     ['l2.stress_test_breach', l2Data.stress_test_breach],
     ['l2.deal_pipeline_fact', l2Data.deal_pipeline_fact],
     ['l2.data_quality_score_snapshot', l2Data.data_quality_score_snapshot],
-    ['l2.facility_financial_snapshot', l2Data.facility_financial_snapshot],
-    ['l2.counterparty_financial_snapshot', l2Data.counterparty_financial_snapshot],
-    ['l2.facility_credit_approval', l2Data.facility_credit_approval],
+    // New tables
+    ['l2.facility_pricing_snapshot', l2Data.facility_pricing_snapshot],
     ['l2.facility_risk_snapshot', l2Data.facility_risk_snapshot],
+    ['l2.facility_financial_snapshot', l2Data.facility_financial_snapshot],
+    ['l2.position', l2Data.position],
+    ['l2.position_detail', l2Data.position_detail],
+    ['l2.cash_flow', l2Data.cash_flow],
+    ['l2.facility_lob_attribution', l2Data.facility_lob_attribution],
+    ['l2.counterparty_financial_snapshot', l2Data.counterparty_financial_snapshot],
+    ['l2.facility_profitability_snapshot', l2Data.facility_profitability_snapshot],
+    ['l2.amendment_change_detail', l2Data.amendment_change_detail],
+    ['l2.exception_event', l2Data.exception_event],
+    ['l2.facility_credit_approval', l2Data.facility_credit_approval],
+    ['l2.financial_metric_observation', l2Data.financial_metric_observation],
+    ['l2.netting_set_exposure_snapshot', l2Data.netting_set_exposure_snapshot],
+    ['l2.metric_threshold', l2Data.metric_threshold],
   ];
 
   for (const [table, rows] of mapping) {

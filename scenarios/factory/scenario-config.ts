@@ -138,6 +138,20 @@ export interface L2TableOverrides {
   limit_utilization_event?: { generate: boolean };
   limit_contribution_snapshot?: { generate: boolean };
   exposure_counterparty_attribution?: { generate: boolean };
+  // New table overrides
+  facility_financial_snapshot?: { generate: boolean };
+  facility_risk_snapshot?: { generate: boolean };
+  position?: { generate: boolean };
+  cash_flow?: { generate: boolean };
+  facility_lob_attribution?: { generate: boolean };
+  counterparty_financial_snapshot?: { generate: boolean };
+  facility_profitability_snapshot?: { generate: boolean };
+  amendment_change_detail?: { generate: boolean };
+  exception_event?: { generate: boolean };
+  facility_credit_approval?: { generate: boolean };
+  financial_metric_observation?: { generate: boolean };
+  netting_set_exposure_snapshot?: { generate: boolean };
+  metric_threshold?: { generate: boolean };
 }
 
 /* ────────────────── Full Scenario Config ────────────────── */

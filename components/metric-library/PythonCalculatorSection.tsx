@@ -26,7 +26,7 @@ export default function PythonCalculatorSection({
 }: {
   executableMetricId?: string | null;
 }) {
-  const [activeTab, setActiveTab] = useState<'source' | 'run'>('source');
+  const [activeTab, setActiveTab] = useState<'source' | 'run'>('run');
   const [source, setSource] = useState<CalculatorSource | null>(null);
   const [sourceLoading, setSourceLoading] = useState(false);
   const [sourceError, setSourceError] = useState<string | null>(null);
@@ -97,19 +97,6 @@ export default function PythonCalculatorSection({
       <div className="flex gap-1.5" role="tablist">
         <button
           role="tab"
-          aria-selected={activeTab === 'source'}
-          onClick={() => setActiveTab('source')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-            activeTab === 'source'
-              ? 'bg-purple-500 text-white shadow-md'
-              : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-          }`}
-        >
-          <Code2 className="w-3.5 h-3.5" />
-          Source Code
-        </button>
-        <button
-          role="tab"
           aria-selected={activeTab === 'run'}
           onClick={() => setActiveTab('run')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
@@ -120,6 +107,19 @@ export default function PythonCalculatorSection({
         >
           <Play className="w-3.5 h-3.5" />
           Run Calculator
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'source'}
+          onClick={() => setActiveTab('source')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            activeTab === 'source'
+              ? 'bg-purple-500 text-white shadow-md'
+              : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+          }`}
+        >
+          <Code2 className="w-3.5 h-3.5" />
+          Source Code
         </button>
       </div>
 

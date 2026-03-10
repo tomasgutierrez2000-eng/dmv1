@@ -143,6 +143,7 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
+          AND pdtl.detail_type = 'PRINCIPAL'
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id
       ) fac
@@ -178,6 +179,7 @@ levels:
           INNER JOIN l2.position_detail pdtl
             ON pdtl.position_id = pos.position_id
             AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
           WHERE pos.as_of_date = :as_of_date
           GROUP BY pos.facility_id
         ) fac
@@ -216,6 +218,7 @@ levels:
           INNER JOIN l2.position_detail pdtl
             ON pdtl.position_id = pos.position_id
             AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
           WHERE pos.as_of_date = :as_of_date
           GROUP BY pos.facility_id
         ) fac
@@ -257,6 +260,7 @@ levels:
           INNER JOIN l2.position_detail pdtl
             ON pdtl.position_id = pos.position_id
             AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
           WHERE pos.as_of_date = :as_of_date
           GROUP BY pos.facility_id
         ) fac
@@ -300,6 +304,7 @@ levels:
           INNER JOIN l2.position_detail pdtl
             ON pdtl.position_id = pos.position_id
             AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
           WHERE pos.as_of_date = :as_of_date
           GROUP BY pos.facility_id
         ) fac

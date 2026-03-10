@@ -58,7 +58,12 @@ class InterestExpenseCalculator(BaseCalculator):
         # Step 1: SUM(funded_amount) per facility from position → position_detail
         pos_f = filter_by_date(pos, "as_of_date", as_of_date)[["position_id", "facility_id"]].drop_duplicates()
 
-        pdtl_f = filter_by_date(pdtl, "as_of_date", as_of_date)[["position_id", "funded_amount"]].copy()
+        pdtl_f = filter_by_date(pdtl, "as_of_date", as_of_date)
+        # Only count PRINCIPAL detail rows — INTEREST/FEE rows carry the balance
+        # the accrual is computed on, not additional funded principal
+        if "detail_type" in pdtl_f.columns:
+            pdtl_f = pdtl_f[pdtl_f["detail_type"].astype(str).str.upper() == "PRINCIPAL"]
+        pdtl_f = pdtl_f[["position_id", "funded_amount"]].copy()
         pdtl_f["funded_amount"] = pdtl_f["funded_amount"].fillna(0.0)
 
         j = pos_f.merge(pdtl_f, on="position_id", how="inner")

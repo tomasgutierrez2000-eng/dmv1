@@ -1,13 +1,14 @@
-"""Undrawn Exposure calculator — SUM(unfunded_amount) × bank_share_pct.
+"""Undrawn Exposure calculator — (committed_facility_amt − SUM(funded_amount)) × bank_share_pct.
 
 L1/L2 → Python → L3 Pipeline:
   L2 Inputs:  position (position_id, facility_id, as_of_date)
-              position_detail (unfunded_amount)
-  L2 Inputs:  facility_master (is_active_flag)
+              position_detail (funded_amount)
+  L2 Inputs:  facility_master (committed_facility_amt, is_active_flag)
               facility_lender_allocation (bank_share_pct)
               facility_counterparty_participation (participation_pct)
   L1 Inputs:  enterprise_business_taxonomy (hierarchy)
-  Formula:    SUM(unfunded_amount per position) × bank_share_pct / 100
+  Formula:    (committed_facility_amt − SUM(funded_amount)) × bank_share_pct / 100
+              Derived as Committed Exposure minus Outstanding Exposure (FR Y-14Q).
   L3 Output:  undrawn_exposure_usd per dimension
 """
 
@@ -38,7 +39,8 @@ class UndrawnExposureCalculator(BaseCalculator):
 
     def extra_field_mapping(self) -> dict[str, str]:
         return {
-            "unfunded_amount_sum": "unfunded_amt",
+            "committed_facility_amt": "committed_facility_amt",
+            "funded_amount_sum": "funded_amt",
             "bank_share_pct": "bank_share_pct",
         }
 
@@ -47,43 +49,54 @@ class UndrawnExposureCalculator(BaseCalculator):
         # L2 inputs
         fm = loader.load_table("L2", "facility_master")
         fla = loader.load_table("L2", "facility_lender_allocation")
-        # L2 inputs
         pos = loader.load_table("L2", "position")
         pdtl = loader.load_table("L2", "position_detail")
 
-        # Filter positions to as_of_date
+        # Step 1: SUM(funded_amount) per facility from position → position_detail
         pos_f = filter_by_date(pos, "as_of_date", as_of_date)[["position_id", "facility_id"]].drop_duplicates()
 
-        pdtl_f = filter_by_date(pdtl, "as_of_date", as_of_date)[["position_id", "unfunded_amount"]].copy()
-        pdtl_f["unfunded_amount"] = pdtl_f["unfunded_amount"].fillna(0.0)
+        pdtl_f = filter_by_date(pdtl, "as_of_date", as_of_date)
+        # Only count PRINCIPAL detail rows — INTEREST/FEE rows carry the balance
+        # the accrual is computed on, not additional funded principal
+        if "detail_type" in pdtl_f.columns:
+            pdtl_f = pdtl_f[pdtl_f["detail_type"].astype(str).str.upper() == "PRINCIPAL"]
+        pdtl_f = pdtl_f[["position_id", "funded_amount"]].copy()
+        pdtl_f["funded_amount"] = pdtl_f["funded_amount"].fillna(0.0)
 
-        # Join position → position_detail, SUM(unfunded_amount) per facility
         j = pos_f.merge(pdtl_f, on="position_id", how="inner")
-        fac_sum = j.groupby("facility_id", as_index=False).agg(
-            unfunded_amount_sum=("unfunded_amount", "sum")
+        funded_sum = j.groupby("facility_id", as_index=False).agg(
+            funded_amount_sum=("funded_amount", "sum")
         )
 
-        # Filter active facilities
-        fm_sub = fm[["facility_id", "is_active_flag"]].copy()
+        # Step 2: Get committed_facility_amt and filter active facilities
+        fm_sub = fm[["facility_id", "committed_facility_amt", "is_active_flag"]].copy()
         fm_sub["is_active_flag"] = (
             fm_sub["is_active_flag"].fillna("").astype(str).str.upper().str.strip()
         )
         fm_sub = fm_sub[fm_sub["is_active_flag"].isin(_ACTIVE_TRUTHY)]
-        fac_sum = fac_sum.merge(fm_sub[["facility_id"]], on="facility_id", how="inner")
+        fm_sub["committed_facility_amt"] = fm_sub["committed_facility_amt"].fillna(0.0)
 
-        # Join bank_share_pct from facility_lender_allocation (NOT facility_master)
+        # Step 3: Merge funded sums with facility master
+        fac = fm_sub[["facility_id", "committed_facility_amt"]].merge(
+            funded_sum, on="facility_id", how="left"
+        )
+        fac["funded_amount_sum"] = fac["funded_amount_sum"].fillna(0.0)
+
+        # Step 4: Join bank_share_pct from facility_lender_allocation
         fla_sub = fla[["facility_id", "bank_share_pct"]].drop_duplicates("facility_id")
-        fac_sum = fac_sum.merge(fla_sub, on="facility_id", how="left")
-        fac_sum["bank_share_pct"] = fac_sum["bank_share_pct"].fillna(100.0)
+        fac = fac.merge(fla_sub, on="facility_id", how="left")
+        fac["bank_share_pct"] = fac["bank_share_pct"].fillna(100.0)
 
-        # L3 output: unfunded_sum × bank_share / 100
-        fac_sum["undrawn_exposure_usd"] = (
-            fac_sum["unfunded_amount_sum"] * fac_sum["bank_share_pct"] / 100.0
+        # L3 output: (committed - funded) × bank_share / 100
+        # Derived as Committed Exposure minus Outstanding Exposure (FR Y-14Q)
+        fac["undrawn_exposure_usd"] = (
+            (fac["committed_facility_amt"] - fac["funded_amount_sum"])
+            * fac["bank_share_pct"] / 100.0
         )
 
-        return fac_sum[
+        return fac[
             ["facility_id", "undrawn_exposure_usd",
-             "unfunded_amount_sum", "bank_share_pct"]
+             "committed_facility_amt", "funded_amount_sum", "bank_share_pct"]
         ]
 
     # ── L2 → Python → L3: Counterparty Level ──────────────────

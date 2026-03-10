@@ -121,6 +121,7 @@ levels:
       INNER JOIN l2.position_detail pdtl
         ON pdtl.position_id = pos.position_id
         AND pdtl.as_of_date = pos.as_of_date
+        AND pdtl.detail_type = 'PRINCIPAL'
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = pos.facility_id
         AND fm.is_active_flag = 'Y'
@@ -147,6 +148,7 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
+          AND pdtl.detail_type = 'PRINCIPAL'
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND fm.is_active_flag = 'Y'
@@ -176,6 +178,7 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
+          AND pdtl.detail_type = 'PRINCIPAL'
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND fm.is_active_flag = 'Y'
@@ -207,6 +210,7 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
+          AND pdtl.detail_type = 'PRINCIPAL'
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND fm.is_active_flag = 'Y'
@@ -240,6 +244,7 @@ levels:
         INNER JOIN l2.position_detail pdtl
           ON pdtl.position_id = pos.position_id
           AND pdtl.as_of_date = pos.as_of_date
+          AND pdtl.detail_type = 'PRINCIPAL'
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = pos.facility_id
           AND fm.is_active_flag = 'Y'

@@ -5,7 +5,7 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-017"
 name: "Undrawn Exposure ($)"
-version: "2.0.0"
+version: "2.1.0"
 owner: "credit-risk"
 status: ACTIVE
 effective_date: "2026-01-01"
@@ -18,10 +18,11 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Bank-share-adjusted unfunded commitment amount. Measures contingent
-  funding risk by summing unfunded positions per facility, applying
-  the bank's share percentage from facility_lender_allocation.
-  Derived as Committed Exposure minus Outstanding Exposure.
+  Bank-share-adjusted unfunded commitment amount. Derived as
+  committed_facility_amt minus SUM(funded_amount) from PRINCIPAL positions,
+  multiplied by bank_share_pct / 100. Ensures the identity:
+  Committed Exposure = Outstanding Exposure + Undrawn Exposure.
+  Maps to FR Y-14Q Field 24 minus Field 25.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "FR Y-14Q"
@@ -57,7 +58,7 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: unfunded_amount
+      - name: funded_amount
         role: MEASURE
   - schema: l2
     table: facility_master
@@ -67,6 +68,9 @@ source_tables:
     fields:
       - name: facility_id
         role: JOIN_KEY
+      - name: committed_facility_amt
+        role: MEASURE
+        description: "Total approved committed credit amount (USD)"
       - name: counterparty_id
         role: DIMENSION
       - name: lob_segment_id
@@ -110,25 +114,31 @@ levels:
     aggregation_type: CUSTOM
     formula_text: |
       For each active facility:
-      1. Join position -> position_detail on position_id (both as_of_date filtered)
-      2. SUM(unfunded_amount) across all positions for the facility
+      1. SUM(funded_amount) from PRINCIPAL position_detail rows per facility
+      2. Subtract from committed_facility_amt to get unfunded amount
       3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation
+      Ensures: Committed Exposure = Outstanding Exposure + Undrawn Exposure
     formula_sql: |
       SELECT
-        pos.facility_id AS dimension_key,
-        SUM(COALESCE(pdtl.unfunded_amount, 0))
+        fm.facility_id AS dimension_key,
+        (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
-      FROM l2.position pos
-      INNER JOIN l2.position_detail pdtl
-        ON pdtl.position_id = pos.position_id
-        AND pdtl.as_of_date = pos.as_of_date
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = pos.facility_id
-        AND fm.is_active_flag = 'Y'
+      FROM l2.facility_master fm
+      LEFT JOIN (
+        SELECT
+          pos.facility_id,
+          SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_sum
+        FROM l2.position pos
+        INNER JOIN l2.position_detail pdtl
+          ON pdtl.position_id = pos.position_id
+          AND pdtl.as_of_date = pos.as_of_date
+          AND pdtl.detail_type = 'PRINCIPAL'
+        WHERE pos.as_of_date = :as_of_date
+        GROUP BY pos.facility_id
+      ) funded ON funded.facility_id = fm.facility_id
       LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
-      WHERE pos.as_of_date = :as_of_date
-      GROUP BY pos.facility_id, fla.bank_share_pct
+      WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: CUSTOM
     formula_text: |
@@ -140,20 +150,25 @@ levels:
         SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0)) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(COALESCE(pdtl.unfunded_amount, 0))
+          fm.facility_id,
+          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
-        FROM l2.position pos
-        INNER JOIN l2.position_detail pdtl
-          ON pdtl.position_id = pos.position_id
-          AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
-          AND fm.is_active_flag = 'Y'
+        FROM l2.facility_master fm
+        LEFT JOIN (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id, fla.bank_share_pct
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_counterparty_participation fcp
         ON fcp.facility_id = fac.facility_id
@@ -169,20 +184,25 @@ levels:
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(COALESCE(pdtl.unfunded_amount, 0))
+          fm.facility_id,
+          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
-        FROM l2.position pos
-        INNER JOIN l2.position_detail pdtl
-          ON pdtl.position_id = pos.position_id
-          AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
-          AND fm.is_active_flag = 'Y'
+        FROM l2.facility_master fm
+        LEFT JOIN (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id, fla.bank_share_pct
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
@@ -200,20 +220,25 @@ levels:
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(COALESCE(pdtl.unfunded_amount, 0))
+          fm.facility_id,
+          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
-        FROM l2.position pos
-        INNER JOIN l2.position_detail pdtl
-          ON pdtl.position_id = pos.position_id
-          AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
-          AND fm.is_active_flag = 'Y'
+        FROM l2.facility_master fm
+        LEFT JOIN (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id, fla.bank_share_pct
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
@@ -233,20 +258,25 @@ levels:
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(COALESCE(pdtl.unfunded_amount, 0))
+          fm.facility_id,
+          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
-        FROM l2.position pos
-        INNER JOIN l2.position_detail pdtl
-          ON pdtl.position_id = pos.position_id
-          AND pdtl.as_of_date = pos.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
-          AND fm.is_active_flag = 'Y'
+        FROM l2.facility_master fm
+        LEFT JOIN (
+          SELECT
+            pos.facility_id,
+            SUM(COALESCE(pdtl.funded_amount, 0)) AS funded_sum
+          FROM l2.position pos
+          INNER JOIN l2.position_detail pdtl
+            ON pdtl.position_id = pos.position_id
+            AND pdtl.as_of_date = pos.as_of_date
+            AND pdtl.detail_type = 'PRINCIPAL'
+          WHERE pos.as_of_date = :as_of_date
+          GROUP BY pos.facility_id
+        ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id, fla.bank_share_pct
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id

@@ -910,10 +910,18 @@
       "numerator": [
         {
           "op": "*",
-          "field": "unfunded_amount",
-          "label": "unfunded_amount",
+          "field": "funded_amount",
+          "label": "funded_amount",
           "sample_value": 0,
           "source_table": "position_detail",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_facility_amt",
+          "label": "Total approved committed credit amount (USD)",
+          "sample_value": 0,
+          "source_table": "facility_master",
           "source_layer": "L2"
         },
         {
@@ -935,14 +943,20 @@
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(unfunded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n"
+      "formula_display": "For each active facility:\n1. SUM(funded_amount) from PRINCIPAL position_detail rows per facility\n2. Subtract from committed_facility_amt to get unfunded amount\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\nEnsures: Committed Exposure = Outstanding Exposure + Undrawn Exposure\n"
     },
     "worked_example_columns": [
       {
-        "field": "unfunded_amount",
-        "header": "Unfunded Amount",
+        "field": "funded_amount",
+        "header": "Funded Amount",
         "format": "number",
         "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_facility_amt",
+        "header": "Committed Facility ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
       },
       {
         "field": "bank_share_pct",

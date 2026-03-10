@@ -44,6 +44,8 @@ export interface DbStatusSummary {
 export interface DbStatusResult {
   connected: boolean;
   databaseUrl: boolean;
+  databaseId?: string;
+  databaseLabel?: string;
   timestamp: string;
   summary: DbStatusSummary;
   tables: TableDbStatus[];
@@ -150,13 +152,14 @@ function formatPgColumnType(row: { data_type: string; character_maximum_length?:
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStatusResult> {
+export async function getDbStatus(options?: { exact?: boolean; databaseUrl?: string }): Promise<DbStatusResult> {
   const dd = readDataDictionary();
   const ddMap = dd ? flattenDd(dd) : new Map();
   const timestamp = new Date().toISOString();
+  const connString = options?.databaseUrl ?? process.env.DATABASE_URL;
 
-  // No DATABASE_URL — return all DD tables as not_in_db
-  if (!process.env.DATABASE_URL) {
+  // No connection string — return all DD tables as not_in_db
+  if (!connString) {
     const tables: TableDbStatus[] = [];
     for (const [key, info] of ddMap) {
       const name = key.split('.').slice(1).join('.');
@@ -199,9 +202,9 @@ export async function getDbStatus(options?: { exact?: boolean }): Promise<DbStat
   }
 
   const client = new pg.default.Client({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: connString,
     connectionTimeoutMillis: 5000,
-    ssl: process.env.DATABASE_URL.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
+    ssl: connString.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
   });
 
   try {

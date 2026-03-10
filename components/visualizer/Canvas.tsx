@@ -54,18 +54,6 @@ export default function Canvas() {
   const focusFieldKeyRef = useRef<string | null>(null);
   const savedSearchPositionsRef = useRef<Record<string, TablePosition> | null>(null);
 
-  // Track canvas container width for compact search/filter layout (sidebar reduces available width)
-  const [containerWidth, setContainerWidth] = useState(900);
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const update = () => setContainerWidth(el.clientWidth);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   const {
     model,
     zoom,
@@ -355,13 +343,8 @@ export default function Canvas() {
   const compactOverview = (layoutMode === 'domain-overview' || layoutMode === 'snowflake') && viewMode === 'compact';
   const compactNarrowedPositions = useMemo(() => {
     if (visibleTables.length === 0) return {};
-    return calculateCompactNarrowedLayout(visibleTables, {
-      layoutMode,
-      tableSize,
-      compactOverview,
-      containerWidth,
-    });
-  }, [visibleTables, layoutMode, tableSize, compactOverview, containerWidth]);
+    return calculateCompactNarrowedLayout(visibleTables, { layoutMode, tableSize, compactOverview });
+  }, [visibleTables, layoutMode, tableSize, compactOverview]);
 
   // Narrowed view (search or filters): apply a compact, non-overlapping layout so tables
   // don't stay scattered at separate ends of the screen. Restore when both are cleared.
@@ -492,33 +475,28 @@ export default function Canvas() {
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false;
 
-  // Fit to view when user clicks toolbar "Fit to View", "Fit to results", or empty space.
+  // Fit to view when user clicks toolbar "Fit to View" or empty space.
   // Full diagram: apply "base" view = 30% more zoomed in than fit-all (user can zoom out from there).
-  // Focus mode / search/filter: fit exactly so all results stay on screen.
-  // Uses getState() for positions so we only depend on requestFitToView — avoids re-running on every position change (layout, drag).
+  // Focus mode: fit the focused tables as before.
   useEffect(() => {
     if (!model || !requestFitToView) return;
-    const store = useModelStore.getState();
-    const positions = store.tablePositions;
     const isFocusFit = Boolean(savedPositionsRef.current && focusVisibleTableKeys);
-    const isNarrowed = !!searchQuery.trim() || filtersNarrowing;
     let positionsForFit: TablePosition[];
     let count: number;
     if (isFocusFit) {
       positionsForFit = Array.from(focusVisibleTableKeys!)
-        .map((k) => positions[k])
+        .map((k) => tablePositions[k])
         .filter((p): p is TablePosition => !!p);
       count = positionsForFit.length;
     } else {
       positionsForFit = visibleTables
-        .map((t) => positions[t.key])
+        .map((t) => tablePositions[t.key])
         .filter((p): p is TablePosition => !!p);
       count = visibleTables.length;
     }
     if (positionsForFit.length === 0) return;
     setIsAnimating(true);
-    if (isFocusFit || isNarrowed) {
-      // Fit exactly — no zoom bump — so search/filter results stay fully visible
+    if (isFocusFit) {
       runFitToView(positionsForFit, count);
     } else {
       // Full diagram: base view = 30% more zoomed in than fit-all (revert-to view on empty click)
@@ -538,8 +516,7 @@ export default function Canvas() {
       }
     }
     setTimeout(() => setIsAnimating(false), 350);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- requestFitToView is the trigger; positions from getState(); searchQuery/filtersNarrowing read at run time
-  }, [requestFitToView, model, visibleTables, runFitToView, computeFitView, focusVisibleTableKeys, setPan, setZoom]);
+  }, [requestFitToView, model, visibleTables, tablePositions, runFitToView, computeFitView, focusVisibleTableKeys, setPan, setZoom]);
 
   // Fit to category when user clicks a category header: zoom in to show whole category (from any zoom level)
   const requestFitToDomain = useModelStore((s) => s.requestFitToDomain);

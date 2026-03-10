@@ -61,17 +61,13 @@ export interface CompactNarrowedLayoutOptions {
   layoutMode: LayoutMode;
   tableSize: TableSize;
   compactOverview: boolean;
-  /** Canvas container width in px. Used to wrap categories so layout fits on screen. Falls back to 900 if not provided. */
-  containerWidth?: number;
 }
 
 /**
  * Computes a compact flow layout for a set of tables so they appear grouped by category
  * with no overlap. Used when the user searches or applies filters so visible tables
  * don't stay scattered at "separate ends" of the full layout.
- * Categories flow left-to-right and wrap to new rows. Uses containerWidth so the
- * layout fits the actual canvas (not full window) and wraps aggressively to avoid
- * off-screen content.
+ * Categories flow left-to-right and wrap to new rows (spread out, not stacked vertically).
  * Returns positions keyed by table key; spacing guarantees no overlapping cards.
  */
 export function calculateCompactNarrowedLayout(
@@ -81,7 +77,7 @@ export function calculateCompactNarrowedLayout(
   const positions: Record<string, TablePosition> = {};
   if (tables.length === 0) return positions;
 
-  const { layoutMode, tableSize, compactOverview, containerWidth } = options;
+  const { layoutMode, tableSize, compactOverview } = options;
   const overviewDims = compactOverview ? getCompactOverviewTableDimensions() : getOverviewTableDimensions(tableSize);
   const isOverview = layoutMode === 'domain-overview' || layoutMode === 'snowflake';
   const tw = isOverview ? overviewDims.width : BASE_CARD.TABLE_WIDTH * SIZE_MULTIPLIERS[tableSize].width;
@@ -100,12 +96,12 @@ export function calculateCompactNarrowedLayout(
 
   const sortedCategories = Array.from(byCategory.entries()).sort(([a], [b]) => a.localeCompare(b));
 
-  // Use actual canvas container width so layout fits on screen (sidebar reduces available width).
-  // Wrap aggressively: target ~2 category blocks per row so content stays visible without panning.
+  // Flow layout: place categories left-to-right, wrap when row is full.
+  // Target row width fits ~3 category blocks so layout stays spread horizontally, not a tall vertical stack.
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1400;
   const categoryGap = Math.round(stepX * 0.5);
   const typicalCategoryWidth = 4 * stepX + categoryGap; // ~4 tables per category
-  const effectiveWidth = Math.max(containerWidth ?? 900, 400); // guard against 0 or tiny container
-  const targetRowWidth = Math.min(effectiveWidth * 0.9, Math.max(typicalCategoryWidth * 2, 600));
+  const targetRowWidth = Math.max(viewportWidth * 1.1, typicalCategoryWidth * 3);
 
   let currentX = 0;
   let currentY = 0;

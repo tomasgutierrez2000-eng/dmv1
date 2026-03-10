@@ -125,14 +125,14 @@ npm run validate         # Validate cross-referential integrity
 
 ## Environment Variables
 ```
-DATABASE_URL             # PostgreSQL (Neon) — golden source for schema
+DATABASE_URL             # PostgreSQL (GCP Cloud SQL) — golden source for schema
 GOOGLE_GEMINI_API_KEY    # Gemini agent
 ANTHROPIC_API_KEY        # Claude integration
 AGENT_PROVIDER           # gemini|claude|ollama
 ```
 
 ## Golden Source: PostgreSQL
-The live PostgreSQL database (Neon, via `DATABASE_URL`) is the **golden source of truth** for all table structures, fields, data types, PKs, and FKs. The data flow is:
+The live PostgreSQL database (GCP Cloud SQL, via `DATABASE_URL`) is the **golden source of truth** for all table structures, fields, data types, PKs, and FKs. The data flow is:
 
 1. **PostgreSQL** → `npm run db:introspect` → updates `data-dictionary.json` with exact types/PKs/FKs
 2. **data-dictionary.json** → consumed by visualizers, Excel exporter, validation, schema bundle API

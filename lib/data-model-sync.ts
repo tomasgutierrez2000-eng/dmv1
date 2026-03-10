@@ -205,7 +205,7 @@ async function applyTargetedSql(
     const client = new pg.default.Client({
       connectionString: databaseUrl,
       connectionTimeoutMillis: 10_000,
-      ssl: databaseUrl.includes('neon') ? { rejectUnauthorized: false } : undefined,
+      ssl: databaseUrl.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
     });
     await client.connect();
     try {

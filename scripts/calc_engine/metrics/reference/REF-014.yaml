@@ -34,9 +34,9 @@ source_tables:
     fields:
       - name: facility_id
         role: JOIN_KEY
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
-      - name: active_flag
+      - name: is_active_flag
         role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
@@ -53,31 +53,31 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Direct lookup of active_flag from facility_master.
+      Direct lookup of is_active_flag from facility_master.
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,
-        fm.active_flag AS metric_value
+        fm.is_active_flag AS metric_value
       FROM l1.facility_master fm
-      WHERE fm.active_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read active_flag per counterparty.
+      Read is_active_flag per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        fm.active_flag AS metric_value
+        fm.is_active_flag AS metric_value
       FROM l1.facility_master fm
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fm.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE fm.as_of_date = :as_of_date
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level active_flag per L3 desk segment.
+      SUM of facility-level is_active_flag per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -85,21 +85,21 @@ levels:
       FROM (
         SELECT
           fm.facility_id AS dimension_key,
-          fm.active_flag AS metric_value
+          fm.is_active_flag AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level active_flag per L2 portfolio segment.
+      SUM of facility-level is_active_flag per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -107,14 +107,14 @@ levels:
       FROM (
         SELECT
           fm.facility_id AS dimension_key,
-          fm.active_flag AS metric_value
+          fm.is_active_flag AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -123,7 +123,7 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level active_flag per L1 business segment segment.
+      SUM of facility-level is_active_flag per L1 business segment segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
@@ -131,14 +131,14 @@ levels:
       FROM (
         SELECT
           fm.facility_id AS dimension_key,
-          fm.active_flag AS metric_value
+          fm.is_active_flag AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -155,7 +155,7 @@ output:
 validations:
   - rule_id: "REF-014-V01"
     type: NOT_NULL
-    description: "No null active_flag values"
+    description: "No null is_active_flag values"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
@@ -164,7 +164,7 @@ catalogue:
   insight: >
     Portfolio activity level
   rollup_strategy: "direct-sum"
-  primary_value_field: "active_flag"
+  primary_value_field: "is_active_flag"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["reference", "master-data"]
 dashboard_pages: []

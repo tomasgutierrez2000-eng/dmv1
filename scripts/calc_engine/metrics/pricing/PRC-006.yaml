@@ -26,22 +26,22 @@ regulatory_references:
     description: ""
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l2
-    table: facility_pricing_snapshot
-    alias: fps
+  - schema: l3
+    table: facility_detail_snapshot
+    alias: fds
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: pricing_tier
+      - name: pricing_tier_code
         role: MEASURE
   - schema: l1
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = fps.facility_id"
+    join_on: "fm.facility_id = fds.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -49,7 +49,7 @@ source_tables:
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -66,66 +66,66 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Read pricing_tier from facility_pricing_snapshot for each facility as-of
+      Read pricing_tier_code from facility_detail_snapshot for each facility as-of
       reporting date.
     formula_sql: |
       SELECT
-        fps.facility_id AS dimension_key,
-        fps.pricing_tier AS metric_value
-      FROM l2.facility_pricing_snapshot fps
-      WHERE fps.as_of_date = :as_of_date
+        fds.facility_id AS dimension_key,
+        fds.pricing_tier_code AS metric_value
+      FROM l3.facility_detail_snapshot fds
+      WHERE fds.as_of_date = :as_of_date
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read pricing_tier per counterparty.
+      Read pricing_tier_code per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        fps.pricing_tier AS metric_value
-      FROM l2.facility_pricing_snapshot fps
+        fds.pricing_tier_code AS metric_value
+      FROM l3.facility_detail_snapshot fds
       INNER JOIN l1.facility_master fm
-        ON fm.facility_id = fps.facility_id
-        AND fm.active_flag = 'Y'
-      WHERE fps.as_of_date = :as_of_date
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level pricing_tier per L3 desk segment.
+      SUM of facility-level pricing_tier_code per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_tier AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.pricing_tier_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level pricing_tier per L2 portfolio segment.
+      SUM of facility-level pricing_tier_code per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_tier AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.pricing_tier_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -134,21 +134,21 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level pricing_tier per L1 business segment segment.
+      SUM of facility-level pricing_tier_code per L1 business segment segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_tier AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
+          fds.facility_id AS dimension_key,
+          fds.pricing_tier_code AS metric_value
+        FROM l3.facility_detail_snapshot fds
+        WHERE fds.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -165,7 +165,7 @@ output:
 validations:
   - rule_id: "PRC-006-V01"
     type: NOT_NULL
-    description: "No null pricing_tier values"
+    description: "No null pricing_tier_code values"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
@@ -174,7 +174,7 @@ catalogue:
   insight: >
     Pricing segmentation
   rollup_strategy: "direct-sum"
-  primary_value_field: "pricing_tier"
+  primary_value_field: "pricing_tier_code"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["pricing", "facility-pricing"]
 dashboard_pages: []

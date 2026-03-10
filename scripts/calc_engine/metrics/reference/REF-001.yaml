@@ -40,7 +40,7 @@ source_tables:
     role: DIMENSION
   - name: lob_segment_id
     role: DIMENSION
-  - name: active_flag
+  - name: is_active_flag
     role: FILTER
 - schema: l1
   table: enterprise_business_taxonomy
@@ -64,7 +64,7 @@ levels:
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fes.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
@@ -77,7 +77,7 @@ levels:
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fes.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
@@ -91,7 +91,7 @@ levels:
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fes.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       WHERE fes.as_of_date = :as_of_date
@@ -107,7 +107,7 @@ levels:
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fes.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -125,7 +125,7 @@ levels:
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fes.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

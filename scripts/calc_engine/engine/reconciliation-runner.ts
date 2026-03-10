@@ -139,7 +139,7 @@ async function checkCompleteness(
   const result = await executor.query(
     `SELECT fm.facility_id
      FROM l1.facility_master fm
-     WHERE fm.active_flag = 'Y'
+     WHERE fm.is_active_flag = 'Y'
        AND NOT EXISTS (
          SELECT 1 FROM l3.metric_result mr
          WHERE mr.run_id = :run_id

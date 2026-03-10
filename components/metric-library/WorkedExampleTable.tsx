@@ -122,7 +122,7 @@ export function PositionTable({ facility }: { facility: DemoFacility }) {
           {facility.positions.map((p) => (
             <tr key={p.position_id} className="border-b border-gray-800/50 hover:bg-white/[0.02]">
               <td className="py-2 px-3 font-mono text-xs text-gray-400">{p.position_id}</td>
-              <td className="py-2 px-3"><TypeBadge type={p.position_type} /></td>
+              <td className="py-2 px-3"><TypeBadge type={p.product_code} /></td>
               <td className="py-2 px-3 text-gray-300">{p.description}</td>
               <td className="py-2 px-3 text-right font-mono text-gray-200">{fmt(p.balance_amount)}</td>
             </tr>
@@ -418,7 +418,7 @@ function facilityToEntity(f: DemoFacility): DemoEntity {
     },
     positions: f.positions.map(p => ({
       position_id: p.position_id,
-      position_type: p.position_type,
+      product_code: p.product_code,
       balance_amount: p.balance_amount,
       description: p.description,
     })),

@@ -60,7 +60,7 @@ source_tables:
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy

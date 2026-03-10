@@ -40,7 +40,7 @@ source_tables:
     role: DIMENSION
   - name: lob_segment_id
     role: DIMENSION
-  - name: active_flag
+  - name: is_active_flag
     role: FILTER
 - schema: l1
   table: enterprise_business_taxonomy
@@ -64,7 +64,7 @@ levels:
       FROM l2.facility_risk_snapshot frs
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = frs.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -80,7 +80,7 @@ levels:
       FROM l2.facility_risk_snapshot frs
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = frs.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
 
       GROUP BY fm.counterparty_id
@@ -98,7 +98,7 @@ levels:
       FROM l2.facility_risk_snapshot frs
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = frs.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -117,7 +117,7 @@ levels:
       FROM l2.facility_risk_snapshot frs
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = frs.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -138,7 +138,7 @@ levels:
       FROM l2.facility_risk_snapshot frs
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = frs.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id

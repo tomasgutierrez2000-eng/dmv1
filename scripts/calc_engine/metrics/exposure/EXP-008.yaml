@@ -58,7 +58,7 @@ levels:
       FROM l3.counterparty_exposure_summary ces
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = ces.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.facility_lender_allocation fla
         ON fla.facility_id = ces.facility_id
         AND fla.is_current_flag = 'Y'
@@ -80,7 +80,7 @@ levels:
         FROM l3.counterparty_exposure_summary ces
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ces.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         LEFT JOIN l1.facility_lender_allocation fla
           ON fla.facility_id = ces.facility_id
           AND fla.is_current_flag = 'Y'
@@ -89,7 +89,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
@@ -107,7 +107,7 @@ levels:
         FROM l3.counterparty_exposure_summary ces
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ces.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         LEFT JOIN l1.facility_lender_allocation fla
           ON fla.facility_id = ces.facility_id
           AND fla.is_current_flag = 'Y'
@@ -116,7 +116,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
@@ -137,7 +137,7 @@ levels:
         FROM l3.counterparty_exposure_summary ces
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ces.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         LEFT JOIN l1.facility_lender_allocation fla
           ON fla.facility_id = ces.facility_id
           AND fla.is_current_flag = 'Y'
@@ -146,7 +146,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -169,7 +169,7 @@ levels:
         FROM l3.counterparty_exposure_summary ces
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ces.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         LEFT JOIN l1.facility_lender_allocation fla
           ON fla.facility_id = ces.facility_id
           AND fla.is_current_flag = 'Y'
@@ -178,7 +178,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

@@ -8,11 +8,38 @@
 
 export interface L2TableMeta {
   name: string;
-  scd: 'Snapshot' | 'Event';
+  scd: 'SCD-2' | 'Snapshot' | 'Event';
   category: string;
 }
 
 export const L2_TABLE_META: L2TableMeta[] = [
+  // ── SCD-2 (Versioned Masters — migrated from L1) ──
+  { name: 'counterparty', scd: 'SCD-2', category: 'Business Entity' },
+  { name: 'legal_entity', scd: 'SCD-2', category: 'Business Entity' },
+  { name: 'instrument_master', scd: 'SCD-2', category: 'Financial' },
+  { name: 'credit_agreement_master', scd: 'SCD-2', category: 'Business Entity' },
+  { name: 'facility_master', scd: 'SCD-2', category: 'Business Entity' },
+  { name: 'contract_master', scd: 'SCD-2', category: 'Financial' },
+  { name: 'netting_agreement', scd: 'SCD-2', category: 'Netting' },
+  { name: 'netting_set', scd: 'SCD-2', category: 'Netting' },
+  { name: 'netting_set_link', scd: 'SCD-2', category: 'Netting' },
+  { name: 'csa_master', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'margin_agreement', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'collateral_asset_master', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'collateral_link', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'crm_protection_master', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'protection_link', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'risk_mitigant_master', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'risk_mitigant_link', scd: 'SCD-2', category: 'Collateral & CRM' },
+  { name: 'counterparty_hierarchy', scd: 'SCD-2', category: 'Hierarchy' },
+  { name: 'legal_entity_hierarchy', scd: 'SCD-2', category: 'Hierarchy' },
+  { name: 'control_relationship', scd: 'SCD-2', category: 'Hierarchy' },
+  { name: 'economic_interdependence_relationship', scd: 'SCD-2', category: 'Hierarchy' },
+  { name: 'credit_agreement_counterparty_participation', scd: 'SCD-2', category: 'Counterparty Participation' },
+  { name: 'facility_counterparty_participation', scd: 'SCD-2', category: 'Counterparty Participation' },
+  { name: 'facility_lender_allocation', scd: 'SCD-2', category: 'Counterparty Participation' },
+  { name: 'fx_rate', scd: 'Snapshot', category: 'Market Data' },
+
   // ── Snapshots ──
   { name: 'position', scd: 'Snapshot', category: 'Position Core' },
   { name: 'position_detail', scd: 'Snapshot', category: 'Position Detail' },
@@ -31,6 +58,7 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'financial_metric_observation', scd: 'Snapshot', category: 'Metrics' },
   { name: 'counterparty_financial_snapshot', scd: 'Snapshot', category: 'Financial Metrics' },
   { name: 'facility_risk_snapshot', scd: 'Snapshot', category: 'Risk Monitoring' },
+  { name: 'data_quality_score_snapshot', scd: 'Snapshot', category: 'Data Quality' },
 
   // ── Events ──
   { name: 'cash_flow', scd: 'Event', category: 'Cash Flows' },
@@ -44,10 +72,7 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'exception_event', scd: 'Event', category: 'Exceptions' },
   { name: 'risk_flag', scd: 'Event', category: 'Risk Monitoring' },
   { name: 'facility_credit_approval', scd: 'Event', category: 'Approvals' },
-
-  // ── Tables in DB but not in original TS definitions ──
-  { name: 'data_quality_score_snapshot', scd: 'Snapshot', category: 'Data Quality' },
-  { name: 'metric_threshold', scd: 'Snapshot', category: 'Limits & Thresholds' },
+  { name: 'payment_ledger', scd: 'Event', category: 'Payments' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

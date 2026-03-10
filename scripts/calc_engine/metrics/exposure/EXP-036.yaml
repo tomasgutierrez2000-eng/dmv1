@@ -42,7 +42,7 @@ source_tables:
     role: DIMENSION
   - name: lob_segment_id
     role: DIMENSION
-  - name: active_flag
+  - name: is_active_flag
     role: FILTER
 - schema: l1
   table: enterprise_business_taxonomy
@@ -66,7 +66,7 @@ levels:
       FROM l2.counterparty_financial_snapshot cfs
       INNER JOIN l1.facility_master fm
         ON fm.counterparty_id = cfs.counterparty_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE cfs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -98,7 +98,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.counterparty_id = fac.counterparty_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       INNER JOIN l2.facility_exposure_snapshot fes_w
         ON fes_w.facility_id = fm.facility_id
         AND fes_w.as_of_date = :as_of_date
@@ -125,7 +125,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.counterparty_id = fac.counterparty_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       INNER JOIN l2.facility_exposure_snapshot fes_w
         ON fes_w.facility_id = fm.facility_id
         AND fes_w.as_of_date = :as_of_date
@@ -154,7 +154,7 @@ levels:
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.counterparty_id = fac.counterparty_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       INNER JOIN l2.facility_exposure_snapshot fes_w
         ON fes_w.facility_id = fm.facility_id
         AND fes_w.as_of_date = :as_of_date

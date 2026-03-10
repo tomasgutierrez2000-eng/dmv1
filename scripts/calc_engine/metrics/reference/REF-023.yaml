@@ -32,7 +32,7 @@ source_tables:
     fields:
       - name: facility_id
         role: JOIN_KEY
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
       - name: origination_date
         role: MEASURE
@@ -57,7 +57,7 @@ levels:
         fm.facility_id AS dimension_key,
         fm.origination_date AS metric_value
       FROM l1.facility_master fm
-      WHERE fm.active_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
     aggregation_type: SUM
@@ -72,12 +72,12 @@ levels:
           fm.facility_id AS dimension_key,
           fm.origination_date AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
@@ -92,12 +92,12 @@ levels:
           fm.facility_id AS dimension_key,
           fm.origination_date AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
@@ -114,12 +114,12 @@ levels:
           fm.facility_id AS dimension_key,
           fm.origination_date AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -138,12 +138,12 @@ levels:
           fm.facility_id AS dimension_key,
           fm.origination_date AS metric_value
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.dimension_key
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

@@ -3112,14 +3112,14 @@
   "MET-107": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "facility_active_flag"
+      "primary_value": "is_active_flag"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "active_flag",
-          "label": "active_flag",
+          "field": "is_active_flag",
+          "label": "is_active_flag",
           "sample_value": 0,
           "source_table": "facility_master",
           "source_layer": "L1"
@@ -3127,17 +3127,17 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated facility_active_flag per facility.\n"
+      "formula_display": "Calculated is_active_flag per facility.\n"
     },
     "worked_example_columns": [
       {
-        "field": "active_flag",
+        "field": "is_active_flag",
         "header": "Active Flag",
         "format": "number",
         "subtotal_fn": "none"
       },
       {
-        "field": "facility_active_flag",
+        "field": "is_active_flag",
         "header": "Facility Active Flag",
         "format": "number",
         "is_result": true,

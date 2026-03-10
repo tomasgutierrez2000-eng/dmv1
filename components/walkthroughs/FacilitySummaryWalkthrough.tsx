@@ -90,7 +90,7 @@ const CONFIG = {
       description:
         "L2 snapshot tables. position (24 fields) carries PD/LGD estimates, credit status, exposure type, and trading/banking book indicator. position_detail (25 fields) extends with product-specific attributes: funded/unfunded amounts, CCF, interest rate, days past due, derivative MTM/PFE, SFT terms.",
       fields: [
-        { name: "position_type", value: "LOAN" },
+        { name: "product_code", value: "LOAN" },
         { name: "pd_estimate", value: "0.45%" },
         { name: "lgd_estimate", value: "35%" },
         { name: "credit_status_code", value: "PERFORMING → credit_status_dim" },
@@ -340,7 +340,7 @@ const CONFIG = {
       {
         title: "L2 Snapshot — Position Risk (position + position_detail)",
         fields: [
-          { name: "position_type", value: "LOAN", source: "position", type: "direct" },
+          { name: "product_code", value: "LOAN", source: "position", type: "direct" },
           { name: "pd_estimate", value: "0.45%", source: "position", type: "direct" },
           { name: "lgd_estimate", value: "35%", source: "position", type: "direct" },
           { name: "credit_status_code", value: "PERFORMING", source: "position", type: "direct" },

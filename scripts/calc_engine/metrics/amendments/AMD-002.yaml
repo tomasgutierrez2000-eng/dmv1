@@ -28,7 +28,7 @@ source_tables:
     role: DIMENSION
   - name: lob_segment_id
     role: DIMENSION
-  - name: active_flag
+  - name: is_active_flag
     role: FILTER
 - schema: l1
   table: enterprise_business_taxonomy
@@ -50,7 +50,7 @@ levels:
         fm.facility_id AS dimension_key,
         1 AS metric_value
       FROM l1.facility_master fm
-      WHERE fm.active_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: COUNT
     formula_text: |
@@ -63,11 +63,11 @@ levels:
         SELECT
           fm.facility_id
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: COUNT
@@ -81,11 +81,11 @@ levels:
         SELECT
           fm.facility_id
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
@@ -101,11 +101,11 @@ levels:
         SELECT
           fm.facility_id
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -123,11 +123,11 @@ levels:
         SELECT
           fm.facility_id
         FROM l1.facility_master fm
-        WHERE fm.active_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

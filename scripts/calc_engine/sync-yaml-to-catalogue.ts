@@ -63,7 +63,7 @@ function aggregationToSourcing(agg: string): 'Raw' | 'Calc' | 'Agg' | 'Avg' {
  *      WHERE cs.as_of_date = :as_of_date
  *   2. JOIN  l1.facility_master  (fm)
  *      ON    fm.facility_id = cs.facility_id
- *      AND   fm.active_flag = 'Y'
+ *      AND   fm.is_active_flag = 'Y'
  *   3. GROUP BY cs.facility_id
  *   4. COMPUTE
  *      metric_value = SUM(current_valuation_usd) * ...
@@ -84,7 +84,7 @@ function generateStructuredPseudocode(
     const filterFields = st.fields.filter((f) => f.role === 'FILTER');
     const filterLines = filterFields.map((f) => {
       if (f.name === 'as_of_date') return `${st.alias}.as_of_date = :as_of_date`;
-      if (f.name === 'active_flag') return `${st.alias}.active_flag = 'Y'`;
+      if (f.name === 'is_active_flag') return `${st.alias}.is_active_flag = 'Y'`;
       if (f.name === 'is_current_flag') return `${st.alias}.is_current_flag = 'Y'`;
       return `${st.alias}.${f.name} = <filter>`;
     });

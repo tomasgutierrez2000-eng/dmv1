@@ -62,7 +62,7 @@ source_tables:
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
-      - name: active_flag
+      - name: is_active_flag
         role: FILTER
       - name: bank_share_pct
         role: MEASURE
@@ -106,7 +106,7 @@ levels:
         AND pdtl.as_of_date = pos.as_of_date
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = pos.facility_id
-        AND UPPER(TRIM(CAST(fm.active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
+        AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
       WHERE pos.as_of_date = :as_of_date
       GROUP BY pos.facility_id, fm.bank_share_pct
   counterparty:
@@ -129,7 +129,7 @@ levels:
           AND pdtl.as_of_date = pos.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = pos.facility_id
-          AND UPPER(TRIM(CAST(fm.active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
+          AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
@@ -155,7 +155,7 @@ levels:
           AND pdtl.as_of_date = pos.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = pos.facility_id
-          AND UPPER(TRIM(CAST(fm.active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
+          AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
@@ -183,7 +183,7 @@ levels:
           AND pdtl.as_of_date = pos.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = pos.facility_id
-          AND UPPER(TRIM(CAST(fm.active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
+          AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac
@@ -213,7 +213,7 @@ levels:
           AND pdtl.as_of_date = pos.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = pos.facility_id
-          AND UPPER(TRIM(CAST(fm.active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
+          AND UPPER(TRIM(CAST(fm.is_active_flag AS VARCHAR))) IN ('Y','YES','TRUE','T','1')
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id, fm.bank_share_pct
       ) fac

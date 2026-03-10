@@ -48,7 +48,7 @@ source_tables:
     role: DIMENSION
   - name: lob_segment_id
     role: DIMENSION
-  - name: active_flag
+  - name: is_active_flag
     role: FILTER
 - schema: l1
   table: enterprise_business_taxonomy
@@ -75,7 +75,7 @@ levels:
         AND fes.as_of_date = ffs.as_of_date
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = ffs.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
@@ -98,12 +98,12 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ffs.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM
@@ -126,12 +126,12 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ffs.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
@@ -156,12 +156,12 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ffs.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -188,12 +188,12 @@ levels:
           AND fes.as_of_date = ffs.as_of_date
         INNER JOIN l1.facility_master fm
           ON fm.facility_id = ffs.facility_id
-          AND fm.active_flag = 'Y'
+          AND fm.is_active_flag = 'Y'
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l1.facility_master fm
         ON fm.facility_id = fac.facility_id
-        AND fm.active_flag = 'Y'
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

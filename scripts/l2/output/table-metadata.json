@@ -24,7 +24,7 @@
       "fk": "l1.instrument_master(instrument_id)",
       "nullable": true
     },
-    "position_type": {
+    "product_code": {
       "type": "VARCHAR(50)",
       "pk": false,
       "fk": null,

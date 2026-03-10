@@ -71,6 +71,10 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'risk_flag', scd: 'Event', category: 'Risk Monitoring' },
   { name: 'facility_credit_approval', scd: 'Event', category: 'Approvals' },
   { name: 'payment_ledger', scd: 'Event', category: 'Payments' },
+  { name: 'gl_journal_entry', scd: 'Event', category: 'General Ledger' },
+
+  // ── Snapshots (General Ledger) ──
+  { name: 'gl_account_balance_snapshot', scd: 'Snapshot', category: 'General Ledger' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

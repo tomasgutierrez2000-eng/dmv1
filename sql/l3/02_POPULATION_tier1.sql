@@ -528,3 +528,34 @@ $$;
 -- Cursor should generate these using the field list from 01_DDL_all_tables.sql
 -- and the source table mappings from the conventions doc.
 -- ============================================================
+
+-- ============================================================
+-- T57: gl_account_balance_calc (Tier 1 — reads from L2 only)
+-- Calculated overlay for GL account balances: net balances and period change %
+-- ============================================================
+CREATE OR REPLACE FUNCTION l3.populate_gl_account_balance_calc(
+    p_as_of_date DATE
+) RETURNS VOID LANGUAGE SQL AS $$
+    DELETE FROM l3.gl_account_balance_calc WHERE as_of_date = p_as_of_date;
+
+    INSERT INTO l3.gl_account_balance_calc (
+        ledger_account_id, as_of_date,
+        ending_balance_net_amt, period_net_activity_amt, balance_change_pct,
+        created_ts
+    )
+    SELECT
+        s.ledger_account_id,
+        s.as_of_date,
+        s.ending_balance_dr_amt - s.ending_balance_cr_amt,
+        s.period_activity_dr_amt - s.period_activity_cr_amt,
+        CASE
+            WHEN ABS(s.begin_balance_dr_amt - s.begin_balance_cr_amt) > 0
+            THEN ((s.ending_balance_dr_amt - s.ending_balance_cr_amt)
+                  - (s.begin_balance_dr_amt - s.begin_balance_cr_amt))
+                 / ABS(s.begin_balance_dr_amt - s.begin_balance_cr_amt) * 100
+            ELSE NULL
+        END,
+        CURRENT_TIMESTAMP
+    FROM l2.gl_account_balance_snapshot s
+    WHERE s.as_of_date = p_as_of_date;
+$$;

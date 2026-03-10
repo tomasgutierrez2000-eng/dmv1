@@ -753,15 +753,15 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 196800000.0,
-          "funded_amt": 4100000000.0,
-          "bank_share_pct": 100.0,
+          "interest_expense_amt": 196800000,
+          "funded_amt": 4100000000,
+          "bank_share_pct": 100,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 5000000000.0
+          "committed_facility_amt": 5000000000
         },
         {
           "facility_id": "F-251",
@@ -772,15 +772,15 @@
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 23824817.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 23824817,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_expense_amt": 0.0,
-          "funded_amt": 18583357.0,
-          "bank_share_pct": 55.0,
-          "cost_of_funds_pct": 0.0,
-          "committed_facility_amt": 23824817.0
+          "interest_expense_amt": 0,
+          "funded_amt": 18583357,
+          "bank_share_pct": 55,
+          "cost_of_funds_pct": 0,
+          "committed_facility_amt": 23824817
         },
         {
           "facility_id": "F-360",
@@ -791,15 +791,15 @@
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 66895846.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 66895846,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 1604858.1101,
-          "funded_amt": 98336894.0,
-          "bank_share_pct": 34.0,
+          "funded_amt": 98336894,
+          "bank_share_pct": 34,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 66895846.0
+          "committed_facility_amt": 66895846
         },
         {
           "facility_id": "F-9441",
@@ -810,15 +810,15 @@
           "desk_name": "Government Agencies Desk",
           "portfolio_name": "Agencies & GSEs",
           "lob_name": "Corporate Banking",
-          "committed_amt": 790069670.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 790069670,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 219955.3963,
-          "funded_amt": 458240409.0,
-          "bank_share_pct": 1.0,
+          "funded_amt": 458240409,
+          "bank_share_pct": 1,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 790069670.0
+          "committed_facility_amt": 790069670
         },
         {
           "facility_id": "F-9422",
@@ -829,15 +829,15 @@
           "desk_name": "Direct Auto Lending Desk",
           "portfolio_name": "Auto Loans",
           "lob_name": "Corporate Banking",
-          "committed_amt": 122462108.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 122462108,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "interest_expense_amt": 36444.7234,
-          "funded_amt": 75926507.0,
-          "bank_share_pct": 1.0,
+          "funded_amt": 75926507,
+          "bank_share_pct": 1,
           "cost_of_funds_pct": 4.8,
-          "committed_facility_amt": 122462108.0
+          "committed_facility_amt": 122462108
         }
       ]
     }
@@ -1264,13 +1264,13 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "committed_exposure_usd": 5000000000.0,
-          "committed_facility_amt": 5000000000.0,
-          "bank_share_pct": 100.0
+          "committed_exposure_usd": 5000000000,
+          "committed_facility_amt": 5000000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-194",
@@ -1281,13 +1281,13 @@
           "desk_name": "Multi-Asset Funds Desk",
           "portfolio_name": "Retail / Mutual Funds",
           "lob_name": "Corporate Banking",
-          "committed_amt": 20021593.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 20021593,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 6607125.69,
-          "committed_facility_amt": 20021593.0,
-          "bank_share_pct": 33.0
+          "committed_facility_amt": 20021593,
+          "bank_share_pct": 33
         },
         {
           "facility_id": "F-241",
@@ -1298,13 +1298,13 @@
           "desk_name": "Non-Core Credit Desk",
           "portfolio_name": "Legacy Portfolios",
           "lob_name": "Corporate Banking",
-          "committed_amt": 57312906.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 57312906,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 40119034.2,
-          "committed_facility_amt": 57312906.0,
-          "bank_share_pct": 70.0
+          "committed_facility_amt": 57312906,
+          "bank_share_pct": 70
         },
         {
           "facility_id": "F-5701",
@@ -1315,13 +1315,13 @@
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "committed_exposure_usd": 2000.0,
-          "committed_facility_amt": 200000.0,
-          "bank_share_pct": 1.0
+          "committed_exposure_usd": 2000,
+          "committed_facility_amt": 200000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9584",
@@ -1332,13 +1332,13 @@
           "desk_name": "Follow-On Equity Desk",
           "portfolio_name": "Equity Capital Markets (ECM)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 120476777.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 120476777,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "committed_exposure_usd": 1204767.77,
-          "committed_facility_amt": 120476777.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 120476777,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -1945,14 +1945,14 @@
           "desk_name": "Domestic Large-Cap Corporates Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 2500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": 2499620000.0,
-          "committed_facility_amt": 2500000000.0,
-          "funded_amt": 380000.0,
-          "bank_share_pct": 100.0
+          "undrawn_exposure_usd": 2499620000,
+          "committed_facility_amt": 2500000000,
+          "funded_amt": 380000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-6",
@@ -1963,14 +1963,14 @@
           "desk_name": "Public Company Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 1500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "undrawn_exposure_usd": -435000000.0,
-          "committed_facility_amt": 1500000000.0,
-          "funded_amt": 2370000000.0,
-          "bank_share_pct": 50.0
+          "undrawn_exposure_usd": -435000000,
+          "committed_facility_amt": 1500000000,
+          "funded_amt": 2370000000,
+          "bank_share_pct": 50
         },
         {
           "facility_id": "F-376",
@@ -1981,14 +1981,14 @@
           "desk_name": "High Yield DCM Desk",
           "portfolio_name": "Debt Capital Markets (DCM)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 123968774.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 123968774,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 3409140.9,
-          "committed_facility_amt": 123968774.0,
-          "funded_amt": 117770336.0,
-          "bank_share_pct": 55.0
+          "committed_facility_amt": 123968774,
+          "funded_amt": 117770336,
+          "bank_share_pct": 55
         },
         {
           "facility_id": "F-9408",
@@ -1999,14 +1999,14 @@
           "desk_name": "Private Credit Desk",
           "portfolio_name": "Alternatives (Private Credit, PE, Real Assets)",
           "lob_name": "Corporate Banking",
-          "committed_amt": 186863612.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 186863612,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 710081.73,
-          "committed_facility_amt": 186863612.0,
-          "funded_amt": 115855439.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 186863612,
+          "funded_amt": 115855439,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9483",
@@ -2017,14 +2017,14 @@
           "desk_name": "Industrials & Manufacturing Desk",
           "portfolio_name": "Specialized Industries",
           "lob_name": "Corporate Banking",
-          "committed_amt": 26910114.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 26910114,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "undrawn_exposure_usd": 148005.63,
-          "committed_facility_amt": 26910114.0,
-          "funded_amt": 12109551.0,
-          "bank_share_pct": 1.0
+          "committed_facility_amt": 26910114,
+          "funded_amt": 12109551,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -2601,13 +2601,13 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "outstanding_exposure_usd": 4100000000.0,
-          "funded_amt": 4100000000.0,
-          "bank_share_pct": 100.0
+          "outstanding_exposure_usd": 4100000000,
+          "funded_amt": 4100000000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-360",
@@ -2618,13 +2618,13 @@
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 66895846.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 66895846,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 33434543.96,
-          "funded_amt": 98336894.0,
-          "bank_share_pct": 34.0
+          "funded_amt": 98336894,
+          "bank_share_pct": 34
         },
         {
           "facility_id": "F-5701",
@@ -2635,13 +2635,13 @@
           "desk_name": "Global Corporate Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 200000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 200000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "outstanding_exposure_usd": 1300.0,
-          "funded_amt": 130000.0,
-          "bank_share_pct": 1.0
+          "outstanding_exposure_usd": 1300,
+          "funded_amt": 130000,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9457",
@@ -2652,13 +2652,13 @@
           "desk_name": "Asset Disposition Desk",
           "portfolio_name": "Wind-Down Units",
           "lob_name": "Corporate Banking",
-          "committed_amt": 795728544.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 795728544,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 4615225.56,
-          "funded_amt": 461522556.0,
-          "bank_share_pct": 1.0
+          "funded_amt": 461522556,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9543",
@@ -2669,13 +2669,13 @@
           "desk_name": "Urban Self-Storage Desk",
           "portfolio_name": "Self-Storage",
           "lob_name": "Corporate Banking",
-          "committed_amt": 127553516.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 127553516,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
           "outstanding_exposure_usd": 765321.1,
-          "funded_amt": 76532110.0,
-          "bank_share_pct": 1.0
+          "funded_amt": 76532110,
+          "bank_share_pct": 1
         }
       ]
     }
@@ -3162,12 +3162,12 @@
           "desk_name": "Domestic Large-Cap Corporates Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 2500000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 0.0,
-          "bank_share_pct": 100.0
+          "interest_income_amt": 0,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-10",
@@ -3178,12 +3178,12 @@
           "desk_name": "Core Middle Market Desk",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 5000000000.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 5000000000,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 141440000.0,
-          "bank_share_pct": 100.0
+          "interest_income_amt": 141440000,
+          "bank_share_pct": 100
         },
         {
           "facility_id": "F-384",
@@ -3194,12 +3194,12 @@
           "desk_name": "Infrastructure Funds Coverage Desk",
           "portfolio_name": "Sponsor Coverage",
           "lob_name": "Corporate Banking",
-          "committed_amt": 164974198.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 164974198,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 5384758.0,
-          "bank_share_pct": 28.0
+          "interest_income_amt": 5384758,
+          "bank_share_pct": 28
         },
         {
           "facility_id": "F-9571",
@@ -3210,12 +3210,12 @@
           "desk_name": "On-Campus Student Housing Desk",
           "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 415365813.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 415365813,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 26098472.0,
-          "bank_share_pct": 1.0
+          "interest_income_amt": 26098472,
+          "bank_share_pct": 1
         },
         {
           "facility_id": "F-9637",
@@ -3226,12 +3226,12 @@
           "desk_name": "Discretionary Portfolio Management Deks",
           "portfolio_name": "Investment Advisory",
           "lob_name": "Corporate Banking",
-          "committed_amt": 182226869.0,
-          "collateral_value": 0.0,
-          "ltv_pct": 0.0,
+          "committed_amt": 182226869,
+          "collateral_value": 0,
+          "ltv_pct": 0,
           "positions": [],
-          "interest_income_amt": 5756547.0,
-          "bank_share_pct": 1.0
+          "interest_income_amt": 5756547,
+          "bank_share_pct": 1
         }
       ]
     }

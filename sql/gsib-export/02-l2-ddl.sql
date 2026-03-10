@@ -1158,3 +1158,48 @@ CREATE TABLE IF NOT EXISTS "l2"."payment_ledger" (
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("payment_id")
 );
+
+-- gl_journal_entry (General Ledger)
+CREATE TABLE IF NOT EXISTS "l2"."gl_journal_entry" (
+    "journal_entry_id" BIGINT NOT NULL,
+    "journal_batch_id" BIGINT,
+    "ledger_account_id" BIGINT,
+    "transaction_date" DATE,
+    "posting_date" DATE,
+    "transaction_code" VARCHAR(30),
+    "transaction_desc" VARCHAR(500),
+    "dr_cr_indicator" VARCHAR(30),
+    "transaction_amt" NUMERIC(20,4),
+    "transaction_currency_code" VARCHAR(30),
+    "reporting_currency_amt" NUMERIC(20,4),
+    "position_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "facility_id" BIGINT,
+    "product_code" VARCHAR(30),
+    "lob_segment_id" BIGINT,
+    "org_unit_id" BIGINT,
+    "source_system_id" BIGINT,
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("journal_entry_id")
+);
+
+-- gl_account_balance_snapshot (General Ledger)
+CREATE TABLE IF NOT EXISTS "l2"."gl_account_balance_snapshot" (
+    "ledger_account_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "begin_balance_dr_amt" NUMERIC(20,4),
+    "begin_balance_cr_amt" NUMERIC(20,4),
+    "period_activity_dr_amt" NUMERIC(20,4),
+    "period_activity_cr_amt" NUMERIC(20,4),
+    "ending_balance_dr_amt" NUMERIC(20,4),
+    "ending_balance_cr_amt" NUMERIC(20,4),
+    "currency_code" VARCHAR(30),
+    "reporting_currency_amt" NUMERIC(20,4),
+    "lob_segment_id" BIGINT,
+    "org_unit_id" BIGINT,
+    "source_system_id" BIGINT,
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("ledger_account_id", "as_of_date")
+);

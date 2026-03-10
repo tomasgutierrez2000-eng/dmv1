@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-10T09:15:01.642Z",
+  "createdAt": "2026-03-10T19:25:27.507Z",
   "tables": [
     {
       "layer": "L1",
@@ -2556,7 +2556,7 @@
           "name": "position_currency"
         },
         {
-          "name": "trading_banking_book_flag"
+          "name": "trading_banking_book_code"
         },
         {
           "name": "ultimate_parent_id"
@@ -3007,6 +3007,9 @@
         },
         {
           "name": "position_id"
+        },
+        {
+          "name": "maturity_bucket_id"
         }
       ]
     },
@@ -3127,6 +3130,9 @@
         },
         {
           "name": "cost_of_funds_pct"
+        },
+        {
+          "name": "pricing_tier"
         }
       ]
     },
@@ -5357,6 +5363,123 @@
       ]
     },
     {
+      "layer": "L2",
+      "tableName": "gl_journal_entry",
+      "fields": [
+        {
+          "name": "journal_entry_id"
+        },
+        {
+          "name": "journal_batch_id"
+        },
+        {
+          "name": "ledger_account_id"
+        },
+        {
+          "name": "transaction_date"
+        },
+        {
+          "name": "posting_date"
+        },
+        {
+          "name": "transaction_code"
+        },
+        {
+          "name": "transaction_desc"
+        },
+        {
+          "name": "dr_cr_indicator"
+        },
+        {
+          "name": "transaction_amt"
+        },
+        {
+          "name": "transaction_currency_code"
+        },
+        {
+          "name": "reporting_currency_amt"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "product_code"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "org_unit_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "gl_account_balance_snapshot",
+      "fields": [
+        {
+          "name": "ledger_account_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "begin_balance_dr_amt"
+        },
+        {
+          "name": "begin_balance_cr_amt"
+        },
+        {
+          "name": "period_activity_dr_amt"
+        },
+        {
+          "name": "period_activity_cr_amt"
+        },
+        {
+          "name": "ending_balance_dr_amt"
+        },
+        {
+          "name": "ending_balance_cr_amt"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "reporting_currency_amt"
+        },
+        {
+          "name": "lob_segment_id"
+        },
+        {
+          "name": "org_unit_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
       "layer": "L3",
       "tableName": "exposure_metric_cube",
       "fields": [
@@ -5437,6 +5560,9 @@
         },
         {
           "name": "attribution_pct"
+        },
+        {
+          "name": "exposure_metric_cube_sk"
         }
       ]
     },
@@ -5515,6 +5641,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "risk_metric_cube_sk"
         }
       ]
     },
@@ -5632,6 +5761,9 @@
         },
         {
           "name": "total_cross_entity_exposure_usd"
+        },
+        {
+          "name": "counterparty_exposure_summary_sk"
         }
       ]
     },
@@ -5698,6 +5830,9 @@
         },
         {
           "name": "amendment_status_code"
+        },
+        {
+          "name": "facility_exposure_summary_sk"
         }
       ]
     },
@@ -5749,6 +5884,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "portfolio_summary_sk"
         }
       ]
     },
@@ -5821,6 +5959,9 @@
         },
         {
           "name": "parent_group_code"
+        },
+        {
+          "name": "crm_allocation_summary_sk"
         }
       ]
     },
@@ -5866,6 +6007,9 @@
         },
         {
           "name": "parent_group_code"
+        },
+        {
+          "name": "collateral_portfolio_valuation_sk"
         }
       ]
     },
@@ -5938,6 +6082,9 @@
         },
         {
           "name": "utilization_tier_code"
+        },
+        {
+          "name": "limit_current_state_sk"
         }
       ]
     },
@@ -5974,6 +6121,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "limit_utilization_timeseries_sk"
         }
       ]
     },
@@ -6025,6 +6175,9 @@
         },
         {
           "name": "hierarchy_id"
+        },
+        {
+          "name": "limit_attribution_summary_sk"
         }
       ]
     },
@@ -6064,6 +6217,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "limit_breach_fact_sk"
         }
       ]
     },
@@ -6127,6 +6283,9 @@
         },
         {
           "name": "estimated_exposure_impact_amt"
+        },
+        {
+          "name": "credit_event_summary_sk"
         }
       ]
     },
@@ -6169,6 +6328,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "rating_migration_summary_sk"
         }
       ]
     },
@@ -6211,6 +6373,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "default_loss_recovery_summary_sk"
         }
       ]
     },
@@ -6247,6 +6412,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_run_sk"
         }
       ]
     },
@@ -6277,6 +6445,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_cell_value_sk"
         }
       ]
     },
@@ -6316,6 +6487,9 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "report_cell_contribution_fact_sk"
         }
       ]
     },
@@ -6355,6 +6529,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_cell_rule_execution_sk"
         }
       ]
     },
@@ -6391,6 +6568,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "report_validation_result_sk"
         }
       ]
     },
@@ -6454,6 +6634,9 @@
         },
         {
           "name": "fr2590_category_code"
+        },
+        {
+          "name": "fr2590_position_snapshot_sk"
         }
       ]
     },
@@ -6499,6 +6682,9 @@
         },
         {
           "name": "fr2590_category_code"
+        },
+        {
+          "name": "fr2590_counterparty_aggregate_sk"
         }
       ]
     },
@@ -6598,6 +6784,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "lob_exposure_summary_sk"
         }
       ]
     },
@@ -6676,6 +6865,9 @@
         },
         {
           "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "lob_profitability_summary_sk"
         }
       ]
     },
@@ -6733,6 +6925,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "lob_pricing_summary_sk"
         }
       ]
     },
@@ -6799,6 +6994,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "lob_delinquency_summary_sk"
         }
       ]
     },
@@ -6853,6 +7051,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "lob_profitability_allocation_summary_sk"
         }
       ]
     },
@@ -6895,6 +7096,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "deal_pipeline_stage_summary_sk"
         }
       ]
     },
@@ -6958,6 +7162,9 @@
         },
         {
           "name": "doi_pct"
+        },
+        {
+          "name": "lob_credit_quality_summary_sk"
         }
       ]
     },
@@ -7003,6 +7210,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "kpi_period_summary_sk"
         }
       ]
     },
@@ -7084,6 +7294,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "risk_appetite_metric_state_sk"
         }
       ]
     },
@@ -7123,6 +7336,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "executive_highlight_summary_sk"
         }
       ]
     },
@@ -7240,6 +7456,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "counterparty_detail_snapshot_sk"
         }
       ]
     },
@@ -7285,6 +7504,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "limit_tier_status_matrix_sk"
         }
       ]
     },
@@ -7324,6 +7546,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "limit_counterparty_movement_sk"
         }
       ]
     },
@@ -7369,6 +7594,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "data_quality_score_summary_sk"
         }
       ]
     },
@@ -7432,6 +7660,9 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "legal_entity_risk_profile_sk"
         }
       ]
     },
@@ -7465,6 +7696,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "data_quality_attribute_score_sk"
         }
       ]
     },
@@ -7492,6 +7726,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "data_quality_trend_sk"
         }
       ]
     },
@@ -7555,6 +7792,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "stress_test_result_summary_sk"
         }
       ]
     },
@@ -7597,6 +7837,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "stress_test_breach_detail_sk"
         }
       ]
     },
@@ -7636,6 +7879,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "regulatory_compliance_state_sk"
         }
       ]
     },
@@ -7669,6 +7915,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "facility_timeline_summary_sk"
         }
       ]
     },
@@ -7702,6 +7951,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "amendment_summary_sk"
         }
       ]
     },
@@ -7747,6 +7999,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "amendment_detail_sk"
         }
       ]
     },
@@ -7891,6 +8146,12 @@
         },
         {
           "name": "maturity_bucket_id"
+        },
+        {
+          "name": "facility_detail_snapshot_sk"
+        },
+        {
+          "name": "is_deteriorated"
         }
       ]
     },
@@ -7933,6 +8194,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_risk_ratio_summary_sk"
         }
       ]
     },
@@ -7990,6 +8254,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_deterioration_summary_sk"
         }
       ]
     },
@@ -8026,6 +8293,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_rating_distribution_sk"
         }
       ]
     },
@@ -8068,6 +8338,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "lob_top_contributors_sk"
         }
       ]
     },
@@ -8116,6 +8389,9 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "metric_value_fact_sk"
         }
       ]
     },
@@ -8401,6 +8677,162 @@
         },
         {
           "name": "netting_benefit_amt"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "gl_account_balance_calc",
+      "fields": [
+        {
+          "name": "ledger_account_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "ending_balance_net_amt"
+        },
+        {
+          "name": "period_net_activity_amt"
+        },
+        {
+          "name": "balance_change_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_financial_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "dscr"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "interest_coverage_ratio"
+        },
+        {
+          "name": "debt_yield_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_exposure_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "undrawn_amt"
+        },
+        {
+          "name": "coverage_ratio_pct"
+        },
+        {
+          "name": "net_exposure_amt"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "data_quality_score_snapshot",
+      "fields": [
+        {
+          "name": "table_name"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "completeness_score_pct"
+        },
+        {
+          "name": "accuracy_score_pct"
+        },
+        {
+          "name": "timeliness_score_pct"
+        },
+        {
+          "name": "overall_dq_score_pct"
+        },
+        {
+          "name": "total_row_count"
+        },
+        {
+          "name": "null_field_count"
+        },
+        {
+          "name": "anomaly_count"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "stress_test_result",
+      "fields": [
+        {
+          "name": "stress_test_result_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "stressed_exposure_amt"
+        },
+        {
+          "name": "stressed_expected_loss"
+        },
+        {
+          "name": "capital_impact_pct"
+        },
+        {
+          "name": "currency_code"
         },
         {
           "name": "created_ts"

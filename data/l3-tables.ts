@@ -77,6 +77,13 @@ export const L3_TABLES: L3TableDef[] = [
   // T55-T56: Additional calculated overlay tables (derived fields split from L2 snapshots)
   { id: 'T55', name: 'facility_risk_calc',                  category: 'Exposure & Risk Metrics',                 tier: 1 },
   { id: 'T56', name: 'netting_set_exposure_calc',           category: 'Exposure & Risk Metrics',                 tier: 1 },
+  // T57: GL calculated overlay (derived fields split from L2 gl_account_balance_snapshot)
+  { id: 'T57', name: 'gl_account_balance_calc',             category: 'General Ledger',                          tier: 1 },
+  // T58-T61: Calculation engine infrastructure tables
+  { id: 'T58', name: 'calc_run',                             category: 'Calculation Engine',                      tier: 1 },
+  { id: 'T59', name: 'calc_audit_log',                       category: 'Calculation Engine',                      tier: 1 },
+  { id: 'T60', name: 'calc_validation_result',               category: 'Calculation Engine',                      tier: 1 },
+  { id: 'T61', name: 'metric_result',                        category: 'Calculation Engine',                      tier: 1 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

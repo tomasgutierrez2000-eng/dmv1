@@ -1,1 +1,3592 @@
-{}
+{
+  "MET-108": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "interest_expense_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "funded_amount",
+          "label": "funded_amount",
+          "sample_value": 0,
+          "source_table": "position_detail",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "cost_of_funds_pct",
+          "label": "FTP / internal transfer price. Fallback: all_in_rate_pct - spread_bps/100",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "all_in_rate_pct",
+          "label": "All-in interest rate for fallback derivation",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "spread_bps",
+          "label": "Credit spread in basis points for fallback derivation",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each active facility:\n1. Join position -> position_detail, SUM(funded_amount) per facility\n2. Multiply by bank_share_pct / 100 from facility_lender_allocation\n3. Multiply by COALESCE(cost_of_funds_pct, all_in_rate_pct - spread_bps/100) / 100\n   from facility_pricing_snapshot\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "funded_amount",
+        "header": "Funded Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "cost_of_funds_pct",
+        "header": "Cost Of Funds (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "all_in_rate_pct",
+        "header": "All In Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "spread_bps",
+        "header": "Spread (bps)",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "interest_expense_amt",
+        "header": "Interest Expense ($)",
+        "format": "currency",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-001": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "number_of_loans"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "number_of_loans",
+          "label": "number_of_loans",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read number_of_loans from facility_exposure_snapshot for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "number_of_loans",
+        "header": "Number Of Loans",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-003": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "effective_date"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "effective_date",
+          "label": "effective_date",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read effective_date from facility_master for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "effective_date",
+        "header": "Effective Date",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-004": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "amendment_status_name"
+    }
+  },
+  "MET-005": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "amendment_type_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "amendment_type_code",
+          "label": "amendment_type_code",
+          "sample_value": 0,
+          "source_table": "amendment_type_dim",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of amendment_type_code from amendment_type_dim.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "amendment_type_code",
+        "header": "Amendment Type Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-044": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "amendment_event_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "amendment_event_id",
+          "label": "amendment_event_id",
+          "sample_value": 0,
+          "source_table": "amendment_event",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read amendment_event_id from amendment_event for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "amendment_event_id",
+        "header": "Amendment Event Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-097": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "capital_adequacy_ratio_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "allocated_equity_amt",
+          "label": "allocated_equity_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Read capital_adequacy_ratio_pct from lob_risk_ratio_summary for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "allocated_equity_amt",
+        "header": "Allocated Equity ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "capital_adequacy_ratio_pct",
+        "header": "Capital Adequacy Ratio (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-098": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "return_on_rwa_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "net_income_amt",
+          "label": "net_income_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Calculated return_on_rwa_pct per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "net_income_amt",
+        "header": "Net Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "return_on_rwa_pct",
+        "header": "Return On Rwa (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-100": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "risk_weight_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_weight_pct",
+          "label": "risk_weight_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Read risk_weight_pct from facility_risk_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_weight_pct",
+        "header": "Risk Weight (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-010": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "contractual_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "contractual_amt",
+          "label": "contractual_amt",
+          "sample_value": 0,
+          "source_table": "cash_flow",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "[Facility Cashflow]==[Facility Interest Income w/ Bank Share]\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "contractual_amt",
+        "header": "Contractual ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-012": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "committed_exposure_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "committed_facility_amt",
+          "label": "committed_facility_amt",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each active facility: committed_facility_amt * bank_share_pct / 100. bank_share_pct sourced from facility_lender_allocation (aggregated per facility).\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "committed_facility_amt",
+        "header": "Committed Facility ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_exposure_usd",
+        "header": "Committed Exposure Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-013": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "funded_amount"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "funded_amount",
+          "label": "funded_amount",
+          "sample_value": 0,
+          "source_table": "position_detail",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Lookup Position_ID for each Facility_ID, Select bank_share from Facility_ID from Faciltiy Master THEN contract_amt * bank_share* Interest Rate = [Position Cost of Funds w/ Bank Share] (AKA Utilized Exposure * Interest Rate)  SUM([Position Interest Income w/ Bank Share] across all Position_IDs ==[Facility Cost of Funds w/ Bank Share]\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "funded_amount",
+        "header": "Funded Amount",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-014": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "allocation_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "allocation_pct",
+          "label": "allocation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Direct lookup of allocation_pct from facility_counterparty_participation.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "allocation_pct",
+        "header": "Allocation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-019": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "criticized_portfolio_count"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "internal_risk_rating",
+          "label": "internal_risk_rating",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Binary flag: 1 if criticized rating (internal_risk_rating >= 6), 0 otherwise.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "internal_risk_rating",
+        "header": "Internal Risk Rating",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "criticized_portfolio_count",
+        "header": "Criticized Portfolio Count",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-020": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "total_cross_entity_exposure_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "total_cross_entity_exposure_usd",
+          "label": "total_cross_entity_exposure_usd",
+          "sample_value": 0,
+          "source_table": "counterparty_exposure_summary",
+          "source_layer": "L3"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(total_cross_entity_exposure_usd) per facility from counterparty_exposure_summary. Weighted by bank share percentage.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "total_cross_entity_exposure_usd",
+        "header": "Total Cross Entity Exposure Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-022": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "dpd_bucket_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "dpd_bucket_code",
+          "label": "dpd_bucket_code",
+          "sample_value": 0,
+          "source_table": "facility_delinquency_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "For each Facility_ID lookup the Payments records in the Payment Lockbox table, For each payment record where [Payment_Due_Date] > Today() IF ([Pmt_Applied] <[Pmt_Due])>=1, THEN Today() - [Payment_due_date] ==[Days Overdue] SELECT MAX ([Days Overdue] then lookup in Payments Overdue bucket)\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "dpd_bucket_code",
+        "header": "Dpd Bucket Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-024": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "delinquency_rate_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "days_past_due",
+          "label": "days_past_due",
+          "sample_value": 0,
+          "source_table": "facility_delinquency_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "delinquent_payment_flag",
+          "label": "delinquent_payment_flag",
+          "sample_value": 0,
+          "source_table": "facility_delinquency_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Binary flag: 1 if delinquency (days_past_due > 0), 0 otherwise.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "days_past_due",
+        "header": "Days Past Due",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "delinquent_payment_flag",
+        "header": "Delinquent Payment Flag",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "delinquency_rate_pct",
+        "header": "Delinquency Rate (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-025": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "delinquent_payment_flag"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "delinquent_payment_flag",
+          "label": "delinquent_payment_flag",
+          "sample_value": 0,
+          "source_table": "facility_delinquency_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "For each Facility_ID lookup the Payments records in the Payment Lockbox table. For each payment record where Payment Due Date > Today() IF(COUNT IF ([Pmt_Applied] <[Pmt_Due])>=1, then \"Y\", \"N\")\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "delinquent_payment_flag",
+        "header": "Delinquent Payment Flag",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-026": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "total_overdue_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "overdue_principal_amt",
+          "label": "overdue_principal_amt",
+          "sample_value": 0,
+          "source_table": "facility_delinquency_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "overdue_interest_amt",
+          "label": "overdue_interest_amt",
+          "sample_value": 0,
+          "source_table": "facility_delinquency_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each Facility_ID lookup the Payments records in the Payment Lockbox table. For each payment record where [Payment_Due_Date] > Today() IF(COUNT IF ([Pmt_Applied] <[Pmt_Due])>=1, then [Payment_Amt_Due]+[Fee_Due]-[Payment Applied] == [Deliquent Payment Amount]) SUM([Deliquent Payment Amount] across all payment records where IS(Facility_ID))\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "overdue_principal_amt",
+        "header": "Overdue Principal ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "overdue_interest_amt",
+        "header": "Overdue Interest ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "total_overdue_amt",
+        "header": "Total Overdue ($)",
+        "format": "currency",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-027": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "is_deteriorated"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_rating_status",
+          "label": "risk_rating_status",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read is_deteriorated from facility_detail_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_rating_status",
+        "header": "Risk Rating Status",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "is_deteriorated",
+        "header": "Is Deteriorated",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-028": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "dscr_value"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "noi_amt",
+          "label": "noi_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "total_debt_service_amt",
+          "label": "total_debt_service_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Compute DSCR = noi_amt / total_debt_service_amt per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "noi_amt",
+        "header": "Noi ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "total_debt_service_amt",
+        "header": "Total Debt Service ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "dscr_value",
+        "header": "Dscr Value",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-030": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "expected_loss_rate_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "expected_loss_rate_pct",
+          "label": "expected_loss_rate_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Exposure-weighted average of expected_loss_rate_pct per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "expected_loss_rate_pct",
+        "header": "Expected Loss Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-032": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "expected_loss_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "expected_loss_usd",
+          "label": "expected_loss_usd",
+          "sample_value": 0,
+          "source_table": "stress_test_result",
+          "source_layer": "L3"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(expected_loss_usd) per facility from stress_test_result. Weighted by bank share percentage.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "expected_loss_usd",
+        "header": "Expected Loss Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-033": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "undrawn_exposure_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "unfunded_amount",
+          "label": "unfunded_amount",
+          "sample_value": 0,
+          "source_table": "position_detail",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(unfunded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "unfunded_amount",
+        "header": "Unfunded Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "undrawn_exposure_usd",
+        "header": "Undrawn Exposure Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-034": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "outstanding_exposure_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "funded_amount",
+          "label": "funded_amount",
+          "sample_value": 0,
+          "source_table": "position_detail",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(funded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "funded_amount",
+        "header": "Funded Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "outstanding_exposure_usd",
+        "header": "Outstanding Exposure Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-035": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "limit_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Read limit_amt from lob_exposure_summary for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "limit_amt",
+        "header": "Limit ($)",
+        "format": "currency",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-036": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "exposure_at_default"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "exposure_at_default",
+          "label": "exposure_at_default",
+          "sample_value": 0,
+          "source_table": "credit_event_facility_link",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Read exposure_at_default from credit_event_facility_link for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "exposure_at_default",
+        "header": "Exposure At Default",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-040": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "utilization_status_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "utilization_status_code",
+          "label": "utilization_status_code",
+          "sample_value": 0,
+          "source_table": "facility_detail_snapshot",
+          "source_layer": "L3"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated utilization_status_code per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "utilization_status_code",
+        "header": "Utilization Status Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-045": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "has_cross_entity_flag"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "has_cross_entity_flag",
+          "label": "has_cross_entity_flag",
+          "sample_value": 0,
+          "source_table": "counterparty_exposure_summary",
+          "source_layer": "L3"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Exposure-weighted average of has_cross_entity_flag per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "has_cross_entity_flag",
+        "header": "Has Cross Entity Flag",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-051": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "lgd_estimate"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "lgd_estimate",
+          "label": "lgd_estimate",
+          "sample_value": 0,
+          "source_table": "position",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "EAD * LGD (in Percentage) for all facilities across Counterparties\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "lgd_estimate",
+        "header": "Lgd Estimate",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-052": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "limit_status_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "limit_status_code",
+          "label": "limit_status_code",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated limit_status_code per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "limit_status_code",
+        "header": "Limit Status Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-057": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "lgd_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "lgd_pct",
+          "label": "lgd_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Calculated lgd_pct per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "lgd_pct",
+        "header": "Lgd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-058": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "ltv_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "ltv_pct",
+          "label": "ltv_pct",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "For each DISTINCT (Facility_ID) lookup Collateral ID and SUM(Current_Colalteral_MV) THEN  [Commited_Facility_Amt] / [Current_Collateral_MV] × 100\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "ltv_pct",
+        "header": "Ltv (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-060": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "net_income_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "net_income_amt",
+          "label": "net_income_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Revenue – Interest Expense – Operating Cost – EL\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "net_income_amt",
+        "header": "Net Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-061": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "nim_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "interest_income_amt",
+          "label": "interest_income_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "interest_expense_amt",
+          "label": "interest_expense_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "avg_earning_assets_amt",
+          "label": "avg_earning_assets_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "(Interest Income - Interst Expense)/Average Earning Assets\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "interest_income_amt",
+        "header": "Interest Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "interest_expense_amt",
+        "header": "Interest Expense ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "avg_earning_assets_amt",
+        "header": "Avg Earning Assets ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "nim_pct",
+        "header": "Nim (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-062": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "operating_expense_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "operating_expense_amt",
+          "label": "operating_expense_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Read operating_expense_amt from facility_financial_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "operating_expense_amt",
+        "header": "Operating Expense ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-067": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "pd_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "pd_pct",
+          "label": "pd_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Read pd_pct from facility_risk_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "pd_pct",
+        "header": "Pd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-070": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "revenue_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "revenue_amt",
+          "label": "revenue_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(revenue_amt) per facility from facility_financial_snapshot. Weighted by bank share percentage.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "revenue_amt",
+        "header": "Revenue ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-075": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "original_valuation_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "original_valuation_usd",
+          "label": "original_valuation_usd",
+          "sample_value": 0,
+          "source_table": "collateral_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(original_valuation_usd) per facility from collateral_snapshot. Weighted by bank share percentage.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "original_valuation_usd",
+        "header": "Original Valuation Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-076": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_mitigant_subtype_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_mitigant_subtype_code",
+          "label": "risk_mitigant_subtype_code",
+          "sample_value": 0,
+          "source_table": "risk_mitigant_type_dim",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "SUM(risk_mitigant_subtype_code) per facility from risk_mitigant_type_dim.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_mitigant_subtype_code",
+        "header": "Risk Mitigant Subtype Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-077": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_mitigant_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_mitigant_id",
+          "label": "risk_mitigant_id",
+          "sample_value": 0,
+          "source_table": "risk_mitigant_master",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "SUM(risk_mitigant_id) per facility from risk_mitigant_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_mitigant_id",
+        "header": "Risk Mitigant Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-078": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "roa_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "net_income_amt",
+          "label": "net_income_amt",
+          "sample_value": 0,
+          "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "total_assets_amt",
+          "label": "total_assets_amt",
+          "sample_value": 0,
+          "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Facility Net Income / Facility Exposure\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "net_income_amt",
+        "header": "Net Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "total_assets_amt",
+        "header": "Total Assets ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "roa_pct",
+        "header": "Roa (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-079": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "roe_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "net_income_amt",
+          "label": "net_income_amt",
+          "sample_value": 0,
+          "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "shareholders_equity_amt",
+          "label": "shareholders_equity_amt",
+          "sample_value": 0,
+          "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Net Income (Facility) / Allocated Equity (Facility)\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "net_income_amt",
+        "header": "Net Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "shareholders_equity_amt",
+        "header": "Shareholders Equity ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "roe_pct",
+        "header": "Roe (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-082": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "total_debt_service_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "total_debt_service_amt",
+          "label": "total_debt_service_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Lookup Position_ID for each Facility_ID, Select bank_share and cost_of_funds from Facility_ID from Facility Master THEN (unfunded_amt * bank_share ) = [Facility Debt Service w/ Bank Share]\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "total_debt_service_amt",
+        "header": "Total Debt Service ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-083": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "utilization_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "For each Distinct([Facility ID]), WHEN IS(MAX(AS_OF_DATE) AND [Facility_Active_Flag]=\"Y\" Sum([Utilized Exposure] / [Committed_Facility_Amt])\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "utilization_pct",
+        "header": "Utilization (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-084": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "utilized_amount_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "utilized_amount_usd",
+          "label": "utilized_amount_usd",
+          "sample_value": 0,
+          "source_table": "limit_utilization_event",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Read utilized_amount_usd from limit_utilization_event for each facility as- of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "utilized_amount_usd",
+        "header": "Utilized Amount Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-087": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "interest_income_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "interest_income_amt",
+          "label": "interest_income_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "participation_pct",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(interest_income_amt) per facility from facility_profitability_snapshot.\nWeighted by bank_share_pct from facility_lender_allocation.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "interest_income_amt",
+        "header": "Interest Income ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      }
+    ]
+  },
+  "MET-088": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "total_assets_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "total_assets_amt",
+          "label": "total_assets_amt",
+          "sample_value": 0,
+          "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(total_assets_amt) per facility from counterparty_financial_snapshot. Weighted by bank share percentage.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "total_assets_amt",
+        "header": "Total Assets ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-089": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "allocated_equity_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "allocated_equity_amt",
+          "label": "allocated_equity_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "SUM(allocated_equity_amt) per facility from facility_profitability_snapshot. Weighted by bank share percentage.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "allocated_equity_amt",
+        "header": "Allocated Equity ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-090": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "avg_earning_assets_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "avg_earning_assets_amt",
+          "label": "avg_earning_assets_amt",
+          "sample_value": 0,
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Read avg_earning_assets_amt from facility_profitability_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "avg_earning_assets_amt",
+        "header": "Avg Earning Assets ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-091": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "rwa_density_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "gross_exposure_usd",
+          "label": "gross_exposure_usd",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "SUM(RWA Amount)/SUM(Exposure)\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "gross_exposure_usd",
+        "header": "Gross Exposure Usd",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rwa_density_pct",
+        "header": "Rwa Density (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-092": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "rwa_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Exposure * Risk Weight %\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-094": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "fccr_value"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "ebitda_amt",
+          "label": "ebitda_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "total_debt_service_amt",
+          "label": "total_debt_service_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Read fccr_value from lob_risk_ratio_summary for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "ebitda_amt",
+        "header": "Ebitda ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "total_debt_service_amt",
+        "header": "Total Debt Service ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "fccr_value",
+        "header": "Fccr Value",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-102": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "principal_payment_amt"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "principal_payment_amt",
+          "label": "principal_payment_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Read principal_payment_amt from facility_financial_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "principal_payment_amt",
+        "header": "Principal Payment ($)",
+        "format": "currency",
+        "subtotal_fn": "sum",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-002": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "all_in_rate_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "all_in_rate_pct",
+          "label": "all_in_rate_pct",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Read all_in_rate_pct from facility_pricing_snapshot for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "all_in_rate_pct",
+        "header": "All In Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-008": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "base_rate_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "base_rate_pct",
+          "label": "base_rate_pct",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Exposure-weighted average of base_rate_pct per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "base_rate_pct",
+        "header": "Base Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-031": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "exception_rate_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "pricing_exception_flag",
+          "label": "pricing_exception_flag",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Binary flag: 1 if pricing exception, 0 otherwise.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "pricing_exception_flag",
+        "header": "Pricing Exception Flag",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "exception_rate_pct",
+        "header": "Exception Rate (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-042": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "fee_rate_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "fee_rate_pct",
+          "label": "fee_rate_pct",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Fee Income / Average Balance\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "fee_rate_pct",
+        "header": "Fee Rate (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-065": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "exception_status"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "pricing_exception_status",
+          "label": "pricing_exception_status",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Binary flag: 1 if pricing exception exists, 0 otherwise.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "pricing_exception_status",
+        "header": "Pricing Exception Status",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "exception_status",
+        "header": "Exception Status",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-066": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "pricing_tier_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "pricing_tier_code",
+          "label": "pricing_tier_code",
+          "sample_value": 0,
+          "source_table": "facility_detail_snapshot",
+          "source_layer": "L3"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read pricing_tier_code from facility_detail_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "pricing_tier_code",
+        "header": "Pricing Tier Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-081": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "interest_rate_spread_bps"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "interest_rate_spread_bps",
+          "label": "interest_rate_spread_bps",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Facility Asset Spread/ Total Outstanding Balance\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "interest_rate_spread_bps",
+        "header": "Interest Rate Spread (bps)",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-095": {
+    "rollup_strategy": "weighted-avg",
+    "metric_fields": {
+      "primary_value": "interest_rate_sensitivity_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "interest_rate_sensitivity_pct",
+          "label": "interest_rate_sensitivity_pct",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Read interest_rate_sensitivity_pct from facility_financial_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "interest_rate_sensitivity_pct",
+        "header": "Interest Rate Sensitivity (%)",
+        "format": "percentage",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-101": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "pricing_exception_flag"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "pricing_exception_flag",
+          "label": "pricing_exception_flag",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated pricing_exception_flag per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "pricing_exception_flag",
+        "header": "Pricing Exception Flag",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-006": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "as_of_date"
+    }
+  },
+  "MET-007": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "expected_tenor_months"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "expected_tenor_months",
+          "label": "expected_tenor_months",
+          "sample_value": 0,
+          "source_table": "deal_pipeline_fact",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "For each Facility_ID, [Contract Level Maturity Date]- [Facility Level Effective Date]\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "expected_tenor_months",
+        "header": "Expected Tenor Months",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-015": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "counterparty_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "counterparty_id",
+          "label": "counterparty_id",
+          "sample_value": 0,
+          "source_table": "counterparty",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of counterparty_id from counterparty.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "counterparty_id",
+        "header": "Counterparty Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-016": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "legal_name"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "legal_name",
+          "label": "legal_name",
+          "sample_value": 0,
+          "source_table": "counterparty",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read legal_name from counterparty for each facility's counterparty.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "legal_name",
+        "header": "Legal Name",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-017": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "country_name"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "country_name",
+          "label": "country_name",
+          "sample_value": 0,
+          "source_table": "country_dim",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of country_name from country_dim.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "country_name",
+        "header": "Country Name",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-018": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "credit_agreement_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "credit_agreement_id",
+          "label": "credit_agreement_id",
+          "sample_value": 0,
+          "source_table": "credit_agreement_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of credit_agreement_id from credit_agreement_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "credit_agreement_id",
+        "header": "Credit Agreement Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-023": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "days_until_maturity"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "days_until_maturity",
+          "label": "days_until_maturity",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "[Maturity_Date] - Today()  OR [facility_master.effective_start_date] - Today()\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "days_until_maturity",
+        "header": "Days Until Maturity",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-029": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "origination_date"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "origination_date",
+          "label": "origination_date",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of origination_date from facility_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "origination_date",
+        "header": "Origination Date",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-038": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "facility_id"
+    }
+  },
+  "MET-039": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "facility_name"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "facility_name",
+          "label": "facility_name",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of facility_name from facility_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "facility_name",
+        "header": "Facility Name",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-041": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "facility_type"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "facility_type",
+          "label": "facility_type",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read facility_type from facility_exposure_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "facility_type",
+        "header": "Facility Type",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-043": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "fr2590_category_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "fr2590_category_code",
+          "label": "fr2590_category_code",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated fr2590_category_code per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "fr2590_category_code",
+        "header": "Fr2590 Category Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-047": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "is_active_flag"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "is_active_flag",
+          "label": "is_active_flag",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of is_active_flag from facility_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "is_active_flag",
+        "header": "Is Active Flag",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-048": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "is_syndicated_flag"
+    }
+  },
+  "MET-049": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "legal_name"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "legal_name",
+          "label": "legal_name",
+          "sample_value": 0,
+          "source_table": "counterparty",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of legal_name from counterparty.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "legal_name",
+        "header": "Legal Name",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-050": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "legal_entity_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "legal_entity_id",
+          "label": "legal_entity_id",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read legal_entity_id from facility_exposure_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "legal_entity_id",
+        "header": "Legal Entity Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-053": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "parent"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "parent",
+          "label": "parent",
+          "sample_value": 0,
+          "source_table": "enterprise_business_taxonomy",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "parent",
+        "header": "Parent",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-054": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "parent"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "parent",
+          "label": "parent",
+          "sample_value": 0,
+          "source_table": "enterprise_business_taxonomy",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "parent",
+        "header": "Parent",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-055": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "parent"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "parent",
+          "label": "parent",
+          "sample_value": 0,
+          "source_table": "enterprise_business_taxonomy",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "parent",
+        "header": "Parent",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-056": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "parent"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "parent",
+          "label": "parent",
+          "sample_value": 0,
+          "source_table": "enterprise_business_taxonomy",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "parent",
+        "header": "Parent",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-059": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "maturity_date"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "maturity_date",
+          "label": "maturity_date",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of maturity_date from facility_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "maturity_date",
+        "header": "Maturity Date",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-063": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "origination_date"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "origination_date",
+          "label": "origination_date",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of origination_date from facility_master.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "origination_date",
+        "header": "Origination Date",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-064": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "counterparty_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "counterparty_id",
+          "label": "counterparty_id",
+          "sample_value": 0,
+          "source_table": "counterparty",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of counterparty_id from counterparty.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "counterparty_id",
+        "header": "Counterparty Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-068": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "product_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "product_id",
+          "label": "product_id",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "SUM(product_id) per facility from facility_exposure_snapshot.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "product_id",
+        "header": "Product Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-069": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "region_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "region_code",
+          "label": "region_code",
+          "sample_value": 0,
+          "source_table": "counterparty",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of region_code from counterparty.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "region_code",
+        "header": "Region Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-080": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "industry_name"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "industry_name",
+          "label": "industry_name",
+          "sample_value": 0,
+          "source_table": "industry_dim",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Direct lookup of industry_name from industry_dim.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "industry_name",
+        "header": "Industry Name",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-093": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "number_of_facilities"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "number_of_facilities",
+          "label": "number_of_facilities",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read number_of_facilities from facility_exposure_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "number_of_facilities",
+        "header": "Number Of Facilities",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-096": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "tangible_net_worth_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "tangible_net_worth_usd",
+          "label": "tangible_net_worth_usd",
+          "sample_value": 0,
+          "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read tangible_net_worth_usd from counterparty_financial_snapshot for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "tangible_net_worth_usd",
+        "header": "Tangible Net Worth Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-103": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "maturity_bucket_id"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "maturity_bucket_id",
+          "label": "maturity_bucket_id",
+          "sample_value": 0,
+          "source_table": "maturity_bucket_dim",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated maturity_bucket_id per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "maturity_bucket_id",
+        "header": "Maturity Bucket Id",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-104": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "origination_date_bucket"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "effective_date",
+          "label": "effective_date",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated origination_date_bucket per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "effective_date",
+        "header": "Effective Date",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "origination_date_bucket",
+        "header": "Origination Date Bucket",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-106": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "effective_date_bucket"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "effective_date",
+          "label": "effective_date",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated effective_date_bucket per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "effective_date",
+        "header": "Effective Date",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "effective_date_bucket",
+        "header": "Effective Date Bucket",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-107": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "facility_is_active_flag"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "is_active_flag",
+          "label": "is_active_flag",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Calculated facility_is_active_flag per facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "is_active_flag",
+        "header": "Is Active Flag",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "facility_is_active_flag",
+        "header": "Facility Is Active Flag",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-021": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_rating_status"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_rating_status",
+          "label": "risk_rating_status",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read risk_rating_status from counterparty_rating_observation for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_rating_status",
+        "header": "Risk Rating Status",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-037": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "external_risk_rating"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "external_risk_rating",
+          "label": "external_risk_rating",
+          "sample_value": 0,
+          "source_table": "position",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read external_risk_rating from position for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "external_risk_rating",
+        "header": "External Risk Rating",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-046": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "internal_risk_rating"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "internal_risk_rating",
+          "label": "internal_risk_rating",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read internal_risk_rating from facility_risk_snapshot for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "internal_risk_rating",
+        "header": "Internal Risk Rating",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-071": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_rating_status"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_rating_status",
+          "label": "risk_rating_status",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read risk_rating_status from counterparty_rating_observation for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_rating_status",
+        "header": "Risk Rating Status",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-072": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_rating_change_steps"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_rating_change_steps",
+          "label": "risk_rating_change_steps",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read risk_rating_change_steps from counterparty_rating_observation for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_rating_change_steps",
+        "header": "Risk Rating Change Steps",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-073": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_rating_status"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_rating_status",
+          "label": "risk_rating_status",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read risk_rating_status from counterparty_rating_observation for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_rating_status",
+        "header": "Risk Rating Status",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-074": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "risk_rating_change_steps"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "risk_rating_change_steps",
+          "label": "risk_rating_change_steps",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read risk_rating_change_steps from counterparty_rating_observation for each facility as-of reporting date.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "risk_rating_change_steps",
+        "header": "Risk Rating Change Steps",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-099": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "internal_risk_rating_bucket_code"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "internal_risk_rating_bucket_code",
+          "label": "internal_risk_rating_bucket_code",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read internal_risk_rating_bucket_code from facility_exposure_snapshot for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "internal_risk_rating_bucket_code",
+        "header": "Internal Risk Rating Bucket Code",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-011": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "current_valuation_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "current_valuation_usd",
+          "label": "Current market value of the collateral asset in USD",
+          "sample_value": 0,
+          "source_table": "collateral_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation percentage from current allocation record",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each active facility, SUM current_valuation_usd across all collateral positions, weighted by the bank's current participation share. Formula: SUM(current_valuation_usd) * COALESCE(bank_share_pct, 100) / 100.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "current_valuation_usd",
+        "header": "Current Valuation Usd",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      }
+    ]
+  },
+  "MET-109": {
+    "rollup_strategy": "sum-ratio",
+    "metric_fields": {
+      "primary_value": "ltv_pct"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "committed_facility_amt",
+          "label": "committed_facility_amt",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "current_valuation_usd",
+          "label": "current_valuation_usd",
+          "sample_value": 0,
+          "source_table": "collateral_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "percentage",
+      "formula_display": "Aggregate collateral per facility (a facility may have multiple collateral assets),\nthen compute LTV = committed_facility_amt / SUM(current_valuation_usd) * 100.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "committed_facility_amt",
+        "header": "Committed Facility ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "current_valuation_usd",
+        "header": "Current Valuation Usd",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "ltv_pct",
+        "header": "Ltv (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  }
+}

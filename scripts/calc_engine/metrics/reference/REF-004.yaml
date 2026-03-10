@@ -26,7 +26,7 @@ regulatory_references:
     description: ""
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
+  - schema: l2
     table: counterparty
     alias: cp
     join_type: BASE
@@ -56,7 +56,7 @@ levels:
         fm.facility_id AS dimension_key,
         cp.counterparty_id AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.counterparty cp
+      INNER JOIN l2.counterparty cp
         ON cp.counterparty_id = fm.counterparty_id
         AND cp.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
@@ -69,7 +69,7 @@ levels:
       SELECT
         cp.counterparty_id AS dimension_key,
         cp.counterparty_id AS metric_value
-      FROM l1.counterparty cp
+      FROM l2.counterparty cp
       WHERE cp.is_current_flag = 'Y'
   desk:
     aggregation_type: SUM
@@ -84,7 +84,7 @@ levels:
           fm.facility_id AS dimension_key,
           cp.counterparty_id AS metric_value
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
           AND cp.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'
@@ -109,7 +109,7 @@ levels:
           fm.facility_id AS dimension_key,
           cp.counterparty_id AS metric_value
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
           AND cp.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'
@@ -136,7 +136,7 @@ levels:
           fm.facility_id AS dimension_key,
           cp.counterparty_id AS metric_value
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
           AND cp.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'

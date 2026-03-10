@@ -26,7 +26,7 @@ regulatory_references:
     description: ""
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
+  - schema: l2
     table: credit_agreement_master
     alias: cam
     join_type: BASE
@@ -56,7 +56,7 @@ levels:
         fm.facility_id AS dimension_key,
         cam.credit_agreement_id AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.credit_agreement_master cam
+      INNER JOIN l2.credit_agreement_master cam
         ON cam.facility_id = fm.facility_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
@@ -67,7 +67,7 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         cam.credit_agreement_id AS metric_value
-      FROM l1.credit_agreement_master cam
+      FROM l2.credit_agreement_master cam
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = cam.facility_id
         AND fm.is_active_flag = 'Y'
@@ -85,7 +85,7 @@ levels:
           fm.facility_id AS dimension_key,
           cam.credit_agreement_id AS metric_value
         FROM l2.facility_master fm
-        INNER JOIN l1.credit_agreement_master cam
+        INNER JOIN l2.credit_agreement_master cam
           ON cam.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
@@ -108,7 +108,7 @@ levels:
           fm.facility_id AS dimension_key,
           cam.credit_agreement_id AS metric_value
         FROM l2.facility_master fm
-        INNER JOIN l1.credit_agreement_master cam
+        INNER JOIN l2.credit_agreement_master cam
           ON cam.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
@@ -133,7 +133,7 @@ levels:
           fm.facility_id AS dimension_key,
           cam.credit_agreement_id AS metric_value
         FROM l2.facility_master fm
-        INNER JOIN l1.credit_agreement_master cam
+        INNER JOIN l2.credit_agreement_master cam
           ON cam.facility_id = fm.facility_id
         WHERE fm.is_active_flag = 'Y'
       ) fac

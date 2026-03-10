@@ -90,13 +90,14 @@ def main():
     parser.add_argument("--output", help="Write demo data JSON to this file instead of stdout")
     parser.add_argument("--persist", action="store_true", help="Update catalogue.json in-place")
     parser.add_argument("--force", action="store_true", help="Overwrite existing demo_data")
+    parser.add_argument("--force-json", action="store_true", help="Force JSON sample data (skip PostgreSQL)")
     args = parser.parse_args()
 
     if not args.metric and not args.all:
         parser.error("--metric or --all is required")
 
     catalogue = load_catalogue()
-    loader = DataLoader()
+    loader = DataLoader(force_json=getattr(args, "force_json", False))
 
     try:
         if args.all:

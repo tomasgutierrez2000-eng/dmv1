@@ -17,7 +17,7 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l1
+- schema: l2
   table: counterparty
   alias: cp
   join_type: BASE
@@ -46,7 +46,7 @@ levels:
         fm.facility_id AS dimension_key,
         1 AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.counterparty cp
+      INNER JOIN l2.counterparty cp
         ON cp.counterparty_id = fm.counterparty_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
@@ -62,7 +62,7 @@ levels:
           fm.facility_id,
           cp.counterparty_id
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
@@ -83,7 +83,7 @@ levels:
           fm.facility_id,
           cp.counterparty_id
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
@@ -106,7 +106,7 @@ levels:
           fm.facility_id,
           cp.counterparty_id
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac
@@ -131,7 +131,7 @@ levels:
           fm.facility_id,
           cp.counterparty_id
         FROM l2.facility_master fm
-        INNER JOIN l1.counterparty cp
+        INNER JOIN l2.counterparty cp
           ON cp.counterparty_id = fm.counterparty_id
         WHERE fm.is_active_flag = 'Y'
       ) fac

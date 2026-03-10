@@ -40,7 +40,17 @@ if [ "$MATCHED" = true ]; then
     exit 0
   fi
 
+  # Don't sync capital if the command was already targeting postgres_capital
+  if echo "$CMD" | grep -q "postgres_capital"; then
+    exit 0
+  fi
+
   echo "  [hook] DB schema change detected — syncing data dictionary..."
   npm run db:introspect 2>&1 | tail -5
   echo "  [hook] Data dictionary synced."
+
+  # Auto-sync changes to postgres_capital (silent if capital DB is unavailable)
+  echo "  [hook] Syncing changes to postgres_capital..."
+  npm run db:sync-capital -- --yes 2>&1 | tail -5
+  echo "  [hook] Capital DB sync complete."
 fi

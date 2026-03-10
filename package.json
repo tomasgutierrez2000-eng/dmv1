@@ -26,6 +26,7 @@
     "db:verify-scenarios": "tsx scripts/verify-cro-scenarios.ts",
     "db:migrate": "tsx scripts/migrate-database.ts",
     "db:introspect": "tsx scripts/introspect-db.ts",
+    "db:sync-capital": "tsx scripts/sync-capital-db.ts",
     "sync:all": "tsx scripts/sync-all.ts",
     "sync:data-model": "tsx scripts/sync-data-model.ts",
     "export:data-model": "tsx scripts/export-data-model-excel.ts",

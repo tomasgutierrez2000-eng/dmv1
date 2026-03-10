@@ -1,0 +1,73 @@
+# S25: Retail Sector Delinquency Wave
+#
+# Story: Consumer spending contraction hits 5 retail chains.
+# Holiday season underperformance leads to missed payments.
+# DPD progresses from 30 to 90 days across the portfolio.
+# Two names are approaching default territory.
+#
+# Dashboard signal: Rising delinquency across retail names
+# with accelerating DPD migration and overdue amounts growing.
+
+scenario_id: "S25"
+name: "Retail Sector Delinquency Wave"
+type: DELINQUENCY_TREND
+narrative: "5 retail chains miss payments as consumer spending contracts, DPD migrating 30→90 days"
+
+counterparties:
+  - legal_name: "National Department Stores Inc."
+    country: US
+    industry_id: 7      # Retail
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Coastal Lifestyle Brands LLC"
+    country: US
+    industry_id: 7
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Maple Street Grocery Holdings"
+    country: CA
+    industry_id: 6      # Consumer/Retail
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "London Fashion Retail Group plc"
+    country: GB
+    industry_id: 7
+    rating_tier: HY_LOW
+    story_arc: DETERIORATING
+    size: SMALL
+  - legal_name: "Alpine Specialty Retail AG"
+    country: CH
+    industry_id: 7
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: PAYMENT_DEFAULT
+      date: "2025-01-15"
+      description: "National Department Stores misses $12M scheduled payment"
+      severity: HIGH
+  risk_flags:
+    - code: DELINQUENCY_MIGRATION
+      severity: HIGH
+      description: "Portfolio DPD migrating from 30-day to 90-day bucket"
+    - code: SECTOR_STRESS
+      severity: MEDIUM
+      description: "Consumer discretionary spending down 8% YoY"
+
+verification:
+  min_rows: 10
+  key_assertion: "5 retail counterparties show progressive delinquency with DPD migration"

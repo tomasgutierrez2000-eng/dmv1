@@ -1,0 +1,71 @@
+# S22: Healthcare Rating Divergence
+#
+# Story: A mid-sized hospital chain maintains an internal IG rating
+# while external agencies have downgraded to HY after a failed merger
+# and rising malpractice liabilities. The 3-notch gap between
+# internal and external ratings triggers regulatory scrutiny.
+#
+# Dashboard signal: Rating divergence alert — internal says BBB,
+# external says BB-, requiring immediate rating committee review.
+
+scenario_id: "S22"
+name: "Healthcare Rating Divergence"
+type: RATING_DIVERGENCE
+narrative: "Hospital chain has 3-notch internal vs external rating gap after failed merger and malpractice liabilities"
+
+counterparties:
+  - legal_name: "MedCore Health Systems Inc."
+    country: US
+    industry_id: 3      # Healthcare
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Pacific Regional Medical Group"
+    country: US
+    industry_id: 3
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Cornerstone Senior Living REIT"
+    country: US
+    industry_id: 10     # Real Estate (healthcare properties)
+    rating_tier: IG_LOW
+    story_arc: STEADY_HY
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-01"
+      description: "S&P downgrades MedCore to BB- from BBB-; internal rating unchanged"
+      severity: HIGH
+  risk_flags:
+    - code: RATING_DIVERGENCE
+      severity: HIGH
+      description: "3-notch gap between internal (BBB) and external (BB-) rating"
+    - code: REGULATORY_SCRUTINY
+      severity: MEDIUM
+      description: "OCC inquiry into rating governance process"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BBB-"
+      moodys: "Baa3"
+    ratings_after:
+      sp: "BB-"
+      moodys: "Ba3"
+
+verification:
+  min_rows: 6
+  key_assertion: "Healthcare counterparties show 3-notch rating divergence with regulatory flags"

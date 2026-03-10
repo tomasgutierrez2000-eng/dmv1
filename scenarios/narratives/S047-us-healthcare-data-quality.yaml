@@ -1,0 +1,66 @@
+# S47: US Healthcare Portfolio Data Quality
+#
+# Story: Post-merger integration of an acquired healthcare lending
+# portfolio reveals pervasive data quality issues. 4 hospital
+# groups have missing collateral documentation, stale financial
+# statements, and incomplete KYC. Data quality scores drop below
+# the bank's 70% threshold, triggering remediation program.
+#
+# Dashboard signal: Data quality alerts across healthcare
+# portfolio with missing documentation and stale financials.
+
+scenario_id: "S47"
+name: "Healthcare Portfolio Data Quality"
+type: DATA_QUALITY
+narrative: "Acquired healthcare portfolio reveals pervasive data quality issues — 4 hospitals below 70% threshold"
+
+counterparties:
+  - legal_name: "Midwest Regional Health Network Inc."
+    country: US
+    industry_id: 3      # Healthcare
+    rating_tier: IG_LOW
+    story_arc: STABLE_IG
+    size: LARGE
+  - legal_name: "Southeast Behavioral Health Systems LLC"
+    country: US
+    industry_id: 3
+    rating_tier: HY_HIGH
+    story_arc: STEADY_HY
+    size: MID
+  - legal_name: "Mountain States Orthopedic Group PC"
+    country: US
+    industry_id: 3
+    rating_tier: IG_LOW
+    story_arc: STABLE_IG
+    size: MID
+  - legal_name: "Coastal Rehabilitation Centers Inc."
+    country: US
+    industry_id: 3
+    rating_tier: HY_HIGH
+    story_arc: STEADY_HY
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: DATA_QUALITY_LOW
+      severity: HIGH
+      description: "4 healthcare counterparties below 70% data quality threshold"
+    - code: STALE_FINANCIALS
+      severity: HIGH
+      description: "Financial statements older than 18 months for 3 borrowers"
+    - code: MISSING_COLLATERAL_DOCS
+      severity: MEDIUM
+      description: "Collateral documentation incomplete for 6 of 8 facilities"
+
+verification:
+  min_rows: 8
+  key_assertion: "Healthcare portfolio shows systemic data quality issues requiring remediation"

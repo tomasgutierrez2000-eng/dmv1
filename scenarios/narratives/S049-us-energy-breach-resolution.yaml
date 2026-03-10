@@ -1,0 +1,69 @@
+# S49: US Energy Limit Breach Resolution
+#
+# Story: After the O&G sector downgrade (S19), the bank's energy
+# portfolio breached its sector concentration limit at 16.5% vs
+# 15% threshold. Over 90 days, risk management orchestrates a
+# resolution: $200M of exposures sold in secondary market, 2
+# facilities restructured with lower commitments, and new
+# monitoring protocols implemented.
+#
+# Dashboard signal: Breach resolution in progress — secondary
+# sales, facility restructuring, and exposure reduction.
+
+scenario_id: "S49"
+name: "Energy Limit Breach Resolution"
+type: BREACH_RESOLUTION
+narrative: "Energy sector limit breach resolved over 90 days — $200M secondary sales and facility restructuring"
+
+counterparties:
+  - legal_name: "Permian Basin Resources Inc."
+    country: US
+    industry_id: 4      # Energy
+    rating_tier: HY_HIGH
+    story_arc: RECOVERING
+    size: LARGE
+  - legal_name: "Appalachian Natural Gas Partners LP"
+    country: US
+    industry_id: 4
+    rating_tier: IG_LOW
+    story_arc: RECOVERING
+    size: MID
+  - legal_name: "Gulf Coast Refining Co."
+    country: US
+    industry_id: 4
+    rating_tier: HY_HIGH
+    story_arc: STEADY_HY
+    size: MID
+  - legal_name: "Bakken Shale Production Corp."
+    country: US
+    industry_id: 4
+    rating_tier: HY_MID
+    story_arc: RECOVERING
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: AMENDMENT
+      date: "2024-12-10"
+      description: "Facility commitment reduced from $500M to $350M as part of limit cure"
+      severity: MEDIUM
+  risk_flags:
+    - code: BREACH_CURE_IN_PROGRESS
+      severity: MEDIUM
+      description: "Energy sector limit cure: 16.5% → target 14.5% via sales and restructuring"
+    - code: SECONDARY_MARKET_SALE
+      severity: LOW
+      description: "$200M energy exposure sold in secondary market as part of cure plan"
+
+verification:
+  min_rows: 8
+  key_assertion: "Energy exposure shows breach resolution with declining utilization and cure actions"

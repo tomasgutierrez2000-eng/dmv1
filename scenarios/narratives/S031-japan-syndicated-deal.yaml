@@ -1,0 +1,61 @@
+# S31: Japan Syndicated Infrastructure Deal
+#
+# Story: A $4B syndicated project finance facility for a Japanese
+# bullet train expansion. Bank holds 15% ($600M) as co-lead arranger.
+# 12 lenders in the syndicate. The project faces construction delays,
+# and the borrower requests a 6-month extension with fee renegotiation.
+#
+# Dashboard signal: Large syndicated exposure with multiple
+# lender participations and amendment activity.
+
+scenario_id: "S31"
+name: "Japan Syndicated Infrastructure Deal"
+type: SYNDICATED_FACILITY
+narrative: "Bank holds $600M in $4B syndicated Japan rail project — construction delays trigger amendment"
+
+counterparties:
+  - legal_name: "Nippon Express Railway Development Corp."
+    country: JP
+    industry_id: 8      # Transportation
+    rating_tier: IG_MID
+    story_arc: STABLE_IG
+    size: LARGE
+  - legal_name: "Tokyo Infrastructure Partners Co., Ltd."
+    country: JP
+    industry_id: 5      # Manufacturing/Construction
+    rating_tier: IG_LOW
+    story_arc: STEADY_HY
+    size: MID
+  - legal_name: "Kansai Construction Finance Co., Ltd."
+    country: JP
+    industry_id: 1      # Financial Services
+    rating_tier: IG_MID
+    story_arc: STABLE_IG
+    size: MID
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: AMENDMENT
+      date: "2024-12-20"
+      description: "6-month maturity extension granted — construction delay clause invoked"
+      severity: MEDIUM
+  risk_flags:
+    - code: SYNDICATED_CONCENTRATION
+      severity: MEDIUM
+      description: "15% hold position in $4B syndicated facility"
+    - code: PROJECT_DELAY
+      severity: MEDIUM
+      description: "Construction timeline extended 6 months — cost overrun risk"
+
+verification:
+  min_rows: 6
+  key_assertion: "Syndicated Japan infrastructure deal shows amendment activity and lender allocation"

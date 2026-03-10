@@ -1,0 +1,65 @@
+# S45: Mexico Infrastructure Syndicated Facility
+#
+# Story: A $3.5B syndicated project finance facility for
+# Mexico City metro expansion. Bank holds 20% ($700M).
+# Political risk emerges as incoming administration threatens
+# contract renegotiation. Construction permits delayed.
+# Syndicate members considering exit options.
+#
+# Dashboard signal: Large syndicated exposure with political
+# risk and construction delay in emerging market.
+
+scenario_id: "S45"
+name: "Mexico Infrastructure Syndication"
+type: SYNDICATED_FACILITY
+narrative: "Bank holds $700M in $3.5B Mexico metro syndication — political risk threatens contract renegotiation"
+
+counterparties:
+  - legal_name: "Mexico City Transit Authority"
+    country: MX
+    industry_id: 8      # Transportation
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Constructora Nacional de México SA de CV"
+    country: MX
+    industry_id: 5      # Construction
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Puebla Engineering Services SA de CV"
+    country: MX
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: STEADY_HY
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: AMENDMENT
+      date: "2024-12-28"
+      description: "Syndicate requests standstill pending political clarity on contract terms"
+      severity: MEDIUM
+  risk_flags:
+    - code: POLITICAL_RISK
+      severity: HIGH
+      description: "Incoming administration threatens infrastructure contract renegotiation"
+    - code: SYNDICATED_CONCENTRATION
+      severity: MEDIUM
+      description: "20% hold in $3.5B facility — limited secondary market exit"
+    - code: CONSTRUCTION_DELAY
+      severity: MEDIUM
+      description: "Environmental permits delayed 6+ months"
+
+verification:
+  min_rows: 6
+  key_assertion: "Mexico infrastructure syndication shows political and construction delay risk"

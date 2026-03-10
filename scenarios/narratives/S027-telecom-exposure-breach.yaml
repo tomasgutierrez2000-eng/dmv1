@@ -1,0 +1,67 @@
+# S27: Telecom Exposure Limit Breach
+#
+# Story: A major telecom's aggressive 5G capex borrowing pushes
+# the bank's single-name exposure to $3.2B, breaching the $3B
+# internal limit. Concurrent spectrum auction financing adds
+# $400M of unfunded commitments. Risk management escalates
+# to the board for limit exception approval.
+#
+# Dashboard signal: Hard limit breach on single-name telecom
+# exposure with board-level escalation required.
+
+scenario_id: "S27"
+name: "Telecom Exposure Limit Breach"
+type: EXPOSURE_BREACH
+narrative: "Telecom 5G capex pushes single-name exposure to $3.2B, breaching $3B internal limit"
+
+counterparties:
+  - legal_name: "Meridian Telecommunications Corp."
+    country: US
+    industry_id: 8      # Telecom
+    rating_tier: IG_LOW
+    story_arc: GROWING
+    size: LARGE
+  - legal_name: "Meridian Wireless Holdings LLC"
+    country: US
+    industry_id: 8
+    rating_tier: HY_HIGH
+    story_arc: GROWING
+    size: MID
+  - legal_name: "Spectrum Auction Finance SPV I"
+    country: US
+    industry_id: 8
+    rating_tier: HY_HIGH
+    story_arc: NEW_RELATIONSHIP
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: LIMIT_BREACH
+      date: "2024-12-31"
+      description: "Single-name exposure breaches $3B internal limit at $3.2B"
+      severity: HIGH
+  risk_flags:
+    - code: LIMIT_BREACH
+      severity: HIGH
+      description: "Single-name telecom exposure exceeds $3B limit by $200M"
+    - code: UNFUNDED_COMMITMENT_SPIKE
+      severity: MEDIUM
+      description: "$400M unfunded spectrum auction commitment adds contingent exposure"
+
+limit:
+  type: SINGLE_NAME
+  threshold_pct: 100
+  current_utilization_pct: 107
+
+verification:
+  min_rows: 9
+  key_assertion: "Telecom exposure breaches single-name limit with aggressive 5G capex draws"

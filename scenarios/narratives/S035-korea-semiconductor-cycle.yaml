@@ -1,0 +1,72 @@
+# S35: Korea Semiconductor Cycle Downturn
+#
+# Story: The global semiconductor cycle turns down, hitting
+# 3 Korean chipmakers with $1.5B in exposure. Order cancellations
+# and inventory build-up compress margins. One borrower's
+# rating is downgraded while another draws down its entire
+# $400M revolver for capex preservation.
+#
+# Dashboard signal: Semiconductor sector deterioration with
+# downgrade, full revolver draws, and margin compression.
+
+scenario_id: "S35"
+name: "Korea Semiconductor Downturn"
+type: DETERIORATION_TREND
+narrative: "Semiconductor cycle downturn hits 3 Korean chipmakers — downgrades and full revolver draws on $1.5B exposure"
+
+counterparties:
+  - legal_name: "Hanjin Semiconductor Corp."
+    country: KR
+    industry_id: 2      # Technology
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Seoul Display Technologies Ltd."
+    country: KR
+    industry_id: 2
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Daegu Memory Solutions Co., Ltd."
+    country: KR
+    industry_id: 2
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-10"
+      description: "Fitch downgrades Hanjin from BBB to BBB- on margin compression"
+      severity: MEDIUM
+  risk_flags:
+    - code: SECTOR_CYCLE_DOWNTURN
+      severity: HIGH
+      description: "Semiconductor order books down 30% — inventory build-up accelerating"
+    - code: REVOLVER_FULL_DRAW
+      severity: HIGH
+      description: "Seoul Display draws 100% of $400M revolver for capex preservation"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BBB"
+      moodys: "Baa2"
+    ratings_after:
+      sp: "BBB-"
+      moodys: "Baa3"
+
+verification:
+  min_rows: 9
+  key_assertion: "Korean semiconductor borrowers show cycle downturn with downgrades and full draws"

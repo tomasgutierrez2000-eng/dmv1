@@ -1,0 +1,76 @@
+# S40: Australia Mining Portfolio Stress Test
+#
+# Story: The bank runs a China demand shock stress test on
+# its Australian mining portfolio. Iron ore prices fall 50%,
+# coal demand drops 35%. 5 borrowers face cash flow stress.
+# Stress losses total $680M, exceeding the sector-specific
+# stress buffer of $500M.
+#
+# Dashboard signal: Stress test breach on Australia mining
+# with multiple counterparty failures under China demand shock.
+
+scenario_id: "S40"
+name: "Australia Mining Stress Test"
+type: STRESS_TEST
+narrative: "China demand shock stress test: iron ore -50%, coal -35% — Australia mining losses breach $500M buffer"
+
+counterparties:
+  - legal_name: "Pilbara Iron Resources Pty Ltd"
+    country: AU
+    industry_id: 9      # Materials
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Queensland Coal Holdings Ltd."
+    country: AU
+    industry_id: 9
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Western Gold Mining Corp."
+    country: AU
+    industry_id: 9
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Tasmania Mineral Processing Pty Ltd"
+    country: AU
+    industry_id: 9
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: SMALL
+  - legal_name: "Northern Territory Bauxite Ltd."
+    country: AU
+    industry_id: 9
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: MID
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: STRESS_TEST_BREACH
+      severity: HIGH
+      description: "China demand shock — mining sector stress losses exceed $500M buffer"
+    - code: COMMODITY_PRICE_SENSITIVITY
+      severity: HIGH
+      description: "Iron ore -50% and coal -35% scenarios show severe P&L impact"
+    - code: COUNTRY_CONCENTRATION
+      severity: MEDIUM
+      description: "5 Australian mining names with correlated commodity exposure"
+
+stress_test:
+  scenario_name: "China Demand Shock - Commodity Collapse"
+  loss_threshold_amt: 500000000
+
+verification:
+  min_rows: 10
+  key_assertion: "Australia mining portfolio fails stress test under China demand shock scenario"

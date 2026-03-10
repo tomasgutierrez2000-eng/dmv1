@@ -1,0 +1,83 @@
+# S38: Hong Kong Property Event Cascade
+#
+# Story: A major Hong Kong property developer misses a bond
+# payment, triggering a cross-default on bank facilities,
+# followed by covenant reviews, asset sales, and restructuring
+# negotiations. The cascade unfolds over 90 days with 6
+# distinct credit events.
+#
+# Dashboard signal: Event cascade — default → cross-default →
+# covenant review → restructuring → amendment chain.
+
+scenario_id: "S38"
+name: "Hong Kong Property Event Cascade"
+type: EVENT_CASCADE
+narrative: "HK developer bond default triggers cross-default cascade — 6 events over 90 days across $1.1B exposure"
+
+counterparties:
+  - legal_name: "Victoria Harbour Properties Ltd."
+    country: HK
+    industry_id: 10     # Real Estate
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Kowloon Land Holdings Ltd."
+    country: HK
+    industry_id: 10
+    rating_tier: HY_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "New Territories Development Corp."
+    country: HK
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: PAYMENT_DEFAULT
+      date: "2024-11-28"
+      description: "Victoria Harbour misses HKD 2.1B bond payment"
+      severity: HIGH
+    - type: CROSS_DEFAULT
+      date: "2024-12-05"
+      description: "Cross-default triggered on 3 bank facilities"
+      severity: HIGH
+    - type: RESTRUCTURING
+      date: "2025-01-15"
+      description: "Restructuring negotiations begin — 18-month standstill proposed"
+      severity: HIGH
+  risk_flags:
+    - code: DEFAULT_CONTAGION
+      severity: HIGH
+      description: "Bond default cascading to bank facilities via cross-default clauses"
+    - code: RESTRUCTURING_RISK
+      severity: HIGH
+      description: "Active restructuring negotiations — recovery rate uncertain"
+    - code: GEOGRAPHIC_CONCENTRATION
+      severity: MEDIUM
+      description: "3 HK property developers with correlated default risk"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BB"
+      moodys: "Ba2"
+    ratings_after:
+      sp: "CCC+"
+      moodys: "Caa1"
+
+verification:
+  min_rows: 9
+  key_assertion: "HK property developers show default cascade with cross-default and restructuring"

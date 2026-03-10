@@ -1,0 +1,63 @@
+# S39: German Auto Industry Product Mix Shift
+#
+# Story: 3 German automakers shift from traditional ICE financing
+# to EV supply chain credit. The bank's product mix shifts from
+# 80% term loans to 40% supply chain finance and 30% capex
+# facilities. FR2590 reporting categories change, requiring
+# reclassification of $2.3B in facilities.
+#
+# Dashboard signal: Product mix shift in auto sector with
+# FR2590 reclassification and new facility types emerging.
+
+scenario_id: "S39"
+name: "German Auto Product Mix Shift"
+type: PRODUCT_MIX
+narrative: "3 German automakers pivot to EV financing — $2.3B in facilities require FR2590 reclassification"
+
+counterparties:
+  - legal_name: "Bayerische Elektrofahrzeug AG"
+    country: DE
+    industry_id: 5      # Manufacturing
+    rating_tier: IG_MID
+    story_arc: GROWING
+    size: LARGE
+  - legal_name: "Rhein-Ruhr Automotive Components GmbH"
+    country: DE
+    industry_id: 5
+    rating_tier: IG_LOW
+    story_arc: STEADY_HY
+    size: MID
+  - legal_name: "Stuttgart Precision Engineering AG"
+    country: DE
+    industry_id: 5
+    rating_tier: IG_MID
+    story_arc: GROWING
+    size: MID
+  - legal_name: "Saxony Battery Materials GmbH"
+    country: DE
+    industry_id: 9      # Materials
+    rating_tier: HY_HIGH
+    story_arc: NEW_RELATIONSHIP
+    size: SMALL
+
+facilities:
+  per_counterparty: 3
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: PRODUCT_MIX_SHIFT
+      severity: MEDIUM
+      description: "Auto sector product mix shifting — 40% now supply chain finance vs 10% prior"
+    - code: FR2590_RECLASSIFICATION
+      severity: MEDIUM
+      description: "$2.3B in facilities require FR2590 category reclassification"
+
+verification:
+  min_rows: 12
+  key_assertion: "German auto sector shows product mix shift with FR2590 reclassification flags"

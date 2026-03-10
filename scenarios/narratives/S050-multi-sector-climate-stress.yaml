@@ -1,0 +1,98 @@
+# S50: Multi-Sector Climate Stress Test
+#
+# Story: The bank runs a comprehensive climate transition
+# stress test across its entire portfolio. Physical risk
+# (extreme weather) and transition risk (carbon pricing)
+# affect 8 counterparties across energy, real estate,
+# transportation, and agriculture. Combined stress losses
+# of $1.2B exceed the $1B climate risk buffer.
+#
+# Dashboard signal: Cross-sector climate stress test
+# showing portfolio-wide vulnerability to transition scenario.
+
+scenario_id: "S50"
+name: "Multi-Sector Climate Stress Test"
+type: STRESS_TEST
+narrative: "Climate transition stress test: 8 counterparties across 4 sectors show $1.2B combined losses vs $1B buffer"
+
+counterparties:
+  - legal_name: "Rocky Mountain Coal Holdings Inc."
+    country: US
+    industry_id: 4      # Energy
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Florida Coastal Properties REIT"
+    country: US
+    industry_id: 10     # Real Estate
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Pacific Northwest Timber Corp."
+    country: US
+    industry_id: 9      # Materials
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Shanghai Shipping Container Corp."
+    country: HK
+    industry_id: 8      # Transportation
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Alberta Tar Sands Processing Ltd."
+    country: CA
+    industry_id: 4
+    rating_tier: HY_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Queensland Sugar Plantations Pty Ltd"
+    country: AU
+    industry_id: 6      # Consumer/Agri
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+  - legal_name: "Lagos Cement Manufacturing Co."
+    country: GB
+    industry_id: 5      # Manufacturing
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: SMALL
+  - legal_name: "Midwest Cattle Feedlot Operations Inc."
+    country: US
+    industry_id: 6
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: STRESS_TEST_BREACH
+      severity: HIGH
+      description: "Climate stress losses $1.2B — exceeding $1B climate risk buffer"
+    - code: CLIMATE_TRANSITION_RISK
+      severity: HIGH
+      description: "Carbon pricing at $100/ton renders 3 energy borrowers cash flow negative"
+    - code: CLIMATE_PHYSICAL_RISK
+      severity: HIGH
+      description: "Extreme weather scenario impacts coastal RE and agricultural assets"
+    - code: CROSS_SECTOR_CORRELATION
+      severity: MEDIUM
+      description: "Climate risks correlated across energy, RE, transport, agriculture"
+
+stress_test:
+  scenario_name: "Climate Transition - Physical + Carbon"
+  loss_threshold_amt: 1000000000
+
+verification:
+  min_rows: 16
+  key_assertion: "Multi-sector climate stress test shows portfolio-wide vulnerability exceeding buffer"

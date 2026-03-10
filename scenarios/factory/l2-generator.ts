@@ -1,0 +1,813 @@
+/**
+ * L2 Generator — produces time-series atomic data using story arc curves.
+ *
+ * Generates exposure snapshots, rating observations, credit events, risk flags,
+ * and other L2 tables driven by the story arc assigned to each counterparty.
+ *
+ * Uses the same story arc curves from scripts/shared/mvp-config.ts to ensure
+ * consistency with seed data behavior patterns.
+ */
+
+import {
+  STORY_UTILIZATION,
+  STORY_PD_MULTIPLIERS,
+  STORY_SPREAD_MULTIPLIERS,
+  STORY_CREDIT_STATUS,
+  STORY_DPD,
+  RATING_TIER_MAP,
+} from '../../scripts/shared/mvp-config';
+import type { StoryArc, RatingTier } from '../../scripts/shared/mvp-config';
+import type { L1Chain } from './chain-builder';
+import type { EnrichedCounterparty, EnrichedFacility } from './gsib-enrichment';
+import type { ScenarioConfig, CreditEventConfig, RiskFlagConfig, AmendmentConfig } from './scenario-config';
+import type { IDRegistry } from './id-registry';
+
+/* ────────────────── Output Types ────────────────── */
+
+export interface ExposureRow {
+  facility_exposure_id: number;
+  facility_id: number;
+  counterparty_id: number;
+  as_of_date: string;
+  exposure_type_id: number;
+  drawn_amount: number;
+  committed_amount: number;
+  undrawn_amount: number;
+  currency_code: string;
+  limit_status_code: string;
+}
+
+export interface RatingObservationRow {
+  observation_id: number;
+  counterparty_id: number;
+  as_of_date: string;
+  rating_type: string;
+  rating_value: string;
+  rating_grade_id: number;
+  is_internal_flag: string;
+  pd_implied: string;
+  rating_source_id: number;
+}
+
+export interface CreditEventRow {
+  credit_event_id: number;
+  counterparty_id: number;
+  credit_event_type_code: number;
+  event_date: string;
+  event_summary: string;
+  event_status: string;
+}
+
+export interface EventFacilityLinkRow {
+  link_id: number;
+  credit_event_id: number;
+  facility_id: number;
+}
+
+export interface RiskFlagRow {
+  risk_flag_id: number;
+  facility_id: number | null;
+  counterparty_id: number | null;
+  flag_type: string;
+  flag_code: string;
+  flag_severity: string;
+  as_of_date: string;
+  flag_description: string;
+}
+
+export interface AmendmentEventRow {
+  amendment_id: number;
+  facility_id: number;
+  credit_agreement_id: number;
+  counterparty_id: number;
+  amendment_type_code: string;
+  amendment_status_code: string;
+  effective_date: string;
+  amendment_description: string;
+}
+
+export interface CollateralSnapshotRow {
+  collateral_asset_id: number;
+  counterparty_id: number;
+  as_of_date: string;
+  original_valuation_usd: number;
+  current_valuation_usd: number;
+}
+
+export interface StressTestResultRow {
+  result_id: number;
+  scenario_id: number;
+  as_of_date: string;
+  loss_amount: number;
+  result_status: string;
+  result_description: string;
+}
+
+export interface StressTestBreachRow {
+  breach_id: number;
+  scenario_id: number;
+  as_of_date: string;
+  stress_test_result_id: number;
+  counterparty_id: number;
+  breach_amount_usd: number;
+  breach_severity: string;
+}
+
+export interface DelinquencyRow {
+  facility_id: number;
+  counterparty_id: number;
+  as_of_date: string;
+  credit_status_code: number;
+  days_past_due: number;
+  delinquency_status_code: string;
+}
+
+export interface LimitContributionRow {
+  limit_rule_id: number;
+  counterparty_id: number;
+  as_of_date: string;
+  contribution_amount_usd: number;
+  contribution_pct: number;
+}
+
+export interface LimitUtilizationRow {
+  counterparty_id: number;
+  limit_rule_id: number;
+  as_of_date: string;
+  utilized_amount: number;
+  available_amount: number;
+}
+
+export interface DealPipelineRow {
+  pipeline_id: number;
+  counterparty_id: number;
+  facility_id: number;
+  as_of_date: string;
+  pipeline_stage: string;
+  proposed_amount: number;
+  expected_close_date: string;
+}
+
+export interface DataQualityRow {
+  score_id: number;
+  dimension_name: string;
+  as_of_date: string;
+  completeness_score: number;
+  validity_score: number;
+  timeliness_score: number;
+  overall_score: number;
+}
+
+export interface ExposureAttributionRow {
+  attribution_id: number;
+  counterparty_id: number;
+  facility_id: number;
+  as_of_date: string;
+  exposure_type_id: number;
+  counterparty_role_code: string;
+  attributed_exposure_usd: number;
+  attribution_pct: number;
+}
+
+export interface L2Data {
+  facility_exposure_snapshot?: ExposureRow[];
+  counterparty_rating_observation?: RatingObservationRow[];
+  credit_event?: CreditEventRow[];
+  credit_event_facility_link?: EventFacilityLinkRow[];
+  risk_flag?: RiskFlagRow[];
+  amendment_event?: AmendmentEventRow[];
+  collateral_snapshot?: CollateralSnapshotRow[];
+  stress_test_result?: StressTestResultRow[];
+  stress_test_breach?: StressTestBreachRow[];
+  facility_delinquency_snapshot?: DelinquencyRow[];
+  limit_contribution_snapshot?: LimitContributionRow[];
+  limit_utilization_event?: LimitUtilizationRow[];
+  deal_pipeline_fact?: DealPipelineRow[];
+  data_quality_score_snapshot?: DataQualityRow[];
+  exposure_counterparty_attribution?: ExposureAttributionRow[];
+}
+
+/* ────────────────── PRNG helpers ────────────────── */
+
+function mulberry32(seed: number): () => number {
+  let s = seed | 0;
+  return () => {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  }
+  return h;
+}
+
+/* ────────────────── Risk Weight by Tier ────────────────── */
+
+const TIER_BASE_RW: Record<RatingTier, number> = {
+  IG_HIGH: 50, IG_MID: 75, IG_LOW: 100,
+  HY_HIGH: 100, HY_MID: 125, HY_LOW: 150,
+};
+
+/* ────────────────── Internal / External Rating Labels ────────────────── */
+
+const TIER_INT_RATINGS: Record<RatingTier, string[]> = {
+  IG_HIGH: ['AA-', 'AA', 'A+', 'AA-', 'AA'],
+  IG_MID:  ['A', 'A-', 'A+', 'A', 'A-'],
+  IG_LOW:  ['BBB+', 'BBB', 'BBB+', 'BBB-', 'BBB'],
+  HY_HIGH: ['BB+', 'BB', 'BB+', 'BBB-', 'BB+'],
+  HY_MID:  ['BB', 'BB-', 'B+', 'BB-', 'BB'],
+  HY_LOW:  ['B+', 'B', 'B-', 'B', 'B+'],
+};
+
+const TIER_EXT_RATINGS: Record<RatingTier, string[]> = {
+  IG_HIGH: ['Aa3', 'Aa2', 'A1', 'Aa3', 'Aa2'],
+  IG_MID:  ['A2', 'A3', 'A1', 'A2', 'A3'],
+  IG_LOW:  ['Baa1', 'Baa2', 'Baa1', 'Baa3', 'Baa2'],
+  HY_HIGH: ['Ba1', 'Ba2', 'Ba1', 'Baa3', 'Ba1'],
+  HY_MID:  ['Ba2', 'Ba3', 'B1', 'Ba3', 'Ba2'],
+  HY_LOW:  ['B1', 'B2', 'B3', 'B2', 'B1'],
+};
+
+const RATING_MIGRATION: Record<StoryArc, number[]> = {
+  STABLE_IG:        [0, 0, 0],
+  GROWING:          [0, 0, 1],
+  STEADY_HY:        [0, 0, 0],
+  DETERIORATING:    [0, 1, 2],
+  RECOVERING:       [2, 1, 0],
+  STRESSED_SECTOR:  [0, 1, 1],
+  NEW_RELATIONSHIP: [0, 0, 0],
+};
+
+/* ────────────────── Event Type → BIGINT Mapping ────────────────── */
+
+const EVENT_TYPE_MAP: Record<string, number> = {
+  DEFAULT: 1, FAILURE_TO_PAY: 1,
+  BANKRUPTCY: 2,
+  OBLIGATION_ACCELERATION: 3,
+  OBLIGATION_DEFAULT: 4,
+  RESTRUCTURING: 5, AMENDMENT: 5,
+  REPUDIATION: 6,
+  GOVERNMENTAL_INTERVENTION: 7,
+  CROSS_DEFAULT: 8,
+  DISTRESSED_EXCHANGE: 9,
+  DOWNGRADE: 10, RATING_DOWNGRADE: 10,
+};
+
+/* Credit status code BIGINT mapping (for delinquency snapshot) */
+function dpdToStatusCode(dpd: number): number {
+  if (dpd === 0) return 1;   // PERFORMING / CURRENT
+  if (dpd < 30) return 3;    // WATCH
+  if (dpd < 60) return 4;    // SPECIAL_MENTION
+  if (dpd < 90) return 5;    // SUBSTANDARD
+  if (dpd < 180) return 9;   // DOUBTFUL
+  return 10;                  // DEFAULT
+}
+
+/* ────────────────── Main L2 Generator ────────────────── */
+
+/**
+ * Generate all L2 data for a scenario based on its config and L1 chain.
+ * Uses story arc curves for realistic time-series behavior.
+ */
+export function generateL2Data(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  registry: IDRegistry,
+): L2Data {
+  const data: L2Data = {};
+
+  // Map counterparty IDs to their profiles for story arc lookup
+  const cpProfileMap = new Map<number, { arc: StoryArc; tier: RatingTier }>();
+  config.counterparties.forEach((p, i) => {
+    cpProfileMap.set(chain.counterparties[i].counterparty_id, {
+      arc: p.story_arc,
+      tier: p.rating_tier,
+    });
+  });
+
+  // ── 1. Exposure Snapshots (always generated) ──
+  data.facility_exposure_snapshot = generateExposures(chain, config, cpProfileMap);
+
+  // ── 2. Rating Observations (for DETERIORATION_TREND, RATING_DIVERGENCE, EVENT_CASCADE) ──
+  if (shouldGenerateRatings(config)) {
+    data.counterparty_rating_observation = generateRatings(chain, config, cpProfileMap);
+  }
+
+  // ── 3. Credit Events ──
+  if (config.events?.credit_events && config.events.credit_events.length > 0) {
+    const result = generateCreditEvents(chain, config, registry);
+    data.credit_event = result.events;
+    data.credit_event_facility_link = result.links;
+  }
+
+  // ── 4. Risk Flags ──
+  if (config.events?.risk_flags && config.events.risk_flags.length > 0) {
+    data.risk_flag = generateRiskFlags(chain, config, registry);
+  }
+
+  // ── 5. Amendments ──
+  if (config.events?.amendments && config.events.amendments.length > 0) {
+    data.amendment_event = generateAmendments(chain, config, registry);
+  }
+
+  // ── 6. Collateral Snapshots ──
+  if (config.type === 'COLLATERAL_DECLINE' && chain.collateral_assets) {
+    data.collateral_snapshot = generateCollateralSnapshots(chain, config);
+  }
+
+  // ── 7. Stress Test Results ──
+  if (config.stress_test) {
+    const result = generateStressTest(chain, config, registry);
+    data.stress_test_result = result.results;
+    data.stress_test_breach = result.breaches;
+  }
+
+  // ── 8. Delinquency Snapshots ──
+  if (config.type === 'DELINQUENCY_TREND') {
+    data.facility_delinquency_snapshot = generateDelinquency(chain, config, cpProfileMap);
+  }
+
+  // ── 9. Limit Contributions ──
+  if (config.limit && config.type === 'EXPOSURE_BREACH') {
+    data.limit_contribution_snapshot = generateLimitContributions(chain, config);
+    data.limit_utilization_event = generateLimitUtilization(chain, config);
+  }
+
+  // ── 10. Deal Pipeline ──
+  if (config.type === 'PIPELINE_SPIKE') {
+    data.deal_pipeline_fact = generateDealPipeline(chain, config, registry);
+  }
+
+  // ── 11. Syndicated Attribution ──
+  if (config.type === 'SYNDICATED_FACILITY') {
+    data.exposure_counterparty_attribution = generateAttribution(chain, config);
+  }
+
+  return data;
+}
+
+/* ────────────────── Exposure Generator ────────────────── */
+
+let _exposureIdCounter = 200000;
+
+function generateExposures(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  cpProfileMap: Map<number, { arc: StoryArc; tier: RatingTier }>,
+): ExposureRow[] {
+  const rows: ExposureRow[] = [];
+  const dates = config.timeline.as_of_dates;
+
+  for (const facility of chain.facilities) {
+    const profile = cpProfileMap.get(facility.counterparty_id);
+    const arc = profile?.arc ?? 'STABLE_IG';
+
+    for (let dateIdx = 0; dateIdx < dates.length; dateIdx++) {
+      const cycleIdx = Math.min(dateIdx + 2, 4);
+      const utilRate = STORY_UTILIZATION[arc][cycleIdx];
+
+      const committed = facility.committed_facility_amt;
+      const drawn = Math.round(committed * utilRate);
+      const undrawn = committed - drawn;
+
+      let limitStatus = 'WITHIN_LIMIT';
+      if (utilRate > 0.95) limitStatus = 'BREACHED';
+      else if (utilRate > 0.85) limitStatus = 'APPROACHING';
+
+      _exposureIdCounter++;
+      rows.push({
+        facility_exposure_id: _exposureIdCounter,
+        facility_id: facility.facility_id,
+        counterparty_id: facility.counterparty_id,
+        as_of_date: dates[dateIdx],
+        exposure_type_id: 1,
+        drawn_amount: drawn,
+        committed_amount: committed,
+        undrawn_amount: undrawn,
+        currency_code: facility.currency_code,
+        limit_status_code: limitStatus,
+      });
+    }
+  }
+
+  return rows;
+}
+
+/* ────────────────── Rating Generator ────────────────── */
+
+function shouldGenerateRatings(config: ScenarioConfig): boolean {
+  return ['DETERIORATION_TREND', 'RATING_DIVERGENCE', 'EVENT_CASCADE'].includes(config.type)
+    || config.l2_tables?.counterparty_rating_observation?.generate === true;
+}
+
+let _observationIdCounter = 50000;
+
+function generateRatings(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  cpProfileMap: Map<number, { arc: StoryArc; tier: RatingTier }>,
+): RatingObservationRow[] {
+  const rows: RatingObservationRow[] = [];
+  const dates = config.timeline.as_of_dates;
+
+  for (const cp of chain.counterparties) {
+    const profile = cpProfileMap.get(cp.counterparty_id);
+    const arc = profile?.arc ?? 'STABLE_IG';
+    const tier = profile?.tier ?? 'IG_MID';
+    const migration = RATING_MIGRATION[arc];
+    const intRatings = TIER_INT_RATINGS[tier];
+    const extRatings = TIER_EXT_RATINGS[tier];
+    const tierData = RATING_TIER_MAP[tier];
+
+    // Check for explicit before/after ratings
+    const ratingOverrides = config.l2_tables?.counterparty_rating_observation;
+
+    for (let dateIdx = 0; dateIdx < dates.length; dateIdx++) {
+      const migOffset = migration[dateIdx] ?? 0;
+
+      // Internal rating
+      const intIdx = Math.min(migOffset, intRatings.length - 1);
+      const intRating = ratingOverrides?.ratings_after?.internal && dateIdx === dates.length - 1
+        ? ratingOverrides.ratings_after.internal
+        : intRatings[intIdx];
+
+      _observationIdCounter++;
+      const pdMult = STORY_PD_MULTIPLIERS[arc]?.[dateIdx + 2] ?? 1.0;
+      const pdRaw = tierData.pdLow * pdMult;
+      const pdInt = isNaN(pdRaw) ? 0.01 : Math.round(pdRaw * 10000) / 10000;
+      const gradeId = parseInt(cp.internal_risk_rating);
+      rows.push({
+        observation_id: _observationIdCounter,
+        counterparty_id: cp.counterparty_id,
+        as_of_date: dates[dateIdx],
+        rating_type: 'INTERNAL',
+        rating_value: intRating,
+        rating_grade_id: isNaN(gradeId) ? (intIdx + 3) : gradeId,
+        is_internal_flag: 'Y',
+        pd_implied: String(pdInt),
+        rating_source_id: 1,
+      });
+
+      // External rating
+      const extIdx = Math.min(migOffset, extRatings.length - 1);
+      const extRating = ratingOverrides?.ratings_after?.moodys && dateIdx === dates.length - 1
+        ? ratingOverrides.ratings_after.moodys
+        : extRatings[extIdx];
+
+      _observationIdCounter++;
+      const pdExtRaw = tierData.pdLow * pdMult * 1.1;
+      const pdExt = isNaN(pdExtRaw) ? 0.012 : Math.round(pdExtRaw * 10000) / 10000;
+      rows.push({
+        observation_id: _observationIdCounter,
+        counterparty_id: cp.counterparty_id,
+        as_of_date: dates[dateIdx],
+        rating_type: 'EXTERNAL_MOODYS',
+        rating_value: extRating,
+        rating_grade_id: extIdx + 3,
+        is_internal_flag: 'N',
+        pd_implied: String(pdExt),
+        rating_source_id: 2,
+      });
+    }
+  }
+
+  return rows;
+}
+
+/* ────────────────── Credit Event Generator ────────────────── */
+
+let _linkIdCounter = 300000;
+
+function generateCreditEvents(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  registry: IDRegistry,
+): { events: CreditEventRow[]; links: EventFacilityLinkRow[] } {
+  const events: CreditEventRow[] = [];
+  const links: EventFacilityLinkRow[] = [];
+
+  const evtConfigs = config.events?.credit_events ?? [];
+  if (evtConfigs.length === 0) return { events, links };
+
+  const eventIds = registry.allocate('credit_event', evtConfigs.length, config.scenario_id);
+
+  for (let i = 0; i < evtConfigs.length; i++) {
+    const evt = evtConfigs[i];
+    const cpIdx = i % chain.counterparties.length;
+    const cp = chain.counterparties[cpIdx];
+
+    events.push({
+      credit_event_id: eventIds[i],
+      counterparty_id: cp.counterparty_id,
+      credit_event_type_code: EVENT_TYPE_MAP[evt.type] ?? 4,
+      event_date: evt.date,
+      event_summary: evt.description ?? `${evt.type} for ${cp.legal_name}`,
+      event_status: 'CONFIRMED',
+    });
+
+    // Link to all facilities of this counterparty
+    const cpFacilities = chain.facilities.filter(f => f.counterparty_id === cp.counterparty_id);
+    for (const fac of cpFacilities) {
+      _linkIdCounter++;
+      links.push({
+        link_id: _linkIdCounter,
+        credit_event_id: eventIds[i],
+        facility_id: fac.facility_id,
+      });
+    }
+  }
+
+  return { events, links };
+}
+
+/* ────────────────── Risk Flag Generator ────────────────── */
+
+function generateRiskFlags(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  registry: IDRegistry,
+): RiskFlagRow[] {
+  const flagConfigs = config.events?.risk_flags ?? [];
+  if (flagConfigs.length === 0) return [];
+
+  // One flag per config per counterparty
+  const totalFlags = flagConfigs.length * chain.counterparties.length;
+  const flagIds = registry.allocate('risk_flag', totalFlags, config.scenario_id);
+
+  const rows: RiskFlagRow[] = [];
+  let idx = 0;
+
+  for (const flagCfg of flagConfigs) {
+    for (const cp of chain.counterparties) {
+      const cpFacs = chain.facilities.filter(f => f.counterparty_id === cp.counterparty_id);
+      const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+
+      // Map severity to flag_type: HIGH → WATCH_LIST, others → CONCENTRATION
+      const flagType = flagCfg.severity === 'HIGH' ? 'WATCH_LIST' : 'CONCENTRATION';
+
+      rows.push({
+        risk_flag_id: flagIds[idx++],
+        facility_id: cpFacs.length > 0 ? cpFacs[0].facility_id : null,
+        counterparty_id: cp.counterparty_id,
+        flag_type: flagType,
+        flag_code: flagCfg.code,
+        flag_severity: flagCfg.severity,
+        as_of_date: lastDate,
+        flag_description: flagCfg.description ?? `${flagCfg.code} — ${cp.legal_name}`,
+      });
+    }
+  }
+
+  return rows;
+}
+
+/* ────────────────── Amendment Generator ────────────────── */
+
+function generateAmendments(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  registry: IDRegistry,
+): AmendmentEventRow[] {
+  const amdConfigs = config.events?.amendments ?? [];
+  if (amdConfigs.length === 0) return [];
+
+  const amdIds = registry.allocate('amendment_event', amdConfigs.length, config.scenario_id);
+
+  return amdConfigs.map((amd, i) => {
+    const cpIdx = i % chain.counterparties.length;
+    const cpFacs = chain.facilities.filter(f => f.counterparty_id === chain.counterparties[cpIdx].counterparty_id);
+    return {
+      amendment_id: amdIds[i],
+      facility_id: cpFacs.length > 0 ? cpFacs[0].facility_id : chain.facilities[0].facility_id,
+      credit_agreement_id: chain.agreements[i % chain.agreements.length].credit_agreement_id,
+      counterparty_id: chain.counterparties[cpIdx].counterparty_id,
+      amendment_type_code: amd.type,
+      amendment_status_code: amd.status,
+      effective_date: amd.date,
+      amendment_description: amd.description ?? `${amd.type} for ${config.name}`,
+    };
+  });
+}
+
+/* ────────────────── Collateral Snapshot Generator ────────────────── */
+
+function generateCollateralSnapshots(
+  chain: L1Chain,
+  config: ScenarioConfig,
+): CollateralSnapshotRow[] {
+  if (!chain.collateral_assets) return [];
+
+  const declinePct = config.l2_tables?.collateral_snapshot?.decline_pct ?? 15;
+  const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+
+  return chain.collateral_assets.map(asset => {
+    // Generate a realistic original valuation based on counterparty's facilities
+    const cpFacs = chain.facilities.filter(f => f.counterparty_id === asset.counterparty_id);
+    const baseVal = cpFacs.length > 0
+      ? Math.round(cpFacs[0].committed_facility_amt * 1.2)
+      : 100_000_000;
+    return {
+      collateral_asset_id: asset.collateral_asset_id,
+      counterparty_id: asset.counterparty_id,
+      as_of_date: lastDate,
+      original_valuation_usd: baseVal,
+      current_valuation_usd: Math.round(baseVal * (1 - declinePct / 100)),
+    };
+  });
+}
+
+/* ────────────────── Stress Test Generator ────────────────── */
+
+function generateStressTest(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  registry: IDRegistry,
+): { results: StressTestResultRow[]; breaches: StressTestBreachRow[] } {
+  const st = config.stress_test!;
+  const resultIds = registry.allocate('stress_test_result', 1, config.scenario_id);
+  const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+
+  // scenario_id must reference l1.scenario_dim (1-10). Map stress type → valid ID.
+  // 1=BASE, 2=ADV, 3=SEV_ADV, 4=MGMT, 5=HIST_GFC, 6=HIST_COVID, 7=RATE_UP, 8=RATE_DN, 9=CRE, 10=IDIO
+  const stressScenarioMap: Record<string, number> = {
+    'CCAR Severely Adverse': 3, 'CCAR Adverse': 2, 'CCAR Baseline': 1,
+    'CRE Downturn': 9, 'Rate Shock': 7,
+  };
+  const scenarioNum = stressScenarioMap[st.scenario_name] ?? 3; // default to Severely Adverse
+
+  const results: StressTestResultRow[] = [{
+    result_id: resultIds[0],
+    scenario_id: scenarioNum,
+    as_of_date: lastDate,
+    loss_amount: st.loss_amount,
+    result_status: st.result_status,
+    result_description: `Stress test: ${st.scenario_name} — ${config.name}`,
+  }];
+
+  const breaches: StressTestBreachRow[] = [];
+  if (st.breaches) {
+    const breachIds = registry.allocate('stress_test_breach', st.breaches.length, config.scenario_id);
+    for (let i = 0; i < st.breaches.length; i++) {
+      const b = st.breaches[i];
+      breaches.push({
+        breach_id: breachIds[i],
+        scenario_id: scenarioNum,
+        as_of_date: lastDate,
+        stress_test_result_id: resultIds[0],
+        counterparty_id: chain.counterparties[b.counterparty_index % chain.counterparties.length].counterparty_id,
+        breach_amount_usd: b.amount,
+        breach_severity: b.severity,
+      });
+    }
+  }
+
+  return { results, breaches };
+}
+
+/* ────────────────── Delinquency Generator ────────────────── */
+
+function generateDelinquency(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  cpProfileMap: Map<number, { arc: StoryArc; tier: RatingTier }>,
+): DelinquencyRow[] {
+  const rows: DelinquencyRow[] = [];
+  const dates = config.timeline.as_of_dates;
+
+  for (const facility of chain.facilities) {
+    const profile = cpProfileMap.get(facility.counterparty_id);
+    const arc = profile?.arc ?? 'STEADY_HY';
+
+    for (let dateIdx = 0; dateIdx < dates.length; dateIdx++) {
+      const cycleIdx = Math.min(dateIdx + 2, 4);
+      const dpd = STORY_DPD[arc][cycleIdx];
+
+      rows.push({
+        facility_id: facility.facility_id,
+        counterparty_id: facility.counterparty_id,
+        as_of_date: dates[dateIdx],
+        credit_status_code: dpdToStatusCode(dpd),
+        days_past_due: dpd,
+        delinquency_status_code: dpd === 0 ? 'CURRENT' : dpd < 30 ? 'PAST_DUE_30' : dpd < 60 ? 'PAST_DUE_60' : 'PAST_DUE_90',
+      });
+    }
+  }
+
+  return rows;
+}
+
+/* ────────────────── Limit Contribution Generator ────────────────── */
+
+function generateLimitContributions(
+  chain: L1Chain,
+  config: ScenarioConfig,
+): LimitContributionRow[] {
+  if (!chain.limit_rules || chain.limit_rules.length === 0) return [];
+
+  const limitRule = chain.limit_rules[0];
+  const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+
+  return chain.counterparties.map((cp, i) => {
+    // Distribute exposure across counterparties
+    const cpFacs = chain.facilities.filter(f => f.counterparty_id === cp.counterparty_id);
+    const totalExposure = cpFacs.reduce((sum, f) => sum + f.committed_facility_amt, 0);
+    const allExposure = chain.facilities.reduce((sum, f) => sum + f.committed_facility_amt, 0);
+
+    return {
+      limit_rule_id: limitRule.limit_rule_id,
+      counterparty_id: cp.counterparty_id,
+      as_of_date: lastDate,
+      contribution_amount_usd: totalExposure,
+      contribution_pct: Math.round(totalExposure / allExposure * 100 * 100) / 100,
+    };
+  });
+}
+
+/* ────────────────── Limit Utilization Generator ────────────────── */
+
+function generateLimitUtilization(
+  chain: L1Chain,
+  config: ScenarioConfig,
+): LimitUtilizationRow[] {
+  if (!chain.limit_rules || chain.limit_rules.length === 0) return [];
+
+  const limitRule = chain.limit_rules[0];
+  const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+  const totalExposure = chain.facilities.reduce((sum, f) => sum + f.committed_facility_amt, 0);
+
+  return [{
+    counterparty_id: chain.counterparties[0].counterparty_id,
+    limit_rule_id: limitRule.limit_rule_id,
+    as_of_date: lastDate,
+    utilized_amount: totalExposure,
+    available_amount: Math.max(0, limitRule.limit_amount_usd - totalExposure),
+  }];
+}
+
+/* ────────────────── Deal Pipeline Generator ────────────────── */
+
+function generateDealPipeline(
+  chain: L1Chain,
+  config: ScenarioConfig,
+  registry: IDRegistry,
+): DealPipelineRow[] {
+  const pipelineCount = config.l2_tables?.deal_pipeline_fact?.pipeline_count ?? chain.facilities.length;
+  const stages = config.l2_tables?.deal_pipeline_fact?.stages ?? ['ORIGINATION', 'UNDERWRITING', 'APPROVED', 'CLOSING'];
+  const pipelineIds = registry.allocate('deal_pipeline_fact', pipelineCount, config.scenario_id);
+
+  const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+  return pipelineIds.map((id, i) => {
+    const fac = chain.facilities[i % chain.facilities.length];
+    return {
+      pipeline_id: id,
+      counterparty_id: fac.counterparty_id,
+      facility_id: fac.facility_id,
+      as_of_date: lastDate,
+      pipeline_stage: stages[i % stages.length],
+      proposed_amount: fac.committed_facility_amt,
+      expected_close_date: lastDate,
+    };
+  });
+}
+
+/* ────────────────── Attribution Generator ────────────────── */
+
+let _attributionIdCounter = 400000;
+
+function generateAttribution(
+  chain: L1Chain,
+  config: ScenarioConfig,
+): ExposureAttributionRow[] {
+  const rows: ExposureAttributionRow[] = [];
+  const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+
+  const roles = ['BORROWER', 'GUARANTOR', 'PARTICIPANT', 'CO-LENDER'];
+
+  for (let i = 0; i < chain.counterparties.length; i++) {
+    const cp = chain.counterparties[i];
+    for (const fac of chain.facilities) {
+      const role = i === 0 ? 'BORROWER' : roles[i % roles.length];
+      const pct = i === 0 ? 40 : Math.round(60 / (chain.counterparties.length - 1));
+
+      _attributionIdCounter++;
+      rows.push({
+        attribution_id: _attributionIdCounter,
+        counterparty_id: cp.counterparty_id,
+        facility_id: fac.facility_id,
+        as_of_date: lastDate,
+        exposure_type_id: 1,
+        counterparty_role_code: role,
+        attributed_exposure_usd: Math.round(fac.committed_facility_amt * pct / 100),
+        attribution_pct: pct,
+      });
+    }
+  }
+
+  return rows;
+}

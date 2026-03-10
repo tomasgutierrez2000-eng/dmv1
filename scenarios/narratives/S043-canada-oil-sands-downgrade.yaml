@@ -1,0 +1,81 @@
+# S43: Canada Oil Sands Rating Migration
+#
+# Story: Carbon regulation tightens on Canadian oil sands,
+# triggering rating downgrades for 4 Alberta-based producers.
+# ESG-linked covenants are being tested. The bank's energy
+# portfolio sees coordinated adverse rating migration —
+# 4 names downgraded within a 45-day window.
+#
+# Dashboard signal: Coordinated rating downgrades in Canadian
+# energy with ESG-driven regulatory pressure.
+
+scenario_id: "S43"
+name: "Canada Oil Sands Rating Migration"
+type: RATING_DIVERGENCE
+narrative: "Carbon regulation triggers 4 rating downgrades in Canadian oil sands within 45 days"
+
+counterparties:
+  - legal_name: "Athabasca Heavy Oil Corp."
+    country: CA
+    industry_id: 4      # Energy
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Fort McMurray Extraction Ltd."
+    country: CA
+    industry_id: 4
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Peace River Bitumen Holdings Inc."
+    country: CA
+    industry_id: 4
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Saskatchewan Pipeline Services Corp."
+    country: CA
+    industry_id: 4
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-01"
+      description: "Moody's downgrades 4 oil sands producers citing carbon regulation risk"
+      severity: HIGH
+  risk_flags:
+    - code: RATING_MIGRATION_ADVERSE
+      severity: HIGH
+      description: "4 coordinated downgrades in 45-day window"
+    - code: ESG_REGULATORY_RISK
+      severity: HIGH
+      description: "Carbon emission regulations tightening — stranded asset risk"
+    - code: SECTOR_CONCENTRATION
+      severity: MEDIUM
+      description: "Oil sands sub-sector concentration exceeds policy threshold"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BB+"
+      moodys: "Ba1"
+    ratings_after:
+      sp: "BB-"
+      moodys: "Ba3"
+
+verification:
+  min_rows: 8
+  key_assertion: "Canadian oil sands producers show coordinated downgrades from carbon regulation"

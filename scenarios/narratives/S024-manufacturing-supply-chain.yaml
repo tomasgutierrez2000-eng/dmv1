@@ -1,0 +1,78 @@
+# S24: Manufacturing Supply Chain Disruption
+#
+# Story: 6 industrial manufacturers face cascading supply chain
+# disruption from port closures and semiconductor shortages.
+# Production halts trigger working capital draws on revolvers.
+# The bank sees $900M of exposure to affected names with
+# utilization jumping from 45% to 78% in 60 days.
+#
+# Dashboard signal: Sector-wide utilization spike in industrials
+# with pipeline stress and deteriorating credit metrics.
+
+scenario_id: "S24"
+name: "Manufacturing Supply Chain Disruption"
+type: DETERIORATION_TREND
+narrative: "6 manufacturers draw down $900M revolvers as supply chain disruption halts production"
+
+counterparties:
+  - legal_name: "Heartland Precision Manufacturing Corp."
+    country: US
+    industry_id: 5      # Manufacturing
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Pacific Rim Components Ltd."
+    country: JP
+    industry_id: 5
+    rating_tier: IG_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Rhine Valley Automotive Parts GmbH"
+    country: DE
+    industry_id: 5
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Great Lakes Steel Fabricators Inc."
+    country: US
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Maple Leaf Industrial Systems Corp."
+    country: CA
+    industry_id: 5
+    rating_tier: IG_MID
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+  - legal_name: "Brisbane Heavy Equipment Pty Ltd."
+    country: AU
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: SECTOR_CONCENTRATION
+      severity: HIGH
+      description: "Manufacturing sector utilization spike — 45% to 78% in 60 days"
+    - code: REVOLVER_DRAW_SPIKE
+      severity: HIGH
+      description: "6 counterparties simultaneously drawing revolvers"
+    - code: SUPPLY_CHAIN_DISRUPTION
+      severity: MEDIUM
+      description: "Port closures and semiconductor shortage impacting production"
+
+verification:
+  min_rows: 12
+  key_assertion: "6 manufacturers show rising utilization trend driven by supply chain disruption"

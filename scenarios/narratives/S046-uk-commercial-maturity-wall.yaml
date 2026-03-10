@@ -1,0 +1,78 @@
+# S46: UK Commercial Property Maturity Wall
+#
+# Story: 6 UK commercial property borrowers face £2.8B in
+# maturing facilities within Q1 2025. Post-Brexit valuations
+# have compressed, and refinancing at higher rates creates
+# negative carry. 3 borrowers are exploring sale-leaseback
+# to reduce leverage.
+#
+# Dashboard signal: Maturity wall in UK CRE with compressed
+# valuations and refinancing risk at higher rates.
+
+scenario_id: "S46"
+name: "UK Commercial Property Maturity Wall"
+type: MATURITY_WALL
+narrative: "6 UK commercial property borrowers face £2.8B maturity wall with compressed valuations and rate shock"
+
+counterparties:
+  - legal_name: "Canary Wharf Office Holdings plc"
+    country: GB
+    industry_id: 10     # Real Estate
+    rating_tier: IG_LOW
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Manchester Industrial Estates Ltd."
+    country: GB
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Edinburgh Retail Parks plc"
+    country: GB
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Birmingham Mixed-Use Properties Ltd."
+    country: GB
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+  - legal_name: "Bristol Logistics Warehouse REIT plc"
+    country: GB
+    industry_id: 10
+    rating_tier: IG_LOW
+    story_arc: STEADY_HY
+    size: MID
+  - legal_name: "Leeds Student Housing Partners LLP"
+    country: GB
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: MATURITY_CONCENTRATION
+      severity: HIGH
+      description: "£2.8B UK CRE maturities concentrated in Q1 2025"
+    - code: REFINANCING_RISK
+      severity: HIGH
+      description: "Rate shock — refinancing at 300bps higher than original terms"
+    - code: COLLATERAL_COVERAGE_DECLINE
+      severity: MEDIUM
+      description: "UK commercial property values down 15% from peak"
+
+verification:
+  min_rows: 12
+  key_assertion: "UK CRE borrowers face maturity wall with refinancing risk and valuation compression"

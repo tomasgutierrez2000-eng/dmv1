@@ -1775,13 +1775,27 @@ const ACCOUNT_TYPES = ['ASSET', 'ASSET', 'ASSET', 'LIABILITY', 'LIABILITY', 'LIA
 const IS_BALANCE_SHEET = [true, true, true, false, false, false, true, true, true, true];
 const REG_REPORT_CODES = ['FFIEC031_SC_C', 'FFIEC031_SC_C', 'FFIEC031_SC_C', 'FFIEC031_SC_L', 'FFIEC031_SC_L', 'FFIEC031_SC_L', 'FFIEC031_SC_Q', 'FFIEC031_SC_R', 'FFIEC031_SC_C', 'FFIEC031_SC_C'];
 
-export const JURISDICTION_CODES = ['US_FED', 'US_STATE', 'EU', 'UK', 'CH', 'SG', 'HK', 'JP', 'CA', 'AU'];
+export const JURISDICTION_CODES = [
+  'US_FED', 'US_STATE', 'EU', 'UK', 'CH', 'SG', 'HK', 'JP', 'CA', 'AU',
+  'CN', 'KR', 'IN', 'BR', 'MX', 'TW', 'KY', 'AE',
+];
 export const JURISDICTION_NAMES = [
   'United States (Federal)', 'United States (State)', 'European Union', 'United Kingdom', 'Switzerland',
   'Singapore', 'Hong Kong SAR', 'Japan', 'Canada', 'Australia',
+  'China (Mainland)', 'South Korea', 'India', 'Brazil', 'Mexico', 'Taiwan', 'Cayman Islands', 'UAE / DIFC',
 ];
-const JURISDICTION_REGULATORS = ['OCC / FRB / FDIC', 'State Banking Depts', 'ECB / EBA', 'PRA / FCA', 'FINMA', 'MAS', 'HKMA', 'FSA / BOJ', 'OSFI', 'APRA'];
-const JURISDICTION_FRAMEWORKS = ['US Basel III (Final Rule)', 'State Banking Law', 'CRR III / CRD VI', 'UK Basel 3.1', 'Swiss SBA', 'MAS Notice 637', 'HKMA SPM', 'FSA Basel III', 'OSFI CAR', 'APRA APS'];
+const JURISDICTION_REGULATORS = [
+  'OCC / FRB / FDIC', 'State Banking Depts', 'ECB / EBA', 'PRA / FCA', 'FINMA',
+  'MAS', 'HKMA', 'FSA / BOJ', 'OSFI', 'APRA',
+  'CBIRC / PBOC', 'FSC / FSS', 'RBI', 'BCB (Banco Central)', 'CNBV / Banxico',
+  'FSC (Taiwan)', 'CIMA', 'DFSA / CBUAE',
+];
+const JURISDICTION_FRAMEWORKS = [
+  'US Basel III (Final Rule)', 'State Banking Law', 'CRR III / CRD VI', 'UK Basel 3.1', 'FINMA Basel III',
+  'MAS Notice 637', 'HKMA SPM', 'FSA Basel III', 'OSFI CAR', 'APRA APS',
+  'China Basel III', 'FSC Basel III', 'RBI Basel III', 'BCB Basel III', 'CNBV Basel III',
+  'FSC Basel III', 'CIMA Banking Law', 'DFSA Prudential Rules',
+];
 
 export const GRADE_CODES = ['AAA', 'AA+', 'AA', 'A+', 'A', 'BBB+', 'BBB', 'BBB-', 'BB+', 'BB'];
 export const GRADE_NAMES = [
@@ -1839,31 +1853,99 @@ const MATURITY_BUCKET_NAMES = ['Overnight', '1 Week', '1 Month', '3 Months', '6 
 const BUCKET_START_DAYS = [0, 1, 8, 31, 91, 181, 366, 731, 1826, 3651];
 const BUCKET_END_DAYS = [1, 7, 30, 90, 180, 365, 730, 1825, 3650, 99999];
 
+const FR2590_CATEGORY_CODES = [
+  'G1_A', 'G1_B', 'G1_C', 'G1_D', 'G1_E', 'G1_F', 'G1_G',
+  'G2_REPO', 'G2_REV_REPO', 'G2_SEC_LEND', 'G2_SEC_BORR',
+  'G4_IR', 'G4_FX', 'G4_CR', 'G4_EQ', 'G4_CO', 'G4_OT',
+  'G5_COLL', 'G5_GUAR', 'G5_CDS', 'G5_HEDGE',
+  'CT_01', 'CT_02', 'CT_03', 'CT_04', 'CT_05', 'CT_06', 'CT_07', 'CT_08', 'CT_09', 'CT_10',
+];
 const FR2590_CATEGORY_NAMES = [
-  'C&I - Term', 'C&I - Revolving', 'CRE - Construction', 'CRE - Non-Farm Non-Residential',
-  'CRE - Multifamily', 'Consumer - Credit Card', 'Consumer - Auto', 'Consumer - Other',
-  'Sovereign & Government', 'Interbank',
+  'Deposits', 'Loans and Leases', 'Debt Securities', 'Equity Securities',
+  'Committed Credit Lines', 'Guarantees and LOCs', 'Securitization Look-Through',
+  'Repos', 'Reverse Repos', 'Securities Lending', 'Securities Borrowing',
+  'Interest Rate Derivatives', 'Foreign Exchange Derivatives', 'Credit Derivatives',
+  'Equity Derivatives', 'Commodity Derivatives', 'Other Derivatives',
+  'Collateral', 'Eligible Guarantees', 'Eligible Credit Derivatives', 'Other Eligible Hedges',
+  'Natural Person', 'Company', 'CCP', 'US State or Municipality', 'US Government',
+  'US Government Agency', 'Foreign Sovereign (non-zero RW)', 'Foreign Sovereign (zero RW)',
+  'Foreign Political Subdivision', 'Multilateral Development Bank',
 ];
 const FR2590_DEFINITIONS = [
-  'Commercial & industrial term loans', 'Commercial & industrial revolving credits',
-  'Construction and land development loans', 'Non-farm non-residential property loans',
-  'Multifamily residential property loans', 'Credit card loans to individuals',
-  'Automobile loans to individuals', 'Other consumer purpose loans',
-  'Loans to sovereign and government entities', 'Loans to depository institutions',
+  'Deposits placed with counterparty', 'Loans and leases to counterparty',
+  'Debt securities or other investments issued by counterparty', 'Equity securities or investments in counterparty',
+  'Committed but undrawn credit facilities', 'Guarantees and letters of credit issued for counterparty',
+  'Exposure arising from securitization look-through',
+  'Securities sold under agreements to repurchase', 'Securities purchased under agreements to resell',
+  'Securities lent to counterparty', 'Securities borrowed from counterparty',
+  'IR swaps, futures, options, swaptions', 'FX forwards, swaps, options',
+  'CDS, CLN, total return swaps on credit', 'Equity swaps, options, forwards',
+  'Commodity swaps, futures, options', 'All other derivative types',
+  'Eligible collateral offsetting exposure', 'Eligible guarantees received',
+  'Purchased CDS/CLN hedging exposure', 'Other eligible hedges per SCCL rules',
+  'Individual counterparty', 'Corporate/non-financial counterparty',
+  'Central counterparty clearinghouse', 'US state/local government entity',
+  'US federal government', 'US government-sponsored entity/agency',
+  'Foreign sovereign with non-zero risk weight', 'Foreign sovereign with zero risk weight (exempt)',
+  'Political subdivision of foreign sovereign', 'MDB (e.g., World Bank, IBRD)',
 ];
 
-const REG_CAP_BASIS_CODES = ['SA', 'AIRB', 'FIRB', 'SA_CCR', 'IMM', 'CEM', 'BIA', 'STA', 'AMA', 'IMA'];
+const REG_CAP_BASIS_CODES = [
+  'SA_CR', 'A_IRB', 'F_IRB', 'SA_CCR', 'IMM', 'CEM', 'SMA', 'BIA', 'TSA', 'AMA',
+  'FRTB_SA', 'FRTB_IMA', 'IMA_MR', 'SEC_SA', 'SEC_IRBA', 'SEC_ERBA', 'SA_CVA', 'BA_CVA',
+  'SA_CR_EU', 'SA_CCR_EU', 'FRTB_SA_EU', 'SMA_EU',
+  'SA_CR_UK', 'A_IRB_UK', 'FRTB_SA_UK', 'SMA_UK',
+  'SA_CR_JP', 'FRTB_SA_JP',
+];
 const REG_CAP_BASIS_NAMES = [
-  'Standardized Approach', 'Advanced IRB', 'Foundation IRB', 'SA-CCR', 'Internal Models Method',
-  'Current Exposure Method', 'Basic Indicator Approach', 'Standardized Approach (OpRisk)',
-  'Advanced Measurement Approach', 'Internal Models Approach',
+  'SA (Credit Risk)', 'Advanced IRB', 'Foundation IRB', 'SA-CCR', 'Internal Models Method',
+  'Current Exposure Method', 'Standardized Measurement Approach', 'Basic Indicator Approach',
+  'Standardized Approach (OpRisk)', 'Advanced Measurement Approach',
+  'FRTB Standardized Approach', 'FRTB Internal Models Approach', 'Internal Models Approach (Market Risk)',
+  'Securitization SA', 'Securitization IRB-Based', 'Securitization External Ratings-Based',
+  'Standardized Approach (CVA)', 'Basic Approach (CVA)',
+  'SA (Credit Risk) - EU', 'SA-CCR - EU', 'FRTB-SA - EU', 'SMA - EU',
+  'SA (Credit Risk) - UK', 'Advanced IRB - UK', 'FRTB-SA - UK', 'SMA - UK',
+  'SA (Credit Risk) - Japan', 'FRTB-SA - Japan',
 ];
 const REG_CAP_BASIS_DESCS = [
-  'Basel III Standardized Approach for credit risk', 'Advanced Internal Ratings-Based approach',
+  'Basel III Standardized Approach for credit risk', 'Advanced Internal Ratings-Based approach (restricted under finalization)',
   'Foundation Internal Ratings-Based approach', 'Standardized Approach for Counterparty Credit Risk',
-  'Internal Models Method for counterparty credit risk', 'Current Exposure Method (legacy)',
-  'Basic Indicator Approach for operational risk', 'Standardized Approach for operational risk',
-  'Advanced Measurement Approach for operational risk', 'Internal Models Approach for market risk',
+  'Internal Models Method for CCR (EAD = alpha x EEPE)', 'Current Exposure Method — legacy, being phased out',
+  'Standardized Measurement Approach — replaces BIA/STA/AMA', 'Basic Indicator Approach — superseded by SMA',
+  'Standardized Approach for operational risk — superseded by SMA', 'Advanced Measurement Approach — superseded by SMA',
+  'FRTB Standardized: SBM + DRC + RRAO', 'FRTB IMA: Expected Shortfall, desk-level approval',
+  'Legacy market risk IMA (pre-FRTB)', 'Securitization SA — only approach available in US',
+  'Securitization IRB-Based using K_IRB', 'Securitization External Ratings-Based — not available in US',
+  'Adapted from FRTB-SA for CVA risk', 'Standardized formulas with supervisory risk weights',
+  'CRR III standardized approach for credit risk', 'EU variant SA-CCR (alpha=1 transitional)',
+  'CRR III market risk SA', 'CRR III SMA (ILM=1)',
+  'PRA Basel 3.1 standardized', 'PRA Basel 3.1 A-IRB (restricted)',
+  'PRA FRTB SA (Jan 2027)', 'PRA SMA (ILM=1, Jan 2027)',
+  'FSA Basel III SA', 'FSA FRTB (implemented Mar 2024)',
+];
+const REG_CAP_BASIS_JURISDICTIONS = [
+  'US_FED', 'EU', 'EU', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED',
+  'US_FED', 'US_FED', 'US_FED', 'US_FED', 'EU', 'EU', 'US_FED', 'US_FED',
+  'EU', 'EU', 'EU', 'EU',
+  'UK', 'UK', 'UK', 'UK',
+  'JP', 'JP',
+];
+const REG_CAP_BASIS_ACTIVE = [
+  true, true, true, true, true, false, true, false, false, false,
+  true, true, false, true, true, true, true, true,
+  true, true, true, true,
+  true, true, true, true,
+  true, true,
+];
+const REG_CAP_BASIS_EFF_TO = [
+  '9999-12-31', '9999-12-31', '9999-12-31', '9999-12-31', '9999-12-31', '2025-01-01',
+  '9999-12-31', '2025-01-01', '2025-01-01', '2025-01-01',
+  '9999-12-31', '9999-12-31', '2025-01-01', '9999-12-31', '9999-12-31', '9999-12-31',
+  '9999-12-31', '9999-12-31',
+  '9999-12-31', '9999-12-31', '9999-12-31', '9999-12-31',
+  '9999-12-31', '9999-12-31', '9999-12-31', '9999-12-31',
+  '9999-12-31', '9999-12-31',
 ];
 
 const CONTEXT_DOMAINS = ['RISK', 'REGULATORY', 'FINANCIAL', 'OPERATIONAL', 'MANAGEMENT', 'STRESS_TEST', 'AUDIT', 'PRICING', 'COMPLIANCE', 'TREASURY'];
@@ -1971,11 +2053,38 @@ const PROTECTION_COVERAGES = [100.0, 80.0, 100.0, 50.0, 75.0, 100.0, 60.0, 100.0
 
 const HAIRCUT_METHOD = ['SUPERVISORY', 'SUPERVISORY', 'OWN_ESTIMATES', 'SUPERVISORY', 'OWN_ESTIMATES', 'OWN_ESTIMATES', 'SUPERVISORY', 'SUPERVISORY', 'OWN_ESTIMATES', 'SUPERVISORY'];
 
-const REPORTING_ENTITY_CODES = ['MNB_CONSOL', 'MNB_BANK', 'MSI_BD', 'MBE_EU', 'MSE_EU', 'MBJ_JP', 'MBC_CA', 'MWM_US', 'MLC_US', 'MMS_US'];
+const REPORTING_ENTITY_CODES = [
+  'MNB_CONSOL', 'MNB_BANK', 'MSI_BD', 'MNB_SE', 'MSE_UK', 'MNB_UK', 'MSJ_JP', 'MNB_JP',
+  'MSA_HK', 'MNB_SG', 'MNB_AU', 'MBC_CA', 'MTJ_KY', 'MNB_CN', 'MAM_US', 'MAM_EU',
+  'MWM_US', 'MPP_US', 'MLC_US', 'MNB_KR', 'MNB_IN', 'MNB_AE',
+];
 const REPORTING_ENTITY_NAMES = [
-  'Meridian National Bancorp (Consolidated)', 'Meridian National Bank, N.A.', 'Meridian Securities Inc.',
-  'Meridian Bank Europe DAC', 'Meridian Securities Europe SA', 'Meridian Bank (Japan) Ltd.',
-  'Meridian Bank Canada', 'Meridian Wealth Management LLC', 'Meridian Leasing Corp.', 'Meridian Merchant Services Inc.',
+  'Meridian National Bancorp, Inc. (Consolidated)', 'Meridian National Bank, N.A.',
+  'Meridian Securities, Inc.', 'Meridian Bank Europe SE', 'Meridian Securities plc',
+  'Meridian National Bank, London Branch', 'Meridian Securities Japan Co., Ltd.',
+  'Meridian National Bank, Tokyo Branch', 'Meridian Securities (Asia Pacific) Ltd.',
+  'Meridian National Bank, Singapore Branch', 'Meridian National Bank, Sydney Branch',
+  'Meridian Bank Canada', 'Meridian Trust Company (Cayman) Ltd.', 'Meridian Bank (China) Co., Ltd.',
+  'Meridian Asset Management LLC', 'Meridian Asset Management (Europe) S.a r.l.',
+  'Meridian Wealth Management LLC', 'Meridian Payment Processing, Inc.',
+  'Meridian Leasing Corp.', 'Meridian National Bank, Seoul Branch',
+  'Meridian National Bank, Mumbai Branch', 'Meridian National Bank, DIFC Branch',
+];
+const REPORTING_ENTITY_JURISDICTIONS = [
+  'US_FED', 'US_FED', 'US_FED', 'EU', 'UK', 'UK', 'JP', 'JP',
+  'HK', 'SG', 'AU', 'CA', 'KY', 'CN', 'US_FED', 'EU',
+  'US_FED', 'US_FED', 'US_FED', 'KR', 'IN', 'AE',
+];
+const REPORTING_ENTITY_CURRENCIES = [
+  'USD', 'USD', 'USD', 'EUR', 'GBP', 'GBP', 'JPY', 'JPY',
+  'HKD', 'SGD', 'AUD', 'CAD', 'USD', 'CNY', 'USD', 'EUR',
+  'USD', 'USD', 'USD', 'KRW', 'INR', 'USD',
+];
+const REPORTING_ENTITY_CONSOLIDATION = [
+  'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED',
+  'FULLY_CONSOLIDATED', 'SUB_CONSOLIDATED', 'SOLO', 'SOLO',
+  'SOLO', 'SOLO', 'SOLO', 'SOLO', 'SOLO', 'SOLO', 'FULLY_CONSOLIDATED', 'SUB_CONSOLIDATED',
+  'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'SOLO', 'SOLO', 'SOLO',
 ];
 
 const REPORT_NAMES = [
@@ -2039,15 +2148,17 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'source_system_id') return 10; // Regulatory
       break;
 
-    /* ──────────── regulatory_jurisdiction ──────────── */
-    case 'regulatory_jurisdiction':
-      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[idx];
-      if (columnName === 'jurisdiction_name') return JURISDICTION_NAMES[idx];
-      if (columnName === 'jurisdiction_id') return idx + 1;
+    /* ──────────── regulatory_jurisdiction (18 rows) ──────────── */
+    case 'regulatory_jurisdiction': {
+      const jIdx = rowIndex % JURISDICTION_CODES.length;
+      if (columnName === 'jurisdiction_code') return JURISDICTION_CODES[jIdx];
+      if (columnName === 'jurisdiction_name') return JURISDICTION_NAMES[jIdx];
+      if (columnName === 'jurisdiction_id') return rowIndex + 1;
       if (columnName === 'is_active') return 'Y';
-      if (columnName === 'primary_regulator') return JURISDICTION_REGULATORS[idx];
-      if (columnName === 'regulatory_framework') return JURISDICTION_FRAMEWORKS[idx];
+      if (columnName === 'primary_regulator') return JURISDICTION_REGULATORS[jIdx];
+      if (columnName === 'regulatory_framework') return JURISDICTION_FRAMEWORKS[jIdx];
       break;
+    }
 
     /* ──────────── entity_type_dim ──────────── */
     case 'entity_type_dim':
@@ -2133,14 +2244,16 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'regulatory_framework') return 'US Basel III (Final Rule)';
       break;
 
-    /* ──────────── fr2590_category_dim ──────────── */
-    case 'fr2590_category_dim':
-      if (columnName === 'fr2590_category_code') return String(idx + 1);
-      if (columnName === 'category_name') return FR2590_CATEGORY_NAMES[idx];
-      if (columnName === 'definition') return FR2590_DEFINITIONS[idx];
-      if (columnName === 'display_order') return idx + 1;
+    /* ──────────── fr2590_category_dim (31 rows — SCCL) ──────────── */
+    case 'fr2590_category_dim': {
+      const fIdx = rowIndex % FR2590_CATEGORY_CODES.length;
+      if (columnName === 'fr2590_category_code') return FR2590_CATEGORY_CODES[fIdx];
+      if (columnName === 'category_name') return FR2590_CATEGORY_NAMES[fIdx];
+      if (columnName === 'definition') return FR2590_DEFINITIONS[fIdx];
+      if (columnName === 'display_order') return rowIndex + 1;
       if (columnName === 'active_flag') return 'Y';
       break;
+    }
 
     /* ──────────── counterparty_role_dim ──────────── */
     case 'counterparty_role_dim':
@@ -2228,17 +2341,19 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
     }
 
-    /* ──────────── regulatory_capital_basis_dim ──────────── */
-    case 'regulatory_capital_basis_dim':
-      if (columnName === 'regulatory_capital_basis_id') return idx + 1;
-      if (columnName === 'basis_code') return REG_CAP_BASIS_CODES[idx];
-      if (columnName === 'basis_name') return REG_CAP_BASIS_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
-      if (columnName === 'description') return REG_CAP_BASIS_DESCS[idx];
+    /* ──────────── regulatory_capital_basis_dim (28 rows) ──────────── */
+    case 'regulatory_capital_basis_dim': {
+      const rcIdx = rowIndex % REG_CAP_BASIS_CODES.length;
+      if (columnName === 'regulatory_capital_basis_id') return rowIndex + 1;
+      if (columnName === 'basis_code') return REG_CAP_BASIS_CODES[rcIdx];
+      if (columnName === 'basis_name') return REG_CAP_BASIS_NAMES[rcIdx];
+      if (columnName === 'active_flag') return REG_CAP_BASIS_ACTIVE[rcIdx] ? 'Y' : 'N';
+      if (columnName === 'description') return REG_CAP_BASIS_DESCS[rcIdx];
       if (columnName === 'effective_from_date') return '2024-01-01';
-      if (columnName === 'effective_to_date') return '9999-12-31';
-      if (columnName === 'jurisdiction_code') return ['US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED', 'US_FED'][idx];
+      if (columnName === 'effective_to_date') return REG_CAP_BASIS_EFF_TO[rcIdx];
+      if (columnName === 'jurisdiction_code') return REG_CAP_BASIS_JURISDICTIONS[rcIdx];
       break;
+    }
 
     /* ──────────── industry_dim ──────────── */
     case 'industry_dim':
@@ -3047,22 +3162,21 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
     }
 
-    /* ──────────── reporting_entity_dim ──────────── */
+    /* ──────────── reporting_entity_dim (22 rows) ──────────── */
     case 'reporting_entity_dim': {
-      const reJurisdictions = ['US_FED', 'US_FED', 'US_FED', 'EU', 'EU', 'JP', 'CA', 'US_FED', 'US_FED', 'US_FED'];
-      const reFuncCurrencies = ['USD', 'USD', 'USD', 'EUR', 'EUR', 'JPY', 'CAD', 'USD', 'USD', 'USD'];
-      const reConsolBasis = ['FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'SUB_CONSOLIDATED', 'SOLO', 'SOLO', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED', 'FULLY_CONSOLIDATED'];
-      if (columnName === 'entity_code') return REPORTING_ENTITY_CODES[idx];
-      if (columnName === 'entity_name') return REPORTING_ENTITY_NAMES[idx];
-      if (columnName === 'reporting_entity_code') return REPORTING_ENTITY_CODES[idx];
-      if (columnName === 'reporting_entity_name') return REPORTING_ENTITY_NAMES[idx];
+      const reIdx = rowIndex % REPORTING_ENTITY_CODES.length;
+      if (columnName === 'entity_code') return REPORTING_ENTITY_CODES[reIdx];
+      if (columnName === 'entity_name') return REPORTING_ENTITY_NAMES[reIdx];
+      if (columnName === 'reporting_entity_code') return REPORTING_ENTITY_CODES[reIdx];
+      if (columnName === 'reporting_entity_name') return REPORTING_ENTITY_NAMES[reIdx];
       if (columnName === 'active_flag') return 'Y';
-      if (columnName === 'consolidation_basis') return reConsolBasis[idx];
+      if (columnName === 'consolidation_basis') return REPORTING_ENTITY_CONSOLIDATION[reIdx];
       if (columnName === 'effective_from_date') return '2020-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
-      if (columnName === 'functional_currency_code') return reFuncCurrencies[idx];
+      if (columnName === 'functional_currency_code') return REPORTING_ENTITY_CURRENCIES[reIdx];
       if (columnName === 'is_current') return 'Y';
-      if (columnName === 'jurisdiction_code') return reJurisdictions[idx];
+      if (columnName === 'jurisdiction_code') return REPORTING_ENTITY_JURISDICTIONS[reIdx];
+      if (columnName === 'legal_entity_id') return rowIndex < 10 ? rowIndex + 1 : null;
       break;
     }
 
@@ -3216,50 +3330,69 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
     }
 
-    /* ──────────── regulatory_mapping ──────────── */
+    /* ──────────── regulatory_mapping (160 rows across 6 reports) ──────────── */
     case 'regulatory_mapping': {
-      const regmCodes = ['RM-001', 'RM-002', 'RM-003', 'RM-004', 'RM-005', 'RM-006', 'RM-007', 'RM-008', 'RM-009', 'RM-010'];
-      const regmLineItems = ['RCON2122', 'RCON2123', 'RCON3123', 'RCON3128', 'BHCK2170', 'BHCKB993', 'BHCK3210', 'BHCKA223', 'BHCKC880', 'BHCK4230'];
-      const regmMetricNames = [
-        'C&I Loans Domestic', 'C&I Loans Foreign', 'CRE Loans', 'Residential Mortgage',
-        'Total Assets', 'Tier 1 Capital', 'Total Risk-Based Capital', 'Total RWA',
-        'CECL Allowance', 'Net Income',
-      ];
-      const regmReportCodes = ['FFIEC031', 'FFIEC031', 'FFIEC031', 'FFIEC031', 'FRY9C', 'FRY9C', 'FRY9C', 'FRY9C', 'FFIEC031', 'FRY9C'];
-      const regmSchedules = ['RC_C', 'RC_C', 'RC_C', 'RC_C', 'RC', 'RC_R', 'RC_R', 'RC_R', 'RC_C', 'RI'];
-      const regmSourceMdrm = ['RCON2122', 'RCON2123', 'RCON3123', 'RCON3128', 'BHCK2170', 'BHCKB993', 'BHCK3210', 'BHCKA223', 'BHCKC880', 'BHCK4230'];
-      const regmTargetMdrm = ['RCON2122', 'RCON2123', 'RCON3123', 'RCON3128', 'BHCK2170', 'BHCKB993', 'BHCK3210', 'BHCKA223', 'BHCKC880', 'BHCK4230'];
-      const regmSourceReports = ['GL', 'GL', 'GL', 'GL', 'GL', 'CAPITAL_CALC', 'CAPITAL_CALC', 'RWA_ENGINE', 'CECL_ENGINE', 'GL'];
-      const regmTargetReports = ['FFIEC031', 'FFIEC031', 'FFIEC031', 'FFIEC031', 'FRY9C', 'FRY9C', 'FRY9C', 'FRY9C', 'FFIEC031', 'FRY9C'];
-      const regmRelTypes = ['DIRECT', 'DIRECT', 'DIRECT', 'DIRECT', 'AGGREGATION', 'CALCULATION', 'CALCULATION', 'CALCULATION', 'DIRECT', 'AGGREGATION'];
-      const regmTransformRules = ['PASSTHROUGH', 'PASSTHROUGH', 'PASSTHROUGH', 'PASSTHROUGH', 'SUM', 'FORMULA', 'FORMULA', 'FORMULA', 'PASSTHROUGH', 'SUM'];
-      const regmNotes = [
-        'Direct map from GL to Call Report Schedule RC-C', 'Direct map — foreign C&I loans',
-        'CRE loans per FFIEC instructions', 'Residential mortgage per Schedule RC-C',
-        'Sum of all asset accounts for FR Y-9C RC', 'CET1 + AT1 capital calculation',
-        'Tier 1 + Tier 2 total risk-based capital', 'Total RWA from risk engine',
-        'Current expected credit loss provision', 'Aggregate net income line items',
-      ];
-      if (columnName === 'mapping_code') return regmCodes[idx];
+      // Report blocks: FFIEC031 RC(1-10), RC-C(11-25), RC-L(26-35), RC-R(36-50),
+      //   FRY9C HC(51-65), HC-R/HI(66-85), FRY14Q(86-110), FR2052A(111-130),
+      //   FFIEC009(131-145), FR2590(146-160)
+      const rmId = rowIndex + 1;
+      const rmReportBlock = rmId <= 50 ? 'FFIEC031'
+        : rmId <= 85 ? 'FRY9C'
+        : rmId <= 110 ? 'FRY14Q'
+        : rmId <= 130 ? 'FR2052A'
+        : rmId <= 145 ? 'FFIEC009'
+        : 'FR2590';
+      const rmSchedule = rmId <= 10 ? 'RC'
+        : rmId <= 25 ? 'RC_C'
+        : rmId <= 35 ? 'RC_L'
+        : rmId <= 50 ? (rmId <= 43 ? 'RC_R1' : 'RC_R2')
+        : rmId <= 63 ? 'HC'
+        : rmId <= 65 ? 'HC_C'
+        : rmId <= 74 ? 'HC_R1'
+        : rmId <= 81 ? 'HC_R2'
+        : rmId <= 85 ? 'HI'
+        : rmId <= 95 ? 'H1'
+        : rmId <= 100 ? 'D'
+        : rmId <= 103 ? 'B'
+        : rmId <= 110 ? 'F'
+        : rmId <= 115 ? 'INF'
+        : rmId <= 121 ? 'OUT'
+        : rmId <= 130 ? 'SUP'
+        : rmId <= 140 ? 'C1'
+        : rmId <= 142 ? 'L'
+        : rmId <= 145 ? 'O'
+        : rmId <= 155 ? (rmId <= 149 ? 'G1' : rmId <= 151 ? 'G2' : rmId <= 154 ? 'G4' : 'G5')
+        : 'SUM';
+      const rmSourceSystem = rmId <= 50 ? 1 : rmId <= 85 ? 2 : rmId <= 110 ? 3 : rmId <= 130 ? 4 : rmId <= 145 ? 5 : 6;
+      // Relationship type derived from report structure
+      const rmRelType = ['CALCULATION', 'FORMULA'].includes(rmSchedule) ? 'CALCULATION'
+        : ['RC_R1', 'HC_R1', 'D', 'F', 'SUP'].includes(rmSchedule) ? 'CALCULATION'
+        : ['RC', 'HC', 'RC_C', 'HC_C', 'HI', 'INF', 'OUT', 'C1', 'SUM'].includes(rmSchedule) ? 'AGGREGATION'
+        : 'DIRECT';
+      const rmTransform = rmRelType === 'CALCULATION' ? 'FORMULA'
+        : rmRelType === 'AGGREGATION' ? 'SUM'
+        : 'PASSTHROUGH';
+      const rmCode = `RM-${String(rmId).padStart(3, '0')}`;
+      if (columnName === 'mapping_code') return rmCode;
       if (columnName === 'jurisdiction_code') return 'US_FED';
       if (columnName === 'effective_start_date') return '2024-01-01';
       if (columnName === 'effective_end_date') return '9999-12-31';
-      if (columnName === 'line_item_code') return regmLineItems[idx];
-      if (columnName === 'mapping_id') return idx + 1;
-      if (columnName === 'mdrm_id') return idx + 1;
-      if (columnName === 'metric_name') return regmMetricNames[idx];
-      if (columnName === 'notes') return regmNotes[idx];
-      if (columnName === 'relationship_type') return regmRelTypes[idx];
-      if (columnName === 'report_code') return regmReportCodes[idx];
-      if (columnName === 'schedule_code') return regmSchedules[idx];
-      if (columnName === 'source_mdrm_code') return regmSourceMdrm[idx];
-      if (columnName === 'source_report_code') return regmSourceReports[idx];
-      if (columnName === 'source_system_id') return 10; // Regulatory
-      if (columnName === 'target_mdrm_code') return regmTargetMdrm[idx];
-      if (columnName === 'target_report_code') return regmTargetReports[idx];
-      if (columnName === 'tolerance_pct') return [0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.001, 0.001, 0.01, 0.001][idx];
-      if (columnName === 'transformation_rule') return regmTransformRules[idx];
-      if (columnName === 'calculation_rule_id') return idx + 1;
+      if (columnName === 'line_item_code') return `${rmReportBlock}_${rmSchedule}_${rmId}`;
+      if (columnName === 'mapping_id') return rmId;
+      if (columnName === 'mdrm_id') return rmId;
+      if (columnName === 'metric_name') return `${rmReportBlock} ${rmSchedule} Line ${rmId}`;
+      if (columnName === 'notes') return `${rmReportBlock} Schedule ${rmSchedule} mapping row ${rmId}`;
+      if (columnName === 'relationship_type') return rmRelType;
+      if (columnName === 'report_code') return rmReportBlock;
+      if (columnName === 'schedule_code') return rmSchedule;
+      if (columnName === 'source_mdrm_code') return `${rmReportBlock}_${rmSchedule}_${rmId}`;
+      if (columnName === 'source_report_code') return rmId <= 50 ? 'GL' : rmId <= 85 ? 'GL' : 'LOAN_SYS';
+      if (columnName === 'source_system_id') return rmSourceSystem;
+      if (columnName === 'target_mdrm_code') return `${rmReportBlock}_${rmSchedule}_${rmId}`;
+      if (columnName === 'target_report_code') return rmReportBlock;
+      if (columnName === 'tolerance_pct') return rmRelType === 'CALCULATION' ? 0.001 : 0.01;
+      if (columnName === 'transformation_rule') return rmTransform;
+      if (columnName === 'calculation_rule_id') return rmId;
       break;
     }
 
@@ -3466,7 +3599,18 @@ const FIXED_SIZE_TABLES = new Set([
   'model_registry_dim', 'rule_registry', 'validation_check_registry',
 ]);
 
+/** Tables with expanded GSIB-aligned row counts (override both DIMENSION and FIXED_SIZE). */
+const CUSTOM_TABLE_SIZES: Record<string, number> = {
+  'regulatory_jurisdiction': 18,
+  'fr2590_category_dim': 31,
+  'regulatory_capital_basis_dim': 28,
+  'reporting_entity_dim': 22,
+  'regulatory_mapping': 160,
+};
+
 export function getTableRowCount(tableName: string, requestedRows: number, profile?: string): number {
+  // Custom table sizes for GSIB-aligned expanded tables
+  if (tableName in CUSTOM_TABLE_SIZES) return CUSTOM_TABLE_SIZES[tableName];
   // Dimension tables stay at 10 (their natural domain size)
   if (DIMENSION_TABLES.has(tableName)) return 10;
   // Fixed-size tables stay at 10 (unless MVP profile overrides them)

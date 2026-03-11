@@ -341,7 +341,7 @@ export function getMvpFacilityField(
       return seededPick(rng, [2, 9, 10]);
     }
     case 'industry_code': {
-      const industryCodes = ['TMT', 'HC', 'FIN', 'ENE', 'IND', 'CON', 'RET', 'UTL', 'MAT', 'CD'];
+      const industryCodes = ['51', '62', '52', '21', '31', '44', '45', '22', '32', '71'];
       const storyArc = getCounterpartyStoryArc(agrIdx);
       // Use consistent industry based on counterparty
       const cpRng = mulberry32(hashStr(`cpind.${agrIdx}`));

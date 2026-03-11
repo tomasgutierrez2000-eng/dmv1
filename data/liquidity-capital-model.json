@@ -5106,7 +5106,7 @@
         },
         {
           "name": "counterparty code type",
-          "description": "Add to l1.counterparty.industry_code_type VARCHAR(20) \u2014 NAICS/SIC/GIC",
+          "description": "Add to l1.counterparty.industry_code_type VARCHAR(20) \u2014 NAICS 2022",
           "isPK": false,
           "isFK": false
         },
@@ -5595,7 +5595,7 @@
         },
         {
           "name": "entity industry code type",
-          "description": "Add to l1.legal_entity.entity_industry_code_type VARCHAR(20) \u2014 NAICS/SIC/GIC",
+          "description": "Add to l1.legal_entity.entity_industry_code_type VARCHAR(20) \u2014 NAICS 2022",
           "isPK": false,
           "isFK": false
         },

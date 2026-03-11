@@ -32,7 +32,6 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'utilization_status_dim', scd: 'SCD-0', category: 'Facility' },
   { name: 'origination_date_bucket_dim', scd: 'SCD-0', category: 'Calendar & Time' },
   { name: 'limit_status_dim', scd: 'SCD-0', category: 'Limits & Thresholds' },
-  { name: 'exception_status_dim', scd: 'SCD-0', category: 'Facility' },
   { name: 'rating_change_status_dim', scd: 'SCD-0', category: 'Ratings' },
   { name: 'maturity_bucket_dim', scd: 'SCD-0', category: 'Calendar & Time' },
   { name: 'fr2590_category_dim', scd: 'SCD-0', category: 'Regulatory Mapping' },

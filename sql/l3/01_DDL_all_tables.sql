@@ -1303,7 +1303,6 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_pricing_calc" (
     "facility_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
     "pricing_exception_flag" BOOLEAN,
-    "exception_status_code" VARCHAR(20),
     "pricing_tier_code" VARCHAR(20),
     "fee_rate_pct" NUMERIC(10,6),
     "created_ts" TIMESTAMP,

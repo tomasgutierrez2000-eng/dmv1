@@ -247,6 +247,7 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_pricing_snapshot" (
     "rate_cap_pct" NUMERIC(10,4),
     "rate_index_code" VARCHAR(20),
     "pricing_exception_flag" BOOLEAN,
+    "pricing_exception_status" VARCHAR(64),
     "fee_rate_pct" NUMERIC(10,6),
     "cost_of_funds_pct" NUMERIC(10,6),
     PRIMARY KEY ("facility_id", "as_of_date")

@@ -17,8 +17,8 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l3
-  table: facility_pricing_calc
+- schema: l2
+  table: facility_pricing_snapshot
   alias: fps
   join_type: BASE
   fields:
@@ -63,7 +63,7 @@ levels:
       SELECT
         fps.facility_id AS dimension_key,
         CASE WHEN fps.pricing_exception_flag = 'Y' THEN 1.0 ELSE 0.0 END AS metric_value
-      FROM l3.facility_pricing_calc fps
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
@@ -79,7 +79,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l3.facility_pricing_calc fps
+        FROM l2.facility_pricing_snapshot fps
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fps.facility_id
           AND fm.is_active_flag = 'Y'
@@ -101,7 +101,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l3.facility_pricing_calc fps
+        FROM l2.facility_pricing_snapshot fps
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fps.facility_id
           AND fm.is_active_flag = 'Y'
@@ -125,7 +125,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l3.facility_pricing_calc fps
+        FROM l2.facility_pricing_snapshot fps
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fps.facility_id
           AND fm.is_active_flag = 'Y'
@@ -151,7 +151,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id
-        FROM l3.facility_pricing_calc fps
+        FROM l2.facility_pricing_snapshot fps
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = fps.facility_id
           AND fm.is_active_flag = 'Y'

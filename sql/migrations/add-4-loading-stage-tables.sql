@@ -1,5 +1,5 @@
--- Add 4 tables from loading stage to PostgreSQL
--- L1: exception_status_dim, limit_status_dim, rating_change_status_dim
+-- Add 3 tables from loading stage to PostgreSQL
+-- L1: limit_status_dim, rating_change_status_dim
 -- L2: limit_assignment_snapshot
 
 -- L1 Tables
@@ -11,16 +11,6 @@ CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
     "display_order" INTEGER,
     "active_flag" BOOLEAN,
     PRIMARY KEY ("limit_status_code")
-);
-
-CREATE TABLE IF NOT EXISTS "l1"."exception_status_dim" (
-    "exception_status_code" VARCHAR(20) NOT NULL,
-    "status_name" VARCHAR(200),
-    "description" VARCHAR(500),
-    "requires_approval_flag" BOOLEAN,
-    "display_order" INTEGER,
-    "active_flag" BOOLEAN,
-    PRIMARY KEY ("exception_status_code")
 );
 
 CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (

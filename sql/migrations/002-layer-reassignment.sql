@@ -29,17 +29,6 @@ CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
     PRIMARY KEY ("limit_status_code")
 );
 
--- exception_status_dim: Reference codes for pricing exception statuses
-CREATE TABLE IF NOT EXISTS "l1"."exception_status_dim" (
-    "exception_status_code" VARCHAR(20) NOT NULL,
-    "status_name" VARCHAR(200),
-    "description" VARCHAR(500),
-    "requires_approval_flag" BOOLEAN,
-    "display_order" INTEGER,
-    "active_flag" BOOLEAN DEFAULT TRUE,
-    PRIMARY KEY ("exception_status_code")
-);
-
 -- rating_change_status_dim: Reference codes for rating movement direction
 CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
     "rating_change_status_code" VARCHAR(20) NOT NULL,
@@ -58,14 +47,6 @@ INSERT INTO "l1"."limit_status_dim" ("limit_status_code", "status_name", "descri
     ('AT_LIMIT', 'At Limit', 'Utilization equals approved limit', 3, 3, TRUE),
     ('BREACHED', 'Limit Breached', 'Utilization exceeds approved limit', 4, 4, TRUE),
     ('SUSPENDED', 'Limit Suspended', 'Limit has been suspended', 5, 5, TRUE)
-ON CONFLICT DO NOTHING;
-
-INSERT INTO "l1"."exception_status_dim" ("exception_status_code", "status_name", "description", "requires_approval_flag", "display_order", "active_flag") VALUES
-    ('NONE', 'No Exception', 'Standard pricing applies', FALSE, 1, TRUE),
-    ('PENDING', 'Pending Approval', 'Exception requested, awaiting approval', TRUE, 2, TRUE),
-    ('APPROVED', 'Approved', 'Exception approved by authorized party', FALSE, 3, TRUE),
-    ('DENIED', 'Denied', 'Exception request denied', FALSE, 4, TRUE),
-    ('EXPIRED', 'Expired', 'Exception approval has expired', FALSE, 5, TRUE)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO "l1"."rating_change_status_dim" ("rating_change_status_code", "status_name", "description", "direction", "display_order", "active_flag") VALUES
@@ -179,7 +160,6 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_pricing_calc" (
     "facility_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
     "pricing_exception_flag" BOOLEAN,
-    "exception_status_code" VARCHAR(20),
     "pricing_tier_code" VARCHAR(20),
     "fee_rate_pct" NUMERIC(10,6),
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

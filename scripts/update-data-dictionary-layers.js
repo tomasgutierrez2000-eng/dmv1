@@ -54,19 +54,6 @@ const newL1Tables = [
     ]
   },
   {
-    name: 'exception_status_dim',
-    layer: 'L1',
-    category: 'Facility',
-    fields: [
-      field('exception_status_code', 'Unique code for pricing exception status', 'Facility', 'VARCHAR(20)', { isPk: true }),
-      field('status_name', 'Display name for the exception status', 'Facility', 'VARCHAR(200)'),
-      field('description', 'Detailed description of the status', 'Facility', 'VARCHAR(500)'),
-      field('requires_approval_flag', 'Whether this status requires approval', 'Facility', 'BOOLEAN'),
-      field('display_order', 'UI display order', 'Facility', 'INTEGER'),
-      field('active_flag', 'Whether this status is currently active', 'Facility', 'BOOLEAN'),
-    ]
-  },
-  {
     name: 'rating_change_status_dim',
     layer: 'L1',
     category: 'Ratings',
@@ -189,7 +176,6 @@ const newL3Tables = [
       field('facility_id', 'FK to source L2 facility_pricing_snapshot', 'Facility Analytics', 'BIGINT', { isPk: true, isComposite: true, fkTarget: { layer: 'L2', table: 'facility_master', field: 'facility_id' } }),
       field('as_of_date', 'Snapshot date matching source L2 row', 'Facility Analytics', 'DATE', { isPk: true, isComposite: true }),
       field('pricing_exception_flag', 'Whether facility has a pricing exception', 'Facility Analytics', 'BOOLEAN'),
-      field('exception_status_code', 'Calculated exception status assignment', 'Facility Analytics', 'VARCHAR(20)', { fkTarget: { layer: 'L1', table: 'exception_status_dim', field: 'exception_status_code' } }),
       field('pricing_tier_code', 'Calculated pricing tier assignment', 'Facility Analytics', 'VARCHAR(20)', { fkTarget: { layer: 'L1', table: 'pricing_tier_dim', field: 'pricing_tier_code' } }),
       field('fee_rate_pct', 'Fee rate percentage (derived)', 'Facility Analytics', 'NUMERIC(10,6)'),
       field('created_ts', 'Record creation timestamp', 'Facility Analytics', 'TIMESTAMP'),

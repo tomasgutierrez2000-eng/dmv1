@@ -2247,8 +2247,8 @@
           "field": "pricing_exception_status",
           "label": "pricing_exception_status",
           "sample_value": 0,
-          "source_table": "facility_pricing_calc",
-          "source_layer": "L3"
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],

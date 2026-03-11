@@ -504,3 +504,26 @@ def generate_scenario(scenario_id, narrative, counterparty_count, facility_per_c
     - DDL generator (`lib/ddl-generator.ts`) converts data dictionary → SQL via `sqlTypeForField()`
     - If you edit SQL DDL files directly, the data dictionary becomes out of sync — update both
     - Type priority: explicit `data_type` field in data dictionary > naming convention defaults in DDL generator
+
+## GSIB Data Model Audit (`/audit-db`)
+
+A reusable skill for running comprehensive GSIB-level effective challenge reviews of the credit risk data model. Invoke with `/audit-db`.
+
+### What it does
+- Reads all input sources (data dictionary, DDL files, table metadata, metric catalogue, YAML metrics)
+- Runs 9-step review procedure across 7 parallel domains: Structural Integrity, Data Types/Naming, Semantic Quality, Layer/Temporal, GSIB Coverage, Metric System, Scalability
+- Checks 15 required GSIB credit risk subject areas
+- Produces `~/Downloads/GSIB_CreditRisk_DataModel_Review.xlsx` with 200-400 findings (17-column schema)
+- Compares against previous review to show delta/progress
+
+### Key files
+- `.claude/skills/audit-db/SKILL.md` — full skill definition with review procedure, thresholds, severity rules
+- `scripts/generate-gsib-review.py` — base finding generator (76 structural findings)
+- `scripts/merge-gsib-findings.py` — merges base + agent JSON findings into comprehensive Excel
+- `review-findings/*.json` — granular findings from parallel analysis agents
+
+### When to run
+- After schema changes (new tables, altered columns, new DDL)
+- After adding new metrics or metric domains
+- Periodic regulatory readiness review
+- Before major releases or regulatory submissions

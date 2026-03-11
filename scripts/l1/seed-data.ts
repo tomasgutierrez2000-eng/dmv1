@@ -50,13 +50,14 @@ const IS_FIN_INST = ['N', 'Y', 'N', 'Y', 'N', 'Y', 'Y', 'N', 'N', 'N'];
 const IS_SOVEREIGN = ['N', 'N', 'Y', 'N', 'N', 'N', 'N', 'N', 'N', 'N'];
 const REG_CPTY_CLASS = ['CORPORATE', 'BANK', 'SOVEREIGN', 'BANK', 'CORPORATE', 'EQUITY', 'INSURANCE', 'CORPORATE', 'CRE', 'OTHER'];
 
-export const INDUSTRY_CODES = ['TMT', 'HC', 'FIN', 'ENE', 'IND', 'CON', 'RET', 'UTL', 'MAT', 'CD'];
+export const INDUSTRY_CODES = ['51', '62', '52', '21', '31', '44', '45', '22', '32', '71'];
 export const INDUSTRY_NAMES = [
-  'Technology Media Telecom', 'Healthcare', 'Financials', 'Energy', 'Industrials',
-  'Consumer Staples', 'Retail', 'Utilities', 'Materials', 'Consumer Discretionary',
+  'Information', 'Health Care and Social Assistance', 'Finance and Insurance',
+  'Mining, Quarrying, and Oil and Gas Extraction', 'Manufacturing', 'Retail Trade',
+  'Retail Trade', 'Utilities', 'Manufacturing', 'Arts, Entertainment, and Recreation',
 ];
-const INDUSTRY_LEVELS = ['SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'INDUSTRY', 'SECTOR', 'SECTOR', 'SECTOR'];
-const INDUSTRY_STANDARDS = ['GICS', 'GICS', 'GICS', 'GICS', 'GICS', 'GICS', 'GICS', 'GICS', 'GICS', 'GICS'];
+const INDUSTRY_LEVELS = ['SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR', 'SECTOR'];
+const INDUSTRY_STANDARDS = ['NAICS', 'NAICS', 'NAICS', 'NAICS', 'NAICS', 'NAICS', 'NAICS', 'NAICS', 'NAICS', 'NAICS'];
 
 export const PORTFOLIO_CODES = ['IG-CORP', 'LEV-FIN', 'COMM', 'CRE', 'FIG', 'TMT', 'ENERGY', 'HEALTH', 'SYND', 'BILAT'];
 export const PORTFOLIO_NAMES = [
@@ -1617,7 +1618,7 @@ export const COUNTERPARTY_LEGAL_NAMES = [
 ];
 export const COUNTERPARTY_TYPES = ['CORPORATE', 'CORPORATE', 'CORPORATE', 'BANK', 'CORPORATE', 'CORPORATE', 'CORPORATE', 'CORPORATE', 'CORPORATE', 'RE_TRUST'];
 const CPTY_ENTITY_TYPES = ['CORP', 'CORP', 'CORP', 'FI', 'CORP', 'CORP', 'CORP', 'CORP', 'PE', 'RE'];
-const CPTY_INDUSTRIES = [1, 2, 4, 3, 5, 6, 2, 9, 5, 10];
+const CPTY_INDUSTRIES = [51, 62, 21, 52, 31, 44, 62, 32, 31, 71];
 const CPTY_COUNTRIES = ['US', 'US', 'US', 'GB', 'DE', 'US', 'US', 'AU', 'CA', 'US'];
 const CPTY_BASEL_ASSET_CLASS = ['CORPORATE', 'CORPORATE', 'CORPORATE', 'BANK', 'CORPORATE', 'CORPORATE', 'CORPORATE', 'CORPORATE', 'CORPORATE', 'CRE'];
 const CPTY_INTERNAL_RATINGS = ['3', '4', '5', '2', '4', '3', '5', '6', '5', '4'];
@@ -2245,8 +2246,8 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'industry_name') return INDUSTRY_NAMES[idx];
       if (columnName === 'industry_level') return INDUSTRY_LEVELS[idx];
       if (columnName === 'industry_standard') return INDUSTRY_STANDARDS[idx];
-      if (columnName === 'parent_industry_id') return idx < 5 ? null : Math.ceil(idx / 2);
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'parent_industry_id') return INDUSTRY_CODES[idx]; // Self-reference for sectors (NOT NULL constraint)
+      if (columnName === 'active_flag') return true;
       break;
 
     /* ──────────── enterprise_business_taxonomy (249 rows from Excel) ──────────── */

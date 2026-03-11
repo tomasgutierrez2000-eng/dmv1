@@ -51,7 +51,7 @@ const CONFIG = {
         { name: "counterparty_id", value: "CTP-00294" },
         { name: "legal_name", value: "Meridian Industrial Holdings, Inc." },
         { name: "counterparty_type", value: "CORPORATE" },
-        { name: "industry_id", value: "IND-TMT → industry_dim" },
+        { name: "industry_id", value: "51 → industry_dim (Information)" },
         { name: "internal_risk_rating", value: "2 (Investment Grade)" },
         { name: "external_rating_sp", value: "BBB+" },
         { name: "external_rating_moodys", value: "Baa1" },
@@ -314,7 +314,7 @@ const CONFIG = {
         fields: [
           { name: "legal_name", value: "Meridian Industrial Holdings, Inc.", source: "counterparty", type: "direct" },
           { name: "counterparty_type", value: "CORPORATE", source: "counterparty", type: "direct" },
-          { name: "industry_id → industry_dim", value: "TMT", source: "counterparty", type: "direct" },
+          { name: "industry_id → industry_dim", value: "51 (Information)", source: "counterparty", type: "direct" },
           { name: "internal_risk_rating", value: "2 — Investment Grade", source: "counterparty", type: "direct" },
           { name: "external_rating_sp / moodys", value: "BBB+ / Baa1", source: "counterparty", type: "direct" },
           { name: "basel_asset_class", value: "CORPORATE", source: "counterparty", type: "direct" },

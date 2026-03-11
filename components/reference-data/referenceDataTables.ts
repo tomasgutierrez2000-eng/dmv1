@@ -40,7 +40,7 @@ export const REFERENCE_DATA_TABLES: ReferenceDataTableDef[] = [
   { name: 'counterparty_role_dim', category: 'Counterparty', description: 'Counterparty participation roles (borrower, guarantor, etc.)', scd: 'SCD-0', importance: 'supporting' },
 
   // ── Taxonomy & Lookup (SCD-1) ──
-  { name: 'industry_dim', category: 'Industry & Taxonomy', description: 'Industry classification codes (NAICS, SIC, GICS)', scd: 'SCD-1', importance: 'core' },
+  { name: 'industry_dim', category: 'Industry & Taxonomy', description: 'NAICS 2022 industry classification hierarchy (2-6 digit codes)', scd: 'SCD-1', importance: 'core' },
   { name: 'enterprise_business_taxonomy', category: 'Industry & Taxonomy', description: 'Business segment and line-of-business hierarchy', scd: 'SCD-1', importance: 'core' },
   { name: 'enterprise_product_taxonomy', category: 'Industry & Taxonomy', description: 'Product type hierarchy and classification', scd: 'SCD-1', importance: 'core' },
   { name: 'portfolio_dim', category: 'Portfolio & Organization', description: 'Portfolio definitions for grouping facilities', scd: 'SCD-1', importance: 'core' },

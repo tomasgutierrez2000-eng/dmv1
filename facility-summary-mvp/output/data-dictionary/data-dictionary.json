@@ -3873,7 +3873,7 @@
         },
         {
           "name": "industry_code",
-          "description": "Industry code (NAICS/SIC/GICS)",
+          "description": "NAICS 2022 industry classification code (2-6 digit)",
           "category": "Industry",
           "why_required": "Mapping key from counterparty attributes",
           "data_type": "VARCHAR(20)"
@@ -3894,7 +3894,7 @@
         },
         {
           "name": "industry_standard",
-          "description": "Standard (NAICS/SIC/GICS)",
+          "description": "Industry classification standard (NAICS 2022)",
           "category": "Industry",
           "why_required": "Disambiguates code sets",
           "data_type": "VARCHAR(100)"

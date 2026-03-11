@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
 import { getDomains } from '@/lib/metric-library/store';
+import { jsonSuccess } from '@/lib/api-response';
 
 export async function GET() {
   const domains = getDomains();
-  return NextResponse.json(domains);
+  return jsonSuccess(domains);
 }

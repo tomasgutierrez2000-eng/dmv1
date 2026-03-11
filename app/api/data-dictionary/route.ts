@@ -1,30 +1,22 @@
-import { NextResponse } from 'next/server';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 import { readDataDictionary, getDataDictionaryPath } from '@/lib/data-dictionary';
 import fs from 'fs';
 
 export async function GET() {
   try {
     if (!fs.existsSync(getDataDictionaryPath())) {
-      return NextResponse.json(
-        { error: 'Data dictionary not found. Please upload and parse an Excel file first.' },
-        { status: 404 }
-      );
+      return jsonError('Data dictionary not found. Please upload and parse an Excel file first.', { status: 404 });
     }
 
     const dataDictionary = readDataDictionary();
     if (!dataDictionary) {
-      return NextResponse.json(
-        { error: 'Failed to read data dictionary' },
-        { status: 500 }
-      );
+      return jsonError('Failed to read data dictionary');
     }
 
-    return NextResponse.json(dataDictionary);
+    return jsonSuccess(dataDictionary);
   } catch (error) {
     console.error('Error reading data dictionary:', error);
-    return NextResponse.json(
-      { error: 'Failed to read data dictionary' },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

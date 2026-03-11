@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getCatalogueItems, upsertCatalogueItem } from '@/lib/metric-library/store';
 import type { CatalogueItem } from '@/lib/metric-library/types';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get('status') ?? undefined;
 
   const items = getCatalogueItems({ kind, domain_id: domain, search, status });
-  return NextResponse.json(items);
+  return jsonSuccess(items);
 }
 
 export async function POST(req: NextRequest) {
@@ -18,18 +19,13 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as CatalogueItem;
 
     if (!body.item_id || !body.item_name || !body.kind) {
-      return NextResponse.json(
-        { error: 'item_id, item_name, and kind are required' },
-        { status: 400 }
-      );
+      return jsonError('item_id, item_name, and kind are required', { status: 400 });
     }
 
     upsertCatalogueItem(body);
-    return NextResponse.json(body, { status: 201 });
-  } catch {
-    return NextResponse.json(
-      { error: 'Read-only file system or invalid JSON' },
-      { status: 503 }
-    );
+    return jsonSuccess(body, 201);
+  } catch (err) {
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import {
   readDataDictionary,
   writeDataDictionary,
@@ -8,6 +8,7 @@ import {
   type DataDictionaryRelationship,
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 type Layer = 'L1' | 'L2' | 'L3';
 
@@ -35,41 +36,29 @@ export async function POST(
     const { layer, tableName: rawTableName } = await context.params;
     const tableName = decodeURIComponent(rawTableName || '');
     if (!isValidLayer(layer)) {
-      return NextResponse.json({ error: 'Invalid layer. Use L1, L2, or L3.' }, { status: 400 });
+      return jsonError('Invalid layer. Use L1, L2, or L3.', { status: 400 });
     }
 
     const body = (await request.json()) as AddFieldBody;
     const { name, data_type, description, pk_fk } = body;
 
     if (!name || typeof name !== 'string' || !name.trim()) {
-      return NextResponse.json(
-        { error: 'Field name is required.' },
-        { status: 400 }
-      );
+      return jsonError('Field name is required.', { status: 400 });
     }
 
     const fieldName = name.trim().replace(/\s+/g, '_');
     const dd = readDataDictionary();
     if (!dd) {
-      return NextResponse.json(
-        { error: 'Data dictionary not found. Load or create a model first.' },
-        { status: 404 }
-      );
+      return jsonError('Data dictionary not found. Load or create a model first.', { status: 404 });
     }
 
     const table = findTable(dd, layer, tableName);
     if (!table) {
-      return NextResponse.json(
-        { error: `Table "${tableName}" not found in ${layer}.` },
-        { status: 404 }
-      );
+      return jsonError(`Table "${tableName}" not found in ${layer}.`, { status: 404 });
     }
 
     if (table.fields.some((f) => f.name === fieldName)) {
-      return NextResponse.json(
-        { error: `Field "${fieldName}" already exists in table "${tableName}".` },
-        { status: 409 }
-      );
+      return jsonError(`Field "${fieldName}" already exists in table "${tableName}".`, { status: 409 });
     }
 
     const newField: DataDictionaryField = {
@@ -107,7 +96,7 @@ export async function POST(
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'add-field', layer, tableName, fieldName });
 
-    return NextResponse.json({
+    return jsonSuccess({
       success: true,
       message: `Field "${fieldName}" added to ${layer}.${tableName}.`,
       fieldName,
@@ -115,9 +104,7 @@ export async function POST(
     });
   } catch (error) {
     console.error('Add field error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to add field.' },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

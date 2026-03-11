@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getVariant, saveVariant, getParentMetric } from '@/lib/metric-library/store';
 import type { MetricVariant } from '@/lib/metric-library/types';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
 export async function GET(
   _request: NextRequest,
@@ -9,10 +10,10 @@ export async function GET(
   const { variant_id } = await params;
   const variant = getVariant(variant_id);
   if (!variant) {
-    return NextResponse.json({ error: 'Variant not found' }, { status: 404 });
+    return jsonError('Variant not found', { status: 404 });
   }
   const parent = variant.parent_metric_id ? getParentMetric(variant.parent_metric_id) : null;
-  return NextResponse.json({
+  return jsonSuccess({
     variant,
     parent: parent ? { metric_id: parent.metric_id, metric_name: parent.metric_name } : null,
   });
@@ -25,14 +26,14 @@ export async function PUT(
   const { variant_id } = await params;
   const existing = getVariant(variant_id);
   if (!existing) {
-    return NextResponse.json({ error: 'Variant not found' }, { status: 404 });
+    return jsonError('Variant not found', { status: 404 });
   }
 
   let body: Partial<MetricVariant>;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    return jsonError('Invalid JSON body', { status: 400 });
   }
 
   const updated: MetricVariant = {
@@ -41,5 +42,5 @@ export async function PUT(
     variant_id: existing.variant_id,
   };
   saveVariant(updated);
-  return NextResponse.json(updated);
+  return jsonSuccess(updated);
 }

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 import { getSchemaBundle, getSchemaSummary } from '@/lib/schema-bundle';
 
 export const dynamic = 'force-dynamic';
@@ -15,20 +16,14 @@ export async function GET(request: NextRequest) {
 
     if (summaryOnly) {
       const summary = getSchemaSummary();
-      return NextResponse.json(summary);
+      return jsonSuccess(summary);
     }
 
     const bundle = getSchemaBundle();
-    return NextResponse.json(bundle);
+    return jsonSuccess(bundle);
   } catch (error) {
     console.error('[schema/bundle]', error);
-    const details = error instanceof Error ? error.message : String(error);
-    return NextResponse.json(
-      {
-        error: 'Failed to build schema bundle',
-        ...(process.env.NODE_ENV === 'development' && { details }),
-      },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

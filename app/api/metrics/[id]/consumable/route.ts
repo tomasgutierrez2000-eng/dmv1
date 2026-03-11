@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getMergedMetrics } from '@/lib/metrics-store';
 import { resolveAllowedDimensions } from '@/lib/metrics-calculation';
 import type { CalculationDimension } from '@/data/l3-metrics';
 import { CALCULATION_DIMENSION_LABELS, DIMENSION_TO_CONSUMPTION_LEVEL } from '@/data/l3-metrics';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
 export interface ConsumableMetricDetail {
   id: string;
@@ -21,12 +22,12 @@ export async function GET(
 ) {
   const { id } = await params;
   if (!id?.trim()) {
-    return NextResponse.json({ error: 'Metric id is required' }, { status: 400 });
+    return jsonError('Metric id is required', { status: 400 });
   }
   const merged = getMergedMetrics();
   const metric = merged.find((m) => m.id === id.trim());
   if (!metric) {
-    return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
+    return jsonError('Metric not found', { status: 404 });
   }
 
   const baseUrl = request.nextUrl.origin;
@@ -54,7 +55,7 @@ export async function GET(
     displayFormat: metric.displayFormat,
   };
 
-  return NextResponse.json(body);
+  return jsonSuccess(body);
 }
 
 function getDefaultRollupSummary(): string {

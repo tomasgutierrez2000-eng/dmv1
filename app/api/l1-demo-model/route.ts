@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 import path from 'path';
 import fs from 'fs';
 import type { DataModel, Relationship, TableDef, Field } from '@/types/model';
@@ -153,10 +153,7 @@ function buildL3TablesAndRelationships(
 
 export async function GET() {
   if (!fs.existsSync(L1_SAMPLE_DATA_PATH)) {
-    return NextResponse.json(
-      { error: 'Run: npx tsx scripts/l1/generate.ts to generate L1 sample data first.' },
-      { status: 404 }
-    );
+    return jsonError('Run: npx tsx scripts/l1/generate.ts to generate L1 sample data first.', { status: 404 });
   }
 
   const l1Data = loadJsonIfExists<Record<string, { columns: string[]; rows: unknown[][] }>>(
@@ -250,5 +247,5 @@ export async function GET() {
     layers,
   };
 
-  return NextResponse.json(model);
+  return jsonSuccess(model);
 }

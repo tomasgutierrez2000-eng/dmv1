@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getParentMetric, getVariants } from '@/lib/metric-library/store';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
 export async function GET(
   _request: NextRequest,
@@ -8,8 +9,8 @@ export async function GET(
   const { metric_id } = await params;
   const parent = getParentMetric(metric_id);
   if (!parent) {
-    return NextResponse.json({ error: 'Parent metric not found' }, { status: 404 });
+    return jsonError('Parent metric not found', { status: 404 });
   }
   const variants = getVariants({ parent_metric_id: metric_id });
-  return NextResponse.json({ ...parent, variants });
+  return jsonSuccess({ ...parent, variants });
 }

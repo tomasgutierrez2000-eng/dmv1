@@ -20,11 +20,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { useModelStore } from '../../store/modelStore';
-import { modelToSchemaExport } from '../../utils/schemaExport';
-import { schemaExportToModel } from '../../utils/schemaExport';
-import { schemaToFieldsSheetData, schemaToRelationshipsSheetData } from '../../utils/schemaExportExcel';
-import { parseSchemaFromWorkbook } from '../../utils/schemaExportExcel';
-import { exportSchemaToExcel } from '../../utils/schemaExportExcelPro';
+import { modelToSchemaExport, schemaExportToModel } from '../../utils/schemaExport';
+import { parseSchemaFromWorkbook, exportSchemaToExcel } from '../../utils/schemaExportExcel';
 import { computeModelDiff } from '../../utils/modelDiff';
 import type { DataModel } from '../../types/model';
 import type { SchemaExport } from '../../types/schemaExport';

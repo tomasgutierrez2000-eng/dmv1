@@ -168,7 +168,7 @@ export default function UploadPage() {
         </p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/overview"
+            href="/"
             className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-pwc-gray hover:bg-pwc-gray-light rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pwc-orange focus-visible:ring-offset-2 focus-visible:ring-offset-pwc-black"
           >
             <LayoutDashboard className="w-4 h-4" aria-hidden />

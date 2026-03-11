@@ -67,7 +67,7 @@ export default function LibraryMainView() {
         <div className="max-w-6xl mx-auto px-6 py-5">
           <div className="flex items-center gap-4">
             <Link
-              href="/overview"
+              href="/"
               className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
             >
               <ChevronLeft className="w-4 h-4 flex-shrink-0" aria-hidden />

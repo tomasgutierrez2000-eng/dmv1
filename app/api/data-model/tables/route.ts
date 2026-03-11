@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import {
   readDataDictionary,
   writeDataDictionary,
@@ -10,6 +10,7 @@ import {
   type DataDictionaryRelationship,
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 /** Request body for adding a table. */
 interface AddTableBody {
@@ -38,45 +39,30 @@ export async function POST(request: NextRequest) {
     const { layer, name, category, fields } = body;
 
     if (!layer || !name || !Array.isArray(fields) || fields.length === 0) {
-      return NextResponse.json(
-        { error: 'Missing required fields: layer, name, and at least one field.' },
-        { status: 400 }
-      );
+      return jsonError('Missing required fields: layer, name, and at least one field.', { status: 400 });
     }
 
     const tableName = normalizeTableName(name);
     if (!tableName) {
-      return NextResponse.json(
-        { error: 'Table name cannot be empty.' },
-        { status: 400 }
-      );
+      return jsonError('Table name cannot be empty.', { status: 400 });
     }
 
     const normalizedFieldNames = fields
       .map((f) => (f.name && typeof f.name === 'string' ? f.name.trim().replace(/\s+/g, '_') : ''))
       .filter(Boolean);
     if (normalizedFieldNames.length === 0) {
-      return NextResponse.json(
-        { error: 'At least one field with a non-empty name is required.' },
-        { status: 400 }
-      );
+      return jsonError('At least one field with a non-empty name is required.', { status: 400 });
     }
     const uniqueNames = new Set(normalizedFieldNames);
     if (uniqueNames.size !== normalizedFieldNames.length) {
-      return NextResponse.json(
-        { error: 'Duplicate field names are not allowed within a table.' },
-        { status: 400 }
-      );
+      return jsonError('Duplicate field names are not allowed within a table.', { status: 400 });
     }
 
     let dd = readDataDictionary();
     if (!dd) dd = ensureEmptyDataDictionary();
 
     if (findTable(dd, layer, tableName)) {
-      return NextResponse.json(
-        { error: `Table "${tableName}" already exists in ${layer}.` },
-        { status: 409 }
-      );
+      return jsonError(`Table "${tableName}" already exists in ${layer}.`, { status: 409 });
     }
 
     const ddFields: DataDictionaryField[] = fields
@@ -120,7 +106,7 @@ export async function POST(request: NextRequest) {
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'add-table', layer, tableName });
 
-    return NextResponse.json({
+    return jsonSuccess({
       success: true,
       message: `Table "${tableName}" added to ${layer}.`,
       tableKey: `${layer}.${tableName}`,
@@ -128,9 +114,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Add table error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to add table.' },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

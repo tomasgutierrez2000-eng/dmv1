@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, isReadOnlyFsError } from '@/lib/metrics-store';
+import { getMergedMetrics, readCustomMetrics, writeCustomMetrics } from '@/lib/metrics-store';
 import type { L3Metric } from '@/data/l3-metrics';
 import { normalizeMetric, validateMetric } from '@/lib/metrics-calculation';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 /** GET one metric */
 export async function GET(
@@ -11,8 +12,8 @@ export async function GET(
   const { id } = await params;
   const merged = getMergedMetrics();
   const metric = merged.find(m => m.id === id);
-  if (!metric) return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
-  return NextResponse.json({ ...metric, source: 'custom' });
+  if (!metric) return jsonError('Metric not found', { status: 404 });
+  return jsonSuccess({ ...metric, source: 'custom' });
 }
 
 /** PUT: update a metric */
@@ -25,12 +26,12 @@ export async function PUT(
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    return jsonError('Invalid JSON body', { status: 400 });
   }
 
   const validation = validateMetric({ ...body, id });
   if (!validation.ok) {
-    return NextResponse.json({ error: validation.error }, { status: 400 });
+    return jsonError(validation.error ?? 'Validation failed', { status: 400 });
   }
 
   const custom = readCustomMetrics();
@@ -45,12 +46,10 @@ export async function PUT(
   try {
     writeCustomMetrics(custom);
   } catch (err) {
-    return NextResponse.json(
-      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
-      { status: 503 }
-    );
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
-  return NextResponse.json({ ...metric, source: 'custom' });
+  return jsonSuccess({ ...metric, source: 'custom' });
 }
 
 /** DELETE: remove a metric */
@@ -62,15 +61,13 @@ export async function DELETE(
   const custom = readCustomMetrics();
   const filtered = custom.filter(m => m.id !== id);
   if (filtered.length === custom.length) {
-    return NextResponse.json({ error: 'Metric not found' }, { status: 404 });
+    return jsonError('Metric not found', { status: 404 });
   }
   try {
     writeCustomMetrics(filtered);
   } catch (err) {
-    return NextResponse.json(
-      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
-      { status: 503 }
-    );
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
   return new NextResponse(null, { status: 204 });
 }

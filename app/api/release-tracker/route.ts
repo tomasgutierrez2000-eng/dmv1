@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 import { RELEASE_ENTRIES, type ReleaseEntry } from '@/lib/release-tracker-data';
 
 /** GET: export release tracker as Excel (.xlsx). */
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      return jsonError('No file uploaded', { status: 400 });
     }
 
     const XLSX = await import('xlsx');
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     ) ?? wb.SheetNames[0];
 
     if (!sheetName) {
-      return NextResponse.json({ error: 'No sheets found in workbook' }, { status: 400 });
+      return jsonError('No sheets found in workbook', { status: 400 });
     }
 
     const rows = XLSX.utils.sheet_to_json<Record<string, string>>(wb.Sheets[sheetName]);
@@ -113,15 +114,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    return jsonSuccess({
       imported: imported.length,
       errors,
       entries: imported,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to parse file' },
-      { status: 500 },
-    );
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

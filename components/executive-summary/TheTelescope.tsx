@@ -611,7 +611,7 @@ export default function TheTelescope() {
         <header className="px-6 pt-5 pb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
-              href="/overview"
+              href="/"
               className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-300 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />

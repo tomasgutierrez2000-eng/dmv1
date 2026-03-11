@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { EXCEL_TEMPLATE_COLUMN_MAPPING } from '@/EXCEL_TEMPLATE_CONFIG';
 import { readDataDictionary } from '@/lib/data-dictionary';
 import { writeDdlFiles, executeDdl } from '@/lib/data-model-sync';
 import { findColumnIndex, getDetectedColumns } from './column-mapping';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 interface FieldDefinition {
   name: string;
@@ -127,10 +128,7 @@ export async function POST(request: NextRequest) {
     const applyDdl = String(formData.get('applyDdl') ?? '').toLowerCase() === 'true';
 
     if (!file) {
-      return NextResponse.json(
-        { success: false, message: 'No file uploaded' },
-        { status: 400 }
-      );
+      return jsonError('No file uploaded', { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -145,13 +143,7 @@ export async function POST(request: NextRequest) {
     const missingSheets = requiredSheets.filter((sheet) => !workbook.SheetNames.includes(sheet));
 
     if (missingSheets.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Missing required sheets: ${missingSheets.join(', ')}. L3 is optional.`,
-        },
-        { status: 400 }
-      );
+      return jsonError(`Missing required sheets: ${missingSheets.join(', ')}. L3 is optional.`, { status: 400 });
     }
 
     const dataDictionary: DataDictionary = {
@@ -498,7 +490,7 @@ export async function POST(request: NextRequest) {
       L3_fields: dataDictionary.L3.reduce((sum, t) => sum + t.fields.length, 0),
     };
 
-    return NextResponse.json({
+    return jsonSuccess({
       success: errors.length === 0,
       message: errors.length === 0
         ? `Successfully parsed data dictionary: ${stats.L1_tables} L1, ${stats.L2_tables} L2, ${stats.L3_tables} L3 tables`
@@ -526,12 +518,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Excel parsing error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: `Error parsing file: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

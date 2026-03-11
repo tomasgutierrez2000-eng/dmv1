@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { discoverIngredient, discoverIngredients, getTableRelationships } from '@/lib/metric-library/ingredient-discovery';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -8,10 +9,7 @@ export async function GET(req: NextRequest) {
   const layer = searchParams.get('layer') as 'L1' | 'L2' | 'L3' | null;
 
   if (!table || !field) {
-    return NextResponse.json(
-      { error: 'table and field query parameters are required' },
-      { status: 400 }
-    );
+    return jsonError('table and field query parameters are required', { status: 400 });
   }
 
   const ingredient = discoverIngredient({
@@ -21,15 +19,12 @@ export async function GET(req: NextRequest) {
   });
 
   if (!ingredient) {
-    return NextResponse.json(
-      { error: `Field ${table}.${field} not found in data dictionary` },
-      { status: 404 }
-    );
+    return jsonError(`Field ${table}.${field} not found in data dictionary`, { status: 404 });
   }
 
   const relationships = getTableRelationships(table);
 
-  return NextResponse.json({ ingredient, relationships });
+  return jsonSuccess({ ingredient, relationships });
 }
 
 export async function POST(req: NextRequest) {
@@ -41,18 +36,12 @@ export async function POST(req: NextRequest) {
     }>;
 
     if (!Array.isArray(body) || body.length === 0) {
-      return NextResponse.json(
-        { error: 'Body must be a non-empty array of { table, field, layer? }' },
-        { status: 400 }
-      );
+      return jsonError('Body must be a non-empty array of { table, field, layer? }', { status: 400 });
     }
 
     const ingredients = discoverIngredients(body);
-    return NextResponse.json(ingredients);
+    return jsonSuccess(ingredients);
   } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body' },
-      { status: 400 }
-    );
+    return jsonError('Invalid JSON body', { status: 400 });
   }
 }

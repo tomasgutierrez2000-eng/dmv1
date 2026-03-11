@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jsonError, normalizeCaughtError } from '@/lib/api-response';
 import path from 'path';
 import fs from 'fs';
 import { tableKeyToDbTable } from '@/lib/db-table-mapping';
@@ -23,40 +24,32 @@ function escapeSql(val: unknown): string {
 export async function GET(request: NextRequest) {
   const tableKey = request.nextUrl.searchParams.get('tableKey');
   if (!tableKey) {
-    return NextResponse.json({ error: 'Missing tableKey' }, { status: 400 });
+    return jsonError('Missing tableKey', { status: 400 });
   }
 
   const dbTable = tableKeyToDbTable(tableKey);
   if (!dbTable) {
-    return NextResponse.json({ error: 'Invalid tableKey' }, { status: 400 });
+    return jsonError('Invalid tableKey', { status: 400 });
   }
 
   let entry: { columns: string[]; rows: unknown[][] };
 
   if (tableKey.startsWith('L3.')) {
     if (!fs.existsSync(L3_SAMPLE_DATA_PATH)) {
-      return NextResponse.json(
-        { error: 'L3 sample data not found. Run scripts to generate L3 sample data.' },
-        { status: 404 }
-      );
+      return jsonError('L3 sample data not found. Run scripts to generate L3 sample data.', { status: 404 });
     }
     try {
       const raw = fs.readFileSync(L3_SAMPLE_DATA_PATH, 'utf-8');
       const data = JSON.parse(raw) as Record<string, { columns?: string[]; rows?: unknown[][] }>;
       const e = data[tableKey];
       if (!e || !Array.isArray(e.columns) || !Array.isArray(e.rows)) {
-        return NextResponse.json(
-          { error: `No sample data for table ${tableKey}` },
-          { status: 404 }
-        );
+        return jsonError(`No sample data for table ${tableKey}`, { status: 404 });
       }
       entry = { columns: e.columns, rows: e.rows };
     } catch (err) {
       console.error('L3 sample data read error:', err);
-      return NextResponse.json(
-        { error: 'Sample data unavailable' },
-        { status: 500 }
-      );
+      const normalized = normalizeCaughtError(err);
+      return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
     }
   } else {
     const isL2 = tableKey.startsWith('L2.');
@@ -64,10 +57,7 @@ export async function GET(request: NextRequest) {
     const hint = isL2 ? 'npx tsx scripts/l2/generate.ts' : 'npx tsx scripts/l1/generate.ts';
 
     if (!fs.existsSync(samplePath)) {
-      return NextResponse.json(
-        { error: `Sample data not generated. Run: ${hint}` },
-        { status: 404 }
-      );
+      return jsonError(`Sample data not generated. Run: ${hint}`, { status: 404 });
     }
 
     try {
@@ -75,18 +65,13 @@ export async function GET(request: NextRequest) {
       const data = JSON.parse(raw) as Record<string, { columns?: string[]; rows?: unknown[][] }>;
       const e = data[tableKey];
       if (!e || !Array.isArray(e.columns) || !Array.isArray(e.rows)) {
-        return NextResponse.json(
-          { error: `No sample data for table ${tableKey}` },
-          { status: 404 }
-        );
+        return jsonError(`No sample data for table ${tableKey}`, { status: 404 });
       }
       entry = { columns: e.columns, rows: e.rows };
     } catch (err) {
       console.error('Sample data read error:', err);
-      return NextResponse.json(
-        { error: 'Sample data unavailable' },
-        { status: 500 }
-      );
+      const normalized = normalizeCaughtError(err);
+      return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
     }
   }
 

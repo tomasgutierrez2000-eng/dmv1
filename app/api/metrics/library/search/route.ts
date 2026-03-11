@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import {
   getDomains,
   getParentMetrics,
   getVariants,
 } from '@/lib/metric-library/store';
+import { jsonSuccess } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = (searchParams.get('q') ?? '').trim().toLowerCase();
   if (!q) {
-    return NextResponse.json({ parents: [], variants: [] });
+    return jsonSuccess({ parents: [], variants: [] });
   }
 
   const parents = getParentMetrics();
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
   const matchedParents = parents.filter(matchParent);
   const matchedVariants = variants.filter(matchVariant);
 
-  return NextResponse.json({
+  return jsonSuccess({
     parents: matchedParents.map((p) => ({
       ...p,
       domain_names: (p.domain_ids ?? [])

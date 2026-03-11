@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 import path from 'path';
 import fs from 'fs';
 
@@ -12,15 +13,12 @@ export async function GET(
   const { layer } = await params;
   const layerUpper = (layer || '').toUpperCase();
   if (layerUpper !== 'L1' && layerUpper !== 'L2') {
-    return NextResponse.json({ error: 'Invalid layer. Use L1 or L2.' }, { status: 400 });
+    return jsonError('Invalid layer. Use L1 or L2.', { status: 400 });
   }
 
   const samplePath = layerUpper === 'L2' ? L2_SAMPLE_DATA_PATH : L1_SAMPLE_DATA_PATH;
   if (!fs.existsSync(samplePath)) {
-    return NextResponse.json(
-      { error: `Sample data not generated for ${layerUpper}. Run: npx tsx scripts/${layerUpper.toLowerCase()}/generate.ts` },
-      { status: 404 }
-    );
+    return jsonError(`Sample data not generated for ${layerUpper}. Run: npx tsx scripts/${layerUpper.toLowerCase()}/generate.ts`, { status: 404 });
   }
 
   const data = JSON.parse(fs.readFileSync(samplePath, 'utf-8')) as Record<
@@ -38,5 +36,5 @@ export async function GET(
     }
   }
 
-  return NextResponse.json(filtered);
+  return jsonSuccess(filtered);
 }

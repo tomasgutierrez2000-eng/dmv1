@@ -1,5 +1,5 @@
-import OverviewContent from '@/components/overview/OverviewContent';
+import { redirect } from 'next/navigation';
 
-export default function OverviewPage() {
-  return <OverviewContent />;
+export default function OverviewRedirect() {
+  redirect('/');
 }

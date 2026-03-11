@@ -1,4 +1,5 @@
 import DynamicMetricLineage from '@/components/metric-library/DynamicMetricLineage';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 import { getCatalogueItem, getCatalogueItems } from '@/lib/metric-library/store';
 import { getMetricById } from '@/lib/metrics-calculation/registry';
 import { generateLineage } from '@/lib/lineage-generator';
@@ -56,5 +57,17 @@ export default async function MetricLineagePage({ params }: PageProps) {
 
   const l3Metric = resolveL3Metric(item.executable_metric_id);
 
-  return <DynamicMetricLineage item={item} l3Metric={l3Metric} />;
+  return (
+    <>
+      <div className="bg-[#0a0a0a] border-b border-white/10 px-6 py-3">
+        <Breadcrumb items={[
+          { label: 'Home', href: '/' },
+          { label: 'Metrics', href: '/metrics/library' },
+          { label: item.item_name, href: `/metrics/library/${encodeURIComponent(item.item_id)}` },
+          { label: 'Lineage' },
+        ]} />
+      </div>
+      <DynamicMetricLineage item={item} l3Metric={l3Metric} />
+    </>
+  );
 }

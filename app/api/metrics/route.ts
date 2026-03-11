@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getMergedMetrics, readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
 import type { L3Metric, DashboardPage } from '@/data/l3-metrics';
 import { normalizeMetric, PAGES, validateMetric } from '@/lib/metrics-calculation';
 import { getParentMetric, upsertParentMetric, saveVariant } from '@/lib/metric-library/store';
 import type { MetricVariant, ParentMetric } from '@/lib/metric-library/types';
-import { jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 export type MetricSource = 'builtin' | 'custom';
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   if (id) result = withSource.filter(m => m.id === id);
   else if (page && PAGES.includes(page as DashboardPage)) result = withSource.filter(m => m.page === page);
 
-  return NextResponse.json(result);
+  return jsonSuccess(result);
 }
 
 /** POST: create a new custom metric */
@@ -99,5 +99,5 @@ export async function POST(request: NextRequest) {
     // Library write is best-effort; metric was already saved successfully.
   }
 
-  return NextResponse.json({ ...metric, source: 'custom' });
+  return jsonSuccess({ ...metric, source: 'custom' });
 }

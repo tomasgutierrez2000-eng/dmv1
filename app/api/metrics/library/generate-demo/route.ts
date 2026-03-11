@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { getCatalogueItems, upsertCatalogueItem } from '@/lib/metric-library/store';
-import { jsonSuccess, jsonError } from '@/lib/api-response';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 const execFileAsync = promisify(execFile);
 
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       persisted: persist,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return jsonError(`Demo generation failed: ${message}`);
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

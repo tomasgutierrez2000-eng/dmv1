@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { jsonSuccess } from '@/lib/api-response';
 import { getEnvKeyInfo, getEnvVar } from '@/lib/env';
 
 /**
@@ -23,7 +23,7 @@ export async function GET() {
         ? 'Using Claude'
         : 'Using Gemini'
     : 'No agent backend configured';
-  return NextResponse.json({
+  return jsonSuccess({
     ok,
     provider,
     passwordRequired,

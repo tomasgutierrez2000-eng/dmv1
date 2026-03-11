@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import {
   LIBRARY_SHEET_NAMES,
   REQUIRED_COLUMNS,
@@ -16,6 +16,7 @@ import {
   addVariant,
 } from '@/lib/metric-library/store';
 import type { MetricDomain, ParentMetric, MetricVariant } from '@/lib/metric-library/types';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 const METRIC_CLASSES = ['SOURCED', 'CALCULATED', 'HYBRID'] as const;
 const UNIT_TYPES = ['RATIO', 'PERCENTAGE', 'CURRENCY', 'COUNT', 'RATE', 'ORDINAL', 'DAYS', 'INDEX'] as const;
@@ -58,12 +59,12 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     if (!file) {
-      return NextResponse.json({ error: 'No file provided. Use form field "file".' }, { status: 400 });
+      return jsonError('No file provided. Use form field "file".', { status: 400 });
     }
 
     const name = (file.name ?? '').toLowerCase();
     if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
-      return NextResponse.json({ error: 'File must be .xlsx or .xls' }, { status: 400 });
+      return jsonError('File must be .xlsx or .xls', { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     const hasParents = getSheet(wb, LIBRARY_SHEET_NAMES.PARENT_METRICS, xlsxForSheet) !== null;
     const hasVariants = getSheet(wb, LIBRARY_SHEET_NAMES.VARIANTS, xlsxForSheet) !== null;
     if (!hasDomains && !hasParents && !hasVariants) {
-      return NextResponse.json({ error: 'Workbook must contain Domains, ParentMetrics, or Variants sheet.' }, { status: 400 });
+      return jsonError('Workbook must contain Domains, ParentMetrics, or Variants sheet.', { status: 400 });
     }
 
     const errors: ImportResult['errors'] = [];
@@ -251,9 +252,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: errors.length === 0, created, updated, errors: errors.length > 0 ? errors : undefined });
+    return jsonSuccess({ success: errors.length === 0, created, updated, errors: errors.length > 0 ? errors : undefined });
   } catch (err) {
     console.error('Metric library import error:', err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Import failed.' }, { status: 500 });
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

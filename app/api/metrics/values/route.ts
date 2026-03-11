@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getMergedMetrics } from '@/lib/metrics-store';
 import {
   CONSUMPTION_LEVELS,
@@ -9,6 +9,7 @@ import {
   getMetricValueRowsFromDb,
   type MetricValueRow,
 } from '@/lib/metrics-value-store';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
 const DEFAULT_RUN_VERSION = 'default';
 
@@ -31,10 +32,7 @@ export async function GET(request: NextRequest) {
   const lobId = searchParams.get('lobId') || undefined;
 
   if (!level || !CONSUMPTION_LEVELS.includes(level)) {
-    return NextResponse.json(
-      { error: `level is required and must be one of: ${CONSUMPTION_LEVELS.join(', ')}` },
-      { status: 400 }
-    );
+    return jsonError(`level is required and must be one of: ${CONSUMPTION_LEVELS.join(', ')}`, { status: 400 });
   }
 
   const trimmedMetricId = typeof metricId === 'string' ? metricId.trim() : '';
@@ -66,7 +64,7 @@ export async function GET(request: NextRequest) {
   // Single metric
   if (trimmedMetricId) {
     const meta = metaMap.get(trimmedMetricId) ?? { id: trimmedMetricId, name: trimmedMetricId };
-    return NextResponse.json({
+    return jsonSuccess({
       metric: meta,
       level,
       asOfDate: rows[0]?.as_of_date ?? asOfDateUsed,
@@ -89,7 +87,7 @@ export async function GET(request: NextRequest) {
   }));
 
   const firstAsOf = results[0]?.rows?.[0]?.as_of_date ?? asOfDateUsed;
-  return NextResponse.json({
+  return jsonSuccess({
     level,
     asOfDate: firstAsOf,
     runVersion,

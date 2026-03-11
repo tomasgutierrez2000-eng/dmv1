@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getMergedMetrics } from '@/lib/metrics-store';
 import { resolveAllowedDimensions } from '@/lib/metrics-calculation';
 import type { CalculationDimension } from '@/data/l3-metrics';
 import { CALCULATION_DIMENSION_LABELS, DIMENSION_TO_CONSUMPTION_LEVEL } from '@/data/l3-metrics';
+import { jsonSuccess } from '@/lib/api-response';
 
 export interface ConsumableMetricItem {
   id: string;
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  return NextResponse.json({ metrics });
+  return jsonSuccess({ metrics });
 }
 
 function getDefaultRollupSummary(): string {

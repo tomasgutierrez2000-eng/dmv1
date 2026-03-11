@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import {
   readDataDictionary,
   writeDataDictionary,
@@ -7,6 +7,7 @@ import {
   type DataDictionaryField,
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 type Layer = 'L1' | 'L2' | 'L3';
 
@@ -29,7 +30,7 @@ export async function PATCH(
     const fieldName = decodeFieldName(encodedFieldName || '');
 
     if (!isValidLayer(layer)) {
-      return NextResponse.json({ error: 'Invalid layer. Use L1, L2, or L3.' }, { status: 400 });
+      return jsonError('Invalid layer. Use L1, L2, or L3.', { status: 400 });
     }
 
     const body = (await request.json().catch(() => ({}))) as {
@@ -40,40 +41,25 @@ export async function PATCH(
 
     const dd = readDataDictionary();
     if (!dd) {
-      return NextResponse.json(
-        { error: 'Data dictionary not found. Load or create a model first.' },
-        { status: 404 }
-      );
+      return jsonError('Data dictionary not found. Load or create a model first.', { status: 404 });
     }
 
     const table = findTable(dd, layer, tableName);
     if (!table) {
-      return NextResponse.json(
-        { error: `Table "${tableName}" not found in ${layer}.` },
-        { status: 404 }
-      );
+      return jsonError(`Table "${tableName}" not found in ${layer}.`, { status: 404 });
     }
 
     const fieldIndex = table.fields.findIndex((f) => f.name === fieldName);
     if (fieldIndex === -1) {
-      return NextResponse.json(
-        { error: `Field "${fieldName}" not found in table "${tableName}".` },
-        { status: 404 }
-      );
+      return jsonError(`Field "${fieldName}" not found in table "${tableName}".`, { status: 404 });
     }
 
     const newName = typeof body.name === 'string' ? body.name.trim().replace(/\s+/g, '_') : fieldName;
     if (!newName) {
-      return NextResponse.json(
-        { error: 'Field name cannot be empty.' },
-        { status: 400 }
-      );
+      return jsonError('Field name cannot be empty.', { status: 400 });
     }
     if (newName !== fieldName && table.fields.some((f) => f.name === newName)) {
-      return NextResponse.json(
-        { error: `Field "${newName}" already exists in table "${tableName}".` },
-        { status: 409 }
-      );
+      return jsonError(`Field "${newName}" already exists in table "${tableName}".`, { status: 409 });
     }
 
     const existing = table.fields[fieldIndex];
@@ -115,7 +101,7 @@ export async function PATCH(
       ...(newName !== fieldName ? { oldFieldName: fieldName } : {}),
     });
 
-    return NextResponse.json({
+    return jsonSuccess({
       success: true,
       message: `Field "${fieldName}" updated.`,
       fieldName: newName,
@@ -123,10 +109,8 @@ export async function PATCH(
     });
   } catch (error) {
     console.error('Update field error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to update field.' },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }
 
@@ -140,30 +124,21 @@ export async function DELETE(
     const fieldName = decodeFieldName(encodedFieldName || '');
 
     if (!isValidLayer(layer)) {
-      return NextResponse.json({ error: 'Invalid layer. Use L1, L2, or L3.' }, { status: 400 });
+      return jsonError('Invalid layer. Use L1, L2, or L3.', { status: 400 });
     }
 
     const dd = readDataDictionary();
     if (!dd) {
-      return NextResponse.json(
-        { error: 'Data dictionary not found. Load or create a model first.' },
-        { status: 404 }
-      );
+      return jsonError('Data dictionary not found. Load or create a model first.', { status: 404 });
     }
 
     const table = findTable(dd, layer, tableName);
     if (!table) {
-      return NextResponse.json(
-        { error: `Table "${tableName}" not found in ${layer}.` },
-        { status: 404 }
-      );
+      return jsonError(`Table "${tableName}" not found in ${layer}.`, { status: 404 });
     }
 
     if (!table.fields.some((f) => f.name === fieldName)) {
-      return NextResponse.json(
-        { error: `Field "${fieldName}" not found in table "${tableName}".` },
-        { status: 404 }
-      );
+      return jsonError(`Field "${fieldName}" not found in table "${tableName}".`, { status: 404 });
     }
 
     const updatedTables = dd[layer].map((t) =>
@@ -186,16 +161,14 @@ export async function DELETE(
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'delete-field', layer, tableName, fieldName });
 
-    return NextResponse.json({
+    return jsonSuccess({
       success: true,
       message: `Field "${fieldName}" removed from ${layer}.${tableName}.`,
       sync: { ddlFiles: syncResult.ddlFilesWritten.length, dbApplied: syncResult.dbApplied, ...(syncResult.dbError && { dbError: syncResult.dbError }) },
     });
   } catch (error) {
     console.error('Remove field error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to remove field.' },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

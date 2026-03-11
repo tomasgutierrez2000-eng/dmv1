@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId, isReadOnlyFsError } from '@/lib/metrics-store';
+import { NextRequest } from 'next/server';
+import { readCustomMetrics, writeCustomMetrics, nextCustomMetricId } from '@/lib/metrics-store';
 import { writeModelGaps } from '@/lib/model-gaps-store';
 import type { L3Metric, SourceField } from '@/data/l3-metrics';
 import {
@@ -12,6 +12,7 @@ import {
   parseToggles,
   validateMetric,
 } from '@/lib/metrics-calculation';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 export interface ImportResult {
   created: string[];
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
   const file = formData.get('file') as File | null;
   const replace = String(formData.get('replace') ?? '').toLowerCase() === 'true';
   if (!file) {
-    return NextResponse.json({ error: 'No file provided. Use form field "file".' }, { status: 400 });
+    return jsonError('No file provided. Use form field "file".', { status: 400 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
       const data = JSON.parse(buffer.toString('utf-8'));
       const list = data.metrics ?? (Array.isArray(data) ? data : []);
       if (!Array.isArray(list)) {
-        return NextResponse.json({ error: 'JSON must have a "metrics" array or be an array of metrics.' }, { status: 400 });
+        return jsonError('JSON must have a "metrics" array or be an array of metrics.', { status: 400 });
       }
       for (let i = 0; i < list.length; i++) {
         const m = list[i];
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
         toImport.push(normalized);
       }
     } catch (e) {
-      return NextResponse.json({ error: 'Invalid JSON: ' + (e instanceof Error ? e.message : 'parse error') }, { status: 400 });
+      return jsonError('Invalid JSON: ' + (e instanceof Error ? e.message : 'parse error'), { status: 400 });
     }
   } else if (isExcel) {
     const XLSX = await import('xlsx');
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     const metricsSheet = wb.Sheets['Metrics'] || wb.Sheets[wb.SheetNames[0]];
     const sourceSheet = wb.Sheets['SourceFields'] || wb.Sheets[wb.SheetNames[1]];
     if (!metricsSheet) {
-      return NextResponse.json({ error: 'Excel must have a "Metrics" sheet.' }, { status: 400 });
+      return jsonError('Excel must have a "Metrics" sheet.', { status: 400 });
     }
     const metricsRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(metricsSheet, { defval: '' });
     const sourceRows = sourceSheet ? XLSX.utils.sheet_to_json<Record<string, unknown>>(sourceSheet, { defval: '' }) : [];
@@ -173,19 +174,17 @@ export async function POST(request: NextRequest) {
       }
     }
   } else {
-    return NextResponse.json({ error: 'Unsupported file type. Use .json or .xlsx' }, { status: 400 });
+    return jsonError('Unsupported file type. Use .json or .xlsx', { status: 400 });
   }
 
   if (replace) {
     try {
       writeCustomMetrics(toImport);
     } catch (err) {
-      return NextResponse.json(
-        { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
-        { status: 503 }
-      );
+      const normalized = normalizeCaughtError(err);
+      return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
     }
-    return NextResponse.json({
+    return jsonSuccess({
       created: [],
       updated: [],
       errors: [...errors],
@@ -215,10 +214,8 @@ export async function POST(request: NextRequest) {
   try {
     writeCustomMetrics(custom);
   } catch (err) {
-    return NextResponse.json(
-      { error: isReadOnlyFsError(err) ? 'Saving metrics is not available on this deployment (read-only filesystem).' : 'Failed to write metrics.' },
-      { status: 503 }
-    );
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
-  return NextResponse.json(result);
+  return jsonSuccess(result);
 }

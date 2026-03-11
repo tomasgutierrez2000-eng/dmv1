@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jsonError } from '@/lib/api-response';
 import path from 'path';
 import fs from 'fs';
 
@@ -19,14 +20,14 @@ const ALLOWED_FILES = [
 export async function GET(request: NextRequest) {
   const file = request.nextUrl.searchParams.get('file');
   if (!file) {
-    return NextResponse.json({ error: 'Missing file query parameter' }, { status: 400 });
+    return jsonError('Missing file query parameter', { status: 400 });
   }
   if (!ALLOWED_FILES.includes(file)) {
-    return NextResponse.json({ error: 'File not allowed' }, { status: 403 });
+    return jsonError('File not allowed', { status: 403 });
   }
   const filePath = path.join(L3_SQL_DIR, file);
   if (!fs.existsSync(filePath)) {
-    return NextResponse.json({ error: 'File not found' }, { status: 404 });
+    return jsonError('File not found', { status: 404 });
   }
   const content = fs.readFileSync(filePath, 'utf-8');
   const contentType = file.endsWith('.md') ? 'text/markdown' : 'text/plain';

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
 import { readDataDictionary } from '@/lib/data-dictionary';
 import type { DataDictionary } from '@/lib/data-dictionary';
 import type { DataModel, Relationship, Field } from '@/types/model';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 function dataDictionaryToModel(dd: DataDictionary): DataModel {
   const tables: DataModel['tables'] = {};
@@ -86,19 +86,14 @@ export async function GET() {
   try {
     const dd = readDataDictionary();
     if (!dd) {
-      return NextResponse.json(
-        { error: 'Data dictionary not found. Load or create a model first (e.g. upload Excel or add tables in Data Model).' },
-        { status: 404 }
-      );
+      return jsonError('Data dictionary not found. Load or create a model first (e.g. upload Excel or add tables in Data Model).', { status: 404 });
     }
 
     const model = dataDictionaryToModel(dd);
-    return NextResponse.json(model);
+    return jsonSuccess(model);
   } catch (error) {
     console.error('Data model from dictionary error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to build model from data dictionary.' },
-      { status: 500 }
-    );
+    const normalized = normalizeCaughtError(error);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }

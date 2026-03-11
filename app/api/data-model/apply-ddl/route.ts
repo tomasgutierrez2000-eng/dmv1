@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { readDataDictionary } from '@/lib/data-dictionary';
 import { buildFullDdl, executeDdl } from '@/lib/data-model-sync';
-import { jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 /**
  * Apply DDL: dry run returns SQL; execute runs against PostgreSQL when DATABASE_URL is set.
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const fullSql = buildFullDdl(dd);
 
     if (!fullSql.trim()) {
-      return NextResponse.json({
+      return jsonSuccess({
         success: true,
         dryRun,
         message: 'No DDL to run. Add tables to the data model first.',
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (dryRun) {
-      return NextResponse.json({
+      return jsonSuccess({
         success: true,
         dryRun: true,
         sql: fullSql,
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const result = await executeDdl(dd);
     if (result.ok) {
-      return NextResponse.json({
+      return jsonSuccess({
         success: true,
         dryRun: false,
         message: 'DDL executed successfully.',
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const status = result.error?.includes('DATABASE_URL') || result.error?.includes('pg')
       ? 503
       : 500;
-    return NextResponse.json({ ok: false, error: result.error ?? 'DDL execution failed', sql: fullSql }, { status });
+    return jsonError(result.error ?? 'DDL execution failed', { status });
   } catch (error) {
     console.error('Apply DDL error:', error);
     const { message, details, status } = normalizeCaughtError(error);

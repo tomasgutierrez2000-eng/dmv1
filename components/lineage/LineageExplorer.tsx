@@ -449,7 +449,7 @@ export default function LineageExplorer() {
       {/* ── Sidebar: Page Navigation ── */}
       <aside className="w-56 flex-shrink-0 border-r border-white/[0.04] bg-[#080c16] flex flex-col">
         <div className="p-4 border-b border-white/[0.04]">
-          <Link href="/overview" className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-sm mb-3">
+          <Link href="/" className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-sm mb-3">
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </Link>

@@ -514,7 +514,7 @@ export default function DataModelPage() {
                   <span>Interactive Visualizer</span>
                 </Link>
                 <Link
-                  href="/overview"
+                  href="/"
                   className="px-4 py-2 bg-pwc-gray text-pwc-white rounded-lg hover:bg-pwc-gray-light text-sm"
                 >
                   Overview

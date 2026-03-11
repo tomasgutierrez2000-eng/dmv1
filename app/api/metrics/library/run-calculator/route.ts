@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { jsonSuccess, jsonError } from '@/lib/api-response';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 const execFileAsync = promisify(execFile);
 
@@ -40,11 +40,8 @@ export async function POST(req: NextRequest) {
     // ── Local python3 fallback ──────────────────────────────────
     return runViaLocalPython(metric_id, dimension, as_of_date);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (message.includes('ENOENT') || message.includes('python3')) {
-      return jsonError('Python runtime not available in this environment. Set CALC_ENGINE_URL to use Cloud Run.', { status: 503 });
-    }
-    return jsonError(`Calculator execution failed: ${message}`);
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 }
 

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getVariants, addVariant, getVariant } from '@/lib/metric-library/store';
-import { isReadOnlyFsError } from '@/lib/metrics-store';
 import type { MetricVariant } from '@/lib/metric-library/types';
+import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     domain_id,
     executable_only,
   });
-  return NextResponse.json(variants);
+  return jsonSuccess(variants);
 }
 
 export async function POST(request: NextRequest) {
@@ -24,17 +24,14 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    return jsonError('Invalid JSON body', { status: 400 });
   }
 
   const variant_id = (body.variant_id ?? '').trim();
   const parent_metric_id = (body.parent_metric_id ?? '').trim();
   const variant_name = (body.variant_name ?? '').trim();
   if (!variant_id || !parent_metric_id || !variant_name) {
-    return NextResponse.json(
-      { error: 'variant_id, parent_metric_id, and variant_name are required' },
-      { status: 400 }
-    );
+    return jsonError('variant_id, parent_metric_id, and variant_name are required', { status: 400 });
   }
 
   try {
@@ -46,13 +43,10 @@ export async function POST(request: NextRequest) {
       status: body.status ?? 'DRAFT',
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to add variant';
-    if (isReadOnlyFsError(err)) {
-      return NextResponse.json({ error: msg }, { status: 503 });
-    }
-    return NextResponse.json({ error: msg }, { status: 400 });
+    const normalized = normalizeCaughtError(err);
+    return jsonError(normalized.message, { status: normalized.status, details: normalized.details, code: normalized.code });
   }
 
   const variant = getVariant(variant_id);
-  return NextResponse.json(variant ?? body);
+  return jsonSuccess(variant ?? body);
 }

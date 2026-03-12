@@ -267,6 +267,8 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_profitability_snapshot" (
     "interest_expense_amt" NUMERIC(18,2),
     "interest_income_amt" NUMERIC(18,2),
     "profitability_snapshot_id" BIGINT,
+    "avg_nonearning_assets_amt" NUMERIC(18,2),
+    "equity_allocation_pct" NUMERIC(10,6),
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -548,7 +550,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_financial_snapshot" (
     "as_of_date" DATE NOT NULL,
     "noi_amt" NUMERIC(18,2),
     "total_debt_service_amt" NUMERIC(18,2),
-    "revenue_amt" NUMERIC(18,2),
     "operating_expense_amt" NUMERIC(18,2),
     "ebitda_amt" NUMERIC(18,2),
     "interest_expense_amt" NUMERIC(18,2),
@@ -667,6 +668,7 @@ CREATE TABLE IF NOT EXISTS "l2"."counterparty" (
     "created_ts" TIMESTAMP,
     "region_code" VARCHAR(20),
     "revenue_amt" NUMERIC(18,2),
+    "pricing_tier_code" VARCHAR(20),
     PRIMARY KEY ("counterparty_id")
 );
 
@@ -777,7 +779,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_master" (
     "effective_start_date" DATE,
     "effective_end_date" DATE,
     "is_current_flag" BOOLEAN,
-    "revenue_amt" NUMERIC(18,2),
     PRIMARY KEY ("facility_id")
 );
 

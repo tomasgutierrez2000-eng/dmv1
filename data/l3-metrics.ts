@@ -216,7 +216,7 @@ export const DIMENSION_LABELS: Record<string, string> = {
   scenario_id: 'Scenario',
   region_code: 'Region',
   industry_code: 'Industry',
-  risk_tier_code: 'Risk Tier',
+  risk_rating_tier_code: 'Risk Rating Tier',
   limit_status_code: 'Limit Status',
   rating_grade_id: 'Rating Grade',
   risk_mitigant_subtype: 'Risk Mitigant',

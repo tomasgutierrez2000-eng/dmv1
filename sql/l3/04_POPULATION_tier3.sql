@@ -151,7 +151,7 @@ SELECT
     ces.avg_pd_pct, ces.avg_lgd_pct, ces.expected_loss_amt,
     ces.credit_limit_amt,
     ces.total_outstanding_amt,   -- utilized_amt
-    ces.utilization_pct, ces.headroom_amt, ces.risk_tier_code, ces.limit_status_code,
+    ces.utilization_pct, ces.headroom_amt, ces.risk_rating_tier_code, ces.limit_status_code,
     (SELECT COUNT(DISTINCT facility_id) FROM l3.facility_exposure_summary
      WHERE counterparty_id = ces.counterparty_id AND run_version_id = p_run_version_id),
     (SELECT parent_group_code FROM l3.crm_allocation_summary

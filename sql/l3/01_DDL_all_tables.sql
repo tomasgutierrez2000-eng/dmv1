@@ -101,13 +101,14 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_exposure_summary" (
     "credit_limit_amt" NUMERIC(20,4),
     "utilization_pct" NUMERIC(10,6),
     "headroom_amt" NUMERIC(20,4),
-    "risk_tier_code" VARCHAR(30),
+    "risk_rating_tier_code" VARCHAR(30),
     "limit_status_code" VARCHAR(30),
     "region_code" VARCHAR(30),
     "industry_code" VARCHAR(30),
     "rwa_amt" NUMERIC(20,4),
     "rwa_density_pct" NUMERIC(10,6),
     "total_cross_entity_exposure_usd" NUMERIC(18,2),
+    "bank_revenue_amt" NUMERIC(20,4),
     PRIMARY KEY ("counterparty_exposure_summary_sk")
 );
 
@@ -536,6 +537,7 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_profitability_summary" (
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     "return_on_rwa_pct" NUMERIC(10,6),
+    "equity_allocation_pct" NUMERIC(10,6),
     PRIMARY KEY ("lob_profitability_summary_sk")
 );
 
@@ -1273,7 +1275,6 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_financial_calc" (
     "ltv_pct" NUMERIC(10,6),
     "net_income_amt" NUMERIC(20,4),
     "total_debt_service_amt" NUMERIC(20,4),
-    "revenue_amt" NUMERIC(20,4),
     "interest_expense_amt" NUMERIC(20,4),
     "interest_income_amt" NUMERIC(20,4),
     "avg_earning_assets_amt" NUMERIC(20,4),

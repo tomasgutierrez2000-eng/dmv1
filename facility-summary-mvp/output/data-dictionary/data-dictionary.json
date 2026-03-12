@@ -1036,7 +1036,7 @@
       "fields": [
         {
           "name": "limit_rule_id",
-          "description": "PK \u2014 surrogate identifier for the approved limit rule",
+          "description": "PK — surrogate identifier for the approved limit rule",
           "category": "Limits & Thresholds",
           "why_required": "Unique key for FK references from limit_utilization_event and limit_threshold",
           "pk_fk": {
@@ -1073,7 +1073,7 @@
           "name": "as_of_date",
           "description": "Snapshot date for the limit definition",
           "category": "Limits & Thresholds",
-          "why_required": "Temporal partitioning \u2014 supports historical limit analysis",
+          "why_required": "Temporal partitioning — supports historical limit analysis",
           "data_type": "DATE"
         },
         {
@@ -1087,14 +1087,14 @@
           "name": "effective_from_date",
           "description": "Date the limit became effective",
           "category": "Limits & Thresholds",
-          "why_required": "Limit lifecycle \u2014 determines when limit applies",
+          "why_required": "Limit lifecycle — determines when limit applies",
           "data_type": "DATE"
         },
         {
           "name": "effective_to_date",
           "description": "Date the limit expires (NULL = currently active)",
           "category": "Limits & Thresholds",
-          "why_required": "Limit lifecycle \u2014 determines when limit no longer applies",
+          "why_required": "Limit lifecycle — determines when limit no longer applies",
           "data_type": "DATE"
         },
         {
@@ -1108,7 +1108,7 @@
           "name": "limit_amount_usd",
           "description": "Approved limit amount in USD",
           "category": "Limits & Thresholds",
-          "why_required": "The limit value \u2014 set by credit policy; used as denominator for utilization %",
+          "why_required": "The limit value — set by credit policy; used as denominator for utilization %",
           "data_type": "NUMERIC(18,2)"
         },
         {
@@ -1155,7 +1155,7 @@
       "fields": [
         {
           "name": "limit_threshold_id",
-          "description": "PK \u2014 unique threshold boundary record",
+          "description": "PK — unique threshold boundary record",
           "category": "Limits & Thresholds",
           "why_required": "Unique identifier for each threshold band definition",
           "pk_fk": {
@@ -1166,7 +1166,7 @@
         },
         {
           "name": "limit_rule_id",
-          "description": "FK to limit_rule \u2014 links threshold bands to a specific limit",
+          "description": "FK to limit_rule — links threshold bands to a specific limit",
           "category": "Limits & Thresholds",
           "why_required": "Associates threshold boundaries with approved limits",
           "pk_fk": {
@@ -1200,14 +1200,14 @@
         },
         {
           "name": "active_flag",
-          "description": "Y/N \u2014 whether this threshold is currently in effect",
+          "description": "Y/N — whether this threshold is currently in effect",
           "category": "Limits & Thresholds",
           "why_required": "Filters to current active thresholds",
           "data_type": "BOOLEAN"
         },
         {
           "name": "direction",
-          "description": "CEILING or FLOOR \u2014 indicates if limit is a cap or a minimum",
+          "description": "CEILING or FLOOR — indicates if limit is a cap or a minimum",
           "category": "Limits & Thresholds",
           "why_required": "Determines whether inner/outer thresholds are above or below limit",
           "data_type": "VARCHAR(100)"
@@ -1506,7 +1506,7 @@
       "fields": [
         {
           "name": "managed_segment_id",
-          "description": "PK \u2014 unique identifier for the managed segment node",
+          "description": "PK — unique identifier for the managed segment node",
           "category": "Business Taxonomy",
           "why_required": "Unique node identifier for LoB hierarchy resolution",
           "pk_fk": {
@@ -1633,7 +1633,7 @@
           "name": "tree_level",
           "description": "Numeric level in hierarchy (1=Top/Org, 2=L1 LoB, 3=L2 LoB, etc.)",
           "category": "Business Taxonomy",
-          "why_required": "Drives aggregation level for dashboards (L1\u2013L8+)",
+          "why_required": "Drives aggregation level for dashboards (L1–L8+)",
           "data_type": "INTEGER"
         }
       ]
@@ -1645,7 +1645,7 @@
       "fields": [
         {
           "name": "product_node_id",
-          "description": "PK \u2014 unique identifier for the product taxonomy node",
+          "description": "PK — unique identifier for the product taxonomy node",
           "category": "Product Taxonomy",
           "why_required": "Unique node identifier for product hierarchy resolution",
           "pk_fk": {
@@ -1875,7 +1875,7 @@
       "fields": [
         {
           "name": "portfolio_id",
-          "description": "PK \u2014 unique portfolio identifier",
+          "description": "PK — unique portfolio identifier",
           "category": "Portfolio",
           "why_required": "Unique key for FK references from facility_master",
           "pk_fk": {
@@ -1912,21 +1912,21 @@
         },
         {
           "name": "active_flag",
-          "description": "Y/N \u2014 whether this portfolio is currently active",
+          "description": "Y/N — whether this portfolio is currently active",
           "category": "Portfolio",
           "why_required": "Filters to active portfolios for current reporting",
           "data_type": "BOOLEAN"
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 LoB alignment for this portfolio",
+          "description": "FK to enterprise_business_taxonomy — LoB alignment for this portfolio",
           "category": "Portfolio",
           "why_required": "Links portfolio to LoB hierarchy for cross-dimensional analysis",
           "data_type": "BIGINT"
         },
         {
           "name": "parent_portfolio_id",
-          "description": "FK to parent portfolio (nullable \u2014 for hierarchical portfolio structures)",
+          "description": "FK to parent portfolio (nullable — for hierarchical portfolio structures)",
           "category": "Portfolio",
           "why_required": "Supports portfolio hierarchy if sub-portfolios exist",
           "data_type": "BIGINT"
@@ -2315,14 +2315,14 @@
         },
         {
           "name": "active_flag",
-          "description": "Y/N \u2014 whether this rating grade is currently in use",
+          "description": "Y/N — whether this rating grade is currently in use",
           "category": "Ratings",
           "why_required": "Filters to active grades for current reporting",
           "data_type": "BOOLEAN"
         },
         {
           "name": "default_flag",
-          "description": "Y/N \u2014 whether this grade represents a default state (e.g., D, C, internal 5)",
+          "description": "Y/N — whether this grade represents a default state (e.g., D, C, internal 5)",
           "category": "Ratings",
           "why_required": "Identifies default-grade counterparties for default counts, NPL analysis, and credit event triggers",
           "data_type": "BOOLEAN"
@@ -2336,7 +2336,7 @@
         },
         {
           "name": "investment_grade_flag",
-          "description": "Y/N \u2014 whether this grade is considered investment grade",
+          "description": "Y/N — whether this grade is considered investment grade",
           "category": "Ratings",
           "why_required": "Supports IG vs non-IG segmentation for portfolio analysis (Page 7) and deterioration flags",
           "data_type": "BOOLEAN"
@@ -2350,7 +2350,7 @@
         },
         {
           "name": "rating_grade_id",
-          "description": "PK \u2014 unique identifier for each rating grade entry",
+          "description": "PK — unique identifier for each rating grade entry",
           "category": "Ratings",
           "why_required": "Unique key for FK references from counterparty_rating_observation",
           "data_type": "BIGINT"
@@ -2359,7 +2359,7 @@
           "name": "rating_notch",
           "description": "Standardized numeric notch across all scales (1 = best, N = worst). Internal and external ratings are mapped to the same notch scale to enable direct comparison",
           "category": "Ratings",
-          "why_required": "Core crosswalk field \u2014 JOIN on rating_notch across scale_types to compare internal vs external ratings; drives the Risk Rating Toggle, migration analysis, and upgrade/downgrade counts",
+          "why_required": "Core crosswalk field — JOIN on rating_notch across scale_types to compare internal vs external ratings; drives the Risk Rating Toggle, migration analysis, and upgrade/downgrade counts",
           "data_type": "VARCHAR(100)"
         },
         {
@@ -2973,7 +2973,7 @@
       "fields": [
         {
           "name": "rate_index_id",
-          "description": "PK \u2014 rate index identifier",
+          "description": "PK — rate index identifier",
           "category": "Market Data",
           "why_required": "Primary key",
           "pk_fk": {
@@ -3056,7 +3056,7 @@
           "name": "fallback_to_index_id",
           "description": "FK to replacement rate index",
           "category": "Market Data",
-          "why_required": "Legacy \u2192 fallback mapping",
+          "why_required": "Legacy → fallback mapping",
           "data_type": "BIGINT"
         },
         {
@@ -3103,7 +3103,7 @@
       "fields": [
         {
           "name": "ledger_account_id",
-          "description": "PK \u2014 GL account identifier",
+          "description": "PK — GL account identifier",
           "category": "General Ledger",
           "why_required": "Primary key",
           "pk_fk": {
@@ -3184,7 +3184,7 @@
         },
         {
           "name": "is_reconciliation_account_flag",
-          "description": "Y/N \u2014 subject to risk-to-finance recon",
+          "description": "Y/N — subject to risk-to-finance recon",
           "category": "General Ledger",
           "why_required": "Scope recon checks",
           "data_type": "BOOLEAN"
@@ -3214,7 +3214,7 @@
           "name": "regulatory_report_code",
           "description": "Mapping to regulatory report line items",
           "category": "General Ledger",
-          "why_required": "GL \u2192 reg report mapping",
+          "why_required": "GL → reg report mapping",
           "data_type": "VARCHAR(20)"
         },
         {
@@ -3226,7 +3226,7 @@
         },
         {
           "name": "is_balance_sheet_flag",
-          "description": "Y/N \u2014 whether this account appears on the balance sheet",
+          "description": "Y/N — whether this account appears on the balance sheet",
           "category": "General Ledger",
           "why_required": "BS vs P&L classification",
           "data_type": "BOOLEAN"
@@ -5143,7 +5143,7 @@
           "name": "calculation_rule_id",
           "description": "Links definition to executable logic when applicable.",
           "category": "Uncategorized",
-          "why_required": "FK \u2192 L1.rule_registry.rule_id",
+          "why_required": "FK → L1.rule_registry.rule_id",
           "data_type": "BIGINT"
         },
         {
@@ -5186,7 +5186,7 @@
           "name": "source_system_id",
           "description": "Lineage.",
           "category": "Uncategorized",
-          "why_required": "FK \u2192 L1.source_system_registry.source_system_id",
+          "why_required": "FK → L1.source_system_registry.source_system_id",
           "data_type": "BIGINT"
         },
         {
@@ -5635,115 +5635,6 @@
           "data_type": "BOOLEAN"
         }
       ]
-    },
-    {
-      "name": "equity_allocation_config",
-      "layer": "L1",
-      "category": "Capital & Equity",
-      "fields": [
-        {
-          "name": "equity_allocation_config_id",
-          "description": "Surrogate key for equity allocation configuration",
-          "category": "Capital & Equity",
-          "why_required": "Primary key",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "legal_entity_id",
-          "description": "Legal entity this configuration applies to",
-          "category": "Capital & Equity",
-          "why_required": "Scopes config to entity",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L2",
-              "table": "legal_entity",
-              "field": "legal_entity_id"
-            }
-          }
-        },
-        {
-          "name": "allocation_method_code",
-          "description": "Equity allocation method (RWA_PROPORTIONAL, ECONOMIC_CAPITAL, REGULATORY, FLAT, CUSTOM)",
-          "category": "Capital & Equity",
-          "why_required": "Defines allocation methodology",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "allocation_method_name",
-          "description": "Human-readable allocation method name",
-          "category": "Capital & Equity",
-          "data_type": "VARCHAR(200)"
-        },
-        {
-          "name": "allocation_scope_code",
-          "description": "Scope level for allocation (ENTITY, LOB, DESK, PORTFOLIO)",
-          "category": "Capital & Equity",
-          "why_required": "Defines granularity of allocation rule",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "scope_reference_id",
-          "description": "FK to the scoped entity (lob_node_id, desk_id, portfolio_id depending on scope)",
-          "category": "Capital & Equity",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "target_allocation_pct",
-          "description": "Target equity allocation percentage",
-          "category": "Capital & Equity",
-          "why_required": "Defines target allocation",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "min_allocation_pct",
-          "description": "Floor allocation percentage",
-          "category": "Capital & Equity",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "max_allocation_pct",
-          "description": "Ceiling allocation percentage",
-          "category": "Capital & Equity",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "effective_from_date",
-          "description": "Configuration effective start date",
-          "category": "Capital & Equity",
-          "data_type": "DATE"
-        },
-        {
-          "name": "effective_to_date",
-          "description": "Configuration effective end date",
-          "category": "Capital & Equity",
-          "data_type": "DATE"
-        },
-        {
-          "name": "active_flag",
-          "description": "Active indicator",
-          "category": "Capital & Equity",
-          "data_type": "BOOLEAN"
-        },
-        {
-          "name": "created_ts",
-          "description": "Record creation timestamp",
-          "category": "Capital & Equity",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "updated_ts",
-          "description": "Record last update timestamp",
-          "category": "Capital & Equity",
-          "data_type": "TIMESTAMP"
-        }
-      ]
     }
   ],
   "L2": [
@@ -5757,7 +5648,7 @@
           "description": "Surrogate unique position identifier",
           "category": "Position Core",
           "why_required": "Core PK for all position-level facts",
-          "simplification_note": "Simplified from 41\u219228 fields. Removed refs to non-existent L1 tables. All fields are source-system attributes.",
+          "simplification_note": "Simplified from 41→28 fields. Removed refs to non-existent L1 tables. All fields are source-system attributes.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -5920,7 +5811,7 @@
           "name": "lgd_estimate",
           "description": "LGD estimate (source-system output)",
           "category": "Position Core",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Loss Given Default from credit risk model (e.g., downturn LGD model). Requires collateral recovery assumptions, seniority, jurisdiction-specific recovery data not available in this data model.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Loss Given Default from credit risk model (e.g., downturn LGD model). Requires collateral recovery assumptions, seniority, jurisdiction-specific recovery data not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "VARCHAR(100)"
         },
@@ -5933,7 +5824,7 @@
         },
         {
           "name": "netting_set_id",
-          "description": "Netting set identifier (nullable \u2014 derivatives/SFT only)",
+          "description": "Netting set identifier (nullable — derivatives/SFT only)",
           "category": "Position Core",
           "why_required": "Links position to netting set for close-out netting",
           "data_type": "BIGINT"
@@ -5949,7 +5840,7 @@
           "name": "pd_estimate",
           "description": "Point-in-time PD estimate (source-system output)",
           "category": "Position Core",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 PIT Probability of Default from credit risk model (e.g., Moody's RiskCalc, internal IRB model). Cannot be re-derived without underlying obligor financials, market data, and model calibration.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — PIT Probability of Default from credit risk model (e.g., Moody's RiskCalc, internal IRB model). Cannot be re-derived without underlying obligor financials, market data, and model calibration.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "VARCHAR(100)"
         },
@@ -6070,7 +5961,7 @@
           "name": "ccf",
           "description": "Credit conversion factor",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Credit Conversion Factor from regulatory/internal model. Basel-prescribed or model-based CCF for off-balance sheet items. Mapped by exposure type and regulatory approach (SA vs IRB).",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Credit Conversion Factor from regulatory/internal model. Basel-prescribed or model-based CCF for off-balance sheet items. Mapped by exposure type and regulatory approach (SA vs IRB).",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "NUMERIC(5,4)"
         },
@@ -6120,7 +6011,7 @@
           "name": "haircut_applied_pct",
           "description": "Haircut applied percentage",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Supervisory or model-based haircut from collateral management system. Depends on asset type, holding period, and volatility assumptions.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Supervisory or model-based haircut from collateral management system. Depends on asset type, holding period, and volatility assumptions.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "NUMERIC(10,4)"
         },
@@ -6156,7 +6047,7 @@
           "name": "pfe",
           "description": "Potential future exposure",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 SA-CCR Potential Future Exposure from risk engine. Requires supervisory factors, hedging set decomposition, delta adjustments not available in this data model.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — SA-CCR Potential Future Exposure from risk engine. Requires supervisory factors, hedging set decomposition, delta adjustments not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "VARCHAR(100)"
         },
@@ -6185,7 +6076,7 @@
           "name": "replacement_cost",
           "description": "Replacement cost",
           "category": "Position Detail",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 SA-CCR replacement cost from risk engine. Requires trade-level Greeks, market data curves, and close-out netting logic not available in this data model.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — SA-CCR replacement cost from risk engine. Requires trade-level Greeks, market data curves, and close-out netting logic not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "NUMERIC(18,2)"
         },
@@ -6293,7 +6184,7 @@
       "fields": [
         {
           "name": "attribution_id",
-          "description": "PK \u2014 unique counterparty exposure attribution",
+          "description": "PK — unique counterparty exposure attribution",
           "category": "Exposure",
           "why_required": "Primary key",
           "simplification_note": "L2 review new table",
@@ -6332,7 +6223,7 @@
         },
         {
           "name": "counterparty_id",
-          "description": "FK to counterparty \u2014 party receiving exposure",
+          "description": "FK to counterparty — party receiving exposure",
           "category": "Exposure",
           "why_required": "SCCL target",
           "simplification_note": "L2 review new table",
@@ -6386,7 +6277,7 @@
         },
         {
           "name": "counterparty_role_code",
-          "description": "FK to counterparty_role_dim \u2014 role",
+          "description": "FK to counterparty_role_dim — role",
           "category": "Exposure",
           "why_required": "Role-based rules",
           "simplification_note": "L2 review new table",
@@ -6530,7 +6421,7 @@
           "description": "Surrogate identifier",
           "category": "Exposure",
           "why_required": "Unique row identity",
-          "simplification_note": "Facility-level gross/net exposure snapshot. Atomic: 1 facility \u00d7 1 date. CRM-adjusted net_exposure_usd computed here. | Atomic gross exposure. Net exposure and coverage ratios computed in L3 by joining collateral_snapshot.",
+          "simplification_note": "Facility-level gross/net exposure snapshot. Atomic: 1 facility × 1 date. CRM-adjusted net_exposure_usd computed here. | Atomic gross exposure. Net exposure and coverage ratios computed in L3 by joining collateral_snapshot.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -6560,7 +6451,7 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 primary LoB",
+          "description": "FK to enterprise_business_taxonomy — primary LoB",
           "category": "Exposure",
           "why_required": "Page 7 LoB breakdown",
           "simplification_note": "L2 review addition",
@@ -6717,7 +6608,7 @@
           "name": "collateral_held_usd",
           "description": "Collateral held against netting set (USD)",
           "category": "Exposure",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Collateral held per netting set from margin/collateral management system. Reflects CSA terms, margin calls, and collateral eligibility.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Collateral held per netting set from margin/collateral management system. Reflects CSA terms, margin calls, and collateral eligibility.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "NUMERIC(18,2)"
         },
@@ -6732,7 +6623,7 @@
           "name": "gross_mtm_usd",
           "description": "Gross mark-to-market (USD) before netting",
           "category": "Exposure",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Gross MTM from front-office/risk engine. Sum of position-level MTMs within netting set before netting benefit.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Gross MTM from front-office/risk engine. Sum of position-level MTMs within netting set before netting benefit.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "NUMERIC(18,2)"
         },
@@ -6748,14 +6639,14 @@
           "description": "Surrogate identifier",
           "category": "Exposure",
           "why_required": "Unique row identity",
-          "simplification_note": "Netting-set-level exposure for derivatives/SFT. Atomic: 1 netting_set \u00d7 1 date. Separate from facility exposure. | RE-ADDED. Atomic netting set exposure record from the CCR/SA-CCR engine. Now anchored to L1.netting_set. Each row = 1 netting set \u00d7 1 date. Records gross/net MTM, PFE, EAD, and collateral held per netting set.",
+          "simplification_note": "Netting-set-level exposure for derivatives/SFT. Atomic: 1 netting_set × 1 date. Separate from facility exposure. | RE-ADDED. Atomic netting set exposure record from the CCR/SA-CCR engine. Now anchored to L1.netting_set. Each row = 1 netting set × 1 date. Records gross/net MTM, PFE, EAD, and collateral held per netting set.",
           "data_type": "BIGINT"
         },
         {
           "name": "pfe_usd",
           "description": "Potential future exposure (USD)",
           "category": "Exposure",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 PFE from SA-CCR/IMM engine. Requires add-on calculations with supervisory factors, hedging set decomposition per BCBS standards.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — PFE from SA-CCR/IMM engine. Requires add-on calculations with supervisory factors, hedging set decomposition per BCBS standards.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "NUMERIC(18,2)"
         },
@@ -6774,7 +6665,7 @@
       "fields": [
         {
           "name": "attribution_id",
-          "description": "PK \u2014 unique attribution record",
+          "description": "PK — unique attribution record",
           "category": "Business Segment Attribution",
           "why_required": "Primary key",
           "simplification_note": "L2 review new table",
@@ -6997,7 +6888,7 @@
           "name": "original_valuation_usd",
           "description": "Original valuation amount (USD)",
           "category": "CRM",
-          "why_required": "Facility drawer \u2014 original vs current comparison",
+          "why_required": "Facility drawer — original vs current comparison",
           "data_type": "NUMERIC(18,2)"
         },
         {
@@ -7006,6 +6897,137 @@
           "category": "CRM",
           "why_required": "Identifies exposure reattribution",
           "data_type": "BOOLEAN"
+        }
+      ]
+    },
+    {
+      "name": "cash_flow",
+      "layer": "L2",
+      "category": "Cash Flows",
+      "fields": [
+        {
+          "name": "cash_flow_id",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "Facility identifier (nullable)",
+          "category": "Cash Flows",
+          "why_required": "Links to facility for facility-level cash flow views",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          },
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "cash_flow_date",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "DATE"
+        },
+        {
+          "name": "cash_flow_type",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "amount",
+          "description": "",
+          "category": "Exposure & collateral snapshots",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "currency_code",
+          "description": "Cash flow currency",
+          "category": "Cash Flows",
+          "why_required": "FX context",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot as-of date",
+          "category": "Cash Flows",
+          "why_required": "12-month history",
+          "data_type": "DATE"
+        },
+        {
+          "name": "contractual_amt",
+          "description": "Contractual amount (local currency)",
+          "category": "Cash Flows",
+          "why_required": "Source-system contractual cash flow",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "contractual_amt_usd",
+          "description": "Contractual amount in USD",
+          "category": "Cash Flows",
+          "why_required": "Standardized reporting",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "Counterparty identifier",
+          "category": "Cash Flows",
+          "why_required": "Counterparty-level cash flow aggregation for drawer",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "flow_date",
+          "description": "Cash flow date",
+          "category": "Cash Flows",
+          "why_required": "Temporal bucketing for maturity profile",
+          "data_type": "DATE"
+        },
+        {
+          "name": "flow_direction",
+          "description": "Inflow (+) or Outflow (−)",
+          "category": "Cash Flows",
+          "why_required": "Net cash flow calculation",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "flow_id",
+          "description": "Unique cash flow identifier",
+          "category": "Cash Flows",
+          "why_required": "PK",
+          "simplification_note": "RE-ADDED. Atomic cash flow record per position/facility per flow date. Required for Counterparty Details Drawer (Page 2 — Cashflows) and liquidity/maturity profiling. Simplified from original 16→12 fields — removed dangling FKs (run_control, source_system_registry, lob_node).",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "flow_type",
+          "description": "Cash flow type (INTEREST / PRINCIPAL / FEE / OTHER)",
+          "category": "Cash Flows",
+          "why_required": "Cash flow classification",
+          "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "position_id",
+          "description": "Position identifier (nullable)",
+          "category": "Cash Flows",
+          "why_required": "Links to originating position",
+          "data_type": "BIGINT"
         }
       ]
     },
@@ -7364,13 +7386,6 @@
           "data_type": "NUMERIC(18,2)"
         },
         {
-          "name": "equity_allocation_pct",
-          "description": "Equity allocation percentage applied to this facility from entity total equity",
-          "category": "Financial Metrics",
-          "why_required": "Input to allocated_equity_amt calculation; audit trail for equity allocation methodology",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
           "name": "avg_earning_assets_amt",
           "description": "Average earning assets (NIM denominator)",
           "category": "Financial Metrics",
@@ -7497,10 +7512,10 @@
         },
         {
           "name": "contribution_id",
-          "description": "PK \u2014 unique contribution record",
+          "description": "PK — unique contribution record",
           "category": "Limits",
           "why_required": "Primary key",
-          "simplification_note": "Line-item breakdown of what contributes to a limit's utilization. Child of limit_utilization_event \u2014 decomposes the total into per-facility/counterparty amounts. | L2 review new table",
+          "simplification_note": "Line-item breakdown of what contributes to a limit's utilization. Child of limit_utilization_event — decomposes the total into per-facility/counterparty amounts. | L2 review new table",
           "data_type": "BIGINT"
         },
         {
@@ -7531,7 +7546,7 @@
           "description": "Limit definition identifier",
           "category": "Limits",
           "why_required": "Links to limit being monitored",
-          "simplification_note": "FK renamed: limit_definition \u2192 limit_rule",
+          "simplification_note": "FK renamed: limit_definition → limit_rule",
           "pk_fk": {
             "is_pk": true,
             "is_composite": true,
@@ -7981,7 +7996,7 @@
           "description": "Credit event identifier",
           "category": "Credit Events",
           "why_required": "Links to credit event",
-          "simplification_note": "Atomic junction: 1 event \u00d7 1 facility.",
+          "simplification_note": "Atomic junction: 1 event × 1 facility.",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -8045,7 +8060,7 @@
       "fields": [
         {
           "name": "breach_id",
-          "description": "PK \u2014 breach within stress test",
+          "description": "PK — breach within stress test",
           "category": "Stress Testing",
           "why_required": "Primary key",
           "simplification_note": "Individual breach details within a stress test execution. Child of stress_test_result. | L2 review new table",
@@ -8303,10 +8318,10 @@
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 LoB node for pipeline deal (replaces inline lob_l1/l2)",
+          "description": "FK to enterprise_business_taxonomy — LoB node for pipeline deal (replaces inline lob_l1/l2)",
           "category": "Deal Pipeline",
           "why_required": "Business Segment grouping",
-          "simplification_note": "CHANGED: lob_l1_name \u2192 lob_segment_id FK",
+          "simplification_note": "CHANGED: lob_l1_name → lob_segment_id FK",
           "data_type": "BIGINT"
         },
         {
@@ -8382,7 +8397,7 @@
         },
         {
           "name": "rating_grade_id",
-          "description": "FK to rating_scale_dim \u2014 maps this observation to the canonical rating grade with standardized rating_notch for cross-scale comparison",
+          "description": "FK to rating_scale_dim — maps this observation to the canonical rating grade with standardized rating_notch for cross-scale comparison",
           "category": "Ratings",
           "why_required": "Core linkage for standardized rating analytics: crosswalk between internal and external scales, migration tracking via rating_notch delta, color coding, IG/non-IG segmentation",
           "simplification_note": "NEW: Enables standardized rating comparison via rating_notch join.",
@@ -8422,7 +8437,7 @@
           "name": "pd_implied",
           "description": "PD implied by rating (if available)",
           "category": "Ratings",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 PD implied by external rating from rating agency mapping tables (e.g., S&P transition matrices). Requires agency-specific calibration.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — PD implied by external rating from rating agency mapping tables (e.g., S&P transition matrices). Requires agency-specific calibration.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "VARCHAR(100)"
         },
@@ -8430,7 +8445,7 @@
           "name": "prior_rating_value",
           "description": "Previous rating value (source-system look-back)",
           "category": "Ratings",
-          "why_required": "MUST BE SOURCE SYSTEM INPUT \u2014 Previous rating value stamped by rating observation system at time of rating action. Source system lookback, not a cross-row derivation.",
+          "why_required": "MUST BE SOURCE SYSTEM INPUT — Previous rating value stamped by rating observation system at time of rating action. Source system lookback, not a cross-row derivation.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
           "data_type": "VARCHAR(20)"
         },
@@ -8450,7 +8465,7 @@
         },
         {
           "name": "rating_type",
-          "description": "INTERNAL or EXTERNAL \u2014 high-level classification of rating source",
+          "description": "INTERNAL or EXTERNAL — high-level classification of rating source",
           "category": "Ratings",
           "why_required": "Drives Risk Rating Toggle; can also be derived from rating_scale_dim.scale_type but kept for direct filtering",
           "simplification_note": "UPDATED: Retained for convenience filtering alongside rating_grade_id FK.",
@@ -8458,7 +8473,7 @@
         },
         {
           "name": "rating_value",
-          "description": "Rating value label (e.g., \"AA\", \"3\") \u2014 RETAINED for source-system traceability but rating_grade_id FK is the governed reference",
+          "description": "Rating value label (e.g., \"AA\", \"3\") — RETAINED for source-system traceability but rating_grade_id FK is the governed reference",
           "category": "Ratings",
           "why_required": "Source-system rating value as ingested; use rating_grade_id for standardized analytics",
           "simplification_note": "UPDATED: Supplementary to rating_grade_id FK. Use FK for joins/analytics.",
@@ -8628,7 +8643,7 @@
       "fields": [
         {
           "name": "exception_id",
-          "description": "PK \u2014 unique exception record",
+          "description": "PK — unique exception record",
           "category": "Exceptions",
           "why_required": "Core PK for exception tracking",
           "simplification_note": "L2 exception lifecycle events (breaches, waivers, overrides). Different from L1 exception_rule which defines standing exception rules. This is the EVENT record when an exception occurs. | NEW table. Mirrors limit structure with severity, lifecycle, and governance attributes.",
@@ -8654,7 +8669,7 @@
         },
         {
           "name": "facility_id",
-          "description": "FK to facility_master \u2014 the facility involved in the exception",
+          "description": "FK to facility_master — the facility involved in the exception",
           "category": "Exceptions",
           "why_required": "Links exception to impacted facility",
           "pk_fk": {
@@ -8670,7 +8685,7 @@
         },
         {
           "name": "counterparty_id",
-          "description": "FK to counterparty \u2014 the counterparty involved",
+          "description": "FK to counterparty — the counterparty involved",
           "category": "Exceptions",
           "why_required": "Links exception to impacted counterparty",
           "pk_fk": {
@@ -8778,12 +8793,12 @@
           "description": "FK to limit_rule if exception relates to a limit breach",
           "category": "Exceptions",
           "why_required": "Links exception to the breached limit",
-          "simplification_note": "FK renamed: limit_definition \u2192 limit_rule",
+          "simplification_note": "FK renamed: limit_definition → limit_rule",
           "data_type": "BIGINT"
         },
         {
           "name": "lob_segment_id",
-          "description": "FK to enterprise_business_taxonomy \u2014 LoB segment where exception occurred",
+          "description": "FK to enterprise_business_taxonomy — LoB segment where exception occurred",
           "category": "Exceptions",
           "why_required": "Links exception to business hierarchy",
           "data_type": "BIGINT"
@@ -8835,7 +8850,7 @@
           "description": "Surrogate identifier",
           "category": "Risk Monitoring",
           "why_required": "PK",
-          "simplification_note": "Consolidated flag observations (DETERIORATED, WATCH_LIST, COVENANT_BREACH, etc.). 1 row = 1 flag \u00d7 1 entity \u00d7 1 date. | CONSOLIDATED from 2 flag tables. Each row = 1 flag observation for 1 entity.",
+          "simplification_note": "Consolidated flag observations (DETERIORATED, WATCH_LIST, COVENANT_BREACH, etc.). 1 row = 1 flag × 1 entity × 1 date. | CONSOLIDATED from 2 flag tables. Each row = 1 flag observation for 1 entity.",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -9165,6 +9180,12 @@
           "data_type": "NUMERIC(18,2)"
         },
         {
+          "name": "total_assets_amt",
+          "description": "",
+          "category": "Uncategorized",
+          "data_type": "NUMERIC(18,2)"
+        },
+        {
           "name": "total_liabilities_amt",
           "description": "",
           "category": "Uncategorized",
@@ -9257,6 +9278,12 @@
               "field": "counterparty_id"
             }
           }
+        },
+        {
+          "name": "pd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "lgd_pct",
@@ -15424,12 +15451,6 @@
           "data_type": "NUMERIC(20,4)"
         },
         {
-          "name": "equity_allocation_pct",
-          "description": "Aggregated equity allocation percentage for this LOB",
-          "category": "Business Segment Summary",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
           "name": "nim_pct",
           "description": "",
           "category": "Business Segment Summary",
@@ -18485,7 +18506,7 @@
     {
       "name": "calc_audit_log",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Calculation Engine",
       "fields": [
         {
           "name": "audit_id",
@@ -18596,7 +18617,7 @@
     {
       "name": "calc_run",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Calculation Engine",
       "fields": [
         {
           "name": "run_id",
@@ -18712,7 +18733,7 @@
     {
       "name": "calc_validation_result",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Calculation Engine",
       "fields": [
         {
           "name": "validation_id",
@@ -18798,7 +18819,7 @@
     {
       "name": "metric_result",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Calculation Engine",
       "fields": [
         {
           "name": "result_id",
@@ -18978,6 +18999,2791 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "facility_derived",
+      "layer": "L3",
+      "category": "Dashboard Consumption",
+      "fields": [
+        {
+          "name": "facility_derived_sk",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "legal_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "credit_agreement_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "facility_type",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "legal_entity_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_node_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "lob_l1_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l2_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l3_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "country_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "region_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "industry_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "maturity_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "origination_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "contract_origination_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "pricing_tier_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "fr2590_category_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "participating_counterparty_ids",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "is_active_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "facility_active_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "is_syndicated_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "is_deteriorated_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "delinquent_payment_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "has_cross_entity_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "pricing_exception_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "amendment_event_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "amendment_status_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "amendment_type_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "utilization_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "dpd_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "maturity_bucket_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "origination_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "exception_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "risk_mitigant_subtype_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "mitigant_category",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "criticized_portfolio_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "committed_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "outstanding_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "unfunded_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_capital_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "expected_drawdown_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "principal_payment_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "current_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "original_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "cross_entity_exposure_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "contractual_cashflow_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "number_of_loans",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "expected_loss_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lgd_estimate_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_overdue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "delinquency_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "dscr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "all_in_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "base_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "fee_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "spread_bps",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "cost_of_funds_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocation_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "revenue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "operating_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "fees_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_equity_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "avg_earning_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "nim_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roe_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "return_on_rwa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_tenor_months",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "days_until_maturity",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "counterparty_derived",
+      "layer": "L3",
+      "category": "Dashboard Consumption",
+      "fields": [
+        {
+          "name": "counterparty_derived_sk",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "legal_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "credit_agreement_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "legal_entity_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_node_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "lob_l1_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l2_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l3_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "country_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "region_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "industry_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "maturity_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "pricing_tier_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "participating_counterparty_ids",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "is_active_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "is_deteriorated_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "delinquent_payment_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "has_cross_entity_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "amendment_status_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "utilization_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "dpd_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "criticized_portfolio_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "risk_rating_tier_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "external_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "internal_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "limit_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "ext_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "ext_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "int_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "int_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "committed_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "outstanding_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "unfunded_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "expected_drawdown_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "current_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "original_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "cross_entity_exposure_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "contractual_cashflow_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "limit_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "number_of_loans",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "number_of_facilities",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "expected_loss_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lgd_estimate_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_overdue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "tangible_net_worth_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "delinquency_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "dscr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "exception_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "pd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lgd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "fccr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "all_in_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "base_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "spread_bps",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "cost_of_funds_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocation_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "revenue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "operating_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "fees_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_equity_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "avg_earning_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "nim_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roe_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "return_on_rwa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_tenor_months",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "desk_derived",
+      "layer": "L3",
+      "category": "Dashboard Consumption",
+      "fields": [
+        {
+          "name": "desk_derived_sk",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "hierarchy_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "lob_node_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "legal_entity_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l1_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l2_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l3_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "region_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "industry_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "facility_type",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "is_deteriorated_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "delinquent_payment_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "pricing_exception_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "amendment_status_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "amendment_type_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "utilization_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "dpd_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "maturity_bucket_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "origination_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "exception_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "risk_mitigant_subtype_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "mitigant_category",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "criticized_portfolio_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "risk_rating_tier_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "external_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "internal_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "limit_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "ext_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "ext_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "int_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "int_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "committed_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "outstanding_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "unfunded_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_capital_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "expected_drawdown_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "current_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "original_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "cross_entity_exposure_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "contractual_cashflow_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "limit_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "number_of_loans",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "number_of_facilities",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "facility_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "counterparty_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "expected_loss_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lgd_estimate_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_overdue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "tangible_net_worth_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "delinquency_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "dscr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "exception_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "pd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lgd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "fccr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "capital_adequacy_ratio_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "all_in_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "base_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "spread_bps",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "cost_of_funds_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "revenue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "operating_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "fees_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_equity_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "avg_earning_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "nim_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roe_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "return_on_rwa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_tenor_months",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "days_until_maturity",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "origination_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "portfolio_derived",
+      "layer": "L3",
+      "category": "Dashboard Consumption",
+      "fields": [
+        {
+          "name": "portfolio_derived_sk",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "hierarchy_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "lob_node_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "legal_entity_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l1_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l2_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "region_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "industry_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "facility_type",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "is_deteriorated_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "delinquent_payment_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "pricing_exception_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "amendment_status_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "amendment_type_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "utilization_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "dpd_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "maturity_bucket_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "origination_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "exception_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "risk_mitigant_subtype_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "mitigant_category",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "criticized_portfolio_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "risk_rating_tier_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "external_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "internal_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "limit_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "ext_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "ext_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "int_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "int_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "committed_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "outstanding_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "unfunded_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_capital_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "expected_drawdown_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "current_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "original_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "cross_entity_exposure_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "contractual_cashflow_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "limit_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "number_of_loans",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "number_of_facilities",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "facility_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "counterparty_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "expected_loss_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lgd_estimate_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_overdue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "tangible_net_worth_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "delinquency_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "dscr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "exception_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "pd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lgd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "fccr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "capital_adequacy_ratio_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "all_in_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "base_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "spread_bps",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "cost_of_funds_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "revenue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "operating_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "fees_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_equity_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "avg_earning_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "nim_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roe_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "return_on_rwa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_tenor_months",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "segment_derived",
+      "layer": "L3",
+      "category": "Dashboard Consumption",
+      "fields": [
+        {
+          "name": "segment_derived_sk",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "run_version_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "hierarchy_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "lob_node_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "legal_entity_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "lob_l1_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "region_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "industry_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "product_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "facility_type",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "is_deteriorated_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "delinquent_payment_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "pricing_exception_flag",
+          "description": "",
+          "why_required": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "amendment_status_name",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "amendment_type_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "utilization_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "dpd_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "maturity_bucket_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "origination_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "exception_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "risk_mitigant_subtype_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "mitigant_category",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "criticized_portfolio_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "risk_rating_tier_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "external_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "internal_risk_rating",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "limit_status_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "ext_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "ext_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "int_risk_rating_status",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "int_risk_rating_change_steps",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "committed_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "outstanding_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "unfunded_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_capital_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "expected_drawdown_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "current_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "original_valuation_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "cross_entity_exposure_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "contractual_cashflow_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "limit_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "number_of_loans",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "number_of_facilities",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "facility_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "counterparty_count",
+          "description": "",
+          "why_required": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "expected_loss_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lgd_estimate_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_overdue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "tangible_net_worth_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "delinquency_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "rwa_density_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "dscr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "ltv_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "exception_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "pd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lgd_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "fccr_value",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "capital_adequacy_ratio_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "all_in_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "base_rate_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "spread_bps",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "cost_of_funds_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "revenue_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "operating_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_expense_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "interest_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "fees_income_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "allocated_equity_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "avg_earning_assets_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "nim_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "roe_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "return_on_rwa_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "expected_tenor_months",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(12,6)"
+        },
+        {
+          "name": "base_currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -19280,6 +22086,22 @@
     {
       "from_layer": "L2",
       "from_table": "amendment_event",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "cash_flow",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "cash_flow",
       "from_field": "facility_id",
       "to_layer": "L2",
       "to_table": "facility_master",
@@ -20634,6 +23456,14 @@
       "from_field": "crm_type_code",
       "to_table": "crm_type_dim",
       "to_field": "crm_type_code",
+      "from_layer": "L2",
+      "to_layer": "L1"
+    },
+    {
+      "from_table": "cash_flow",
+      "from_field": "maturity_bucket_id",
+      "to_table": "maturity_bucket_dim",
+      "to_field": "maturity_bucket_id",
       "from_layer": "L2",
       "to_layer": "L1"
     },

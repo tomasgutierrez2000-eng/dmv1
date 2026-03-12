@@ -44,6 +44,18 @@ source_tables:
     role: DIMENSION
   - name: is_active_flag
     role: FILTER
+- schema: l3
+  table: facility_exposure_calc
+  alias: fec
+  join_type: LEFT
+  join_on: fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: as_of_date
+    role: FILTER
+  - name: rwa_amt
+    role: MEASURE
 - schema: l1
   table: enterprise_business_taxonomy
   alias: ebt

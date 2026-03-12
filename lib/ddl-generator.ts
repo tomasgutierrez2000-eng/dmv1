@@ -135,6 +135,111 @@ export function buildAlterColumnType(
   return `ALTER TABLE ${quoteId(schema)}.${quoteId(tableName)} ALTER COLUMN ${quoteId(fieldName)} TYPE ${newType} USING ${quoteId(fieldName)}::${newType};`;
 }
 
+/** Abbreviate a table name to fit within constraint name limits. */
+function abbreviateTable(name: string): string {
+  // Common abbreviations for long table names
+  const abbrevs: Record<string, string> = {
+    'credit_agreement': 'ca',
+    'counterparty': 'cp',
+    'facility': 'fac',
+    'collateral': 'coll',
+    'instrument': 'instr',
+    'netting': 'net',
+    'protection': 'prot',
+    'relationship': 'rel',
+    'interdependence': 'interdep',
+    'economic': 'econ',
+    'observation': 'obs',
+    'snapshot': 'snap',
+    'participation': 'part',
+    'allocation': 'alloc',
+    'assignment': 'assign',
+    'contribution': 'contrib',
+    'utilization': 'util',
+    'attribution': 'attr',
+    'delinquency': 'delinq',
+    'profitability': 'profit',
+    'financial': 'fin',
+    'amendment': 'amend',
+    'exposure': 'exp',
+    'agreement': 'agr',
+    'hierarchy': 'hier',
+    'master': 'mstr',
+    'calculation': 'calc',
+    'regulatory': 'reg',
+    'capital': 'cap',
+    'consumption': 'cons',
+    'movement': 'mov',
+    'summary': 'summ',
+    'binding': 'bind',
+    'constraint': 'constr',
+    'portfolio': 'port',
+    'segment': 'seg',
+    'position': 'pos',
+    'quality': 'qual',
+    'impairment': 'impair',
+    'provision': 'prov',
+    'allowance': 'allow',
+    'watchlist': 'watch',
+    'forbearance': 'forb',
+    'category': 'cat',
+    'mitigant': 'mitig',
+    'staging': 'stg',
+    'pipeline': 'pipe',
+    'exception': 'excpt',
+    'approval': 'appr',
+    'payment': 'pay',
+    'ledger': 'ldgr',
+    'journal': 'jrnl',
+    'account': 'acct',
+    'balance': 'bal',
+    'pricing': 'pric',
+    'lender': 'lndr',
+  };
+
+  let result = name;
+  // Apply abbreviations from longest match to shortest
+  const sorted = Object.entries(abbrevs).sort((a, b) => b[0].length - a[0].length);
+  for (const [full, abbr] of sorted) {
+    result = result.replace(new RegExp(full, 'g'), abbr);
+  }
+  return result;
+}
+
+/** Build an FK constraint name that fits within PostgreSQL's 63-char NAMEDATALEN. */
+function fkConstraintName(fromTable: string, fromField: string): string {
+  const base = `fk_${fromTable}_${fromField}`;
+  if (base.length <= 63) return base;
+  // Abbreviate and retry
+  const abbr = `fk_${abbreviateTable(fromTable)}_${fromField}`;
+  if (abbr.length <= 63) return abbr;
+  // Further truncate field name
+  return abbr.substring(0, 63);
+}
+
+/** Build ALTER TABLE ADD CONSTRAINT ... FOREIGN KEY statement. */
+export function buildForeignKey(rel: {
+  from_layer: string;
+  from_table: string;
+  from_field: string;
+  to_layer: string;
+  to_table: string;
+  to_field: string;
+}): string {
+  const fromSchema = rel.from_layer.toLowerCase();
+  const toSchema = rel.to_layer.toLowerCase();
+  const constraintName = fkConstraintName(rel.from_table, rel.from_field);
+  return (
+    `DO $$ BEGIN\n` +
+    `  ALTER TABLE ${quoteId(fromSchema)}.${quoteId(rel.from_table)}\n` +
+    `    ADD CONSTRAINT ${quoteId(constraintName)}\n` +
+    `    FOREIGN KEY (${quoteId(rel.from_field)})\n` +
+    `    REFERENCES ${quoteId(toSchema)}.${quoteId(rel.to_table)} (${quoteId(rel.to_field)});\n` +
+    `EXCEPTION WHEN OTHERS THEN NULL;\n` +
+    `END $$;`
+  );
+}
+
 /** Generate full DDL file content for a layer from data dictionary. */
 export function generateLayerDdl(
   dd: DataDictionary,
@@ -149,7 +254,20 @@ export function generateLayerDdl(
   const body = tables
     .map((t) => `-- ${t.name} (${t.category})\n${buildCreateTable(t, schema)}\n`)
     .join('\n');
-  return header + body;
+
+  // Emit FK constraints for relationships originating from this layer
+  const rels = (dd.relationships || []).filter(
+    (r) => r.from_layer.toUpperCase() === layer
+  );
+  let fkSection = '';
+  if (rels.length > 0) {
+    fkSection =
+      `\n-- Foreign Key Constraints (${layer})\n\n` +
+      rels.map((r) => buildForeignKey(r)).join('\n\n') +
+      '\n';
+  }
+
+  return header + body + fkSection;
 }
 
 /** Generate full L3 DDL (all L3 tables). */

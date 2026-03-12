@@ -1369,3 +1369,67 @@ CREATE TABLE IF NOT EXISTS "l3"."gl_account_balance_calc" (
     "created_ts" TIMESTAMP,
     PRIMARY KEY ("ledger_account_id", "as_of_date")
 );
+
+-- ecl_provision_calc (ECL / IFRS 9)
+CREATE TABLE IF NOT EXISTS "l3"."ecl_provision_calc" (
+    "ecl_provision_id" BIGSERIAL NOT NULL,
+    "facility_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "as_of_date" DATE,
+    "ecl_stage_code" VARCHAR(20),
+    "twelve_month_ecl_amt" NUMERIC(20,4),
+    "lifetime_ecl_amt" NUMERIC(20,4),
+    "provision_amt" NUMERIC(20,4),
+    "lifetime_pd_pct" NUMERIC(10,6),
+    "twelve_month_pd_pct" NUMERIC(10,6),
+    "lgd_pct" NUMERIC(10,6),
+    "ead_amt" NUMERIC(20,4),
+    "stage_transfer_flag" BOOLEAN,
+    "model_code" VARCHAR(20),
+    "currency_code" VARCHAR(20),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("ecl_provision_id")
+);
+
+-- ecl_allowance_movement (ECL / IFRS 9)
+CREATE TABLE IF NOT EXISTS "l3"."ecl_allowance_movement" (
+    "allowance_movement_id" BIGSERIAL NOT NULL,
+    "legal_entity_id" BIGINT,
+    "as_of_date" DATE,
+    "ecl_stage_code" VARCHAR(20),
+    "opening_balance_amt" NUMERIC(20,4),
+    "provision_charge_amt" NUMERIC(20,4),
+    "write_off_amt" NUMERIC(20,4),
+    "recovery_amt" NUMERIC(20,4),
+    "fx_adjustment_amt" NUMERIC(20,4),
+    "stage_transfer_amt" NUMERIC(20,4),
+    "closing_balance_amt" NUMERIC(20,4),
+    "currency_code" VARCHAR(20),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("allowance_movement_id")
+);
+
+-- T69: watchlist_movement_summary (watchlist entry/exit summary by category)
+CREATE TABLE IF NOT EXISTS "l3"."watchlist_movement_summary" (
+    "movement_summary_id" BIGSERIAL NOT NULL,
+    "as_of_date" DATE,
+    "watchlist_category_code" VARCHAR(20),
+    "legal_entity_id" BIGINT,
+    "entry_count" INTEGER,
+    "exit_count" INTEGER,
+    "net_change" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "total_facilities_count" INTEGER,
+    "currency_code" VARCHAR(20),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("movement_summary_id")
+);

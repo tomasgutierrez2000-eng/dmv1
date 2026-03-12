@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-12T03:53:42.863Z",
+  "createdAt": "2026-03-12T05:09:49.928Z",
   "tables": [
     {
       "layer": "L1",
@@ -2483,6 +2483,147 @@
       ]
     },
     {
+      "layer": "L1",
+      "tableName": "ecl_stage_dim",
+      "fields": [
+        {
+          "name": "ecl_stage_code"
+        },
+        {
+          "name": "stage_name"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "ifrs9_stage_mapping"
+        },
+        {
+          "name": "cecl_equivalent"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "impairment_model_dim",
+      "fields": [
+        {
+          "name": "model_code"
+        },
+        {
+          "name": "model_name"
+        },
+        {
+          "name": "regulatory_framework"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "watchlist_category_dim",
+      "fields": [
+        {
+          "name": "watchlist_category_code"
+        },
+        {
+          "name": "category_name"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "severity_ordinal"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L1",
+      "tableName": "forbearance_type_dim",
+      "fields": [
+        {
+          "name": "forbearance_type_code"
+        },
+        {
+          "name": "type_name"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "display_order"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
       "layer": "L2",
       "tableName": "position",
       "fields": [
@@ -3010,6 +3151,9 @@
         },
         {
           "name": "position_id"
+        },
+        {
+          "name": "maturity_bucket_id"
         }
       ]
     },
@@ -3130,6 +3274,9 @@
         },
         {
           "name": "cost_of_funds_pct"
+        },
+        {
+          "name": "pricing_tier"
         }
       ]
     },
@@ -5356,6 +5503,183 @@
         },
         {
           "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "ecl_staging_snapshot",
+      "fields": [
+        {
+          "name": "ecl_staging_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "ecl_stage_code"
+        },
+        {
+          "name": "prior_stage_code"
+        },
+        {
+          "name": "stage_change_date"
+        },
+        {
+          "name": "stage_change_reason"
+        },
+        {
+          "name": "model_code"
+        },
+        {
+          "name": "days_past_due"
+        },
+        {
+          "name": "significant_increase_flag"
+        },
+        {
+          "name": "credit_impaired_flag"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "watchlist_entry",
+      "fields": [
+        {
+          "name": "watchlist_entry_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "watchlist_category_code"
+        },
+        {
+          "name": "entry_date"
+        },
+        {
+          "name": "exit_date"
+        },
+        {
+          "name": "entry_reason"
+        },
+        {
+          "name": "exit_reason"
+        },
+        {
+          "name": "assigned_officer"
+        },
+        {
+          "name": "review_frequency"
+        },
+        {
+          "name": "next_review_date"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "forbearance_event",
+      "fields": [
+        {
+          "name": "forbearance_event_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "forbearance_type_code"
+        },
+        {
+          "name": "event_date"
+        },
+        {
+          "name": "original_maturity_date"
+        },
+        {
+          "name": "modified_maturity_date"
+        },
+        {
+          "name": "original_rate_pct"
+        },
+        {
+          "name": "modified_rate_pct"
+        },
+        {
+          "name": "maturity_extension_months"
+        },
+        {
+          "name": "principal_forgiven_amt"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "approval_date"
+        },
+        {
+          "name": "approved_by"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
         }
       ]
     },
@@ -8007,7 +8331,7 @@
           "name": "created_ts"
         },
         {
-          "name": "is_deteriorated_flag"
+          "name": "is_deteriorated"
         },
         {
           "name": "risk_rating_tier_code"
@@ -8535,7 +8859,13 @@
           "name": "rwa_amt"
         },
         {
+          "name": "exposure_at_default"
+        },
+        {
           "name": "created_ts"
+        },
+        {
+          "name": "lgd_estimate"
         }
       ]
     },
@@ -8557,6 +8887,453 @@
         },
         {
           "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_exposure_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "number_of_facilities"
+        },
+        {
+          "name": "days_until_maturity"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "utilization_status_code"
+        },
+        {
+          "name": "risk_rating_tier_code"
+        },
+        {
+          "name": "limit_status_code"
+        },
+        {
+          "name": "coverage_ratio_pct"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "undrawn_amt"
+        },
+        {
+          "name": "net_exposure_amt"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_financial_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "dscr"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "interest_income_amt"
+        },
+        {
+          "name": "avg_earning_assets_amt"
+        },
+        {
+          "name": "fee_rate_pct"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "interest_coverage_ratio"
+        },
+        {
+          "name": "debt_yield_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "counterparty_rating_calc",
+      "fields": [
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "rating_type"
+        },
+        {
+          "name": "risk_rating_change_steps"
+        },
+        {
+          "name": "rating_change_status_code"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_pricing_calc",
+      "fields": [
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "pricing_exception_flag"
+        },
+        {
+          "name": "pricing_tier_code"
+        },
+        {
+          "name": "fee_rate_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "collateral_calc",
+      "fields": [
+        {
+          "name": "collateral_asset_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "allocated_amount_usd"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "cash_flow_calc",
+      "fields": [
+        {
+          "name": "cash_flow_id"
+        },
+        {
+          "name": "contractual_amt"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "data_quality_score_snapshot",
+      "fields": [
+        {
+          "name": "table_name"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "completeness_score_pct"
+        },
+        {
+          "name": "accuracy_score_pct"
+        },
+        {
+          "name": "timeliness_score_pct"
+        },
+        {
+          "name": "overall_dq_score_pct"
+        },
+        {
+          "name": "total_row_count"
+        },
+        {
+          "name": "null_field_count"
+        },
+        {
+          "name": "anomaly_count"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "stress_test_result",
+      "fields": [
+        {
+          "name": "stress_test_result_id"
+        },
+        {
+          "name": "position_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "scenario_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "stressed_exposure_amt"
+        },
+        {
+          "name": "stressed_expected_loss"
+        },
+        {
+          "name": "capital_impact_pct"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "gl_account_balance_calc",
+      "fields": [
+        {
+          "name": "ledger_account_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "ending_balance_net_amt"
+        },
+        {
+          "name": "period_net_activity_amt"
+        },
+        {
+          "name": "balance_change_pct"
+        },
+        {
+          "name": "created_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "ecl_provision_calc",
+      "fields": [
+        {
+          "name": "ecl_provision_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "ecl_stage_code"
+        },
+        {
+          "name": "twelve_month_ecl_amt"
+        },
+        {
+          "name": "lifetime_ecl_amt"
+        },
+        {
+          "name": "provision_amt"
+        },
+        {
+          "name": "lifetime_pd_pct"
+        },
+        {
+          "name": "twelve_month_pd_pct"
+        },
+        {
+          "name": "lgd_pct"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "stage_transfer_flag"
+        },
+        {
+          "name": "model_code"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "ecl_allowance_movement",
+      "fields": [
+        {
+          "name": "allowance_movement_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "ecl_stage_code"
+        },
+        {
+          "name": "opening_balance_amt"
+        },
+        {
+          "name": "provision_charge_amt"
+        },
+        {
+          "name": "write_off_amt"
+        },
+        {
+          "name": "recovery_amt"
+        },
+        {
+          "name": "fx_adjustment_amt"
+        },
+        {
+          "name": "stage_transfer_amt"
+        },
+        {
+          "name": "closing_balance_amt"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "watchlist_movement_summary",
+      "fields": [
+        {
+          "name": "movement_summary_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "watchlist_category_code"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "entry_count"
+        },
+        {
+          "name": "exit_count"
+        },
+        {
+          "name": "net_change"
+        },
+        {
+          "name": "total_exposure_amt"
+        },
+        {
+          "name": "total_facilities_count"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "created_by"
         }
       ]
     }

@@ -81,6 +81,12 @@ export const L1_TABLE_META: L1TableMeta[] = [
 
   // ── Tables in DB but not in original TS definitions ──
   { name: 'metric_threshold', scd: 'SCD-1', category: 'Limits & Thresholds' },
+
+  // ── ECL / Watchlist / Forbearance (Regulatory Coverage) ──
+  { name: 'ecl_stage_dim', scd: 'SCD-0', category: 'ECL/Impairment' },
+  { name: 'impairment_model_dim', scd: 'SCD-0', category: 'ECL/Impairment' },
+  { name: 'watchlist_category_dim', scd: 'SCD-0', category: 'Watchlist' },
+  { name: 'forbearance_type_dim', scd: 'SCD-0', category: 'Forbearance' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

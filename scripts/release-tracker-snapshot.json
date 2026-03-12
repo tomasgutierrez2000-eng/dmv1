@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-12T03:53:42.863Z",
+  "createdAt": "2026-03-12T04:30:39.349Z",
   "tables": [
     {
       "layer": "L1",
@@ -2483,6 +2483,54 @@
       ]
     },
     {
+      "layer": "L1",
+      "tableName": "equity_allocation_config",
+      "fields": [
+        {
+          "name": "equity_allocation_config_id"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "allocation_method_code"
+        },
+        {
+          "name": "allocation_method_name"
+        },
+        {
+          "name": "allocation_scope_code"
+        },
+        {
+          "name": "scope_reference_id"
+        },
+        {
+          "name": "target_allocation_pct"
+        },
+        {
+          "name": "min_allocation_pct"
+        },
+        {
+          "name": "max_allocation_pct"
+        },
+        {
+          "name": "effective_from_date"
+        },
+        {
+          "name": "effective_to_date"
+        },
+        {
+          "name": "active_flag"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
       "layer": "L2",
       "tableName": "position",
       "fields": [
@@ -3154,6 +3202,9 @@
         },
         {
           "name": "allocated_equity_amt"
+        },
+        {
+          "name": "equity_allocation_pct"
         },
         {
           "name": "avg_earning_assets_amt"
@@ -6715,6 +6766,9 @@
         },
         {
           "name": "allocated_equity_amt"
+        },
+        {
+          "name": "equity_allocation_pct"
         },
         {
           "name": "nim_pct"

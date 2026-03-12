@@ -526,6 +526,7 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_profitability_summary" (
     "avg_earning_assets_amt" NUMERIC(20,4),
     "avg_total_assets_amt" NUMERIC(20,4),
     "allocated_equity_amt" NUMERIC(20,4),
+    "equity_allocation_pct" NUMERIC(10,6),
     "nim_pct" NUMERIC(10,6),
     "roa_pct" NUMERIC(10,6),
     "roe_pct" NUMERIC(10,6),

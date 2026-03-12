@@ -27,11 +27,11 @@ regulatory_references:
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l3
-    table: stress_test_result
+    table: facility_stress_test_calc
     alias: str_res
     join_type: BASE
     fields:
-      - name: expected_loss_usd
+      - name: stressed_expected_loss
         role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
@@ -48,14 +48,14 @@ levels:
   facility:
     aggregation_type: SUM
     formula_text: >
-      SUM(expected_loss_usd) per facility from stress_test_result. Weighted by
+      SUM(stressed_expected_loss) per facility from stress_test_result. Weighted by
       bank share percentage.
     formula_sql: |
       SELECT
         str_res.facility_id AS dimension_key,
-        SUM(str_res.expected_loss_usd
+        SUM(str_res.stressed_expected_loss
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-      FROM l3.stress_test_result str_res
+      FROM l3.facility_stress_test_calc str_res
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = str_res.facility_id
         AND fm.is_active_flag = 'Y'
@@ -67,7 +67,7 @@ levels:
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level expected_loss_usd per counterparty.
+      SUM of facility-level stressed_expected_loss per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
@@ -75,9 +75,9 @@ levels:
       FROM (
         SELECT
           str_res.facility_id AS dimension_key,
-          SUM(str_res.expected_loss_usd
+          SUM(str_res.stressed_expected_loss
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.stress_test_result str_res
+        FROM l3.facility_stress_test_calc str_res
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = str_res.facility_id
           AND fm.is_active_flag = 'Y'
@@ -94,7 +94,7 @@ levels:
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level expected_loss_usd per L3 desk segment.
+      SUM of facility-level stressed_expected_loss per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -102,9 +102,9 @@ levels:
       FROM (
         SELECT
           str_res.facility_id AS dimension_key,
-          SUM(str_res.expected_loss_usd
+          SUM(str_res.stressed_expected_loss
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.stress_test_result str_res
+        FROM l3.facility_stress_test_calc str_res
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = str_res.facility_id
           AND fm.is_active_flag = 'Y'
@@ -123,7 +123,7 @@ levels:
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level expected_loss_usd per L2 portfolio segment.
+      SUM of facility-level stressed_expected_loss per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -131,9 +131,9 @@ levels:
       FROM (
         SELECT
           str_res.facility_id AS dimension_key,
-          SUM(str_res.expected_loss_usd
+          SUM(str_res.stressed_expected_loss
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.stress_test_result str_res
+        FROM l3.facility_stress_test_calc str_res
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = str_res.facility_id
           AND fm.is_active_flag = 'Y'
@@ -154,7 +154,7 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level expected_loss_usd per L1 business segment segment.
+      SUM of facility-level stressed_expected_loss per L1 business segment segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
@@ -162,9 +162,9 @@ levels:
       FROM (
         SELECT
           str_res.facility_id AS dimension_key,
-          SUM(str_res.expected_loss_usd
+          SUM(str_res.stressed_expected_loss
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.stress_test_result str_res
+        FROM l3.facility_stress_test_calc str_res
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = str_res.facility_id
           AND fm.is_active_flag = 'Y'
@@ -193,11 +193,11 @@ output:
 validations:
   - rule_id: "EXP-016-V01"
     type: NOT_NULL
-    description: "No null expected_loss_usd values"
+    description: "No null stressed_expected_loss values"
     severity: ERROR
   - rule_id: "EXP-016-V02"
     type: NON_NEGATIVE
-    description: "expected_loss_usd must be >= 0"
+    description: "stressed_expected_loss must be >= 0"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
@@ -206,7 +206,7 @@ catalogue:
   insight: >
     Risk of loss estimation
   rollup_strategy: "direct-sum"
-  primary_value_field: "expected_loss_usd"
+  primary_value_field: "stressed_expected_loss"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["exposure", "risk-metrics"]
 dashboard_pages: []

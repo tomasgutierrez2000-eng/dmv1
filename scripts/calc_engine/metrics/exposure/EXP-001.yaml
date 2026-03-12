@@ -115,7 +115,7 @@ levels:
         ON fla.facility_id = cs.facility_id
        AND fla.is_current_flag = 'Y'
       WHERE cs.as_of_date = :as_of_date
-      GROUP BY cs.facility_id, fla.bank_share_pct
+      GROUP BY cs.facility_id
   counterparty:
     aggregation_type: SUM
     formula_text: >

@@ -136,18 +136,18 @@
     ]
   },
   "MET-003": {
-    "rollup_strategy": "custom",
+    "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "effective_start_date"
+      "primary_value": "effective_date"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "effective_start_date",
-          "label": "effective_start_date",
+          "field": "effective_date",
+          "label": "effective_date",
           "sample_value": 0,
-          "source_table": "facility_master",
+          "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
         }
       ],
@@ -157,8 +157,8 @@
     },
     "worked_example_columns": [
       {
-        "field": "effective_start_date",
-        "header": "Effective Start Date",
+        "field": "effective_date",
+        "header": "Effective Date",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -610,7 +610,7 @@
     ]
   },
   "MET-022": {
-    "rollup_strategy": "custom",
+    "rollup_strategy": "worst-case",
     "metric_fields": {
       "primary_value": "dpd_bucket_code"
     },
@@ -902,27 +902,27 @@
   "MET-032": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "expected_loss_usd"
+      "primary_value": "stressed_expected_loss"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "expected_loss_usd",
-          "label": "expected_loss_usd",
+          "field": "stressed_expected_loss",
+          "label": "stressed_expected_loss",
           "sample_value": 0,
-          "source_table": "stress_test_result",
+          "source_table": "facility_stress_test_calc",
           "source_layer": "L3"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "SUM(expected_loss_usd) per facility from stress_test_result. Weighted by bank share percentage.\n"
+      "formula_display": "SUM(stressed_expected_loss) per facility from stress_test_result. Weighted by bank share percentage.\n"
     },
     "worked_example_columns": [
       {
-        "field": "expected_loss_usd",
-        "header": "Expected Loss Usd",
+        "field": "stressed_expected_loss",
+        "header": "Stressed Expected Loss",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -1971,14 +1971,6 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
-        },
-        {
-          "op": "*",
-          "field": "rwa_amt",
-          "label": "rwa_amt",
-          "sample_value": 0,
-          "source_table": "facility_exposure_calc",
-          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -1997,12 +1989,6 @@
         "header": "Gross Exposure Usd",
         "format": "number",
         "subtotal_fn": "none"
-      },
-      {
-        "field": "rwa_amt",
-        "header": "Rwa ($)",
-        "format": "currency",
-        "subtotal_fn": "sum"
       },
       {
         "field": "rwa_density_pct",
@@ -2025,8 +2011,8 @@
           "field": "rwa_amt",
           "label": "rwa_amt",
           "sample_value": 0,
-          "source_table": "facility_exposure_calc",
-          "source_layer": "L3"
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],

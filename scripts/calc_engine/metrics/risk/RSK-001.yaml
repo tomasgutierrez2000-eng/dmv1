@@ -22,7 +22,7 @@ source_tables:
   alias: cro
   join_type: BASE
   fields:
-  - name: counterparty_id
+  - name: facility_id
     role: JOIN_KEY
   - name: as_of_date
     role: FILTER
@@ -32,7 +32,7 @@ source_tables:
   table: facility_master
   alias: fm
   join_type: INNER
-  join_on: fm.counterparty_id = cro.counterparty_id
+  join_on: fm.facility_id = cro.facility_id
   fields:
   - name: facility_id
     role: JOIN_KEY
@@ -60,7 +60,7 @@ levels:
     formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
-        cro.risk_rating_status AS metric_value
+        cro.rating_grade_id AS metric_value
       FROM l2.counterparty_rating_observation cro
       INNER JOIN l2.facility_master fm
         ON fm.counterparty_id = cro.counterparty_id

@@ -1343,9 +1343,10 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_snapshot" (
     PRIMARY KEY ("table_name", "as_of_date")
 );
 
--- stress_test_result (Stress Testing)
-CREATE TABLE IF NOT EXISTS "l3"."stress_test_result" (
-    "stress_test_result_id" BIGSERIAL NOT NULL,
+-- facility_stress_test_calc (Stress Testing)
+-- Facility/position-level calculated stress test breakdown (L3 overlay)
+CREATE TABLE IF NOT EXISTS "l3"."facility_stress_test_calc" (
+    "facility_stress_test_calc_id" BIGSERIAL NOT NULL,
     "position_id" BIGINT,
     "facility_id" BIGINT,
     "counterparty_id" BIGINT,
@@ -1356,7 +1357,7 @@ CREATE TABLE IF NOT EXISTS "l3"."stress_test_result" (
     "capital_impact_pct" NUMERIC(10,6),
     "currency_code" VARCHAR(30),
     "created_ts" TIMESTAMP,
-    PRIMARY KEY ("stress_test_result_id")
+    PRIMARY KEY ("facility_stress_test_calc_id")
 );
 
 -- gl_account_balance_calc (General Ledger)

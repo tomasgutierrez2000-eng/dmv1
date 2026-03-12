@@ -73,7 +73,7 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T52', name: 'facility_exposure_calc',             category: 'Exposure & Risk Metrics',                 tier: 1 },
   // T53-T54: Promoted from L2 (entirely computed tables)
   { id: 'T53', name: 'data_quality_score_snapshot',        category: 'Data Quality',                            tier: 1 },
-  { id: 'T54', name: 'stress_test_result',                 category: 'Stress Testing',                          tier: 1 },
+  { id: 'T54', name: 'facility_stress_test_calc',          category: 'Stress Testing',                          tier: 1 },
   // T55-T56: Additional calculated overlay tables (derived fields split from L2 snapshots)
   { id: 'T55', name: 'facility_risk_calc',                  category: 'Exposure & Risk Metrics',                 tier: 1 },
   { id: 'T56', name: 'netting_set_exposure_calc',           category: 'Exposure & Risk Metrics',                 tier: 1 },

@@ -5,7 +5,7 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-003"
 name: "Average Tenor (Years)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
 status: DRAFT
 effective_date: "2026-01-01"
@@ -15,13 +15,14 @@ domain: "reference"
 sub_domain: "master-data"
 metric_class: CALCULATED
 direction: NEUTRAL
-unit_type: DAYS
-display_format: ",.0f"
+unit_type: RATIO
+display_format: ",.1f"
 description: >
   Average tenor of the underlying facilities across exposures. For facility,
   displayed the calculated tenor based on Origination Date ("Effective Date")
-  and Maturity Date ("End Date") and other levels this metric is aggregated as
+  and Maturity Date ("End Date"). At other levels this metric is aggregated as
   an average to represent the average period of the underlying facilities.
+  Calculated from l2.facility_master.maturity_date and origination_date.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
@@ -29,21 +30,9 @@ regulatory_references:
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: deal_pipeline_fact
-    alias: dpf
-    join_type: BASE
-    fields:
-      - name: facility_id
-        role: JOIN_KEY
-      - name: as_of_date
-        role: FILTER
-      - name: expected_tenor_months
-        role: MEASURE
-  - schema: l2
     table: facility_master
     alias: fm
-    join_type: INNER
-    join_on: "fm.facility_id = dpf.facility_id"
+    join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -51,6 +40,10 @@ source_tables:
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
+      - name: origination_date
+        role: MEASURE
+      - name: maturity_date
+        role: MEASURE
       - name: is_active_flag
         role: FILTER
   - schema: l1
@@ -68,102 +61,79 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      For each Facility_ID, [Contract Level Maturity Date]- [Facility Level
-      Effective Date]
+      For each Facility_ID, (Maturity Date - Origination Date) / 365.25
+      to get tenor in years.
     formula_sql: |
       SELECT
-        dpf.facility_id AS dimension_key,
-        dpf.expected_tenor_months AS metric_value
-      FROM l3.deal_pipeline_calc dpf
-      WHERE dpf.as_of_date = :as_of_date
+        fm.facility_id AS dimension_key,
+        ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1) AS metric_value
+      FROM l2.facility_master fm
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.maturity_date IS NOT NULL
+        AND fm.origination_date IS NOT NULL
   counterparty:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      Exposure-weighted average of expected_tenor_months across counterparty
-      facilities.
+      Average of facility-level tenor (years) across counterparty facilities.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          dpf.facility_id AS dimension_key,
-          dpf.expected_tenor_months AS metric_value
-        FROM l3.deal_pipeline_calc dpf
-        WHERE dpf.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1)) AS metric_value
+      FROM l2.facility_master fm
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.maturity_date IS NOT NULL
+        AND fm.origination_date IS NOT NULL
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level expected_tenor_months per L3 desk segment.
+      AVG of facility-level tenor (years) per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          dpf.facility_id AS dimension_key,
-          dpf.expected_tenor_months AS metric_value
-        FROM l3.deal_pipeline_calc dpf
-        WHERE dpf.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1)) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.maturity_date IS NOT NULL
+        AND fm.origination_date IS NOT NULL
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level expected_tenor_months per L2 portfolio segment.
+      AVG of facility-level tenor (years) per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          dpf.facility_id AS dimension_key,
-          dpf.expected_tenor_months AS metric_value
-        FROM l3.deal_pipeline_calc dpf
-        WHERE dpf.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1)) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.maturity_date IS NOT NULL
+        AND fm.origination_date IS NOT NULL
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level expected_tenor_months per L1 business segment segment.
+      AVG of facility-level tenor (years) per L1 business segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          dpf.facility_id AS dimension_key,
-          dpf.expected_tenor_months AS metric_value
-        FROM l3.deal_pipeline_calc dpf
-        WHERE dpf.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1)) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.maturity_date IS NOT NULL
+        AND fm.origination_date IS NOT NULL
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -174,7 +144,7 @@ output:
 validations:
   - rule_id: "REF-003-V01"
     type: NOT_NULL
-    description: "No null expected_tenor_months values"
+    description: "No null tenor values (requires both origination_date and maturity_date)"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
@@ -182,8 +152,8 @@ catalogue:
   abbreviation: "ATY"
   insight: >
     Portfolio maturity profile
-  rollup_strategy: "direct-sum"
-  primary_value_field: "expected_tenor_months"
+  rollup_strategy: "weighted-avg"
+  primary_value_field: "tenor_years"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["reference", "master-data"]
 dashboard_pages: []

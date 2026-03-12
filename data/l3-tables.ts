@@ -80,7 +80,6 @@ export const L3_TABLES: L3TableDef[] = [
   // T57-T61: Layer reassignment overlay tables (derived fields split from L2 per architecture review)
   { id: 'T57', name: 'counterparty_rating_calc',            category: 'Credit Events & Performance',             tier: 1 },
   { id: 'T58', name: 'facility_pricing_calc',               category: 'Facility Analytics',                      tier: 1 },
-  { id: 'T59', name: 'deal_pipeline_calc',                  category: 'Business Segment Summary',                tier: 1 },
   { id: 'T60', name: 'collateral_calc',                     category: 'Credit Risk Mitigation (CRM)',            tier: 1 },
   { id: 'T61', name: 'cash_flow_calc',                      category: 'Cash Flows',                              tier: 1 },
   // T62: GL calculated overlay (derived fields split from L2 gl_account_balance_snapshot)

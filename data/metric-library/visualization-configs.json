@@ -2398,32 +2398,52 @@
     }
   },
   "MET-007": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "weighted-avg",
     "metric_fields": {
-      "primary_value": "expected_tenor_months"
+      "primary_value": "tenor_years"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "expected_tenor_months",
-          "label": "expected_tenor_months",
+          "field": "origination_date",
+          "label": "origination_date",
           "sample_value": 0,
-          "source_table": "deal_pipeline_fact",
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "maturity_date",
+          "label": "maturity_date",
+          "sample_value": 0,
+          "source_table": "facility_master",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
-      "result_format": "number",
-      "formula_display": "For each Facility_ID, [Contract Level Maturity Date]- [Facility Level Effective Date]\n"
+      "result_format": "ratio",
+      "formula_display": "For each Facility_ID, (Maturity Date - Origination Date) / 365.25 to get tenor in years.\n"
     },
     "worked_example_columns": [
       {
-        "field": "expected_tenor_months",
-        "header": "Expected Tenor Months",
+        "field": "origination_date",
+        "header": "Origination Date",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "maturity_date",
+        "header": "Maturity Date",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "tenor_years",
+        "header": "Tenor Years",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },

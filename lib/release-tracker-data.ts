@@ -9,6 +9,19 @@ export interface ReleaseEntry {
 
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
+  // ── 2026-03-12: Auto-detected changes ─────────────────────────
+  { date: '2026-03-12', layer: 'L1', table: 'ledger_account_dim', field: 'is_balance_sheet_flag', changeType: 'Added', rationale: 'Field added to L1.ledger_account_dim' },
+  { date: '2026-03-12', layer: 'L2', table: 'cash_flow', field: 'maturity_bucket_id', changeType: 'Removed', rationale: 'Field removed from L2.cash_flow' },
+  { date: '2026-03-12', layer: 'L2', table: 'facility_pricing_snapshot', field: 'pricing_tier', changeType: 'Removed', rationale: 'Field removed from L2.facility_pricing_snapshot' },
+  { date: '2026-03-12', layer: 'L2', table: 'gl_journal_entry', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-12', layer: 'L2', table: 'gl_account_balance_snapshot', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-12', layer: 'L3', table: 'facility_detail_snapshot', field: 'is_deteriorated', changeType: 'Removed', rationale: 'Field removed from L3.facility_detail_snapshot' },
+  { date: '2026-03-12', layer: 'L3', table: 'gl_account_balance_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
+  { date: '2026-03-12', layer: 'L3', table: 'facility_financial_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
+  { date: '2026-03-12', layer: 'L3', table: 'facility_exposure_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
+  { date: '2026-03-12', layer: 'L3', table: 'data_quality_score_snapshot', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
+  { date: '2026-03-12', layer: 'L3', table: 'stress_test_result', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
+
   // ── 2026-03-10: Auto-detected changes ─────────────────────────
   { date: '2026-03-10', layer: 'L2', table: 'facility_exposure_snapshot', field: 'coverage_ratio_pct', changeType: 'Added', rationale: 'Field added to L2.facility_exposure_snapshot' },
   { date: '2026-03-10', layer: 'L2', table: 'facility_exposure_snapshot', field: 'number_of_loans', changeType: 'Added', rationale: 'Field added to L2.facility_exposure_snapshot' },
@@ -54,7 +67,7 @@ export const RELEASE_ENTRIES: ReleaseEntry[] = [
   { date: '2026-03-10', layer: 'L3', table: 'facility_financial_calc', field: 'interest_rate_sensitivity_pct', changeType: 'Removed', rationale: 'Field removed from L3.facility_financial_calc' },
   { date: '2026-03-10', layer: 'L3', table: 'counterparty_rating_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
   { date: '2026-03-10', layer: 'L3', table: 'facility_pricing_calc', field: 'exception_status_code', changeType: 'Removed', rationale: 'exception_status reverted from L3 back to L2 atomic field' },
-  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
+  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed — Average Tenor metric now calculates from facility_master dates' },
   { date: '2026-03-10', layer: 'L3', table: 'collateral_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
   { date: '2026-03-10', layer: 'L3', table: 'cash_flow_calc', field: '(entire table)', changeType: 'Removed', rationale: 'L3 table removed' },
 
@@ -230,11 +243,6 @@ export const RELEASE_ENTRIES: ReleaseEntry[] = [
   { date: '2026-03-10', layer: 'L3', table: 'facility_pricing_calc', field: 'pricing_tier_code', changeType: 'Added', rationale: 'Field added to new L3.facility_pricing_calc' },
   { date: '2026-03-10', layer: 'L3', table: 'facility_pricing_calc', field: 'fee_rate_pct', changeType: 'Added', rationale: 'Field added to new L3.facility_pricing_calc' },
   { date: '2026-03-10', layer: 'L3', table: 'facility_pricing_calc', field: 'created_ts', changeType: 'Added', rationale: 'Field added to new L3.facility_pricing_calc' },
-  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: '(new table)', changeType: 'Added', rationale: 'New L3 table added' },
-  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: 'deal_id', changeType: 'Added', rationale: 'Field added to new L3.deal_pipeline_calc' },
-  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: 'as_of_date', changeType: 'Added', rationale: 'Field added to new L3.deal_pipeline_calc' },
-  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: 'expected_tenor_months', changeType: 'Added', rationale: 'Field added to new L3.deal_pipeline_calc' },
-  { date: '2026-03-10', layer: 'L3', table: 'deal_pipeline_calc', field: 'created_ts', changeType: 'Added', rationale: 'Field added to new L3.deal_pipeline_calc' },
   { date: '2026-03-10', layer: 'L3', table: 'collateral_calc', field: '(new table)', changeType: 'Added', rationale: 'New L3 table added' },
   { date: '2026-03-10', layer: 'L3', table: 'collateral_calc', field: 'collateral_asset_id', changeType: 'Added', rationale: 'Field added to new L3.collateral_calc' },
   { date: '2026-03-10', layer: 'L3', table: 'collateral_calc', field: 'as_of_date', changeType: 'Added', rationale: 'Field added to new L3.collateral_calc' },

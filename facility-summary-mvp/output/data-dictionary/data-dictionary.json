@@ -64,6 +64,16 @@
           "category": "Counterparty",
           "why_required": "Drives RWA/large exposures treatments",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -123,6 +133,16 @@
           "description": "Audit trail.",
           "category": "Counterparty Participation",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -209,6 +229,11 @@
           "category": "SCCL Grouping",
           "why_required": "Roll-up key for group-level metrics",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -302,6 +327,16 @@
           "category": "SCCL Grouping",
           "why_required": "Lineage",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -383,6 +418,16 @@
           "description": "",
           "category": "Instrument",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -462,6 +507,16 @@
           "description": "",
           "category": "Collateral & CRM",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -548,6 +603,16 @@
           "description": "",
           "category": "Collateral & CRM",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -661,6 +726,16 @@
           "category": "Collateral & CRM",
           "why_required": "For comprehensive approach",
           "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -747,6 +822,16 @@
           "description": "",
           "category": "Collateral & CRM",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -818,6 +903,16 @@
           "description": "",
           "category": "Collateral & CRM",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -895,6 +990,16 @@
           "description": "Lineage.",
           "category": "Collateral & CRM",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1014,6 +1119,16 @@
           "category": "Limits & Thresholds",
           "why_required": "Drives risk tier distribution chart (Page 3) and tier-based analysis",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1127,6 +1242,16 @@
           "category": "Limits & Thresholds",
           "why_required": "Defines where this status band ends",
           "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1239,6 +1364,16 @@
           "category": "Legal Entity",
           "why_required": "Human-readable label",
           "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1347,6 +1482,16 @@
           "category": "Organization",
           "why_required": "Lineage",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1486,6 +1631,16 @@
           "category": "Business Taxonomy",
           "why_required": "Drives aggregation level for dashboards (L1–L8+)",
           "data_type": "INTEGER"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1632,6 +1787,16 @@
           "category": "Product Taxonomy",
           "why_required": "Drives aggregation level for product grouping",
           "data_type": "INTEGER"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1698,6 +1863,16 @@
           "category": "Portfolio",
           "why_required": "Audit trail",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1770,6 +1945,16 @@
           "category": "Portfolio",
           "why_required": "Enables portfolio grouping and filter behavior",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1823,6 +2008,16 @@
           "description": "Audit trail.",
           "category": "Regulatory Mapping",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -1948,6 +2143,16 @@
           "category": "Ratings",
           "why_required": "Lineage",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2074,6 +2279,16 @@
           "category": "Ratings",
           "why_required": "Lineage",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2172,6 +2387,16 @@
           "category": "Ratings",
           "why_required": "Identifies which rating agency or internal model produced the grade; enables filtering and crosswalk joins",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2245,6 +2470,16 @@
           "category": "Ratings",
           "why_required": "Integration key",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2291,6 +2526,26 @@
           "category": "Credit Risk Status",
           "why_required": "Operational gating",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2337,6 +2592,26 @@
           "category": "Credit Risk Status",
           "why_required": "Aggregation bucket",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2391,6 +2666,16 @@
           "description": "Audit trail.",
           "category": "Credit Events / Amendments",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2439,6 +2724,16 @@
           "description": "Audit trail.",
           "category": "Credit Events / Amendments",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2499,6 +2794,26 @@
           "category": "Default Rules",
           "why_required": "Prevents false defaults",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2584,6 +2899,16 @@
           "category": "Exposure Classification",
           "why_required": "Derivative exposure treatment",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2691,6 +3016,16 @@
           "category": "Scenario",
           "why_required": "Supports logic-as-data for scenario application",
           "data_type": "VARCHAR(255)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2751,6 +3086,16 @@
           "description": "Audit trail.",
           "category": "Metrics & Context",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -2881,6 +3226,16 @@
           "category": "Market Data",
           "why_required": "Tenor variant distinction",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3018,6 +3373,16 @@
           "category": "General Ledger",
           "why_required": "Lineage",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3172,6 +3537,26 @@
           "description": "",
           "category": "Date & time",
           "data_type": "INTEGER"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3249,6 +3634,16 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3326,6 +3721,16 @@
           "description": "Framework (LCR/NSFR/BASEL_HAIRCUTS/etc.)",
           "category": "Calendar & Time",
           "why_required": "Supports multiple regulatory bucketing schemes",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
           "data_type": "VARCHAR(100)"
         }
       ]
@@ -3426,6 +3831,16 @@
           "category": "Calendar & Time",
           "why_required": "Drives filing-specific logic",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3514,6 +3929,26 @@
           "category": "Geography",
           "why_required": "Supports jurisdictional rules mapping",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3573,6 +4008,16 @@
           "description": "Lineage for reference data governance.",
           "category": "Geography",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3633,6 +4078,26 @@
           "category": "Currency",
           "why_required": "Determines Basel haircut treatment",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3705,6 +4170,16 @@
           "description": "",
           "category": "Industry",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3784,6 +4259,16 @@
           "category": "Regulatory",
           "why_required": "Basis differs by jurisdiction",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -3848,6 +4333,16 @@
           "description": "BASEL_III, CRR_CRD, PRA, OSFI, APRA",
           "category": "Regulatory",
           "why_required": "Regulatory framework",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
           "data_type": "VARCHAR(100)"
         }
       ]
@@ -4016,6 +4511,16 @@
           "category": "Regulatory",
           "why_required": "Calculation",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4133,6 +4638,16 @@
           "category": "Regulatory",
           "why_required": "Consistent interpretation",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4239,6 +4754,16 @@
           "category": "Models",
           "why_required": "Model risk management control",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4345,6 +4870,16 @@
           "category": "Models",
           "why_required": "Routes rule execution and governance",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4478,6 +5013,16 @@
           "category": "Run Control & Lineage",
           "why_required": "Quantifies breach magnitude",
           "data_type": "NUMERIC(18,4)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4563,6 +5108,16 @@
           "category": "Run Control & Lineage",
           "why_required": "Regulatory context",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4661,6 +5216,11 @@
           "category": "Run Control & Lineage",
           "why_required": "Run lifecycle control and downstream gating",
           "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4728,6 +5288,16 @@
           "category": "Run Control & Lineage",
           "why_required": "Audit trail",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4821,6 +5391,16 @@
           "description": "",
           "category": "Run Control & Lineage",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4925,6 +5505,16 @@
           "description": "Supports controlled evolution of metric definitions.",
           "category": "Uncategorized",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -4972,6 +5562,26 @@
           "description": "Y/N flag indicating if bucket is currently in use",
           "why_required": "Soft-delete support for reference data",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5025,6 +5635,26 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5161,6 +5791,16 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5208,6 +5848,26 @@
           "description": "",
           "why_required": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5255,6 +5915,26 @@
           "description": "",
           "why_required": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5302,6 +5982,26 @@
           "description": "",
           "why_required": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5349,6 +6049,26 @@
           "description": "",
           "why_required": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5435,6 +6155,16 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5476,6 +6206,26 @@
           "name": "active_flag",
           "description": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     },
@@ -5517,6 +6267,265 @@
           "name": "active_flag",
           "description": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "ecl_stage_dim",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "ecl_stage_code",
+          "description": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "stage_name",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "ifrs9_stage_mapping",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "cecl_equivalent",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "display_order",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "active_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "forbearance_type_dim",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "forbearance_type_code",
+          "description": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "type_name",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "display_order",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "active_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "impairment_model_dim",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "model_code",
+          "description": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "model_name",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "regulatory_framework",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "active_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "watchlist_category_dim",
+      "layer": "L1",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "watchlist_category_code",
+          "description": "",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "category_name",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "description",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "severity_ordinal",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "display_order",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "active_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     }
@@ -5729,6 +6738,31 @@
           "description": "",
           "why_required": "",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -6004,6 +7038,36 @@
           "description": "",
           "category": "Position & exposure",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -6109,6 +7173,31 @@
           "why_required": "CRM audit trail",
           "simplification_note": "L2 review new table",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -6308,6 +7397,36 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -6408,6 +7527,36 @@
           "description": "",
           "category": "Exposure & collateral snapshots",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -6493,6 +7642,31 @@
           "description": "",
           "category": "Exposure & collateral snapshots",
           "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -6618,6 +7792,41 @@
           "category": "CRM",
           "why_required": "Identifies exposure reattribution",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -6731,6 +7940,31 @@
           "category": "Cash Flows",
           "why_required": "Links to originating position",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -6871,6 +8105,36 @@
           "name": "dpd_bucket_code",
           "description": "",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -7005,6 +8269,36 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -7102,6 +8396,41 @@
           "why_required": "PK",
           "simplification_note": "Source-system profitability record. NII, NIM, ROA, ROE are same-grain source-system outputs from FTP engine.",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -7189,6 +8518,36 @@
           "why_required": "Facility driver",
           "simplification_note": "L2 review new table",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -7259,6 +8618,36 @@
           "category": "Limits",
           "why_required": "Raw utilization observation",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -7331,6 +8720,31 @@
           "category": "Amendments",
           "why_required": "Ordering",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -7458,6 +8872,31 @@
           "category": "Amendments",
           "why_required": "Recency tracking",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -7552,6 +8991,36 @@
           "category": "Credit Events",
           "why_required": "Recovery tracking",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -7611,6 +9080,36 @@
           "category": "Credit Events",
           "why_required": "Partial impact allocation",
           "data_type": "NUMERIC(10,4)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -7718,6 +9217,36 @@
           "why_required": "Parent result",
           "simplification_note": "L2 review new table",
           "data_type": "BIGINT"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -7868,6 +9397,31 @@
           "category": "Deal Pipeline",
           "why_required": "Toggle view",
           "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -7979,6 +9533,36 @@
           "description": "",
           "category": "Ratings & metrics",
           "data_type": "INTEGER"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -8086,6 +9670,36 @@
           "category": "Metrics",
           "why_required": "Temporal alignment",
           "data_type": "DATE"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -8272,6 +9886,36 @@
           "category": "Exceptions",
           "why_required": "Reference point for severity calculation",
           "data_type": "NUMERIC(18,4)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -8372,6 +10016,26 @@
           "category": "Risk Monitoring",
           "why_required": "Quantified trigger",
           "data_type": "NUMERIC(18,4)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -8489,6 +10153,36 @@
           "description": "",
           "category": "L2",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -8625,6 +10319,36 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -8717,6 +10441,36 @@
           "name": "expected_loss_rate_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -8812,6 +10566,36 @@
           "description": "",
           "why_required": "",
           "data_type": "DATE"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -9075,6 +10859,21 @@
           "name": "duns_global_ultimate",
           "description": "",
           "data_type": "VARCHAR(9)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -9199,6 +10998,21 @@
           "name": "created_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -9331,6 +11145,21 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -9419,6 +11248,26 @@
           "name": "created_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -9665,6 +11514,16 @@
           "description": "",
           "why_required": "",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -9772,6 +11631,21 @@
           "description": "",
           "why_required": "",
           "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -9879,6 +11753,31 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -9974,6 +11873,21 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10044,6 +11958,26 @@
           "name": "created_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -10146,6 +12080,26 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10246,6 +12200,26 @@
           "name": "created_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -10426,6 +12400,21 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10509,6 +12498,31 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -10616,6 +12630,21 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10705,6 +12734,31 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -10824,6 +12878,21 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10895,6 +12964,26 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10951,6 +13040,21 @@
           "name": "updated_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -11041,6 +13145,26 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -11124,6 +13248,26 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -11200,6 +13344,26 @@
           "name": "created_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -11284,6 +13448,26 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -11366,6 +13550,26 @@
           "name": "created_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -11450,6 +13654,31 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
         }
       ]
     },
@@ -11526,6 +13755,21 @@
           "name": "updated_ts",
           "description": "",
           "why_required": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
           "data_type": "TIMESTAMP"
         }
       ]
@@ -11634,6 +13878,21 @@
           "description": "",
           "why_required": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -11685,6 +13944,36 @@
           "name": "issue_count",
           "description": "",
           "data_type": "INTEGER"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -11775,6 +14064,26 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -11886,6 +14195,21 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -11955,6 +14279,26 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_hash",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     },
@@ -11991,6 +14335,31 @@
           "name": "threshold_type",
           "description": "",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -12042,6 +14411,329 @@
           "name": "scenario_type",
           "description": "",
           "data_type": "VARCHAR(50)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "ecl_staging_snapshot",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "ecl_staging_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "ecl_stage_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "prior_stage_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "stage_change_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "stage_change_reason",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "model_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "days_past_due",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "significant_increase_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "credit_impaired_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "forbearance_event",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "forbearance_event_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "forbearance_type_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "event_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "original_maturity_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "modified_maturity_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "original_rate_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "modified_rate_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "maturity_extension_months",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "principal_forgiven_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "approval_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "approved_by",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "watchlist_entry",
+      "layer": "L2",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "watchlist_entry_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "watchlist_category_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "entry_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "exit_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "entry_reason",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "exit_reason",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "assigned_officer",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "review_frequency",
+          "description": "",
+          "data_type": "VARCHAR(500)"
+        },
+        {
+          "name": "next_review_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "is_current_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     }
@@ -12068,6 +14760,26 @@
         },
         {
           "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
           "description": "",
           "data_type": "TIMESTAMP"
         }
@@ -12103,6 +14815,26 @@
         },
         {
           "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
           "description": "",
           "data_type": "TIMESTAMP"
         }
@@ -12152,6 +14884,26 @@
         },
         {
           "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
           "description": "",
           "data_type": "TIMESTAMP"
         }
@@ -12217,6 +14969,26 @@
         },
         {
           "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
           "description": "",
           "data_type": "TIMESTAMP"
         }
@@ -12302,6 +15074,26 @@
         },
         {
           "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
           "description": "",
           "data_type": "TIMESTAMP"
         }
@@ -12399,6 +15191,26 @@
           "name": "created_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -12444,6 +15256,26 @@
           "name": "created_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -12487,6 +15319,26 @@
         },
         {
           "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
           "description": "",
           "data_type": "TIMESTAMP"
         }
@@ -12555,6 +15407,304 @@
           "name": "created_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "ecl_allowance_movement",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "allowance_movement_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "ecl_stage_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "opening_balance_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "provision_charge_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "write_off_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "recovery_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "fx_adjustment_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "stage_transfer_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "closing_balance_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "ecl_provision_calc",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "ecl_provision_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "ecl_stage_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "twelve_month_ecl_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lifetime_ecl_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "provision_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "lifetime_pd_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "twelve_month_pd_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "lgd_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "ead_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "stage_transfer_flag",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "model_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        }
+      ]
+    },
+    {
+      "name": "watchlist_movement_summary",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "movement_summary_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "watchlist_category_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "entry_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "exit_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "net_change",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "total_exposure_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_facilities_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
         }
       ]
     }

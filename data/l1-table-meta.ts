@@ -19,6 +19,7 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'region_dim', scd: 'SCD-0', category: 'Geography' },
   { name: 'regulatory_jurisdiction', scd: 'SCD-0', category: 'Regulatory' },
   { name: 'entity_type_dim', scd: 'SCD-0', category: 'Counterparty' },
+  { name: 'duns_entity_dim', scd: 'SCD-1', category: 'External Data' },
   { name: 'credit_event_type_dim', scd: 'SCD-0', category: 'Credit Risk Status' },
   { name: 'credit_status_dim', scd: 'SCD-0', category: 'Credit Risk Status' },
   { name: 'exposure_type_dim', scd: 'SCD-0', category: 'Exposure Classification' },

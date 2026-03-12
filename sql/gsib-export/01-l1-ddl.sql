@@ -563,6 +563,7 @@ CREATE TABLE IF NOT EXISTS "l1"."ledger_account_dim" (
     "parent_account_id" BIGINT,
     "regulatory_report_code" VARCHAR(20),
     "source_system_id" BIGINT,
+    "normal_balance_indicator" VARCHAR(2),
     PRIMARY KEY ("ledger_account_id")
 );
 
@@ -1053,4 +1054,19 @@ CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
     "display_order" INTEGER,
     "active_flag" BOOLEAN,
     PRIMARY KEY ("rating_change_status_code")
+);
+
+-- equity_allocation_config (Equity Allocation)
+CREATE TABLE IF NOT EXISTS "l1"."equity_allocation_config" (
+    "equity_allocation_id" BIGSERIAL NOT NULL,
+    "managed_segment_id" BIGINT NOT NULL,
+    "legal_entity_id" BIGINT,
+    "effective_date" DATE NOT NULL,
+    "equity_allocation_amt" NUMERIC(20,4) NOT NULL,
+    "currency_code" VARCHAR(20) DEFAULT 'USD',
+    "active_flag" BOOLEAN DEFAULT TRUE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("equity_allocation_id"),
+    FOREIGN KEY ("managed_segment_id") REFERENCES "l1"."enterprise_business_taxonomy"("managed_segment_id")
 );

@@ -65,7 +65,7 @@ SELECT
     lcs.limit_amt                                                   AS credit_limit_amt,
     lcs.utilization_pct,
     lcs.available_amt                                               AS headroom_amt,
-    lcs.utilization_tier_code                                       AS risk_tier_code,
+    lcs.utilization_tier_code                                       AS risk_rating_tier_code,
     lcs.status_code                                                 AS limit_status_code,
 
     -- REGION + INDUSTRY from L1 counterparty → country → region

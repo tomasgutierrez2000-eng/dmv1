@@ -70,7 +70,7 @@ export default function MetricUploadView() {
   // Deploy state
   const [deploying, setDeploying] = useState(false);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
-  const [generateDemo, setGenerateDemo] = useState(false);
+  // Demo data auto-populated from live DB during deploy (no user toggle needed)
 
   // ─── Handlers ──────────────────────────────────────────────────────
 
@@ -178,7 +178,6 @@ export default function MetricUploadView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           metrics,
-          generate_demo: generateDemo,
           dry_run: false,
         }),
       });
@@ -189,7 +188,7 @@ export default function MetricUploadView() {
     } finally {
       setDeploying(false);
     }
-  }, [metrics, generateDemo]);
+  }, [metrics]);
 
   // ─── Derived state ─────────────────────────────────────────────────
 
@@ -431,18 +430,8 @@ export default function MetricUploadView() {
               Step 4: Deploy to Data Model
             </h2>
             <p className="text-sm text-gray-600 mb-4">
-              All metrics passed validation. Deploy will generate YAML definitions, sync the catalogue, and optionally create demo data.
+              All metrics passed validation. Deploy will generate YAML definitions, sync the catalogue, and auto-populate demo data from the live database.
             </p>
-
-            <label className="flex items-center gap-2 text-sm text-gray-700 mb-4">
-              <input
-                type="checkbox"
-                checked={generateDemo}
-                onChange={(e) => setGenerateDemo(e.target.checked)}
-                className="rounded"
-              />
-              Generate demo data (takes longer)
-            </label>
 
             <button
               onClick={handleDeploy}

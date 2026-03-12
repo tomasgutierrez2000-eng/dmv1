@@ -2,7 +2,7 @@
  * POST /api/metrics/library/upload/deploy
  *
  * Takes validated metrics (from the upload flow) and deploys them:
- * writes YAML, runs calc:sync, optionally generates demo data.
+ * writes YAML, runs calc:sync, auto-populates demo data from live DB.
  */
 
 import { NextRequest } from 'next/server';
@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const metrics: MetricWithSources[] = body.metrics;
-    const generateDemo: boolean = body.generate_demo ?? false;
     const dryRun: boolean = body.dry_run ?? false;
 
     if (!Array.isArray(metrics) || metrics.length === 0) {
@@ -31,10 +30,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const result = await deployMetrics(metrics, {
-      generateDemo,
-      dryRun,
-    });
+    const result = await deployMetrics(metrics, { dryRun });
 
     return jsonSuccess(result);
   } catch (err) {

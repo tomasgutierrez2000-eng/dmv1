@@ -16,7 +16,7 @@
     "regulatory_references": [
       "FR Y-14Q Schedule H"
     ],
-    "insight": "Funding cost burden reveals margin compression risk \u2014 rising interest expense relative to committed amounts signals tightening spreads or increased leverage.",
+    "insight": "Funding cost burden reveals margin compression risk — rising interest expense relative to committed amounts signals tightening spreads or increased leverage.",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "ACTIVE",
@@ -746,7 +746,7 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
@@ -765,7 +765,7 @@
         },
         {
           "facility_id": "F-251",
-          "facility_name": "Horizon Home \u2014 USD L/C 2029-C",
+          "facility_name": "Horizon Home — USD L/C 2029-C",
           "counterparty_id": "CP-69",
           "counterparty_name": "Horizon Home Furnishings Inc.",
           "lob_segment_id": "SEG-3",
@@ -784,7 +784,7 @@
         },
         {
           "facility_id": "F-360",
-          "facility_name": "Nordic P&P \u2014 EUR Revolver 2026-A",
+          "facility_name": "Nordic P&P — EUR Revolver 2026-A",
           "counterparty_id": "CP-92",
           "counterparty_name": "Nordic Pulp & Paper AB",
           "lob_segment_id": "SEG-111",
@@ -803,7 +803,7 @@
         },
         {
           "facility_id": "F-9441",
-          "facility_name": "Meridian \u2014 USD Term Loan 2028-B",
+          "facility_name": "Meridian — USD Term Loan 2028-B",
           "counterparty_id": "CP-3328",
           "counterparty_name": "Meridian Telecommunications Corp.",
           "lob_segment_id": "SEG-229",
@@ -822,7 +822,7 @@
         },
         {
           "facility_id": "F-9422",
-          "facility_name": "Maple \u2014 CAD Revolver 2028-A",
+          "facility_name": "Maple — CAD Revolver 2028-A",
           "counterparty_id": "CP-3321",
           "counterparty_name": "Maple Street Grocery Holdings",
           "lob_segment_id": "SEG-211",
@@ -1257,7 +1257,7 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
@@ -1274,7 +1274,7 @@
         },
         {
           "facility_id": "F-194",
-          "facility_name": "Ironworks \u2014 USD L/C 2025-E",
+          "facility_name": "Ironworks — USD L/C 2025-E",
           "counterparty_id": "CP-56",
           "counterparty_name": "Ironworks Steel Manufacturing Inc.",
           "lob_segment_id": "SEG-194",
@@ -1291,7 +1291,7 @@
         },
         {
           "facility_id": "F-241",
-          "facility_name": "Summit Apparel \u2014 USD Revolver 2025-A",
+          "facility_name": "Summit Apparel — USD Revolver 2025-A",
           "counterparty_id": "CP-67",
           "counterparty_name": "Summit Apparel & Sportswear Inc.",
           "lob_segment_id": "SEG-241",
@@ -1308,7 +1308,7 @@
         },
         {
           "facility_id": "F-5701",
-          "facility_name": "Mortgage \u2014 Retail Mortgage Borrower 1",
+          "facility_name": "Mortgage — Retail Mortgage Borrower 1",
           "counterparty_id": "CP-1701",
           "counterparty_name": "Retail Mortgage Borrower 1",
           "lob_segment_id": "SEG-3",
@@ -1325,7 +1325,7 @@
         },
         {
           "facility_id": "F-9584",
-          "facility_name": "Peace \u2014 CAD Revolver 2029-A",
+          "facility_name": "Peace — CAD Revolver 2029-A",
           "counterparty_id": "CP-3389",
           "counterparty_name": "Peace River Bitumen Holdings Inc.",
           "lob_segment_id": "SEG-123",
@@ -1938,7 +1938,7 @@
       "facilities": [
         {
           "facility_id": "F-4",
-          "facility_name": "Silverton Financial \u2014 Bridge Facility",
+          "facility_name": "Silverton Financial — Bridge Facility",
           "counterparty_id": "CP-4",
           "counterparty_name": "Silverton Financial Group",
           "lob_segment_id": "SEG-4",
@@ -1956,7 +1956,7 @@
         },
         {
           "facility_id": "F-6",
-          "facility_name": "Greenfield Consumer \u2014 Syndicated RCF",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
           "counterparty_id": "CP-6",
           "counterparty_name": "Greenfield Consumer Brands Inc.",
           "lob_segment_id": "SEG-6",
@@ -1974,7 +1974,7 @@
         },
         {
           "facility_id": "F-376",
-          "facility_name": "Ridgemont \u2014 USD Term Loan 2029-B",
+          "facility_name": "Ridgemont — USD Term Loan 2029-B",
           "counterparty_id": "CP-95",
           "counterparty_name": "Ridgemont Timber Holdings Inc.",
           "lob_segment_id": "SEG-127",
@@ -1992,7 +1992,7 @@
         },
         {
           "facility_id": "F-9408",
-          "facility_name": "Pacific \u2014 JPY Revolver 2029-A",
+          "facility_name": "Pacific — JPY Revolver 2029-A",
           "counterparty_id": "CP-3314",
           "counterparty_name": "Pacific Rim Components Ltd.",
           "lob_segment_id": "SEG-196",
@@ -2010,7 +2010,7 @@
         },
         {
           "facility_id": "F-9483",
-          "facility_name": "Bangalore \u2014 INR Revolver 2029-A",
+          "facility_name": "Bangalore — INR Revolver 2029-A",
           "counterparty_id": "CP-3348",
           "counterparty_name": "Bangalore Lending Platform Pvt. Ltd.",
           "lob_segment_id": "SEG-22",
@@ -2594,7 +2594,7 @@
       "facilities": [
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
@@ -2611,7 +2611,7 @@
         },
         {
           "facility_id": "F-360",
-          "facility_name": "Nordic P&P \u2014 EUR Revolver 2026-A",
+          "facility_name": "Nordic P&P — EUR Revolver 2026-A",
           "counterparty_id": "CP-92",
           "counterparty_name": "Nordic Pulp & Paper AB",
           "lob_segment_id": "SEG-111",
@@ -2628,7 +2628,7 @@
         },
         {
           "facility_id": "F-5701",
-          "facility_name": "Mortgage \u2014 Retail Mortgage Borrower 1",
+          "facility_name": "Mortgage — Retail Mortgage Borrower 1",
           "counterparty_id": "CP-1701",
           "counterparty_name": "Retail Mortgage Borrower 1",
           "lob_segment_id": "SEG-3",
@@ -2645,7 +2645,7 @@
         },
         {
           "facility_id": "F-9457",
-          "facility_name": "Heritage \u2014 USD Revolver 2026-A",
+          "facility_name": "Heritage — USD Revolver 2026-A",
           "counterparty_id": "CP-3335",
           "counterparty_name": "Heritage Foods International Inc.",
           "lob_segment_id": "SEG-245",
@@ -2662,7 +2662,7 @@
         },
         {
           "facility_id": "F-9543",
-          "facility_name": "Rhein-Ruhr \u2014 EUR Term Loan 2028-B",
+          "facility_name": "Rhein-Ruhr — EUR Term Loan 2028-B",
           "counterparty_id": "CP-3371",
           "counterparty_name": "Rhein-Ruhr Automotive Components GmbH",
           "lob_segment_id": "SEG-82",
@@ -3155,7 +3155,7 @@
       "facilities": [
         {
           "facility_id": "F-4",
-          "facility_name": "Silverton Financial \u2014 Bridge Facility",
+          "facility_name": "Silverton Financial — Bridge Facility",
           "counterparty_id": "CP-4",
           "counterparty_name": "Silverton Financial Group",
           "lob_segment_id": "SEG-4",
@@ -3171,7 +3171,7 @@
         },
         {
           "facility_id": "F-10",
-          "facility_name": "Crestview REIT \u2014 Credit Facility",
+          "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
           "counterparty_name": "Crestview Real Estate Investment Trust",
           "lob_segment_id": "SEG-10",
@@ -3187,7 +3187,7 @@
         },
         {
           "facility_id": "F-384",
-          "facility_name": "Great Lakes PL \u2014 USD L/C 2026-E",
+          "facility_name": "Great Lakes PL — USD L/C 2026-E",
           "counterparty_id": "CP-96",
           "counterparty_name": "Great Lakes Power & Light Corp.",
           "lob_segment_id": "SEG-135",
@@ -3203,7 +3203,7 @@
         },
         {
           "facility_id": "F-9571",
-          "facility_name": "Zurich \u2014 CHF Revolver 2029-A",
+          "facility_name": "Zurich — CHF Revolver 2029-A",
           "counterparty_id": "CP-3384",
           "counterparty_name": "Zurich Capital Partners Fund III AG",
           "lob_segment_id": "SEG-111",
@@ -3219,7 +3219,7 @@
         },
         {
           "facility_id": "F-9637",
-          "facility_name": "Appalachian \u2014 USD Revolver 2029-A",
+          "facility_name": "Appalachian — USD Revolver 2029-A",
           "counterparty_id": "CP-3414",
           "counterparty_name": "Appalachian Natural Gas Partners LP",
           "lob_segment_id": "SEG-176",
@@ -5626,7 +5626,7 @@
       "Basel III Section CRE22",
       "FR Y-14Q Schedule G"
     ],
-    "insight": "Shows the bank's share of current collateral market value securing the portfolio. A declining trend indicates collateral erosion \u2014 increasing uncovered exposure. Compare against gross exposure (EXP-002) to derive a real-time collateral coverage ratio. Critical input for LGD estimation and recovery projections.\n",
+    "insight": "Shows the bank's share of current collateral market value securing the portfolio. A declining trend indicates collateral erosion — increasing uncovered exposure. Compare against gross exposure (EXP-002) to derive a real-time collateral coverage ratio. Critical input for LGD estimation and recovery projections.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "DRAFT",
@@ -5723,7 +5723,7 @@
             "layer": "L2",
             "table": "facility_lender_allocation",
             "field": "is_current_flag",
-            "description": "SCD filter \u2014 only current allocation row to prevent double-counting"
+            "description": "SCD filter — only current allocation row to prevent double-counting"
           },
           {
             "layer": "L1",
@@ -5810,7 +5810,7 @@
             "layer": "L2",
             "table": "facility_lender_allocation",
             "field": "is_current_flag",
-            "description": "SCD filter \u2014 only current allocation row to prevent double-counting"
+            "description": "SCD filter — only current allocation row to prevent double-counting"
           },
           {
             "layer": "L1",
@@ -5897,7 +5897,7 @@
             "layer": "L2",
             "table": "facility_lender_allocation",
             "field": "is_current_flag",
-            "description": "SCD filter \u2014 only current allocation row to prevent double-counting"
+            "description": "SCD filter — only current allocation row to prevent double-counting"
           },
           {
             "layer": "L1",
@@ -5984,7 +5984,7 @@
             "layer": "L2",
             "table": "facility_lender_allocation",
             "field": "is_current_flag",
-            "description": "SCD filter \u2014 only current allocation row to prevent double-counting"
+            "description": "SCD filter — only current allocation row to prevent double-counting"
           },
           {
             "layer": "L1",
@@ -6071,7 +6071,7 @@
             "layer": "L2",
             "table": "facility_lender_allocation",
             "field": "is_current_flag",
-            "description": "SCD filter \u2014 only current allocation row to prevent double-counting"
+            "description": "SCD filter — only current allocation row to prevent double-counting"
           },
           {
             "layer": "L1",
@@ -7897,7 +7897,7 @@
     "item_name": "Delinquency Rate (%)",
     "abbreviation": "DR",
     "kind": "METRIC",
-    "definition": "Calculated as Count of Delinquent Loans / Total Loans \u00d7 100. Portfolio stress KPI measuring prevalence of past-due exposures.\n",
+    "definition": "Calculated as Count of Delinquent Loans / Total Loans × 100. Portfolio stress KPI measuring prevalence of past-due exposures.\n",
     "generic_formula": "Binary flag: 1 if delinquency (days_past_due > 0), 0 otherwise.\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
@@ -9038,7 +9038,7 @@
     "item_name": "Deteriorated Deal Flag",
     "abbreviation": "DDF",
     "kind": "METRIC",
-    "definition": "Derived indicator that the facility\u2019s internal credit rating has worsened during the reporting period. Provides automated early deterioration signal supporting migration monitoring and risk escalation.\n",
+    "definition": "Derived indicator that the facility’s internal credit rating has worsened during the reporting period. Provides automated early deterioration signal supporting migration monitoring and risk escalation.\n",
     "generic_formula": "Read is_deteriorated from facility_detail_snapshot for each facility as-of reporting date.\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "RATE",
@@ -10179,7 +10179,7 @@
     "item_name": "Expected Loss ($)",
     "abbreviation": "EL",
     "kind": "METRIC",
-    "definition": "PD \u00d7 LGD \u00d7 Exposure expressed in USD. Calculated forward-looking loss metric supporting provisioning, capital planning, and stress testing analytics.\n",
+    "definition": "PD × LGD × Exposure expressed in USD. Calculated forward-looking loss metric supporting provisioning, capital planning, and stress testing analytics.\n",
     "generic_formula": "SUM(expected_loss_usd) per facility from stress_test_result. Weighted by bank share percentage.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
@@ -11594,7 +11594,7 @@
     "item_name": "Loss Given Default ($)",
     "abbreviation": "LGD",
     "kind": "METRIC",
-    "definition": "Exposure \u00d7 LGD expressed in dollar terms weighted based on facility-level exposure. Derived loss severity metric estimating expected recovery-adjusted loss magnitude.\n",
+    "definition": "Exposure × LGD expressed in dollar terms weighted based on facility-level exposure. Derived loss severity metric estimating expected recovery-adjusted loss magnitude.\n",
     "generic_formula": "EAD * LGD (in Percentage) for all facilities across Counterparties\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
@@ -12660,7 +12660,7 @@
     "abbreviation": "LTVR",
     "kind": "METRIC",
     "definition": "Loan to Value Ratio (%) metric.\n",
-    "generic_formula": "For each DISTINCT (Facility_ID) lookup Collateral ID and SUM(Current_Colalteral_MV) THEN  [Commited_Facility_Amt] / [Current_Collateral_MV] \u00d7 100\n",
+    "generic_formula": "For each DISTINCT (Facility_ID) lookup Collateral ID and SUM(Current_Colalteral_MV) THEN  [Commited_Facility_Amt] / [Current_Collateral_MV] × 100\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
@@ -13015,7 +13015,7 @@
     "abbreviation": "NI",
     "kind": "METRIC",
     "definition": "Profit after all expenses in USD. Indicator of borrower profitability and financial sustainability.\n",
-    "generic_formula": "Revenue \u2013 Interest Expense \u2013 Operating Cost \u2013 EL\n",
+    "generic_formula": "Revenue – Interest Expense – Operating Cost – EL\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
@@ -23857,9 +23857,9 @@
     "abbreviation": "ATY",
     "kind": "METRIC",
     "definition": "Average tenor of the underlying facilities across exposures. For facility, displayed the calculated tenor based on Origination Date (\"Effective Date\") and Maturity Date (\"End Date\") and other levels this metric is aggregated as an average to represent the average period of the underlying facilities.\n",
-    "generic_formula": "For each Facility_ID, [Contract Level Maturity Date]- [Facility Level Effective Date]\n",
-    "data_type": "INTEGER",
-    "unit_type": "DAYS",
+    "generic_formula": "For each Facility_ID, (Maturity Date - Origination Date) / 365.25 to get tenor in years.\n",
+    "data_type": "NUMERIC(12,6)",
+    "unit_type": "RATIO",
     "direction": "NEUTRAL",
     "metric_class": "CALCULATED",
     "domain_ids": [
@@ -23874,14 +23874,22 @@
     "status": "DRAFT",
     "executable_metric_id": "REF-003",
     "normalized_de_name": "Average Tenor (Years)",
-    "data_element_in_dm": "expected_tenor_months",
+    "data_element_in_dm": "tenor_years",
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "deal_pipeline_fact",
-        "field": "expected_tenor_months",
-        "description": "expected_tenor_months",
-        "data_type": "VARCHAR(64)",
+        "table": "facility_master",
+        "field": "origination_date",
+        "description": "Facility origination/effective date",
+        "data_type": "DATE",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_master",
+        "field": "maturity_date",
+        "description": "Facility maturity/end date",
+        "data_type": "DATE",
         "sample_value": ""
       }
     ],
@@ -23891,26 +23899,8 @@
         "dashboard_display_name": "Average Tenor (Years) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.deal_pipeline_fact  (dpf)\n   WHERE dpf.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = dpf.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = dpf.expected_tenor_months",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1)",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "expected_tenor_months",
-            "description": "expected_tenor_months"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -23928,6 +23918,18 @@
             "table": "facility_master",
             "field": "lob_segment_id",
             "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "origination_date",
+            "description": "origination_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "maturity_date",
+            "description": "maturity_date"
           },
           {
             "layer": "L2",
@@ -23954,26 +23956,8 @@
         "dashboard_display_name": "Average Tenor (Years) (counterparty)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.deal_pipeline_fact  (dpf)\n   WHERE dpf.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = dpf.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = AVG(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1))",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "expected_tenor_months",
-            "description": "expected_tenor_months"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -23991,6 +23975,18 @@
             "table": "facility_master",
             "field": "lob_segment_id",
             "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "origination_date",
+            "description": "origination_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "maturity_date",
+            "description": "maturity_date"
           },
           {
             "layer": "L2",
@@ -24017,26 +24013,8 @@
         "dashboard_display_name": "Average Tenor (Years) (desk)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.deal_pipeline_fact  (dpf)\n   WHERE dpf.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = dpf.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = AVG(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1))",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "expected_tenor_months",
-            "description": "expected_tenor_months"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -24054,6 +24032,18 @@
             "table": "facility_master",
             "field": "lob_segment_id",
             "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "origination_date",
+            "description": "origination_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "maturity_date",
+            "description": "maturity_date"
           },
           {
             "layer": "L2",
@@ -24080,26 +24070,8 @@
         "dashboard_display_name": "Average Tenor (Years) (portfolio)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.deal_pipeline_fact  (dpf)\n   WHERE dpf.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = dpf.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = AVG(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1))",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "expected_tenor_months",
-            "description": "expected_tenor_months"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -24117,6 +24089,18 @@
             "table": "facility_master",
             "field": "lob_segment_id",
             "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "origination_date",
+            "description": "origination_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "maturity_date",
+            "description": "maturity_date"
           },
           {
             "layer": "L2",
@@ -24142,27 +24126,9 @@
         "level": "lob",
         "dashboard_display_name": "Average Tenor (Years) (lob)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.deal_pipeline_fact  (dpf)\n   WHERE dpf.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = dpf.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Avg",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = AVG(ROUND((fm.maturity_date - fm.origination_date) / 365.25, 1))",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "deal_pipeline_fact",
-            "field": "expected_tenor_months",
-            "description": "expected_tenor_months"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -24180,6 +24146,18 @@
             "table": "facility_master",
             "field": "lob_segment_id",
             "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "origination_date",
+            "description": "origination_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "maturity_date",
+            "description": "maturity_date"
           },
           {
             "layer": "L2",
@@ -25031,7 +25009,7 @@
     "item_name": "Days Until Maturity",
     "abbreviation": "DUM",
     "kind": "METRIC",
-    "definition": "Number of calendar days remaining until contractual maturity, calculated as (Maturity Date \u2013 Today's Date). Derived tenor metric providing insight into rollover risk and portfolio duration concentration.\n",
+    "definition": "Number of calendar days remaining until contractual maturity, calculated as (Maturity Date – Today's Date). Derived tenor metric providing insight into rollover risk and portfolio duration concentration.\n",
     "generic_formula": "[Maturity_Date] - Today()  OR [facility_master.effective_start_date] - Today()\n",
     "data_type": "INTEGER",
     "unit_type": "DAYS",
@@ -30398,7 +30376,7 @@
     "item_name": "Tangible Net Worth",
     "abbreviation": "TNW",
     "kind": "METRIC",
-    "definition": "Represents \u201chard\u201d equity after removing intangibles; reflects true loss- absorbing capacity, covenant strength, and resilience under downside scenarios.\n",
+    "definition": "Represents “hard” equity after removing intangibles; reflects true loss- absorbing capacity, covenant strength, and resilience under downside scenarios.\n",
     "generic_formula": "Read tangible_net_worth_usd from counterparty_financial_snapshot for each facility as-of reporting date.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "ORDINAL",
@@ -32343,7 +32321,7 @@
     "item_name": "Risk Rating - Internal Risk Rating",
     "abbreviation": "RRIR",
     "kind": "METRIC",
-    "definition": "The institution\u2019s internally assigned credit risk grade for a borrower, facility, or exposure as of a given date, reflecting its assessment of default risk according to the firm\u2019s internal rating scale/model.\n",
+    "definition": "The institution’s internally assigned credit risk grade for a borrower, facility, or exposure as of a given date, reflecting its assessment of default risk according to the firm’s internal rating scale/model.\n",
     "generic_formula": "Read internal_risk_rating from facility_risk_snapshot for each facility.\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
@@ -34485,7 +34463,7 @@
     "regulatory_references": [
       "Basel III"
     ],
-    "insight": "Loss severity risk indicator \u2014 higher LTV means less collateral protection relative to the loan amount\n",
+    "insight": "Loss severity risk indicator — higher LTV means less collateral protection relative to the loan amount\n",
     "number_of_instances": 5,
     "directly_displayed": false,
     "status": "DRAFT",

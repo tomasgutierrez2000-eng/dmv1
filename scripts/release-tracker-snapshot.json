@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-10T19:40:13.318Z",
+  "createdAt": "2026-03-12T03:53:42.863Z",
   "tables": [
     {
       "layer": "L1",
@@ -1375,6 +1375,9 @@
         },
         {
           "name": "source_system_id"
+        },
+        {
+          "name": "is_balance_sheet_flag"
         }
       ]
     },
@@ -3007,9 +3010,6 @@
         },
         {
           "name": "position_id"
-        },
-        {
-          "name": "maturity_bucket_id"
         }
       ]
     },
@@ -3130,9 +3130,6 @@
         },
         {
           "name": "cost_of_funds_pct"
-        },
-        {
-          "name": "pricing_tier"
         }
       ]
     },
@@ -5353,123 +5350,6 @@
         },
         {
           "name": "currency_code"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
-      "tableName": "gl_journal_entry",
-      "fields": [
-        {
-          "name": "journal_entry_id"
-        },
-        {
-          "name": "journal_batch_id"
-        },
-        {
-          "name": "ledger_account_id"
-        },
-        {
-          "name": "transaction_date"
-        },
-        {
-          "name": "posting_date"
-        },
-        {
-          "name": "transaction_code"
-        },
-        {
-          "name": "transaction_desc"
-        },
-        {
-          "name": "dr_cr_indicator"
-        },
-        {
-          "name": "transaction_amt"
-        },
-        {
-          "name": "transaction_currency_code"
-        },
-        {
-          "name": "reporting_currency_amt"
-        },
-        {
-          "name": "position_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "product_code"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "org_unit_id"
-        },
-        {
-          "name": "source_system_id"
-        },
-        {
-          "name": "created_ts"
-        },
-        {
-          "name": "updated_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
-      "tableName": "gl_account_balance_snapshot",
-      "fields": [
-        {
-          "name": "ledger_account_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "begin_balance_dr_amt"
-        },
-        {
-          "name": "begin_balance_cr_amt"
-        },
-        {
-          "name": "period_activity_dr_amt"
-        },
-        {
-          "name": "period_activity_cr_amt"
-        },
-        {
-          "name": "ending_balance_dr_amt"
-        },
-        {
-          "name": "ending_balance_cr_amt"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "reporting_currency_amt"
-        },
-        {
-          "name": "lob_segment_id"
-        },
-        {
-          "name": "org_unit_id"
-        },
-        {
-          "name": "source_system_id"
         },
         {
           "name": "created_ts"
@@ -8149,9 +8029,6 @@
         },
         {
           "name": "facility_detail_snapshot_sk"
-        },
-        {
-          "name": "is_deteriorated"
         }
       ]
     },
@@ -8677,162 +8554,6 @@
         },
         {
           "name": "netting_benefit_amt"
-        },
-        {
-          "name": "created_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "gl_account_balance_calc",
-      "fields": [
-        {
-          "name": "ledger_account_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "ending_balance_net_amt"
-        },
-        {
-          "name": "period_net_activity_amt"
-        },
-        {
-          "name": "balance_change_pct"
-        },
-        {
-          "name": "created_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "facility_financial_calc",
-      "fields": [
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "dscr"
-        },
-        {
-          "name": "ltv_pct"
-        },
-        {
-          "name": "net_income_amt"
-        },
-        {
-          "name": "interest_coverage_ratio"
-        },
-        {
-          "name": "debt_yield_pct"
-        },
-        {
-          "name": "created_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "facility_exposure_calc",
-      "fields": [
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "utilization_pct"
-        },
-        {
-          "name": "undrawn_amt"
-        },
-        {
-          "name": "coverage_ratio_pct"
-        },
-        {
-          "name": "net_exposure_amt"
-        },
-        {
-          "name": "created_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "data_quality_score_snapshot",
-      "fields": [
-        {
-          "name": "table_name"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "completeness_score_pct"
-        },
-        {
-          "name": "accuracy_score_pct"
-        },
-        {
-          "name": "timeliness_score_pct"
-        },
-        {
-          "name": "overall_dq_score_pct"
-        },
-        {
-          "name": "total_row_count"
-        },
-        {
-          "name": "null_field_count"
-        },
-        {
-          "name": "anomaly_count"
-        },
-        {
-          "name": "created_ts"
-        }
-      ]
-    },
-    {
-      "layer": "L3",
-      "tableName": "stress_test_result",
-      "fields": [
-        {
-          "name": "stress_test_result_id"
-        },
-        {
-          "name": "position_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "scenario_id"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "stressed_exposure_amt"
-        },
-        {
-          "name": "stressed_expected_loss"
-        },
-        {
-          "name": "capital_impact_pct"
-        },
-        {
-          "name": "currency_code"
         },
         {
           "name": "created_ts"

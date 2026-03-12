@@ -1309,16 +1309,6 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_pricing_calc" (
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
--- deal_pipeline_calc (Business Segment Summary)
--- Calculated overlay for l2.deal_pipeline_fact
-CREATE TABLE IF NOT EXISTS "l3"."deal_pipeline_calc" (
-    "deal_id" BIGINT NOT NULL,
-    "as_of_date" DATE NOT NULL,
-    "expected_tenor_months" NUMERIC(10,2),
-    "created_ts" TIMESTAMP,
-    PRIMARY KEY ("deal_id", "as_of_date")
-);
-
 -- collateral_calc (Credit Risk Mitigation (CRM))
 -- Calculated overlay for l2.collateral_snapshot
 CREATE TABLE IF NOT EXISTS "l3"."collateral_calc" (

@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { Download, Upload, Filter, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { RELEASE_ENTRIES, type ReleaseEntry } from '@/lib/release-tracker-data';
+import ReleaseSummaryCards from './ReleaseSummaryCards';
 
 type SortField = 'date' | 'layer' | 'table' | 'field' | 'changeType';
 type SortDir = 'asc' | 'desc';
@@ -100,6 +101,9 @@ export default function ReleaseTracker() {
 
   return (
     <div className="space-y-4">
+      {/* Summary cards */}
+      <ReleaseSummaryCards entries={filtered} />
+
       {/* Toolbar: filters + actions */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Layer filters */}

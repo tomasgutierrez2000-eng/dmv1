@@ -39,12 +39,11 @@ export async function GET() {
     ['direction', 'Yes', 'What direction is good?', 'HIGHER_BETTER, LOWER_BETTER, NEUTRAL'],
     ['metric_class', 'Yes', 'How is it sourced?', 'SOURCED, CALCULATED, HYBRID'],
     ['insight', 'No', 'Why this metric matters', ''],
-    ['formula_facility', 'No', 'SQL formula at facility level', 'SELECT dimension_key, metric_value FROM ...'],
-    ['formula_counterparty', 'No', 'SQL formula at counterparty level', ''],
-    ['formula_desk', 'No', 'SQL formula at desk level', ''],
-    ['formula_portfolio', 'No', 'SQL formula at portfolio level', ''],
-    ['formula_segment', 'No', 'SQL formula at business segment level', ''],
     ['rollup_strategy', 'No', 'How to aggregate across levels', 'direct-sum, sum-ratio, weighted-avg'],
+    ['calculator_mode', 'No', 'Python calculator type to use', 'full, simple, (leave empty for no calculator)'],
+    [],
+    ['─── Python Calculator ───'],
+    ['Upload a .py calculator file alongside this Excel. Set calculator_mode to "full" (complete BaseCalculator subclass) or "simple" (just a facility_level function).'],
     [],
     ['─── Column Reference: SourceFields Sheet ───'],
     ['Column', 'Required', 'Description', 'Valid Values'],
@@ -63,8 +62,7 @@ export async function GET() {
   const metricsHeaders = [
     'metric_id', 'name', 'domain', 'abbreviation', 'definition', 'generic_formula',
     'unit_type', 'direction', 'metric_class', 'insight',
-    'formula_facility', 'formula_counterparty', 'formula_desk', 'formula_portfolio', 'formula_segment',
-    'rollup_strategy',
+    'rollup_strategy', 'calculator_mode',
   ];
   const metricsExample = [
     'EXP-099', 'Example: Total Drawn Exposure', 'exposure', 'DRAWN',
@@ -72,9 +70,7 @@ export async function GET() {
     'SUM(drawn_amount)',
     'CURRENCY', 'NEUTRAL', 'CALCULATED',
     'Core exposure metric tracking total utilization.',
-    'SELECT fes.facility_id AS dimension_key, fes.drawn_amount AS metric_value FROM l2.facility_exposure_snapshot fes WHERE fes.as_of_date = :as_of_date',
-    '', '', '', '',
-    'direct-sum',
+    'direct-sum', 'simple',
   ];
 
   // ── Sheet 3: SourceFields (with example rows) ──────────────────────

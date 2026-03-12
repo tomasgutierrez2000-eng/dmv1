@@ -29,7 +29,10 @@ export function getYamlFilePath(metricId: string, domain: string): string {
  * Generate a YAML string from uploaded metric data, matching the exact format
  * of existing YAML metric files (see scripts/calc_engine/metrics/_template.yaml).
  */
-export function generateYamlFromUpload(metric: MetricWithSources): string {
+export function generateYamlFromUpload(
+  metric: MetricWithSources,
+  options?: { hasPythonCalculator?: boolean }
+): string {
   const today = formatDate(new Date());
   const metricId = metric.metric_id;
   const name = metric.name;
@@ -45,6 +48,15 @@ export function generateYamlFromUpload(metric: MetricWithSources): string {
   const insight = metric.insight ?? `Tracks ${name.toLowerCase()} across the portfolio.`;
   const rollupStrategy = metric.rollup_strategy ?? 'direct-sum';
 
+  // Determine if this metric has a Python calculator
+  const hasCalculator =
+    options?.hasPythonCalculator ||
+    metric.calculator_mode === 'full' ||
+    metric.calculator_mode === 'simple';
+
+  // Derive calculator module name from metric ID (e.g., "EXP-050" -> "exp_050")
+  const calculatorModule = metricId.toLowerCase().replace(/-/g, '_');
+
   // Build source tables section
   const sourceTablesYaml = buildSourceTables(metric);
 
@@ -56,6 +68,11 @@ export function generateYamlFromUpload(metric: MetricWithSources): string {
 
   // Build catalogue
   const catalogueYaml = buildCatalogue(metricId, abbreviation, insight, rollupStrategy);
+
+  // Build optional calculator_module line
+  const calculatorLine = hasCalculator
+    ? `\ncalculator_module: "${calculatorModule}"`
+    : '';
 
   return `\
 # ${'═'.repeat(63)}
@@ -93,6 +110,7 @@ levels:
 ${levelsYaml}
 
 depends_on: []
+${calculatorLine}
 
 output:
   table: metric_result
@@ -279,58 +297,45 @@ function buildLevels(
   const aggType = inferAggregationType(rollupStrategy);
   const facilityAggType = rollupStrategy === 'direct-sum' ? 'RAW' : aggType;
 
-  const facilityFormula = metric.formula_facility || null;
-  const counterpartyFormula = metric.formula_counterparty || null;
-  const deskFormula = metric.formula_desk || null;
-  const portfolioFormula = metric.formula_portfolio || null;
-  const segmentFormula = metric.formula_segment || null;
+  const hasCalculator =
+    metric.calculator_mode === 'full' || metric.calculator_mode === 'simple';
 
-  // Determine base table info for placeholder SQL
-  const baseInfo = getBaseTableInfo(metric);
+  const facilityFormulaText = hasCalculator
+    ? 'Calculated by Python calculator'
+    : genericFormula || `${metric.name} per facility`;
 
-  const facilityFormulaText = genericFormula || `${metric.name} per facility`;
-  const facilitySQL = facilityFormula
-    ? facilityFormula
-    : generatePlaceholderSQL('facility', baseInfo);
-  const counterpartySQL = counterpartyFormula
-    ? counterpartyFormula
-    : generatePlaceholderSQL('counterparty', baseInfo);
-  const deskSQL = deskFormula
-    ? deskFormula
-    : generatePlaceholderSQL('desk', baseInfo);
-  const portfolioSQL = portfolioFormula
-    ? portfolioFormula
-    : generatePlaceholderSQL('portfolio', baseInfo);
-  const segmentSQL = segmentFormula
-    ? segmentFormula
-    : generatePlaceholderSQL('business_segment', baseInfo);
+  const counterpartyFormulaText = hasCalculator
+    ? 'Calculated by Python calculator'
+    : 'Aggregated per counterparty';
+
+  const deskFormulaText = hasCalculator
+    ? 'Calculated by Python calculator'
+    : 'Aggregated per desk segment';
+
+  const portfolioFormulaText = hasCalculator
+    ? 'Calculated by Python calculator'
+    : 'Aggregated per portfolio segment';
+
+  const segmentFormulaText = hasCalculator
+    ? 'Calculated by Python calculator'
+    : 'Aggregated per business segment';
 
   return `\
   facility:
     aggregation_type: ${facilityAggType}
     formula_text: "${escapeYamlString(facilityFormulaText)}"
-    formula_sql: |
-${indentBlock(facilitySQL.trimEnd(), 6)}
   counterparty:
     aggregation_type: ${aggType}
-    formula_text: "Aggregated per counterparty"
-    formula_sql: |
-${indentBlock(counterpartySQL.trimEnd(), 6)}
+    formula_text: "${escapeYamlString(counterpartyFormulaText)}"
   desk:
     aggregation_type: SUM
-    formula_text: "Aggregated per desk segment"
-    formula_sql: |
-${indentBlock(deskSQL.trimEnd(), 6)}
+    formula_text: "${escapeYamlString(deskFormulaText)}"
   portfolio:
     aggregation_type: SUM
-    formula_text: "Aggregated per portfolio segment"
-    formula_sql: |
-${indentBlock(portfolioSQL.trimEnd(), 6)}
+    formula_text: "${escapeYamlString(portfolioFormulaText)}"
   business_segment:
     aggregation_type: SUM
-    formula_text: "Aggregated per business segment"
-    formula_sql: |
-${indentBlock(segmentSQL.trimEnd(), 6)}`;
+    formula_text: "${escapeYamlString(segmentFormulaText)}"`;
 }
 
 function inferAggregationType(rollupStrategy: string): string {
@@ -343,122 +348,6 @@ function inferAggregationType(rollupStrategy: string): string {
     case 'max': return 'MAX';
     case 'avg': return 'WEIGHTED_AVG';
     default: return 'SUM';
-  }
-}
-
-interface BaseTableInfo {
-  schema: string;
-  table: string;
-  alias: string;
-  hasCounterpartyJoin: boolean;
-  joinTable: string;
-  joinAlias: string;
-}
-
-function getBaseTableInfo(metric: MetricWithSources): BaseTableInfo {
-  const sources = metric.sources ?? [];
-  if (sources.length === 0) {
-    return {
-      schema: 'l2',
-      table: 'facility_exposure_snapshot',
-      alias: 'fes',
-      hasCounterpartyJoin: true,
-      joinTable: 'facility_master',
-      joinAlias: 'fm',
-    };
-  }
-
-  const first = sources[0];
-  const schema = layerToSchema(first.layer);
-  const table = first.table;
-  const parts = table.split('_').filter(Boolean);
-  const alias = parts.map((p) => p[0]).join('') || 'src';
-
-  // Check if we have facility_master in sources for counterparty join
-  const hasFM = sources.some(
-    (s) => s.table === 'facility_master' || s.table === 'fm'
-  );
-
-  return {
-    schema,
-    table,
-    alias,
-    hasCounterpartyJoin: hasFM || schema === 'l2',
-    joinTable: 'facility_master',
-    joinAlias: 'fm',
-  };
-}
-
-function generatePlaceholderSQL(
-  level: string,
-  base: BaseTableInfo
-): string {
-  const fullTable = `${base.schema}.${base.table}`;
-  const a = base.alias;
-
-  switch (level) {
-    case 'facility':
-      return `\
-SELECT
-  ${a}.facility_id AS dimension_key,
-  0 AS metric_value
-FROM ${fullTable} ${a}
-WHERE ${a}.as_of_date = :as_of_date`;
-
-    case 'counterparty':
-      return `\
-SELECT
-  fm.counterparty_id AS dimension_key,
-  SUM(0) AS metric_value
-FROM ${fullTable} ${a}
-INNER JOIN l2.facility_master fm ON fm.facility_id = ${a}.facility_id
-WHERE ${a}.as_of_date = :as_of_date
-GROUP BY fm.counterparty_id`;
-
-    case 'desk':
-      return `\
-SELECT
-  ebt.managed_segment_id AS dimension_key,
-  SUM(0) AS metric_value
-FROM ${fullTable} ${a}
-INNER JOIN l2.facility_master fm ON fm.facility_id = ${a}.facility_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt
-  ON ebt.managed_segment_id = fm.lob_segment_id
-WHERE ${a}.as_of_date = :as_of_date
-GROUP BY ebt.managed_segment_id`;
-
-    case 'portfolio':
-      return `\
-SELECT
-  ebt_l2.managed_segment_id AS dimension_key,
-  SUM(0) AS metric_value
-FROM ${fullTable} ${a}
-INNER JOIN l2.facility_master fm ON fm.facility_id = ${a}.facility_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-  ON ebt_l3.managed_segment_id = fm.lob_segment_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-WHERE ${a}.as_of_date = :as_of_date
-GROUP BY ebt_l2.managed_segment_id`;
-
-    case 'business_segment':
-      return `\
-SELECT
-  ebt_l1.managed_segment_id AS dimension_key,
-  SUM(0) AS metric_value
-FROM ${fullTable} ${a}
-INNER JOIN l2.facility_master fm ON fm.facility_id = ${a}.facility_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-  ON ebt_l3.managed_segment_id = fm.lob_segment_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-WHERE ${a}.as_of_date = :as_of_date
-GROUP BY ebt_l1.managed_segment_id`;
-
-    default:
-      return `SELECT 0 AS dimension_key, 0 AS metric_value`;
   }
 }
 

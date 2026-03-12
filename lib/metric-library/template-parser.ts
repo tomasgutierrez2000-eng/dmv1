@@ -15,12 +15,8 @@ export interface ParsedMetric {
   direction: string;
   metric_class: string;
   insight: string;
-  formula_facility: string;
-  formula_counterparty: string;
-  formula_desk: string;
-  formula_portfolio: string;
-  formula_segment: string;
   rollup_strategy: string;
+  calculator_mode: string;
 }
 
 export interface ParsedSourceField {
@@ -63,12 +59,8 @@ const METRIC_COLUMNS: (keyof ParsedMetric)[] = [
   'direction',
   'metric_class',
   'insight',
-  'formula_facility',
-  'formula_counterparty',
-  'formula_desk',
-  'formula_portfolio',
-  'formula_segment',
   'rollup_strategy',
+  'calculator_mode',
 ];
 
 const SOURCE_FIELD_COLUMNS: (keyof ParsedSourceField)[] = [

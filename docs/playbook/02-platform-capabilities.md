@@ -6,7 +6,7 @@ This section describes what the platform offers. Understanding these tools will 
 
 ## Data Model Visualizer (`/visualizer`)
 
-The interactive visualizer renders all 182+ tables as draggable nodes on an SVG canvas, organized by L1/L2/L3 layers with color coding.
+The interactive visualizer renders all 189+ tables as draggable nodes on an SVG canvas, organized by L1/L2/L3 layers with color coding.
 
 **Key features:**
 - **Table nodes** -- Each table appears as a card showing the table name, layer, and a status dot indicating database state

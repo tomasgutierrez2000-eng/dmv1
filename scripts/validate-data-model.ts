@@ -1,5 +1,5 @@
 /**
- * Comprehensive data model validation — 30 checks across 7 groups.
+ * Comprehensive data model validation — 35 checks across 8 groups.
  *
  * Validates cross-referential integrity between all source-of-truth files
  * (L1/L2/L3 definitions, DDL, data dictionary, metrics, catalogue, domains,
@@ -36,6 +36,7 @@ import {
   getParentMetrics,
 } from '../lib/metric-library/store';
 import { ROLLUP_HIERARCHY_LEVELS } from '../lib/metric-library/types';
+import { L2_TABLE_META } from '../data/l2-table-meta';
 import { metricWithLineage } from '../lib/lineage-generator';
 import {
   resolveFormulaForDimension,
@@ -924,6 +925,106 @@ function validateExportSurface(ddLookup: DDLookup): CheckResult[] {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Group 8: Naming Conventions & Layer Integrity
+// ═══════════════════════════════════════════════════════════════════════════
+
+function validateLayerConventions(ddLookup: DDLookup): CheckResult[] {
+  const results: CheckResult[] = [];
+  const { dd } = ddLookup;
+
+  // 8.1 L1 tables must not have as_of_date (except documented exceptions)
+  {
+    const ALLOWLIST = new Set(['reporting_calendar_dim', 'run_control', 'sccl_counterparty_group', 'capital_allocation']);
+    const issues: string[] = [];
+    for (const table of dd.L1) {
+      if (ALLOWLIST.has(table.name)) continue;
+      for (const field of table.fields) {
+        if (field.name === 'as_of_date') {
+          issues.push(`L1.${table.name}.as_of_date: L1 reference tables should not have as_of_date (use effective_start/end_date for SCD-2)`);
+        }
+      }
+    }
+    results.push(check('8.1', 8, 'L1 tables: no as_of_date', issues));
+  }
+
+  // 8.2 L2 SCD-2 tables must have complete temporal triple
+  {
+    const issues: string[] = [];
+    const scd2Tables = L2_TABLE_META.filter(t => t.scd === 'SCD-2').map(t => t.name);
+    for (const tableName of scd2Tables) {
+      const ddTable = dd.L2.find(t => t.name === tableName);
+      if (!ddTable) continue; // table not in DD — separate validation concern
+      const fieldNames = new Set(ddTable.fields.map(f => f.name));
+      const missing: string[] = [];
+      if (!fieldNames.has('effective_start_date')) missing.push('effective_start_date');
+      if (!fieldNames.has('effective_end_date')) missing.push('effective_end_date');
+      if (!fieldNames.has('is_current_flag')) missing.push('is_current_flag');
+      if (missing.length > 0) {
+        issues.push(`L2.${tableName} (SCD-2): missing ${missing.join(', ')}`);
+      }
+    }
+    results.push(check('8.2', 8, 'L2 SCD-2 temporal triple', issues));
+  }
+
+  // 8.3 _pct columns must be NUMERIC(10,6)
+  {
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (field.name.endsWith('_pct') && field.data_type) {
+            const dt = field.data_type.toLowerCase().replace(/\s/g, '');
+            // Accept numeric(10,6) — flag anything else that's numeric with wrong precision
+            if (dt.startsWith('numeric') && dt !== 'numeric(10,6)') {
+              issues.push(`${layer}.${table.name}.${field.name}: ${field.data_type} (expected NUMERIC(10,6))`);
+            }
+          }
+        }
+      }
+    }
+    results.push(check('8.3', 8, '_pct precision NUMERIC(10,6)', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 8.4 No is_active_flag (must use active_flag)
+  {
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (field.name === 'is_active_flag') {
+            issues.push(`${layer}.${table.name}.is_active_flag: should be active_flag`);
+          }
+        }
+      }
+    }
+    results.push(check('8.4', 8, 'No is_active_flag naming', issues));
+  }
+
+  // 8.5 No effective_from_date / effective_to_date (must use effective_start/end_date)
+  {
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (field.name === 'effective_from_date') {
+            issues.push(`${layer}.${table.name}.effective_from_date: should be effective_start_date`);
+          }
+          if (field.name === 'effective_to_date') {
+            issues.push(`${layer}.${table.name}.effective_to_date: should be effective_end_date`);
+          }
+          if (field.name === 'substatus_effective_to_date') {
+            issues.push(`${layer}.${table.name}.substatus_effective_to_date: should be substatus_effective_end_date`);
+          }
+        }
+      }
+    }
+    results.push(check('8.5', 8, 'No effective_from/to_date naming', issues));
+  }
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Main Orchestrator
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -967,6 +1068,7 @@ export async function runValidation(options: CliOptions): Promise<ValidationRepo
     { group: 5, name: 'Lineage Integrity',              run: () => validateLineageIntegrity(mergedMetrics) },
     { group: 6, name: 'Calculation Engine Readiness',   run: () => validateCalculationEngine(mergedMetrics) },
     { group: 7, name: 'Export/API Surface Consistency',  run: () => validateExportSurface(ddLookup) },
+    { group: 8, name: 'Naming Conventions & Layer Integrity', run: () => validateLayerConventions(ddLookup) },
   ];
 
   for (const runner of groupRunners) {

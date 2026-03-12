@@ -80,9 +80,24 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'rating_mapping', scd: 'SCD-1', category: 'Ratings' },
   { name: 'scenario_dim', scd: 'SCD-1', category: 'Scenario' },
 
-  // ── Tables in DB but not in original TS definitions ──
-  // metric_threshold removed — lives in L2 schema (has as_of_date, is a snapshot not pure reference)
+  // ── Tables added via migrations ──
+  { name: 'metric_threshold', scd: 'SCD-1', category: 'Limits & Thresholds' },
   { name: 'equity_allocation_config', scd: 'SCD-1', category: 'Capital & Equity' },
+  { name: 'capital_allocation', scd: 'SCD-2', category: 'Capital & Equity' }, // SCD-2: allocation targets change with regulatory updates; has as_of_date in PK
+  { name: 'ecl_stage_dim', scd: 'SCD-0', category: 'ECL / Impairment' },
+  { name: 'impairment_model_dim', scd: 'SCD-1', category: 'ECL / Impairment' },
+  { name: 'forbearance_type_dim', scd: 'SCD-0', category: 'Credit Events / Amendments' },
+  { name: 'watchlist_category_dim', scd: 'SCD-0', category: 'Credit Risk Status' },
+  { name: 'basel_exposure_type_dim', scd: 'SCD-0', category: 'Capital & Equity' }, // Basel III exposure classes (migration 002)
+  { name: 'regulatory_capital_requirement', scd: 'SCD-1', category: 'Capital & Equity' }, // Fed-published capital reqs (migration 002)
+
+  // ── Accepted L1→L2 FK exceptions ──
+  // These L1 tables reference L2 masters. This is an accepted architectural exception
+  // because counterparty, legal_entity, and instrument_master are operational masters
+  // that L1 configuration must reference. Documented per GSIB data model review.
+  // Affected tables: sccl_counterparty_group_member (→ l2.counterparty),
+  //                  instrument_identifier (→ l2.instrument_master),
+  //                  capital_allocation (→ l2.legal_entity)
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

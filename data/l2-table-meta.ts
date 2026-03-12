@@ -80,6 +80,7 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'ecl_staging_snapshot', scd: 'Snapshot', category: 'ECL/Impairment' },
   { name: 'watchlist_entry', scd: 'Event', category: 'Watchlist' },
   { name: 'forbearance_event', scd: 'Event', category: 'Forbearance' },
+  { name: 'capital_position_snapshot', scd: 'Snapshot', category: 'Capital & Equity' }, // Entity-level capital ratios (migration 002)
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

@@ -971,25 +971,6 @@ CREATE TABLE IF NOT EXISTS "l1"."metric_threshold" (
     PRIMARY KEY ("threshold_id")
 );
 
--- equity_allocation_config (Capital & Equity)
-CREATE TABLE IF NOT EXISTS "l1"."equity_allocation_config" (
-    "equity_allocation_config_id" BIGINT NOT NULL,
-    "legal_entity_id" BIGINT,
-    "allocation_method_code" VARCHAR(30),
-    "allocation_method_name" VARCHAR(200),
-    "allocation_scope_code" VARCHAR(30),
-    "scope_reference_id" BIGINT,
-    "target_allocation_pct" NUMERIC(10,6),
-    "min_allocation_pct" NUMERIC(10,6),
-    "max_allocation_pct" NUMERIC(10,6),
-    "effective_from_date" DATE,
-    "effective_to_date" DATE,
-    "active_flag" BOOLEAN,
-    "created_ts" TIMESTAMP,
-    "updated_ts" TIMESTAMP,
-    PRIMARY KEY ("equity_allocation_config_id")
-);
-
 -- risk_rating_tier_dim (Ratings)
 CREATE TABLE IF NOT EXISTS "l1"."risk_rating_tier_dim" (
     "tier_code" VARCHAR(20) NOT NULL,

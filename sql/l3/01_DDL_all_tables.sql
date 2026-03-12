@@ -1434,3 +1434,165 @@ CREATE TABLE IF NOT EXISTS "l3"."watchlist_movement_summary" (
     "created_by" VARCHAR(100),
     PRIMARY KEY ("movement_summary_id")
 );
+
+-- ── Capital Metrics (migration 002-capital-metrics) ──
+
+-- stress_test_result (Stress Testing)
+CREATE TABLE IF NOT EXISTS "l3"."stress_test_result" (
+    "stress_test_result_id" BIGINT NOT NULL,
+    "position_id" BIGINT,
+    "facility_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "scenario_id" BIGINT,
+    "as_of_date" DATE,
+    "stressed_exposure_amt" NUMERIC(20,4),
+    "stressed_expected_loss" NUMERIC(20,4),
+    "capital_impact_pct" NUMERIC(10,6),
+    "currency_code" VARCHAR(30),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "created_by" VARCHAR(100),
+    "record_source" VARCHAR(100),
+    "load_timestamp" TIMESTAMP,
+    PRIMARY KEY ("stress_test_result_id")
+);
+
+-- facility_rwa_calc (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."facility_rwa_calc" (
+    "facility_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+-- capital_binding_constraint (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."capital_binding_constraint" (
+    "legal_entity_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "cet1_binding_amt" NUMERIC(20,4),
+    "tier1_binding_amt" NUMERIC(20,4),
+    "total_capital_binding_amt" NUMERIC(20,4),
+    "tier1_leverage_binding_amt" NUMERIC(20,4),
+    "leverage_binding_amt" NUMERIC(20,4),
+    "slr_binding_amt" NUMERIC(20,4),
+    "tlac_binding_amt" NUMERIC(20,4),
+    "most_binding_constraint" VARCHAR(30),
+    "most_binding_ratio_pct" NUMERIC(10,6),
+    "most_binding_denominator" VARCHAR(30),
+    "binding_rwa_approach" VARCHAR(10),
+    "cet1_buffer_pct" NUMERIC(10,6),
+    "tier1_buffer_pct" NUMERIC(10,6),
+    "total_capital_buffer_pct" NUMERIC(10,6),
+    "tier1_leverage_buffer_pct" NUMERIC(10,6),
+    "leverage_buffer_pct" NUMERIC(10,6),
+    "slr_buffer_pct" NUMERIC(10,6),
+    "tlac_buffer_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("legal_entity_id", "as_of_date")
+);
+
+-- facility_capital_consumption (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."facility_capital_consumption" (
+    "facility_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "legal_entity_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "min_capital_std_amt" NUMERIC(20,4),
+    "min_capital_erba_amt" NUMERIC(20,4),
+    "min_capital_delta_amt" NUMERIC(20,4),
+    "capital_consumption_amt" NUMERIC(20,4),
+    "rwa_binding_amt" NUMERIC(20,4),
+    "most_binding_constraint" VARCHAR(30),
+    "basel_exposure_type_id" BIGINT,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("facility_id", "as_of_date")
+);
+
+-- counterparty_capital_consumption (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."counterparty_capital_consumption" (
+    "counterparty_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "legal_entity_id" BIGINT NOT NULL,
+    "exposure_count" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "rwa_binding_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6),
+    "capital_consumption_amt" NUMERIC(20,4),
+    "capital_consumption_std_amt" NUMERIC(20,4),
+    "capital_consumption_erba_amt" NUMERIC(20,4),
+    "capital_delta_amt" NUMERIC(20,4),
+    "most_binding_constraint" VARCHAR(30),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("counterparty_id", "as_of_date", "legal_entity_id")
+);
+
+-- desk_capital_consumption (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."desk_capital_consumption" (
+    "org_unit_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "legal_entity_id" BIGINT NOT NULL,
+    "exposure_count" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "rwa_binding_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6),
+    "capital_consumption_amt" NUMERIC(20,4),
+    "capital_consumption_std_amt" NUMERIC(20,4),
+    "capital_consumption_erba_amt" NUMERIC(20,4),
+    "capital_delta_amt" NUMERIC(20,4),
+    "most_binding_constraint" VARCHAR(30),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("org_unit_id", "as_of_date", "legal_entity_id")
+);
+
+-- portfolio_capital_consumption (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."portfolio_capital_consumption" (
+    "portfolio_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "legal_entity_id" BIGINT NOT NULL,
+    "basel_exposure_type_id" BIGINT NOT NULL,
+    "exposure_count" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6),
+    "capital_consumption_amt" NUMERIC(20,4),
+    "capital_consumption_std_amt" NUMERIC(20,4),
+    "capital_consumption_erba_amt" NUMERIC(20,4),
+    "capital_delta_amt" NUMERIC(20,4),
+    "most_binding_constraint" VARCHAR(30),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("portfolio_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
+);
+
+-- segment_capital_consumption (Capital & Equity)
+CREATE TABLE IF NOT EXISTS "l3"."segment_capital_consumption" (
+    "lob_segment_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "legal_entity_id" BIGINT NOT NULL,
+    "basel_exposure_type_id" BIGINT NOT NULL,
+    "exposure_count" INTEGER,
+    "total_exposure_amt" NUMERIC(20,4),
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "rwa_density_pct" NUMERIC(10,6),
+    "capital_consumption_amt" NUMERIC(20,4),
+    "capital_consumption_std_amt" NUMERIC(20,4),
+    "capital_consumption_erba_amt" NUMERIC(20,4),
+    "capital_delta_amt" NUMERIC(20,4),
+    "most_binding_constraint" VARCHAR(30),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("lob_segment_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
+);

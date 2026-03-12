@@ -49,7 +49,8 @@
     "factory:generate": "tsx scenarios/factory/scenario-runner.ts --all",
     "factory:generate:one": "tsx scenarios/factory/scenario-runner.ts --scenario",
     "factory:validate": "tsx scenarios/factory/scenario-runner.ts --validate --all",
-    "factory:dry-run": "tsx scenarios/factory/scenario-runner.ts --dry-run --all"
+    "factory:dry-run": "tsx scenarios/factory/scenario-runner.ts --dry-run --all",
+    "doc:sync": "tsx scripts/sync-doc-counts.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

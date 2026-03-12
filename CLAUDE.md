@@ -4,9 +4,9 @@
 Banking data model visualization platform with metrics calculation engine. Next.js 14 App Router, TypeScript, Tailwind CSS, Zustand, Recharts. PostgreSQL + sql.js for calculations.
 
 ## Architecture: Three-Layer Data Model
-- **L1 — Reference Data (61 tables):** Dimensions, masters, lookups, hierarchies, configuration. Rarely changes. Examples: `counterparty`, `facility_master`, `currency_dim`, `metric_threshold`
-- **L2 — Atomic Data (53 tables):** Raw source-system snapshots and events. Point-in-time observations, not computed. Examples: `facility_exposure_snapshot`, `credit_event`, `position`
-- **L3 — Derived Data (56 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
+- **L1 — Reference Data (63 tables):** Dimensions, masters, lookups, hierarchies, configuration. Rarely changes. Examples: `counterparty`, `facility_master`, `currency_dim`, `metric_threshold`
+- **L2 — Atomic Data (56 tables):** Raw source-system snapshots and events. Point-in-time observations, not computed. Examples: `facility_exposure_snapshot`, `credit_event`, `position`
+- **L3 — Derived Data (66 tables):** Anything calculated, aggregated, or computed from L1+L2. Examples: `exposure_metric_cube`, `facility_financial_calc`, `stress_test_result`
 
 Rollup hierarchy: **Facility → Counterparty → Desk (L3) → Portfolio (L2) → Business Segment (L1)**
 
@@ -34,8 +34,8 @@ lib/                    # Core business logic
   metric-library/       # Catalogue store & types
   deep-dive/            # Seed metrics, lineage parser, cross-tier resolver
 data/                   # Data definitions
-  l3-metrics.ts         # 106+ metric definitions (SOURCE OF TRUTH for L3 metrics)
-  l3-tables.ts          # 54 L3 table definitions
+  l3-metrics.ts         # 105+ metric definitions (SOURCE OF TRUTH for L3 metrics)
+  l3-tables.ts          # 66 L3 table definitions
   metric-library/       # catalogue.json, variants.json, parent-metrics.json, domains.json
 scripts/                # CLI data processing scripts
 ```
@@ -121,7 +121,19 @@ npm run db:introspect    # Introspect PostgreSQL → update data dictionary
 npm run sync:data-model  # Sync model from DDL (offline fallback) or DB
 npm run export:data-model # Export to Excel
 npm run validate         # Validate cross-referential integrity
+npm run doc:sync         # Sync table/metric counts in CLAUDE.md + playbook docs
 ```
+
+## Keeping This File Current
+Table and metric counts in this file (L1=63, L2=56, L3=66, etc.) are **auto-synced** by `npm run doc:sync`. The same script also updates `docs/playbook/` files.
+
+**When to run `npm run doc:sync`:**
+- After adding/removing tables in `data/l1-table-meta.ts`, `data/l2-table-meta.ts`, or `data/l3-tables.ts`
+- After adding/removing metrics in `data/metric-library/catalogue.json`
+- After adding/removing domains in `data/metric-library/domains.json`
+- Automatically: the PostToolUse hook runs `doc:sync` after any DB schema change (alongside `db:introspect`)
+
+**If you notice stale counts** in this file or the playbook, just run `npm run doc:sync` to fix them.
 
 ## Environment Variables
 ```

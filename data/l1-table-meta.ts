@@ -87,6 +87,9 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'impairment_model_dim', scd: 'SCD-0', category: 'ECL/Impairment' },
   { name: 'watchlist_category_dim', scd: 'SCD-0', category: 'Watchlist' },
   { name: 'forbearance_type_dim', scd: 'SCD-0', category: 'Forbearance' },
+
+  // ── Capital Allocation ──
+  { name: 'capital_allocation', scd: 'SCD-1', category: 'Capital Allocation' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

@@ -33,6 +33,10 @@ export interface DataDictionaryTable {
   layer: 'L1' | 'L2' | 'L3';
   category: string;
   fields: DataDictionaryField[];
+  data_owner?: string;
+  data_steward?: string;
+  retention_policy?: string;
+  update_frequency?: string;
 }
 
 export interface DataDictionaryRelationship {

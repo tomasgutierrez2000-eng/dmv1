@@ -18,24 +18,14 @@ regulatory_references:
   description: ''
 source_tables:
 - schema: l2
-  table: facility_exposure_snapshot
-  alias: fes
+  table: facility_master
+  alias: fm
   join_type: BASE
   fields:
   - name: facility_id
     role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: effective_date
+  - name: effective_start_date
     role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.facility_id = fes.facility_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
   - name: counterparty_id
     role: DIMENSION
   - name: lob_segment_id
@@ -60,7 +50,7 @@ levels:
     formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
-        EXTRACT(EPOCH FROM fm.effective_date)::BIGINT AS metric_value
+        EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT AS metric_value
       FROM l2.facility_master fm
       WHERE fm.is_active_flag = 'Y'
   counterparty:
@@ -70,7 +60,7 @@ levels:
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
+        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
       FROM l2.facility_master fm
       WHERE fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -81,7 +71,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
+        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
       FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -94,7 +84,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
+        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
       FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -109,7 +99,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_date)::BIGINT) AS metric_value
+        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
       FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -125,15 +115,15 @@ output:
 validations:
 - rule_id: AMD-001-V01
   type: NOT_NULL
-  description: No null effective_date values
+  description: No null effective_start_date values
   severity: ERROR
 catalogue:
   item_id: MET-003
   abbreviation: ASD
   insight: |
     Amendment lifecycle tracking
-  rollup_strategy: direct-sum
-  primary_value_field: effective_date
+  rollup_strategy: custom
+  primary_value_field: effective_start_date
 tags:
 - amendments
 - amendment-events

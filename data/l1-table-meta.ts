@@ -19,7 +19,6 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'region_dim', scd: 'SCD-0', category: 'Geography' },
   { name: 'regulatory_jurisdiction', scd: 'SCD-0', category: 'Regulatory' },
   { name: 'entity_type_dim', scd: 'SCD-0', category: 'Counterparty' },
-  { name: 'duns_entity_dim', scd: 'SCD-1', category: 'External Data' },
   { name: 'credit_event_type_dim', scd: 'SCD-0', category: 'Credit Risk Status' },
   { name: 'credit_status_dim', scd: 'SCD-0', category: 'Credit Risk Status' },
   { name: 'exposure_type_dim', scd: 'SCD-0', category: 'Exposure Classification' },
@@ -82,7 +81,12 @@ export const L1_TABLE_META: L1TableMeta[] = [
 
   // ── Tables in DB but not in original TS definitions ──
   { name: 'metric_threshold', scd: 'SCD-1', category: 'Limits & Thresholds' },
-  { name: 'equity_allocation_config', scd: 'SCD-1', category: 'Capital & Equity' },
+
+  // ── ECL / Watchlist / Forbearance (Regulatory Coverage) ──
+  { name: 'ecl_stage_dim', scd: 'SCD-0', category: 'ECL/Impairment' },
+  { name: 'impairment_model_dim', scd: 'SCD-0', category: 'ECL/Impairment' },
+  { name: 'watchlist_category_dim', scd: 'SCD-0', category: 'Watchlist' },
+  { name: 'forbearance_type_dim', scd: 'SCD-0', category: 'Forbearance' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

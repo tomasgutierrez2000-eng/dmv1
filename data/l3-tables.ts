@@ -81,6 +81,7 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T57', name: 'counterparty_rating_calc',            category: 'Credit Events & Performance',             tier: 1 },
   { id: 'T58', name: 'facility_pricing_calc',               category: 'Facility Analytics',                      tier: 1 },
   { id: 'T60', name: 'collateral_calc',                     category: 'Credit Risk Mitigation (CRM)',            tier: 1 },
+  { id: 'T61', name: 'cash_flow_calc',                      category: 'Cash Flows',                              tier: 1 },
   // T62: GL calculated overlay (derived fields split from L2 gl_account_balance_snapshot)
   { id: 'T62', name: 'gl_account_balance_calc',             category: 'General Ledger',                          tier: 1 },
   // T63-T66: Calculation engine infrastructure tables
@@ -88,12 +89,11 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T64', name: 'calc_audit_log',                       category: 'Calculation Engine',                      tier: 1 },
   { id: 'T65', name: 'calc_validation_result',               category: 'Calculation Engine',                      tier: 1 },
   { id: 'T66', name: 'metric_result',                        category: 'Calculation Engine',                      tier: 1 },
-  // T67-T71: Dashboard consumption derived tables (consolidated wide tables per rollup level)
-  { id: 'T67', name: 'facility_derived',                     category: 'Dashboard Consumption',                   tier: 2 },
-  { id: 'T68', name: 'counterparty_derived',                 category: 'Dashboard Consumption',                   tier: 2 },
-  { id: 'T69', name: 'desk_derived',                         category: 'Dashboard Consumption',                   tier: 2 },
-  { id: 'T70', name: 'portfolio_derived',                    category: 'Dashboard Consumption',                   tier: 2 },
-  { id: 'T71', name: 'segment_derived',                      category: 'Dashboard Consumption',                   tier: 2 },
+
+  // ── ECL / Watchlist / Forbearance (Regulatory Coverage) ──
+  { id: 'T67', name: 'ecl_provision_calc',                  category: 'ECL/Impairment',                          tier: 1 },
+  { id: 'T68', name: 'ecl_allowance_movement',              category: 'ECL/Impairment',                          tier: 2 },
+  { id: 'T69', name: 'watchlist_movement_summary',           category: 'Watchlist',                               tier: 2 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

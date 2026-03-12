@@ -75,6 +75,11 @@ export const L2_TABLE_META: L2TableMeta[] = [
 
   // ── Snapshots (General Ledger) ──
   { name: 'gl_account_balance_snapshot', scd: 'Snapshot', category: 'General Ledger' },
+
+  // ── ECL / Watchlist / Forbearance (Regulatory Coverage) ──
+  { name: 'ecl_staging_snapshot', scd: 'Snapshot', category: 'ECL/Impairment' },
+  { name: 'watchlist_entry', scd: 'Event', category: 'Watchlist' },
+  { name: 'forbearance_event', scd: 'Event', category: 'Forbearance' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

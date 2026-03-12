@@ -1,5 +1,5 @@
 /**
- * L3 Table manifest — 77 tables (69 original + 8 from capital metrics migration).
+ * L3 Table manifest — 82 tables (69 original + 8 capital + 5 dashboard derived).
  * Matches sql/l3/01_DDL_all_tables.sql and execution order in 06_ORCHESTRATOR.sql.
  * T51-T52: Calculated overlay tables (derived fields split from L2 snapshots).
  * T53-T54: Promoted from L2 (entirely computed tables).
@@ -104,6 +104,13 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T75', name: 'desk_capital_consumption',             category: 'Capital & Equity',                        tier: 2 },
   { id: 'T76', name: 'portfolio_capital_consumption',        category: 'Capital & Equity',                        tier: 2 },
   { id: 'T77', name: 'segment_capital_consumption',          category: 'Capital & Equity',                        tier: 3 },
+
+  // ── Dashboard Derived (wide denormalized tables for CRO dashboard) ──
+  { id: 'T78', name: 'facility_derived',                     category: 'Dashboard Derived',                       tier: 4 },
+  { id: 'T79', name: 'counterparty_derived',                 category: 'Dashboard Derived',                       tier: 4 },
+  { id: 'T80', name: 'desk_derived',                         category: 'Dashboard Derived',                       tier: 4 },
+  { id: 'T81', name: 'portfolio_derived',                    category: 'Dashboard Derived',                       tier: 4 },
+  { id: 'T82', name: 'segment_derived',                      category: 'Dashboard Derived',                       tier: 4 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

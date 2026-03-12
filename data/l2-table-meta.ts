@@ -71,6 +71,7 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'risk_flag', scd: 'Event', category: 'Risk Monitoring' },
   { name: 'facility_credit_approval', scd: 'Event', category: 'Approvals' },
   { name: 'payment_ledger', scd: 'Event', category: 'Payments' },
+  { name: 'cash_flow', scd: 'Event', category: 'Payments' },
   { name: 'gl_journal_entry', scd: 'Event', category: 'General Ledger' },
 
   // ── Snapshots (General Ledger) ──

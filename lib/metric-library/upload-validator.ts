@@ -3,13 +3,14 @@
  *
  * Checks metric ID format, collisions with existing catalogue items, required
  * fields, domain/unit/direction/class validity, source field existence in the
- * data dictionary (with fuzzy matching suggestions), and SQL formula safety.
+ * data dictionary (with fuzzy matching suggestions), and Python calculator files.
  */
 
 import { readDataDictionary, findTable } from '@/lib/data-dictionary';
 import type { DataDictionary } from '@/lib/data-dictionary';
 import { getCatalogueItems } from './store';
 import type { MetricWithSources } from './template-parser';
+import { validatePythonFile } from './python-validator';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -76,16 +77,6 @@ const VALID_METRIC_CLASSES = [
 ] as const;
 
 const VALID_LAYERS = ['L1', 'L2', 'L3'] as const;
-
-const DANGEROUS_SQL_KEYWORDS = [
-  'INSERT',
-  'UPDATE',
-  'DELETE',
-  'DROP',
-  'ALTER',
-  'CREATE',
-  'TRUNCATE',
-];
 
 // ---------------------------------------------------------------------------
 // Levenshtein distance (simple DP implementation, no external deps)
@@ -363,39 +354,6 @@ function validateMetric(
     }
   }
 
-  // 12. SQL formula validation
-  const formulaKeys = Object.keys(metric).filter(
-    (k) => k.startsWith('formula') && typeof m[k] === 'string'
-  );
-
-  for (const key of formulaKeys) {
-    const formula = (m[key] as string).trim();
-    if (!formula) continue;
-
-    // Must start with SELECT
-    if (!/^\s*SELECT\b/i.test(formula)) {
-      issues.push({
-        severity: 'warning',
-        field: key,
-        message: `Formula in '${key}' does not start with SELECT.`,
-        suggestion: 'SQL formulas should begin with a SELECT statement.',
-      });
-    }
-
-    // Must not contain dangerous keywords
-    for (const keyword of DANGEROUS_SQL_KEYWORDS) {
-      const pattern = new RegExp(`\\b${keyword}\\b`, 'i');
-      if (pattern.test(formula)) {
-        issues.push({
-          severity: 'warning',
-          field: key,
-          message: `Formula in '${key}' contains prohibited keyword '${keyword}'.`,
-          suggestion: 'Only SELECT queries are allowed in metric formulas.',
-        });
-      }
-    }
-  }
-
   // Determine overall status
   const hasError = issues.some((i) => i.severity === 'error');
   const hasWarning = issues.some((i) => i.severity === 'warning');
@@ -417,7 +375,10 @@ function validateMetric(
 // Public API
 // ---------------------------------------------------------------------------
 
-export function validateUpload(metrics: MetricWithSources[]): ValidationReport {
+export function validateUpload(
+  metrics: MetricWithSources[],
+  pythonFiles?: Map<string, string>  // metric_id -> python file content
+): ValidationReport {
   // Load data dictionary (may be null if unavailable)
   const dd = readDataDictionary();
   const tblByLayer = dd ? tableNamesByLayer(dd) : {};
@@ -431,6 +392,48 @@ export function validateUpload(metrics: MetricWithSources[]): ValidationReport {
   const validations = metrics.map((m) =>
     validateMetric(m, existingIds, dd, tblByLayer, allTbls)
   );
+
+  // Python file validation
+  if (pythonFiles && pythonFiles.size > 0) {
+    for (const validation of validations) {
+      const metric = metrics.find((m) => (m.metric_id ?? '') === validation.metric_id);
+      if (!metric) continue;
+
+      // Try to find a matching Python file: by metric_id directly, or by
+      // filename without .py extension
+      const pythonContent =
+        pythonFiles.get(metric.metric_id) ??
+        pythonFiles.get(metric.metric_id?.replace(/\.py$/, '') ?? '');
+
+      const mode = (typeof metric.calculator_mode === 'string' ? metric.calculator_mode : '').trim().toLowerCase();
+
+      if ((mode === 'full' || mode === 'simple') && !pythonContent) {
+        validation.issues.push({
+          severity: 'warning',
+          field: 'python_calculator',
+          message: `calculator_mode is '${mode}' but no Python file was uploaded for this metric.`,
+        });
+      }
+
+      if (pythonContent) {
+        const pyResult = validatePythonFile(pythonContent, metric.metric_id);
+        for (const pyIssue of pyResult.issues) {
+          validation.issues.push({
+            severity: pyIssue.severity,
+            field: 'python_calculator',
+            message: pyIssue.line
+              ? `[line ${pyIssue.line}] ${pyIssue.message}`
+              : pyIssue.message,
+          });
+        }
+      }
+
+      // Recompute status after adding Python issues
+      const hasError = validation.issues.some((i) => i.severity === 'error');
+      const hasWarning = validation.issues.some((i) => i.severity === 'warning');
+      validation.status = hasError ? 'error' : hasWarning ? 'warning' : 'valid';
+    }
+  }
 
   // Build summary
   let valid = 0;

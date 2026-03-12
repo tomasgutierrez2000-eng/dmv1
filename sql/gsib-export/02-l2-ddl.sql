@@ -241,6 +241,7 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_profitability_snapshot" (
     "fee_income_ytd" NUMERIC(18,2),
     "ledger_account_id" BIGINT,
     "allocated_equity_amt" NUMERIC(18,2),
+    "equity_allocation_pct" NUMERIC(10,6),
     "avg_earning_assets_amt" NUMERIC(18,2),
     "base_currency_code" VARCHAR(20),
     "fee_income_amt" NUMERIC(18,2),

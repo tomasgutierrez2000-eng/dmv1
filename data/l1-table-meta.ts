@@ -81,6 +81,7 @@ export const L1_TABLE_META: L1TableMeta[] = [
 
   // ── Tables in DB but not in original TS definitions ──
   { name: 'metric_threshold', scd: 'SCD-1', category: 'Limits & Thresholds' },
+  { name: 'equity_allocation_config', scd: 'SCD-1', category: 'Capital & Equity' },
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

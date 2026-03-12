@@ -15,6 +15,25 @@ export const RELEASE_ENTRIES: ReleaseEntry[] = [
   { date: '2026-03-12', layer: 'L2', table: 'facility_risk_snapshot', field: 'pd_pct', changeType: 'Removed', rationale: 'Field removed from L2.facility_risk_snapshot' },
 
   // ── 2026-03-12: Auto-detected changes ─────────────────────────
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: '(new table)', changeType: 'Added', rationale: 'New L1 table added' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'equity_allocation_config_id', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'legal_entity_id', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'allocation_method_code', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'allocation_method_name', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'allocation_scope_code', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'scope_reference_id', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'target_allocation_pct', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'min_allocation_pct', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'max_allocation_pct', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'effective_from_date', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'effective_to_date', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'active_flag', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'created_ts', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L1', table: 'equity_allocation_config', field: 'updated_ts', changeType: 'Added', rationale: 'Field added to new L1.equity_allocation_config' },
+  { date: '2026-03-12', layer: 'L2', table: 'facility_profitability_snapshot', field: 'equity_allocation_pct', changeType: 'Added', rationale: 'Field added to L2.facility_profitability_snapshot' },
+  { date: '2026-03-12', layer: 'L3', table: 'lob_profitability_summary', field: 'equity_allocation_pct', changeType: 'Added', rationale: 'Field added to L3.lob_profitability_summary' },
+
+  // ── 2026-03-12: Auto-detected changes ─────────────────────────
   { date: '2026-03-12', layer: 'L1', table: 'ledger_account_dim', field: 'is_balance_sheet_flag', changeType: 'Added', rationale: 'Field added to L1.ledger_account_dim' },
   { date: '2026-03-12', layer: 'L2', table: 'cash_flow', field: 'maturity_bucket_id', changeType: 'Removed', rationale: 'Field removed from L2.cash_flow' },
   { date: '2026-03-12', layer: 'L2', table: 'facility_pricing_snapshot', field: 'pricing_tier', changeType: 'Removed', rationale: 'Field removed from L2.facility_pricing_snapshot' },

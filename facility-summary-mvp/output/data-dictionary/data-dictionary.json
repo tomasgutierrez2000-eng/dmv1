@@ -5635,6 +5635,115 @@
           "data_type": "BOOLEAN"
         }
       ]
+    },
+    {
+      "name": "equity_allocation_config",
+      "layer": "L1",
+      "category": "Capital & Equity",
+      "fields": [
+        {
+          "name": "equity_allocation_config_id",
+          "description": "Surrogate key for equity allocation configuration",
+          "category": "Capital & Equity",
+          "why_required": "Primary key",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "legal_entity_id",
+          "description": "Legal entity this configuration applies to",
+          "category": "Capital & Equity",
+          "why_required": "Scopes config to entity",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "legal_entity",
+              "field": "legal_entity_id"
+            }
+          }
+        },
+        {
+          "name": "allocation_method_code",
+          "description": "Equity allocation method (RWA_PROPORTIONAL, ECONOMIC_CAPITAL, REGULATORY, FLAT, CUSTOM)",
+          "category": "Capital & Equity",
+          "why_required": "Defines allocation methodology",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "allocation_method_name",
+          "description": "Human-readable allocation method name",
+          "category": "Capital & Equity",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "allocation_scope_code",
+          "description": "Scope level for allocation (ENTITY, LOB, DESK, PORTFOLIO)",
+          "category": "Capital & Equity",
+          "why_required": "Defines granularity of allocation rule",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "scope_reference_id",
+          "description": "FK to the scoped entity (lob_node_id, desk_id, portfolio_id depending on scope)",
+          "category": "Capital & Equity",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "target_allocation_pct",
+          "description": "Target equity allocation percentage",
+          "category": "Capital & Equity",
+          "why_required": "Defines target allocation",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "min_allocation_pct",
+          "description": "Floor allocation percentage",
+          "category": "Capital & Equity",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "max_allocation_pct",
+          "description": "Ceiling allocation percentage",
+          "category": "Capital & Equity",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "effective_from_date",
+          "description": "Configuration effective start date",
+          "category": "Capital & Equity",
+          "data_type": "DATE"
+        },
+        {
+          "name": "effective_to_date",
+          "description": "Configuration effective end date",
+          "category": "Capital & Equity",
+          "data_type": "DATE"
+        },
+        {
+          "name": "active_flag",
+          "description": "Active indicator",
+          "category": "Capital & Equity",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "created_ts",
+          "description": "Record creation timestamp",
+          "category": "Capital & Equity",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "Record last update timestamp",
+          "category": "Capital & Equity",
+          "data_type": "TIMESTAMP"
+        }
+      ]
     }
   ],
   "L2": [
@@ -7253,6 +7362,13 @@
           "category": "Financial Metrics",
           "why_required": "ROE calculation",
           "data_type": "NUMERIC(18,2)"
+        },
+        {
+          "name": "equity_allocation_pct",
+          "description": "Equity allocation percentage applied to this facility from entity total equity",
+          "category": "Financial Metrics",
+          "why_required": "Input to allocated_equity_amt calculation; audit trail for equity allocation methodology",
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "avg_earning_assets_amt",
@@ -15306,6 +15422,12 @@
           "description": "",
           "category": "Business Segment Summary",
           "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "equity_allocation_pct",
+          "description": "Aggregated equity allocation percentage for this LOB",
+          "category": "Business Segment Summary",
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "nim_pct",

@@ -53,4 +53,9 @@ if [ "$MATCHED" = true ]; then
   echo "  [hook] Syncing changes to postgres_capital..."
   npm run db:sync-capital -- --yes 2>&1 | tail -5
   echo "  [hook] Capital DB sync complete."
+
+  # Auto-sync doc counts in CLAUDE.md and playbook after schema changes
+  echo "  [hook] Syncing doc counts (CLAUDE.md + playbook)..."
+  npm run doc:sync 2>&1 | tail -5
+  echo "  [hook] Doc counts synced."
 fi

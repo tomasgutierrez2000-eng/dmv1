@@ -90,6 +90,12 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T64', name: 'calc_audit_log',                       category: 'Calculation Engine',                      tier: 1 },
   { id: 'T65', name: 'calc_validation_result',               category: 'Calculation Engine',                      tier: 1 },
   { id: 'T66', name: 'metric_result',                        category: 'Calculation Engine',                      tier: 1 },
+  // T67-T71: Dashboard consumption derived tables (consolidated wide tables per rollup level)
+  { id: 'T67', name: 'facility_derived',                     category: 'Dashboard Consumption',                   tier: 2 },
+  { id: 'T68', name: 'counterparty_derived',                 category: 'Dashboard Consumption',                   tier: 2 },
+  { id: 'T69', name: 'desk_derived',                         category: 'Dashboard Consumption',                   tier: 2 },
+  { id: 'T70', name: 'portfolio_derived',                    category: 'Dashboard Consumption',                   tier: 2 },
+  { id: 'T71', name: 'segment_derived',                      category: 'Dashboard Consumption',                   tier: 2 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

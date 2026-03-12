@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, BookOpen, ChevronLeft, Database, Activity } from 'lucide-react';
+import { Search, BookOpen, ChevronLeft, Database, Activity, Upload } from 'lucide-react';
 import type { MetricDomain, CatalogueItem, CatalogueItemKind } from '@/lib/metric-library/types';
 import { KindBadge, TypeBadge, SourcingBadge } from './badges';
 import { DomainIcon } from './domain-icons';
@@ -74,6 +74,15 @@ export default function LibraryMainView() {
               Overview
             </Link>
             <h1 className="text-2xl font-bold text-gray-900">Data Catalogue</h1>
+            <div className="ml-auto">
+              <Link
+                href="/metrics/library/upload"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              >
+                <Upload className="w-4 h-4" aria-hidden />
+                Upload Metrics
+              </Link>
+            </div>
           </div>
           {!loading && !error && (
             <p className="text-sm text-gray-500 mt-1">

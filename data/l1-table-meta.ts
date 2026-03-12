@@ -81,7 +81,7 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'scenario_dim', scd: 'SCD-1', category: 'Scenario' },
 
   // ── Tables in DB but not in original TS definitions ──
-  { name: 'metric_threshold', scd: 'SCD-1', category: 'Limits & Thresholds' },
+  // metric_threshold removed — lives in L2 schema (has as_of_date, is a snapshot not pure reference)
   { name: 'equity_allocation_config', scd: 'SCD-1', category: 'Capital & Equity' },
 ];
 

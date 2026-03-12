@@ -76,11 +76,14 @@ levels:
     formula_sql: |-
       SELECT
         ffs.facility_id AS dimension_key,
-        ffs.net_income_amt / NULLIF(fec.rwa_amt, 0) * 100.0 AS metric_value
+        ffs.net_income_amt / NULLIF(COALESCE(fec.rwa_amt, fes.rwa_amt), 0) * 100.0 AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = ffs.facility_id
         AND fes.as_of_date = ffs.as_of_date
+      LEFT JOIN l3.facility_exposure_calc fec
+        ON fec.facility_id = ffs.facility_id
+        AND fec.as_of_date = ffs.as_of_date
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
@@ -99,11 +102,14 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.net_income_amt AS numerator_val,
-          fec.rwa_amt AS denominator_val
+          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
         FROM l2.facility_financial_snapshot ffs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
+        LEFT JOIN l3.facility_exposure_calc fec
+          ON fec.facility_id = ffs.facility_id
+          AND fec.as_of_date = ffs.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -127,11 +133,14 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.net_income_amt AS numerator_val,
-          fec.rwa_amt AS denominator_val
+          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
         FROM l2.facility_financial_snapshot ffs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
+        LEFT JOIN l3.facility_exposure_calc fec
+          ON fec.facility_id = ffs.facility_id
+          AND fec.as_of_date = ffs.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -157,11 +166,14 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.net_income_amt AS numerator_val,
-          fec.rwa_amt AS denominator_val
+          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
         FROM l2.facility_financial_snapshot ffs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
+        LEFT JOIN l3.facility_exposure_calc fec
+          ON fec.facility_id = ffs.facility_id
+          AND fec.as_of_date = ffs.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
@@ -189,11 +201,14 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.net_income_amt AS numerator_val,
-          fec.rwa_amt AS denominator_val
+          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
         FROM l2.facility_financial_snapshot ffs
         INNER JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
           AND fes.as_of_date = ffs.as_of_date
+        LEFT JOIN l3.facility_exposure_calc fec
+          ON fec.facility_id = ffs.facility_id
+          AND fec.as_of_date = ffs.as_of_date
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'

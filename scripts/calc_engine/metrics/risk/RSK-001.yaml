@@ -60,7 +60,7 @@ levels:
     formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
-        1 AS metric_value
+        cro.rating_grade_id AS metric_value
       FROM l2.counterparty_rating_observation cro
       INNER JOIN l2.facility_master fm
         ON fm.counterparty_id = cro.counterparty_id

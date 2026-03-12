@@ -4455,7 +4455,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = fprs.allocated_equity_amt / NULLIF(fec.rwa_amt, 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = fprs.allocated_equity_amt / NULLIF(COALESCE(fec.rwa_amt, fes.rwa_amt), 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -4878,7 +4878,7 @@
         "dashboard_display_name": "Return on RWA (%) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = ffs.net_income_amt / NULLIF(fec.rwa_amt, 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = ffs.net_income_amt / NULLIF(COALESCE(fec.rwa_amt, fes.rwa_amt), 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -5657,7 +5657,7 @@
         "dashboard_display_name": "Current Collateral Market Value (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY cs.facility_id, fla.bank_share_pct\n6. COMPUTE\n   metric_value = SUM(cs.current_valuation_usd) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY cs.facility_id\n6. COMPUTE\n   metric_value = SUM(cs.current_valuation_usd) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -7640,7 +7640,7 @@
         "dashboard_display_name": "Days Payment Overdue Bucket (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = MAX(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -7703,7 +7703,7 @@
         "dashboard_display_name": "Days Payment Overdue Bucket (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = MAX(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -7766,7 +7766,7 @@
         "dashboard_display_name": "Days Payment Overdue Bucket (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = MAX(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -7829,7 +7829,7 @@
         "dashboard_display_name": "Days Payment Overdue Bucket (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_delinquency_snapshot  (fds)\n   WHERE fds.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fds.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = MAX(fac.metric_value)",
         "source_references": [
           {
             "layer": "L2",
@@ -10180,7 +10180,7 @@
     "abbreviation": "EL",
     "kind": "METRIC",
     "definition": "PD × LGD × Exposure expressed in USD. Calculated forward-looking loss metric supporting provisioning, capital planning, and stress testing analytics.\n",
-    "generic_formula": "SUM(expected_loss_usd) per facility from stress_test_result. Weighted by bank share percentage.\n",
+    "generic_formula": "SUM(stressed_expected_loss) per facility from stress_test_result. Weighted by bank share percentage.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
@@ -10214,13 +10214,13 @@
         "dashboard_display_name": "Expected Loss ($) (facility)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l3.stress_test_result  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY str_res.facility_id\n4. COMPUTE\n   metric_value = SUM(str_res.expected_loss_usd * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
+        "level_logic": "1. LOAD  l3.facility_stress_test_calc  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY str_res.facility_id\n4. COMPUTE\n   metric_value = SUM(str_res.stressed_expected_loss * COALESCE(fla.bank_share_pct, 100.0) / 100.0)",
         "source_references": [
           {
             "layer": "L3",
-            "table": "stress_test_result",
-            "field": "expected_loss_usd",
-            "description": "expected_loss_usd"
+            "table": "facility_stress_test_calc",
+            "field": "stressed_expected_loss",
+            "description": "stressed_expected_loss"
           },
           {
             "layer": "L1",
@@ -10241,13 +10241,13 @@
         "dashboard_display_name": "Expected Loss ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l3.stress_test_result  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l3.facility_stress_test_calc  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L3",
-            "table": "stress_test_result",
-            "field": "expected_loss_usd",
-            "description": "expected_loss_usd"
+            "table": "facility_stress_test_calc",
+            "field": "stressed_expected_loss",
+            "description": "stressed_expected_loss"
           },
           {
             "layer": "L1",
@@ -10268,13 +10268,13 @@
         "dashboard_display_name": "Expected Loss ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l3.stress_test_result  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l3.facility_stress_test_calc  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L3",
-            "table": "stress_test_result",
-            "field": "expected_loss_usd",
-            "description": "expected_loss_usd"
+            "table": "facility_stress_test_calc",
+            "field": "stressed_expected_loss",
+            "description": "stressed_expected_loss"
           },
           {
             "layer": "L1",
@@ -10295,13 +10295,13 @@
         "dashboard_display_name": "Expected Loss ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l3.stress_test_result  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l3.facility_stress_test_calc  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L3",
-            "table": "stress_test_result",
-            "field": "expected_loss_usd",
-            "description": "expected_loss_usd"
+            "table": "facility_stress_test_calc",
+            "field": "stressed_expected_loss",
+            "description": "stressed_expected_loss"
           },
           {
             "layer": "L1",
@@ -10322,13 +10322,13 @@
         "dashboard_display_name": "Expected Loss ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l3.stress_test_result  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l3.facility_stress_test_calc  (str_res)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
         "source_references": [
           {
             "layer": "L3",
-            "table": "stress_test_result",
-            "field": "expected_loss_usd",
-            "description": "expected_loss_usd"
+            "table": "facility_stress_test_calc",
+            "field": "stressed_expected_loss",
+            "description": "stressed_expected_loss"
           },
           {
             "layer": "L1",
@@ -31646,7 +31646,7 @@
         "dashboard_display_name": "Risk Rating Tier (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.counterparty_rating_observation  (cro)\n   WHERE cro.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = cro.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = 1",
+        "level_logic": "1. LOAD  l2.counterparty_rating_observation  (cro)\n   WHERE cro.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = cro.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = cro.rating_grade_id",
         "source_references": [
           {
             "layer": "L2",

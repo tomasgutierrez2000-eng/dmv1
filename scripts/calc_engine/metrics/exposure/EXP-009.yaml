@@ -78,13 +78,13 @@ levels:
       FROM l2.facility_delinquency_snapshot fds
       WHERE fds.as_of_date = :as_of_date
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: MAX
     formula_text: >
-      SUM of facility-level dpd_bucket_code per counterparty.
+      Worst (MAX) facility-level dpd_bucket_code per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        MAX(fac.metric_value) AS metric_value
       FROM (
         SELECT
           fds.facility_id AS dimension_key,
@@ -97,13 +97,13 @@ levels:
         AND fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: MAX
     formula_text: >
-      SUM of facility-level dpd_bucket_code per L3 desk segment.
+      Worst (MAX) facility-level dpd_bucket_code per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        MAX(fac.metric_value) AS metric_value
       FROM (
         SELECT
           fds.facility_id AS dimension_key,
@@ -118,13 +118,13 @@ levels:
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: MAX
     formula_text: >
-      SUM of facility-level dpd_bucket_code per L2 portfolio segment.
+      Worst (MAX) facility-level dpd_bucket_code per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        MAX(fac.metric_value) AS metric_value
       FROM (
         SELECT
           fds.facility_id AS dimension_key,
@@ -141,13 +141,13 @@ levels:
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: MAX
     formula_text: >
-      SUM of facility-level dpd_bucket_code per L1 business segment segment.
+      Worst (MAX) facility-level dpd_bucket_code per L1 business segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        MAX(fac.metric_value) AS metric_value
       FROM (
         SELECT
           fds.facility_id AS dimension_key,
@@ -182,7 +182,7 @@ catalogue:
   abbreviation: "DPOB"
   insight: >
     Late payment severity
-  rollup_strategy: "direct-sum"
+  rollup_strategy: "worst-case"
   primary_value_field: "dpd_bucket_code"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["exposure", "risk-metrics"]

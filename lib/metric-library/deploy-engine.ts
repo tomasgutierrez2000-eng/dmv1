@@ -1,7 +1,11 @@
 /**
  * Deploy Engine — takes validated metrics and integrates them into the data model.
  *
- * Pipeline: generate YAML → write file → run calc:sync → verify catalogue → optionally generate demo.
+ * Pipeline:
+ *   1. Generate YAML → write file
+ *   2. Run calc:sync (YAML → catalogue + Excel)
+ *   3. Verify catalogue entries exist
+ *   4. Auto-populate demo data from live PostgreSQL (no user opt-in needed)
  */
 
 import fs from 'fs';
@@ -10,6 +14,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { generateYamlFromUpload, getYamlFilePath } from './yaml-generator';
 import { getCatalogueItem } from './store';
+import { generateAndPersistDemoData } from './live-demo-query';
 import type { MetricWithSources } from './template-parser';
 
 const execFileAsync = promisify(execFile);
@@ -29,7 +34,6 @@ export interface DeployResult {
 }
 
 interface DeployOptions {
-  generateDemo: boolean;
   dryRun: boolean;
 }
 
@@ -88,15 +92,9 @@ export async function deployMetrics(
         fs.mkdirSync(dir, { recursive: true });
       }
 
-      // Check if file already exists
-      if (fs.existsSync(absPath)) {
-        // Overwrite with new content
-        fs.writeFileSync(absPath, yaml, 'utf-8');
-        return `Updated ${relPath}`;
-      }
-
+      const existed = fs.existsSync(absPath);
       fs.writeFileSync(absPath, yaml, 'utf-8');
-      return `Created ${relPath}`;
+      return existed ? `Updated ${relPath}` : `Created ${relPath}`;
     });
     steps.push(step);
 
@@ -144,24 +142,22 @@ export async function deployMetrics(
     steps.push(verifyStep);
   }
 
-  // Step 4: Generate demo data (optional)
-  if (options.generateDemo && !options.dryRun) {
-    for (const metricId of deployedIds) {
-      const demoStep = await runStep(`Generate demo: ${metricId}`, async () => {
-        const { stdout, stderr } = await execFileAsync(
-          'python3',
-          ['-m', 'scripts.calc_engine.generate_demo_data', '--metric', metricId, '--persist', '--force'],
-          { cwd: root, timeout: 30_000 }
-        );
-        return (stdout + '\n' + stderr).trim() || 'Demo generated';
-      });
-      steps.push(demoStep);
-    }
-  } else if (options.generateDemo && options.dryRun) {
+  // Step 4: Auto-populate demo data from live database
+  if (!options.dryRun && deployedIds.length > 0) {
+    const demoStep = await runStep('Populate demo data from DB', async () => {
+      const results: string[] = [];
+      for (const metricId of deployedIds) {
+        const ok = await generateAndPersistDemoData(metricId);
+        results.push(ok ? `${metricId}: ✓` : `${metricId}: skipped (no DB)`);
+      }
+      return results.join(', ');
+    });
+    steps.push(demoStep);
+  } else if (options.dryRun) {
     steps.push({
-      name: 'Generate demo data',
+      name: 'Populate demo data from DB',
       status: 'skipped',
-      message: '[dry-run] Would generate demo data',
+      message: '[dry-run] Would query DB for demo data',
       duration_ms: 0,
     });
   }

@@ -10,6 +10,11 @@ export interface ReleaseEntry {
 /** All data model changes, newest first. */
 export const RELEASE_ENTRIES: ReleaseEntry[] = [
   // ── 2026-03-12: Auto-detected changes ─────────────────────────
+  { date: '2026-03-12', layer: 'L2', table: 'cash_flow', field: '(entire table)', changeType: 'Removed', rationale: 'L2 table removed' },
+  { date: '2026-03-12', layer: 'L2', table: 'counterparty_financial_snapshot', field: 'total_assets_amt', changeType: 'Removed', rationale: 'Field removed from L2.counterparty_financial_snapshot' },
+  { date: '2026-03-12', layer: 'L2', table: 'facility_risk_snapshot', field: 'pd_pct', changeType: 'Removed', rationale: 'Field removed from L2.facility_risk_snapshot' },
+
+  // ── 2026-03-12: Auto-detected changes ─────────────────────────
   { date: '2026-03-12', layer: 'L1', table: 'ledger_account_dim', field: 'is_balance_sheet_flag', changeType: 'Added', rationale: 'Field added to L1.ledger_account_dim' },
   { date: '2026-03-12', layer: 'L2', table: 'cash_flow', field: 'maturity_bucket_id', changeType: 'Removed', rationale: 'Field removed from L2.cash_flow' },
   { date: '2026-03-12', layer: 'L2', table: 'facility_pricing_snapshot', field: 'pricing_tier', changeType: 'Removed', rationale: 'Field removed from L2.facility_pricing_snapshot' },

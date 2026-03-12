@@ -81,7 +81,6 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T57', name: 'counterparty_rating_calc',            category: 'Credit Events & Performance',             tier: 1 },
   { id: 'T58', name: 'facility_pricing_calc',               category: 'Facility Analytics',                      tier: 1 },
   { id: 'T60', name: 'collateral_calc',                     category: 'Credit Risk Mitigation (CRM)',            tier: 1 },
-  { id: 'T61', name: 'cash_flow_calc',                      category: 'Cash Flows',                              tier: 1 },
   // T62: GL calculated overlay (derived fields split from L2 gl_account_balance_snapshot)
   { id: 'T62', name: 'gl_account_balance_calc',             category: 'General Ledger',                          tier: 1 },
   // T63-T66: Calculation engine infrastructure tables

@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-12T03:53:42.863Z",
+  "createdAt": "2026-03-12T04:24:14.124Z",
   "tables": [
     {
       "layer": "L1",
@@ -2964,57 +2964,6 @@
     },
     {
       "layer": "L2",
-      "tableName": "cash_flow",
-      "fields": [
-        {
-          "name": "cash_flow_id"
-        },
-        {
-          "name": "facility_id"
-        },
-        {
-          "name": "cash_flow_date"
-        },
-        {
-          "name": "cash_flow_type"
-        },
-        {
-          "name": "amount"
-        },
-        {
-          "name": "currency_code"
-        },
-        {
-          "name": "as_of_date"
-        },
-        {
-          "name": "contractual_amt"
-        },
-        {
-          "name": "contractual_amt_usd"
-        },
-        {
-          "name": "counterparty_id"
-        },
-        {
-          "name": "flow_date"
-        },
-        {
-          "name": "flow_direction"
-        },
-        {
-          "name": "flow_id"
-        },
-        {
-          "name": "flow_type"
-        },
-        {
-          "name": "position_id"
-        }
-      ]
-    },
-    {
-      "layer": "L2",
       "tableName": "facility_delinquency_snapshot",
       "fields": [
         {
@@ -3828,9 +3777,6 @@
           "name": "amortization_amt"
         },
         {
-          "name": "total_assets_amt"
-        },
-        {
           "name": "total_liabilities_amt"
         },
         {
@@ -3868,9 +3814,6 @@
         },
         {
           "name": "counterparty_id"
-        },
-        {
-          "name": "pd_pct"
         },
         {
           "name": "lgd_pct"

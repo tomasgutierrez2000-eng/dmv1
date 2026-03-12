@@ -61,7 +61,6 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'facility_risk_snapshot', scd: 'Snapshot', category: 'Risk Monitoring' },
 
   // ── Events ──
-  { name: 'cash_flow', scd: 'Event', category: 'Cash Flows' },
   { name: 'amendment_change_detail', scd: 'Event', category: 'Amendments' },
   { name: 'amendment_event', scd: 'Event', category: 'Amendments' },
   { name: 'credit_event', scd: 'Event', category: 'Credit Events' },

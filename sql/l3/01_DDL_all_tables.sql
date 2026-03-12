@@ -1319,15 +1319,6 @@ CREATE TABLE IF NOT EXISTS "l3"."collateral_calc" (
     PRIMARY KEY ("collateral_asset_id", "as_of_date")
 );
 
--- cash_flow_calc (Cash Flows)
--- Calculated overlay for l2.cash_flow
-CREATE TABLE IF NOT EXISTS "l3"."cash_flow_calc" (
-    "cash_flow_id" BIGINT NOT NULL,
-    "contractual_amt" NUMERIC(20,4),
-    "created_ts" TIMESTAMP,
-    PRIMARY KEY ("cash_flow_id")
-);
-
 -- data_quality_score_snapshot (Data Quality)
 CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_snapshot" (
     "table_name" VARCHAR(100) NOT NULL,

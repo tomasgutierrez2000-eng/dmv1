@@ -186,26 +186,6 @@ CREATE TABLE IF NOT EXISTS "l2"."collateral_snapshot" (
     PRIMARY KEY ("collateral_asset_id", "as_of_date")
 );
 
--- cash_flow (Cash Flows)
-CREATE TABLE IF NOT EXISTS "l2"."cash_flow" (
-    "cash_flow_id" BIGINT NOT NULL,
-    "facility_id" BIGINT,
-    "cash_flow_date" DATE,
-    "cash_flow_type" VARCHAR(50),
-    "amount" NUMERIC(18,2),
-    "currency_code" VARCHAR(20),
-    "as_of_date" DATE,
-    "contractual_amt" NUMERIC(18,2),
-    "contractual_amt_usd" NUMERIC(18,2),
-    "counterparty_id" BIGINT,
-    "flow_date" DATE,
-    "flow_direction" VARCHAR(100),
-    "flow_id" BIGINT,
-    "flow_type" VARCHAR(50),
-    "position_id" BIGINT,
-    PRIMARY KEY ("cash_flow_id")
-);
-
 -- facility_delinquency_snapshot (Financial Metrics)
 CREATE TABLE IF NOT EXISTS "l2"."facility_delinquency_snapshot" (
     "facility_id" BIGINT NOT NULL,
@@ -578,7 +558,6 @@ CREATE TABLE IF NOT EXISTS "l2"."counterparty_financial_snapshot" (
     "tax_expense_amt" NUMERIC(18,2),
     "depreciation_amt" NUMERIC(18,2),
     "amortization_amt" NUMERIC(18,2),
-    "total_assets_amt" NUMERIC(18,2),
     "total_liabilities_amt" NUMERIC(18,2),
     "shareholders_equity_amt" NUMERIC(18,2),
     "ebitda_amt" NUMERIC(18,2),
@@ -595,7 +574,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_risk_snapshot" (
     "facility_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
     "counterparty_id" BIGINT,
-    "pd_pct" NUMERIC(10,6),
     "lgd_pct" NUMERIC(10,6),
     "ccf" NUMERIC(6,4),
     "ead_amt" NUMERIC(18,2),

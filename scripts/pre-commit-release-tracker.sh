@@ -25,7 +25,7 @@ echo "[release-tracker] Data model definitions changed — syncing release track
 npx tsx scripts/release-tracker-sync.ts 2>&1
 
 # Check if the sync modified files that aren't staged
-TRACKER_MODIFIED=$(git diff --name-only lib/release-tracker-data.ts scripts/release-tracker-snapshot.json 2>/dev/null)
+TRACKER_MODIFIED=$(git diff --name-only data/release-entries.json scripts/release-tracker-snapshot.json 2>/dev/null)
 
 if [ -n "$TRACKER_MODIFIED" ]; then
   echo ""
@@ -33,7 +33,7 @@ if [ -n "$TRACKER_MODIFIED" ]; then
   echo "$TRACKER_MODIFIED"
   echo ""
   echo "Review the changes, then stage and re-commit:"
-  echo "  git add lib/release-tracker-data.ts scripts/release-tracker-snapshot.json"
+  echo "  git add data/release-entries.json scripts/release-tracker-snapshot.json"
   echo "  git commit"
   exit 1
 fi

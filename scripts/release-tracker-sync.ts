@@ -7,7 +7,7 @@
  * `npm run db:introspect` from PostgreSQL).
  *
  * If tables or fields were added/removed, appends entries to
- * lib/release-tracker-data.ts and updates the snapshot.
+ * data/release-entries.json and updates the snapshot.
  *
  * Usage:
  *   npx tsx scripts/release-tracker-sync.ts          # normal run
@@ -51,7 +51,7 @@ interface Change {
 
 const ROOT = path.resolve(__dirname, '..');
 const SNAPSHOT_PATH = path.join(ROOT, 'scripts', 'release-tracker-snapshot.json');
-const DATA_PATH = path.join(ROOT, 'lib', 'release-tracker-data.ts');
+const DATA_JSON_PATH = path.join(ROOT, 'data', 'release-entries.json');
 const DATA_DICT_PATH = path.join(ROOT, 'facility-summary-mvp', 'output', 'data-dictionary', 'data-dictionary.json');
 
 // ---------------------------------------------------------------------------
@@ -178,33 +178,27 @@ function diff(prev: TableInfo[], curr: TableInfo[]): Change[] {
 }
 
 // ---------------------------------------------------------------------------
-// Writer — append entries to release-tracker-data.ts
+// Writer — prepend entries to data/release-entries.json
 // ---------------------------------------------------------------------------
 
 function appendEntries(changes: Change[]): void {
-  const src = fs.readFileSync(DATA_PATH, 'utf-8');
   const today = new Date().toISOString().slice(0, 10);
+  const existing: Record<string, unknown>[] = fs.existsSync(DATA_JSON_PATH)
+    ? JSON.parse(fs.readFileSync(DATA_JSON_PATH, 'utf-8'))
+    : [];
 
-  // Build new entry lines
-  const lines = changes.map((c) => {
-    const rationale = c.rationale.replace(/'/g, "\\'");
-    return `  { date: '${today}', layer: '${c.layer}', table: '${c.table}', field: '${c.field}', changeType: '${c.changeType}', rationale: '${rationale}' },`;
-  });
+  const newEntries = changes.map((c) => ({
+    date: today,
+    layer: c.layer,
+    table: c.table,
+    field: c.field,
+    changeType: c.changeType,
+    rationale: c.rationale,
+  }));
 
-  const block = `  // ── ${today}: Auto-detected changes ─────────────────────────\n${lines.join('\n')}`;
-
-  // Insert after the opening of the array (after the first line containing `= [`)
-  const insertMarker = 'export const RELEASE_ENTRIES: ReleaseEntry[] = [';
-  const idx = src.indexOf(insertMarker);
-  if (idx === -1) {
-    console.error('Could not find RELEASE_ENTRIES array in', DATA_PATH);
-    process.exit(1);
-  }
-
-  const insertPos = idx + insertMarker.length;
-  const updated = src.slice(0, insertPos) + '\n' + block + '\n' + src.slice(insertPos);
-
-  fs.writeFileSync(DATA_PATH, updated, 'utf-8');
+  // Prepend new entries (newest first)
+  const updated = [...newEntries, ...existing];
+  fs.writeFileSync(DATA_JSON_PATH, JSON.stringify(updated, null, 2) + '\n', 'utf-8');
 }
 
 // ---------------------------------------------------------------------------
@@ -263,7 +257,7 @@ function main() {
   appendEntries(changes);
   saveSnapshot(current);
 
-  console.log(`\nAppended ${changes.length} entries to lib/release-tracker-data.ts`);
+  console.log(`\nAppended ${changes.length} entries to data/release-entries.json`);
   console.log('Snapshot updated.');
 }
 

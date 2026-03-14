@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pre-commit hook: auto-detect data model changes and update the release tracker.
+# Pre-commit hook: auto-detect data model changes, validate architecture, and update the release tracker.
 #
 # Install:  npm run hooks:install
 # Skip:     git commit --no-verify  (when you intentionally skip)
@@ -10,7 +10,7 @@ DEFS_CHANGED=false
 
 for f in $STAGED; do
   case "$f" in
-    scripts/l1/l1-definitions.ts|scripts/l2/l2-definitions.ts|sql/l3/01_DDL_all_tables.sql)
+    scripts/l1/l1-definitions.ts|scripts/l2/l2-definitions.ts|sql/l3/01_DDL_all_tables.sql|data-dictionary.json|sql/gsib-export/*.sql|sql/l3/*.sql|data/*.ts)
       DEFS_CHANGED=true
       ;;
   esac
@@ -19,6 +19,18 @@ done
 if [ "$DEFS_CHANGED" = false ]; then
   exit 0
 fi
+
+# Run architecture compliance checks (Group 9) — prevents recurrence of GSIB audit findings
+echo "[validate] Running architecture compliance checks (Group 9)..."
+npx tsx scripts/validate-data-model.ts --group=9 2>&1
+VALIDATE_EXIT=$?
+if [ $VALIDATE_EXIT -ne 0 ]; then
+  echo ""
+  echo "[validate] Architecture compliance checks FAILED."
+  echo "Fix the issues above, then re-commit."
+  exit 1
+fi
+echo "[validate] Architecture compliance checks passed."
 
 echo "[release-tracker] Data model definitions changed — syncing release tracker..."
 

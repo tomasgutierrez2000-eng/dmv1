@@ -1,5 +1,5 @@
 /**
- * Comprehensive data model validation — 35 checks across 8 groups.
+ * Comprehensive data model validation — 45 checks across 9 groups.
  *
  * Validates cross-referential integrity between all source-of-truth files
  * (L1/L2/L3 definitions, DDL, data dictionary, metrics, catalogue, domains,
@@ -36,7 +36,9 @@ import {
   getParentMetrics,
 } from '../lib/metric-library/store';
 import { ROLLUP_HIERARCHY_LEVELS } from '../lib/metric-library/types';
+import { L1_TABLE_META } from '../data/l1-table-meta';
 import { L2_TABLE_META } from '../data/l2-table-meta';
+import { varcharIdFieldNames } from '../data/naming-exceptions';
 import { metricWithLineage } from '../lib/lineage-generator';
 import {
   resolveFormulaForDimension,
@@ -62,7 +64,7 @@ interface CheckResult {
   details: string[];
 }
 
-interface ValidationReport {
+export interface ValidationReport {
   checks: CheckResult[];
   totalChecks: number;
   passes: number;
@@ -71,7 +73,7 @@ interface ValidationReport {
   durationMs: number;
 }
 
-interface CliOptions {
+export interface CliOptions {
   fix: boolean;
   group: number | null;
 }
@@ -1031,6 +1033,216 @@ function validateLayerConventions(ddLookup: DDLookup): CheckResult[] {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Group 9: Architecture Compliance (GSIB Remediation — prevents recurrence)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function validateArchitectureCompliance(ddLookup: DDLookup): CheckResult[] {
+  const results: CheckResult[] = [];
+  const { dd } = ddLookup;
+
+  const L1_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/01-l1-ddl.sql');
+  const L2_DDL_PATH = path.resolve(__dirname, '../sql/gsib-export/02-l2-ddl.sql');
+  const L3_DDL_PATH = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
+
+  // 9.1 Cross-layer table name uniqueness
+  {
+    const issues: string[] = [];
+    const nameToLayers = new Map<string, string[]>();
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        const existing = nameToLayers.get(table.name) ?? [];
+        existing.push(layer);
+        nameToLayers.set(table.name, existing);
+      }
+    }
+    for (const [name, layers] of nameToLayers) {
+      if (layers.length > 1) {
+        issues.push(`${name}: appears in ${layers.join(', ')}`);
+      }
+    }
+    results.push(check('9.1', 9, 'Cross-layer table name uniqueness', issues));
+  }
+
+  // 9.2 Duplicate columns within table (data dictionary)
+  {
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        const seen = new Set<string>();
+        for (const field of table.fields) {
+          if (seen.has(field.name)) {
+            issues.push(`${layer}.${table.name}.${field.name}: duplicate column`);
+          }
+          seen.add(field.name);
+        }
+      }
+    }
+    results.push(check('9.2', 9, 'No duplicate columns within table', issues));
+  }
+
+  // 9.3 L2 calculated overlay compliance (deprecated fields should not exist in DDL)
+  {
+    const issues: string[] = [];
+    for (const table of dd.L2) {
+      for (const field of table.fields) {
+        const f = field as Record<string, unknown>;
+        if (f.deprecated === true) {
+          issues.push(`L2.${table.name}.${field.name}: deprecated field still in DD (deprecated_by: ${f.deprecated_by ?? 'unknown'})`);
+        }
+      }
+    }
+    results.push(check('9.3', 9, 'L2 calculated overlay compliance', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 9.4 VARCHAR-for-numeric detection
+  {
+    const numericSuffixes = ['_amt', '_pct', '_count', '_bps'];
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (!field.data_type) continue;
+          const dt = field.data_type.toUpperCase();
+          if (!dt.startsWith('VARCHAR')) continue;
+          for (const suffix of numericSuffixes) {
+            if (field.name.endsWith(suffix)) {
+              issues.push(`${layer}.${table.name}.${field.name}: ${field.data_type} — suffix ${suffix} implies numeric type`);
+              break;
+            }
+          }
+        }
+      }
+    }
+    results.push(check('9.4', 9, 'VARCHAR-for-numeric detection', issues));
+  }
+
+  // 9.5 is_active_flag consistency
+  {
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (field.name === 'active_flag') {
+            issues.push(`${layer}.${table.name}.active_flag: should be is_active_flag`);
+          }
+        }
+      }
+    }
+    results.push(check('9.5', 9, 'is_active_flag consistency', issues));
+  }
+
+  // 9.6 _id VARCHAR exception list
+  {
+    const issues: string[] = [];
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const table of dd[layer]) {
+        for (const field of table.fields) {
+          if (!field.name.endsWith('_id')) continue;
+          if (!field.data_type) continue;
+          if (!field.data_type.toUpperCase().startsWith('VARCHAR')) continue;
+          if (varcharIdFieldNames.has(field.name)) continue;
+          issues.push(`${layer}.${table.name}.${field.name}: ${field.data_type} — _id field with VARCHAR not in exception list`);
+        }
+      }
+    }
+    results.push(check('9.6', 9, '_id VARCHAR exception list', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 9.7 Table meta completeness
+  {
+    const issues: string[] = [];
+    const l1MetaNames = new Set(L1_TABLE_META.map(t => t.name));
+    const l2MetaNames = new Set(L2_TABLE_META.map(t => t.name));
+    const l3MetaNames = new Set(L3_TABLES.map(t => t.name));
+
+    for (const table of dd.L1) {
+      if (!l1MetaNames.has(table.name)) {
+        issues.push(`L1.${table.name}: missing from l1-table-meta.ts`);
+      }
+    }
+    for (const table of dd.L2) {
+      if (!l2MetaNames.has(table.name)) {
+        issues.push(`L2.${table.name}: missing from l2-table-meta.ts`);
+      }
+    }
+    for (const table of dd.L3) {
+      if (!l3MetaNames.has(table.name)) {
+        issues.push(`L3.${table.name}: missing from l3-tables.ts`);
+      }
+    }
+    results.push(check('9.7', 9, 'Table meta completeness', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 9.8 DDL completeness vs data dictionary
+  {
+    const issues: string[] = [];
+    const ddlFiles = [
+      { path: L1_DDL_PATH, layer: 'L1' as const },
+      { path: L2_DDL_PATH, layer: 'L2' as const },
+      { path: L3_DDL_PATH, layer: 'L3' as const },
+    ];
+    for (const { path: ddlPath, layer } of ddlFiles) {
+      if (!fs.existsSync(ddlPath)) continue;
+      const parsed = parseDDL(fs.readFileSync(ddlPath, 'utf-8'), layer.toLowerCase() as 'l1' | 'l2' | 'l3');
+      const ddlNames = new Set(parsed.map(t => t.name));
+      for (const table of dd[layer]) {
+        const f = table as Record<string, unknown>;
+        if (f.deprecated === true) continue;
+        if (!ddlNames.has(table.name)) {
+          issues.push(`${layer}.${table.name}: in DD but not in canonical DDL`);
+        }
+      }
+    }
+    results.push(check('9.8', 9, 'DDL completeness vs data dictionary', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 9.9 FK relationship coverage
+  {
+    const issues: string[] = [];
+    const rels = (dd as Record<string, unknown>).relationships as Array<{
+      from_layer: string;
+      from_table: string;
+      from_field: string;
+    }> | undefined;
+
+    if (rels) {
+      const relKeys = new Set(rels.map(r => `${r.from_layer}.${r.from_table}.${r.from_field}`));
+      for (const layer of ['L1', 'L2', 'L3'] as const) {
+        for (const table of dd[layer]) {
+          for (const field of table.fields) {
+            if (!field.name.endsWith('_id')) continue;
+            if (field.pk_fk?.is_pk) continue;
+            const key = `${layer}.${table.name}.${field.name}`;
+            if (!relKeys.has(key) && !field.pk_fk?.fk_target) {
+              issues.push(`${key}: _id column has no relationship entry or fk_target`);
+            }
+          }
+        }
+      }
+    }
+    results.push(check('9.9', 9, 'FK relationship coverage', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 9.10 Referential chain coverage (Facility → Counterparty → Desk → Portfolio → Segment)
+  {
+    const issues: string[] = [];
+    const facilityMaster = dd.L2.find(t => t.name === 'facility_master');
+    if (facilityMaster) {
+      const fieldNames = new Set(facilityMaster.fields.map(f => f.name));
+      if (!fieldNames.has('counterparty_id')) issues.push('facility_master: missing counterparty_id (Facility→Counterparty link)');
+      if (!fieldNames.has('org_unit_id')) issues.push('facility_master: missing org_unit_id (Facility→Desk link)');
+      if (!fieldNames.has('portfolio_id')) issues.push('facility_master: missing portfolio_id (Facility→Portfolio link)');
+      if (!fieldNames.has('lob_segment_id')) issues.push('facility_master: missing lob_segment_id (Facility→Segment link)');
+    } else {
+      issues.push('facility_master: table not found in L2 data dictionary');
+    }
+    results.push(check('9.10', 9, 'Referential chain coverage', issues));
+  }
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Main Orchestrator
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1075,6 +1287,7 @@ export async function runValidation(options: CliOptions): Promise<ValidationRepo
     { group: 6, name: 'Calculation Engine Readiness',   run: () => validateCalculationEngine(mergedMetrics) },
     { group: 7, name: 'Export/API Surface Consistency',  run: () => validateExportSurface(ddLookup) },
     { group: 8, name: 'Naming Conventions & Layer Integrity', run: () => validateLayerConventions(ddLookup) },
+    { group: 9, name: 'Architecture Compliance',              run: () => validateArchitectureCompliance(ddLookup) },
   ];
 
   for (const runner of groupRunners) {

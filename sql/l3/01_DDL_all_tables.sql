@@ -604,7 +604,7 @@ CREATE TABLE IF NOT EXISTS "l3"."fr2590_counterparty_aggregate" (
     "country_code" VARCHAR(30),
     "base_currency_code" VARCHAR(30),
     "total_amount_amt" NUMERIC(20,4),
-    "rank_within_entity" VARCHAR(255),
+    "rank_within_entity" INTEGER,
     "is_top_counterparty_flag" BOOLEAN,
 
     -- Governance
@@ -800,7 +800,7 @@ CREATE TABLE IF NOT EXISTS "l3"."deal_pipeline_stage_summary" (
     "expected_exposure_amt" NUMERIC(20,4),
     "expected_collateral_value_amt" NUMERIC(20,4),
     "avg_expected_spread_bps" NUMERIC(10,4),
-    "avg_expected_coverage_ratio" VARCHAR(255),
+    "avg_expected_coverage_ratio" NUMERIC(10,6),
 
     -- Governance
     "model_version" VARCHAR(50),
@@ -991,10 +991,10 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_tier_status_matrix" (
     "limit_status_code" VARCHAR(30),
     "counterparty_count" INTEGER,
     "prior_period_counterparty_count" INTEGER,
-    "counterparty_count_change" VARCHAR(255),
+    "counterparty_count_change" INTEGER,
     "total_utilized_exposure_amt" NUMERIC(20,4),
     "total_headroom_amt" NUMERIC(20,4),
-    "risk_score" VARCHAR(255),
+    "risk_score" NUMERIC(10,4),
     "base_currency_code" VARCHAR(30),
 
     -- Governance
@@ -1042,7 +1042,7 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_summary" (
     "data_quality_score_pct" NUMERIC(10,6),
     "prior_period_dq_score_pct" NUMERIC(10,6),
     "dq_score_change_pct" NUMERIC(10,6),
-    "total_dq_issues" VARCHAR(255),
+    "total_dq_issues" INTEGER,
     "reconciliation_break_count" INTEGER,
     "prior_period_recon_break_count" INTEGER,
     "leading_issue_type" VARCHAR(255),
@@ -1119,7 +1119,7 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_trend" (
     "legal_entity_id" BIGINT,
     "data_quality_score_pct" NUMERIC(10,6),
     "reconciliation_break_count" INTEGER,
-    "total_dq_issues" VARCHAR(255),
+    "total_dq_issues" INTEGER,
 
     -- Governance
     "model_version" VARCHAR(50),
@@ -1270,7 +1270,7 @@ CREATE TABLE IF NOT EXISTS "l3"."amendment_detail" (
     "amended_value" NUMERIC(12,6),
     "amendment_start_date" DATE,
     "amendment_status_code" VARCHAR(30),
-    "amendment_aging_days" VARCHAR(255),
+    "amendment_aging_days" INTEGER,
 
     -- Governance
     "model_version" VARCHAR(50),
@@ -1303,8 +1303,8 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_detail_snapshot" (
     "coverage_ratio_pct" NUMERIC(10,6),
     "effective_date" DATE,
     "maturity_date" DATE,
-    "days_remaining" VARCHAR(255),
-    "facility_duration_days" VARCHAR(255),
+    "days_remaining" INTEGER,
+    "facility_duration_days" INTEGER,
     "status_code" VARCHAR(30),
     "is_syndicated_flag" BOOLEAN,
     "interest_rate_pct" NUMERIC(10,6),
@@ -1331,7 +1331,7 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_detail_snapshot" (
 
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "is_deteriorated" VARCHAR(64),
+    "is_deteriorated" BOOLEAN,
     "risk_rating_tier_code" VARCHAR(20),
     "utilization_status_code" VARCHAR(20),
     "pricing_tier_code" VARCHAR(20),
@@ -1751,8 +1751,8 @@ CREATE TABLE IF NOT EXISTS "l3"."cash_flow_calc" (
     PRIMARY KEY ("cash_flow_id")
 );
 
--- data_quality_score_snapshot (Data Quality)
-CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_snapshot" (
+-- data_quality_score_calc (Data Quality)
+CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_calc" (
     "table_name" VARCHAR(100) NOT NULL,
     "as_of_date" DATE NOT NULL,
     "completeness_score_pct" NUMERIC(10,6),
@@ -1896,8 +1896,8 @@ CREATE TABLE IF NOT EXISTS "l3"."watchlist_movement_summary" (
 
 -- ── Capital Metrics (migration 002-capital-metrics) ──
 
--- stress_test_result (Stress Testing)
-CREATE TABLE IF NOT EXISTS "l3"."stress_test_result" (
+-- stress_test_result_calc (Stress Testing)
+CREATE TABLE IF NOT EXISTS "l3"."stress_test_result_calc" (
     "stress_test_result_id" BIGINT NOT NULL,
     "position_id" BIGINT,
     "facility_id" BIGINT,

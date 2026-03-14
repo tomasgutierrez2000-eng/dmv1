@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-14T05:29:42.138Z",
+  "createdAt": "2026-03-14T06:30:00.145Z",
   "tables": [
     {
       "layer": "L1",
@@ -6669,6 +6669,9 @@
           "name": "legal_entity_id"
         },
         {
+          "name": "org_unit_id"
+        },
+        {
           "name": "profit_center_code"
         },
         {
@@ -8603,6 +8606,48 @@
       ]
     },
     {
+      "layer": "L2",
+      "tableName": "cash_flow",
+      "fields": [
+        {
+          "name": "cash_flow_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "cash_flow_date"
+        },
+        {
+          "name": "cash_flow_type"
+        },
+        {
+          "name": "amount"
+        },
+        {
+          "name": "currency_code"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "flow_direction"
+        },
+        {
+          "name": "flow_type"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
       "layer": "L3",
       "tableName": "cash_flow_calc",
       "fields": [
@@ -8724,7 +8769,7 @@
     },
     {
       "layer": "L3",
-      "tableName": "data_quality_score_snapshot",
+      "tableName": "data_quality_score_calc",
       "fields": [
         {
           "name": "table_name"
@@ -9150,7 +9195,7 @@
     },
     {
       "layer": "L3",
-      "tableName": "stress_test_result",
+      "tableName": "stress_test_result_calc",
       "fields": [
         {
           "name": "stress_test_result_id"

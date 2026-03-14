@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Info } from 'lucide-react';
+import { ChevronLeft, Info, Calculator, History } from 'lucide-react';
 import type { CatalogueItem, MetricDomain } from '@/lib/metric-library/types';
 import { KindBadge, TypeBadge, StatusBadge } from './badges';
 import { DomainIcon } from './domain-icons';
@@ -11,6 +11,7 @@ import IngredientFieldsTable from './IngredientFieldsTable';
 import LevelRollupTable from './LevelRollupTable';
 import PythonCalculatorSection from './PythonCalculatorSection';
 import CatalogueDeepDive from './CatalogueDeepDive';
+import ChangeHistoryPanel from '@/components/governance/ChangeHistoryPanel';
 
 export default function CatalogueItemDetailView({ itemId }: { itemId: string }) {
   const [item, setItem] = useState<CatalogueItem | null>(null);
@@ -82,7 +83,17 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
             <TypeBadge type={item.metric_class} />
             <StatusBadge status={item.status} />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">{item.item_name}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold text-white">{item.item_name}</h1>
+            <Link
+              href={`/metrics/library/${encodeURIComponent(item.item_id)}/calculator`}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-pwc-orange/20 text-pwc-orange border border-pwc-orange/40
+                         rounded-lg text-xs font-medium hover:bg-pwc-orange/30 transition-colors"
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Open Calculator
+            </Link>
+          </div>
           <div className="flex items-center gap-2 flex-wrap">
             {itemDomains.map((d) => (
               <span
@@ -161,6 +172,11 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
           <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-800">
             <PythonCalculatorSection executableMetricId={item.executable_metric_id} />
           </div>
+        </section>
+
+        {/* ── Section 7: Change History ── */}
+        <section>
+          <ChangeHistoryPanel itemId={item.item_id} />
         </section>
 
         {/* Back link */}

@@ -559,9 +559,6 @@ export default function GenericTableTraversalDemo({
             </marker>
           </defs>
 
-          <text x={8} y={SVG_PAD + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L2 Snapshots</text>
-          <text x={8} y={ROW_HEIGHT + 10} fill="#4b5563" fontSize={8} fontWeight={700} fontFamily="monospace">L1 Reference</text>
-
           {/* Arrows */}
           {demo.steps.map((s, i) => {
             if (!s.arrowFrom || !s.arrowTo) return null;

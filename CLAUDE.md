@@ -214,6 +214,33 @@ The visualizer shows live reconciliation between the data dictionary and Postgre
 - When modifying metrics: always update both the catalogue item AND the L3 metric definition if both exist
 - Level definitions use `sourcing_type`: `Raw` (direct field), `Calc` (computed), `Agg` (aggregated), `Avg` (weighted average)
 
+### Level Logic Format (`level_logic` field)
+Each `LevelDefinition` has a `level_logic` string written in SQL-like numbered steps. The UI (`LevelRollupTable.tsx`) auto-parses this into human-readable pseudo code with color-coded verbs. **When writing `level_logic`, follow this exact format so the parser works:**
+
+```
+1. LOAD  l2.table_name  (alias)
+   WHERE alias.field = :param
+2. JOIN  l2.other_table  (alias2)
+   ON    alias2.fk = alias.pk
+3. LEFT JOIN  l1.dim_table  (alias3)
+   ON    alias3.code = alias.code
+4. GROUP BY alias.grouping_field
+5. COMPUTE
+   metric_value = formula_expression
+```
+
+**Parser transformation rules (auto-applied in UI):**
+| SQL syntax | Displayed as | Color |
+|---|---|---|
+| `LOAD` | **Read** [Table Name] | Blue |
+| `JOIN` | **Link to** [Table Name] | Cyan |
+| `LEFT JOIN` | **Look up** [Table Name] (if available) | Gray |
+| `GROUP BY` | **Group by** [Field Name] | Amber |
+| `COMPUTE` | **Calculate** [humanized formula] | Green |
+| Plain text (e.g. "Not applicable...") | Italic note | Gray |
+
+**Formula humanization (auto-applied):** `COALESCE(x, 0)` → `x`, `NULLIF(x, 0)` → `x`, `SUM(x)` → `Sum of (x)`, `MAX(x)` → `Latest (x)`, `COUNT(*)` → `Count`, `alias.field_name` → `Field Name`, `* ` → `×`, `AS alias` removed. Table/field names converted from snake_case to Title Case.
+
 ### Formula Storage — Option C (Hybrid)
 - **YAML** (`scripts/calc_engine/metrics/**/*.yaml`) = technical source of truth for the calc-engine (formula_sql, source_tables, validations)
 - **Excel** (`data/metrics_dimensions_filled.xlsx`) = business-facing view, generated from YAML via `npm run calc:sync:excel`

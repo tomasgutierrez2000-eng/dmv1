@@ -1,18 +1,23 @@
 /**
  * Validator — pre-emit validation for generated scenario data.
  *
- * Catches errors BEFORE SQL is written:
+ * Catches errors BEFORE SQL/DB writes:
  *   - FK chain completeness (every facility has agreement + counterparty)
  *   - L2→L1 FK reference integrity
  *   - Financial consistency (drawn <= committed, positive amounts)
  *   - PK uniqueness (no composite PK collisions)
  *   - ID collision detection via registry
+ *   - V2: Covenant consistency, IFRS 9 staging, distribution health,
+ *     cross-table correlation, lifecycle consistency
  */
 
 import type { L1Chain } from './chain-builder';
 import type { L2Data } from './l2-generator';
 import type { ScenarioConfig } from './scenario-config';
 import type { IDRegistry } from './id-registry';
+import type { V2GeneratorOutput } from './v2/generators';
+import type { FacilityState, FacilityStateMap, TableData as V2TableData } from './v2/types';
+import { stateKey } from './v2/types';
 
 export interface ValidationResult {
   valid: boolean;
@@ -414,4 +419,288 @@ export function validateScenario(
       total_inserts: totalInserts,
     },
   };
+}
+
+/* ────────────────── V2 Validation ────────────────── */
+
+export interface V2ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  stats: {
+    l1_counterparties: number;
+    l1_facilities: number;
+    l2_total_rows: number;
+    date_count: number;
+    tables_generated: number;
+  };
+}
+
+/**
+ * Validate v2 generator output.
+ *
+ * Runs L1 chain checks plus v2-specific checks:
+ *   - FK references (L2 → L1)
+ *   - Financial consistency
+ *   - PK uniqueness per table
+ *   - Covenant consistency
+ *   - IFRS 9 staging rules
+ *   - Distribution health (unique amounts)
+ *   - Cross-table correlation
+ *   - Lifecycle consistency
+ */
+export function validateV2Output(
+  chain: L1Chain,
+  output: V2GeneratorOutput,
+  config: ScenarioConfig,
+): V2ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  const counterpartyIds = new Set(chain.counterparties.map(c => c.counterparty_id));
+  const facilityIds = new Set(chain.facilities.map(f => f.facility_id));
+  const agreementIds = new Set(chain.agreements.map(a => a.credit_agreement_id));
+
+  // ── 1. L1 Chain Completeness ──
+
+  for (const fac of chain.facilities) {
+    if (!agreementIds.has(fac.credit_agreement_id)) {
+      errors.push(`Facility ${fac.facility_id}: references agreement ${fac.credit_agreement_id} not in chain`);
+    }
+    if (!counterpartyIds.has(fac.counterparty_id)) {
+      errors.push(`Facility ${fac.facility_id}: references counterparty ${fac.counterparty_id} not in chain`);
+    }
+  }
+  for (const agr of chain.agreements) {
+    if (!counterpartyIds.has(agr.borrower_counterparty_id)) {
+      errors.push(`Agreement ${agr.credit_agreement_id}: references borrower ${agr.borrower_counterparty_id} not in chain`);
+    }
+  }
+
+  // ── 2. FK References in L2 Tables ──
+
+  for (const td of output.tables) {
+    for (const row of td.rows) {
+      if ('facility_id' in row && typeof row.facility_id === 'number') {
+        if (!facilityIds.has(row.facility_id)) {
+          errors.push(`${td.schema}.${td.table}: facility_id ${row.facility_id} not in L1`);
+          break; // One error per table is enough
+        }
+      }
+      if ('counterparty_id' in row && typeof row.counterparty_id === 'number') {
+        if (!counterpartyIds.has(row.counterparty_id)) {
+          errors.push(`${td.schema}.${td.table}: counterparty_id ${row.counterparty_id} not in L1`);
+          break;
+        }
+      }
+    }
+  }
+
+  // ── 3. PK Uniqueness ──
+
+  for (const td of output.tables) {
+    if (td.rows.length === 0) continue;
+    const pkFields = guessPKFields(td.table, td.rows[0]);
+    if (pkFields.length === 0) continue;
+
+    const seen = new Set<string>();
+    for (const row of td.rows) {
+      const pk = pkFields.map(f => String(row[f])).join('|');
+      if (seen.has(pk)) {
+        errors.push(`${td.schema}.${td.table}: duplicate PK (${pkFields.join(',')}) = ${pk}`);
+        break;
+      }
+      seen.add(pk);
+    }
+  }
+
+  // ── 4. Financial Consistency ──
+
+  const exposureTable = output.tables.find(t => t.table === 'facility_exposure_snapshot');
+  if (exposureTable) {
+    for (const row of exposureTable.rows) {
+      const drawn = row.drawn_amount as number;
+      const committed = row.committed_amount as number;
+      if (drawn > committed * 1.001) {
+        errors.push(`Exposure: facility ${row.facility_id} on ${row.as_of_date}: drawn (${drawn}) > committed (${committed})`);
+      }
+      if (drawn < 0) {
+        errors.push(`Exposure: facility ${row.facility_id}: negative drawn_amount ${drawn}`);
+      }
+      if (committed <= 0) {
+        errors.push(`Exposure: facility ${row.facility_id}: non-positive committed_amount ${committed}`);
+      }
+    }
+  }
+
+  // PD range check
+  const riskTable = output.tables.find(t => t.table === 'facility_risk_snapshot');
+  if (riskTable) {
+    for (const row of riskTable.rows) {
+      const pd = row.pd_pct as number;
+      if (pd < 0 || pd > 1) {
+        warnings.push(`Risk: facility ${row.facility_id} on ${row.as_of_date}: PD ${pd} out of [0,1]`);
+      }
+    }
+  }
+
+  // ── 5. Covenant Consistency (v2-specific) ──
+
+  for (const entry of Array.from(output.stateMap.entries())) {
+    const state = entry[1];
+    if (state.covenants.some(c => c.is_breached && !c.waiver_active)) {
+      if (state.credit_status === 'PERFORMING') {
+        warnings.push(
+          `Facility ${state.facility_id}: has unwaived covenant breach but status is PERFORMING`
+        );
+      }
+    }
+  }
+
+  // ── 6. IFRS 9 Staging Rules ──
+
+  for (const entry of Array.from(output.stateMap.entries())) {
+    const state = entry[1];
+    if (state.ifrs9_stage === 3 && state.days_past_due < 90) {
+      warnings.push(
+        `Facility ${state.facility_id}: Stage 3 but DPD=${state.days_past_due} (<90)`
+      );
+    }
+    if (state.ifrs9_stage === 1 && state.days_past_due > 30) {
+      warnings.push(
+        `Facility ${state.facility_id}: Stage 1 but DPD=${state.days_past_due} (>30)`
+      );
+    }
+  }
+
+  // ── 7. Distribution Health ──
+
+  if (exposureTable && exposureTable.rows.length > 10) {
+    // Check that drawn amounts aren't all identical
+    const lastDate = output.dates[output.dates.length - 1];
+    const lastDateRows = exposureTable.rows.filter(r => r.as_of_date === lastDate);
+    const drawnAmounts = lastDateRows.map(r => r.drawn_amount as number);
+    const uniqueDrawn = new Set(drawnAmounts);
+    if (uniqueDrawn.size < Math.min(drawnAmounts.length, 3)) {
+      warnings.push(
+        `Distribution: only ${uniqueDrawn.size} unique drawn amounts on ${lastDate} across ${drawnAmounts.length} facilities`
+      );
+    }
+  }
+
+  // ── 8. Cross-Table Correlation ──
+
+  // If PD increased significantly, spread should have also increased
+  const pricingTable = output.tables.find(t => t.table === 'facility_pricing_snapshot');
+  if (riskTable && pricingTable && output.dates.length >= 2) {
+    const firstDate = output.dates[0];
+    const lastDate = output.dates[output.dates.length - 1];
+
+    for (const facId of Array.from(facilityIds)) {
+      const pdFirst = riskTable.rows.find(r => r.facility_id === facId && r.as_of_date === firstDate);
+      const pdLast = riskTable.rows.find(r => r.facility_id === facId && r.as_of_date === lastDate);
+      const spreadFirst = pricingTable.rows.find(r => r.facility_id === facId && r.as_of_date === firstDate);
+      const spreadLast = pricingTable.rows.find(r => r.facility_id === facId && r.as_of_date === lastDate);
+
+      if (pdFirst && pdLast && spreadFirst && spreadLast) {
+        const pdIncrease = (pdLast.pd_pct as number) / Math.max(pdFirst.pd_pct as number, 0.0001);
+        const spreadIncrease = (spreadLast.interest_rate_spread_bps as number) - (spreadFirst.interest_rate_spread_bps as number);
+
+        // If PD more than doubled, spread should have increased
+        if (pdIncrease > 2.0 && spreadIncrease < 0) {
+          warnings.push(
+            `Correlation: facility ${facId}: PD increased ${pdIncrease.toFixed(1)}x but spread decreased by ${Math.abs(spreadIncrease).toFixed(0)}bps`
+          );
+        }
+      }
+    }
+  }
+
+  // ── 9. Lifecycle Consistency ──
+
+  for (const entry of Array.from(output.stateMap.entries())) {
+    const key = entry[0];
+    const state = entry[1];
+    // Extract date from key (format: "facilityId|date")
+    const parts = key.split('|');
+    if (parts.length < 2) continue;
+    const date = parts[1];
+
+    if (state.lifecycle_stage === 'MATURED' && state.maturity_date > date) {
+      warnings.push(
+        `Facility ${state.facility_id}: lifecycle=MATURED but maturity_date=${state.maturity_date} is after ${date}`
+      );
+    }
+
+    if (state.lifecycle_stage === 'FUNDED' && state.drawn_amount <= 0) {
+      warnings.push(
+        `Facility ${state.facility_id}: lifecycle=FUNDED but drawn_amount=${state.drawn_amount}`
+      );
+    }
+  }
+
+  // ── 10. Data Completeness ──
+
+  if (chain.counterparties.length === 0) errors.push('No counterparties generated');
+  if (chain.facilities.length === 0) errors.push('No facilities generated');
+  if (!exposureTable || exposureTable.rows.length === 0) {
+    warnings.push('No exposure snapshots generated');
+  }
+
+  // ── Stats ──
+
+  const totalRows = output.tables.reduce((s, t) => s + t.rows.length, 0);
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+    stats: {
+      l1_counterparties: chain.counterparties.length,
+      l1_facilities: chain.facilities.length,
+      l2_total_rows: totalRows,
+      date_count: output.dates.length,
+      tables_generated: output.tables.length,
+    },
+  };
+}
+
+/* ────────────────── PK Field Guesser ────────────────── */
+
+/** Guess PK fields from table name and row shape. */
+function guessPKFields(table: string, sampleRow: Record<string, unknown>): string[] {
+  // Tables with known composite PKs
+  const compositePKs: Record<string, string[]> = {
+    facility_exposure_snapshot: ['facility_id', 'as_of_date'],
+    facility_pricing_snapshot: ['facility_id', 'as_of_date'],
+    facility_risk_snapshot: ['facility_id', 'as_of_date'],
+    facility_financial_snapshot: ['facility_id', 'as_of_date'],
+    facility_delinquency_snapshot: ['facility_id', 'as_of_date'],
+    facility_profitability_snapshot: ['facility_id', 'as_of_date'],
+    collateral_snapshot: ['collateral_asset_id', 'as_of_date'],
+    counterparty_rating_observation: ['counterparty_id', 'as_of_date'],
+    counterparty_financial_snapshot: ['counterparty_id', 'as_of_date'],
+    limit_contribution_snapshot: ['limit_rule_id', 'facility_id', 'as_of_date'],
+  };
+
+  if (compositePKs[table]) {
+    const pk = compositePKs[table];
+    if (pk.every(f => f in sampleRow)) return pk;
+  }
+
+  // Single ID PK patterns
+  const idFields = [
+    `${table.replace(/_snapshot$/, '')}_id`,
+    `${table}_id`,
+  ];
+  for (const f of idFields) {
+    if (f in sampleRow) return [f];
+  }
+
+  // Common single PK field names
+  for (const f of ['position_id', 'credit_event_id', 'risk_flag_id', 'amendment_id', 'exception_id', 'cash_flow_id', 'approval_id', 'observation_id', 'attribution_id']) {
+    if (f in sampleRow) return [f];
+  }
+
+  return [];
 }

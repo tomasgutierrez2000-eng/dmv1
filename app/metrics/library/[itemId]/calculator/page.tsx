@@ -11,7 +11,10 @@ import CalculationWorkspace from '@/components/governance/CalculationWorkspace';
 import RollupResultsPane from '@/components/governance/RollupResultsPane';
 import GovernanceStatusBanner from '@/components/governance/GovernanceStatusBanner';
 import UserIdentitySetup from '@/components/governance/UserIdentitySetup';
+import { useToast } from '@/components/ui/Toast';
+import { getStoredIdentity, governanceHeaders } from '@/lib/governance/identity';
 import type { CatalogueItem } from '@/lib/metric-library/types';
+import { getFormulasForItem } from '@/components/governance/CalculationWorkspace';
 import type { GovernanceStatus } from '@/lib/governance/status-machine';
 
 interface ResultRow {
@@ -27,11 +30,14 @@ interface ResultRow {
 export default function CalculatorPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const itemId = decodeURIComponent(String(params.itemId ?? ''));
 
   const [item, setItem] = useState<CatalogueItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [asOfDate, setAsOfDate] = useState<string | null>(null);
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [dbConnected, setDbConnected] = useState<boolean | null>(null);
   const [activeResults, setActiveResults] = useState<{ level: string; rows: ResultRow[] } | undefined>();
   const [showIdentitySetup, setShowIdentitySetup] = useState(false);
 
@@ -50,18 +56,29 @@ export default function CalculatorPage() {
     if (itemId) loadItem();
   }, [itemId]);
 
-  // Fetch latest as_of_date
+  // Fetch dates for picker
   useEffect(() => {
-    async function loadDate() {
+    async function loadDates() {
       try {
         const res = await fetch('/api/metrics/governance/reference-data?type=dates');
-        if (res.ok) {
-          const data = await res.json();
-          setAsOfDate(data.latest ?? null);
+        if (res.status === 503) {
+          setDbConnected(false);
+          setAvailableDates([]);
+          return;
         }
-      } catch { /* ignore */ }
+        if (res.ok) {
+          setDbConnected(true);
+          const data = await res.json();
+          setAvailableDates(data.available ?? []);
+          setAsOfDate((prev) => prev ?? data.latest ?? data.available?.[0] ?? null);
+        } else {
+          setDbConnected(false);
+        }
+      } catch {
+        setDbConnected(false);
+      }
     }
-    loadDate();
+    loadDates();
   }, []);
 
   const handleResultsChange = useCallback((level: string, rows: ResultRow[]) => {
@@ -71,6 +88,48 @@ export default function CalculatorPage() {
   const handleStatusChange = useCallback((newStatus: GovernanceStatus) => {
     setItem(prev => prev ? { ...prev, status: newStatus as CatalogueItem['status'] } : prev);
   }, []);
+
+  const handleFormulaSave = useCallback(
+    async (level: string, sql: string) => {
+      if (!item) return;
+      const levelKey = level === 'business_segment' ? 'lob' : level;
+      const existing = item.level_definitions.find((ld) => ld.level === levelKey);
+      const updatedLevelDefs = existing
+        ? item.level_definitions.map((ld) =>
+            ld.level === levelKey ? { ...ld, formula_sql: sql } : ld,
+          )
+        : [
+            ...item.level_definitions,
+            {
+              level: levelKey as 'facility' | 'counterparty' | 'desk' | 'portfolio' | 'lob',
+              dashboard_display_name: `${item.item_name} (${levelKey})`,
+              in_record: true,
+              sourcing_type: 'Calc' as const,
+              level_logic: '',
+              source_references: [],
+              formula_sql: sql,
+            },
+          ];
+      const user = typeof window !== 'undefined' ? getStoredIdentity() : null;
+      const res = await fetch(`/api/metrics/library/catalogue/${encodeURIComponent(itemId)}`, {
+        method: 'PUT',
+        headers: governanceHeaders(user, 'Formula updated via governance calculator'),
+        body: JSON.stringify({ level_definitions: updatedLevelDefs }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setItem(data);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast({
+          type: 'error',
+          title: 'Formula save failed',
+          description: err.error || `HTTP ${res.status}`,
+        });
+      }
+    },
+    [item, itemId, toast],
+  );
 
   if (loading) {
     return (
@@ -117,15 +176,29 @@ export default function CalculatorPage() {
           <h1 className="text-sm font-semibold text-pwc-white truncate">
             {item.abbreviation} — {item.item_name}
           </h1>
-          <p className="text-[10px] text-gray-500 truncate">{item.generic_formula}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-[10px] text-gray-500 truncate">{item.generic_formula}</p>
+            {item.regulatory_references?.length ? (
+              <span className="text-[9px] text-gray-600" title="SR 11-7 / BCBS 239 traceability">
+                {item.regulatory_references.map((ref) => (
+                  <span key={ref} className="px-1 py-0.5 rounded bg-gray-700/50 font-mono mr-0.5">
+                    {ref}
+                  </span>
+                ))}
+              </span>
+            ) : null}
+          </div>
         </div>
 
         {/* Governance status */}
-        <div className="w-64 shrink-0">
+        <div className="min-w-0 flex-1 max-w-xs">
           <GovernanceStatusBanner
             itemId={itemId}
             currentStatus={(item.status as GovernanceStatus) ?? 'DRAFT'}
+            lastEditorId={item.last_editor_id ?? undefined}
+            lastEditorName={item.last_editor_name ?? undefined}
             onStatusChange={handleStatusChange}
+            onIdentityRequired={() => setShowIdentitySetup(true)}
           />
         </div>
 
@@ -133,7 +206,21 @@ export default function CalculatorPage() {
         <div className="flex items-center gap-1.5 text-xs text-gray-400 shrink-0">
           <Calendar className="w-3.5 h-3.5" />
           <span>as_of:</span>
-          {asOfDate ? (
+          {dbConnected === false ? (
+            <span className="text-amber-400" title="Database not connected">DB not connected</span>
+          ) : availableDates.length > 0 ? (
+            <select
+              value={asOfDate ?? ''}
+              onChange={(e) => setAsOfDate(e.target.value || null)}
+              className="bg-pwc-black border border-pwc-gray-light rounded px-2 py-1 text-gray-300 font-mono text-xs focus:outline-none focus:border-pwc-orange"
+            >
+              {availableDates.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          ) : asOfDate ? (
             <span className="text-gray-300 font-mono">{asOfDate}</span>
           ) : (
             <span className="text-amber-400">loading...</span>
@@ -141,9 +228,11 @@ export default function CalculatorPage() {
         </div>
 
         {/* DB status */}
-        <div className="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
-          <Database className="w-3 h-3" />
-          <span>PostgreSQL</span>
+        <div className="flex items-center gap-1 text-[10px] shrink-0" title={dbConnected === true ? 'Database connected' : dbConnected === false ? 'Database not connected' : 'Checking...'}>
+          <Database className={`w-3 h-3 ${dbConnected === true ? 'text-emerald-500' : dbConnected === false ? 'text-amber-500' : 'text-gray-500'}`} />
+          <span className={dbConnected === true ? 'text-emerald-400' : dbConnected === false ? 'text-amber-400' : 'text-gray-500'}>
+            {dbConnected === true ? 'Connected' : dbConnected === false ? 'Disconnected' : 'PostgreSQL'}
+          </span>
         </div>
 
         {/* Identity settings */}
@@ -168,7 +257,10 @@ export default function CalculatorPage() {
         <div className="flex-1 bg-pwc-gray overflow-hidden">
           <CalculationWorkspace
             asOfDate={asOfDate}
+            itemId={itemId}
+            item={item}
             onResultsChange={handleResultsChange}
+            onFormulaSave={handleFormulaSave}
           />
         </div>
 
@@ -177,6 +269,8 @@ export default function CalculatorPage() {
           <RollupResultsPane
             asOfDate={asOfDate}
             activeResults={activeResults}
+            levelFormulas={item ? getFormulasForItem(item) : undefined}
+            item={item}
           />
         </div>
       </div>

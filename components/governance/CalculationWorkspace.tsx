@@ -3,12 +3,24 @@
 import { useState, useCallback } from 'react';
 import {
   Play, Loader2, Code2, AlertTriangle, ArrowUpDown,
-  ChevronDown, ChevronRight, TrendingUp, TrendingDown,
+  ChevronDown, ChevronRight, TrendingUp, TrendingDown, Pencil,
 } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
+import FormulaEditor from './FormulaEditor';
+import type { CatalogueItem, LevelDefinition } from '@/lib/metric-library/types';
 
-/* ── LTV Level Formulas (from RSK-009.yaml) ──────────────────── */
+/** Map tab key to catalogue level_definitions level key. */
+const TAB_TO_LEVEL: Record<string, string> = {
+  facility: 'facility',
+  counterparty: 'counterparty',
+  desk: 'desk',
+  portfolio: 'portfolio',
+  business_segment: 'lob',
+};
 
-const LEVEL_FORMULAS: Record<string, { sql: string; description: string }> = {
+/* ── LTV fallback formulas (when item has no formula_sql) ──────────────────── */
+
+const LTV_FALLBACK_FORMULAS: Record<string, { sql: string; description: string }> = {
   facility: {
     description: 'Aggregate collateral per facility, then compute LTV = committed_amt / SUM(collateral) × 100',
     sql: `SELECT
@@ -119,6 +131,25 @@ const LEVEL_TABS = [
   { key: 'business_segment', label: 'Segment' },
 ];
 
+export function getFormulasForItem(item: CatalogueItem | null | undefined): Record<string, { sql: string; description: string }> {
+  if (!item?.level_definitions?.length) return LTV_FALLBACK_FORMULAS;
+  const result: Record<string, { sql: string; description: string }> = {};
+  for (const tab of LEVEL_TABS) {
+    const levelKey = TAB_TO_LEVEL[tab.key] ?? tab.key;
+    const def = item.level_definitions.find((d: LevelDefinition) => d.level === levelKey);
+    const fallback = LTV_FALLBACK_FORMULAS[tab.key];
+    if (def?.formula_sql?.trim()) {
+      result[tab.key] = {
+        sql: def.formula_sql,
+        description: (def.level_logic || def.dashboard_display_name || fallback?.description) ?? '',
+      };
+    } else if (fallback) {
+      result[tab.key] = fallback;
+    }
+  }
+  return Object.keys(result).length > 0 ? result : LTV_FALLBACK_FORMULAS;
+}
+
 interface ResultRow {
   dimension_key: unknown;
   metric_value: unknown;
@@ -127,14 +158,33 @@ interface ResultRow {
 
 interface CalculationWorkspaceProps {
   asOfDate: string | null;
+  itemId?: string;
+  item?: CatalogueItem | null;
   onResultsChange?: (level: string, rows: ResultRow[]) => void;
+  onFormulaSave?: (level: string, sql: string) => void;
 }
 
-function ltvColor(val: number): string {
-  if (val < 60) return 'text-emerald-400';
-  if (val < 80) return 'text-amber-400';
-  if (val < 100) return 'text-orange-400';
-  return 'text-red-400';
+/** Color based on metric value, unit type, and direction. */
+function metricColor(
+  val: number,
+  unitType?: string,
+  direction?: string,
+): string {
+  if (unitType === 'PERCENTAGE' || unitType === 'RATIO') {
+    if (direction === 'LOWER_BETTER') {
+      if (val < 60) return 'text-emerald-400';
+      if (val < 80) return 'text-amber-400';
+      if (val < 100) return 'text-orange-400';
+      return 'text-red-400';
+    }
+    if (direction === 'HIGHER_BETTER') {
+      if (val >= 100) return 'text-emerald-400';
+      if (val >= 80) return 'text-amber-400';
+      if (val >= 60) return 'text-orange-400';
+      return 'text-red-400';
+    }
+  }
+  return 'text-gray-300';
 }
 
 function formatNumber(val: unknown): string {
@@ -147,7 +197,13 @@ function formatNumber(val: unknown): string {
 /**
  * Center pane: formula display, level selector, and live result table.
  */
-export default function CalculationWorkspace({ asOfDate, onResultsChange }: CalculationWorkspaceProps) {
+export default function CalculationWorkspace({
+  asOfDate,
+  itemId,
+  item,
+  onResultsChange,
+  onFormulaSave,
+}: CalculationWorkspaceProps) {
   const [activeLevel, setActiveLevel] = useState('facility');
   const [rows, setRows] = useState<ResultRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -156,8 +212,11 @@ export default function CalculationWorkspace({ asOfDate, onResultsChange }: Calc
   const [showSql, setShowSql] = useState(false);
   const [sortAsc, setSortAsc] = useState(true);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [showFormulaEditor, setShowFormulaEditor] = useState(false);
 
-  const formula = LEVEL_FORMULAS[activeLevel];
+  const levelFormulas = getFormulasForItem(item);
+  const formula = levelFormulas[activeLevel] ?? LTV_FALLBACK_FORMULAS[activeLevel];
+  const metricColorFn = (v: number) => metricColor(v, item?.unit_type, item?.direction);
 
   const runCalculation = useCallback(async () => {
     if (!asOfDate) return;
@@ -243,7 +302,19 @@ export default function CalculationWorkspace({ asOfDate, onResultsChange }: Calc
 
       {/* Formula description */}
       <div className="px-4 py-2 border-b border-pwc-gray-light/50 shrink-0">
-        <p className="text-xs text-gray-400">{formula.description}</p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-gray-400 flex-1 min-w-0">{formula.description}</p>
+          {itemId && onFormulaSave && (
+            <button
+              type="button"
+              onClick={() => setShowFormulaEditor(true)}
+              className="flex items-center gap-1 px-2 py-1 text-[10px] text-pwc-orange hover:bg-pwc-orange/10 rounded transition-colors shrink-0"
+            >
+              <Pencil className="w-3 h-3" />
+              Edit formula
+            </button>
+          )}
+        </div>
         <button
           type="button"
           onClick={() => setShowSql(!showSql)}
@@ -258,6 +329,30 @@ export default function CalculationWorkspace({ asOfDate, onResultsChange }: Calc
           </pre>
         )}
       </div>
+
+      {/* Formula Editor Modal */}
+      {showFormulaEditor && itemId && (
+        <Modal
+          open={showFormulaEditor}
+          onClose={() => setShowFormulaEditor(false)}
+          title="Edit formula"
+          panelClassName="max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+        >
+          <div className="flex-1 overflow-y-auto">
+            <FormulaEditor
+              currentSql={formula.sql}
+              level={activeLevel}
+              itemId={itemId}
+              asOfDate={asOfDate}
+              onAccept={(sql) => {
+                onFormulaSave?.(activeLevel, sql);
+                setShowFormulaEditor(false);
+              }}
+              onCancel={() => setShowFormulaEditor(false)}
+            />
+          </div>
+        </Modal>
+      )}
 
       {/* Results */}
       <div className="flex-1 overflow-y-auto">
@@ -295,10 +390,10 @@ export default function CalculationWorkspace({ asOfDate, onResultsChange }: Calc
               <span>{rows.length} results</span>
               {durationMs !== null && <span>{durationMs}ms</span>}
               {asOfDate && <span>as_of: {asOfDate}</span>}
-              <span>Avg LTV: <span className={ltvColor(avgLtv)}>{avgLtv.toFixed(1)}%</span></span>
-              {highLtv > 0 && (
+              <span>Avg: <span className={metricColorFn(avgLtv)}>{avgLtv.toFixed(1)}%</span></span>
+              {highLtv > 0 && (item?.unit_type === 'PERCENTAGE' || item?.unit_type === 'RATIO') && (
                 <span className="text-red-400">
-                  {highLtv} &gt;100% LTV
+                  {highLtv} &gt;100%
                 </span>
               )}
             </div>
@@ -313,7 +408,7 @@ export default function CalculationWorkspace({ asOfDate, onResultsChange }: Calc
                       onClick={() => setSortAsc(!sortAsc)}
                       className="flex items-center gap-1 ml-auto hover:text-gray-300 transition-colors"
                     >
-                      LTV %
+                      {item?.abbreviation ?? 'Value'} %
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
@@ -340,7 +435,7 @@ export default function CalculationWorkspace({ asOfDate, onResultsChange }: Calc
                         {isExpanded ? <ChevronDown className="w-3 h-3 text-gray-500" /> : <ChevronRight className="w-3 h-3 text-gray-500" />}
                         {dimKey}
                       </td>
-                      <td className={`px-4 py-2 text-right font-semibold tabular-nums ${isNaN(val) ? 'text-gray-500' : ltvColor(val)}`}>
+                      <td className={`px-4 py-2 text-right font-semibold tabular-nums ${isNaN(val) ? 'text-gray-500' : metricColorFn(val)}`}>
                         {isNaN(val) ? 'N/A' : `${val.toFixed(1)}%`}
                         {!isNaN(val) && val > 100 && <TrendingUp className="w-3 h-3 inline ml-1 text-red-400" />}
                         {!isNaN(val) && val < 50 && <TrendingDown className="w-3 h-3 inline ml-1 text-emerald-400" />}

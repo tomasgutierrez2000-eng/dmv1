@@ -3,13 +3,14 @@
 import { useState, useCallback } from 'react';
 import {
   Code2, Sparkles, CheckCircle2, XCircle, Loader2,
-  AlertTriangle, Copy, Check,
+  AlertTriangle, Copy, Check, Beaker, ChevronDown, ChevronUp,
 } from 'lucide-react';
 
 interface FormulaEditorProps {
   currentSql: string;
   level: string;
   itemId: string;
+  asOfDate?: string | null;
   onAccept: (sql: string) => void;
   onCancel: () => void;
 }
@@ -21,6 +22,7 @@ export default function FormulaEditor({
   currentSql,
   level,
   itemId,
+  asOfDate,
   onAccept,
   onCancel,
 }: FormulaEditorProps) {
@@ -36,6 +38,15 @@ export default function FormulaEditor({
     warnings: string[];
   } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [sandboxResult, setSandboxResult] = useState<{
+    as_of_date: string;
+    current: { row_count: number; error?: string | null };
+    proposed: { row_count: number; error?: string | null };
+    comparison: { total_keys: number; matching: number; changed: number; changes: Array<{ key: string; current: number | null; proposed: number | null; delta: number | null }> };
+  } | null>(null);
+  const [sandboxError, setSandboxError] = useState<string | null>(null);
+  const [showSandboxDetails, setShowSandboxDetails] = useState(false);
 
   const handleGenerateSql = useCallback(async () => {
     if (!nlPrompt.trim()) return;
@@ -101,6 +112,39 @@ export default function FormulaEditor({
       setTimeout(() => setCopied(false), 2000);
     }
   }, [mode, generatedSql, sqlText]);
+
+  const handleRunSandboxTest = useCallback(async () => {
+    const proposed = mode === 'nl' ? (generatedSql ?? '') : sqlText;
+    if (!proposed.trim() || !currentSql.trim()) return;
+    setSandboxLoading(true);
+    setSandboxError(null);
+    setSandboxResult(null);
+    try {
+      const res = await fetch('/api/metrics/governance/sandbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: itemId,
+          level: level === 'business_segment' ? 'lob' : level,
+          current_sql: currentSql,
+          proposed_sql: proposed,
+          as_of_date: asOfDate ?? undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Sandbox test failed');
+      setSandboxResult({
+        as_of_date: data.as_of_date,
+        current: data.current ?? { row_count: 0 },
+        proposed: data.proposed ?? { row_count: 0 },
+        comparison: data.comparison ?? { total_keys: 0, matching: 0, changed: 0, changes: [] },
+      });
+    } catch (err) {
+      setSandboxError(err instanceof Error ? err.message : 'Sandbox test failed');
+    } finally {
+      setSandboxLoading(false);
+    }
+  }, [mode, generatedSql, sqlText, currentSql, itemId, level, asOfDate]);
 
   const activeSql = mode === 'nl' ? (generatedSql ?? '') : sqlText;
 
@@ -271,8 +315,66 @@ export default function FormulaEditor({
         </div>
       )}
 
+      {/* Sandbox test result */}
+      {sandboxError && (
+        <div className="mx-4 mb-2 px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-sm flex items-center gap-2">
+          <XCircle className="w-4 h-4 flex-shrink-0" />
+          {sandboxError}
+        </div>
+      )}
+      {sandboxResult && (
+        <div className="mx-4 mb-2 px-3 py-2 rounded-lg border border-pwc-gray-light/50 bg-pwc-black/30 text-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-gray-400">Sandbox comparison (as_of: {sandboxResult.as_of_date})</span>
+            <button
+              type="button"
+              onClick={() => setShowSandboxDetails((v) => !v)}
+              className="text-pwc-orange hover:text-pwc-orange/80 text-xs flex items-center gap-0.5"
+            >
+              {showSandboxDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              {showSandboxDetails ? 'Hide' : 'Details'}
+            </button>
+          </div>
+          <div className="mt-2 grid grid-cols-4 gap-2 text-xs">
+            <div className="text-gray-500">Current rows</div>
+            <div className="text-gray-300">{sandboxResult.current.row_count}</div>
+            <div className="text-gray-500">Proposed rows</div>
+            <div className="text-gray-300">{sandboxResult.proposed.row_count}</div>
+            <div className="text-gray-500">Matching</div>
+            <div className="text-emerald-400">{sandboxResult.comparison.matching}</div>
+            <div className="text-gray-500">Changed</div>
+            <div className={sandboxResult.comparison.changed > 0 ? 'text-amber-400' : 'text-gray-300'}>
+              {sandboxResult.comparison.changed}
+            </div>
+          </div>
+          {showSandboxDetails && sandboxResult.comparison.changes.length > 0 && (
+            <div className="mt-2 max-h-32 overflow-y-auto border-t border-pwc-gray-light/30 pt-2">
+              <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Sample changes</div>
+              {sandboxResult.comparison.changes.slice(0, 20).map((c, i) => (
+                <div key={i} className="text-[10px] font-mono text-gray-400 flex gap-2">
+                  <span className="truncate max-w-[120px]" title={c.key}>{c.key}</span>
+                  <span>cur: {c.current ?? '—'}</span>
+                  <span>prop: {c.proposed ?? '—'}</span>
+                  {c.delta != null && <span className="text-amber-400">Δ{c.delta}</span>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex items-center gap-3 px-4 py-3 border-t border-pwc-gray-light bg-pwc-black/20">
+        <button
+          type="button"
+          onClick={handleRunSandboxTest}
+          disabled={sandboxLoading || !activeSql.trim()}
+          className="flex items-center gap-1.5 px-4 py-2 text-pwc-orange border border-pwc-orange/50 rounded-lg text-sm font-medium
+                     hover:bg-pwc-orange/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {sandboxLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Beaker className="w-3.5 h-3.5" />}
+          {sandboxLoading ? 'Running...' : 'Run Sandbox Test'}
+        </button>
         <button
           type="button"
           onClick={() => onAccept(activeSql)}
@@ -280,7 +382,7 @@ export default function FormulaEditor({
           className="flex items-center gap-1.5 px-4 py-2 bg-pwc-orange text-white rounded-lg text-sm font-medium
                      hover:bg-pwc-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          Test Changes
+          Save Formula
         </button>
         <button
           type="button"

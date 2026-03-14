@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { jsonSuccess, jsonError, withErrorHandling } from '@/lib/api-response';
+import { getCatalogueItem } from '@/lib/metric-library/store';
 
 const CLAUDE_MODEL = 'claude-haiku-4-5';
 const MAX_TOKENS = 4096;
@@ -71,7 +72,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Enrich with catalogue context when item_id provided
+    let catalogueContext = '';
+    if (context?.item_id) {
+      const item = getCatalogueItem(context.item_id);
+      if (item) {
+        const levelKey = context.level ?? 'facility';
+        const levelDef = item.level_definitions?.find((ld) => ld.level === levelKey);
+        const ingredients = item.ingredient_fields
+          ?.map((f) => `${f.layer}.${f.table}.${f.field}`)
+          .join(', ');
+        catalogueContext = [
+          `Metric: ${item.item_name} (${item.abbreviation})`,
+          `Generic formula: ${item.generic_formula}`,
+          ingredients ? `Ingredient fields: ${ingredients}` : '',
+          levelDef?.level_logic ? `Level logic (${levelKey}): ${levelDef.level_logic}` : '',
+          levelDef?.spec_formula ? `Spec formula: ${levelDef.spec_formula}` : '',
+          levelDef?.formula_sql ? `Current formula SQL (${levelKey}):\n${levelDef.formula_sql}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n');
+      }
+    }
+
     const userMessage = [
+      catalogueContext ? `Context:\n${catalogueContext}\n` : '',
       `Level: ${context?.level ?? 'facility'}`,
       context?.current_sql ? `Current SQL:\n${context.current_sql}` : '',
       `Request: ${prompt}`,

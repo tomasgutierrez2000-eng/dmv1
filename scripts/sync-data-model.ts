@@ -58,7 +58,7 @@ const FIELD_DESCRIPTIONS: Record<string, Record<string, { description: string; w
       description: 'Sort order for display in reports',
       why_required: 'Consistent ordering in UI and reports',
     },
-    active_flag: {
+    is_active_flag: {
       description: 'Y/N flag indicating if bucket is currently in use',
       why_required: 'Soft-delete support for reference data',
     },
@@ -80,7 +80,7 @@ const FIELD_DESCRIPTIONS: Record<string, Record<string, { description: string; w
       description: 'Sort order for display in reports',
       why_required: 'Consistent ordering in UI and reports',
     },
-    active_flag: {
+    is_active_flag: {
       description: 'Y/N flag indicating if tier is currently in use',
       why_required: 'Soft-delete support for reference data',
     },

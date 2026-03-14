@@ -2164,7 +2164,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'entity_type_dim':
       if (columnName === 'entity_type_code') return ENTITY_TYPE_CODES[idx];
       if (columnName === 'entity_type_name') return ENTITY_TYPE_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'is_financial_institution') return IS_FIN_INST[idx];
       if (columnName === 'is_sovereign') return IS_SOVEREIGN[idx];
       if (columnName === 'regulatory_counterparty_class') return REG_CPTY_CLASS[idx];
@@ -2177,8 +2177,8 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'credit_event_type_code') return idx + 1;
       if (columnName === 'credit_event_type_id') return idx + 1;
       if (columnName === 'credit_event_type_name') return eventNames[idx];
-      if (columnName === 'default_trigger_flag') return triggers[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_default_trigger_flag') return triggers[idx];
+      if (columnName === 'is_active_flag') return 'Y';
       break;
     }
 
@@ -2186,7 +2186,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'credit_status_dim':
       if (columnName === 'credit_status_code') return idx + 1;
       if (columnName === 'credit_status_name') return CREDIT_STATUS_NAMES[idx];
-      if (columnName === 'default_flag') return CREDIT_DEFAULT_FLAGS[idx];
+      if (columnName === 'is_default_flag') return CREDIT_DEFAULT_FLAGS[idx];
       if (columnName === 'delinquency_bucket') return CREDIT_DELINQUENCY_BUCKETS[idx];
       if (columnName === 'status_category') return CREDIT_STATUS_CATEGORIES[idx];
       break;
@@ -2196,10 +2196,10 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'exposure_type_id') return idx + 1;
       if (columnName === 'exposure_type_code') return EXPOSURE_TYPE_CODES[idx];
       if (columnName === 'exposure_type_name') return EXPOSURE_TYPE_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'basel_exposure_class') return BASEL_EXPOSURE_CLASSES[idx];
       if (columnName === 'ccf_pct') return CCF_PCTS[idx];
-      if (columnName === 'off_balance_sheet_flag') return OFF_BS_FLAGS[idx];
+      if (columnName === 'is_off_balance_sheet_flag') return OFF_BS_FLAGS[idx];
       if (columnName === 'product_id') return idx + 1;
       if (columnName === 'sa_ccr_asset_class') return SA_CCR_CLASSES[idx];
       break;
@@ -2210,7 +2210,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'amendment_status_name') return AMENDMENT_STATUS_NAMES[idx];
       if (columnName === 'status_group') return AMENDMENT_STATUS_GROUPS[idx];
       if (columnName === 'is_terminal_flag') return AMENDMENT_IS_TERMINAL[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       break;
 
     /* ──────────── amendment_type_dim ──────────── */
@@ -2218,7 +2218,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'amendment_type_code') return AMENDMENT_TYPE_CODES[idx];
       if (columnName === 'amendment_type_name') return AMENDMENT_TYPE_NAMES[idx];
       if (columnName === 'description') return AMENDMENT_TYPE_DESCS[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       break;
 
     /* ──────────── default_definition_dim ──────────── */
@@ -2228,7 +2228,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'description') return DEFAULT_DEF_DESCS[idx];
       if (columnName === 'jurisdiction_code') return DEFAULT_DEF_JURISDICTIONS[idx];
       if (columnName === 'days_past_due_threshold') return DEFAULT_DEF_DPD_THRESHOLDS[idx];
-      if (columnName === 'credit_event_trigger_flag') return DEFAULT_DEF_CREDIT_EVENT[idx];
+      if (columnName === 'is_credit_event_trigger_flag') return DEFAULT_DEF_CREDIT_EVENT[idx];
       if (columnName === 'materiality_threshold_amt') return DEFAULT_DEF_MATERIALITY[idx];
       break;
 
@@ -2237,7 +2237,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'maturity_bucket_id') return idx + 1;
       if (columnName === 'bucket_code') return MATURITY_BUCKET_CODES[idx];
       if (columnName === 'bucket_name') return MATURITY_BUCKET_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'bucket_start_days') return BUCKET_START_DAYS[idx];
       if (columnName === 'bucket_end_days') return BUCKET_END_DAYS[idx];
       if (columnName === 'jurisdiction_code') return 'US_FED';
@@ -2251,7 +2251,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'category_name') return FR2590_CATEGORY_NAMES[fIdx];
       if (columnName === 'definition') return FR2590_DEFINITIONS[fIdx];
       if (columnName === 'display_order') return rowIndex + 1;
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       break;
     }
 
@@ -2269,10 +2269,10 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'rating_scale_dim':
       if (columnName === 'rating_scale_id') return idx + 1;
       if (columnName === 'scale_name') return SCALE_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
-      if (columnName === 'default_flag') return idx === 0 ? 'Y' : 'N';
+      if (columnName === 'is_active_flag') return 'Y';
+      if (columnName === 'is_default_flag') return idx === 0 ? 'Y' : 'N';
       if (columnName === 'display_color_hex') return SCALE_COLORS[idx];
-      if (columnName === 'investment_grade_flag') return GRADE_INVESTMENT_FLAGS[idx];
+      if (columnName === 'is_investment_grade_flag') return GRADE_INVESTMENT_FLAGS[idx];
       if (columnName === 'pd_implied') return GRADE_PD_12M[idx];
       if (columnName === 'rating_grade_id') return idx + 1;
       if (columnName === 'rating_notch') return GRADE_NOTCHES[idx];
@@ -2284,10 +2284,10 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'crm_type_dim':
       if (columnName === 'crm_type_code') return CRM_TYPE_CODES[idx];
       if (columnName === 'crm_type_name') return CRM_TYPE_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'basel_recognition_method') return BASEL_RECOG_METHODS[idx];
       if (columnName === 'crm_category') return CRM_CATEGORIES[idx];
-      if (columnName === 'eligible_flag') return 'Y';
+      if (columnName === 'is_eligible_flag') return 'Y';
       if (columnName === 'risk_mitigant_subtype_code') return CRM_RISK_MIT_SUBTYPES[idx];
       break;
 
@@ -2297,7 +2297,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'data_domain') return SOURCE_DOMAINS[idx];
       if (columnName === 'ingestion_frequency') return SOURCE_FREQUENCIES[idx];
       if (columnName === 'system_owner') return SOURCE_OWNERS[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       break;
 
     /* ──────────── date_dim ──────────── */
@@ -2347,7 +2347,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'regulatory_capital_basis_id') return rowIndex + 1;
       if (columnName === 'basis_code') return REG_CAP_BASIS_CODES[rcIdx];
       if (columnName === 'basis_name') return REG_CAP_BASIS_NAMES[rcIdx];
-      if (columnName === 'active_flag') return REG_CAP_BASIS_ACTIVE[rcIdx] ? 'Y' : 'N';
+      if (columnName === 'is_active_flag') return REG_CAP_BASIS_ACTIVE[rcIdx] ? 'Y' : 'N';
       if (columnName === 'description') return REG_CAP_BASIS_DESCS[rcIdx];
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return REG_CAP_BASIS_EFF_TO[rcIdx];
@@ -2362,7 +2362,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'industry_level') return INDUSTRY_LEVELS[idx];
       if (columnName === 'industry_standard') return INDUSTRY_STANDARDS[idx];
       if (columnName === 'parent_industry_id') return INDUSTRY_CODES[idx]; // Self-reference for sectors (NOT NULL constraint)
-      if (columnName === 'active_flag') return true;
+      if (columnName === 'is_active_flag') return true;
       break;
 
     /* ──────────── enterprise_business_taxonomy (249 rows from Excel) ──────────── */
@@ -2407,7 +2407,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'portfolio_dim':
       if (columnName === 'portfolio_code') return PORTFOLIO_CODES[idx];
       if (columnName === 'portfolio_name') return PORTFOLIO_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'lob_segment_id') return (idx % 5) + 1;
       if (columnName === 'parent_portfolio_id') return idx < 4 ? null : (idx % 4) + 1;
       if (columnName === 'portfolio_type') return PORTFOLIO_TYPES[idx];
@@ -2431,7 +2431,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     /* ──────────── rating_source ──────────── */
     case 'rating_source':
       if (columnName === 'source_name') return RATING_SOURCE_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'priority_rank') return RATING_PRIORITIES[idx];
       if (columnName === 'rating_source_name') return RATING_SOURCE_NAMES[idx];
       if (columnName === 'rating_source_type') return RATING_SOURCE_TYPES[idx];
@@ -2442,7 +2442,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'rating_grade_dim':
       if (columnName === 'grade_code') return GRADE_CODES[idx];
       if (columnName === 'grade_name') return GRADE_NAMES[idx];
-      if (columnName === 'default_flag') return idx >= 9 ? 'Y' : 'N';
+      if (columnName === 'is_default_flag') return idx >= 9 ? 'Y' : 'N';
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
       if (columnName === 'is_current') return 'Y';
@@ -2460,7 +2460,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'name') return COLLATERAL_TYPE_NAMES[idx];
       if (columnName === 'collateral_category') return COLLATERAL_CATEGORIES[idx];
       if (columnName === 'description') return COLLATERAL_DESCS[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'basel_rwa_weight') return COLLATERAL_BASEL_RW[idx];
       if (columnName === 'hqla_level') return COLLATERAL_HQLA[idx];
       if (columnName === 'is_eligible_crm') return COLLATERAL_ELIGIBLE_CRM[idx];
@@ -2475,7 +2475,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'interest_rate_index_dim':
       if (columnName === 'index_code') return RATE_INDEX_CODES[idx];
       if (columnName === 'index_name') return RATE_INDEX_NAMES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'cessation_date') return '9999-12-31'; // active indices — far-future sentinel
       if (columnName === 'compounding_method') return INDEX_COMPOUNDING[idx];
       if (columnName === 'currency_code') return INDEX_CURRENCIES[idx];
@@ -2496,7 +2496,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'account_category') return ACCOUNT_CATEGORIES[idx];
       if (columnName === 'account_type') return ACCOUNT_TYPES[idx];
       if (columnName === 'is_balance_sheet_flag') return IS_BALANCE_SHEET[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'currency_code') return 'USD';
       if (columnName === 'effective_from_date') return '2020-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
@@ -2578,7 +2578,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'legal_name') return LEGAL_ENTITY_NAMES[idx];
       if (columnName === 'legal_entity_name') return LEGAL_ENTITY_NAMES[idx];
       if (columnName === 'country_code') return COUNTRY_CODES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'entity_type_code') return LE_ENTITY_TYPE_CODES[idx];
       if (columnName === 'functional_currency_code') return LE_FUNC_CURRENCIES[idx];
       if (columnName === 'institution_id') return 1; // all belong to same GSIB holding company
@@ -2603,7 +2603,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const couponFreqs = ['SEMI_ANNUAL', 'SEMI_ANNUAL', 'QUARTERLY', 'SEMI_ANNUAL', 'SEMI_ANNUAL', 'NONE', 'SEMI_ANNUAL', 'ANNUAL', 'SEMI_ANNUAL', 'SEMI_ANNUAL'];
       if (columnName === 'country_code') return COUNTRY_CODES[idx];
       if (columnName === 'currency_code') return CURRENCY_CODES[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'coupon_frequency') return couponFreqs[idx];
       if (columnName === 'coupon_rate') return coupons[idx];
       if (columnName === 'instrument_name') return instNames[idx];
@@ -2673,14 +2673,14 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'interest_rate_type') return idx % 2 === 0 ? 'FLOATING' : 'FIXED';
       if (columnName === 'next_repricing_date') return idx % 2 === 0 ? '2025-04-30' : '9999-12-31';
       if (columnName === 'payment_frequency') return PAYMENT_FREQS[idx];
-      if (columnName === 'prepayment_penalty_flag') return idx % 3 === 0 ? 'Y' : 'N';
+      if (columnName === 'is_prepayment_penalty_flag') return idx % 3 === 0 ? 'Y' : 'N';
       if (columnName === 'product_id') return idx + 1;
       if (columnName === 'rate_cap_pct') return RATE_CAPS[idx];
       if (columnName === 'rate_floor_pct') return RATE_FLOORS[idx];
       if (columnName === 'region_code') return COUNTRY_REGION_CODES[idx];
-      if (columnName === 'revolving_flag') return REVOLVING_FLAGS[idx];
+      if (columnName === 'is_revolving_flag') return REVOLVING_FLAGS[idx];
       if (columnName === 'industry_code') return INDUSTRY_CODES[idx];
-      if (columnName === 'active_flag') return FACILITY_STATUSES[idx] === 'ACTIVE' ? 'Y' : 'N';
+      if (columnName === 'is_active_flag') return FACILITY_STATUSES[idx] === 'ACTIVE' ? 'Y' : 'N';
       break;
 
     /* ──────────── contract_master ──────────── */
@@ -2704,7 +2704,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
 
     /* ──────────── netting_set ──────────── */
     case 'netting_set':
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'governing_law') return GOVERNING_LAWS[idx];
       if (columnName === 'is_enforceable_flag') return 'Y';
       if (columnName === 'master_agreement_reference') return `ISDA-${2020 + idx}-${String(idx + 1).padStart(3, '0')}`;
@@ -2748,13 +2748,13 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'collateral_status') return COLLATERAL_STATUSES[idx];
       if (columnName === 'description') return COLLATERAL_DESCS[idx];
       if (columnName === 'insurance_expiry_date') return idx === 4 ? '2026-06-30' : '9999-12-31';
-      if (columnName === 'insurance_flag') return idx === 4 ? 'Y' : 'N';
+      if (columnName === 'is_insurance_flag') return idx === 4 ? 'Y' : 'N';
       if (columnName === 'lien_priority') return COLLATERAL_LIEN_PRIORITIES[idx];
       if (columnName === 'location_country_code') return COUNTRY_CODES[idx];
       if (columnName === 'location_description') return `${COUNTRY_NAMES[idx]} — Primary Location`;
       if (columnName === 'maturity_date') return idx < 5 ? MATURITY_DATES[idx] : null;
       if (columnName === 'original_cost') return COLLATERAL_ORIG_COSTS[idx];
-      if (columnName === 'regulatory_eligible_flag') return COLLATERAL_ELIGIBLE_CRM[idx];
+      if (columnName === 'is_regulatory_eligible_flag') return COLLATERAL_ELIGIBLE_CRM[idx];
       if (columnName === 'revaluation_frequency') return COLLATERAL_REVAL_FREQS[idx];
       if (columnName === 'source_record_id') return idx + 1;
       if (columnName === 'valuation_currency_code') return CURRENCY_CODES[idx];
@@ -2774,7 +2774,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
     case 'collateral_eligibility_dim':
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
-      if (columnName === 'eligible_flag') return COLLATERAL_ELIGIBLE_CRM[idx];
+      if (columnName === 'is_eligible_flag') return COLLATERAL_ELIGIBLE_CRM[idx];
       if (columnName === 'jurisdiction_code') return 'US_FED';
       if (columnName === 'haircut_method') return HAIRCUT_METHOD[idx];
       break;
@@ -2793,7 +2793,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'crm_type_code') return CRM_TYPE_CODES[idx];
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
-      if (columnName === 'eligible_flag') return 'Y';
+      if (columnName === 'is_eligible_flag') return 'Y';
       if (columnName === 'jurisdiction_code') return 'US_FED';
       if (columnName === 'eligibility_conditions') return `Basel III eligible under ${JURISDICTION_FRAMEWORKS[0]}`;
       break;
@@ -2804,7 +2804,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'currency_code') return CURRENCY_CODES[idx];
       if (columnName === 'notional_amount') return PROTECTION_NOTIONALS[idx];
       if (columnName === 'maturity_date') return MATURITY_DATES[idx];
-      if (columnName === 'enforceable_flag') return 'Y';
+      if (columnName === 'is_enforceable_flag') return 'Y';
       if (columnName === 'coverage_pct') return PROTECTION_COVERAGES[idx];
       if (columnName === 'protection_reference') return PROTECTION_REFS[idx];
       break;
@@ -2830,9 +2830,9 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const rmtParentNames = ['Funded CRM', 'Funded CRM', 'Funded CRM', 'Funded CRM', 'Funded CRM', 'Funded CRM', 'Unfunded CRM', 'Unfunded CRM', 'Funded CRM', 'Unfunded CRM'];
       if (columnName === 'risk_mitigant_subtype_code') return rmtCodes[idx];
       if (columnName === 'subtype_name') return rmtNames[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'display_order') return idx + 1;
-      if (columnName === 'eligible_flag') return ['Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y'][idx];
+      if (columnName === 'is_eligible_flag') return ['Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'N', 'Y'][idx];
       if (columnName === 'mitigant_category') return rmtCategories[idx];
       if (columnName === 'parent_group_code') return rmtParentCodes[idx];
       if (columnName === 'parent_group_name') return rmtParentNames[idx];
@@ -2884,7 +2884,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
         'Credit General Pledges', 'Markets Margin Pool', 'Treasury Repo Pool', 'Risk Hedging Book',
       ];
       if (columnName === 'description') return cpDescs[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'portfolio_name_override') return cpOverrides[idx];
       break;
     }
@@ -2984,7 +2984,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'group_name') return scclNames[idx];
       if (columnName === 'sccl_group_name') return scclNames[idx];
       if (columnName === 'group_type') return 'CORPORATE_FAMILY';
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'as_of_date') return '2025-01-31';
       if (columnName === 'created_by') return 'CREDIT_RISK_SYSTEM';
       if (columnName === 'grouping_basis') return scclBases[idx];
@@ -3009,10 +3009,10 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const memberOwnership = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 80.0, 75.0, 100.0, 60.0];
       if (columnName === 'sccl_group_id') return memberGroups[idx];
       if (columnName === 'counterparty_id') return memberCptys[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'effective_start_date') return '2024-01-01';
       if (columnName === 'effective_end_date') return '9999-12-31';
-      if (columnName === 'included_flag') return 'Y';
+      if (columnName === 'is_included_flag') return 'Y';
       if (columnName === 'member_role_code') return memberRoles[idx];
       if (columnName === 'ownership_pct') return memberOwnership[idx];
       if (columnName === 'sccl_group_member_id') return idx + 1;
@@ -3042,7 +3042,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'limit_type') return limitTypes[idx];
       if (columnName === 'outer_threshold_pct') return outerThresholds[idx];
       if (columnName === 'risk_tier') return riskTiers[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       break;
     }
 
@@ -3058,7 +3058,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const upperPcts = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0];
       if (columnName === 'threshold_value') return thresholdValues[idx];
       if (columnName === 'threshold_amount') return thresholdValues[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'direction') return directions[idx];
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
@@ -3129,7 +3129,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'report_code') return reportCodes[idx];
       if (columnName === 'report_name') return REPORT_NAMES[idx];
       if (columnName === 'description') return REPORT_DESCRIPTIONS[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'effective_from_date') return '2020-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
       if (columnName === 'frequency') return reportFreqs[idx];
@@ -3150,11 +3150,11 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       const isPeriodEnd = ['Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y'];
       if (columnName === 'calendar_code') return calCodes[idx];
       if (columnName === 'calendar_name') return calNames[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'as_of_date') return '2025-01-31';
       if (columnName === 'cutoff_ts') return '2025-01-31 23:59:59';
-      if (columnName === 'fiscal_quarter') return fiscalQuarters[idx];
-      if (columnName === 'fiscal_year') return fiscalYears[idx];
+      if (columnName === 'fiscal_quarter_date') return fiscalQuarters[idx];
+      if (columnName === 'fiscal_year_date') return fiscalYears[idx];
       if (columnName === 'is_period_end') return isPeriodEnd[idx];
       if (columnName === 'period_end_date') return periodEnds[idx];
       if (columnName === 'period_start_date') return periodStarts[idx];
@@ -3169,7 +3169,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'entity_name') return REPORTING_ENTITY_NAMES[reIdx];
       if (columnName === 'reporting_entity_code') return REPORTING_ENTITY_CODES[reIdx];
       if (columnName === 'reporting_entity_name') return REPORTING_ENTITY_NAMES[reIdx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'consolidation_basis') return REPORTING_ENTITY_CONSOLIDATION[reIdx];
       if (columnName === 'effective_from_date') return '2020-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
@@ -3424,7 +3424,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'cell_code') return rcdCellCodes[idx];
       if (columnName === 'cell_name') return rcdCellNames[idx];
       if (columnName === 'cell_definition') return rcdCellDefs[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'calculation_rule_id') return idx + 1;
       if (columnName === 'cell_datatype') return rcdDatatypes[idx];
       if (columnName === 'cell_id') return idx + 1;
@@ -3461,7 +3461,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'effective_from_date') return '2024-01-01';
       if (columnName === 'effective_to_date') return '9999-12-31';
       if (columnName === 'is_current') return 'Y';
-      if (columnName === 'regulatory_approved_flag') return 'Y';
+      if (columnName === 'is_regulatory_approved_flag') return 'Y';
       break;
     }
 
@@ -3522,7 +3522,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'target_table') return vcTables[idx];
       if (columnName === 'target_column') return vcColumns[idx];
       if (columnName === 'severity') return vcSeverities[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'validation_check_id') return idx + 1;
       break;
     }
@@ -3546,7 +3546,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
         'ead,risk_weight', 'ead,pd,lgd,maturity', 'exposure_type',
         'pd,lgd,ead', 'dpd,rating_delta', 'market_value,haircut_pct', 'exposure,limit_amount',
       ];
-      const rrOutputs = ['pd_value', 'lgd_value', 'ead_value', 'rwa_sa', 'rwa_irb', 'ccf_pct', 'ecl_amount', 'ifrs9_stage', 'adjusted_value', 'breach_flag'];
+      const rrOutputs = ['pd_value', 'lgd_value', 'ead_value', 'rwa_sa', 'rwa_irb', 'ccf_pct', 'ecl_amount', 'ifrs9_stage', 'adjusted_value', 'is_breach_flag'];
       const rrApprovers = ['M.WILLIAMS', 'M.WILLIAMS', 'R.JOHNSON', 'R.JOHNSON', 'S.CHEN', 'S.CHEN', 'A.GARCIA', 'A.GARCIA', 'K.PATEL', 'K.PATEL'];
       if (columnName === 'rule_code') return rrCodes[idx];
       if (columnName === 'rule_name') return rrNames[idx];
@@ -3554,7 +3554,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'rule_expression') return rrExpressions[idx];
       if (columnName === 'input_variables') return rrInputs[idx];
       if (columnName === 'output_variable') return rrOutputs[idx];
-      if (columnName === 'active_flag') return 'Y';
+      if (columnName === 'is_active_flag') return 'Y';
       if (columnName === 'approved_by') return rrApprovers[idx];
       if (columnName === 'approved_ts') return '2024-06-01 10:00:00';
       if (columnName === 'effective_from_date') return '2024-01-01';

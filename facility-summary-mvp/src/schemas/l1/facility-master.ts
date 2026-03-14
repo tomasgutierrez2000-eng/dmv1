@@ -9,7 +9,7 @@ export interface FacilityMaster {
   origination_date: string;
   maturity_date: string;
   interest_rate_reference: string;
-  revolving_flag: boolean;
+  is_revolving_flag: boolean;
   currency_code: string;
   lob_l1_name: string;
   lob_l2_name: string;

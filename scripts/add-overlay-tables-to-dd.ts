@@ -101,7 +101,7 @@ const overlayTables: DDTable[] = [
     fields: [
       { name: 'facility_id', description: 'Foreign key linking to facility master', data_type: 'BIGINT', pk_fk: { is_pk: true, is_composite: true, fk_target: { layer: 'L2', table: 'facility_master', field: 'facility_id' } } },
       { name: 'as_of_date', description: 'Reporting date for the snapshot', data_type: 'DATE', pk_fk: { is_pk: true, is_composite: true } },
-      { name: 'pricing_exception_flag', description: 'Whether pricing exception applies to this facility', data_type: 'BOOLEAN', category: 'Facility Analytics' },
+      { name: 'is_pricing_exception_flag', description: 'Whether pricing exception applies to this facility', data_type: 'BOOLEAN', category: 'Facility Analytics' },
       { name: 'pricing_tier_code', description: 'Pricing tier classification code', data_type: 'VARCHAR(20)', category: 'Facility Analytics' },
       { name: 'fee_rate_pct', description: 'Fee rate as a percentage', data_type: 'NUMERIC(10,6)', category: 'Facility Analytics' },
       { name: 'created_ts', description: 'Timestamp when the record was created', data_type: 'TIMESTAMP', category: 'Audit' },

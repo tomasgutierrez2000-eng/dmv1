@@ -432,7 +432,7 @@ export const assembleFacilitySummary = (
       all_in_rate_pct: latestPricing?.all_in_rate_pct ?? 0,
       rate_index_code: latestPricing?.rate_index_code ?? "",
       rate_cap_pct: latestPricing?.rate_cap_pct ?? null,
-      below_threshold_flag: latestPricing?.below_threshold_flag ?? false,
+      is_below_threshold_flag: latestPricing?.is_below_threshold_flag ?? false,
       prior_month_spread_bps: priorSpreadBps,
       spread_change_bps: spreadBps - priorSpreadBps,
 
@@ -444,7 +444,7 @@ export const assembleFacilitySummary = (
       is_delinquent: isDelinquent,
 
       // Enrichment fields - Pricing Exception
-      pricing_exception_flag: latestPricing?.pricing_exception_flag ?? false,
+      is_pricing_exception_flag: latestPricing?.is_pricing_exception_flag ?? false,
 
       // Enrichment fields - Profitability
       net_interest_income_amt: latestProfitability?.net_interest_income_amt ?? 0,

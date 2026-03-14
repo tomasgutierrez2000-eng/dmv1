@@ -6,7 +6,7 @@ This section describes what the platform offers. Understanding these tools will 
 
 ## Data Model Visualizer (`/visualizer`)
 
-The interactive visualizer renders all 213+ tables as draggable nodes on an SVG canvas, organized by L1/L2/L3 layers with color coding.
+The interactive visualizer renders all 214+ tables as draggable nodes on an SVG canvas, organized by L1/L2/L3 layers with color coding.
 
 **Key features:**
 - **Table nodes** -- Each table appears as a card showing the table name, layer, and a status dot indicating database state
@@ -28,7 +28,7 @@ The interactive visualizer renders all 213+ tables as draggable nodes on an SVG 
 The metric library is the catalogue of all business metrics across all risk stripes.
 
 **Key features:**
-- **105+ catalogue items** across 7 domains (Amendments, Capital, Exposure, Pricing, Profitability, Reference, Risk)
+- **5+ catalogue items** across 7 domains (Amendments, Capital, Exposure, Pricing, Profitability, Reference, Risk)
 - **Each catalogue item shows:**
   - Business definition and formula
   - Ingredient fields -- the raw L1/L2 fields it reads
@@ -106,7 +106,7 @@ Live reconciliation between the data dictionary and PostgreSQL. Shows:
 Programmatic JSON export of the entire data model:
 - Full data dictionary (all tables, fields, types, PKs, FKs)
 - L3 table manifest with tiers and categories
-- All L105+ metric definitions
+- All L5+ metric definitions
 
 Use `?summary=true` for a token-efficient version suitable for AI prompts.
 

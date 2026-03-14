@@ -308,7 +308,7 @@ async function main() {
           credit_status_code: 'CURRENT',
           exposure_type_code: 'FUNDED',
           notional_amount: committed,
-          trading_banking_book_flag: 'N',
+          is_trading_banking_book_flag: 'N',
           product_node_id: ((facId - 1) % 100) + 1,
         }));
       }
@@ -376,7 +376,7 @@ async function main() {
           fee_rate_pct: FEE_RATE,
           cost_of_funds_pct: COST_OF_FUNDS,
           payment_frequency: 'QUARTERLY',
-          prepayment_penalty_flag: 'N',
+          is_prepayment_penalty_flag: 'N',
         }));
       }
       sqlLines.push('');

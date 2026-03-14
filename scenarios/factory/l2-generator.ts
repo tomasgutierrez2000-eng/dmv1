@@ -183,7 +183,7 @@ export interface FacilityPricingRow {
   fee_rate_pct: number;
   cost_of_funds_pct: number;
   payment_frequency: string;
-  prepayment_penalty_flag: string;
+  is_prepayment_penalty_flag: string;
 }
 
 export interface FacilityRiskRow {
@@ -235,7 +235,7 @@ export interface PositionRow {
   internal_risk_rating: string;
   external_risk_rating: string;
   notional_amount: number;
-  trading_banking_book_flag: string;
+  is_trading_banking_book_flag: string;
   product_node_id: number;
 }
 
@@ -255,7 +255,7 @@ export interface PositionDetailRow {
   spread_bps: number;
   exposure_type_code: string;
   notional_amount: number;
-  delinquent_payment_flag: string;
+  is_delinquent_payment_flag: string;
 }
 
 export interface CashFlowRow {
@@ -344,7 +344,7 @@ export interface FacilityCreditApprovalRow {
   approval_status: string;
   approval_date: string;
   approved_amount: number;
-  exception_flag: string;
+  is_exception_flag: string;
 }
 
 export interface FinancialMetricObservationRow {
@@ -1151,7 +1151,7 @@ function generateFacilityPricing(
         fee_rate_pct: 0.0025, // 25 bps commitment fee
         cost_of_funds_pct: baseRate - 0.005,
         payment_frequency: 'QUARTERLY',
-        prepayment_penalty_flag: 'N',
+        is_prepayment_penalty_flag: 'N',
       });
     }
   }
@@ -1328,7 +1328,7 @@ function generatePositions(
         internal_risk_rating: intRatings[intIdx],
         external_risk_rating: extRatings[extIdx],
         notional_amount: committed,
-        trading_banking_book_flag: 'B',
+        is_trading_banking_book_flag: 'B',
         product_node_id: ((facility.facility_id - 1) % 100) + 1,
       });
     }
@@ -1388,7 +1388,7 @@ function generatePositionDetails(
       spread_bps: spread,
       exposure_type_code: 'FUNDED',
       notional_amount: committed,
-      delinquent_payment_flag: dpd > 0 ? 'Y' : 'N',
+      is_delinquent_payment_flag: dpd > 0 ? 'Y' : 'N',
     });
   }
 
@@ -1738,7 +1738,7 @@ function generateFacilityCreditApprovals(
       approval_status: statuses[i % statuses.length],
       approval_date: lastDate,
       approved_amount: fac.committed_facility_amt,
-      exception_flag: 'N',
+      is_exception_flag: 'N',
     });
   }
 

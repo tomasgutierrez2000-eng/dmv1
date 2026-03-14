@@ -92,8 +92,8 @@ export const generateL2EnrichmentData = (
         rate_index_code: rateIndex,
         rate_cap_pct: rateIndex === "FIXED" ? null : roundTo(allInRate + 2.5, 2),
         min_spread_threshold_bps: minThreshold,
-        below_threshold_flag: belowThreshold,
-        pricing_exception_flag: index % 8 === 0,
+        is_below_threshold_flag: belowThreshold,
+        is_pricing_exception_flag: index % 8 === 0,
       });
       pricingSeq += 1;
     });

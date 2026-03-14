@@ -260,8 +260,8 @@ export interface EnrichedFacility {
   all_in_rate_pct: number;
   day_count_convention: string;
   amortization_type: string;
-  revolving_flag: string;
-  active_flag: string;
+  is_revolving_flag: string;
+  is_active_flag: string;
   facility_reference: string;
   payment_frequency: string;
   effective_start_date: string;
@@ -352,8 +352,8 @@ export function enrichFacilities(
       all_in_rate_pct: Math.round((baseSpreadBps / 100 + 2.5 + rng() * 1.5) * 100) / 100,
       day_count_convention: rng() < 0.6 ? 'ACT/360' : 'ACT/365',
       amortization_type: slot.isRevolving ? 'BULLET' : pick(rng, ['AMORTIZING', 'BULLET']),
-      revolving_flag: slot.isRevolving ? 'Y' : 'N',
-      active_flag: 'Y',
+      is_revolving_flag: slot.isRevolving ? 'Y' : 'N',
+      is_active_flag: 'Y',
       facility_reference: `FAC-${originYear}-${String(facId).padStart(5, '0')}-${slot.tranche}`,
       payment_frequency: pick(rng, ['QUARTERLY', 'MONTHLY', 'QUARTERLY']),
       effective_start_date: '2024-01-01',

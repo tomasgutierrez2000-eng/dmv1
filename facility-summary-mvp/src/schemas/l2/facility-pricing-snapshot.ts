@@ -8,6 +8,6 @@ export interface FacilityPricingSnapshot {
   rate_index_code: string;
   rate_cap_pct: number | null;
   min_spread_threshold_bps: number;
-  below_threshold_flag: boolean;
-  pricing_exception_flag: boolean;
+  is_below_threshold_flag: boolean;
+  is_pricing_exception_flag: boolean;
 }

@@ -152,7 +152,7 @@ function generateSeedSQL(entries: NaicsEntry[]): string {
   for (const e of sorted) {
     const parentVal = String(e.parent_industry_id);
     lines.push(
-      `INSERT INTO l1.industry_dim (industry_id, industry_code, industry_name, industry_level, industry_standard, parent_industry_id, active_flag, created_ts, updated_ts) VALUES (${e.industry_id}, '${e.industry_code}', '${e.industry_name}', '${e.industry_level}', '${e.industry_standard}', ${parentVal}, TRUE, '2024-06-15 12:00:00', '2024-06-15 12:00:00');`
+      `INSERT INTO l1.industry_dim (industry_id, industry_code, industry_name, industry_level, industry_standard, parent_industry_id, is_active_flag, created_ts, updated_ts) VALUES (${e.industry_id}, '${e.industry_code}', '${e.industry_name}', '${e.industry_level}', '${e.industry_standard}', ${parentVal}, TRUE, '2024-06-15 12:00:00', '2024-06-15 12:00:00');`
     );
   }
 
@@ -179,7 +179,7 @@ function generateMigrationSQL(entries: NaicsEntry[]): string {
   for (const e of sorted) {
     const parentVal = String(e.parent_industry_id);
     lines.push(
-      `INSERT INTO l1.industry_dim (industry_id, industry_code, industry_name, industry_level, industry_standard, parent_industry_id, active_flag, created_ts, updated_ts) VALUES (${e.industry_id}, '${e.industry_code}', '${e.industry_name}', '${e.industry_level}', '${e.industry_standard}', ${parentVal}, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);`
+      `INSERT INTO l1.industry_dim (industry_id, industry_code, industry_name, industry_level, industry_standard, parent_industry_id, is_active_flag, created_ts, updated_ts) VALUES (${e.industry_id}, '${e.industry_code}', '${e.industry_name}', '${e.industry_level}', '${e.industry_standard}', ${parentVal}, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);`
     );
   }
   lines.push('');

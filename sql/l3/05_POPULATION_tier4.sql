@@ -7,7 +7,7 @@
 -- Reads: T22, T25, T47, T8, T11 — one row per KPI code
 -- Formula: change_pct = (current - prior) / |prior| × 100
 CREATE OR REPLACE PROCEDURE l3.populate_kpi_period_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_prior_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE, p_prior_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 DELETE FROM l3.kpi_period_summary WHERE run_version_id = p_run_version_id;
@@ -51,7 +51,7 @@ $$;
 -- Reads: T30, T29, T11, T12
 -- Logic: Scan for breach/warning metrics, new breaches, credit events, largest changes
 CREATE OR REPLACE PROCEDURE l3.populate_executive_highlight_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 DELETE FROM l3.executive_highlight_summary WHERE run_version_id = p_run_version_id;

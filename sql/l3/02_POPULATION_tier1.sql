@@ -9,7 +9,7 @@
 -- Formula: gross = outstanding + undrawn; net = gross - netting_benefit; ead = drawn + CCF × undrawn
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_exposure_metric_cube(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
+    p_run_version_id BIGINT, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
 )
 LANGUAGE SQL AS $$
 
@@ -86,7 +86,7 @@ WHERE p.as_of_date = p_as_of_date;
 $$;
 
 -- POST-STEP: Update secured/unsecured after T6 populates
-CREATE OR REPLACE PROCEDURE l3.update_exposure_secured_amounts(p_run_version_id VARCHAR)
+CREATE OR REPLACE PROCEDURE l3.update_exposure_secured_amounts(p_run_version_id BIGINT)
 LANGUAGE SQL AS $$
 UPDATE l3.exposure_metric_cube emc
 SET
@@ -117,7 +117,7 @@ $$;
 -- Formula: EL = PD × LGD × EAD; RWA = EAD × Risk_Weight; Capital = RWA × 8%
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_risk_metric_cube(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
+    p_run_version_id BIGINT, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
 )
 LANGUAGE SQL AS $$
 
@@ -202,7 +202,7 @@ $$;
 -- Formula: recognized = market_value × (1 - haircut%); allocated = MIN(recognized, target_exposure)
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_crm_allocation_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
+    p_run_version_id BIGINT, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
 )
 LANGUAGE SQL AS $$
 
@@ -280,7 +280,7 @@ $$;
 --          velocity_30d = current_util% - util%_30days_ago
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_limit_current_state(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -395,7 +395,7 @@ $$;
 -- Formula: breach_amount = utilized - limit; severity based on overdraft %
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_limit_breach_fact(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -439,7 +439,7 @@ $$;
 --          risk_rating derived from default flag and loss amounts
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_credit_event_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
+    p_run_version_id BIGINT, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
 )
 LANGUAGE SQL AS $$
 
@@ -489,7 +489,7 @@ $$;
 -- Formula: result_status = FAIL if critical/high breaches, WARNING if any breaches, PASS otherwise
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_stress_test_result_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
+    p_run_version_id BIGINT, p_as_of_date DATE, p_base_currency VARCHAR DEFAULT 'USD'
 )
 LANGUAGE SQL AS $$
 

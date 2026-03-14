@@ -3,7 +3,7 @@
 -- Run after population to validate data integrity
 -- ============================================================
 
-CREATE OR REPLACE PROCEDURE l3.run_reconciliation_checks(p_run_version_id VARCHAR, p_as_of_date DATE)
+CREATE OR REPLACE PROCEDURE l3.run_reconciliation_checks(p_run_version_id BIGINT, p_as_of_date DATE)
 LANGUAGE plpgsql AS $$
 DECLARE
     v_t1_gross NUMERIC; v_t3_gross NUMERIC; v_t22_gross NUMERIC;

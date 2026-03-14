@@ -13,7 +13,7 @@
 --   exposure_change% = (current - prior) / prior × 100
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_lob_exposure_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_prior_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE, p_prior_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -130,7 +130,7 @@ $$;
 -- Purpose: Unified profile for all drawer pop-ups (Pages 2,3,4,6)
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_counterparty_detail_snapshot(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -181,7 +181,7 @@ $$;
 --          days_remaining = maturity_date - as_of_date
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_facility_detail_snapshot(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -297,7 +297,7 @@ $$;
 --          velocity = current_util% - util%_N_days_ago
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_risk_appetite_metric_state(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -359,7 +359,7 @@ $$;
 --   criticized_exposure_amt = SUM(gross_exposure for criticized facilities)
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_lob_credit_quality_criticized(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -395,7 +395,7 @@ $$;
 -- Same source logic as T28 but targets lob_deterioration_summary
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_lob_deterioration_criticized(
-    p_run_version_id VARCHAR, p_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 

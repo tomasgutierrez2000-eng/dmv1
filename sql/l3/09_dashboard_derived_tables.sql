@@ -12,7 +12,7 @@ SET search_path TO l1, l2, l3, public;
 CREATE TABLE IF NOT EXISTS "l3"."facility_derived" (
     -- PK & grain
     "facility_derived_sk" BIGSERIAL NOT NULL,
-    "run_version_id" VARCHAR(64),
+    "run_version_id" BIGINT,
     "facility_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
 
@@ -118,9 +118,15 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_derived" (
     "expected_tenor_months" NUMERIC(12,6),
     "days_until_maturity" INTEGER,
 
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     -- System
     "base_currency_code" VARCHAR(30),
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_derived_sk")
 );
 
@@ -133,7 +139,7 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_derived" (
 CREATE TABLE IF NOT EXISTS "l3"."counterparty_derived" (
     -- PK & grain
     "counterparty_derived_sk" BIGSERIAL NOT NULL,
-    "run_version_id" VARCHAR(64),
+    "run_version_id" BIGINT,
     "facility_id" BIGINT NOT NULL,
     "counterparty_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
@@ -240,9 +246,15 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_derived" (
     -- Tenor
     "expected_tenor_months" NUMERIC(12,6),
 
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     -- System
     "base_currency_code" VARCHAR(30),
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("counterparty_derived_sk")
 );
 
@@ -256,7 +268,7 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_derived" (
 CREATE TABLE IF NOT EXISTS "l3"."desk_derived" (
     -- PK & grain
     "desk_derived_sk" BIGSERIAL NOT NULL,
-    "run_version_id" VARCHAR(64),
+    "run_version_id" BIGINT,
     "hierarchy_id" BIGINT,
     "lob_node_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
@@ -365,9 +377,15 @@ CREATE TABLE IF NOT EXISTS "l3"."desk_derived" (
     "days_until_maturity" INTEGER,
     "origination_date" DATE,
 
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     -- System
     "base_currency_code" VARCHAR(30),
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("desk_derived_sk")
 );
 
@@ -381,7 +399,7 @@ CREATE TABLE IF NOT EXISTS "l3"."desk_derived" (
 CREATE TABLE IF NOT EXISTS "l3"."portfolio_derived" (
     -- PK & grain
     "portfolio_derived_sk" BIGSERIAL NOT NULL,
-    "run_version_id" VARCHAR(64),
+    "run_version_id" BIGINT,
     "hierarchy_id" BIGINT,
     "lob_node_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
@@ -487,9 +505,15 @@ CREATE TABLE IF NOT EXISTS "l3"."portfolio_derived" (
     -- Tenor
     "expected_tenor_months" NUMERIC(12,6),
 
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     -- System
     "base_currency_code" VARCHAR(30),
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("portfolio_derived_sk")
 );
 
@@ -503,7 +527,7 @@ CREATE TABLE IF NOT EXISTS "l3"."portfolio_derived" (
 CREATE TABLE IF NOT EXISTS "l3"."segment_derived" (
     -- PK & grain
     "segment_derived_sk" BIGSERIAL NOT NULL,
-    "run_version_id" VARCHAR(64),
+    "run_version_id" BIGINT,
     "hierarchy_id" BIGINT,
     "lob_node_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
@@ -608,8 +632,14 @@ CREATE TABLE IF NOT EXISTS "l3"."segment_derived" (
     -- Tenor
     "expected_tenor_months" NUMERIC(12,6),
 
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     -- System
     "base_currency_code" VARCHAR(30),
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("segment_derived_sk")
 );

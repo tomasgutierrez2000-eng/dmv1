@@ -31,7 +31,14 @@ CREATE TABLE IF NOT EXISTS "l3"."exposure_metric_cube" (
     "ead_amt" NUMERIC(20,4),
     "secured_amt" NUMERIC(20,4),
     "unsecured_residual_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "hierarchy_id" BIGINT,
     "attribution_pct" NUMERIC(10,6),
@@ -61,7 +68,14 @@ CREATE TABLE IF NOT EXISTS "l3"."risk_metric_cube" (
     "risk_weight_pct" NUMERIC(10,6),
     "rwa_amt" NUMERIC(20,4),
     "capital_req_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "hierarchy_id" BIGINT,
     "rwa_density_pct" NUMERIC(10,6),
@@ -84,7 +98,14 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_exposure_summary" (
     "total_ead_amt" NUMERIC(20,4),
     "secured_amt" NUMERIC(20,4),
     "unsecured_residual_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "hierarchy_id" BIGINT,
     "has_cross_entity_flag" BOOLEAN,
@@ -127,7 +148,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_exposure_summary" (
     "ead_amt" NUMERIC(20,4),
     "secured_amt" NUMERIC(20,4),
     "unsecured_residual_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "attribution_pct" NUMERIC(10,6),
     "is_syndicated_flag" BOOLEAN,
@@ -152,7 +180,14 @@ CREATE TABLE IF NOT EXISTS "l3"."portfolio_summary" (
     "avg_pd_pct" NUMERIC(10,6),
     "avg_lgd_pct" NUMERIC(10,6),
     "total_rwa_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "rwa_density_pct" NUMERIC(10,6),
     PRIMARY KEY ("portfolio_summary_sk")
@@ -178,7 +213,14 @@ CREATE TABLE IF NOT EXISTS "l3"."crm_allocation_summary" (
     "crm_recognized_amt" NUMERIC(20,4),
     "allocated_amt" NUMERIC(20,4),
     "allocation_method_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "risk_mitigant_id" BIGINT,
     "risk_mitigant_subtype_code" VARCHAR(30),
@@ -199,7 +241,14 @@ CREATE TABLE IF NOT EXISTS "l3"."collateral_portfolio_valuation" (
     "collateral_market_value_amt" NUMERIC(20,4),
     "collateral_recognized_amt" NUMERIC(20,4),
     "asset_count" INTEGER,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "parent_group_code" VARCHAR(30),
     PRIMARY KEY ("collateral_portfolio_valuation_sk")
@@ -220,7 +269,14 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_current_state" (
     "utilization_pct" NUMERIC(10,6),
     "status_code" VARCHAR(30),
     "last_breach_ts" TIMESTAMP,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "hierarchy_id" BIGINT,
     "last_status_change_ts" TIMESTAMP,
@@ -244,7 +300,14 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_utilization_timeseries" (
     "utilized_amt" NUMERIC(20,4),
     "available_amt" NUMERIC(20,4),
     "utilization_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     PRIMARY KEY ("limit_utilization_timeseries_sk")
 );
@@ -264,7 +327,14 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_attribution_summary" (
     "org_unit_id" BIGINT,
     "contribution_amt" NUMERIC(20,4),
     "contribution_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "hierarchy_id" BIGINT,
     PRIMARY KEY ("limit_attribution_summary_sk")
@@ -282,7 +352,14 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_breach_fact" (
     "breach_amount" NUMERIC(20,4),
     "status_code" VARCHAR(30),
     "resolved_ts" TIMESTAMP,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     PRIMARY KEY ("limit_breach_fact_sk")
 );
@@ -302,7 +379,14 @@ CREATE TABLE IF NOT EXISTS "l3"."credit_event_summary" (
     "recovery_amt" NUMERIC(20,4),
     "net_loss_amt" NUMERIC(20,4),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "impacted_facility_count" INTEGER,
     "event_summary_text" TEXT,
@@ -325,7 +409,14 @@ CREATE TABLE IF NOT EXISTS "l3"."rating_migration_summary" (
     "migration_count" INTEGER,
     "exposure_at_migration_amt" NUMERIC(20,4),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     PRIMARY KEY ("rating_migration_summary_sk")
 );
@@ -343,7 +434,14 @@ CREATE TABLE IF NOT EXISTS "l3"."default_loss_recovery_summary" (
     "recovery_amt" NUMERIC(20,4),
     "realized_lgd_pct" NUMERIC(10,6),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     PRIMARY KEY ("default_loss_recovery_summary_sk")
 );
@@ -360,7 +458,14 @@ CREATE TABLE IF NOT EXISTS "l3"."report_run" (
     "started_ts" TIMESTAMP,
     "completed_ts" TIMESTAMP,
     "produced_by_system_id" BIGINT,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("report_run_sk")
 );
 
@@ -374,7 +479,14 @@ CREATE TABLE IF NOT EXISTS "l3"."report_cell_value" (
     "unit_code" VARCHAR(30),
     "value_precision" VARCHAR(255),
     "calculation_rule_id" BIGINT,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("report_cell_value_sk")
 );
 
@@ -390,7 +502,14 @@ CREATE TABLE IF NOT EXISTS "l3"."report_cell_contribution_fact" (
     "currency_code" VARCHAR(30),
     "base_currency_code" VARCHAR(30),
     "rule_id" BIGINT,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     PRIMARY KEY ("report_cell_contribution_fact_sk")
 );
@@ -408,7 +527,14 @@ CREATE TABLE IF NOT EXISTS "l3"."report_cell_rule_execution" (
     "input_record_count" INTEGER,
     "output_value_amt" NUMERIC(20,4),
     "error_message" VARCHAR(255),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("report_cell_rule_execution_sk")
 );
 
@@ -424,7 +550,14 @@ CREATE TABLE IF NOT EXISTS "l3"."report_validation_result" (
     "threshold_value" NUMERIC(12,6),
     "observed_value" NUMERIC(12,6),
     "message" VARCHAR(255),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("report_validation_result_sk")
 );
 
@@ -447,7 +580,14 @@ CREATE TABLE IF NOT EXISTS "l3"."fr2590_position_snapshot" (
     "mapped_line_id" VARCHAR(64),
     "mapped_column_id" VARCHAR(64),
     "amount_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "fr2590_category_code" VARCHAR(30),
     PRIMARY KEY ("fr2590_position_snapshot_sk")
@@ -466,7 +606,14 @@ CREATE TABLE IF NOT EXISTS "l3"."fr2590_counterparty_aggregate" (
     "total_amount_amt" NUMERIC(20,4),
     "rank_within_entity" VARCHAR(255),
     "is_top_counterparty_flag" BOOLEAN,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "lob_node_id" BIGINT,
     "fr2590_category_code" VARCHAR(30),
     PRIMARY KEY ("fr2590_counterparty_aggregate_sk")
@@ -500,7 +647,14 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_exposure_summary" (
     "npl_ratio_pct" NUMERIC(10,6),
     "prior_period_gross_exposure_amt" NUMERIC(20,4),
     "exposure_change_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "result_status_code" VARCHAR(30),
     "scenario_scope_desc" TEXT,
     "coverage_ratio_pct" NUMERIC(10,6),
@@ -533,6 +687,12 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_profitability_summary" (
     "revenue_change_pct" NUMERIC(10,6),
     "prior_period_net_income_amt" NUMERIC(20,4),
     "net_income_change_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     "return_on_rwa_pct" NUMERIC(10,6),
@@ -557,6 +717,12 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_pricing_summary" (
     "prior_period_avg_spread_bps" NUMERIC(10,4),
     "avg_spread_change_bps" NUMERIC(10,4),
     "weighted_avg_fee_rate_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("lob_pricing_summary_sk")
@@ -583,6 +749,12 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_delinquency_summary" (
     "overdue_amt_0_30" NUMERIC(20,4),
     "overdue_amt_31_60" NUMERIC(20,4),
     "overdue_amt_61_90_plus" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("lob_delinquency_summary_sk")
@@ -605,6 +777,12 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_profitability_allocation_summary" (
     "roe_pct" NUMERIC(10,6),
     "roa_pct" NUMERIC(10,6),
     "nim_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("lob_profitability_allocation_summary_sk")
@@ -623,6 +801,12 @@ CREATE TABLE IF NOT EXISTS "l3"."deal_pipeline_stage_summary" (
     "expected_collateral_value_amt" NUMERIC(20,4),
     "avg_expected_spread_bps" NUMERIC(10,4),
     "avg_expected_coverage_ratio" VARCHAR(255),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("deal_pipeline_stage_summary_sk")
@@ -642,6 +826,12 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_credit_quality_summary" (
     "dcsr_value" NUMERIC(12,6),
     "rwa_density_pct" NUMERIC(10,6),
     "rating_downgrade_count" INTEGER,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     "external_downgrade_count" INTEGER,
@@ -668,7 +858,14 @@ CREATE TABLE IF NOT EXISTS "l3"."kpi_period_summary" (
     "unit_of_measure" VARCHAR(255),
     "base_currency_code" VARCHAR(30),
     "run_version_id" BIGINT,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("kpi_period_summary_sk")
 );
 
@@ -699,7 +896,14 @@ CREATE TABLE IF NOT EXISTS "l3"."risk_appetite_metric_state" (
     "last_metric_updated_ts" TIMESTAMP,
     "last_threshold_updated_ts" TIMESTAMP,
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("risk_appetite_metric_state_sk")
 );
 
@@ -716,7 +920,14 @@ CREATE TABLE IF NOT EXISTS "l3"."executive_highlight_summary" (
     "icon_code" VARCHAR(30),
     "severity_code" VARCHAR(30),
     "source_metric_id" VARCHAR(64),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("executive_highlight_summary_sk")
 );
 
@@ -757,7 +968,14 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_detail_snapshot" (
     "exposure_change_pct" NUMERIC(10,6),
     "base_currency_code" VARCHAR(30),
     "lob_node_id" BIGINT,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "rwa_amt" NUMERIC(20,4),
     "rwa_density_pct" NUMERIC(10,6),
     PRIMARY KEY ("counterparty_detail_snapshot_sk")
@@ -778,7 +996,14 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_tier_status_matrix" (
     "total_headroom_amt" NUMERIC(20,4),
     "risk_score" VARCHAR(255),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("limit_tier_status_matrix_sk")
 );
 
@@ -795,7 +1020,14 @@ CREATE TABLE IF NOT EXISTS "l3"."limit_counterparty_movement" (
     "prior_limit_status_code" VARCHAR(30),
     "counterparty_name" VARCHAR(500),
     "gross_exposure_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("limit_counterparty_movement_sk")
 );
 
@@ -814,7 +1046,14 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_summary" (
     "reconciliation_break_count" INTEGER,
     "prior_period_recon_break_count" INTEGER,
     "leading_issue_type" VARCHAR(255),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("data_quality_score_summary_sk")
 );
 
@@ -837,7 +1076,14 @@ CREATE TABLE IF NOT EXISTS "l3"."legal_entity_risk_profile" (
     "avg_lgd_pct" NUMERIC(10,6),
     "expected_loss_amt" NUMERIC(20,4),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "rwa_amt" NUMERIC(20,4),
     "rwa_density_pct" NUMERIC(10,6),
     PRIMARY KEY ("legal_entity_risk_profile_sk")
@@ -854,7 +1100,14 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_attribute_score" (
     "impact_pct" NUMERIC(10,6),
     "impacted_reports" VARCHAR(255),
     "rank_order" INTEGER,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("data_quality_attribute_score_sk")
 );
 
@@ -867,7 +1120,14 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_trend" (
     "data_quality_score_pct" NUMERIC(10,6),
     "reconciliation_break_count" INTEGER,
     "total_dq_issues" VARCHAR(255),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("data_quality_trend_sk")
 );
 
@@ -892,7 +1152,14 @@ CREATE TABLE IF NOT EXISTS "l3"."stress_test_result_summary" (
     "result_status_code" VARCHAR(30),
     "last_tested_date" DATE,
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("stress_test_result_summary_sk")
 );
 
@@ -910,7 +1177,14 @@ CREATE TABLE IF NOT EXISTS "l3"."stress_test_breach_detail" (
     "control_owner_name" VARCHAR(500),
     "exception_description" TEXT,
     "expected_loss_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("stress_test_breach_detail_sk")
 );
 
@@ -927,7 +1201,14 @@ CREATE TABLE IF NOT EXISTS "l3"."regulatory_compliance_state" (
     "compliance_status" VARCHAR(255),
     "prior_period_value" NUMERIC(12,6),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("regulatory_compliance_state_sk")
 );
 
@@ -942,7 +1223,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_timeline_summary" (
     "total_exposure_amt" NUMERIC(20,4),
     "cumulative_exposure_change_amt" NUMERIC(20,4),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_timeline_summary_sk")
 );
 
@@ -957,7 +1245,14 @@ CREATE TABLE IF NOT EXISTS "l3"."amendment_summary" (
     "amendment_status_name" VARCHAR(500),
     "credit_agreement_count" INTEGER,
     "total_exposure_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("amendment_summary_sk")
 );
 
@@ -976,7 +1271,14 @@ CREATE TABLE IF NOT EXISTS "l3"."amendment_detail" (
     "amendment_start_date" DATE,
     "amendment_status_code" VARCHAR(30),
     "amendment_aging_days" VARCHAR(255),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("amendment_detail_sk")
 );
 
@@ -1021,7 +1323,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_detail_snapshot" (
     "effective_date_bucket" VARCHAR(20),
     "bank_share_pct" NUMERIC(10,4),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "is_deteriorated" VARCHAR(64),
     "risk_rating_tier_code" VARCHAR(20),
     "utilization_status_code" VARCHAR(20),
@@ -1046,7 +1355,14 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_risk_ratio_summary" (
     "cash_interest_expense_amt" NUMERIC(20,4),
     "exception_rate_pct" NUMERIC(10,6),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("lob_risk_ratio_summary_sk")
 );
 
@@ -1069,7 +1385,14 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_deterioration_summary" (
     "prior_period_deteriorated_count" INTEGER,
     "deterioration_change_pct" NUMERIC(10,6),
     "base_currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("lob_deterioration_summary_sk")
 );
 
@@ -1085,7 +1408,14 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_rating_distribution" (
     "counterparty_count" INTEGER,
     "exposure_amt" NUMERIC(20,4),
     "bucket_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("lob_rating_distribution_sk")
 );
 
@@ -1103,7 +1433,14 @@ CREATE TABLE IF NOT EXISTS "l3"."lob_top_contributors" (
     "exposure_amt" NUMERIC(20,4),
     "utilization_pct" NUMERIC(10,6),
     "contribution_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("lob_top_contributors_sk")
 );
 
@@ -1123,7 +1460,14 @@ CREATE TABLE IF NOT EXISTS "l3"."metric_value_fact" (
     "value" NUMERIC(20,6),
     "unit" VARCHAR(30),
     "display_format" VARCHAR(64),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("metric_value_fact_sk")
 );
 
@@ -1149,6 +1493,12 @@ CREATE TABLE IF NOT EXISTS "l3"."calc_audit_log" (
     "error_code" VARCHAR(30),
     "error_detail" TEXT,
     "dependency_chain" text[],
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "created_by" VARCHAR(100),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("audit_id")
 );
 
@@ -1175,6 +1525,12 @@ CREATE TABLE IF NOT EXISTS "l3"."calc_run" (
     "git_sha" VARCHAR(40),
     "error_summary" TEXT,
     "config_snapshot" VARCHAR(64),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "created_by" VARCHAR(100),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("run_id")
 );
 
@@ -1195,6 +1551,12 @@ CREATE TABLE IF NOT EXISTS "l3"."calc_validation_result" (
     "message" TEXT,
     "detail" VARCHAR(64),
     "checked_at" TIMESTAMP,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "created_by" VARCHAR(100),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("validation_id")
 );
 
@@ -1216,7 +1578,13 @@ CREATE TABLE IF NOT EXISTS "l3"."metric_result" (
     "scenario_id" BIGINT,
     "formula_hash" VARCHAR(64),
     "source_row_count" INTEGER,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("result_id")
 );
 
@@ -1229,7 +1597,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_risk_calc" (
     "rwa_amt" NUMERIC(20,4),
     "exposure_at_default" NUMERIC(20,4),
     "lgd_estimate" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -1239,7 +1614,14 @@ CREATE TABLE IF NOT EXISTS "l3"."netting_set_exposure_calc" (
     "as_of_date" DATE NOT NULL,
     "netted_exposure_amount" NUMERIC(20,4),
     "netting_benefit_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("netting_set_id", "as_of_date")
 );
 
@@ -1259,7 +1641,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_exposure_calc" (
     "utilization_pct" NUMERIC(10,6),
     "undrawn_amt" NUMERIC(20,4),
     "net_exposure_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -1281,7 +1670,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_financial_calc" (
     "interest_rate_sensitivity_pct" NUMERIC(10,6),
     "interest_coverage_ratio" NUMERIC(10,6),
     "debt_yield_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -1293,7 +1689,14 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_rating_calc" (
     "rating_type" VARCHAR(30),
     "risk_rating_change_steps" INTEGER,
     "rating_change_status_code" VARCHAR(20),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("counterparty_id", "as_of_date", "rating_type")
 );
 
@@ -1305,7 +1708,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_pricing_calc" (
     "pricing_exception_flag" BOOLEAN,
     "pricing_tier_code" VARCHAR(20),
     "fee_rate_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -1315,7 +1725,14 @@ CREATE TABLE IF NOT EXISTS "l3"."collateral_calc" (
     "collateral_asset_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
     "allocated_amount_usd" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("collateral_asset_id", "as_of_date")
 );
 
@@ -1324,7 +1741,14 @@ CREATE TABLE IF NOT EXISTS "l3"."collateral_calc" (
 CREATE TABLE IF NOT EXISTS "l3"."cash_flow_calc" (
     "cash_flow_id" BIGINT NOT NULL,
     "contractual_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("cash_flow_id")
 );
 
@@ -1339,7 +1763,14 @@ CREATE TABLE IF NOT EXISTS "l3"."data_quality_score_snapshot" (
     "total_row_count" INTEGER,
     "null_field_count" INTEGER,
     "anomaly_count" INTEGER,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("table_name", "as_of_date")
 );
 
@@ -1356,7 +1787,14 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_stress_test_calc" (
     "stressed_expected_loss" NUMERIC(20,4),
     "capital_impact_pct" NUMERIC(10,6),
     "currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_stress_test_calc_id")
 );
 
@@ -1367,7 +1805,14 @@ CREATE TABLE IF NOT EXISTS "l3"."gl_account_balance_calc" (
     "ending_balance_net_amt" NUMERIC(20,4),
     "period_net_activity_amt" NUMERIC(20,4),
     "balance_change_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("ledger_account_id", "as_of_date")
 );
 
@@ -1388,6 +1833,11 @@ CREATE TABLE IF NOT EXISTS "l3"."ecl_provision_calc" (
     "stage_transfer_flag" BOOLEAN,
     "model_code" VARCHAR(20),
     "currency_code" VARCHAR(20),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "record_source" VARCHAR(100),
@@ -1409,6 +1859,11 @@ CREATE TABLE IF NOT EXISTS "l3"."ecl_allowance_movement" (
     "stage_transfer_amt" NUMERIC(20,4),
     "closing_balance_amt" NUMERIC(20,4),
     "currency_code" VARCHAR(20),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "record_source" VARCHAR(100),
@@ -1428,6 +1883,11 @@ CREATE TABLE IF NOT EXISTS "l3"."watchlist_movement_summary" (
     "total_exposure_amt" NUMERIC(20,4),
     "total_facilities_count" INTEGER,
     "currency_code" VARCHAR(20),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "record_source" VARCHAR(100),
@@ -1449,6 +1909,11 @@ CREATE TABLE IF NOT EXISTS "l3"."stress_test_result" (
     "stressed_expected_loss" NUMERIC(20,4),
     "capital_impact_pct" NUMERIC(10,6),
     "currency_code" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "created_by" VARCHAR(100),
@@ -1463,6 +1928,12 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_rwa_calc" (
     "as_of_date" DATE NOT NULL,
     "rwa_std_amt" NUMERIC(20,4),
     "rwa_erba_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
@@ -1490,6 +1961,12 @@ CREATE TABLE IF NOT EXISTS "l3"."capital_binding_constraint" (
     "leverage_buffer_pct" NUMERIC(10,6),
     "slr_buffer_pct" NUMERIC(10,6),
     "tlac_buffer_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("legal_entity_id", "as_of_date")
@@ -1508,6 +1985,12 @@ CREATE TABLE IF NOT EXISTS "l3"."facility_capital_consumption" (
     "rwa_binding_amt" NUMERIC(20,4),
     "most_binding_constraint" VARCHAR(30),
     "basel_exposure_type_id" BIGINT,
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("facility_id", "as_of_date")
@@ -1529,6 +2012,12 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_capital_consumption" (
     "capital_consumption_erba_amt" NUMERIC(20,4),
     "capital_delta_amt" NUMERIC(20,4),
     "most_binding_constraint" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("counterparty_id", "as_of_date", "legal_entity_id")
@@ -1550,6 +2039,12 @@ CREATE TABLE IF NOT EXISTS "l3"."desk_capital_consumption" (
     "capital_consumption_erba_amt" NUMERIC(20,4),
     "capital_delta_amt" NUMERIC(20,4),
     "most_binding_constraint" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("org_unit_id", "as_of_date", "legal_entity_id")
@@ -1571,6 +2066,12 @@ CREATE TABLE IF NOT EXISTS "l3"."portfolio_capital_consumption" (
     "capital_consumption_erba_amt" NUMERIC(20,4),
     "capital_delta_amt" NUMERIC(20,4),
     "most_binding_constraint" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("portfolio_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
@@ -1592,6 +2093,12 @@ CREATE TABLE IF NOT EXISTS "l3"."segment_capital_consumption" (
     "capital_consumption_erba_amt" NUMERIC(20,4),
     "capital_delta_amt" NUMERIC(20,4),
     "most_binding_constraint" VARCHAR(30),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+    "created_by" VARCHAR(100),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("lob_segment_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
@@ -1615,6 +2122,11 @@ CREATE TABLE IF NOT EXISTS "l3"."capital_position_calc" (
     "rwa_std_amt" NUMERIC(20,4),
     "rwa_erba_amt" NUMERIC(20,4),
     "total_capital_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "created_by" VARCHAR(64),
@@ -1631,6 +2143,11 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_financial_calc" (
     "total_assets_amt" NUMERIC(20,4),
     "total_liabilities_amt" NUMERIC(20,4),
     "total_debt_service_amt" NUMERIC(20,4),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "created_by" VARCHAR(64),
@@ -1645,6 +2162,11 @@ CREATE TABLE IF NOT EXISTS "l3"."exception_event_calc" (
     "as_of_date" DATE,
     "days_open" INTEGER,
     "breach_pct" NUMERIC(10,6),
+
+    -- Governance
+    "model_version" VARCHAR(50),
+    "run_id" VARCHAR(64),
+
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "created_by" VARCHAR(64),

@@ -10,7 +10,7 @@
 --          limit fields from T8; period-over-period from prior month T3
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_counterparty_exposure_summary(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_prior_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE, p_prior_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 
@@ -124,7 +124,7 @@ $$;
 -- Formula: Risk Score = SUM(status_weight × count) where Sufficient=0, Approaching=1, Met=2, Overdraft=3
 -- ============================================================
 CREATE OR REPLACE PROCEDURE l3.populate_limit_tier_status_matrix(
-    p_run_version_id VARCHAR, p_as_of_date DATE, p_prior_as_of_date DATE
+    p_run_version_id BIGINT, p_as_of_date DATE, p_prior_as_of_date DATE
 )
 LANGUAGE SQL AS $$
 

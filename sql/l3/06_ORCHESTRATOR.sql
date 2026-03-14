@@ -4,7 +4,7 @@
 -- ============================================================
 
 CREATE OR REPLACE PROCEDURE l3.run_full_population(
-    p_run_version_id VARCHAR,
+    p_run_version_id BIGINT,
     p_as_of_date DATE,
     p_prior_as_of_date DATE DEFAULT NULL,
     p_base_currency VARCHAR DEFAULT 'USD'

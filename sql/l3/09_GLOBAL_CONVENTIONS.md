@@ -4,7 +4,8 @@
 
 | Pattern | SQL Type | Notes |
 |---|---|---|
-| `*_id` | `VARCHAR(64)` | Business keys from source systems |
+| `*_id` | `BIGINT` | FK references to L1/L2 dimensional tables match parent PK type |
+| `*_id` (business keys) | `VARCHAR(64)` | L3-generated business keys (metric_id, variant_id, run_id) |
 | `*_code` | `VARCHAR(30)` | Classification/status codes |
 | `*_name`, `*_desc`, `*_text` | `VARCHAR(500)` or `TEXT` | Display names |
 | `*_amt` | `NUMERIC(20,4)` | Monetary amounts in base currency |
@@ -23,10 +24,28 @@
 - Nullable PK parts: Use COALESCE in unique index
 - Single PKs (breach_id, report_run_id): UUID generation
 
+## Governance Columns (Mandatory on ALL L3 tables)
+
+Every L3 table MUST include these governance columns for SR 11-7 compliance and audit traceability:
+
+| Column | Type | Description | Source |
+|--------|------|-------------|--------|
+| `model_version` | `VARCHAR(50)` | SR 11-7 model version identifier — which formula/model produced the row | Calc engine sets at runtime |
+| `run_id` | `VARCHAR(64)` | FK to `l3.calc_run(run_id)` — technical execution batch identifier | Calc engine sets at runtime |
+| `run_version_id` | `BIGINT` | FK to `l1.run_control(run_version_id)` — business run version | Orchestrator sets |
+| `created_by` | `VARCHAR(100)` | System/user identity that created the row | Process identity |
+| `created_ts` | `TIMESTAMP DEFAULT CURRENT_TIMESTAMP` | Row creation timestamp | Auto |
+| `updated_ts` | `TIMESTAMP DEFAULT CURRENT_TIMESTAMP` | Last modification timestamp | Auto |
+
+**Type rules:**
+- `run_version_id` is always `BIGINT` (matching `l1.run_control.run_version_id`) — never VARCHAR
+- `run_id` is always `VARCHAR(64)` (matching `l3.calc_run.run_id` PK) — never BIGINT
+- Stored procedure parameters must use matching types: `p_run_version_id BIGINT`
+
 ## Foreign Key Convention
 
 - All FKs reference `l1.*` or `l2.*` schemas
-- Cross-L3 FKs: logical only (documented in comments, not enforced)
+- Exception: `run_id` → `l3.calc_run(run_id)` is the only enforced cross-L3 FK
 - Nullable FKs: no constraint, documented
 
 ## Currency Conversion Pattern

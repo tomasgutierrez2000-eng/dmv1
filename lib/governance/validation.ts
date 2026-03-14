@@ -27,7 +27,10 @@ export const FIELD_LIMITS = {
 
 /* ── Enum Allowlists ────────────────────────────────────────────── */
 
-export const VALID_STATUSES = new Set(['ACTIVE', 'DRAFT', 'DEPRECATED']);
+export const VALID_STATUSES = new Set([
+  'DRAFT', 'PENDING_REVIEW', 'IN_REVIEW', 'APPROVED',
+  'ACTIVE', 'CHANGES_REQUESTED', 'DEPRECATED', 'RETIRED',
+]);
 export const VALID_GOVERNANCE_STATUSES = new Set([
   'DRAFT', 'PENDING_REVIEW', 'IN_REVIEW', 'APPROVED',
   'ACTIVE', 'CHANGES_REQUESTED', 'DEPRECATED', 'RETIRED',

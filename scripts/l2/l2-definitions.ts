@@ -129,13 +129,10 @@ export const L2_TABLES: L2TableDef[] = [
       // L3 procedure compatibility: same as drawn_amount / undrawn_amount
       { name: 'outstanding_balance_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'undrawn_commitment_amt', type: 'DECIMAL(18,2)', nullable: true },
-      { name: 'number_of_loans', type: 'INTEGER', nullable: true },
-      { name: 'number_of_facilities', type: 'INTEGER', nullable: true },
-      { name: 'days_until_maturity', type: 'INTEGER', nullable: true },
+      // Computed fields moved to L3 overlay: facility_exposure_calc (T52)
+      // number_of_loans, number_of_facilities, days_until_maturity,
+      // limit_status_code, internal_risk_rating_bucket_code, rwa_amt
       { name: 'bank_share_pct', type: 'DECIMAL(10,4)', nullable: true },
-      { name: 'limit_status_code', type: 'VARCHAR(30)', nullable: true },
-      { name: 'rwa_amt', type: 'DECIMAL(18,2)', nullable: true },
-      { name: 'internal_risk_rating_bucket_code', type: 'VARCHAR(20)', nullable: true, fk: 'l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)' },
       { name: 'total_collateral_mv_usd', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
@@ -560,7 +557,8 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'currency_code', type: 'VARCHAR(20)', nullable: true, fk: 'l1.currency_dim(currency_code)' },
       { name: 'revenue_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'operating_expense_amt', type: 'DECIMAL(18,2)', nullable: true },
-      { name: 'net_income_amt', type: 'DECIMAL(18,2)', nullable: true },
+      // Derived fields moved to L3 overlay: counterparty_financial_calc (T84)
+      // net_income_amt, ebitda_amt, noi_amt, total_debt_service_amt
       { name: 'interest_expense_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'tax_expense_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'depreciation_amt', type: 'DECIMAL(18,2)', nullable: true },
@@ -568,9 +566,6 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'total_assets_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'total_liabilities_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'shareholders_equity_amt', type: 'DECIMAL(18,2)', nullable: true },
-      { name: 'ebitda_amt', type: 'DECIMAL(18,2)', nullable: true },
-      { name: 'noi_amt', type: 'DECIMAL(18,2)', nullable: true },
-      { name: 'total_debt_service_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'expected_drawdown_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'fee_income_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'tangible_net_worth_usd', type: 'DECIMAL(18,2)', nullable: true },

@@ -14,7 +14,7 @@ The data model is organized into three layers. Every table, every field, and eve
                             │ L2 reads from L1
                             ▼
  ┌─────────────────────────────────────────────────────────┐
- │  L2 -- ATOMIC DATA  (61 tables)                        │
+ │  L2 -- ATOMIC DATA  (62 tables)                        │
  │  Raw source-system snapshots and events                 │
  │  Point-in-time observations. Never computed.            │
  │  Examples: position, facility_exposure_snapshot, fx_rate │
@@ -132,7 +132,7 @@ This is the "shopping list" for onboarding teams. Check which tables your risk s
 | **Models** | `model_registry_dim`, `rule_registry` |
 | **SCCL Grouping** | `sccl_counterparty_group`, `sccl_counterparty_group_member` |
 
-### L2 -- ATOMIC DATA  (61 tables)
+### L2 -- ATOMIC DATA  (62 tables)
 
 | Category | Tables | SCD Type |
 |----------|--------|----------|

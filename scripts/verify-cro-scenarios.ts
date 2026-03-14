@@ -25,7 +25,7 @@ const SCENARIOS: ScenarioCheck[] = [
     id: 'S1',
     name: 'Large Exposure Breach',
     narrative: 'Single-name concentration exceeding limit — $2.5B drawn vs $2B limit (125%)',
-    query: `SELECT c.legal_name, f.facility_name, fes.drawn_amount, fes.committed_amount,
+    query: `SELECT c.legal_name, f.facility_name, fes.outstanding_balance_amt, fes.committed_amount,
        fes.limit_status_code, lu.utilized_amount, lu.available_amount
 FROM l1.counterparty c
 JOIN l1.facility_master f ON f.counterparty_id = c.counterparty_id
@@ -42,8 +42,8 @@ WHERE c.counterparty_id = 1001 AND fes.as_of_date = '2025-01-31'`,
     id: 'S2',
     name: 'Gradual Deterioration',
     narrative: '3-month utilization trend 82%→88%→93% with rating downgrade A→A-',
-    query: `SELECT fes.as_of_date, f.facility_name, fes.drawn_amount, fes.committed_amount,
-       ROUND(fes.drawn_amount::numeric / NULLIF(fes.committed_amount,0) * 100, 1) AS util_pct
+    query: `SELECT fes.as_of_date, f.facility_name, fes.outstanding_balance_amt, fes.committed_amount,
+       ROUND(fes.outstanding_balance_amt::numeric / NULLIF(fes.committed_amount,0) * 100, 1) AS util_pct
 FROM l2.facility_exposure_snapshot fes
 JOIN l1.facility_master f ON f.facility_id = fes.facility_id
 WHERE fes.counterparty_id = 1051
@@ -166,7 +166,7 @@ ORDER BY dpf.proposed_amount DESC`,
     id: 'S10',
     name: 'Maturity Wall',
     narrative: '15 facilities ($4.8B) maturing Feb–Apr 2025, 1–90 days',
-    query: `SELECT f.facility_name, c.legal_name, fes.drawn_amount, fes.days_until_maturity,
+    query: `SELECT f.facility_name, c.legal_name, fes.outstanding_balance_amt, fes.days_until_maturity,
        f.maturity_date, rf.flag_severity
 FROM l2.facility_exposure_snapshot fes
 JOIN l1.facility_master f ON f.facility_id = fes.facility_id
@@ -199,7 +199,7 @@ ORDER BY dqs.overall_score`,
     name: 'Product Mix Shift',
     narrative: '3-month FR 2590 G-1/G-4 trend — G-4 growing 12% MoM',
     query: `SELECT fes.as_of_date, fes.fr2590_category_code,
-       SUM(fes.drawn_amount) AS total_drawn,
+       SUM(fes.outstanding_balance_amt) AS total_drawn,
        COUNT(*) AS facility_count
 FROM l2.facility_exposure_snapshot fes
 WHERE fes.as_of_date IN ('2024-11-30','2024-12-31','2025-01-31')
@@ -216,8 +216,8 @@ ORDER BY fes.as_of_date, fes.fr2590_category_code`,
     id: 'S13',
     name: 'Leveraged Finance',
     narrative: 'High NII yield (4.5%) but B-rated — risk-return tradeoff',
-    query: `SELECT f.facility_name, fes.drawn_amount, fps.nii_ytd,
-       ROUND(fps.nii_ytd::numeric / NULLIF(fes.drawn_amount,0) * 100, 2) AS nii_yield_pct,
+    query: `SELECT f.facility_name, fes.outstanding_balance_amt, fps.nii_ytd,
+       ROUND(fps.nii_ytd::numeric / NULLIF(fes.outstanding_balance_amt,0) * 100, 2) AS nii_yield_pct,
        cro.rating_value, cro.rating_grade_id
 FROM l2.facility_exposure_snapshot fes
 JOIN l1.facility_master f ON f.facility_id = fes.facility_id
@@ -290,7 +290,7 @@ ORDER BY ae.amendment_status_code, ae.facility_id`,
     name: 'Region Concentration',
     narrative: '5 APAC counterparties, 31% exposure growth over 3 months',
     query: `SELECT fes.as_of_date, c.country_code,
-       SUM(fes.drawn_amount) AS total_drawn,
+       SUM(fes.outstanding_balance_amt) AS total_drawn,
        COUNT(*) AS facility_count
 FROM l2.facility_exposure_snapshot fes
 JOIN l1.counterparty c ON c.counterparty_id = fes.counterparty_id

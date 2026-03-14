@@ -127,8 +127,8 @@ async function queryDemoFacilities(
         COALESCE(fes.committed_amount, 0) AS committed_amt,
         COALESCE(cs.market_value_amt, 0) AS collateral_value,
         CASE
-          WHEN COALESCE(cs.market_value_amt, 0) > 0 AND COALESCE(fes.drawn_amount, 0) > 0
-          THEN ROUND((fes.drawn_amount / cs.market_value_amt * 100)::numeric, 2)
+          WHEN COALESCE(cs.market_value_amt, 0) > 0 AND COALESCE(fes.outstanding_balance_amt, 0) > 0
+          THEN ROUND((fes.outstanding_balance_amt / cs.market_value_amt * 100)::numeric, 2)
           ELSE 0
         END AS ltv_pct
         ${extraSelectClause}

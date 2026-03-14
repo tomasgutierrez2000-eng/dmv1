@@ -62,7 +62,7 @@ levels:
     formula_sql: |-
       SELECT
         fes.facility_id AS dimension_key,
-        fes.drawn_amount / NULLIF(fes.committed_amount, 0) * 100.0 AS metric_value
+        fes.outstanding_balance_amt / NULLIF(fes.committed_amount, 0) * 100.0 AS metric_value
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
@@ -81,7 +81,7 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.drawn_amount AS numerator_val,
+          fes.outstanding_balance_amt AS numerator_val,
           fes.committed_amount AS denominator_val
         FROM l2.facility_exposure_snapshot fes
         INNER JOIN l2.facility_master fm
@@ -106,7 +106,7 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.drawn_amount AS numerator_val,
+          fes.outstanding_balance_amt AS numerator_val,
           fes.committed_amount AS denominator_val
         FROM l2.facility_exposure_snapshot fes
         INNER JOIN l2.facility_master fm
@@ -133,7 +133,7 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.drawn_amount AS numerator_val,
+          fes.outstanding_balance_amt AS numerator_val,
           fes.committed_amount AS denominator_val
         FROM l2.facility_exposure_snapshot fes
         INNER JOIN l2.facility_master fm
@@ -162,7 +162,7 @@ levels:
       FROM (
         SELECT
           fes.facility_id,
-          fes.drawn_amount AS numerator_val,
+          fes.outstanding_balance_amt AS numerator_val,
           fes.committed_amount AS denominator_val
         FROM l2.facility_exposure_snapshot fes
         INNER JOIN l2.facility_master fm

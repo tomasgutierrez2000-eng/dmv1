@@ -2139,6 +2139,8 @@ CREATE TABLE IF NOT EXISTS "l3"."counterparty_financial_calc" (
     "counterparty_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
     "net_income_amt" NUMERIC(20,4),
+    "ebitda_amt" NUMERIC(20,4),
+    "noi_amt" NUMERIC(20,4),
     "total_assets_amt" NUMERIC(20,4),
     "total_liabilities_amt" NUMERIC(20,4),
     "total_debt_service_amt" NUMERIC(20,4),

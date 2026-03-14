@@ -114,24 +114,30 @@
       "numerator": [
         {
           "op": "*",
-          "field": "number_of_loans",
-          "label": "number_of_loans",
+          "field": "position_id",
+          "label": "position_id",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
+          "source_table": "position",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read number_of_loans from facility_exposure_snapshot for each facility.\n"
+      "formula_display": "For each Facility_ID, COUNT DISTINCT(Position_ID) from l2.position. Result materialized to l3.facility_exposure_calc.number_of_loans.\n"
     },
     "worked_example_columns": [
+      {
+        "field": "position_id",
+        "header": "Position Id",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
       {
         "field": "number_of_loans",
         "header": "Number Of Loans",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -2113,6 +2119,22 @@
           "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2126,6 +2148,18 @@
         "format": "percentage",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
       }
     ]
   },

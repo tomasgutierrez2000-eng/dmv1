@@ -2,7 +2,7 @@ metric_id: PRC-001
 name: All in Rate (%)
 version: 1.0.0
 owner: market-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: pricing
@@ -27,6 +27,20 @@ source_tables:
   - name: as_of_date
     role: FILTER
   - name: all_in_rate_pct
+    role: MEASURE
+- schema: l2
+  table: facility_exposure_snapshot
+  alias: fes
+  join_type: INNER
+  join_on: fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: as_of_date
+    role: FILTER
+  - name: committed_amount
+    role: MEASURE
+  - name: bank_share_pct
     role: MEASURE
 - schema: l2
   table: facility_master
@@ -68,120 +82,89 @@ levels:
       WHERE fps.as_of_date = :as_of_date
   counterparty:
     aggregation_type: WEIGHTED_AVG
+    weighting_field: committed_amount * bank_share_pct
     formula_text: |
-      Exposure-weighted average all_in_rate_pct per counterparty.
+      For each Counterparty_ID, lookup Facility_IDs in Facility Master where IS(Counterparty_ID), SELECT all_in_rate_pct. Weight by bank share committed amount (committed_amount * bank_share_pct). Weighted average = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        CASE WHEN SUM(fac.weight_val) = 0 THEN NULL
-             ELSE SUM(fac.rate_val * fac.weight_val) / SUM(fac.weight_val)
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
         END AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id,
-          fps.all_in_rate_pct AS rate_val,
-          fes.committed_amount AS weight_val
-        FROM l2.facility_pricing_snapshot fps
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fps.facility_id
-          AND fes.as_of_date = fps.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fps.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: WEIGHTED_AVG
+    weighting_field: committed_amount * bank_share_pct
     formula_text: |
-      Exposure-weighted average all_in_rate_pct per L3 desk segment.
+      For each L3 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by bank share committed exposure (committed_amount * bank_share_pct). Weighted average = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.weight_val) = 0 THEN NULL
-             ELSE SUM(fac.rate_val * fac.weight_val) / SUM(fac.weight_val)
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
         END AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id,
-          fps.all_in_rate_pct AS rate_val,
-          fes.committed_amount AS weight_val
-        FROM l2.facility_pricing_snapshot fps
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fps.facility_id
-          AND fes.as_of_date = fps.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fps.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: WEIGHTED_AVG
+    aggregation_type: CUSTOM
     formula_text: |
-      Exposure-weighted average all_in_rate_pct per L2 portfolio segment.
+      For each L2 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by bank share committed exposure (committed_amount * bank_share_pct). Calculated = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.weight_val) = 0 THEN NULL
-             ELSE SUM(fac.rate_val * fac.weight_val) / SUM(fac.weight_val)
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
         END AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id,
-          fps.all_in_rate_pct AS rate_val,
-          fes.committed_amount AS weight_val
-        FROM l2.facility_pricing_snapshot fps
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fps.facility_id
-          AND fes.as_of_date = fps.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fps.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: WEIGHTED_AVG
+    aggregation_type: CUSTOM
     formula_text: |
-      Exposure-weighted average all_in_rate_pct per L1 business segment.
+      For each L1 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by bank share committed exposure (committed_amount * bank_share_pct). Calculated = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.weight_val) = 0 THEN NULL
-             ELSE SUM(fac.rate_val * fac.weight_val) / SUM(fac.weight_val)
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
         END AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id,
-          fps.all_in_rate_pct AS rate_val,
-          fes.committed_amount AS weight_val
-        FROM l2.facility_pricing_snapshot fps
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fps.facility_id
-          AND fes.as_of_date = fps.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fps.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -189,6 +172,7 @@ levels:
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 depends_on: []
 output:

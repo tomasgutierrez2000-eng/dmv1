@@ -28,6 +28,8 @@ import {
 } from './sql-emitter';
 import type { TableData as V2TableData } from './v2/types';
 import { validateV2Output } from './validator';
+import { ReferenceDataRegistry } from './reference-data-registry';
+import { runAllQualityControls, runDriftDetection } from './quality-controls';
 import type { StoryArc, RatingTier, SizeProfile } from '../../scripts/shared/mvp-config';
 import type { TimeFrequency } from './v2/types';
 
@@ -44,6 +46,7 @@ interface CliArgs {
   startDate: string;       // Time series start date
   endDate: string;         // Time series end date
   deterministic: boolean;  // Freeze metadata timestamps for deterministic output
+  skipQualityControls: boolean; // Skip L1-driven quality controls
 }
 
 const DEFAULT_START = '2024-07-01';
@@ -63,6 +66,7 @@ function parseArgs(): CliArgs {
     startDate: DEFAULT_START,
     endDate: DEFAULT_END,
     deterministic: false,
+    skipQualityControls: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -95,6 +99,10 @@ function parseArgs(): CliArgs {
         break;
       case '--deterministic':
         result.deterministic = true;
+        break;
+      case '--skip-quality-controls':
+      case '--skip-qc':
+        result.skipQualityControls = true;
         break;
       case '--frequency':
       case '-f':
@@ -269,6 +277,40 @@ async function main() {
   const registryPath = path.join(__dirname, '..', 'config', 'id-registry.json');
   const registry = new IDRegistry(registryPath);
 
+  // Load L1 reference data registry (for quality controls)
+  let refRegistry: ReferenceDataRegistry | undefined;
+  if (!args.skipQualityControls) {
+    try {
+      refRegistry = ReferenceDataRegistry.fromSeedSQL();
+      const refSummary = refRegistry.summary();
+      console.log(`L1 Registry: ${refSummary.tables} tables, ${refSummary.totalRows} rows loaded from ${refRegistry.getLoadPath()}`);
+
+      // Run drift detection ONCE before any generation — fail-fast on stale maps
+      const drift = runDriftDetection(refRegistry);
+      if (drift.errors.length > 0) {
+        console.log(`\n⚠ Drift detection FAILED:`);
+        for (const err of drift.errors) {
+          console.log(`  ✗ ${err}`);
+        }
+        console.log(`Fix the hardcoded maps to match L1 seed data, or use --skip-quality-controls.`);
+        process.exit(1);
+      }
+      if (drift.warnings.length > 0) {
+        console.log(`L1 Drift: ${drift.warnings.length} warning(s)${args.verbose ? ':' : ' (use --verbose)'}`);
+        if (args.verbose) {
+          for (const w of drift.warnings) {
+            console.log(`  ⚡ ${w}`);
+          }
+        }
+      }
+    } catch (err) {
+      console.log(`⚠ Could not load L1 registry: ${err instanceof Error ? err.message : String(err)}`);
+      console.log('  Quality controls will be skipped. Use --skip-quality-controls to suppress this warning.');
+    }
+  } else {
+    console.log('Quality controls: SKIPPED (--skip-quality-controls)');
+  }
+
   // Determine output mode
   const dbWriter = new DBWriter();
   const useDb = dbWriter.isAvailable() && args.output === null;
@@ -330,6 +372,32 @@ async function main() {
         if (args.verbose) {
           for (const w of validation.warnings.slice(0, 10)) {
             console.log(`     ⚡ ${w}`);
+          }
+        }
+      }
+
+      // Run L1-driven quality controls (Groups 1, 3, 4, 5)
+      if (refRegistry) {
+        const qc = runAllQualityControls(v2Output, chain, config, refRegistry);
+        const qcErrorCount = qc.errors.length;
+        const qcWarnCount = qc.warnings.length;
+        if (qcErrorCount > 0) {
+          console.log(`   ⚠ Quality controls: ${qcErrorCount} error(s)`);
+          for (const err of qc.errors.slice(0, 5)) {
+            console.log(`     ✗ ${err}`);
+          }
+          if (qcErrorCount > 5) {
+            console.log(`     ... and ${qcErrorCount - 5} more`);
+          }
+          allValid = false;
+          continue;
+        }
+        if (qcWarnCount > 0) {
+          console.log(`   QC: ${qcWarnCount} warning(s)${args.verbose ? ':' : ' (use --verbose)'}`);
+          if (args.verbose) {
+            for (const w of qc.warnings.slice(0, 25)) {
+              console.log(`     ⚡ ${w}`);
+            }
           }
         }
       }

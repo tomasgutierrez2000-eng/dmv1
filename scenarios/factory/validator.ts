@@ -709,10 +709,16 @@ export function validateV2Output(
   }
 
   // ── 10. L1 Reference Code Validation ──
-  // Verify that FK code values in generated rows match valid L1 dim table entries.
+  // Verify FK code values in generated rows match valid L1 dim table entries.
+  // Uses L1 seed data via ReferenceDataRegistry (loaded dynamically from SQL).
+  // Falls back to hardcoded sets when registry is not available.
 
-  const VALID_CREDIT_STATUS_CODES = new Set([1, 3, 4, 5, 9, 10]);
   const VALID_LIMIT_STATUS_CODES = new Set(['NEAR_LIMIT', 'WITHIN_LIMIT', 'OVER_LIMIT', 'INACTIVE']);
+
+  // Dynamic L1 validation — if ReferenceDataRegistry is loaded by quality-controls.ts,
+  // the comprehensive FK checks run there. Here we keep lightweight fallback checks
+  // for credit_status_code (using ALL 10 L1 codes) and limit_status_code.
+  const VALID_CREDIT_STATUS_CODES = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const VALID_COLLATERAL_TYPE_IDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
   for (const td of output.tables) {
@@ -721,7 +727,7 @@ export function validateV2Output(
       if ('credit_status_code' in row && row.credit_status_code !== null && row.credit_status_code !== undefined) {
         const code = typeof row.credit_status_code === 'string' ? parseInt(row.credit_status_code, 10) : row.credit_status_code as number;
         if (!isNaN(code) && !VALID_CREDIT_STATUS_CODES.has(code)) {
-          warnings.push(`${td.schema}.${td.table}: credit_status_code ${row.credit_status_code} not in L1 credit_status_dim`);
+          warnings.push(`${td.schema}.${td.table}: credit_status_code ${row.credit_status_code} not in L1 credit_status_dim (1-10)`);
           break;
         }
       }
@@ -735,14 +741,7 @@ export function validateV2Output(
       // collateral_type_id FK
       if ('collateral_type_id' in row && row.collateral_type_id !== null && row.collateral_type_id !== undefined) {
         if (!VALID_COLLATERAL_TYPE_IDS.has(row.collateral_type_id as number)) {
-          warnings.push(`${td.schema}.${td.table}: collateral_type_id ${row.collateral_type_id} not in L1 collateral_type_dim (1-10)`);
-          break;
-        }
-      }
-      // source_system_id FK — should be 1 (DATA_FACTORY_V2)
-      if ('source_system_id' in row && row.source_system_id !== null && row.source_system_id !== undefined) {
-        if (row.source_system_id !== 1) {
-          warnings.push(`${td.schema}.${td.table}: unexpected source_system_id ${row.source_system_id} (expected 1)`);
+          warnings.push(`${td.schema}.${td.table}: collateral_type_id ${row.collateral_type_id} not in L1 collateral_type (1-10)`);
           break;
         }
       }

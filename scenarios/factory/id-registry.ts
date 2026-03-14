@@ -177,7 +177,6 @@ export class IDRegistry {
   /** Remove all allocations for a scenario (allows re-generation) */
   deallocate(scenarioId: string): number {
     const before = this.state.allocations.length;
-    const removed = this.state.allocations.filter(a => a.scenarioId === scenarioId);
     this.state.allocations = this.state.allocations.filter(a => a.scenarioId !== scenarioId);
     const removed = before - this.state.allocations.length;
 

@@ -3947,7 +3947,7 @@
           "description": "Credit adjustment spread (bps)",
           "category": "Market Data",
           "why_required": "ISDA fallback spread",
-          "data_type": "NUMERIC(8,2)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "fallback_to_index_id",
@@ -8621,7 +8621,7 @@
           "category": "Position Core",
           "why_required": "MUST BE SOURCE SYSTEM INPUT — Loss Given Default from credit risk model (e.g., downturn LGD model). Requires collateral recovery assumptions, seniority, jurisdiction-specific recovery data not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
-          "data_type": "VARCHAR(100)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "market_value_amt",
@@ -8650,7 +8650,7 @@
           "category": "Position Core",
           "why_required": "MUST BE SOURCE SYSTEM INPUT — PIT Probability of Default from credit risk model (e.g., Moody's RiskCalc, internal IRB model). Cannot be re-derived without underlying obligor financials, market data, and model calibration.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
-          "data_type": "VARCHAR(100)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "position_currency",
@@ -8895,7 +8895,7 @@
           "category": "Position Detail",
           "why_required": "MUST BE SOURCE SYSTEM INPUT — SA-CCR Potential Future Exposure from risk engine. Requires supervisory factors, hedging set decomposition, delta adjustments not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
-          "data_type": "VARCHAR(100)"
+          "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "quantity",
@@ -8938,7 +8938,7 @@
           "description": "Contractual spread over index (bps)",
           "category": "Position Detail",
           "why_required": "Spread analysis (Page 7)",
-          "data_type": "NUMERIC(8,2)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "total_commitment",
@@ -8959,7 +8959,7 @@
           "description": "Unrealized gain/loss",
           "category": "Position Detail",
           "why_required": "P&L impact",
-          "data_type": "VARCHAR(100)"
+          "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "product_node_id",
@@ -10196,7 +10196,7 @@
           "description": "Contractual spread in basis points",
           "category": "Financial Metrics",
           "why_required": "Spread analysis (Page 7)",
-          "data_type": "NUMERIC(10,2)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "rate_index_id",
@@ -10261,7 +10261,7 @@
           "description": "Minimum spread threshold (bps) from policy",
           "category": "Financial Metrics",
           "why_required": "Below-threshold analysis (Page 7)",
-          "data_type": "NUMERIC(8,2)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "payment_frequency",
@@ -11761,7 +11761,7 @@
           "description": "Expected tenor in months",
           "category": "Deal Pipeline",
           "why_required": "Deal tenor analysis",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "facility_id",
@@ -14403,6 +14403,20 @@
               "layer": "L2",
               "table": "legal_entity",
               "field": "legal_entity_id"
+            }
+          }
+        },
+        {
+          "name": "org_unit_id",
+          "description": "Desk/organizational unit attribution — enables Facility→Desk referential chain",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "org_unit_dim",
+              "field": "org_unit_id"
             }
           }
         },
@@ -18545,6 +18559,101 @@
           "data_type": "VARCHAR(100)"
         }
       ]
+    },
+    {
+      "name": "cash_flow",
+      "layer": "L2",
+      "category": "Payments",
+      "fields": [
+        {
+          "name": "cash_flow_id",
+          "description": "Cash flow event identifier",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "facility_id",
+          "description": "FK to facility_master",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_fk": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
+        },
+        {
+          "name": "counterparty_id",
+          "description": "FK to counterparty",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_fk": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
+        },
+        {
+          "name": "cash_flow_date",
+          "description": "Date of the cash flow event",
+          "data_type": "DATE"
+        },
+        {
+          "name": "cash_flow_type",
+          "description": "Type of cash flow (e.g., PRINCIPAL, INTEREST, FEE)",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "amount",
+          "description": "Cash flow amount",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "currency_code",
+          "description": "ISO currency code",
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_fk": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "Snapshot date",
+          "data_type": "DATE"
+        },
+        {
+          "name": "flow_direction",
+          "description": "Direction of flow (INFLOW/OUTFLOW)",
+          "data_type": "VARCHAR(20)"
+        },
+        {
+          "name": "flow_type",
+          "description": "Detailed flow type classification",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
     }
   ],
   "L3": [
@@ -18773,7 +18882,7 @@
       ]
     },
     {
-      "name": "data_quality_score_snapshot",
+      "name": "data_quality_score_calc",
       "layer": "L3",
       "category": "Data Quality",
       "fields": [
@@ -19268,22 +19377,30 @@
         {
           "name": "dscr_value",
           "description": "",
-          "data_type": "NUMERIC(12,6)"
+          "data_type": "NUMERIC(12,6)",
+          "deprecated": true,
+          "deprecated_by": "l3.facility_financial_calc.dscr_value"
         },
         {
           "name": "dscr",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "data_type": "NUMERIC(10,6)",
+          "deprecated": true,
+          "deprecated_by": "l3.facility_financial_calc.dscr"
         },
         {
           "name": "ltv_pct",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "data_type": "NUMERIC(10,6)",
+          "deprecated": true,
+          "deprecated_by": "l3.facility_financial_calc.ltv_pct"
         },
         {
           "name": "net_income_amt",
           "description": "",
-          "data_type": "NUMERIC(20,4)"
+          "data_type": "NUMERIC(20,4)",
+          "deprecated": true,
+          "deprecated_by": "l3.facility_financial_calc.net_income_amt"
         },
         {
           "name": "total_debt_service_amt",
@@ -19528,9 +19645,9 @@
       ]
     },
     {
-      "name": "stress_test_result",
+      "name": "stress_test_result_calc",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Stress Testing",
       "fields": [
         {
           "name": "stress_test_result_id",
@@ -22602,7 +22719,7 @@
           "name": "rank_within_entity",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "is_top_counterparty_flag",
@@ -23571,7 +23688,7 @@
           "name": "avg_expected_coverage_ratio",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "created_ts",
@@ -24503,7 +24620,7 @@
           "name": "counterparty_count_change",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "total_utilized_exposure_amt",
@@ -24521,7 +24638,7 @@
           "name": "risk_score",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "NUMERIC(10,4)"
         },
         {
           "name": "base_currency_code",
@@ -24737,7 +24854,7 @@
           "name": "total_dq_issues",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "reconciliation_break_count",
@@ -25090,7 +25207,7 @@
           "name": "total_dq_issues",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "created_ts",
@@ -25780,7 +25897,7 @@
           "name": "amendment_aging_days",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "created_ts",
@@ -25942,13 +26059,13 @@
           "name": "days_remaining",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "facility_duration_days",
           "description": "",
           "why_required": "",
-          "data_type": "VARCHAR(255)"
+          "data_type": "INTEGER"
         },
         {
           "name": "status_code",
@@ -26065,7 +26182,7 @@
         {
           "name": "is_deteriorated",
           "description": "",
-          "data_type": "VARCHAR(64)"
+          "data_type": "BOOLEAN"
         },
         {
           "name": "risk_rating_tier_code",
@@ -33306,5 +33423,52 @@
       "to_layer": "L1"
     }
   ],
-  "derivation_dag": {}
+  "derivation_dag": {},
+  "layer_exceptions": [
+    {
+      "l1_table": "sccl_counterparty_group_member",
+      "references_l2_table": "counterparty",
+      "fk_field": "counterparty_id",
+      "pattern": "CONFIG_TO_MASTER",
+      "rationale": "Group membership configuration legitimately references L2 counterparty master (SCD-2 versioned entity)"
+    },
+    {
+      "l1_table": "instrument_identifier",
+      "references_l2_table": "instrument_master",
+      "fk_field": "instrument_id",
+      "pattern": "REFERENCE_TO_MASTER",
+      "rationale": "Identifier mapping references L2 instrument master for entity-keyed lookups"
+    },
+    {
+      "l1_table": "reporting_entity_dim",
+      "references_l2_table": "legal_entity",
+      "fk_field": "legal_entity_id",
+      "pattern": "REFERENCE_TO_MASTER",
+      "rationale": "Reporting entity view references L2 legal entity (SCD-2 versioned)"
+    },
+    {
+      "l1_table": "capital_allocation",
+      "references_l2_table": "legal_entity",
+      "fk_field": "legal_entity_id",
+      "pattern": "CONFIG_TO_MASTER",
+      "rationale": "Capital allocation configuration keyed to L2 legal entity"
+    },
+    {
+      "l1_table": "regulatory_capital_requirement",
+      "references_l2_table": "legal_entity",
+      "fk_field": "legal_entity_id",
+      "pattern": "CONFIG_TO_MASTER",
+      "rationale": "Fed-published capital requirements reference L2 legal entity"
+    },
+    {
+      "l1_table": "equity_allocation_config",
+      "references_l2_table": "legal_entity",
+      "fk_field": "legal_entity_id",
+      "pattern": "CONFIG_TO_MASTER",
+      "rationale": "Equity allocation configuration keyed to L2 legal entity (accepted per GSIB audit 2026-03)"
+    }
+  ],
+  "naming_convention_notes": {
+    "rating_grade_dim_pd_lgd": "Fields pd_12m and lgd_downturn in l1.rating_grade_dim are grade-level benchmarks (e.g., 'Baa2 maps to 0.15% PD'), not obligor-level estimates. They are required in L1 because they define the calibration scale for the entire rating system and are referenced by multiple L2 snapshot tables."
+  }
 }

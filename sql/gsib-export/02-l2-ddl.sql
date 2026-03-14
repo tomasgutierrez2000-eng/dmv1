@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS "l2"."position" (
     "external_risk_rating" VARCHAR(100),
     "internal_risk_rating" VARCHAR(100),
     "legal_entity_id" BIGINT,
-    "lgd_estimate" VARCHAR(100),
+    "lgd_estimate" NUMERIC(10,6),
     "market_value_amt" NUMERIC(18,2),
     "netting_set_id" BIGINT,
     "notional_amount" NUMERIC(18,2),
-    "pd_estimate" VARCHAR(100),
+    "pd_estimate" NUMERIC(10,6),
     "position_currency" VARCHAR(100),
     "trading_banking_book_flag" BOOLEAN,
     "ultimate_parent_id" BIGINT,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS "l2"."position_detail" (
     "interest_rate" NUMERIC(8,6),
     "mark_to_market" NUMERIC(18,2),
     "origination_date" DATE,
-    "pfe" VARCHAR(100),
+    "pfe" NUMERIC(20,4),
     "quantity" INTEGER,
     "rate_index" NUMERIC(10,4),
     "rate_type" VARCHAR(64),
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS "l2"."position_detail" (
     "spread_bps" NUMERIC(8,2),
     "total_commitment" NUMERIC(18,2),
     "unfunded_amount" NUMERIC(18,2),
-    "unrealized_gain_loss" VARCHAR(100),
+    "unrealized_gain_loss" NUMERIC(20,4),
     "product_node_id" BIGINT,
     "exposure_type_code" VARCHAR(20),
     "notional_amount" NUMERIC(18,2),
@@ -110,7 +110,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_exposure_snapshot" (
     "undrawn_amount" NUMERIC(18,2),
     "source_system_id" BIGINT,
     "counterparty_id" BIGINT,
-    "coverage_ratio_pct" NUMERIC(10,4),
     "currency_code" VARCHAR(20),
     "exposure_amount_local" NUMERIC(18,2),
     "facility_exposure_id" BIGINT NOT NULL,
@@ -118,16 +117,9 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_exposure_snapshot" (
     "gross_exposure_usd" NUMERIC(18,2),
     "legal_entity_id" BIGINT,
     "lob_segment_id" BIGINT,
-    "net_exposure_usd" NUMERIC(18,2),
     "product_node_id" BIGINT,
     "outstanding_balance_amt" NUMERIC(18,2),
     "undrawn_commitment_amt" NUMERIC(18,2),
-    "number_of_loans" INTEGER,
-    "number_of_facilities" INTEGER,
-    "days_until_maturity" INTEGER,
-    "limit_status_code" VARCHAR(50),
-    "rwa_amt" NUMERIC(18,2),
-    "internal_risk_rating_bucket_code" VARCHAR(20),
     "total_collateral_mv_usd" NUMERIC(18,2),
     "bank_share_pct" NUMERIC(10,4),
     PRIMARY KEY ("facility_exposure_id")
@@ -137,7 +129,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_exposure_snapshot" (
 CREATE TABLE IF NOT EXISTS "l2"."netting_set_exposure_snapshot" (
     "netting_set_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
-    "netted_exposure_amount" NUMERIC(18,2),
     "gross_exposure_amount" NUMERIC(18,2),
     "currency_code" VARCHAR(20),
     "collateral_held_usd" NUMERIC(18,2),
@@ -146,7 +137,6 @@ CREATE TABLE IF NOT EXISTS "l2"."netting_set_exposure_snapshot" (
     "legal_entity_id" BIGINT,
     "netting_set_exposure_id" BIGINT,
     "pfe_usd" NUMERIC(18,2),
-    "netting_benefit_amt" NUMERIC(18,2),
     PRIMARY KEY ("netting_set_id", "as_of_date")
 );
 
@@ -173,7 +163,6 @@ CREATE TABLE IF NOT EXISTS "l2"."collateral_snapshot" (
     "haircut_pct" NUMERIC(10,4),
     "eligible_collateral_amount" NUMERIC(18,2),
     "source_system_id" BIGINT,
-    "allocated_amount_usd" NUMERIC(18,2),
     "collateral_snapshot_id" BIGINT,
     "counterparty_id" BIGINT,
     "crm_type_code" VARCHAR(20),
@@ -249,7 +238,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_profitability_snapshot" (
     "interest_income_amt" NUMERIC(18,2),
     "profitability_snapshot_id" BIGINT,
     "avg_nonearning_assets_amt" NUMERIC(18,2),
-    "equity_allocation_pct" NUMERIC(10,6),
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -406,7 +394,7 @@ CREATE TABLE IF NOT EXISTS "l2"."deal_pipeline_fact" (
     "expected_exposure_amt" NUMERIC(18,2),
     "expected_internal_risk_grade" VARCHAR(255),
     "expected_spread_bps" NUMERIC(8,2),
-    "expected_tenor_months" VARCHAR(255),
+    "expected_tenor_months" INTEGER,
     "facility_id" BIGINT,
     "lob_segment_id" BIGINT,
     "pipeline_deal_id" BIGINT,
@@ -431,7 +419,6 @@ CREATE TABLE IF NOT EXISTS "l2"."counterparty_rating_observation" (
     "rating_type" VARCHAR(50),
     "rating_value" VARCHAR(20),
     "risk_rating_status" VARCHAR(30),
-    "risk_rating_change_steps" INTEGER,
     PRIMARY KEY ("observation_id")
 );
 
@@ -454,8 +441,8 @@ CREATE TABLE IF NOT EXISTS "l2"."financial_metric_observation" (
     PRIMARY KEY ("observation_id")
 );
 
--- metric_threshold (Limits & Thresholds)
-CREATE TABLE IF NOT EXISTS "l2"."metric_threshold" (
+-- metric_threshold_snapshot (Limits & Thresholds)
+CREATE TABLE IF NOT EXISTS "l2"."metric_threshold_snapshot" (
     "threshold_id" BIGINT NOT NULL,
     "metric_definition_id" BIGINT,
     "as_of_date" DATE,
@@ -476,8 +463,6 @@ CREATE TABLE IF NOT EXISTS "l2"."exception_event" (
     "actual_remediation_date" DATE,
     "approver" VARCHAR(100),
     "breach_amount_usd" NUMERIC(18,2),
-    "breach_pct" NUMERIC(10,4),
-    "days_open" INTEGER,
     "exception_description" VARCHAR(2000),
     "exception_owner" VARCHAR(100),
     "exception_severity" VARCHAR(100),
@@ -512,18 +497,7 @@ CREATE TABLE IF NOT EXISTS "l2"."risk_flag" (
     PRIMARY KEY ("risk_flag_id")
 );
 
--- data_quality_score_snapshot (Data Quality)
-CREATE TABLE IF NOT EXISTS "l2"."data_quality_score_snapshot" (
-    "score_id" BIGINT NOT NULL,
-    "as_of_date" DATE,
-    "dimension_name" VARCHAR(100),
-    "completeness_pct" NUMERIC(10,4),
-    "validity_pct" NUMERIC(10,4),
-    "overall_score" NUMERIC(10,4),
-    "target_table" VARCHAR(100),
-    "issue_count" INTEGER,
-    PRIMARY KEY ("score_id")
-);
+-- data_quality_score_snapshot: REMOVED from L2 — entirely computed, now l3.data_quality_score_calc
 
 -- facility_financial_snapshot (Financial Metrics)
 CREATE TABLE IF NOT EXISTS "l2"."facility_financial_snapshot" (
@@ -539,10 +513,6 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_financial_snapshot" (
     "currency_code" VARCHAR(20),
     "reporting_period" VARCHAR(20),
     "financial_snapshot_id" BIGINT,
-    "dscr_value" NUMERIC(12,6),
-    "ltv_pct" NUMERIC(10,6),
-    "net_income_amt" NUMERIC(18,2),
-    "interest_rate_sensitivity_pct" NUMERIC(10,6),
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -578,13 +548,8 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_risk_snapshot" (
     "counterparty_id" BIGINT,
     "lgd_pct" NUMERIC(10,6),
     "ccf" NUMERIC(6,4),
-    "ead_amt" NUMERIC(18,2),
-    "expected_loss_amt" NUMERIC(18,2),
-    "rwa_amt" NUMERIC(18,2),
-    "risk_weight_pct" NUMERIC(10,6),
     "internal_risk_rating" VARCHAR(100),
     "currency_code" VARCHAR(20),
-    "expected_loss_rate_pct" NUMERIC(10,6),
     PRIMARY KEY ("facility_id", "as_of_date")
 );
 
@@ -657,7 +622,7 @@ CREATE TABLE IF NOT EXISTS "l2"."legal_entity" (
     "legal_name" VARCHAR(200),
     "legal_entity_name" VARCHAR(200),
     "country_code" VARCHAR(20),
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "entity_type_code" VARCHAR(20),
     "functional_currency_code" VARCHAR(20),
     "institution_id" BIGINT,
@@ -680,7 +645,7 @@ CREATE TABLE IF NOT EXISTS "l2"."instrument_master" (
     "instrument_id" BIGINT NOT NULL,
     "country_code" VARCHAR(20),
     "currency_code" VARCHAR(20),
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "coupon_frequency" VARCHAR(30),
     "coupon_rate" NUMERIC(10,4),
     "instrument_name" VARCHAR(200),
@@ -758,6 +723,7 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_master" (
     "effective_start_date" DATE,
     "effective_end_date" DATE,
     "is_current_flag" BOOLEAN,
+    "org_unit_id" BIGINT,
     PRIMARY KEY ("facility_id")
 );
 
@@ -807,7 +773,7 @@ CREATE TABLE IF NOT EXISTS "l2"."netting_agreement" (
 CREATE TABLE IF NOT EXISTS "l2"."netting_set" (
     "netting_set_id" BIGINT NOT NULL,
     "netting_agreement_id" BIGINT,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "counterparty_id" BIGINT,
     "governing_law" VARCHAR(100),
     "is_enforceable_flag" BOOLEAN,
@@ -1198,4 +1164,116 @@ CREATE TABLE IF NOT EXISTS "l2"."gl_account_balance_snapshot" (
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("ledger_account_id", "as_of_date")
+);
+
+-- cash_flow (Payments)
+CREATE TABLE IF NOT EXISTS "l2"."cash_flow" (
+    "cash_flow_id" BIGINT NOT NULL,
+    "facility_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "cash_flow_date" DATE,
+    "cash_flow_type" VARCHAR(30),
+    "amount" NUMERIC(20,4),
+    "currency_code" VARCHAR(20),
+    "as_of_date" DATE,
+    "flow_direction" VARCHAR(20),
+    "flow_type" VARCHAR(30),
+    "created_ts" TIMESTAMP,
+    "updated_ts" TIMESTAMP,
+    PRIMARY KEY ("cash_flow_id")
+);
+
+-- capital_position_snapshot (Capital)
+CREATE TABLE IF NOT EXISTS "l2"."capital_position_snapshot" (
+    "legal_entity_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "currency_code" VARCHAR(20),
+    "cet1_ratio_pct" NUMERIC(10,6),
+    "tier1_ratio_pct" NUMERIC(10,6),
+    "total_capital_ratio_pct" NUMERIC(10,6),
+    "tier1_leverage_ratio_pct" NUMERIC(10,6),
+    "leverage_ratio_pct" NUMERIC(10,6),
+    "tlac_ratio_pct" NUMERIC(10,6),
+    "slr_pct" NUMERIC(10,6),
+    "tier1_capital_amt" NUMERIC(20,4),
+    "cet1_capital_amt" NUMERIC(20,4),
+    "total_capital_amt" NUMERIC(20,4),
+    "rwa_amt" NUMERIC(20,4),
+    "total_assets_leverage_amt" NUMERIC(20,4),
+    "total_leverage_exposure_amt" NUMERIC(20,4),
+    "tlac_amt" NUMERIC(20,4),
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "source_filing_code" VARCHAR(30),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("legal_entity_id", "as_of_date")
+);
+
+-- ecl_staging_snapshot (Regulatory)
+CREATE TABLE IF NOT EXISTS "l2"."ecl_staging_snapshot" (
+    "ecl_staging_id" BIGSERIAL NOT NULL,
+    "facility_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "as_of_date" DATE,
+    "ecl_stage_code" VARCHAR(20),
+    "prior_stage_code" VARCHAR(20),
+    "stage_change_date" DATE,
+    "stage_change_reason" VARCHAR(500),
+    "model_code" VARCHAR(20),
+    "days_past_due" INTEGER,
+    "significant_increase_flag" BOOLEAN,
+    "credit_impaired_flag" BOOLEAN,
+    "currency_code" VARCHAR(20),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("ecl_staging_id")
+);
+
+-- forbearance_event (Regulatory)
+CREATE TABLE IF NOT EXISTS "l2"."forbearance_event" (
+    "forbearance_event_id" BIGSERIAL NOT NULL,
+    "facility_id" BIGINT,
+    "counterparty_id" BIGINT,
+    "forbearance_type_code" VARCHAR(20),
+    "event_date" DATE,
+    "original_maturity_date" DATE,
+    "modified_maturity_date" DATE,
+    "original_rate_pct" NUMERIC(10,6),
+    "modified_rate_pct" NUMERIC(10,6),
+    "maturity_extension_months" INTEGER,
+    "principal_forgiven_amt" NUMERIC(20,4),
+    "currency_code" VARCHAR(20),
+    "approval_date" DATE,
+    "approved_by" VARCHAR(500),
+    "as_of_date" DATE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("forbearance_event_id")
+);
+
+-- watchlist_entry (Watchlist)
+CREATE TABLE IF NOT EXISTS "l2"."watchlist_entry" (
+    "watchlist_entry_id" BIGSERIAL NOT NULL,
+    "counterparty_id" BIGINT,
+    "facility_id" BIGINT,
+    "watchlist_category_code" VARCHAR(20),
+    "entry_date" DATE,
+    "exit_date" DATE,
+    "entry_reason" VARCHAR(500),
+    "exit_reason" VARCHAR(500),
+    "assigned_officer" VARCHAR(500),
+    "review_frequency" VARCHAR(500),
+    "next_review_date" DATE,
+    "as_of_date" DATE,
+    "is_current_flag" BOOLEAN DEFAULT TRUE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("watchlist_entry_id")
 );

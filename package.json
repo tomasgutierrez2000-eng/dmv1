@@ -33,6 +33,8 @@
     "sync:data-model": "tsx scripts/sync-data-model.ts",
     "export:data-model": "tsx scripts/export-data-model-excel.ts",
     "validate": "tsx scripts/validate-data-model.ts",
+    "validate:arch": "tsx scripts/validate-data-model.ts --group=9",
+    "lint:sql": "tsx scripts/lint-sql.ts",
     "calc:run": "tsx scripts/calc_engine/cli.ts run",
     "calc:validate": "tsx scripts/calc_engine/cli.ts validate",
     "calc:audit": "tsx scripts/calc_engine/cli.ts audit",

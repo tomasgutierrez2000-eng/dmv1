@@ -1,6 +1,430 @@
 [
   {
     "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_master",
+    "field": "org_unit_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L2 table added"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "cash_flow_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "facility_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "counterparty_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "cash_flow_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "cash_flow_type",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "amount",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "currency_code",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "flow_direction",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "flow_type",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.cash_flow"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "table_name",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "completeness_score_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "accuracy_score_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "timeliness_score_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "overall_dq_score_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "total_row_count",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "null_field_count",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "anomaly_count",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "created_by",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "record_source",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "load_timestamp",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "run_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_calc",
+    "field": "model_version",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.data_quality_score_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "stress_test_result_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "position_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "facility_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "counterparty_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "scenario_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "stressed_exposure_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "stressed_expected_loss",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "capital_impact_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "currency_code",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "created_by",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "record_source",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "load_timestamp",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "run_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_calc",
+    "field": "model_version",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.stress_test_result_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_snapshot",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-14",
     "layer": "L1",
     "table": "entity_type_dim",
     "field": "effective_start_date",

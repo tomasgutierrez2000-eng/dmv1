@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS "l1"."entity_type_dim" (
     "entity_type_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "is_financial_institution_flag" BOOLEAN,
     "is_sovereign_flag" BOOLEAN,
     "regulatory_counterparty_class" VARCHAR(50),
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS "l1"."collateral_type" (
     "name" VARCHAR(200),
     "collateral_category" VARCHAR(50),
     "description" VARCHAR(2000),
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     "basel_rwa_weight" VARCHAR(100),
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS "l1"."crm_type_dim" (
     "crm_type_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "basel_recognition_method" VARCHAR(255),
     "crm_category" VARCHAR(50),
     "eligible_flag" BOOLEAN,
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS "l1"."risk_mitigant_type_dim" (
     "subtype_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "display_order" INTEGER,
     "eligible_flag" BOOLEAN,
     "mitigant_category" VARCHAR(50),
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS "l1"."limit_threshold" (
     "threshold_value" NUMERIC(18,2),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "direction" VARCHAR(100),
     "effective_from_date" DATE,
     "effective_to_date" DATE,
@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS "l1"."reporting_entity_dim" (
     "legal_entity_id" BIGINT,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "consolidation_basis" VARCHAR(50),
     "effective_from_date" DATE,
     "effective_to_date" DATE,
@@ -309,7 +309,7 @@ CREATE TABLE IF NOT EXISTS "l1"."collateral_portfolio" (
     "portfolio_id" BIGINT,
     "description" VARCHAR(2000),
     "lob_segment_id" BIGINT,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "portfolio_name_override" VARCHAR(255),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS "l1"."portfolio_dim" (
     "portfolio_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "lob_segment_id" BIGINT,
     "parent_portfolio_id" BIGINT,
     "portfolio_type" VARCHAR(50),
@@ -336,7 +336,7 @@ CREATE TABLE IF NOT EXISTS "l1"."fr2590_category_dim" (
     "category_name" VARCHAR(200),
     "definition" VARCHAR(100),
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("fr2590_category_code")
@@ -392,7 +392,7 @@ CREATE TABLE IF NOT EXISTS "l1"."rating_scale_dim" (
     "scale_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "default_flag" BOOLEAN,
     "display_color_hex" VARCHAR(100),
     "investment_grade_flag" BOOLEAN,
@@ -410,7 +410,7 @@ CREATE TABLE IF NOT EXISTS "l1"."rating_source" (
     "source_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "priority_rank" INTEGER,
     "rating_source_name" VARCHAR(200),
     "rating_source_type" VARCHAR(50),
@@ -424,7 +424,7 @@ CREATE TABLE IF NOT EXISTS "l1"."credit_event_type_dim" (
     "credit_event_type_id" BIGINT,
     "credit_event_type_name" VARCHAR(200),
     "default_trigger_flag" BOOLEAN,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("credit_event_type_code")
 );
 
@@ -444,7 +444,7 @@ CREATE TABLE IF NOT EXISTS "l1"."amendment_status_dim" (
     "amendment_status_name" VARCHAR(200),
     "status_group" VARCHAR(100),
     "is_terminal_flag" BOOLEAN,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("amendment_status_code")
@@ -455,7 +455,7 @@ CREATE TABLE IF NOT EXISTS "l1"."amendment_type_dim" (
     "amendment_type_code" VARCHAR(20) NOT NULL,
     "amendment_type_name" VARCHAR(200),
     "description" VARCHAR(2000),
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("amendment_type_code")
@@ -480,7 +480,7 @@ CREATE TABLE IF NOT EXISTS "l1"."exposure_type_dim" (
     "exposure_type_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "basel_exposure_class" VARCHAR(100),
     "ccf_pct" NUMERIC(10,4),
     "off_balance_sheet_flag" BOOLEAN,
@@ -528,7 +528,7 @@ CREATE TABLE IF NOT EXISTS "l1"."interest_rate_index_dim" (
     "index_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "cessation_date" DATE,
     "compounding_method" VARCHAR(100),
     "currency_code" VARCHAR(20),
@@ -553,7 +553,7 @@ CREATE TABLE IF NOT EXISTS "l1"."ledger_account_dim" (
     "account_category" VARCHAR(50),
     "account_type" VARCHAR(20),
     "is_balance_sheet_flag" BOOLEAN,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "currency_code" VARCHAR(20),
     "effective_from_date" DATE,
     "effective_to_date" DATE,
@@ -615,7 +615,7 @@ CREATE TABLE IF NOT EXISTS "l1"."maturity_bucket_dim" (
     "bucket_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "bucket_end_days" INTEGER,
     "bucket_start_days" INTEGER,
     "jurisdiction_code" VARCHAR(20),
@@ -690,7 +690,7 @@ CREATE TABLE IF NOT EXISTS "l1"."industry_dim" (
     "industry_level" VARCHAR(100),
     "industry_standard" VARCHAR(100),
     "parent_industry_id" BIGINT,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("industry_id")
@@ -703,7 +703,7 @@ CREATE TABLE IF NOT EXISTS "l1"."regulatory_capital_basis_dim" (
     "basis_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "description" VARCHAR(2000),
     "effective_from_date" DATE,
     "effective_to_date" DATE,
@@ -760,7 +760,7 @@ CREATE TABLE IF NOT EXISTS "l1"."report_cell_definition" (
     "cell_definition" TEXT,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "calculation_rule_id" BIGINT,
     "cell_datatype" VARCHAR(100),
     "cell_id" BIGINT,
@@ -799,7 +799,7 @@ CREATE TABLE IF NOT EXISTS "l1"."rule_registry" (
     "rule_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "approved_by" VARCHAR(100),
     "approved_ts" TIMESTAMP,
     "effective_from_date" DATE,
@@ -841,7 +841,7 @@ CREATE TABLE IF NOT EXISTS "l1"."report_registry" (
     "report_name" VARCHAR(200),
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "effective_from_date" DATE,
     "effective_to_date" DATE,
     "frequency" VARCHAR(30),
@@ -875,7 +875,7 @@ CREATE TABLE IF NOT EXISTS "l1"."source_system_registry" (
     "data_domain" VARCHAR(100),
     "ingestion_frequency" VARCHAR(30),
     "system_owner" VARCHAR(100),
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
     PRIMARY KEY ("source_system_id")
@@ -891,7 +891,7 @@ CREATE TABLE IF NOT EXISTS "l1"."validation_check_registry" (
     "target_column" VARCHAR(100),
     "severity" VARCHAR(100),
     "owner_id" BIGINT,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "validation_check_id" BIGINT,
     "created_ts" TIMESTAMP,
     "updated_ts" TIMESTAMP,
@@ -925,7 +925,7 @@ CREATE TABLE IF NOT EXISTS "l1"."internal_risk_rating_bucket_dim" (
     "rating_score_min" INTEGER,
     "rating_score_max" INTEGER,
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("internal_risk_rating_bucket_code")
 );
 
@@ -935,7 +935,7 @@ CREATE TABLE IF NOT EXISTS "l1"."pricing_tier_dim" (
     "tier_name" VARCHAR(200),
     "tier_ordinal" INTEGER,
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "spread_min_bps" NUMERIC(10,4),
     "spread_max_bps" NUMERIC(10,4),
     PRIMARY KEY ("pricing_tier_code")
@@ -949,7 +949,7 @@ CREATE TABLE IF NOT EXISTS "l1"."metric_threshold" (
     "threshold_value" NUMERIC(18,4),
     "effective_from_date" DATE,
     "effective_to_date" DATE,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     "inner_threshold_pct" NUMERIC(10,4),
     "last_threshold_updated_date" DATE,
     "limit_type" VARCHAR(50),
@@ -978,7 +978,7 @@ CREATE TABLE IF NOT EXISTS "l1"."risk_rating_tier_dim" (
     "pd_min_pct" NUMERIC(10,6),
     "pd_max_pct" NUMERIC(10,6),
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("tier_code")
 );
 
@@ -989,7 +989,7 @@ CREATE TABLE IF NOT EXISTS "l1"."dpd_bucket_dim" (
     "dpd_min" INTEGER,
     "dpd_max" INTEGER,
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("dpd_bucket_code")
 );
 
@@ -1000,7 +1000,7 @@ CREATE TABLE IF NOT EXISTS "l1"."utilization_status_dim" (
     "utilization_min_pct" NUMERIC(10,4),
     "utilization_max_pct" NUMERIC(10,4),
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("utilization_status_code")
 );
 
@@ -1011,7 +1011,7 @@ CREATE TABLE IF NOT EXISTS "l1"."origination_date_bucket_dim" (
     "months_since_origination_min" INTEGER,
     "months_since_origination_max" INTEGER,
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("origination_bucket_code")
 );
 
@@ -1022,7 +1022,7 @@ CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
     "description" VARCHAR(500),
     "severity_ordinal" INTEGER,
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("limit_status_code")
 );
 
@@ -1033,7 +1033,7 @@ CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
     "description" VARCHAR(500),
     "direction" VARCHAR(20),
     "display_order" INTEGER,
-    "active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN,
     PRIMARY KEY ("rating_change_status_code")
 );
 
@@ -1045,9 +1045,166 @@ CREATE TABLE IF NOT EXISTS "l1"."equity_allocation_config" (
     "effective_date" DATE NOT NULL,
     "equity_allocation_amt" NUMERIC(20,4) NOT NULL,
     "currency_code" VARCHAR(20) DEFAULT 'USD',
-    "active_flag" BOOLEAN DEFAULT TRUE,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
     "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("equity_allocation_id"),
     FOREIGN KEY ("managed_segment_id") REFERENCES "l1"."enterprise_business_taxonomy"("managed_segment_id")
+);
+
+-- basel_exposure_type_dim (Capital)
+CREATE TABLE IF NOT EXISTS "l1"."basel_exposure_type_dim" (
+    "basel_exposure_type_id" BIGINT NOT NULL,
+    "exposure_type_code" VARCHAR(30),
+    "exposure_type_name" VARCHAR(200),
+    "description" VARCHAR(2000),
+    "std_risk_weight_pct" NUMERIC(10,6),
+    "erba_risk_weight_pct" NUMERIC(10,6),
+    "asset_class_group" VARCHAR(100),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("basel_exposure_type_id")
+);
+
+-- duns_entity_dim (External Data)
+CREATE TABLE IF NOT EXISTS "l1"."duns_entity_dim" (
+    "duns_number" VARCHAR(9) NOT NULL,
+    "business_name" VARCHAR(500),
+    "trade_style_name" VARCHAR(500),
+    "sic_code" VARCHAR(10),
+    "naics_code" VARCHAR(10),
+    "employee_count" INTEGER,
+    "annual_revenue_amt" NUMERIC(20,4),
+    "duns_country_code" VARCHAR(3),
+    "paydex_score" INTEGER,
+    "dnb_rating" VARCHAR(10),
+    "failure_score" INTEGER,
+    "is_out_of_business_flag" BOOLEAN DEFAULT FALSE,
+    "last_updated_date" DATE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("duns_number")
+);
+
+-- ecl_stage_dim (Regulatory)
+CREATE TABLE IF NOT EXISTS "l1"."ecl_stage_dim" (
+    "ecl_stage_code" VARCHAR(20) NOT NULL,
+    "stage_name" VARCHAR(500),
+    "description" VARCHAR(500),
+    "ifrs9_stage_mapping" VARCHAR(500),
+    "cecl_equivalent" VARCHAR(500),
+    "display_order" INTEGER,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("ecl_stage_code")
+);
+
+-- forbearance_type_dim (Regulatory)
+CREATE TABLE IF NOT EXISTS "l1"."forbearance_type_dim" (
+    "forbearance_type_code" VARCHAR(20) NOT NULL,
+    "type_name" VARCHAR(500),
+    "description" VARCHAR(500),
+    "display_order" INTEGER,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("forbearance_type_code")
+);
+
+-- impairment_model_dim (Regulatory)
+CREATE TABLE IF NOT EXISTS "l1"."impairment_model_dim" (
+    "model_code" VARCHAR(20) NOT NULL,
+    "model_name" VARCHAR(500),
+    "regulatory_framework" VARCHAR(500),
+    "description" VARCHAR(500),
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("model_code")
+);
+
+-- limit_status_dim (Limits)
+CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
+    "limit_status_code" VARCHAR(20) NOT NULL,
+    "status_name" VARCHAR(200),
+    "description" VARCHAR(500),
+    "severity_ordinal" INTEGER,
+    "display_order" INTEGER,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY ("limit_status_code")
+);
+
+-- rating_change_status_dim (Ratings)
+CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
+    "rating_change_status_code" VARCHAR(20) NOT NULL,
+    "status_name" VARCHAR(200),
+    "description" VARCHAR(500),
+    "direction" VARCHAR(20),
+    "display_order" INTEGER,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY ("rating_change_status_code")
+);
+
+-- watchlist_category_dim (Watchlist)
+CREATE TABLE IF NOT EXISTS "l1"."watchlist_category_dim" (
+    "watchlist_category_code" VARCHAR(20) NOT NULL,
+    "category_name" VARCHAR(500),
+    "description" VARCHAR(500),
+    "severity_ordinal" INTEGER,
+    "display_order" INTEGER,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "record_source" VARCHAR(100),
+    "created_by" VARCHAR(100),
+    PRIMARY KEY ("watchlist_category_code")
+);
+
+-- capital_allocation (Capital)
+CREATE TABLE IF NOT EXISTS "l1"."capital_allocation" (
+    "node_id" BIGINT NOT NULL,
+    "node_type" VARCHAR(30) NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "legal_entity_id" BIGINT NOT NULL,
+    "allocated_capital_amt" NUMERIC(20,4),
+    "capital_allocation_pct" NUMERIC(10,6),
+    "required_capital_pct" NUMERIC(10,6),
+    "allocated_equity_amt" NUMERIC(20,4),
+    "equity_allocation_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("node_id", "node_type", "as_of_date", "legal_entity_id")
+);
+
+-- regulatory_capital_requirement (Capital)
+CREATE TABLE IF NOT EXISTS "l1"."regulatory_capital_requirement" (
+    "legal_entity_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "regulatory_capital_basis_id" BIGINT NOT NULL,
+    "min_cet1_ratio_pct" NUMERIC(10,6),
+    "min_tier1_ratio_pct" NUMERIC(10,6),
+    "min_total_capital_ratio_pct" NUMERIC(10,6),
+    "min_leverage_ratio_pct" NUMERIC(10,6),
+    "min_slr_pct" NUMERIC(10,6),
+    "stress_capital_buffer_pct" NUMERIC(10,6),
+    "gsib_surcharge_pct" NUMERIC(10,6),
+    "countercyclical_buffer_pct" NUMERIC(10,6),
+    "total_cet1_req_pct" NUMERIC(10,6),
+    "total_tier1_req_pct" NUMERIC(10,6),
+    "total_capital_req_pct" NUMERIC(10,6),
+    "total_leverage_req_pct" NUMERIC(10,6),
+    "total_slr_req_pct" NUMERIC(10,6),
+    "tlac_risk_based_req_pct" NUMERIC(10,6),
+    "tlac_leverage_req_pct" NUMERIC(10,6),
+    "currency_code" VARCHAR(20),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("legal_entity_id", "as_of_date", "regulatory_capital_basis_id")
 );

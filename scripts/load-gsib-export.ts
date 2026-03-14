@@ -4,11 +4,15 @@
  *
  * Usage: npm run db:load-gsib
  * Requires: DATABASE_URL in .env, 5 SQL files in sql/gsib-export/
+ *
+ * Pre-flight: runs structural integrity validation (Group 1 + 9)
+ * before loading to prevent deploying invalid schemas.
  */
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 import pg from 'pg';
+import { runValidation } from './validate-data-model';
 
 const ROOT = path.resolve(__dirname, '..');
 const SQL_DIR = process.env.SQL_DIR ?? path.join(ROOT, 'sql/gsib-export');
@@ -21,11 +25,34 @@ const FILES = [
   '05-scenario-seed.sql',
 ];
 
+const MIGRATION_DIR = path.join(ROOT, 'sql/migrations');
+
+const POST_SEED_MIGRATIONS = [
+  '008a-fk-constraints-l1.sql',
+  '008b-fk-constraints-l2.sql',
+  '008c-fk-constraints-l3.sql',
+  '019a-cash-flow-ddl.sql',
+  '019c-rename-collisions.sql',
+];
+
 async function main() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     console.error('Set DATABASE_URL in .env or pass connection string.');
     process.exit(1);
+  }
+
+  if (!process.env.SKIP_VALIDATION) {
+    console.log('=== Pre-flight validation (Group 1 + 9) ===');
+    const report = await runValidation({ fix: false, group: 1 });
+    const report9 = await runValidation({ fix: false, group: 9 });
+    const totalFailures = report.failures + report9.failures;
+    if (totalFailures > 0) {
+      console.error(`Pre-flight validation FAILED with ${totalFailures} errors.`);
+      console.error('Fix the issues above or set SKIP_VALIDATION=1 to bypass.');
+      process.exit(1);
+    }
+    console.log('Pre-flight validation passed.\n');
   }
 
   for (const f of FILES) {
@@ -253,6 +280,18 @@ async function main() {
         }
       } else {
         await pool.query(sql);
+      }
+    }
+    // Apply FK constraints and post-seed migrations
+    console.log('=== Applying FK constraints & post-seed migrations ===');
+    for (const mig of POST_SEED_MIGRATIONS) {
+      const migPath = path.join(MIGRATION_DIR, mig);
+      if (fs.existsSync(migPath)) {
+        console.log('  →', mig);
+        const migSql = fs.readFileSync(migPath, 'utf-8');
+        await queryWithRetry(migSql);
+      } else {
+        console.warn('  ⚠ Migration not found, skipping:', mig);
       }
     }
     console.log('=== Done ===');

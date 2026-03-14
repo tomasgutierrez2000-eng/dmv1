@@ -99,7 +99,7 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
         FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
@@ -124,7 +124,7 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
         FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
@@ -151,7 +151,7 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
         FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id
@@ -180,7 +180,7 @@ levels:
         SELECT
           ffs.facility_id,
           ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.drawn_amount, 0) AS drawn_amount
+          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
         FROM l3.facility_financial_calc ffs
         LEFT JOIN l2.facility_exposure_snapshot fes
           ON fes.facility_id = ffs.facility_id

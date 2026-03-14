@@ -25,7 +25,7 @@ INSERT INTO l3.exposure_metric_cube (
 SELECT
     p_run_version_id,
     p_as_of_date,
-    COALESCE(p.scenario_id, 'BASE')                               AS scenario_id,
+    COALESCE(p.scenario_id, 0)                                     AS scenario_id,  -- 0 = base scenario (BIGINT, not string)
     p.legal_entity_id,
     COALESCE(fm.org_unit_id, p.org_unit_id)                       AS org_unit_id,
     COALESCE(fm.portfolio_id, p.portfolio_id)                      AS portfolio_id,
@@ -76,8 +76,10 @@ FROM      l2.position p
 JOIN      l2.position_detail pd              ON p.position_id = pd.position_id AND pd.as_of_date = p_as_of_date
 LEFT JOIN l2.facility_exposure_snapshot fes   ON p.facility_id = fes.facility_id AND fes.as_of_date = p_as_of_date
 LEFT JOIN l2.netting_set_exposure_snapshot nse ON p.netting_set_id = nse.netting_set_id AND nse.as_of_date = p_as_of_date
+-- L1 reference joins: static attributes (org_unit, portfolio, product_type, country)
 LEFT JOIN l1.facility_master fm              ON p.facility_id = fm.facility_id
 LEFT JOIN l1.counterparty cp                 ON p.counterparty_id = cp.counterparty_id
+-- L1 fx_rate: reference rate table filtered by as_of_date for point-in-time conversion
 LEFT JOIN l1.fx_rate fx                      ON p.currency_code = fx.from_currency_code
                                              AND fx.to_currency_code = p_base_currency
                                              AND fx.as_of_date = p_as_of_date
@@ -131,7 +133,7 @@ INSERT INTO l3.risk_metric_cube (
 )
 SELECT
     p_run_version_id, p_as_of_date,
-    COALESCE(str.scenario_id, 'BASE'),
+    COALESCE(str.scenario_id, 0)  -- 0 = base scenario,
     p.legal_entity_id,
     COALESCE(fm.portfolio_id, p.portfolio_id),
     COALESCE(pd.product_node_id, fm.product_type_code),
@@ -217,7 +219,7 @@ INSERT INTO l3.crm_allocation_summary (
 )
 SELECT
     p_run_version_id, p_as_of_date,
-    COALESCE(cs.scenario_id, 'BASE'),
+    COALESCE(cs.scenario_id, 0)  -- 0 = base scenario,
     cs.legal_entity_id,
     CASE WHEN ca.collateral_asset_id IS NOT NULL THEN 'COLLATERAL' ELSE 'PROTECTION' END,
     CASE

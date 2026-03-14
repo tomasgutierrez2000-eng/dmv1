@@ -1,5 +1,5 @@
 /**
- * Comprehensive data model validation — 45 checks across 9 groups.
+ * Comprehensive data model validation — 55+ checks across 11 groups.
  *
  * Validates cross-referential integrity between all source-of-truth files
  * (L1/L2/L3 definitions, DDL, data dictionary, metrics, catalogue, domains,
@@ -1243,6 +1243,226 @@ function validateArchitectureCompliance(ddLookup: DDLookup): CheckResult[] {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Group 10: FK Enforcement & DDL Sync
+// ═══════════════════════════════════════════════════════════════════════════
+
+function validateFKEnforcementAndDDLSync(ddLookup: DDLookup): CheckResult[] {
+  const results: CheckResult[] = [];
+  const dd = ddLookup.dd;
+  const rels = (dd as Record<string, unknown>).relationships as Array<{
+    from_layer: string; from_table: string; from_field: string;
+    to_layer: string; to_table: string; to_field: string;
+  }> | undefined;
+
+  // 10.1 FK DDL file existence — every DD relationship should have generated FK DDL
+  {
+    const issues: string[] = [];
+    const fkDir = path.resolve(__dirname, '../sql/fk');
+    const fkFiles = ['fk-l1.sql', 'fk-l2.sql', 'fk-l3.sql'];
+    for (const f of fkFiles) {
+      if (!fs.existsSync(path.join(fkDir, f))) {
+        issues.push(`Missing FK DDL file: sql/fk/${f} — run: npm run generate:fk`);
+      }
+    }
+    if (rels && issues.length === 0) {
+      // Count relationships vs FK statements in generated files
+      let totalFkStatements = 0;
+      for (const f of fkFiles) {
+        const content = fs.readFileSync(path.join(fkDir, f), 'utf-8');
+        totalFkStatements += (content.match(/ADD CONSTRAINT/g) || []).length;
+      }
+      if (totalFkStatements < rels.length) {
+        issues.push(`FK DDL has ${totalFkStatements} constraints but DD defines ${rels.length} relationships — regenerate with npm run generate:fk`);
+      }
+    }
+    results.push(check('10.1', 10, 'FK DDL generation coverage', issues));
+  }
+
+  // 10.2 VARCHAR width parity on FK pairs
+  {
+    const issues: string[] = [];
+    if (rels) {
+      for (const rel of rels) {
+        const fromTable = ddLookup.tablesByLayerName.get(`${rel.from_layer}.${rel.from_table}`);
+        const toTable = ddLookup.tablesByLayerName.get(`${rel.to_layer}.${rel.to_table}`);
+        if (!fromTable || !toTable) continue;
+        const fromField = fromTable.fields.find(f => f.name === rel.from_field);
+        const toField = toTable.fields.find(f => f.name === rel.to_field);
+        if (!fromField?.data_type || !toField?.data_type) continue;
+        const fromMatch = fromField.data_type.match(/VARCHAR\((\d+)\)/i);
+        const toMatch = toField.data_type.match(/VARCHAR\((\d+)\)/i);
+        if (fromMatch && toMatch) {
+          const fromLen = parseInt(fromMatch[1], 10);
+          const toLen = parseInt(toMatch[1], 10);
+          if (fromLen !== toLen) {
+            issues.push(
+              `${rel.from_layer}.${rel.from_table}.${rel.from_field} VARCHAR(${fromLen}) ≠ ` +
+              `${rel.to_layer}.${rel.to_table}.${rel.to_field} VARCHAR(${toLen})`
+            );
+          }
+        }
+      }
+    }
+    results.push(check('10.2', 10, 'FK VARCHAR width parity', issues));
+  }
+
+  // 10.3 FK constraint name length < 63 chars
+  {
+    const issues: string[] = [];
+    if (rels) {
+      for (const rel of rels) {
+        const name = `fk_${rel.from_table}_${rel.from_field}`;
+        if (name.length > 63) {
+          issues.push(`${name} (${name.length} chars) exceeds PostgreSQL 63-char NAMEDATALEN limit`);
+        }
+      }
+    }
+    results.push(check('10.3', 10, 'FK constraint name length', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 10.6 l3-tables.ts ↔ L3 DDL sync
+  {
+    const issues: string[] = [];
+    const L3_DDL = path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql');
+    if (fs.existsSync(L3_DDL)) {
+      const l3Parsed = parseDDL(fs.readFileSync(L3_DDL, 'utf-8'), 'l3');
+      const ddlNames = new Set(l3Parsed.map(t => t.name));
+      for (const t of L3_TABLES) {
+        if (!ddlNames.has(t.name)) {
+          issues.push(`L3.${t.name} (${t.id}): in l3-tables.ts but not in L3 DDL`);
+        }
+      }
+    }
+    results.push(check('10.6', 10, 'l3-tables.ts ↔ L3 DDL sync', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 10.7 DD L2 tables ↔ L2 DDL sync
+  {
+    const issues: string[] = [];
+    const L2_DDL = path.resolve(__dirname, '../sql/gsib-export/02-l2-ddl.sql');
+    if (fs.existsSync(L2_DDL)) {
+      const l2Parsed = parseDDL(fs.readFileSync(L2_DDL, 'utf-8'), 'l2');
+      const ddlNames = new Set(l2Parsed.map(t => t.name));
+      for (const table of dd.L2) {
+        const f = table as Record<string, unknown>;
+        if (f.deprecated === true) continue;
+        if (!ddlNames.has(table.name)) {
+          issues.push(`L2.${table.name}: in data dictionary but not in L2 DDL`);
+        }
+      }
+    }
+    results.push(check('10.7', 10, 'DD L2 tables ↔ L2 DDL sync', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 10.10 Duplicate CREATE TABLE in DDL
+  {
+    const issues: string[] = [];
+    const ddlFiles = [
+      { path: path.resolve(__dirname, '../sql/gsib-export/01-l1-ddl.sql'), label: 'L1' },
+      { path: path.resolve(__dirname, '../sql/gsib-export/02-l2-ddl.sql'), label: 'L2' },
+      { path: path.resolve(__dirname, '../sql/l3/01_DDL_all_tables.sql'), label: 'L3' },
+    ];
+    for (const { path: ddlPath, label } of ddlFiles) {
+      if (!fs.existsSync(ddlPath)) continue;
+      const content = fs.readFileSync(ddlPath, 'utf-8');
+      const tableMatches = [...content.matchAll(/CREATE TABLE[^"]*"[^"]*"\."([^"]+)"/gi)];
+      const seen = new Map<string, number>();
+      for (const m of tableMatches) {
+        const name = m[1];
+        seen.set(name, (seen.get(name) || 0) + 1);
+      }
+      for (const [name, count] of seen) {
+        if (count > 1) {
+          issues.push(`${label}.${name}: CREATE TABLE appears ${count} times in DDL`);
+        }
+      }
+    }
+    results.push(check('10.10', 10, 'No duplicate CREATE TABLE in DDL', issues));
+  }
+
+  // 10.11 L3 summary tables have anchor entity relationships
+  {
+    const issues: string[] = [];
+    const summaryTables = dd.L3.filter(t =>
+      t.name.includes('summary') || t.name.includes('derived') || t.name.includes('rollup')
+    );
+    if (rels) {
+      const relFromKeys = new Set(rels.map(r => `${r.from_layer}.${r.from_table}`));
+      for (const table of summaryTables) {
+        if (!relFromKeys.has(`L3.${table.name}`)) {
+          issues.push(`L3.${table.name}: summary/derived table has no FK relationships defined`);
+        }
+      }
+    }
+    results.push(check('10.11', 10, 'L3 summary tables have anchor FKs', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Group 11: Metric Governance
+// ═══════════════════════════════════════════════════════════════════════════
+
+function validateMetricGovernance(ddLookup: DDLookup): CheckResult[] {
+  const results: CheckResult[] = [];
+  const catalogue = getCatalogueItems();
+
+  // 11.1 Calc/Agg/Avg level_definitions should have formula_sql
+  {
+    const issues: string[] = [];
+    let totalNonRaw = 0;
+    let missingFormula = 0;
+    for (const item of catalogue) {
+      for (const ld of item.level_definitions || []) {
+        if (ld.sourcing_type === 'Raw') continue;
+        totalNonRaw++;
+        if (!ld.formula_sql) {
+          missingFormula++;
+          // Only report first 20 to keep output manageable
+          if (issues.length < 20) {
+            issues.push(`${item.item_id} level "${ld.level}" (${ld.sourcing_type}): missing formula_sql`);
+          }
+        }
+      }
+    }
+    if (missingFormula > 20) {
+      issues.push(`... and ${missingFormula - 20} more (${missingFormula}/${totalNonRaw} total missing)`);
+    }
+    results.push(check('11.1', 11, `formula_sql coverage (${totalNonRaw - missingFormula}/${totalNonRaw} non-Raw have SQL)`, issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 11.2 No empty ingredient_fields
+  {
+    const issues: string[] = [];
+    for (const item of catalogue) {
+      if (!item.ingredient_fields || item.ingredient_fields.length === 0) {
+        issues.push(`${item.item_id} (${item.item_name}): empty ingredient_fields`);
+      }
+    }
+    results.push(check('11.2', 11, 'ingredient_fields populated', issues));
+  }
+
+  // 11.3 DRAFT/ACTIVE status ratio
+  {
+    const statusCounts = new Map<string, number>();
+    for (const item of catalogue) {
+      const s = item.status || 'UNKNOWN';
+      statusCounts.set(s, (statusCounts.get(s) || 0) + 1);
+    }
+    const details: string[] = [];
+    for (const [status, count] of [...statusCounts.entries()].sort((a, b) => b[1] - a[1])) {
+      details.push(`${status}: ${count}/${catalogue.length} (${Math.round(count / catalogue.length * 100)}%)`);
+    }
+    const activeCount = statusCounts.get('ACTIVE') || 0;
+    const severity: Severity = activeCount < catalogue.length * 0.1 ? 'WARN' : 'PASS';
+    results.push(check('11.3', 11, 'Catalogue status distribution', details, severity));
+  }
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Main Orchestrator
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1288,6 +1508,8 @@ export async function runValidation(options: CliOptions): Promise<ValidationRepo
     { group: 7, name: 'Export/API Surface Consistency',  run: () => validateExportSurface(ddLookup) },
     { group: 8, name: 'Naming Conventions & Layer Integrity', run: () => validateLayerConventions(ddLookup) },
     { group: 9, name: 'Architecture Compliance',              run: () => validateArchitectureCompliance(ddLookup) },
+    { group: 10, name: 'FK Enforcement & DDL Sync',           run: () => validateFKEnforcementAndDDLSync(ddLookup) },
+    { group: 11, name: 'Metric Governance',                   run: () => validateMetricGovernance(ddLookup) },
   ];
 
   for (const runner of groupRunners) {

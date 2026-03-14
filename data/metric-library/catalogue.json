@@ -3555,7 +3555,10 @@
     "executable_metric_id": "AMD-002",
     "normalized_de_name": "Amendment Status",
     "data_element_in_dm": "amendment_status_name",
-    "ingredient_fields": [],
+    "ingredient_fields": [
+      { "layer": "L2", "table": "amendment_event", "field": "amendment_status_code", "description": "Status code of the amendment in its approval lifecycle" },
+      { "layer": "L1", "table": "amendment_status_dim", "field": "amendment_status_name", "description": "Human-readable amendment status label" }
+    ],
     "level_definitions": [
       {
         "level": "facility",
@@ -23613,7 +23616,9 @@
     "executable_metric_id": "REF-002",
     "normalized_de_name": "Reporting Period (As-of Date)",
     "data_element_in_dm": "as_of_date",
-    "ingredient_fields": [],
+    "ingredient_fields": [
+      { "layer": "L2", "table": "facility_exposure_snapshot", "field": "as_of_date", "description": "Snapshot date used as temporal reference for all reporting" }
+    ],
     "level_definitions": [
       {
         "level": "facility",
@@ -25672,7 +25677,9 @@
     "executable_metric_id": "REF-010",
     "normalized_de_name": "Facility ID",
     "data_element_in_dm": "facility_id",
-    "ingredient_fields": [],
+    "ingredient_fields": [
+      { "layer": "L2", "table": "facility_master", "field": "facility_id", "description": "Unique identifier for the lending facility" }
+    ],
     "level_definitions": [
       {
         "level": "facility",
@@ -27018,7 +27025,10 @@
     "executable_metric_id": "REF-015",
     "normalized_de_name": "Syndicated Deal Flag",
     "data_element_in_dm": "is_syndicated_flag",
-    "ingredient_fields": [],
+    "ingredient_fields": [
+      { "layer": "L2", "table": "facility_master", "field": "is_syndicated_flag", "description": "Boolean flag indicating whether the facility is part of a syndicated deal" },
+      { "layer": "L2", "table": "credit_agreement_counterparty_participation", "field": "counterparty_id", "description": "Participating lender identifier used to determine syndication" }
+    ],
     "level_definitions": [
       {
         "level": "facility",

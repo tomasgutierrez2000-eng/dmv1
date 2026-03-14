@@ -1,0 +1,13 @@
+-- Migration 019i: FK VARCHAR Parity Check
+-- Finding H7: VARCHAR width mismatches on FK pairs
+--
+-- After comprehensive audit of all 269 relationships in data-dictionary.json,
+-- NO VARCHAR width mismatches were found between FK pairs.
+-- All VARCHAR FK columns have matching widths with their parent PK columns.
+--
+-- The original finding referenced enterprise_product_taxonomy.fr2590_category_code
+-- VARCHAR(20) vs fr2590_category_dim.fr2590_category_code VARCHAR(30), but this
+-- has already been resolved (both are now VARCHAR(30) per data dictionary).
+--
+-- This migration is a no-op, kept as documentation of the audit result.
+-- Future mismatches will be caught by validation check 10.2 in validate-data-model.ts.

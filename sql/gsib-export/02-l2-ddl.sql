@@ -105,9 +105,7 @@ CREATE TABLE IF NOT EXISTS "l2"."facility_exposure_snapshot" (
     "facility_id" BIGINT,
     "as_of_date" DATE,
     "exposure_type_id" BIGINT,
-    "drawn_amount" NUMERIC(18,2),
     "committed_amount" NUMERIC(18,2),
-    "undrawn_amount" NUMERIC(18,2),
     "source_system_id" BIGINT,
     "counterparty_id" BIGINT,
     "currency_code" VARCHAR(20),
@@ -1276,4 +1274,22 @@ CREATE TABLE IF NOT EXISTS "l2"."watchlist_entry" (
     "record_source" VARCHAR(100),
     "created_by" VARCHAR(100),
     PRIMARY KEY ("watchlist_entry_id")
+);
+
+-- duns_entity_observation (D&B Entity Observations)
+CREATE TABLE IF NOT EXISTS "l2"."duns_entity_observation" (
+    "duns_number" VARCHAR(9) NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "paydex_score" INTEGER,
+    "failure_score" INTEGER,
+    "annual_revenue_amt" NUMERIC(20,4),
+    "employee_count" INTEGER,
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "created_by" VARCHAR(100),
+    "load_batch_id" VARCHAR(100),
+    "source_system_id" BIGINT,
+    "raw_record_id" VARCHAR(200),
+    "record_source" VARCHAR(100),
+    PRIMARY KEY ("duns_number", "as_of_date")
 );

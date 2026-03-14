@@ -1022,7 +1022,7 @@ CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
     "description" VARCHAR(500),
     "severity_ordinal" INTEGER,
     "display_order" INTEGER,
-    "is_active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
     PRIMARY KEY ("limit_status_code")
 );
 
@@ -1033,7 +1033,7 @@ CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
     "description" VARCHAR(500),
     "direction" VARCHAR(20),
     "display_order" INTEGER,
-    "is_active_flag" BOOLEAN,
+    "is_active_flag" BOOLEAN DEFAULT TRUE,
     PRIMARY KEY ("rating_change_status_code")
 );
 
@@ -1128,28 +1128,6 @@ CREATE TABLE IF NOT EXISTS "l1"."impairment_model_dim" (
     "record_source" VARCHAR(100),
     "created_by" VARCHAR(100),
     PRIMARY KEY ("model_code")
-);
-
--- limit_status_dim (Limits)
-CREATE TABLE IF NOT EXISTS "l1"."limit_status_dim" (
-    "limit_status_code" VARCHAR(20) NOT NULL,
-    "status_name" VARCHAR(200),
-    "description" VARCHAR(500),
-    "severity_ordinal" INTEGER,
-    "display_order" INTEGER,
-    "is_active_flag" BOOLEAN DEFAULT TRUE,
-    PRIMARY KEY ("limit_status_code")
-);
-
--- rating_change_status_dim (Ratings)
-CREATE TABLE IF NOT EXISTS "l1"."rating_change_status_dim" (
-    "rating_change_status_code" VARCHAR(20) NOT NULL,
-    "status_name" VARCHAR(200),
-    "description" VARCHAR(500),
-    "direction" VARCHAR(20),
-    "display_order" INTEGER,
-    "is_active_flag" BOOLEAN DEFAULT TRUE,
-    PRIMARY KEY ("rating_change_status_code")
 );
 
 -- watchlist_category_dim (Watchlist)

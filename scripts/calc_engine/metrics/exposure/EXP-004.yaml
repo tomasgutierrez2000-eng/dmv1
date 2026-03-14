@@ -7,7 +7,7 @@ metric_id: "EXP-004"
 name: "Committed Exposure ($)"
 version: "2.0.0"
 owner: "credit-risk"
-status: ACTIVE
+status: DRAFT
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────

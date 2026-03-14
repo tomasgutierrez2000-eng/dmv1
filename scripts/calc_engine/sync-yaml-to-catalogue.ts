@@ -551,6 +551,22 @@ function main(): void {
     item.level_definitions = levelDefs;
     item.executable_metric_id = metric.metric_id;
 
+    // Sync top-level fields from YAML → catalogue
+    item.status = metric.status;
+    item.item_name = metric.name;
+    item.definition = metric.description;
+    item.metric_class = metric.metric_class;
+    item.direction = metric.direction;
+    item.domain_ids = [metric.domain];
+    if (metric.catalogue?.abbreviation) {
+      item.abbreviation = metric.catalogue.abbreviation;
+    }
+    if (metric.catalogue?.insight) {
+      item.insight = metric.catalogue.insight;
+    }
+    item.number_of_instances = Object.keys(metric.levels).length;
+    item.regulatory_references = metric.regulatory_references.map(formatRegulatoryRef);
+
     // Sync ingredient_fields if empty or missing
     const existingIngredients = item.ingredient_fields as unknown[] | undefined;
     if (!existingIngredients || existingIngredients.length === 0) {

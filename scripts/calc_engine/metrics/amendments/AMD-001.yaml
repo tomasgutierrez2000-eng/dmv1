@@ -1,8 +1,8 @@
 metric_id: AMD-001
 name: Amendment Start Date
-version: 1.0.0
+version: 2.0.0
 owner: credit-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: amendments
@@ -12,22 +12,36 @@ direction: NEUTRAL
 unit_type: DAYS
 display_format: s
 description: |
-  Date amendment became effective.
+  Effective date of the most recent amendment on a facility. At rollup levels,
+  reports the latest (MAX) amendment effective date across the group — shows
+  how recently amendment activity occurred within each counterparty, desk,
+  portfolio, or business segment.
 regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
 - schema: l2
-  table: facility_master
-  alias: fm
+  table: amendment_event
+  alias: ae
   join_type: BASE
   fields:
   - name: facility_id
     role: JOIN_KEY
-  - name: effective_start_date
+  - name: as_of_date
+    role: FILTER
+  - name: effective_date
     role: MEASURE
+    description: Date the amendment became effective
   - name: counterparty_id
     role: DIMENSION
+- schema: l2
+  table: facility_master
+  alias: fm
+  join_type: INNER
+  join_on: fm.facility_id = ae.facility_id
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
   - name: lob_segment_id
     role: DIMENSION
   - name: is_active_flag
@@ -46,68 +60,94 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: |
-      Read effective_date from facility_master for each facility.
+      Latest amendment effective_date per facility, converted to epoch seconds
+      for numeric comparison. One facility may have multiple amendments;
+      MAX selects the most recent.
     formula_sql: |-
       SELECT
-        fm.facility_id AS dimension_key,
-        EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT AS metric_value
-      FROM l2.facility_master fm
-      WHERE fm.is_active_flag = 'Y'
+        ae.facility_id AS dimension_key,
+        MAX(EXTRACT(EPOCH FROM ae.effective_date)::BIGINT) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
+      WHERE ae.as_of_date = :as_of_date
+        AND ae.effective_date IS NOT NULL
+      GROUP BY ae.facility_id
   counterparty:
     aggregation_type: MAX
     formula_text: |
-      Latest (MAX) effective_date per counterparty.
+      Latest amendment effective_date across all facilities for each
+      counterparty. Uses amendment_event.counterparty_id directly.
     formula_sql: |-
       SELECT
-        fm.counterparty_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
-      FROM l2.facility_master fm
-      WHERE fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+        ae.counterparty_id AS dimension_key,
+        MAX(EXTRACT(EPOCH FROM ae.effective_date)::BIGINT) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
+      WHERE ae.as_of_date = :as_of_date
+        AND ae.effective_date IS NOT NULL
+      GROUP BY ae.counterparty_id
   desk:
     aggregation_type: MAX
     formula_text: |
-      Latest (MAX) effective_date per L3 desk segment.
+      Latest amendment effective_date per L3 desk segment.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
-      FROM l2.facility_master fm
+        MAX(EXTRACT(EPOCH FROM ae.effective_date)::BIGINT) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
-      WHERE fm.is_active_flag = 'Y'
+      WHERE ae.as_of_date = :as_of_date
+        AND ae.effective_date IS NOT NULL
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: MAX
     formula_text: |
-      Latest (MAX) effective_date per L2 portfolio segment.
+      Latest amendment effective_date per L2 portfolio segment.
+      Walks up hierarchy: L3 desk → L2 portfolio via parent_segment_id.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
-      FROM l2.facility_master fm
+        MAX(EXTRACT(EPOCH FROM ae.effective_date)::BIGINT) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      WHERE fm.is_active_flag = 'Y'
+      WHERE ae.as_of_date = :as_of_date
+        AND ae.effective_date IS NOT NULL
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: MAX
     formula_text: |
-      Latest (MAX) effective_date per L1 business segment.
+      Latest amendment effective_date per L1 business segment.
+      Walks up hierarchy: L3 → L2 → L1 via parent_segment_id chain.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        MAX(EXTRACT(EPOCH FROM fm.effective_start_date)::BIGINT) AS metric_value
-      FROM l2.facility_master fm
+        MAX(EXTRACT(EPOCH FROM ae.effective_date)::BIGINT) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      WHERE fm.is_active_flag = 'Y'
+      WHERE ae.as_of_date = :as_of_date
+        AND ae.effective_date IS NOT NULL
       GROUP BY ebt_l1.managed_segment_id
 depends_on: []
 output:
@@ -115,15 +155,17 @@ output:
 validations:
 - rule_id: AMD-001-V01
   type: NOT_NULL
-  description: No null effective_start_date values
+  description: No null effective_date values in source amendments
   severity: ERROR
 catalogue:
   item_id: MET-003
   abbreviation: ASD
   insight: |
-    Amendment lifecycle tracking
+    Most recent amendment activity date — signals how recently credit terms
+    were renegotiated. Stale dates at portfolio level may indicate dormant
+    amendment pipelines requiring CRO attention.
   rollup_strategy: custom
-  primary_value_field: effective_start_date
+  primary_value_field: effective_date
 tags:
 - amendments
 - amendment-events

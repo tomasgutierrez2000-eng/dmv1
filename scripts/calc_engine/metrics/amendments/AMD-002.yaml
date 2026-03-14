@@ -1,8 +1,8 @@
 metric_id: AMD-002
-name: Amendment Status
-version: 1.0.0
+name: Amendment Status Count
+version: 2.0.0
 owner: credit-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: amendments
@@ -12,24 +12,52 @@ direction: NEUTRAL
 unit_type: COUNT
 display_format: ',.0f'
 description: |
-  Status of amendment within the approval lifecycle.
+  Count of amendments by approval lifecycle status (e.g., Prospect Identified,
+  In Underwriting, Under Credit Review, Pending Approval, Complete, Rejected).
+  At each rollup level, provides a distribution breakdown showing how many
+  amendments fall into each status category. Key CRO indicator for amendment
+  pipeline health and bottleneck identification.
 regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
 - schema: l2
-  table: facility_master
-  alias: fm
+  table: amendment_event
+  alias: ae
   join_type: BASE
   fields:
   - name: facility_id
     role: JOIN_KEY
+  - name: as_of_date
+    role: FILTER
+  - name: amendment_status_code
+    role: DIMENSION
+    description: FK to amendment_status_dim for status category grouping
   - name: counterparty_id
     role: DIMENSION
+- schema: l2
+  table: facility_master
+  alias: fm
+  join_type: INNER
+  join_on: fm.facility_id = ae.facility_id
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
   - name: lob_segment_id
     role: DIMENSION
   - name: is_active_flag
     role: FILTER
+- schema: l1
+  table: amendment_status_dim
+  alias: asd
+  join_type: INNER
+  join_on: asd.amendment_status_code = ae.amendment_status_code
+  fields:
+  - name: amendment_status_code
+    role: JOIN_KEY
+  - name: amendment_status_name
+    role: DIMENSION
+    description: Human-readable status label for display
 - schema: l1
   table: enterprise_business_taxonomy
   alias: ebt
@@ -44,112 +72,126 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: |
-      Read amendment status flag for each active facility.
+      Count of amendments per facility, broken out by status category.
+      Each row represents one (facility, status) combination with its count.
     formula_sql: |-
       SELECT
-        fm.facility_id AS dimension_key,
-        1 AS metric_value
-      FROM l2.facility_master fm
-      WHERE fm.is_active_flag = 'Y'
-  counterparty:
-    aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with amendment status per counterparty.
-    formula_sql: |-
-      SELECT
-        fm.counterparty_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        ae.facility_id AS dimension_key,
+        asd.amendment_status_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
-  desk:
-    aggregation_type: COUNT
+      INNER JOIN l1.amendment_status_dim asd
+        ON asd.amendment_status_code = ae.amendment_status_code
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ae.facility_id, asd.amendment_status_name
+  counterparty:
+    aggregation_type: SUM
     formula_text: |
-      COUNT of facilities with amendment status per L3 desk segment.
+      Count of amendments per counterparty by status category.
+      Uses amendment_event.counterparty_id directly (no participation weighting —
+      amendments are discrete events, not divisible by ownership share).
+    formula_sql: |-
+      SELECT
+        ae.counterparty_id AS dimension_key,
+        asd.amendment_status_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_status_dim asd
+        ON asd.amendment_status_code = ae.amendment_status_code
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ae.counterparty_id, asd.amendment_status_name
+  desk:
+    aggregation_type: SUM
+    formula_text: |
+      Count of amendments per L3 desk segment by status category.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        asd.amendment_status_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_status_dim asd
+        ON asd.amendment_status_code = ae.amendment_status_code
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
-      GROUP BY ebt.managed_segment_id
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ebt.managed_segment_id, asd.amendment_status_name
   portfolio:
-    aggregation_type: COUNT
+    aggregation_type: SUM
     formula_text: |
-      COUNT of facilities with amendment status per L2 portfolio segment.
+      Count of amendments per L2 portfolio segment by status category.
+      Walks up hierarchy: L3 desk → L2 portfolio via parent_segment_id.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        asd.amendment_status_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_status_dim asd
+        ON asd.amendment_status_code = ae.amendment_status_code
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      GROUP BY ebt_l2.managed_segment_id
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ebt_l2.managed_segment_id, asd.amendment_status_name
   business_segment:
-    aggregation_type: COUNT
+    aggregation_type: SUM
     formula_text: |
-      COUNT of facilities with amendment status per L1 business segment.
+      Count of amendments per L1 business segment by status category.
+      Walks up hierarchy: L3 → L2 → L1 via parent_segment_id chain.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        asd.amendment_status_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_status_dim asd
+        ON asd.amendment_status_code = ae.amendment_status_code
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      GROUP BY ebt_l1.managed_segment_id
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ebt_l1.managed_segment_id, asd.amendment_status_name
 depends_on: []
 output:
   table: metric_result
 validations:
 - rule_id: AMD-002-V01
   type: NOT_NULL
-  description: No null amendment_status_name values
+  description: amendment_status_code must exist in amendment_status_dim
+  severity: ERROR
+- rule_id: AMD-002-V02
+  type: NON_NEGATIVE
+  description: Amendment count must be >= 0
   severity: ERROR
 catalogue:
   item_id: MET-004
-  abbreviation: AS
+  abbreviation: ASC
   insight: |
-    Operational/process tracking
+    Amendment pipeline distribution by status — reveals bottlenecks
+    (e.g., accumulation in "Pending Approval") and completion rates.
+    CRO uses this to monitor restructuring velocity and operational risk.
   rollup_strategy: direct-sum
-  primary_value_field: amendment_status_name
+  primary_value_field: amendment_status_count
 tags:
 - amendments
 - amendment-events

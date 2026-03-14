@@ -22,7 +22,7 @@ export default function LibraryMainView() {
     setLoading(true);
     Promise.all([
       fetch('/api/metrics/library/domains').then((r) => r.json()),
-      fetch('/api/metrics/library/catalogue').then((r) => r.json()),
+      fetch('/api/metrics/library/catalogue?status=ACTIVE').then((r) => r.json()),
     ])
       .then(([d, c]) => {
         setDomains(Array.isArray(d) ? d : []);

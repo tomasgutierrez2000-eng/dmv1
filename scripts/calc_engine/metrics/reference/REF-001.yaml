@@ -1,8 +1,8 @@
 metric_id: REF-001
 name: Number of Loans
-version: 1.0.0
+version: 2.0.0
 owner: credit-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: reference
@@ -17,8 +17,8 @@ regulatory_references:
 - framework: Basel III
   description: ''
 source_tables:
-- schema: l3
-  table: facility_exposure_calc
+- schema: l2
+  table: facility_exposure_snapshot
   alias: fes
   join_type: BASE
   fields:
@@ -60,8 +60,8 @@ levels:
     formula_sql: |-
       SELECT
         fes.facility_id AS dimension_key,
-        COALESCE(fes.number_of_loans, 1) AS metric_value
-      FROM l3.facility_exposure_calc fes
+        COALESCE(fes.number_of_loans, 0) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -73,8 +73,8 @@ levels:
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l3.facility_exposure_calc fes
+        SUM(COALESCE(fes.number_of_loans, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -87,8 +87,8 @@ levels:
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l3.facility_exposure_calc fes
+        SUM(COALESCE(fes.number_of_loans, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -103,8 +103,8 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l3.facility_exposure_calc fes
+        SUM(COALESCE(fes.number_of_loans, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
@@ -121,8 +121,8 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(COALESCE(fes.number_of_loans, 1)) AS metric_value
-      FROM l3.facility_exposure_calc fes
+        SUM(COALESCE(fes.number_of_loans, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'

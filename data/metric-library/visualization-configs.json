@@ -117,8 +117,8 @@
           "field": "number_of_loans",
           "label": "number_of_loans",
           "sample_value": 0,
-          "source_table": "facility_exposure_calc",
-          "source_layer": "L3"
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -138,27 +138,27 @@
   "MET-003": {
     "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "effective_start_date"
+      "primary_value": "effective_date"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "effective_start_date",
-          "label": "effective_start_date",
+          "field": "effective_date",
+          "label": "Date the amendment became effective",
           "sample_value": 0,
-          "source_table": "facility_master",
+          "source_table": "amendment_event",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read effective_date from facility_master for each facility.\n"
+      "formula_display": "Latest amendment effective_date per facility, converted to epoch seconds\nfor numeric comparison. One facility may have multiple amendments;\nMAX selects the most recent.\n"
     },
     "worked_example_columns": [
       {
-        "field": "effective_start_date",
-        "header": "Effective Start Date",
+        "field": "effective_date",
+        "header": "Effective Date",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -168,38 +168,14 @@
   "MET-004": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "amendment_status_name"
+      "primary_value": "amendment_status_count"
     }
   },
   "MET-005": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "amendment_type_code"
-    },
-    "formula_decomposition": {
-      "numerator": [
-        {
-          "op": "*",
-          "field": "amendment_type_code",
-          "label": "amendment_type_code",
-          "sample_value": 0,
-          "source_table": "amendment_type_dim",
-          "source_layer": "L1"
-        }
-      ],
-      "denominator": [],
-      "result_format": "number",
-      "formula_display": "Direct lookup of amendment_type_code from amendment_type_dim.\n"
-    },
-    "worked_example_columns": [
-      {
-        "field": "amendment_type_code",
-        "header": "Amendment Type Code",
-        "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
-      }
-    ]
+      "primary_value": "amendment_type_count"
+    }
   },
   "MET-044": {
     "rollup_strategy": "direct-sum",
@@ -806,7 +782,7 @@
     ]
   },
   "MET-028": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "dscr_value"
     },
@@ -815,31 +791,31 @@
         {
           "op": "*",
           "field": "noi_amt",
-          "label": "noi_amt",
+          "label": "Net Operating Income — numerator of DSCR",
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
         },
         {
           "op": "*",
-          "field": "total_debt_service_amt",
-          "label": "total_debt_service_amt",
+          "field": "interest_expense_amt",
+          "label": "Interest expense — component of Total Debt Service denominator",
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
         },
         {
           "op": "*",
-          "field": "drawn_amount",
-          "label": "drawn_amount",
+          "field": "principal_payment_amt",
+          "label": "Principal payments — component of Total Debt Service denominator",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
+          "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
-      "result_format": "percentage",
-      "formula_display": "Compute DSCR = noi_amt / total_debt_service_amt per facility.\n"
+      "result_format": "ratio",
+      "formula_display": "For each facility:\n  1. LOAD noi_amt, interest_expense_amt, principal_payment_amt\n     from l2.facility_financial_snapshot\n  2. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt\n  3. COMPUTE DSCR = noi_amt / Total Debt Service\nIngredients: noi_amt (L2), interest_expense_amt (L2), principal_payment_amt (L2)\n"
     },
     "worked_example_columns": [
       {
@@ -849,16 +825,16 @@
         "subtotal_fn": "sum"
       },
       {
-        "field": "total_debt_service_amt",
-        "header": "Total Debt Service ($)",
+        "field": "interest_expense_amt",
+        "header": "Interest Expense ($)",
         "format": "currency",
         "subtotal_fn": "sum"
       },
       {
-        "field": "drawn_amount",
-        "header": "Drawn Amount",
-        "format": "number",
-        "subtotal_fn": "none"
+        "field": "principal_payment_amt",
+        "header": "Principal Payment ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
       },
       {
         "field": "dscr_value",

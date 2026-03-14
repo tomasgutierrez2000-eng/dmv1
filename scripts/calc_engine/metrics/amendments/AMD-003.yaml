@@ -1,179 +1,198 @@
-# ═══════════════════════════════════════════════════════════════
-# GSIB Metric Definition
-# Amendment Type
-# ═══════════════════════════════════════════════════════════════
-# ── IDENTIFICATION ────────────────────────────────────────────
-metric_id: "AMD-003"
-name: "Amendment Type"
-version: "1.0.0"
-owner: "credit-risk"
-status: DRAFT
-effective_date: "2026-01-01"
+metric_id: AMD-003
+name: Amendment Type Count
+version: 2.0.0
+owner: credit-risk
+status: ACTIVE
+effective_date: '2026-01-01'
 supersedes: null
-# ── CLASSIFICATION ────────────────────────────────────────────
-domain: "amendments"
-sub_domain: "amendment-events"
+domain: amendments
+sub_domain: amendment-events
 metric_class: HYBRID
 direction: NEUTRAL
-unit_type: ORDINAL
-display_format: "s"
-description: >
-  Type of contractual amendment (e.g., covenant reset, maturity extension).
-# ── REGULATORY REFERENCES ─────────────────────────────────────
+unit_type: COUNT
+display_format: ',.0f'
+description: |
+  Count of amendments by contractual type (e.g., Commitment Changes, Pricing,
+  Tenor-Maturity, Amortization, Currency). At each rollup level, provides a
+  distribution breakdown showing amendment activity by type category.
+  Key CRO indicator for understanding what credit terms are being renegotiated.
 regulatory_references:
-  - framework: "Basel III"
-    description: ""
-# ── SOURCE TABLES ─────────────────────────────────────────────
+- framework: Basel III
+  description: ''
 source_tables:
-  - schema: l1
-    table: amendment_type_dim
-    alias: atd
-    join_type: BASE
-    fields:
-      - name: facility_id
-        role: JOIN_KEY
-      - name: amendment_type_code
-        role: MEASURE
-  - schema: l1
-    table: enterprise_business_taxonomy
-    alias: ebt
-    join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
-    fields:
-      - name: managed_segment_id
-        role: DIMENSION
-      - name: parent_segment_id
-        role: DIMENSION
-# ── LEVEL FORMULAS ────────────────────────────────────────────
+- schema: l2
+  table: amendment_event
+  alias: ae
+  join_type: BASE
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: as_of_date
+    role: FILTER
+  - name: amendment_type_code
+    role: DIMENSION
+    description: FK to amendment_type_dim for type category grouping
+  - name: counterparty_id
+    role: DIMENSION
+- schema: l2
+  table: facility_master
+  alias: fm
+  join_type: INNER
+  join_on: fm.facility_id = ae.facility_id
+  fields:
+  - name: facility_id
+    role: JOIN_KEY
+  - name: lob_segment_id
+    role: DIMENSION
+  - name: is_active_flag
+    role: FILTER
+- schema: l1
+  table: amendment_type_dim
+  alias: atd
+  join_type: INNER
+  join_on: atd.amendment_type_code = ae.amendment_type_code
+  fields:
+  - name: amendment_type_code
+    role: JOIN_KEY
+  - name: amendment_type_name
+    role: DIMENSION
+    description: Human-readable type label for display
+- schema: l1
+  table: enterprise_business_taxonomy
+  alias: ebt
+  join_type: LEFT
+  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  fields:
+  - name: managed_segment_id
+    role: DIMENSION
+  - name: parent_segment_id
+    role: DIMENSION
 levels:
   facility:
     aggregation_type: RAW
-    formula_text: >
-      Direct lookup of amendment_type_code from amendment_type_dim.
-    formula_sql: |
+    formula_text: |
+      Count of amendments per facility, broken out by amendment type.
+      Each row represents one (facility, type) combination with its count.
+    formula_sql: |-
       SELECT
-        fm.facility_id AS dimension_key,
-        atd.amendment_type_code AS metric_value
-      FROM l2.facility_master fm
+        ae.facility_id AS dimension_key,
+        atd.amendment_type_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ae.facility_id
+        AND fm.is_active_flag = 'Y'
       INNER JOIN l1.amendment_type_dim atd
-        ON atd.facility_id = fm.facility_id
-      WHERE fm.is_active_flag = 'Y'
+        ON atd.amendment_type_code = ae.amendment_type_code
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ae.facility_id, atd.amendment_type_name
   counterparty:
     aggregation_type: SUM
-    formula_text: >
-      SUM(facility-level amendment_type_code) per counterparty.
-    formula_sql: |
+    formula_text: |
+      Count of amendments per counterparty by type category.
+      Uses amendment_event.counterparty_id directly (amendments are
+      discrete events, not weighted by participation share).
+    formula_sql: |-
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          atd.amendment_type_code AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.amendment_type_dim atd
-          ON atd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        ae.counterparty_id AS dimension_key,
+        atd.amendment_type_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+      INNER JOIN l1.amendment_type_dim atd
+        ON atd.amendment_type_code = ae.amendment_type_code
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ae.counterparty_id, atd.amendment_type_name
   desk:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level amendment_type_code per L3 desk segment.
-    formula_sql: |
+    formula_text: |
+      Count of amendments per L3 desk segment by type category.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          atd.amendment_type_code AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.amendment_type_dim atd
-          ON atd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        atd.amendment_type_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_type_dim atd
+        ON atd.amendment_type_code = ae.amendment_type_code
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
-      GROUP BY ebt.managed_segment_id
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ebt.managed_segment_id, atd.amendment_type_name
   portfolio:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level amendment_type_code per L2 portfolio segment.
-    formula_sql: |
+    formula_text: |
+      Count of amendments per L2 portfolio segment by type category.
+      Walks up hierarchy: L3 desk → L2 portfolio via parent_segment_id.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          atd.amendment_type_code AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.amendment_type_dim atd
-          ON atd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        atd.amendment_type_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_type_dim atd
+        ON atd.amendment_type_code = ae.amendment_type_code
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      GROUP BY ebt_l2.managed_segment_id
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ebt_l2.managed_segment_id, atd.amendment_type_name
   business_segment:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level amendment_type_code per L1 business segment segment.
-    formula_sql: |
+    formula_text: |
+      Count of amendments per L1 business segment by type category.
+      Walks up hierarchy: L3 → L2 → L1 via parent_segment_id chain.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          atd.amendment_type_code AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.amendment_type_dim atd
-          ON atd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
+        atd.amendment_type_name AS category_value,
+        COUNT(*) AS metric_value
+      FROM l2.amendment_event ae
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ae.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l1.amendment_type_dim atd
+        ON atd.amendment_type_code = ae.amendment_type_code
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      GROUP BY ebt_l1.managed_segment_id
-# ── DEPENDENCIES ──────────────────────────────────────────────
+      WHERE ae.as_of_date = :as_of_date
+      GROUP BY ebt_l1.managed_segment_id, atd.amendment_type_name
 depends_on: []
-# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
-# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-  - rule_id: "AMD-003-V01"
-    type: NOT_NULL
-    description: "No null amendment_type_code values"
-    severity: ERROR
-# ── CATALOGUE ─────────────────────────────────────────────────
+- rule_id: AMD-003-V01
+  type: NOT_NULL
+  description: amendment_type_code must exist in amendment_type_dim
+  severity: ERROR
+- rule_id: AMD-003-V02
+  type: NON_NEGATIVE
+  description: Amendment count must be >= 0
+  severity: ERROR
 catalogue:
-  item_id: "MET-005"
-  abbreviation: "AT"
-  insight: >
-    Amendment risk or operational impact
-  rollup_strategy: "direct-sum"
-  primary_value_field: "amendment_type_code"
-# ── METADATA ──────────────────────────────────────────────────
-tags: ["amendments", "amendment-events"]
+  item_id: MET-005
+  abbreviation: ATC
+  insight: |
+    Amendment activity distribution by type — reveals which credit terms
+    are being renegotiated most frequently (pricing vs. maturity vs. covenant).
+    Concentration in one type may signal systemic market pressure.
+  rollup_strategy: direct-sum
+  primary_value_field: amendment_type_count
+tags:
+- amendments
+- amendment-events
 dashboard_pages: []
 legacy_metric_ids: []

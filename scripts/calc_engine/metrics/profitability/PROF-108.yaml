@@ -7,7 +7,7 @@ metric_id: "PROF-108"
 name: "Interest Expense"
 version: "2.0.0"
 owner: "treasury"
-status: ACTIVE
+status: DRAFT
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────

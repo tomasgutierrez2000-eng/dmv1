@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-014"
 name: "Debt Service Coverage Ratio (DSCR)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -15,16 +15,32 @@ domain: "exposure"
 sub_domain: "risk-metrics"
 metric_class: CALCULATED
 direction: HIGHER_BETTER
-unit_type: PERCENTAGE
+unit_type: RATIO
 display_format: ".2f"
 description: >
-  Net Operating Income divided by Total Debt Service. Measures borrower's
-  ability to meet debt obligations from operating cash flow, providing
-  insight into covenant compliance and credit resilience.
+  Cashflow (Net Operating Income) divided by Total Debt Service
+  (Interest Expense + Principal Payments). Measures borrower's ability to
+  meet debt obligations from operating cash flow. DSCR > 1.0 means the
+  borrower generates enough income to cover debt payments. Key covenant
+  compliance and credit resilience indicator.
+
+  Ingredient derivation:
+    - NOI (noi_amt): L2 facility_financial_snapshot — raw atomic input
+    - Interest Expense (interest_expense_amt): L2 facility_financial_snapshot — raw
+    - Principal Payment (principal_payment_amt): L2 facility_financial_snapshot — raw
+    - Total Debt Service = interest_expense_amt + principal_payment_amt (L3 derived)
+    - DSCR = noi_amt / Total Debt Service (L3 derived)
+
+  Rollup uses sum-ratio pattern: SUM(NOI) / SUM(Debt Service) at each level,
+  preserving the mathematical relationship between numerator and denominator.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "CRE22"
+    description: "Income-producing real estate lending — DSCR assessment"
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "CRE loan schedule — DSCR reporting field"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -38,16 +54,13 @@ source_tables:
         role: FILTER
       - name: noi_amt
         role: MEASURE
-      - name: total_debt_service_amt
+        description: "Net Operating Income — numerator of DSCR"
+      - name: interest_expense_amt
         role: MEASURE
-  - schema: l2
-    table: facility_exposure_snapshot
-    alias: fes
-    join_type: INNER
-    join_on: "fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date"
-    fields:
-      - name: drawn_amount
+        description: "Interest expense — component of Total Debt Service denominator"
+      - name: principal_payment_amt
         role: MEASURE
+        description: "Principal payments — component of Total Debt Service denominator"
   - schema: l2
     table: facility_master
     alias: fm
@@ -77,124 +90,122 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: |
-      Compute DSCR = noi_amt / total_debt_service_amt per facility.
-    formula_sql: |
+      For each facility:
+        1. LOAD noi_amt, interest_expense_amt, principal_payment_amt
+           from l2.facility_financial_snapshot
+        2. COMPUTE Total Debt Service = interest_expense_amt + principal_payment_amt
+        3. COMPUTE DSCR = noi_amt / Total Debt Service
+      Ingredients: noi_amt (L2), interest_expense_amt (L2), principal_payment_amt (L2)
+    formula_sql: |-
       SELECT
         ffs.facility_id AS dimension_key,
-        ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value
-      FROM l3.facility_financial_calc ffs
+        ffs.noi_amt
+          / NULLIF(ffs.interest_expense_amt + ffs.principal_payment_amt, 0)
+          AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
       WHERE ffs.as_of_date = :as_of_date
+        AND ffs.noi_amt IS NOT NULL
   counterparty:
     aggregation_type: CUSTOM
     formula_text: |
-      Exposure-weighted average DSCR per counterparty:
-      SUM(dscr * drawn_amount) / SUM(drawn_amount).
-    formula_sql: |
+      For each counterparty:
+        1. LOAD all facility-level ingredients (noi_amt, interest_expense_amt,
+           principal_payment_amt) for facilities belonging to this counterparty
+        2. COMPUTE SUM(noi_amt) across all facilities = Counterparty Cashflow
+        3. COMPUTE SUM(interest_expense_amt + principal_payment_amt) = Counterparty Debt Service
+        4. COMPUTE Counterparty DSCR = Counterparty Cashflow / Counterparty Debt Service
+      Sum-ratio rollup preserves ingredient traceability.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
-        END AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id,
-          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
-        FROM l3.facility_financial_calc ffs
-        LEFT JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = ffs.facility_id
-          AND fes.as_of_date = ffs.as_of_date
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.noi_amt)
+          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+          AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
+      WHERE ffs.as_of_date = :as_of_date
+        AND ffs.noi_amt IS NOT NULL
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM
     formula_text: |
-      Exposure-weighted average DSCR per L3 desk segment:
-      SUM(dscr * drawn_amount) / SUM(drawn_amount).
-    formula_sql: |
+      For each L3 Desk segment:
+        1. LOOKUP managed_segment_id from enterprise_business_taxonomy
+           via facility_master.lob_segment_id
+        2. COMPUTE SUM(noi_amt) / SUM(interest_expense + principal_payment)
+           for all facilities mapped to this desk
+      Sum-ratio rollup: aggregate ingredients first, then divide.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
-        END AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id,
-          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
-        FROM l3.facility_financial_calc ffs
-        LEFT JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = ffs.facility_id
-          AND fes.as_of_date = ffs.as_of_date
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.noi_amt)
+          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+          AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE ffs.as_of_date = :as_of_date
+        AND ffs.noi_amt IS NOT NULL
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: CUSTOM
     formula_text: |
-      Exposure-weighted average DSCR per L2 portfolio segment:
-      SUM(dscr * drawn_amount) / SUM(drawn_amount).
-    formula_sql: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. COMPUTE SUM(noi_amt) / SUM(interest_expense + principal_payment)
+           for all facilities whose desk rolls up to this portfolio
+      Sum-ratio rollup: aggregate ingredients first, then divide.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
-        END AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id,
-          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
-        FROM l3.facility_financial_calc ffs
-        LEFT JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = ffs.facility_id
-          AND fes.as_of_date = ffs.as_of_date
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.noi_amt)
+          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+          AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE ffs.as_of_date = :as_of_date
+        AND ffs.noi_amt IS NOT NULL
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: CUSTOM
     formula_text: |
-      Exposure-weighted average DSCR per L1 business segment:
-      SUM(dscr * drawn_amount) / SUM(drawn_amount).
-    formula_sql: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. COMPUTE SUM(noi_amt) / SUM(interest_expense + principal_payment)
+           for all facilities whose desk ultimately rolls up to this segment
+      Sum-ratio rollup: aggregate ingredients first, then divide.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.drawn_amount) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fac.drawn_amount) / SUM(fac.drawn_amount)
-        END AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id,
-          ffs.noi_amt / NULLIF(ffs.total_debt_service_amt, 0) AS metric_value,
-          COALESCE(fes.outstanding_balance_amt, 0) AS drawn_amount
-        FROM l3.facility_financial_calc ffs
-        LEFT JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = ffs.facility_id
-          AND fes.as_of_date = ffs.as_of_date
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.noi_amt)
+          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+          AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE ffs.as_of_date = :as_of_date
+        AND ffs.noi_amt IS NOT NULL
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -205,21 +216,31 @@ output:
 validations:
   - rule_id: "EXP-014-V01"
     type: NOT_NULL
-    description: "No null DSCR values"
+    description: "NOI and debt service components must not be null"
     severity: ERROR
   - rule_id: "EXP-014-V02"
     type: NON_NEGATIVE
-    description: "DSCR must be >= 0"
+    description: "DSCR should be >= 0 (negative NOI is a warning)"
     severity: WARNING
+  - rule_id: "EXP-014-V03"
+    type: THRESHOLD
+    description: "DSCR below 1.0 indicates insufficient debt coverage"
+    severity: WARNING
+    params:
+      min: 0
+      warning_below: 1.0
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-028"
   abbreviation: "DSCR"
   insight: >
-    Risk of default due to insufficient cash flow
-  rollup_strategy: "weighted-avg"
+    Risk of default due to insufficient cash flow. DSCR below 1.0x signals
+    the borrower cannot cover debt payments from operating income alone.
+    Sum-ratio rollup at portfolio level reveals aggregate debt service
+    coverage health — a key CRO early warning indicator.
+  rollup_strategy: "sum-ratio"
   primary_value_field: "dscr_value"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "covenant"]
 dashboard_pages: []
 legacy_metric_ids: []

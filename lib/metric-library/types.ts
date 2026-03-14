@@ -57,6 +57,8 @@ export interface LevelDefinition {
   source_references: IngredientField[];
   /** Per-level formula text from the specification table (for traceability). */
   spec_formula?: string;
+  /** Executable SQL for this rollup level (governance-editable). */
+  formula_sql?: string;
 }
 
 /** Individual position (exposure) within a facility — for demo walkthrough. */
@@ -125,8 +127,12 @@ export interface CatalogueItem {
   level_definitions: LevelDefinition[];
   number_of_instances: number;
   directly_displayed: boolean;
-  status: 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
+  status: 'DRAFT' | 'PENDING_REVIEW' | 'IN_REVIEW' | 'APPROVED' | 'ACTIVE' | 'CHANGES_REQUESTED' | 'DEPRECATED' | 'RETIRED';
   executable_metric_id?: string | null;
+  /** User ID of last person who edited the metric (for maker-checker). */
+  last_editor_id?: string | null;
+  /** Display name of last editor. */
+  last_editor_name?: string | null;
   demo_data?: DemoData;
   /** Normalized data element name from the specification table. */
   normalized_de_name?: string;
@@ -136,6 +142,8 @@ export interface CatalogueItem {
   spec_definition?: string;
   /** Documented differences between the specification and the implementation. */
   spec_discrepancy_notes?: string[];
+  /** Tolerance (in %) for rollup reconciliation avg-diff check. Default 5. */
+  reconciliation_tolerance_pct?: number;
 }
 
 /* ── Legacy types (kept for backward compat during migration) ── */

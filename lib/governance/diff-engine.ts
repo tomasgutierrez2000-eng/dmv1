@@ -47,7 +47,7 @@ const SCALAR_FIELDS: (keyof CatalogueItem)[] = [
   'data_type', 'unit_type', 'direction', 'metric_class', 'insight',
   'status', 'number_of_instances', 'directly_displayed',
   'executable_metric_id', 'normalized_de_name', 'data_element_in_dm',
-  'spec_definition',
+  'spec_definition', 'last_editor_id', 'last_editor_name',
 ];
 
 /** Fields to skip in diff (too large or not meaningful for display). */
@@ -76,7 +76,7 @@ function deepEqual(a: unknown, b: unknown): boolean {
 /* ── Level Definition Diff ──────────────────────────────────────── */
 
 const LEVEL_FIELDS: (keyof LevelDefinition)[] = [
-  'dashboard_display_name', 'in_record', 'sourcing_type', 'level_logic',
+  'dashboard_display_name', 'in_record', 'sourcing_type', 'level_logic', 'formula_sql',
 ];
 
 function diffLevelDefinitions(

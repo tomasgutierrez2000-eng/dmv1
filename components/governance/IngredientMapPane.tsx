@@ -17,6 +17,12 @@ interface IngredientTable {
   row_count: number;
 }
 
+interface JoinRelationship {
+  from: string;
+  to: string;
+  join_type: string;
+}
+
 interface IngredientMapPaneProps {
   itemId: string;
 }
@@ -97,6 +103,7 @@ function TableCard({ table }: { table: IngredientTable }) {
  */
 export default function IngredientMapPane({ itemId }: IngredientMapPaneProps) {
   const [tables, setTables] = useState<IngredientTable[]>([]);
+  const [joinRelationships, setJoinRelationships] = useState<JoinRelationship[]>([]);
   const [loading, setLoading] = useState(true);
   const [dbConnected, setDbConnected] = useState(false);
 
@@ -107,6 +114,7 @@ export default function IngredientMapPane({ itemId }: IngredientMapPaneProps) {
         if (res.ok) {
           const data = await res.json();
           setTables(data.tables ?? []);
+          setJoinRelationships(data.join_relationships ?? []);
           setDbConnected(data.db_connected ?? false);
         }
       } catch { /* ignore */ }
@@ -181,20 +189,20 @@ export default function IngredientMapPane({ itemId }: IngredientMapPaneProps) {
                   Join Relationships
                 </span>
               </div>
-              <div className="space-y-1 text-xs text-gray-500">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-emerald-400/60">fm.facility_id</span>
-                  <ArrowRight className="w-3 h-3" />
-                  <span className="font-mono text-emerald-400/60">cs.facility_id</span>
-                  <span className="text-[10px] text-gray-600">(INNER)</span>
+              {joinRelationships.length > 0 ? (
+                <div className="space-y-1 text-xs text-gray-500">
+                  {joinRelationships.map((j, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <span className="font-mono text-emerald-400/60">{j.from}</span>
+                      <ArrowRight className="w-3 h-3" />
+                      <span className="font-mono text-emerald-400/60">{j.to}</span>
+                      <span className="text-[10px] text-gray-600">({j.join_type})</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-emerald-400/60">fm.lob_segment_id</span>
-                  <ArrowRight className="w-3 h-3" />
-                  <span className="font-mono text-blue-400/60">ebt.managed_segment_id</span>
-                  <span className="text-[10px] text-gray-600">(LEFT)</span>
-                </div>
-              </div>
+              ) : (
+                <p className="text-[10px] text-gray-600 italic">Join relationships inferred from data model</p>
+              )}
             </div>
 
             {/* Legend */}

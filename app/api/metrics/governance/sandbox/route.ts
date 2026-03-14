@@ -4,6 +4,56 @@ import { executeSandboxQuery, getLatestAsOfDate } from '@/lib/governance/sandbox
 import { validateFormulaSql } from '@/lib/governance/validation';
 import { parseGovernanceUser } from '@/lib/governance/identity';
 
+async function persistSandboxRun(params: {
+  item_id: string;
+  run_by_id: string | null;
+  run_by_name: string | null;
+  level: string;
+  as_of_date: string;
+  current_sql: string;
+  proposed_sql: string;
+  current_row_count: number;
+  proposed_row_count: number;
+  current_total: number;
+  proposed_total: number;
+  reconciliation_pass: boolean;
+  duration_ms: number | null;
+  result_snapshot: Record<string, unknown>;
+}): Promise<void> {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return;
+  const { default: pg } = await import('pg');
+  const client = new pg.Client({ connectionString: dbUrl });
+  try {
+    await client.connect();
+    await client.query(
+      `INSERT INTO l3.metric_sandbox_run (
+        item_id, run_by_id, run_by_name, level, as_of_date,
+        current_sql, proposed_sql, current_row_count, proposed_row_count,
+        current_total, proposed_total, reconciliation_pass, duration_ms, result_snapshot
+      ) VALUES ($1, $2, $3, $4, $5::date, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+      [
+        params.item_id,
+        params.run_by_id,
+        params.run_by_name,
+        params.level,
+        params.as_of_date,
+        params.current_sql,
+        params.proposed_sql,
+        params.current_row_count,
+        params.proposed_row_count,
+        params.current_total,
+        params.proposed_total,
+        params.reconciliation_pass,
+        params.duration_ms,
+        JSON.stringify(params.result_snapshot),
+      ],
+    );
+  } finally {
+    await client.end();
+  }
+}
+
 /**
  * POST /api/metrics/governance/sandbox
  *
@@ -99,6 +149,45 @@ export async function POST(req: NextRequest) {
 
     // Parse user for sandbox run logging
     const user = parseGovernanceUser(req);
+
+    // Persist sandbox run for audit (fire-and-forget)
+    const proposedTotal = proposedData.rows.reduce(
+      (sum, r) => sum + (Number(r.metric_value) || 0),
+      0,
+    );
+    const currentTotal = currentData.rows.reduce(
+      (sum, r) => sum + (Number(r.metric_value) || 0),
+      0,
+    );
+    const reconciliationPass = changes.length === 0 || (
+      currentData.row_count > 0 &&
+      changes.length / Math.max(allKeys.size, 1) < 0.1
+    );
+    const durationMs = currentResult.status === 'fulfilled' && proposedResult.status === 'fulfilled'
+      ? (currentResult.value.durationMs ?? 0) + (proposedResult.value.durationMs ?? 0)
+      : null;
+
+    persistSandboxRun({
+      item_id: item_id,
+      run_by_id: user?.user_id ?? null,
+      run_by_name: user?.display_name ?? null,
+      level,
+      as_of_date: resolvedDate,
+      current_sql: current_sql,
+      proposed_sql: proposed_sql,
+      current_row_count: currentData.row_count,
+      proposed_row_count: proposedData.row_count,
+      current_total: currentTotal,
+      proposed_total: proposedTotal,
+      reconciliation_pass: reconciliationPass,
+      duration_ms: durationMs,
+      result_snapshot: {
+        total_keys: allKeys.size,
+        matching: allKeys.size - changes.length,
+        changed: changes.length,
+        changes: changes.slice(0, 50),
+      },
+    }).catch((err) => console.error('[governance] Failed to persist sandbox run:', err));
 
     return jsonSuccess({
       item_id,

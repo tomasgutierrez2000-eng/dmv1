@@ -108,8 +108,8 @@ export function validateFormulaSql(sql: string): SqlValidationResult {
     }
   }
 
-  // Warn about common issues
-  if (!upper.includes('AS DIMENSION_KEY') && !upper.includes('AS METRIC_VALUE')) {
+  // Warn about common issues (case-insensitive: dimension_key and metric_value)
+  if (!upper.includes('DIMENSION_KEY') || !upper.includes('METRIC_VALUE')) {
     warnings.push('Formula should alias result columns as dimension_key and metric_value');
   }
 

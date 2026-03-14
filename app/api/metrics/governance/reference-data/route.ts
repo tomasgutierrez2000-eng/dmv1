@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { jsonSuccess, jsonError, withErrorHandling } from '@/lib/api-response';
-import { fetchReferenceData, getLatestAsOfDate } from '@/lib/governance/sandbox-runner';
+import { fetchReferenceData, getLatestAsOfDate, getAvailableAsOfDates } from '@/lib/governance/sandbox-runner';
 
 /**
  * GET /api/metrics/governance/reference-data?type=segments|products|portfolios|dates
@@ -49,8 +49,11 @@ export async function GET(req: NextRequest) {
       }
 
       case 'dates': {
-        const latestDate = await getLatestAsOfDate();
-        return jsonSuccess({ type: 'dates', latest: latestDate });
+        const [latestDate, available] = await Promise.all([
+          getLatestAsOfDate(),
+          getAvailableAsOfDates(30),
+        ]);
+        return jsonSuccess({ type: 'dates', latest: latestDate, available });
       }
 
       default:

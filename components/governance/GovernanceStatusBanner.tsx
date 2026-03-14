@@ -18,7 +18,10 @@ interface GovernanceStatusBannerProps {
   itemId: string;
   currentStatus: GovernanceStatus;
   lastEditorId?: string | null;
+  lastEditorName?: string | null;
   onStatusChange?: (newStatus: GovernanceStatus) => void;
+  /** Called when API returns 401 (identity required). Use to open identity setup modal. */
+  onIdentityRequired?: () => void;
 }
 
 /**
@@ -29,7 +32,9 @@ export default function GovernanceStatusBanner({
   itemId,
   currentStatus,
   lastEditorId,
+  lastEditorName,
   onStatusChange,
+  onIdentityRequired,
 }: GovernanceStatusBannerProps) {
   const [showActions, setShowActions] = useState(false);
   const [showReasonModal, setShowReasonModal] = useState(false);
@@ -72,6 +77,9 @@ export default function GovernanceStatusBanner({
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        if (res.status === 401 && body.code === 'IDENTITY_REQUIRED') {
+          onIdentityRequired?.();
+        }
         throw new Error(body.error || `HTTP ${res.status}`);
       }
 
@@ -92,20 +100,20 @@ export default function GovernanceStatusBanner({
     } finally {
       setSubmitting(false);
     }
-  }, [pendingTransition, user, reason, itemId, currentStatus, toast, onStatusChange]);
+  }, [pendingTransition, user, reason, itemId, currentStatus, toast, onStatusChange, onIdentityRequired]);
 
   return (
     <>
-      <div className={`flex items-center justify-between px-4 py-2.5 rounded-lg border ${statusColors.bg} ${statusColors.border}`}>
+      <div className={`flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 rounded-lg border ${statusColors.bg} ${statusColors.border}`}>
         <div className="flex items-center gap-3">
           <Shield className={`w-4 h-4 ${statusColors.text}`} />
           <span className={`text-sm font-semibold ${statusColors.text}`}>
             {STATUS_LABELS[currentStatus]}
           </span>
-          {lastEditorId && (
+          {(lastEditorId || lastEditorName) && (
             <span className="flex items-center gap-1 text-xs text-gray-500">
               <User className="w-3 h-3" />
-              Last edit: {lastEditorId}
+              Last edit: {lastEditorName ?? lastEditorId}
             </span>
           )}
         </div>

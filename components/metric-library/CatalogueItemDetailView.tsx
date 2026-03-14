@@ -106,7 +106,11 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
               </span>
             ))}
             {item.regulatory_references?.map((ref) => (
-              <span key={ref} className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 font-mono">
+              <span
+                key={ref}
+                className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 font-mono"
+                title="SR 11-7 / BCBS 239 traceability"
+              >
                 {ref}
               </span>
             ))}

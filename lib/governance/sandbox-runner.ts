@@ -134,7 +134,27 @@ export async function executeCalculatorQuery(
 }
 
 /**
+ * Substitute :param bind parameters with safe literals for PREPARE validation.
+ * PostgreSQL PREPARE does not support :param style; we use placeholder values.
+ */
+function substituteBindParamsForValidation(sql: string): string {
+  const KNOWN_PARAMS: Record<string, string> = {
+    as_of_date: "'2025-01-31'::date",
+    as_of: "'2025-01-31'::date",
+  };
+  let result = sql;
+  for (const [name, literal] of Object.entries(KNOWN_PARAMS)) {
+    const re = new RegExp(`:${name}\\b`, 'g');
+    result = result.replace(re, literal);
+  }
+  // Replace any remaining :param with NULL for validation (syntax check only)
+  result = result.replace(/:([a-zA-Z_][a-zA-Z0-9_]*)/g, 'NULL');
+  return result;
+}
+
+/**
  * Run a SQL PREPARE to validate syntax without executing.
+ * Substitutes :param bind parameters with safe literals so PREPARE succeeds.
  * Returns { valid, error? }.
  */
 export async function validateSqlSyntax(
@@ -146,7 +166,8 @@ export async function validateSqlSyntax(
   try {
     await client.query(`SET statement_timeout = 10000`); // 10s for validation
     const stmtName = `_validate_${Date.now()}`;
-    await client.query(`PREPARE ${stmtName} AS ${sql}`);
+    const sqlForPrepare = substituteBindParamsForValidation(sql);
+    await client.query({ text: `PREPARE ${stmtName} AS $1`, values: [sqlForPrepare] });
     await client.query(`DEALLOCATE ${stmtName}`);
     return { valid: true };
   } catch (err) {
@@ -170,6 +191,25 @@ export async function getLatestAsOfDate(): Promise<string | null> {
     return result.rows[0]?.latest as string | null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Get available as_of_dates for date picker (most recent first).
+ */
+export async function getAvailableAsOfDates(limit = 30): Promise<string[]> {
+  try {
+    const result = await executeSandboxQuery(
+      `SELECT DISTINCT as_of_date::text AS d
+       FROM l2.collateral_snapshot
+       ORDER BY as_of_date DESC
+       LIMIT ${Math.min(limit, 100)}`,
+      {},
+      { maxRows: limit, timeoutMs: 5000 },
+    );
+    return result.rows.map((r) => r.d as string);
+  } catch {
+    return [];
   }
 }
 

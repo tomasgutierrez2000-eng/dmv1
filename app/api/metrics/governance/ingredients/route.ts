@@ -3,6 +3,52 @@ import { jsonSuccess, jsonError, withErrorHandling } from '@/lib/api-response';
 import { getCatalogueItem } from '@/lib/metric-library/store';
 import { executeSandboxQuery } from '@/lib/governance/sandbox-runner';
 
+function tableAlias(table: string): string {
+  return table
+    .split('_')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 3)
+    .toLowerCase() || table.slice(0, 2);
+}
+
+function inferJoinRelationships(
+  tables: Array<{ key: string; layer: string; table: string; fields: Array<{ field: string }> }>,
+): Array<{ from: string; to: string; join_type: string }> {
+  const seen = new Set<string>();
+  const joins: Array<{ from: string; to: string; join_type: string }> = [];
+  const tableFields = new Map<string, Set<string>>();
+  for (const t of tables) {
+    const fields = new Set(t.fields.map((f) => f.field));
+    tableFields.set(t.table, fields);
+  }
+
+  for (const t1 of tables) {
+    for (const t2 of tables) {
+      if (t1.key === t2.key) continue;
+      const f1 = tableFields.get(t1.table);
+      const f2 = tableFields.get(t2.table);
+      if (!f1 || !f2) continue;
+      for (const field of f1) {
+        if (!field.endsWith('_id')) continue;
+        if (f2.has(field)) {
+          const a1 = tableAlias(t1.table);
+          const a2 = tableAlias(t2.table);
+          const key = [a1, field, a2].join('|');
+          if (seen.has(key)) continue;
+          seen.add(key);
+          joins.push({
+            from: `${a1}.${field}`,
+            to: `${a2}.${field}`,
+            join_type: 'INNER',
+          });
+        }
+      }
+    }
+  }
+  return joins;
+}
+
 /**
  * GET /api/metrics/governance/ingredients?item_id=MET-109
  *
@@ -60,10 +106,14 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Infer join relationships from shared _id fields across tables
+    const joinRelationships = inferJoinRelationships(tables);
+
     return jsonSuccess({
       item_id: itemId,
       item_name: item.item_name,
       tables,
+      join_relationships: joinRelationships,
       db_connected: !!process.env.DATABASE_URL,
     });
   });

@@ -190,6 +190,7 @@ function buildLevelDefinition(
   sourcing_type: 'Raw' | 'Calc' | 'Agg' | 'Avg';
   level_logic: string;
   source_references: Array<{ layer: 'L1' | 'L2' | 'L3'; table: string; field: string; description: string }>;
+  formula_sql?: string;
 } {
   const formula = metric.levels[level];
   const sourcing = formula ? aggregationToSourcing(formula.aggregation_type) : 'Calc';
@@ -206,6 +207,7 @@ function buildLevelDefinition(
     sourcing_type: sourcing,
     level_logic: levelLogic,
     source_references: sourceRefs,
+    formula_sql: formula?.formula_sql ?? undefined,
   };
 }
 

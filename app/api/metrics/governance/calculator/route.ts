@@ -2,6 +2,11 @@ import { NextRequest } from 'next/server';
 import { jsonSuccess, jsonError, withErrorHandling } from '@/lib/api-response';
 import { executeSandboxQuery, getLatestAsOfDate } from '@/lib/governance/sandbox-runner';
 import { validateFormulaSql } from '@/lib/governance/validation';
+import {
+  DRILL_HIERARCHY, CHILD_LEVEL, POSITION_QUERY,
+  buildDrillDownSqlSafe, buildLabelSql,
+  type DrillLevel,
+} from '@/lib/governance/drill-down';
 
 /**
  * POST /api/metrics/governance/calculator
@@ -27,11 +32,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { sql, as_of_date, level, max_rows } = body as {
+    const { sql, as_of_date, level, max_rows, drill_down } = body as {
       sql?: string;
       as_of_date?: string;
       level?: string;
       max_rows?: number;
+      drill_down?: {
+        parent_level: string;
+        parent_dim_key: string;
+      };
     };
 
     if (!sql || typeof sql !== 'string') {
@@ -60,20 +69,90 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Determine effective SQL and params
+    let effectiveSql = sql;
+    const params: Record<string, unknown> = { as_of_date: resolvedDate };
+    let childLevel: string | null = null;
+
+    if (drill_down) {
+      const { parent_level, parent_dim_key } = drill_down;
+
+      // Validate parent_level
+      if (!DRILL_HIERARCHY.includes(parent_level as DrillLevel)) {
+        return jsonError(`Invalid parent_level: ${parent_level}`, {
+          status: 400,
+          code: 'VALIDATION_ERROR',
+        });
+      }
+      if (parent_level === 'position') {
+        return jsonError('Cannot drill down from position level', {
+          status: 400,
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      childLevel = CHILD_LEVEL[parent_level] ?? null;
+      params.parent_key = parent_dim_key;
+
+      if (childLevel === 'position') {
+        // Leaf level: use direct position query
+        effectiveSql = POSITION_QUERY;
+      } else {
+        // Wrap the child formula SQL with a parent filter
+        effectiveSql = buildDrillDownSqlSafe(sql, parent_level as DrillLevel);
+      }
+
+      // Re-validate the wrapped SQL
+      const wrappedValidation = validateFormulaSql(effectiveSql);
+      if (!wrappedValidation.valid) {
+        return jsonError(wrappedValidation.error ?? 'Invalid wrapped SQL', {
+          status: 400,
+          code: 'VALIDATION_ERROR',
+          details: wrappedValidation.warnings.join('; '),
+        });
+      }
+    }
+
     // Execute
-    const maxRows = Math.min(max_rows ?? 1000, 5000);
+    const maxRows = Math.min(max_rows ?? (drill_down ? 200 : 1000), 5000);
     const result = await executeSandboxQuery(
-      sql,
-      { as_of_date: resolvedDate },
+      effectiveSql,
+      params,
       { maxRows, timeoutMs: 30_000 },
     );
 
+    // Resolve labels for child-level dimension keys
+    let rows = result.rows;
+    const targetLevel = childLevel ?? level ?? null;
+    if (targetLevel && rows.length > 0) {
+      const labelSql = buildLabelSql(targetLevel as DrillLevel);
+      if (labelSql) {
+        try {
+          const labelResult = await executeSandboxQuery(
+            labelSql,
+            { as_of_date: resolvedDate },
+            { maxRows: 5000, timeoutMs: 5_000 },
+          );
+          const labelMap = new Map<string, string>();
+          for (const lr of labelResult.rows) {
+            labelMap.set(String(lr.dim_key ?? ''), String(lr.dim_label ?? ''));
+          }
+          rows = rows.map(r => ({
+            ...r,
+            dimension_label: labelMap.get(String(r.dimension_key ?? '')) ?? undefined,
+          }));
+        } catch {
+          // Label resolution is best-effort; don't fail the request
+        }
+      }
+    }
+
     return jsonSuccess({
-      rows: result.rows,
+      rows,
       row_count: result.rowCount,
       duration_ms: result.durationMs,
       as_of_date: resolvedDate,
-      level: level ?? null,
+      level: targetLevel,
       truncated: result.rowCount > maxRows,
       warnings: validation.warnings,
     });

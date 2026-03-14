@@ -72,7 +72,7 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T51', name: 'facility_financial_calc',            category: 'Facility Analytics',                      tier: 1 },
   { id: 'T52', name: 'facility_exposure_calc',             category: 'Exposure & Risk Metrics',                 tier: 1 },
   // T53-T54: Promoted from L2 (entirely computed tables)
-  { id: 'T53', name: 'data_quality_score_snapshot',        category: 'Data Quality',                            tier: 1 },
+  { id: 'T53', name: 'data_quality_score_calc',             category: 'Data Quality',                            tier: 1 },
   { id: 'T54', name: 'facility_stress_test_calc',          category: 'Stress Testing',                          tier: 1 },
   // T55-T56: Additional calculated overlay tables (derived fields split from L2 snapshots)
   { id: 'T55', name: 'facility_risk_calc',                  category: 'Exposure & Risk Metrics',                 tier: 1 },
@@ -96,7 +96,7 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T69', name: 'watchlist_movement_summary',           category: 'Watchlist',                               tier: 2 },
 
   // ── Capital Metrics (migration 002-capital-metrics) ──
-  { id: 'T70', name: 'stress_test_result',                   category: 'Stress Testing',                          tier: 1 },
+  { id: 'T70', name: 'stress_test_result_calc',              category: 'Stress Testing',                          tier: 1 },
   { id: 'T71', name: 'facility_rwa_calc',                    category: 'Capital & Equity',                        tier: 1 },
   { id: 'T72', name: 'capital_binding_constraint',           category: 'Capital & Equity',                        tier: 1 },
   { id: 'T73', name: 'facility_capital_consumption',         category: 'Capital & Equity',                        tier: 2 },

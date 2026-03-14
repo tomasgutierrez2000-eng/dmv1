@@ -370,12 +370,12 @@ export function getMvpFacilityField(
       return entry.isRevolving || rng() < 0.6 ? '2025-04-30' : '9999-12-31';
     case 'payment_frequency':
       return seededPick(rng, ['QUARTERLY', 'MONTHLY', 'QUARTERLY']);
-    case 'prepayment_penalty_flag': return rng() < 0.3 ? 'Y' : 'N';
+    case 'is_prepayment_penalty_flag': return rng() < 0.3 ? 'Y' : 'N';
     case 'product_id': return productNodeId;
     case 'rate_cap_pct': return Math.round((7 + rng() * 3) * 100) / 100;
     case 'rate_floor_pct': return Math.round((0.5 + rng() * 1.5) * 100) / 100;
     case 'region_code': return region;
-    case 'revolving_flag': return entry.isRevolving ? 'Y' : 'N';
+    case 'is_revolving_flag': return entry.isRevolving ? 'Y' : 'N';
     default: return null;
   }
 }

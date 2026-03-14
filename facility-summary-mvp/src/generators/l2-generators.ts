@@ -91,7 +91,7 @@ export const generateL2Data = (l1: L1Data): L2Data => {
           : primaryLegalEntity;
 
       // Number of loans: revolving facilities have 1, term loans 1-3
-      const numberOfLoans = facility.revolving_flag ? 1 : 1 + (index % 3);
+      const numberOfLoans = facility.is_revolving_flag ? 1 : 1 + (index % 3);
 
       // RWA: risk-weight based on counterparty rating (50-150% of EAD)
       const rwaAmt = ead * riskWeightForRating(riskRating);

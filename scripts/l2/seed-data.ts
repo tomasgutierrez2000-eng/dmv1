@@ -1082,7 +1082,7 @@ export function getL2SeedValue(
       if (columnName === 'notional_amount') return committed(idx);
       if (columnName === 'pd_estimate') return String(pd(idx));
       if (columnName === 'position_currency') return currency(idx);
-      if (columnName === 'trading_banking_book_flag') return 'B';
+      if (columnName === 'is_trading_banking_book_flag') return 'B';
       if (columnName === 'ultimate_parent_id') return cid(idx);
       if (columnName === 'product_node_id') return fid(idx);
       break;
@@ -1238,7 +1238,7 @@ export function getL2SeedValue(
       if (columnName === 'mitigant_group_code') return pick(MITIGANT_GROUPS_BASE, fid(idx) - 1);
       if (columnName === 'mitigant_subtype') return pick(MITIGANT_SUBTYPES_BASE, fid(idx) - 1);
       if (columnName === 'original_valuation_usd') return Math.round(val * 1.05);
-      if (columnName === 'risk_shifting_flag') return 'N';
+      if (columnName === 'is_risk_shifting_flag') return 'N';
       break;
     }
 
@@ -1296,7 +1296,7 @@ export function getL2SeedValue(
       if (columnName === 'as_of_date') return AS_OF;
       if (columnName === 'credit_status_code') return creditStatusId(idx);
       if (columnName === 'days_past_due') return d;
-      if (columnName === 'watch_list_flag') return isWatch ? 'Y' : 'N';
+      if (columnName === 'is_watch_list_flag') return isWatch ? 'Y' : 'N';
       if (columnName === 'counterparty_id') return cid(idx);
       if (columnName === 'currency_code') return currency(idx);
       if (columnName === 'days_past_due_max') return d;
@@ -1324,7 +1324,7 @@ export function getL2SeedValue(
       if (columnName === 'facility_pricing_id') return i;
       if (columnName === 'min_spread_threshold_bps') return pick([100, 125, 150, 100, 200, 75, 125, 100, 150, 75], fid(idx) - 1);
       if (columnName === 'payment_frequency') return fid(idx) % 2 === 0 ? 'MONTHLY' : 'QUARTERLY';
-      if (columnName === 'prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
+      if (columnName === 'is_prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
       if (columnName === 'rate_cap_pct') return pick([12.00, 10.00, 12.00, 10.00, 14.00, 9.00, 12.00, 10.00, 12.00, 8.00], fid(idx) - 1);
       if (columnName === 'rate_index_code') return pick(['SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR', 'SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR'], fid(idx) - 1);
       break;

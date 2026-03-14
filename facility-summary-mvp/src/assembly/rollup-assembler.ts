@@ -147,7 +147,7 @@ export const assembleRollups = (
     const avgCoverageRatio = weightedAverage(coverageRatios, exposures);
     const avgRiskRating = weightedAverage(riskRatings, exposures);
 
-    const exceptionCount = facilities.filter((f) => f.below_threshold_flag).length;
+    const exceptionCount = facilities.filter((f) => f.is_below_threshold_flag).length;
     const delinquentCount = facilities.filter((f) => f.is_delinquent).length;
     const delinquencyRate =
       facilities.length > 0 ? delinquentCount / facilities.length : 0;
@@ -230,7 +230,7 @@ export const assembleRollups = (
     const rwaDensityPct = totalEad > 0 ? (totalRwa / totalEad) * 100 : 0;
     const avgReturnOnRwa = totalRwa > 0 ? (totalRevenue / totalRwa) * 100 : 0;
     const pricingExceptionCount = facilities.filter(
-      (f) => f.pricing_exception_flag
+      (f) => f.is_pricing_exception_flag
     ).length;
 
     // Concentration

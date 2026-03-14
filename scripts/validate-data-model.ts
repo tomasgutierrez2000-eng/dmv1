@@ -985,19 +985,19 @@ function validateLayerConventions(ddLookup: DDLookup): CheckResult[] {
     results.push(check('8.3', 8, '_pct precision NUMERIC(10,6)', issues, issues.length > 0 ? 'WARN' : 'PASS'));
   }
 
-  // 8.4 No is_active_flag (must use active_flag)
+  // 8.4 No bare active_flag (must use is_active_flag)
   {
     const issues: string[] = [];
     for (const layer of ['L1', 'L2', 'L3'] as const) {
       for (const table of dd[layer]) {
         for (const field of table.fields) {
-          if (field.name === 'is_active_flag') {
-            issues.push(`${layer}.${table.name}.is_active_flag: should be active_flag`);
+          if (field.name === 'active_flag') {
+            issues.push(`${layer}.${table.name}.active_flag: should be is_active_flag`);
           }
         }
       }
     }
-    results.push(check('8.4', 8, 'No is_active_flag naming', issues));
+    results.push(check('8.4', 8, 'No bare active_flag naming', issues));
   }
 
   // 8.5 No effective_from_date / effective_to_date (must use effective_start/end_date)

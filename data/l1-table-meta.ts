@@ -89,15 +89,23 @@ export const L1_TABLE_META: L1TableMeta[] = [
   { name: 'forbearance_type_dim', scd: 'SCD-0', category: 'Credit Events / Amendments' },
   { name: 'watchlist_category_dim', scd: 'SCD-0', category: 'Credit Risk Status' },
   { name: 'basel_exposure_type_dim', scd: 'SCD-0', category: 'Capital & Equity' }, // Basel III exposure classes (migration 002)
-  { name: 'regulatory_capital_requirement', scd: 'SCD-1', category: 'Capital & Equity' }, // Fed-published capital reqs (migration 002)
+  { name: 'regulatory_capital_requirement', scd: 'SCD-1', category: 'Capital & Equity' }, // Fed-published capital reqs (migration 002). EXCEPTION: 5 total_*_req_pct fields are additive sums kept in L1 because the Fed publishes these totals directly in GSIB disclosures.
 
   // ── Accepted L1→L2 FK exceptions ──
-  // These L1 tables reference L2 masters. This is an accepted architectural exception
-  // because counterparty, legal_entity, and instrument_master are operational masters
-  // that L1 configuration must reference. Documented per GSIB data model review.
-  // Affected tables: sccl_counterparty_group_member (→ l2.counterparty),
-  //                  instrument_identifier (→ l2.instrument_master),
-  //                  capital_allocation (→ l2.legal_entity)
+  // These L1 tables reference L2 operational masters. This is an accepted architectural
+  // exception: counterparty, legal_entity, and instrument_master are foundational entities
+  // that sit in L2 due to SCD-2 versioning but serve as reference points for L1 config.
+  // Pattern: CONFIG_TO_MASTER / REFERENCE_TO_MASTER — L1 configuration tables
+  // legitimately reference L2 masters for entity-keyed lookups.
+  //
+  // Affected tables:
+  //   sccl_counterparty_group_member  → l2.counterparty          (group membership)
+  //   instrument_identifier           → l2.instrument_master      (identifier mapping)
+  //   reporting_entity_dim            → l2.legal_entity           (reporting view)
+  //   capital_allocation              → l2.legal_entity           (allocation config)
+  //   regulatory_capital_requirement  → l2.legal_entity           (Fed capital reqs)
+  //
+  // Reviewed and accepted per GSIB data model audit (2026-03).
 ];
 
 /** Lookup helper. Returns undefined if table has no metadata entry. */

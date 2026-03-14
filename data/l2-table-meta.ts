@@ -59,6 +59,7 @@ export const L2_TABLE_META: L2TableMeta[] = [
   { name: 'financial_metric_observation', scd: 'Snapshot', category: 'Metrics' },
   { name: 'counterparty_financial_snapshot', scd: 'Snapshot', category: 'Financial Metrics' },
   { name: 'facility_risk_snapshot', scd: 'Snapshot', category: 'Risk Monitoring' },
+  { name: 'duns_entity_observation', scd: 'Snapshot', category: 'External Data' },
 
   // ── Events ──
   { name: 'amendment_change_detail', scd: 'Event', category: 'Amendments' },

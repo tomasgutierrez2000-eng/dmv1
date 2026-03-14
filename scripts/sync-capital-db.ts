@@ -34,7 +34,7 @@ const CAPITAL_ONLY_COLUMNS = new Set([
   'l2.facility_master.profit_center_code',
   'l2.facility_risk_snapshot.risk_weight_std_pct',
   'l2.facility_risk_snapshot.risk_weight_erba_pct',
-  'l2.facility_risk_snapshot.defaulted_flag',
+  'l2.facility_risk_snapshot.is_defaulted_flag',
   'l2.facility_risk_snapshot.basel_exposure_type_id',
 ]);
 

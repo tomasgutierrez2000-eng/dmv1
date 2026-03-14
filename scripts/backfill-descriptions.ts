@@ -57,7 +57,6 @@ function inferDescription(fieldName: string, tableName: string, layer: string): 
     record_source: 'Source system or feed that provided this record',
     load_timestamp: 'Timestamp when the record was loaded by ETL',
     record_hash: 'SHA-256 hash of business-critical fields for integrity verification',
-    active_flag: 'Whether this record is currently active',
     is_active_flag: 'Whether this record is currently active',
   };
   if (auditFields[fieldName]) return auditFields[fieldName];

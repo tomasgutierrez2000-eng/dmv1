@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-12T06:24:37.606Z",
+  "createdAt": "2026-03-14T02:16:32.952Z",
   "tables": [
     {
       "layer": "L1",
@@ -18,7 +18,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "is_financial_institution_flag"
@@ -34,6 +34,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -57,7 +60,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -70,6 +73,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -112,6 +118,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -141,7 +159,7 @@
           "name": "effective_start_date"
         },
         {
-          "name": "included_flag"
+          "name": "is_included_flag"
         },
         {
           "name": "member_role_code"
@@ -163,6 +181,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -205,6 +226,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -225,7 +249,7 @@
           "name": "effective_end_date"
         },
         {
-          "name": "eligible_flag"
+          "name": "is_eligible_flag"
         },
         {
           "name": "jurisdiction_code"
@@ -247,6 +271,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -292,6 +322,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -312,7 +348,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -349,6 +385,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -369,7 +417,7 @@
           "name": "effective_end_date"
         },
         {
-          "name": "eligible_flag"
+          "name": "is_eligible_flag"
         },
         {
           "name": "jurisdiction_code"
@@ -394,6 +442,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -414,7 +468,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "basel_recognition_method"
@@ -423,7 +477,7 @@
           "name": "crm_category"
         },
         {
-          "name": "eligible_flag"
+          "name": "is_eligible_flag"
         },
         {
           "name": "risk_mitigant_subtype_code"
@@ -433,6 +487,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -453,13 +510,13 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "display_order"
         },
         {
-          "name": "eligible_flag"
+          "name": "is_eligible_flag"
         },
         {
           "name": "mitigant_category"
@@ -478,6 +535,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -535,6 +595,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -558,7 +624,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "direction"
@@ -592,6 +658,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -618,7 +690,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "consolidation_basis"
@@ -649,6 +721,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -703,6 +778,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -772,6 +850,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -844,6 +934,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -864,7 +966,7 @@
           "name": "lob_segment_id"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "portfolio_name_override"
@@ -880,6 +982,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -903,7 +1017,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "lob_segment_id"
@@ -919,6 +1033,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -939,7 +1065,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -952,6 +1078,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -978,7 +1107,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "default_flag"
+          "name": "is_default_flag"
         },
         {
           "name": "effective_start_date"
@@ -1015,6 +1144,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1078,6 +1210,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1098,16 +1233,16 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
-          "name": "default_flag"
+          "name": "is_default_flag"
         },
         {
           "name": "display_color_hex"
         },
         {
-          "name": "investment_grade_flag"
+          "name": "is_investment_grade_flag"
         },
         {
           "name": "pd_implied"
@@ -1129,6 +1264,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1149,7 +1287,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "priority_rank"
@@ -1168,6 +1306,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1185,10 +1335,10 @@
           "name": "credit_event_type_name"
         },
         {
-          "name": "default_trigger_flag"
+          "name": "is_default_trigger_flag"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -1201,6 +1351,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1215,7 +1368,7 @@
           "name": "credit_status_name"
         },
         {
-          "name": "default_flag"
+          "name": "is_default_flag"
         },
         {
           "name": "delinquency_bucket"
@@ -1234,6 +1387,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1254,7 +1410,7 @@
           "name": "is_terminal_flag"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -1267,6 +1423,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1284,7 +1443,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -1297,6 +1456,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1320,7 +1482,7 @@
           "name": "days_past_due_threshold"
         },
         {
-          "name": "credit_event_trigger_flag"
+          "name": "is_credit_event_trigger_flag"
         },
         {
           "name": "materiality_threshold_amt"
@@ -1336,6 +1498,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1359,7 +1524,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "basel_exposure_class"
@@ -1368,7 +1533,7 @@
           "name": "ccf_pct"
         },
         {
-          "name": "off_balance_sheet_flag"
+          "name": "is_off_balance_sheet_flag"
         },
         {
           "name": "product_id"
@@ -1381,6 +1546,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1413,7 +1581,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "regulatory_scenario_code"
@@ -1435,6 +1603,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1458,7 +1638,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -1471,6 +1651,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1494,7 +1686,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "cessation_date"
@@ -1534,6 +1726,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1566,7 +1770,7 @@
           "name": "is_balance_sheet_flag"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "currency_code"
@@ -1603,6 +1807,12 @@
         },
         {
           "name": "normal_balance_indicator"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1684,6 +1894,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1726,6 +1939,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1749,7 +1965,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "bucket_end_days"
@@ -1768,6 +1984,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1797,10 +2016,10 @@
           "name": "cutoff_ts"
         },
         {
-          "name": "fiscal_quarter"
+          "name": "fiscal_quarter_date"
         },
         {
-          "name": "fiscal_year"
+          "name": "fiscal_year_date"
         },
         {
           "name": "is_period_end_flag"
@@ -1819,6 +2038,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1833,7 +2055,7 @@
           "name": "country_name"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "region_code"
@@ -1870,6 +2092,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1893,7 +2118,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "region_group_code"
@@ -1906,6 +2131,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1923,7 +2151,7 @@
           "name": "currency_symbol"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "iso_numeric"
@@ -1945,6 +2173,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -1971,7 +2202,7 @@
           "name": "parent_industry_id"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -1984,6 +2215,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2007,7 +2250,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "description"
@@ -2026,6 +2269,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2046,7 +2292,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "jurisdiction_id"
@@ -2062,6 +2308,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2146,6 +2395,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2172,7 +2424,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "calculation_rule_id"
@@ -2206,6 +2458,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2250,7 +2514,7 @@
           "name": "owner_org_unit_id"
         },
         {
-          "name": "regulatory_approved_flag"
+          "name": "is_regulatory_approved_flag"
         },
         {
           "name": "validation_status"
@@ -2260,6 +2524,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2283,7 +2550,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "approved_by"
@@ -2314,6 +2581,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2380,6 +2653,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2403,7 +2688,7 @@
           "name": "updated_ts"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "effective_start_date"
@@ -2425,6 +2710,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2473,6 +2764,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2496,7 +2799,7 @@
           "name": "system_owner"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -2509,6 +2812,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2541,7 +2856,7 @@
           "name": "owner_id"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "validation_check_id"
@@ -2557,6 +2872,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2592,7 +2919,7 @@
           "name": "effective_end_date"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "metric_domain"
@@ -2614,6 +2941,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2637,7 +2970,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -2650,6 +2983,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2670,7 +3006,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "spread_min_bps"
@@ -2689,6 +3025,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2715,7 +3054,7 @@
           "name": "effective_end_date"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "inner_threshold_pct"
@@ -2776,6 +3115,12 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2799,7 +3144,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -2812,6 +3157,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2835,7 +3183,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -2848,6 +3196,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2871,7 +3222,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -2884,6 +3235,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2907,7 +3261,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -2920,6 +3274,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2959,6 +3316,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -2982,7 +3345,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -2995,6 +3358,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3018,7 +3384,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "updated_ts"
@@ -3031,6 +3397,9 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3054,22 +3423,10 @@
           "name": "naics_code"
         },
         {
-          "name": "employee_count"
-        },
-        {
-          "name": "annual_revenue_amt"
-        },
-        {
           "name": "duns_country_code"
         },
         {
-          "name": "paydex_score"
-        },
-        {
           "name": "dnb_rating"
-        },
-        {
-          "name": "failure_score"
         },
         {
           "name": "is_out_of_business_flag"
@@ -3088,6 +3445,18 @@
         },
         {
           "name": "record_source"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3114,7 +3483,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -3127,6 +3496,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3147,7 +3519,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -3160,6 +3532,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3180,7 +3555,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -3193,6 +3568,18 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3216,7 +3603,7 @@
           "name": "display_order"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
@@ -3229,6 +3616,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3255,13 +3645,28 @@
           "name": "currency_code"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "created_ts"
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3295,6 +3700,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3364,6 +3775,21 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3444,7 +3870,7 @@
           "name": "position_currency"
         },
         {
-          "name": "trading_banking_book_flag"
+          "name": "is_trading_banking_book_flag"
         },
         {
           "name": "ultimate_parent_id"
@@ -3472,6 +3898,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3585,7 +4014,7 @@
           "name": "risk_weight_pct"
         },
         {
-          "name": "delinquent_payment_flag"
+          "name": "is_delinquent_payment_flag"
         },
         {
           "name": "overdue_amt_0_30"
@@ -3613,6 +4042,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3670,6 +4102,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3775,6 +4210,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3835,6 +4273,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3886,6 +4327,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3939,7 +4383,7 @@
           "name": "original_valuation_usd"
         },
         {
-          "name": "risk_shifting_flag"
+          "name": "is_risk_shifting_flag"
         },
         {
           "name": "updated_ts"
@@ -3961,6 +4405,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -3981,7 +4428,7 @@
           "name": "days_past_due"
         },
         {
-          "name": "watch_list_flag"
+          "name": "is_watch_list_flag"
         },
         {
           "name": "counterparty_id"
@@ -4011,7 +4458,7 @@
           "name": "overdue_principal_amt"
         },
         {
-          "name": "delinquent_payment_flag"
+          "name": "is_delinquent_payment_flag"
         },
         {
           "name": "overdue_amt_0_30"
@@ -4042,6 +4489,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4083,7 +4533,7 @@
           "name": "payment_frequency"
         },
         {
-          "name": "prepayment_penalty_flag"
+          "name": "is_prepayment_penalty_flag"
         },
         {
           "name": "rate_cap_pct"
@@ -4092,7 +4542,7 @@
           "name": "rate_index_code"
         },
         {
-          "name": "pricing_exception_flag"
+          "name": "is_pricing_exception_flag"
         },
         {
           "name": "pricing_exception_status"
@@ -4120,6 +4570,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4189,6 +4642,9 @@
         },
         {
           "name": "equity_allocation_pct"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4240,6 +4696,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4288,6 +4747,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4336,6 +4798,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4408,6 +4873,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4468,6 +4936,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4513,6 +4984,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4576,6 +5050,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4657,6 +5134,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4723,6 +5203,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4789,6 +5272,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4888,6 +5374,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -4945,6 +5434,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5017,6 +5509,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5104,6 +5599,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5175,10 +5673,13 @@
           "name": "risk_weight_erba_pct"
         },
         {
-          "name": "defaulted_flag"
+          "name": "is_defaulted_flag"
         },
         {
           "name": "basel_exposure_type_id"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5208,7 +5709,7 @@
           "name": "approved_amount"
         },
         {
-          "name": "exception_flag"
+          "name": "is_exception_flag"
         },
         {
           "name": "exception_type"
@@ -5245,6 +5746,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5386,6 +5890,9 @@
         },
         {
           "name": "pricing_tier_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5406,7 +5913,7 @@
           "name": "country_code"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "entity_type_code"
@@ -5458,6 +5965,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5475,7 +5985,7 @@
           "name": "currency_code"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "coupon_frequency"
@@ -5533,6 +6043,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5590,6 +6103,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5682,7 +6198,7 @@
           "name": "payment_frequency"
         },
         {
-          "name": "prepayment_penalty_flag"
+          "name": "is_prepayment_penalty_flag"
         },
         {
           "name": "product_id"
@@ -5697,10 +6213,10 @@
           "name": "region_code"
         },
         {
-          "name": "revolving_flag"
+          "name": "is_revolving_flag"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "effective_start_date"
@@ -5725,6 +6241,9 @@
         },
         {
           "name": "profit_center_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5788,6 +6307,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5857,6 +6379,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5871,7 +6396,7 @@
           "name": "netting_agreement_id"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "counterparty_id"
@@ -5914,6 +6439,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -5962,6 +6490,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6025,6 +6556,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6088,6 +6622,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6132,7 +6669,7 @@
           "name": "insurance_expiry_date"
         },
         {
-          "name": "insurance_flag"
+          "name": "is_insurance_flag"
         },
         {
           "name": "lien_priority"
@@ -6150,7 +6687,7 @@
           "name": "original_cost"
         },
         {
-          "name": "regulatory_eligible_flag"
+          "name": "is_regulatory_eligible_flag"
         },
         {
           "name": "revaluation_frequency"
@@ -6187,6 +6724,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6244,6 +6784,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6270,7 +6813,7 @@
           "name": "maturity_date"
         },
         {
-          "name": "enforceable_flag"
+          "name": "is_enforceable_flag"
         },
         {
           "name": "coverage_pct"
@@ -6307,6 +6850,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6367,6 +6913,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6390,7 +6939,7 @@
           "name": "description"
         },
         {
-          "name": "active_flag"
+          "name": "is_active_flag"
         },
         {
           "name": "mitigant_source_type"
@@ -6430,6 +6979,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6478,6 +7030,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6523,6 +7078,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6580,6 +7138,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6634,6 +7195,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6685,6 +7249,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6739,6 +7306,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6793,6 +7363,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6850,6 +7423,9 @@
         },
         {
           "name": "currency_code"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6907,6 +7483,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -6970,6 +7549,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7018,6 +7600,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7056,10 +7641,10 @@
           "name": "days_past_due"
         },
         {
-          "name": "significant_increase_flag"
+          "name": "is_significant_increase_flag"
         },
         {
-          "name": "credit_impaired_flag"
+          "name": "is_credit_impaired_flag"
         },
         {
           "name": "currency_code"
@@ -7075,6 +7660,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7138,6 +7726,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7201,6 +7792,9 @@
         },
         {
           "name": "record_hash"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7276,6 +7870,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7333,6 +7930,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7405,6 +8005,48 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        }
+      ]
+    },
+    {
+      "layer": "L2",
+      "tableName": "duns_entity_observation",
+      "fields": [
+        {
+          "name": "duns_number"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "paydex_score"
+        },
+        {
+          "name": "failure_score"
+        },
+        {
+          "name": "annual_revenue_amt"
+        },
+        {
+          "name": "employee_count"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7432,6 +8074,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7462,6 +8107,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7498,6 +8146,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7546,6 +8197,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7600,6 +8254,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7644,7 +8301,7 @@
           "name": "ead_amt"
         },
         {
-          "name": "stage_transfer_flag"
+          "name": "is_stage_transfer_flag"
         },
         {
           "name": "model_code"
@@ -7663,6 +8320,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7723,6 +8383,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7786,6 +8449,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7800,7 +8466,7 @@
           "name": "as_of_date"
         },
         {
-          "name": "pricing_exception_flag"
+          "name": "is_pricing_exception_flag"
         },
         {
           "name": "pricing_tier_code"
@@ -7822,6 +8488,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7858,6 +8527,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7909,6 +8581,9 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -7957,6 +8632,9 @@
         },
         {
           "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8044,6 +8722,12 @@
         },
         {
           "name": "attribution_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8125,6 +8809,12 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8184,7 +8874,7 @@
           "name": "hierarchy_id"
         },
         {
-          "name": "has_cross_entity_flag"
+          "name": "is_has_cross_entity_flag"
         },
         {
           "name": "cross_entity_exposure_amt"
@@ -8248,6 +8938,12 @@
         },
         {
           "name": "bank_revenue_amt"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8310,13 +9006,19 @@
           "name": "is_syndicated_flag"
         },
         {
-          "name": "has_amendment_flag"
+          "name": "is_has_amendment_flag"
         },
         {
           "name": "amendment_type_code"
         },
         {
           "name": "amendment_status_code"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8371,6 +9073,12 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8446,6 +9154,12 @@
         },
         {
           "name": "parent_group_code"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8494,6 +9208,12 @@
         },
         {
           "name": "parent_group_code"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8569,6 +9289,12 @@
         },
         {
           "name": "utilization_tier_code"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8608,6 +9334,12 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8662,6 +9394,12 @@
         },
         {
           "name": "hierarchy_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8704,6 +9442,12 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8736,7 +9480,7 @@
           "name": "event_count"
         },
         {
-          "name": "default_flag"
+          "name": "is_default_flag"
         },
         {
           "name": "charge_off_amt"
@@ -8770,6 +9514,12 @@
         },
         {
           "name": "estimated_exposure_impact_amt"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8815,6 +9565,12 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8860,6 +9616,12 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8899,6 +9661,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8932,6 +9700,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -8974,6 +9748,12 @@
         },
         {
           "name": "lob_node_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9016,6 +9796,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9042,7 +9828,7 @@
           "name": "severity_code"
         },
         {
-          "name": "result_flag"
+          "name": "is_result_flag"
         },
         {
           "name": "threshold_value"
@@ -9055,6 +9841,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9121,6 +9913,12 @@
         },
         {
           "name": "fr2590_category_code"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9169,6 +9967,12 @@
         },
         {
           "name": "fr2590_category_code"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9271,6 +10075,12 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9355,6 +10165,12 @@
         },
         {
           "name": "equity_allocation_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9415,6 +10231,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9484,6 +10306,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9541,6 +10369,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9586,6 +10420,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9652,6 +10492,12 @@
         },
         {
           "name": "doi_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9700,6 +10546,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9784,6 +10636,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9826,6 +10684,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9946,6 +10810,12 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -9994,6 +10864,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10036,6 +10912,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10084,6 +10966,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10116,7 +11004,7 @@
           "name": "net_exposure_amt"
         },
         {
-          "name": "has_cross_entity_flag"
+          "name": "is_has_cross_entity_flag"
         },
         {
           "name": "cross_entity_exposure_amt"
@@ -10150,6 +11038,12 @@
         },
         {
           "name": "rwa_density_pct"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10186,6 +11080,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10216,6 +11116,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10282,6 +11188,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10327,6 +11239,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10369,6 +11287,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10405,6 +11329,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10441,6 +11371,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10489,6 +11425,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10590,13 +11532,13 @@
           "name": "prepayment_penalty_desc"
         },
         {
-          "name": "has_amendment_flag"
+          "name": "is_has_amendment_flag"
         },
         {
           "name": "amendment_count"
         },
         {
-          "name": "facility_active_flag"
+          "name": "is_facility_active_flag"
         },
         {
           "name": "maturity_date_bucket"
@@ -10636,6 +11578,12 @@
         },
         {
           "name": "maturity_bucket_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10681,6 +11629,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10741,6 +11695,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10780,6 +11740,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10825,6 +11791,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10876,6 +11848,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -10942,6 +11920,12 @@
         },
         {
           "name": "dependency_chain"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11011,6 +11995,12 @@
         },
         {
           "name": "config_snapshot"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11062,6 +12052,12 @@
         },
         {
           "name": "checked_at"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11119,6 +12115,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11149,6 +12151,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11170,6 +12178,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11209,6 +12223,12 @@
         },
         {
           "name": "created_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11281,6 +12301,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11335,6 +12361,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11389,6 +12421,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11434,6 +12472,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11458,6 +12502,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11512,6 +12562,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     },
@@ -11566,6 +12622,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
         }
       ]
     }

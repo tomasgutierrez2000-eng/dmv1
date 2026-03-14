@@ -53,7 +53,7 @@ export interface FacilitySummary {
   all_in_rate_pct: number;
   rate_index_code: string;
   rate_cap_pct: number | null;
-  below_threshold_flag: boolean;
+  is_below_threshold_flag: boolean;
   prior_month_spread_bps: number;
   spread_change_bps: number;
 
@@ -65,7 +65,7 @@ export interface FacilitySummary {
   is_delinquent: boolean;
 
   // Enrichment fields - Pricing Exception
-  pricing_exception_flag: boolean;
+  is_pricing_exception_flag: boolean;
 
   // Enrichment fields - Profitability
   net_interest_income_amt: number;

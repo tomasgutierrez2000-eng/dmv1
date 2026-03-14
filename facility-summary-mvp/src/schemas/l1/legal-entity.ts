@@ -4,5 +4,5 @@ export interface LegalEntity {
   short_name: string;
   entity_type_code: string;
   country_code: string;
-  active_flag: boolean;
+  is_active_flag: boolean;
 }

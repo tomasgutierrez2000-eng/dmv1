@@ -194,7 +194,7 @@ export const generateL1Data = (): L1Data => {
     short_name: entity.shortName,
     entity_type_code: entity.type,
     country_code: index % 2 === 0 ? "US" : "GB",
-    active_flag: true,
+    is_active_flag: true,
   }));
 
   const industryDim: IndustryDim[] = INDUSTRIES.map((industry) => ({
@@ -242,7 +242,7 @@ export const generateL1Data = (): L1Data => {
       origination_date: originationDate,
       maturity_date: maturityDate,
       interest_rate_reference: pick(INTEREST_RATE_REFERENCES, i),
-      revolving_flag:
+      is_revolving_flag:
         pick(FACILITY_TYPES, i).includes("Revolving") ||
         pick(PRODUCTS, i).includes("Commitments"),
       currency_code: "USD",

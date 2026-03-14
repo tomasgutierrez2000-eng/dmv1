@@ -1596,3 +1596,58 @@ CREATE TABLE IF NOT EXISTS "l3"."segment_capital_consumption" (
     "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("lob_segment_id", "as_of_date", "legal_entity_id", "basel_exposure_type_id")
 );
+
+
+-- ── Layer Integrity Overlays (migration 011) ──
+
+-- capital_position_calc (Capital & Equity)
+-- Calculated overlay for l2.capital_position_snapshot
+CREATE TABLE IF NOT EXISTS "l3"."capital_position_calc" (
+    "legal_entity_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "cet1_ratio_pct" NUMERIC(10,6),
+    "tier1_ratio_pct" NUMERIC(10,6),
+    "total_capital_ratio_pct" NUMERIC(10,6),
+    "tier1_leverage_ratio_pct" NUMERIC(10,6),
+    "leverage_ratio_pct" NUMERIC(10,6),
+    "tlac_ratio_pct" NUMERIC(10,6),
+    "slr_pct" NUMERIC(10,6),
+    "rwa_std_amt" NUMERIC(20,4),
+    "rwa_erba_amt" NUMERIC(20,4),
+    "total_capital_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "created_by" VARCHAR(64),
+    "load_batch_id" VARCHAR(64),
+    PRIMARY KEY ("legal_entity_id", "as_of_date")
+);
+
+-- counterparty_financial_calc (Counterparty Analytics)
+-- Calculated overlay for l2.counterparty_financial_snapshot
+CREATE TABLE IF NOT EXISTS "l3"."counterparty_financial_calc" (
+    "counterparty_id" BIGINT NOT NULL,
+    "as_of_date" DATE NOT NULL,
+    "net_income_amt" NUMERIC(20,4),
+    "total_assets_amt" NUMERIC(20,4),
+    "total_liabilities_amt" NUMERIC(20,4),
+    "total_debt_service_amt" NUMERIC(20,4),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "created_by" VARCHAR(64),
+    "load_batch_id" VARCHAR(64),
+    PRIMARY KEY ("counterparty_id", "as_of_date")
+);
+
+-- exception_event_calc (Limits & Appetite)
+-- Calculated overlay for l2.exception_event
+CREATE TABLE IF NOT EXISTS "l3"."exception_event_calc" (
+    "exception_id" BIGINT NOT NULL,
+    "as_of_date" DATE,
+    "days_open" INTEGER,
+    "breach_pct" NUMERIC(10,6),
+    "created_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_ts" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "created_by" VARCHAR(64),
+    "load_batch_id" VARCHAR(64),
+    PRIMARY KEY ("exception_id")
+);

@@ -4,35 +4,49 @@
  * Usage:
  *   npx tsx scenarios/factory/scenario-runner.ts --scenario S019
  *   npx tsx scenarios/factory/scenario-runner.ts --all
- *   npx tsx scenarios/factory/scenario-runner.ts --validate
+ *   npx tsx scenarios/factory/scenario-runner.ts --all --start 2024-07-01 --end 2025-01-31
+ *   npx tsx scenarios/factory/scenario-runner.ts --all --frequency daily
+ *   npx tsx scenarios/factory/scenario-runner.ts --all --output sql/generated/factory.sql
+ *   npx tsx scenarios/factory/scenario-runner.ts --all --clean
  *   npx tsx scenarios/factory/scenario-runner.ts --dry-run --all
+ *   npx tsx scenarios/factory/scenario-runner.ts --validate
  *
- * Pipeline: YAML config → ID allocation → L1 chain → L2 data → validate → emit SQL
+ * Pipeline: YAML config → ID allocation → L1 chain → v2 state machine → L2 data → validate → DB/SQL
  */
 
 import { writeFileSync } from 'fs';
 import path from 'path';
 import { IDRegistry } from './id-registry';
-import { parseScenarioYaml, loadAllScenarios } from './scenario-config';
-import { buildL1Chain } from './chain-builder';
-import { generateL2Data } from './l2-generator';
-import { validateScenario } from './validator';
+import { parseScenarioYaml, loadAllScenarios, type ScenarioConfig } from './scenario-config';
+import { buildL1Chain, type L1Chain } from './chain-builder';
+import { generateV2Data, type V2GeneratorConfig, type V2GeneratorOutput } from './v2/generators';
+import { DBWriter, writeToSqlFile } from './v2/db-writer';
 import {
   emitScenarioSql,
   emitCombinedSql,
-  type TableData,
-  type SqlRow,
+  type TableData as SqlEmitterTableData,
 } from './sql-emitter';
+import type { TableData as V2TableData } from './v2/types';
+import type { StoryArc, RatingTier, SizeProfile } from '../../scripts/shared/mvp-config';
+import type { TimeFrequency } from './v2/types';
 
 /* ────────────────── CLI Argument Parsing ────────────────── */
 
 interface CliArgs {
   scenarios: string[];     // Scenario IDs to process, or 'ALL'
-  dryRun: boolean;         // Validate only, don't write SQL
+  dryRun: boolean;         // Show volume stats, no writes
   validateOnly: boolean;   // Show validation stats only
-  output: string;          // Output SQL file path
+  output: string | null;   // Output SQL file path (null = direct DB)
   verbose: boolean;
+  clean: boolean;          // Clean existing factory data before generating
+  frequency: TimeFrequency; // Time series frequency
+  startDate: string;       // Time series start date
+  endDate: string;         // Time series end date
 }
+
+const DEFAULT_START = '2024-07-01';
+const DEFAULT_END = '2025-01-31';
+const DEFAULT_FREQUENCY: TimeFrequency = 'WEEKLY';
 
 function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
@@ -40,8 +54,12 @@ function parseArgs(): CliArgs {
     scenarios: [],
     dryRun: false,
     validateOnly: false,
-    output: path.join(__dirname, '..', '..', 'sql', 'gsib-export', '06-factory-scenarios.sql'),
+    output: null, // null = direct DB (default)
     verbose: false,
+    clean: false,
+    frequency: DEFAULT_FREQUENCY,
+    startDate: DEFAULT_START,
+    endDate: DEFAULT_END,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -69,6 +87,19 @@ function parseArgs(): CliArgs {
       case '--verbose':
         result.verbose = true;
         break;
+      case '--clean':
+        result.clean = true;
+        break;
+      case '--frequency':
+      case '-f':
+        result.frequency = args[++i].toUpperCase() as TimeFrequency;
+        break;
+      case '--start':
+        result.startDate = args[++i];
+        break;
+      case '--end':
+        result.endDate = args[++i];
+        break;
       default:
         // Treat bare args as scenario IDs
         if (!args[i].startsWith('-')) {
@@ -84,69 +115,96 @@ function parseArgs(): CliArgs {
   return result;
 }
 
-/* ────────────────── L1/L2 Data → TableData Converter ────────────────── */
+/* ────────────────── V2 Config Builder ────────────────── */
 
-function chainToTables(chain: ReturnType<typeof buildL1Chain>): TableData[] {
-  const tables: TableData[] = [];
-  const push = (table: string, rows: Record<string, unknown>[]) => {
-    if (rows.length > 0) tables.push({ table, rows });
+/**
+ * Build V2GeneratorConfig from a ScenarioConfig + L1 chain.
+ * Maps counterparty profiles to the story arc / rating tier / size maps.
+ */
+function buildV2Config(
+  config: ScenarioConfig,
+  chain: L1Chain,
+  cliArgs: CliArgs,
+): V2GeneratorConfig {
+  const storyArcs = new Map<number, StoryArc>();
+  const ratingTiers = new Map<number, RatingTier>();
+  const sizeProfiles = new Map<number, SizeProfile>();
+
+  // Map counterparty profiles to their allocated IDs
+  for (let i = 0; i < config.counterparties.length; i++) {
+    const profile = config.counterparties[i];
+    const cp = chain.counterparties[i];
+    if (cp) {
+      storyArcs.set(cp.counterparty_id, profile.story_arc);
+      ratingTiers.set(cp.counterparty_id, profile.rating_tier);
+      sizeProfiles.set(cp.counterparty_id, profile.size);
+    }
+  }
+
+  // Time series: YAML config > CLI args > defaults
+  const timeSeries = config.time_series ?? {
+    start_date: cliArgs.startDate,
+    end_date: cliArgs.endDate,
+    frequency: cliArgs.frequency,
   };
 
-  push('l1.counterparty', chain.counterparties as unknown as SqlRow[]);
-  push('l1.credit_agreement_master', chain.agreements as unknown as SqlRow[]);
-  push('l1.facility_master', chain.facilities as unknown as SqlRow[]);
-  if (chain.hierarchies) push('l1.counterparty_hierarchy', chain.hierarchies as unknown as SqlRow[]);
-  if (chain.collateral_assets) push('l1.collateral_asset_master', chain.collateral_assets as unknown as SqlRow[]);
-  if (chain.limit_rules) push('l1.limit_rule', chain.limit_rules as unknown as SqlRow[]);
-  if (chain.facility_lender_allocations) push('l1.facility_lender_allocation', chain.facility_lender_allocations as unknown as SqlRow[]);
+  // Backward compat: if YAML specifies as_of_dates, use those
+  const snapshotDates = config.timeline?.as_of_dates;
+
+  // Market environment from YAML or default
+  const market = config.market_environment ?? undefined;
+
+  // Limit rules from chain
+  const limitRules = new Map<number, number>();
+  if (chain.limit_rules) {
+    for (const rule of chain.limit_rules) {
+      if (rule.counterparty_id !== null) {
+        limitRules.set(rule.counterparty_id, rule.limit_rule_id);
+      }
+    }
+  }
+
+  return {
+    market,
+    timeSeries: {
+      start_date: timeSeries.start_date ?? cliArgs.startDate,
+      end_date: timeSeries.end_date ?? cliArgs.endDate,
+      frequency: (timeSeries.frequency ?? cliArgs.frequency) as TimeFrequency,
+    },
+    frequency: (timeSeries.frequency ?? cliArgs.frequency) as TimeFrequency,
+    storyArcs,
+    ratingTiers,
+    sizeProfiles,
+    snapshotDates,
+    limitRules,
+  };
+}
+
+/* ────────────────── L1 Chain → TableData Converter ────────────────── */
+
+function chainToV2Tables(chain: L1Chain): V2TableData[] {
+  const tables: V2TableData[] = [];
+  const push = (schema: string, table: string, rows: Record<string, unknown>[]) => {
+    if (rows.length > 0) tables.push({ schema, table, rows });
+  };
+
+  push('l1', 'counterparty', chain.counterparties as unknown as Record<string, unknown>[]);
+  push('l1', 'credit_agreement_master', chain.agreements as unknown as Record<string, unknown>[]);
+  push('l1', 'facility_master', chain.facilities as unknown as Record<string, unknown>[]);
+  if (chain.hierarchies) push('l1', 'counterparty_hierarchy', chain.hierarchies as unknown as Record<string, unknown>[]);
+  if (chain.collateral_assets) push('l1', 'collateral_asset_master', chain.collateral_assets as unknown as Record<string, unknown>[]);
+  if (chain.limit_rules) push('l1', 'limit_rule', chain.limit_rules as unknown as Record<string, unknown>[]);
+  if (chain.facility_lender_allocations) push('l1', 'facility_lender_allocation', chain.facility_lender_allocations as unknown as Record<string, unknown>[]);
 
   return tables;
 }
 
-function l2ToTables(l2Data: ReturnType<typeof generateL2Data>): TableData[] {
-  const tables: TableData[] = [];
-
-  const mapping: [string, unknown[] | undefined][] = [
-    ['l2.facility_exposure_snapshot', l2Data.facility_exposure_snapshot],
-    ['l2.counterparty_rating_observation', l2Data.counterparty_rating_observation],
-    ['l2.collateral_snapshot', l2Data.collateral_snapshot],
-    ['l2.facility_delinquency_snapshot', l2Data.facility_delinquency_snapshot],
-    ['l2.limit_contribution_snapshot', l2Data.limit_contribution_snapshot],
-    ['l2.limit_utilization_event', l2Data.limit_utilization_event],
-    ['l2.exposure_counterparty_attribution', l2Data.exposure_counterparty_attribution],
-    ['l2.credit_event', l2Data.credit_event],
-    ['l2.credit_event_facility_link', l2Data.credit_event_facility_link],
-    ['l2.amendment_event', l2Data.amendment_event],
-    ['l2.risk_flag', l2Data.risk_flag],
-    ['l2.stress_test_result', l2Data.stress_test_result],
-    ['l2.stress_test_breach', l2Data.stress_test_breach],
-    ['l2.deal_pipeline_fact', l2Data.deal_pipeline_fact],
-    ['l2.data_quality_score_snapshot', l2Data.data_quality_score_snapshot],
-    // New tables
-    ['l2.facility_pricing_snapshot', l2Data.facility_pricing_snapshot],
-    ['l2.facility_risk_snapshot', l2Data.facility_risk_snapshot],
-    ['l2.facility_financial_snapshot', l2Data.facility_financial_snapshot],
-    ['l2.position', l2Data.position],
-    ['l2.position_detail', l2Data.position_detail],
-    ['l2.cash_flow', l2Data.cash_flow],
-    ['l2.facility_lob_attribution', l2Data.facility_lob_attribution],
-    ['l2.counterparty_financial_snapshot', l2Data.counterparty_financial_snapshot],
-    ['l2.facility_profitability_snapshot', l2Data.facility_profitability_snapshot],
-    ['l2.amendment_change_detail', l2Data.amendment_change_detail],
-    ['l2.exception_event', l2Data.exception_event],
-    ['l2.facility_credit_approval', l2Data.facility_credit_approval],
-    ['l2.financial_metric_observation', l2Data.financial_metric_observation],
-    ['l2.netting_set_exposure_snapshot', l2Data.netting_set_exposure_snapshot],
-    ['l2.metric_threshold', l2Data.metric_threshold],
-  ];
-
-  for (const [table, rows] of mapping) {
-    if (rows && rows.length > 0) {
-      tables.push({ table, rows: rows as Record<string, unknown>[] });
-    }
-  }
-
-  return tables;
+/** Convert v2 TableData (schema + table) to sql-emitter TableData (schema.table). */
+function toSqlEmitterFormat(tables: V2TableData[]): SqlEmitterTableData[] {
+  return tables.map(t => ({
+    table: `${t.schema}.${t.table}`,
+    rows: t.rows,
+  }));
 }
 
 /* ────────────────── Main ────────────────── */
@@ -155,19 +213,18 @@ async function main() {
   const args = parseArgs();
 
   console.log('╔══════════════════════════════════════════════════════╗');
-  console.log('║          GSIB Scenario Data Factory                 ║');
+  console.log('║        GSIB Scenario Data Factory v2                ║');
   console.log('╚══════════════════════════════════════════════════════╝');
   console.log('');
 
   // Load scenario configs
-  let configs;
+  let configs: ScenarioConfig[];
   if (args.scenarios.includes('ALL')) {
     configs = loadAllScenarios();
     console.log(`Loaded ${configs.length} scenario(s) from narratives/`);
   } else {
     const narrativesDir = path.join(__dirname, '..', 'narratives');
     configs = args.scenarios.map(id => {
-      // Try exact filename first, then fuzzy match
       const patterns = [
         `${id}.yaml`, `${id}.yml`,
         `${id.toUpperCase()}.yaml`, `${id.toLowerCase()}.yaml`,
@@ -177,7 +234,6 @@ async function main() {
           return parseScenarioYaml(path.join(narrativesDir, p));
         } catch { /* continue */ }
       }
-      // Try searching by scenario_id in all files
       const all = loadAllScenarios(narrativesDir);
       const match = all.find(c => c.scenario_id === id || c.scenario_id === id.toUpperCase());
       if (match) return match;
@@ -191,17 +247,41 @@ async function main() {
     process.exit(0);
   }
 
+  console.log(`Frequency: ${args.frequency} | Dates: ${args.startDate} → ${args.endDate}`);
+
   // Initialize ID registry
   const registryPath = path.join(__dirname, '..', 'config', 'id-registry.json');
   const registry = new IDRegistry(registryPath);
 
-  const allSqls: string[] = [];
-  let totalInserts = 0;
+  // Determine output mode
+  const dbWriter = new DBWriter();
+  const useDb = dbWriter.isAvailable() && args.output === null;
+  const sqlOutputPath = args.output ?? path.join(__dirname, '..', '..', 'sql', 'gsib-export', '06-factory-scenarios.sql');
+
+  if (useDb) {
+    console.log('Output: Direct PostgreSQL insert');
+    await dbWriter.connect();
+
+    if (args.clean) {
+      console.log('Cleaning existing factory data...');
+      await dbWriter.clean();
+    }
+  } else if (args.output) {
+    console.log(`Output: SQL file → ${sqlOutputPath}`);
+  } else {
+    console.log('Output: SQL file (DATABASE_URL not set, use --output to specify path)');
+  }
+
+  const allV2Tables: V2TableData[] = [];
+  const allSqlEmitterTables: SqlEmitterTableData[] = [];
+  let totalRows = 0;
   let allValid = true;
 
   for (const config of configs) {
+    const cpCount = config.counterparties.length;
+    const facCount = cpCount * config.facilities.per_counterparty;
     console.log(`\n── ${config.scenario_id}: ${config.name} ──`);
-    console.log(`   Type: ${config.type} | CPs: ${config.counterparties.length} | Facs: ${config.counterparties.length * config.facilities.per_counterparty}`);
+    console.log(`   Type: ${config.type} | CPs: ${cpCount} | Facs: ${facCount}`);
 
     try {
       // Deallocate previous run of same scenario (allows re-generation)
@@ -210,55 +290,92 @@ async function main() {
       // Build L1 chain
       const chain = buildL1Chain(config, registry);
 
-      // Generate L2 data
-      const l2Data = generateL2Data(chain, config, registry);
+      // Build v2 config from scenario + chain
+      const v2Config = buildV2Config(config, chain, args);
 
-      // Validate
-      const validation = validateScenario(chain, l2Data, config, registry);
+      // Generate L2 data via v2 engine
+      const v2Output = generateV2Data(chain, v2Config, registry);
 
-      if (!validation.valid) {
-        console.log(`   ❌ FAILED validation:`);
-        for (const err of validation.errors) {
-          console.log(`      - ${err}`);
+      // Combine L1 + L2 tables
+      const l1Tables = chainToV2Tables(chain);
+      const allTables = [...l1Tables, ...v2Output.tables];
+      const scenarioRows = v2Output.stats.totalRows + l1Tables.reduce((s, t) => s + t.rows.length, 0);
+
+      // Show stats
+      const { tableBreakdown } = v2Output.stats;
+      console.log(`   ✓ Generated | ${scenarioRows} rows across ${allTables.length} tables`);
+      console.log(`   Dates: ${v2Output.dates.length} snapshots (${v2Output.dates[0]} → ${v2Output.dates[v2Output.dates.length - 1]})`);
+
+      if (args.verbose) {
+        for (const [tbl, count] of Object.entries(tableBreakdown).sort((a, b) => b[1] - a[1])) {
+          console.log(`      ${tbl}: ${count} rows`);
         }
-        allValid = false;
+      }
+
+      totalRows += scenarioRows;
+
+      if (args.dryRun || args.validateOnly) {
         continue;
       }
 
-      if (validation.warnings.length > 0 && args.verbose) {
-        console.log(`   ⚠ ${validation.warnings.length} warnings:`);
-        for (const warn of validation.warnings) {
-          console.log(`      - ${warn}`);
-        }
-      }
-
-      console.log(`   ✓ Valid | ${validation.stats.total_inserts} INSERTs (${validation.stats.l1_counterparties} CPs, ${validation.stats.l1_facilities} facs, ${validation.stats.l2_exposure_rows} exposures)`);
-      totalInserts += validation.stats.total_inserts;
-
-      if (!args.validateOnly && !args.dryRun) {
-        // Convert to TableData and emit SQL
-        const tables = [...chainToTables(chain), ...l2ToTables(l2Data)];
-        const sql = emitScenarioSql(tables, {
+      if (useDb) {
+        // Direct DB insert — wrap each scenario in a transaction
+        await dbWriter.withinTransaction(async () => {
+          const results = await dbWriter.writeAll(allTables);
+          const inserted = results.reduce((s, r) => s + r.rowsInserted, 0);
+          const duration = results.reduce((s, r) => s + r.duration_ms, 0);
+          console.log(`   DB: ${inserted} rows inserted (${duration}ms)`);
+        });
+      } else {
+        // SQL file mode — collect for combined output
+        allV2Tables.push(...allTables);
+        const sqlTables = toSqlEmitterFormat(allTables);
+        const sql = emitScenarioSql(sqlTables, {
           scenarioId: config.scenario_id,
           scenarioName: config.name,
           narrative: config.narrative,
         });
-        allSqls.push(sql);
+        allSqlEmitterTables.push(...sqlTables);
       }
     } catch (err) {
       console.log(`   ❌ ERROR: ${err instanceof Error ? err.message : String(err)}`);
+      if (args.verbose && err instanceof Error && err.stack) {
+        console.log(`   ${err.stack.split('\n').slice(1, 4).join('\n   ')}`);
+      }
       allValid = false;
     }
   }
 
   // Summary
   console.log(`\n${'═'.repeat(55)}`);
-  console.log(`Total: ${configs.length} scenarios, ${totalInserts} INSERTs`);
+  console.log(`Total: ${configs.length} scenarios, ${totalRows} rows`);
 
-  if (!args.validateOnly && !args.dryRun && allSqls.length > 0) {
-    const combined = emitCombinedSql(allSqls);
-    writeFileSync(args.output, combined);
-    console.log(`Output: ${args.output} (${(combined.length / 1024).toFixed(1)} KB)`);
+  if (args.dryRun) {
+    console.log(`\nDry run complete. Would generate ${totalRows} rows.`);
+  }
+
+  // SQL file output
+  if (!args.dryRun && !args.validateOnly && !useDb && allV2Tables.length > 0) {
+    writeToSqlFile(allV2Tables, sqlOutputPath);
+  }
+
+  // Post-insert verification (DB mode)
+  if (useDb && !args.dryRun && !args.validateOnly) {
+    console.log('\nRunning post-insert verification...');
+    const verification = await dbWriter.verify();
+    for (const check of verification.checks) {
+      const icon = check.passed ? '✓' : '✗';
+      console.log(`   ${icon} ${check.name}: ${check.message}`);
+    }
+    if (!verification.passed) {
+      console.log('   ⚠ Some verification checks failed');
+      allValid = false;
+    }
+  }
+
+  // Disconnect DB
+  if (useDb) {
+    await dbWriter.disconnect();
   }
 
   // Save registry state
@@ -271,7 +388,7 @@ async function main() {
   console.log(`Registry: ${summary.scenarios} scenarios, ${summary.totalIds} IDs across ${summary.tables} tables`);
 
   if (!allValid) {
-    console.log('\n⚠ Some scenarios had validation errors. Fix the YAML configs and re-run.');
+    console.log('\n⚠ Some scenarios had errors. Fix the YAML configs and re-run.');
     process.exit(1);
   }
 

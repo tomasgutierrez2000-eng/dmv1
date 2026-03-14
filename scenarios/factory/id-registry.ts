@@ -107,7 +107,7 @@ export class IDRegistry {
    * Returns an array of allocated IDs (inclusive).
    * Throws on collision with any existing allocation.
    */
-  allocate(table: string, count: number, scenarioId: string): number[] {
+  allocate(table: string, count: number, scenarioId: string = 'v2'): number[] {
     if (count <= 0) throw new Error(`IDRegistry: count must be positive, got ${count}`);
 
     const start = this.state.nextId[table] ?? DEFAULT_STARTS[table] ?? 10001;

@@ -176,6 +176,44 @@ export interface ScenarioConfig {
     min_rows?: number;
     key_assertion?: string;           // Human-readable assertion
   };
+
+  // ── V2 extensions (optional — all have defaults) ──
+
+  /** Market environment configuration. */
+  market_environment?: {
+    preset: 'CURRENT_2024' | 'CUTTING_CYCLE' | 'RISING_RATES' | 'RATE_PLATEAU' | 'ZERO_LOWER_BOUND' | 'CUSTOM';
+    sector_shocks?: {
+      industry_id: number;
+      stress_level: 'NORMAL' | 'ELEVATED' | 'STRESSED' | 'CRISIS';
+      effective_date: string;
+    }[];
+    rate_overrides?: Record<string, number>;
+  };
+
+  /** Time series configuration — overrides timeline.as_of_dates when set. */
+  time_series?: {
+    start_date: string;
+    end_date: string;
+    frequency: 'DAILY' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'QUARTERLY';
+  };
+
+  /** Lifecycle configuration. */
+  lifecycle?: {
+    include_matured?: boolean;
+    include_workouts?: boolean;
+    refinancing_probability?: number;
+  };
+
+  /** Covenant override configuration. */
+  covenants?: {
+    override?: boolean;
+    packages?: {
+      type: string;
+      threshold: number;
+      direction: 'MIN' | 'MAX';
+      warning_buffer_pct: number;
+    }[];
+  };
 }
 
 /* ────────────────── Parser ────────────────── */

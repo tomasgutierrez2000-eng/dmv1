@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-14T02:46:18.830Z",
+  "createdAt": "2026-03-14T05:29:42.138Z",
   "tables": [
     {
       "layer": "L1",
@@ -37,6 +37,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -76,6 +85,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -490,6 +508,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -538,6 +565,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1081,6 +1117,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1267,6 +1312,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1354,6 +1408,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1390,6 +1453,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1426,6 +1498,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1459,6 +1540,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1501,6 +1591,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1549,6 +1648,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1897,6 +2005,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1942,6 +2059,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -1987,6 +2113,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2041,6 +2176,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2095,6 +2239,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2134,6 +2287,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2176,6 +2338,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2272,6 +2443,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2311,6 +2485,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -2986,6 +3169,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3028,6 +3220,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3160,6 +3361,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3199,6 +3409,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3238,6 +3457,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3277,6 +3505,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3322,6 +3559,18 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "record_source"
         }
       ]
     },
@@ -3361,6 +3610,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3400,6 +3658,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3499,6 +3766,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3535,6 +3811,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3619,6 +3904,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
         }
       ]
     },
@@ -3667,6 +3961,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "record_source"
         }
       ]
     },
@@ -3706,6 +4003,18 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "effective_start_date"
+        },
+        {
+          "name": "effective_end_date"
+        },
+        {
+          "name": "is_current_flag"
+        },
+        {
+          "name": "record_source"
         }
       ]
     },
@@ -3790,6 +4099,9 @@
         },
         {
           "name": "is_current_flag"
+        },
+        {
+          "name": "record_source"
         }
       ]
     },
@@ -3877,9 +4189,6 @@
         },
         {
           "name": "product_node_id"
-        },
-        {
-          "name": "product_code"
         },
         {
           "name": "product_code"
@@ -8242,6 +8551,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "record_source"
         }
       ]
     },
@@ -8284,6 +8596,9 @@
         },
         {
           "name": "raw_record_id"
+        },
+        {
+          "name": "record_source"
         }
       ]
     },
@@ -8314,6 +8629,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8347,6 +8668,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8386,6 +8713,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8437,6 +8770,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8494,6 +8833,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8560,6 +8905,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8626,6 +8977,12 @@
         },
         {
           "name": "total_collateral_mv_usd"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8692,6 +9049,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8731,6 +9094,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8770,6 +9139,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8824,6 +9199,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8875,6 +9256,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -8971,6 +9358,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9061,6 +9454,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9120,7 +9519,7 @@
           "name": "hierarchy_id"
         },
         {
-          "name": "is_has_cross_entity_flag"
+          "name": "has_cross_entity_flag"
         },
         {
           "name": "cross_entity_exposure_amt"
@@ -9193,6 +9592,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9255,7 +9660,7 @@
           "name": "is_syndicated_flag"
         },
         {
-          "name": "is_has_amendment_flag"
+          "name": "has_amendment_flag"
         },
         {
           "name": "amendment_type_code"
@@ -9271,6 +9676,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9334,6 +9745,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9418,6 +9835,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9475,6 +9898,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9559,6 +9988,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9607,6 +10042,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9670,6 +10111,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9721,6 +10168,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9796,6 +10249,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9850,6 +10309,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9904,6 +10369,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9952,6 +10423,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -9994,6 +10471,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10045,6 +10528,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10096,6 +10585,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10144,6 +10639,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10219,6 +10720,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10276,6 +10783,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10387,6 +10900,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10477,6 +10996,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10543,6 +11068,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10618,6 +11149,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10681,6 +11218,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10732,6 +11275,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10804,6 +11353,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10861,6 +11416,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -10954,6 +11515,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11005,6 +11572,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11134,6 +11707,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11191,6 +11770,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11242,6 +11827,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11299,6 +11890,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11331,7 +11928,7 @@
           "name": "net_exposure_amt"
         },
         {
-          "name": "is_has_cross_entity_flag"
+          "name": "has_cross_entity_flag"
         },
         {
           "name": "cross_entity_exposure_amt"
@@ -11374,6 +11971,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11419,6 +12022,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11458,6 +12067,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11533,6 +12148,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11587,6 +12208,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11638,6 +12265,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11683,6 +12316,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11728,6 +12367,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11785,6 +12430,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11886,7 +12537,7 @@
           "name": "prepayment_penalty_desc"
         },
         {
-          "name": "is_has_amendment_flag"
+          "name": "has_amendment_flag"
         },
         {
           "name": "amendment_count"
@@ -11941,6 +12592,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -11995,6 +12652,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12064,6 +12727,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12112,6 +12781,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12166,6 +12841,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12226,6 +12907,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12304,6 +12991,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12385,6 +13075,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12448,6 +13141,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12514,6 +13210,9 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12565,6 +13264,12 @@
         },
         {
           "name": "load_timestamp"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12595,6 +13300,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12643,6 +13354,12 @@
         },
         {
           "name": "updated_ts"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12721,6 +13438,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12781,6 +13504,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12841,6 +13570,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12892,6 +13627,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12922,6 +13663,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -12982,6 +13729,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -13042,6 +13795,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -13096,6 +13855,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -13132,6 +13897,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
         }
       ]
     },
@@ -13162,6 +13933,1467 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "model_version"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "counterparty_derived",
+      "fields": [
+        {
+          "name": "counterparty_derived_sk"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_name"
+        },
+        {
+          "name": "credit_agreement_id"
+        },
+        {
+          "name": "facility_name"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "legal_entity_name"
+        },
+        {
+          "name": "lob_node_id"
+        },
+        {
+          "name": "lob_l1_name"
+        },
+        {
+          "name": "lob_l2_name"
+        },
+        {
+          "name": "lob_l3_name"
+        },
+        {
+          "name": "country_name"
+        },
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "industry_name"
+        },
+        {
+          "name": "product_code"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "effective_date"
+        },
+        {
+          "name": "pricing_tier_code"
+        },
+        {
+          "name": "participating_counterparty_ids"
+        },
+        {
+          "name": "is_active_flag"
+        },
+        {
+          "name": "is_deteriorated_flag"
+        },
+        {
+          "name": "delinquent_payment_flag"
+        },
+        {
+          "name": "has_cross_entity_flag"
+        },
+        {
+          "name": "amendment_status_name"
+        },
+        {
+          "name": "utilization_status_code"
+        },
+        {
+          "name": "dpd_bucket_code"
+        },
+        {
+          "name": "criticized_portfolio_count"
+        },
+        {
+          "name": "risk_rating_tier_code"
+        },
+        {
+          "name": "external_risk_rating"
+        },
+        {
+          "name": "internal_risk_rating"
+        },
+        {
+          "name": "limit_status_code"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code"
+        },
+        {
+          "name": "ext_risk_rating_status"
+        },
+        {
+          "name": "ext_risk_rating_change_steps"
+        },
+        {
+          "name": "int_risk_rating_status"
+        },
+        {
+          "name": "int_risk_rating_change_steps"
+        },
+        {
+          "name": "committed_amt"
+        },
+        {
+          "name": "outstanding_amt"
+        },
+        {
+          "name": "unfunded_amt"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "expected_drawdown_amt"
+        },
+        {
+          "name": "current_valuation_amt"
+        },
+        {
+          "name": "original_valuation_amt"
+        },
+        {
+          "name": "cross_entity_exposure_amt"
+        },
+        {
+          "name": "contractual_cashflow_amt"
+        },
+        {
+          "name": "limit_amt"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "number_of_facilities"
+        },
+        {
+          "name": "expected_loss_amt"
+        },
+        {
+          "name": "lgd_estimate_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "total_overdue_amt"
+        },
+        {
+          "name": "tangible_net_worth_amt"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "expected_loss_rate_pct"
+        },
+        {
+          "name": "delinquency_rate_pct"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct"
+        },
+        {
+          "name": "exception_rate_pct"
+        },
+        {
+          "name": "pd_pct"
+        },
+        {
+          "name": "lgd_pct"
+        },
+        {
+          "name": "fccr_value"
+        },
+        {
+          "name": "all_in_rate_pct"
+        },
+        {
+          "name": "base_rate_pct"
+        },
+        {
+          "name": "spread_bps"
+        },
+        {
+          "name": "cost_of_funds_amt"
+        },
+        {
+          "name": "allocation_pct"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "interest_income_amt"
+        },
+        {
+          "name": "fees_income_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "allocated_equity_amt"
+        },
+        {
+          "name": "avg_earning_assets_amt"
+        },
+        {
+          "name": "nim_pct"
+        },
+        {
+          "name": "roa_pct"
+        },
+        {
+          "name": "roe_pct"
+        },
+        {
+          "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "expected_tenor_months"
+        },
+        {
+          "name": "model_version"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "desk_derived",
+      "fields": [
+        {
+          "name": "desk_derived_sk"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "hierarchy_id"
+        },
+        {
+          "name": "lob_node_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "legal_entity_name"
+        },
+        {
+          "name": "lob_l1_name"
+        },
+        {
+          "name": "lob_l2_name"
+        },
+        {
+          "name": "lob_l3_name"
+        },
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "industry_name"
+        },
+        {
+          "name": "product_code"
+        },
+        {
+          "name": "facility_type"
+        },
+        {
+          "name": "is_deteriorated_flag"
+        },
+        {
+          "name": "delinquent_payment_flag"
+        },
+        {
+          "name": "pricing_exception_flag"
+        },
+        {
+          "name": "amendment_status_name"
+        },
+        {
+          "name": "amendment_type_code"
+        },
+        {
+          "name": "utilization_status_code"
+        },
+        {
+          "name": "dpd_bucket_code"
+        },
+        {
+          "name": "maturity_bucket_id"
+        },
+        {
+          "name": "origination_bucket_code"
+        },
+        {
+          "name": "exception_status"
+        },
+        {
+          "name": "risk_mitigant_subtype_code"
+        },
+        {
+          "name": "mitigant_category"
+        },
+        {
+          "name": "criticized_portfolio_count"
+        },
+        {
+          "name": "risk_rating_tier_code"
+        },
+        {
+          "name": "external_risk_rating"
+        },
+        {
+          "name": "internal_risk_rating"
+        },
+        {
+          "name": "limit_status_code"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code"
+        },
+        {
+          "name": "ext_risk_rating_status"
+        },
+        {
+          "name": "ext_risk_rating_change_steps"
+        },
+        {
+          "name": "int_risk_rating_status"
+        },
+        {
+          "name": "int_risk_rating_change_steps"
+        },
+        {
+          "name": "committed_amt"
+        },
+        {
+          "name": "outstanding_amt"
+        },
+        {
+          "name": "unfunded_amt"
+        },
+        {
+          "name": "allocated_capital_amt"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "expected_drawdown_amt"
+        },
+        {
+          "name": "current_valuation_amt"
+        },
+        {
+          "name": "original_valuation_amt"
+        },
+        {
+          "name": "cross_entity_exposure_amt"
+        },
+        {
+          "name": "contractual_cashflow_amt"
+        },
+        {
+          "name": "limit_amt"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "number_of_facilities"
+        },
+        {
+          "name": "facility_count"
+        },
+        {
+          "name": "counterparty_count"
+        },
+        {
+          "name": "expected_loss_amt"
+        },
+        {
+          "name": "lgd_estimate_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "total_overdue_amt"
+        },
+        {
+          "name": "tangible_net_worth_amt"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "expected_loss_rate_pct"
+        },
+        {
+          "name": "delinquency_rate_pct"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct"
+        },
+        {
+          "name": "exception_rate_pct"
+        },
+        {
+          "name": "pd_pct"
+        },
+        {
+          "name": "lgd_pct"
+        },
+        {
+          "name": "fccr_value"
+        },
+        {
+          "name": "capital_adequacy_ratio_pct"
+        },
+        {
+          "name": "all_in_rate_pct"
+        },
+        {
+          "name": "base_rate_pct"
+        },
+        {
+          "name": "spread_bps"
+        },
+        {
+          "name": "cost_of_funds_amt"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "interest_income_amt"
+        },
+        {
+          "name": "fees_income_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "allocated_equity_amt"
+        },
+        {
+          "name": "avg_earning_assets_amt"
+        },
+        {
+          "name": "nim_pct"
+        },
+        {
+          "name": "roa_pct"
+        },
+        {
+          "name": "roe_pct"
+        },
+        {
+          "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "expected_tenor_months"
+        },
+        {
+          "name": "days_until_maturity"
+        },
+        {
+          "name": "origination_date"
+        },
+        {
+          "name": "model_version"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "facility_derived",
+      "fields": [
+        {
+          "name": "facility_derived_sk"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "facility_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "legal_name"
+        },
+        {
+          "name": "credit_agreement_id"
+        },
+        {
+          "name": "facility_name"
+        },
+        {
+          "name": "facility_type"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "legal_entity_name"
+        },
+        {
+          "name": "lob_node_id"
+        },
+        {
+          "name": "lob_l1_name"
+        },
+        {
+          "name": "lob_l2_name"
+        },
+        {
+          "name": "lob_l3_name"
+        },
+        {
+          "name": "country_name"
+        },
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "industry_name"
+        },
+        {
+          "name": "product_code"
+        },
+        {
+          "name": "maturity_date"
+        },
+        {
+          "name": "origination_date"
+        },
+        {
+          "name": "contract_origination_date"
+        },
+        {
+          "name": "effective_date"
+        },
+        {
+          "name": "pricing_tier_code"
+        },
+        {
+          "name": "fr2590_category_code"
+        },
+        {
+          "name": "participating_counterparty_ids"
+        },
+        {
+          "name": "is_active_flag"
+        },
+        {
+          "name": "facility_active_flag"
+        },
+        {
+          "name": "is_syndicated_flag"
+        },
+        {
+          "name": "is_deteriorated_flag"
+        },
+        {
+          "name": "delinquent_payment_flag"
+        },
+        {
+          "name": "has_cross_entity_flag"
+        },
+        {
+          "name": "pricing_exception_flag"
+        },
+        {
+          "name": "amendment_event_id"
+        },
+        {
+          "name": "amendment_status_name"
+        },
+        {
+          "name": "amendment_type_code"
+        },
+        {
+          "name": "utilization_status_code"
+        },
+        {
+          "name": "dpd_bucket_code"
+        },
+        {
+          "name": "maturity_bucket_id"
+        },
+        {
+          "name": "origination_bucket_code"
+        },
+        {
+          "name": "exception_status"
+        },
+        {
+          "name": "risk_mitigant_subtype_code"
+        },
+        {
+          "name": "mitigant_category"
+        },
+        {
+          "name": "criticized_portfolio_count"
+        },
+        {
+          "name": "committed_amt"
+        },
+        {
+          "name": "outstanding_amt"
+        },
+        {
+          "name": "unfunded_amt"
+        },
+        {
+          "name": "allocated_capital_amt"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "expected_drawdown_amt"
+        },
+        {
+          "name": "principal_payment_amt"
+        },
+        {
+          "name": "current_valuation_amt"
+        },
+        {
+          "name": "original_valuation_amt"
+        },
+        {
+          "name": "cross_entity_exposure_amt"
+        },
+        {
+          "name": "contractual_cashflow_amt"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "expected_loss_amt"
+        },
+        {
+          "name": "lgd_estimate_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "total_overdue_amt"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "expected_loss_rate_pct"
+        },
+        {
+          "name": "delinquency_rate_pct"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "all_in_rate_pct"
+        },
+        {
+          "name": "base_rate_pct"
+        },
+        {
+          "name": "fee_rate_pct"
+        },
+        {
+          "name": "spread_bps"
+        },
+        {
+          "name": "cost_of_funds_amt"
+        },
+        {
+          "name": "allocation_pct"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "interest_income_amt"
+        },
+        {
+          "name": "fees_income_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "allocated_equity_amt"
+        },
+        {
+          "name": "avg_earning_assets_amt"
+        },
+        {
+          "name": "nim_pct"
+        },
+        {
+          "name": "roa_pct"
+        },
+        {
+          "name": "roe_pct"
+        },
+        {
+          "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "expected_tenor_months"
+        },
+        {
+          "name": "days_until_maturity"
+        },
+        {
+          "name": "model_version"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "portfolio_derived",
+      "fields": [
+        {
+          "name": "portfolio_derived_sk"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "hierarchy_id"
+        },
+        {
+          "name": "lob_node_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "legal_entity_name"
+        },
+        {
+          "name": "lob_l1_name"
+        },
+        {
+          "name": "lob_l2_name"
+        },
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "industry_name"
+        },
+        {
+          "name": "product_code"
+        },
+        {
+          "name": "facility_type"
+        },
+        {
+          "name": "is_deteriorated_flag"
+        },
+        {
+          "name": "delinquent_payment_flag"
+        },
+        {
+          "name": "pricing_exception_flag"
+        },
+        {
+          "name": "amendment_status_name"
+        },
+        {
+          "name": "amendment_type_code"
+        },
+        {
+          "name": "utilization_status_code"
+        },
+        {
+          "name": "dpd_bucket_code"
+        },
+        {
+          "name": "maturity_bucket_id"
+        },
+        {
+          "name": "origination_bucket_code"
+        },
+        {
+          "name": "exception_status"
+        },
+        {
+          "name": "risk_mitigant_subtype_code"
+        },
+        {
+          "name": "mitigant_category"
+        },
+        {
+          "name": "criticized_portfolio_count"
+        },
+        {
+          "name": "risk_rating_tier_code"
+        },
+        {
+          "name": "external_risk_rating"
+        },
+        {
+          "name": "internal_risk_rating"
+        },
+        {
+          "name": "limit_status_code"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code"
+        },
+        {
+          "name": "ext_risk_rating_status"
+        },
+        {
+          "name": "ext_risk_rating_change_steps"
+        },
+        {
+          "name": "int_risk_rating_status"
+        },
+        {
+          "name": "int_risk_rating_change_steps"
+        },
+        {
+          "name": "committed_amt"
+        },
+        {
+          "name": "outstanding_amt"
+        },
+        {
+          "name": "unfunded_amt"
+        },
+        {
+          "name": "allocated_capital_amt"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "expected_drawdown_amt"
+        },
+        {
+          "name": "current_valuation_amt"
+        },
+        {
+          "name": "original_valuation_amt"
+        },
+        {
+          "name": "cross_entity_exposure_amt"
+        },
+        {
+          "name": "contractual_cashflow_amt"
+        },
+        {
+          "name": "limit_amt"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "number_of_facilities"
+        },
+        {
+          "name": "facility_count"
+        },
+        {
+          "name": "counterparty_count"
+        },
+        {
+          "name": "expected_loss_amt"
+        },
+        {
+          "name": "lgd_estimate_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "total_overdue_amt"
+        },
+        {
+          "name": "tangible_net_worth_amt"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "expected_loss_rate_pct"
+        },
+        {
+          "name": "delinquency_rate_pct"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct"
+        },
+        {
+          "name": "exception_rate_pct"
+        },
+        {
+          "name": "pd_pct"
+        },
+        {
+          "name": "lgd_pct"
+        },
+        {
+          "name": "fccr_value"
+        },
+        {
+          "name": "capital_adequacy_ratio_pct"
+        },
+        {
+          "name": "all_in_rate_pct"
+        },
+        {
+          "name": "base_rate_pct"
+        },
+        {
+          "name": "spread_bps"
+        },
+        {
+          "name": "cost_of_funds_amt"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "interest_income_amt"
+        },
+        {
+          "name": "fees_income_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "allocated_equity_amt"
+        },
+        {
+          "name": "avg_earning_assets_amt"
+        },
+        {
+          "name": "nim_pct"
+        },
+        {
+          "name": "roa_pct"
+        },
+        {
+          "name": "roe_pct"
+        },
+        {
+          "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "expected_tenor_months"
+        },
+        {
+          "name": "model_version"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "segment_derived",
+      "fields": [
+        {
+          "name": "segment_derived_sk"
+        },
+        {
+          "name": "run_version_id"
+        },
+        {
+          "name": "hierarchy_id"
+        },
+        {
+          "name": "lob_node_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "legal_entity_name"
+        },
+        {
+          "name": "lob_l1_name"
+        },
+        {
+          "name": "region_code"
+        },
+        {
+          "name": "industry_name"
+        },
+        {
+          "name": "product_code"
+        },
+        {
+          "name": "facility_type"
+        },
+        {
+          "name": "is_deteriorated_flag"
+        },
+        {
+          "name": "delinquent_payment_flag"
+        },
+        {
+          "name": "pricing_exception_flag"
+        },
+        {
+          "name": "amendment_status_name"
+        },
+        {
+          "name": "amendment_type_code"
+        },
+        {
+          "name": "utilization_status_code"
+        },
+        {
+          "name": "dpd_bucket_code"
+        },
+        {
+          "name": "maturity_bucket_id"
+        },
+        {
+          "name": "origination_bucket_code"
+        },
+        {
+          "name": "exception_status"
+        },
+        {
+          "name": "risk_mitigant_subtype_code"
+        },
+        {
+          "name": "mitigant_category"
+        },
+        {
+          "name": "criticized_portfolio_count"
+        },
+        {
+          "name": "risk_rating_tier_code"
+        },
+        {
+          "name": "external_risk_rating"
+        },
+        {
+          "name": "internal_risk_rating"
+        },
+        {
+          "name": "limit_status_code"
+        },
+        {
+          "name": "internal_risk_rating_bucket_code"
+        },
+        {
+          "name": "ext_risk_rating_status"
+        },
+        {
+          "name": "ext_risk_rating_change_steps"
+        },
+        {
+          "name": "int_risk_rating_status"
+        },
+        {
+          "name": "int_risk_rating_change_steps"
+        },
+        {
+          "name": "committed_amt"
+        },
+        {
+          "name": "outstanding_amt"
+        },
+        {
+          "name": "unfunded_amt"
+        },
+        {
+          "name": "allocated_capital_amt"
+        },
+        {
+          "name": "ead_amt"
+        },
+        {
+          "name": "expected_drawdown_amt"
+        },
+        {
+          "name": "current_valuation_amt"
+        },
+        {
+          "name": "original_valuation_amt"
+        },
+        {
+          "name": "cross_entity_exposure_amt"
+        },
+        {
+          "name": "contractual_cashflow_amt"
+        },
+        {
+          "name": "limit_amt"
+        },
+        {
+          "name": "number_of_loans"
+        },
+        {
+          "name": "number_of_facilities"
+        },
+        {
+          "name": "facility_count"
+        },
+        {
+          "name": "counterparty_count"
+        },
+        {
+          "name": "expected_loss_amt"
+        },
+        {
+          "name": "lgd_estimate_amt"
+        },
+        {
+          "name": "rwa_amt"
+        },
+        {
+          "name": "total_overdue_amt"
+        },
+        {
+          "name": "tangible_net_worth_amt"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "expected_loss_rate_pct"
+        },
+        {
+          "name": "delinquency_rate_pct"
+        },
+        {
+          "name": "rwa_density_pct"
+        },
+        {
+          "name": "dscr_value"
+        },
+        {
+          "name": "ltv_pct"
+        },
+        {
+          "name": "utilization_pct"
+        },
+        {
+          "name": "committed_to_limit_utilization_pct"
+        },
+        {
+          "name": "exception_rate_pct"
+        },
+        {
+          "name": "pd_pct"
+        },
+        {
+          "name": "lgd_pct"
+        },
+        {
+          "name": "fccr_value"
+        },
+        {
+          "name": "capital_adequacy_ratio_pct"
+        },
+        {
+          "name": "all_in_rate_pct"
+        },
+        {
+          "name": "base_rate_pct"
+        },
+        {
+          "name": "spread_bps"
+        },
+        {
+          "name": "cost_of_funds_amt"
+        },
+        {
+          "name": "interest_rate_sensitivity_pct"
+        },
+        {
+          "name": "revenue_amt"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "operating_expense_amt"
+        },
+        {
+          "name": "interest_expense_amt"
+        },
+        {
+          "name": "interest_income_amt"
+        },
+        {
+          "name": "fees_income_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "allocated_equity_amt"
+        },
+        {
+          "name": "avg_earning_assets_amt"
+        },
+        {
+          "name": "nim_pct"
+        },
+        {
+          "name": "roa_pct"
+        },
+        {
+          "name": "roe_pct"
+        },
+        {
+          "name": "return_on_rwa_pct"
+        },
+        {
+          "name": "expected_tenor_months"
+        },
+        {
+          "name": "model_version"
+        },
+        {
+          "name": "run_id"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "base_currency_code"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     }

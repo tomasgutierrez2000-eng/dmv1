@@ -136,18 +136,18 @@
     ]
   },
   "MET-003": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "effective_date"
+      "primary_value": "effective_start_date"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "effective_date",
-          "label": "effective_date",
+          "field": "effective_start_date",
+          "label": "effective_start_date",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
+          "source_table": "facility_master",
           "source_layer": "L2"
         }
       ],
@@ -157,8 +157,8 @@
     },
     "worked_example_columns": [
       {
-        "field": "effective_date",
-        "header": "Effective Date",
+        "field": "effective_start_date",
+        "header": "Effective Start Date",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -1971,6 +1971,14 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rwa_amt",
+          "label": "rwa_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],
@@ -1989,6 +1997,12 @@
         "header": "Gross Exposure Usd",
         "format": "number",
         "subtotal_fn": "none"
+      },
+      {
+        "field": "rwa_amt",
+        "header": "Rwa ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
       },
       {
         "field": "rwa_density_pct",
@@ -2011,8 +2025,8 @@
           "field": "rwa_amt",
           "label": "rwa_amt",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
-          "source_layer": "L2"
+          "source_table": "facility_exposure_calc",
+          "source_layer": "L3"
         }
       ],
       "denominator": [],

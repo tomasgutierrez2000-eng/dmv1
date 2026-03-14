@@ -51,8 +51,8 @@ export async function generateDemoData(
 
   try {
     // ── Load base tables ────────────────────────────────────
-    const fm = await loader.loadTable('L1', 'facility_master');
-    const cp = await loader.loadTable('L1', 'counterparty');
+    const fm = await loader.loadTable('L2', 'facility_master');
+    const cp = await loader.loadTable('L2', 'counterparty');
     const ebt = await loader.loadTable('L1', 'enterprise_business_taxonomy');
 
     // ── Build lookups ───────────────────────────────────────

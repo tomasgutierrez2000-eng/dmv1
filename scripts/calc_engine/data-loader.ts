@@ -117,7 +117,17 @@ export class DataLoader {
   private loadFromJson(layer: string, table: string): TableData {
     const data = this.ensureJsonLoaded(layer);
     const key = `${layer.toUpperCase()}.${table}`;
-    const entry = data[key];
+    let entry = data[key];
+
+    // Fallback: some tables (facility_master, counterparty) may be classified
+    // differently in sample JSON vs PostgreSQL schema. Try the other layer.
+    if (!entry || !Array.isArray(entry.columns)) {
+      const altLayer = layer.toUpperCase() === 'L1' ? 'L2' : 'L1';
+      const altData = this.ensureJsonLoaded(altLayer);
+      const altKey = `${altLayer}.${table}`;
+      entry = altData[altKey];
+    }
+
     if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {
       throw new Error(`Table not found in sample data: ${key}`);
     }

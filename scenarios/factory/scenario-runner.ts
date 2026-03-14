@@ -205,7 +205,7 @@ function chainToV2Tables(chain: L1Chain): V2TableData[] {
   push('l2', 'credit_agreement_master', chain.agreements as unknown as Record<string, unknown>[]);
   push('l2', 'facility_master', chain.facilities as unknown as Record<string, unknown>[]);
   if (chain.hierarchies) push('l2', 'counterparty_hierarchy', chain.hierarchies as unknown as Record<string, unknown>[]);
-  if (chain.collateral_assets) push('l1', 'collateral_asset_master', chain.collateral_assets as unknown as Record<string, unknown>[]);
+  if (chain.collateral_assets) push('l2', 'collateral_asset_master', chain.collateral_assets as unknown as Record<string, unknown>[]);
   if (chain.limit_rules) push('l1', 'limit_rule', chain.limit_rules as unknown as Record<string, unknown>[]);
   if (chain.facility_lender_allocations) push('l2', 'facility_lender_allocation', chain.facility_lender_allocations as unknown as Record<string, unknown>[]);
 

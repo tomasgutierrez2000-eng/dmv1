@@ -94,6 +94,7 @@ export interface VerificationResult {
 export class DBWriter {
   private client: any; // pg.Client — dynamic import to avoid hard dependency
   private connected = false;
+  private existingTables = new Set<string>(); // "l2.counterparty" format
 
   constructor(private databaseUrl?: string) {
     this.databaseUrl = databaseUrl ?? loadEnv();
@@ -104,7 +105,7 @@ export class DBWriter {
     return !!this.databaseUrl;
   }
 
-  /** Connect to PostgreSQL. */
+  /** Connect to PostgreSQL and discover existing tables. */
   async connect(): Promise<void> {
     if (!this.databaseUrl) {
       throw new Error('DATABASE_URL not set. Use --output flag for SQL file output.');
@@ -115,6 +116,16 @@ export class DBWriter {
     await this.client.connect();
     await this.client.query('SET search_path TO l1, l2, public;');
     this.connected = true;
+
+    // Discover existing tables to skip missing ones gracefully
+    const res = await this.client.query(
+      `SELECT table_schema || '.' || table_name AS full_name
+       FROM information_schema.tables
+       WHERE table_schema IN ('l1', 'l2', 'l3')`,
+    );
+    for (const row of res.rows) {
+      this.existingTables.add(row.full_name);
+    }
   }
 
   /** Disconnect. */
@@ -195,6 +206,12 @@ export class DBWriter {
   async writeAll(tables: TableData[]): Promise<WriteResult[]> {
     const results: WriteResult[] = [];
     for (const td of tables) {
+      const fullName = `${td.schema}.${td.table}`;
+      if (!this.existingTables.has(fullName)) {
+        console.warn(`  ⚠ Skipping ${fullName}: table does not exist in DB`);
+        results.push({ table: fullName, rowsInserted: 0, duration_ms: 0 });
+        continue;
+      }
       const result = await this.insertBatch(td.schema, td.table, td.rows);
       results.push(result);
     }
@@ -207,27 +224,50 @@ export class DBWriter {
    */
   async clean(): Promise<void> {
     const CLEAN_ORDER = [
-      // L3 first (depends on L2)
-      // L2 events
+      // Reverse FK order: children first, parents last
+      // L2 events (leaf tables)
+      'l2.facility_credit_approval',
+      'l2.stress_test_breach',
+      'l2.stress_test_result',
       'l2.exception_event',
+      'l2.amendment_change_detail',
       'l2.amendment_event',
       'l2.risk_flag',
+      'l2.credit_event_facility_link',
       'l2.credit_event',
+      'l2.deal_pipeline_fact',
       // L2 snapshots
+      'l2.ecl_provision_snapshot',
       'l2.facility_profitability_snapshot',
       'l2.collateral_snapshot',
       'l2.counterparty_rating_observation',
       'l2.facility_delinquency_snapshot',
       'l2.counterparty_financial_snapshot',
-      'l2.deal_pipeline_fact',
+      'l2.financial_metric_observation',
       'l2.limit_utilization_event',
       'l2.limit_contribution_snapshot',
+      'l2.netting_set_exposure_snapshot',
+      'l2.exposure_counterparty_attribution',
+      'l2.data_quality_score_snapshot',
+      'l2.facility_lob_attribution',
+      'l2.cash_flow',
       'l2.position_detail',
       'l2.position',
       'l2.facility_financial_snapshot',
       'l2.facility_risk_snapshot',
       'l2.facility_pricing_snapshot',
       'l2.facility_exposure_snapshot',
+      // L1/L2 reference (parents — clean last)
+      'l2.facility_lender_allocation',
+      'l2.facility_counterparty_participation',
+      'l2.collateral_link',
+      'l2.collateral_asset_master',
+      'l1.limit_threshold',
+      'l1.limit_rule',
+      'l2.counterparty_hierarchy',
+      'l2.facility_master',
+      'l2.credit_agreement_master',
+      'l2.counterparty',
     ];
 
     for (const fullTable of CLEAN_ORDER) {
@@ -355,12 +395,13 @@ export function writeToSqlFile(tables: TableData[], outputPath: string, generate
       lines.push(`INSERT INTO ${td.schema}.${td.table} (${colList}) VALUES`);
 
       const valueSets = batch.map((row, i) => {
-        const vals = columns.map(col => formatSqlValue(row[col], col));
-        const comma = i < batch.length - 1 ? ',' : ';';
+        const vals = columns.map(col => formatSqlValue(row[col]));
+        const comma = i < batch.length - 1 ? ',' : '';
         return `(${vals.join(', ')})${comma}`;
       });
 
       lines.push(...valueSets);
+      lines.push('ON CONFLICT DO NOTHING;');
       lines.push('');
     }
   }

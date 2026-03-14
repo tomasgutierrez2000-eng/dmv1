@@ -179,18 +179,25 @@ export class IDRegistry {
     const before = this.state.allocations.length;
     const removed = this.state.allocations.filter(a => a.scenarioId === scenarioId);
     this.state.allocations = this.state.allocations.filter(a => a.scenarioId !== scenarioId);
+    const removed = before - this.state.allocations.length;
 
-    // Rewind nextId for affected tables so re-runs reuse the same ID ranges
-    const affectedTables = new Set(removed.map(a => a.table));
-    for (const table of affectedTables) {
-      const remaining = this.state.allocations.filter(a => a.table === table);
-      if (remaining.length > 0) {
-        this.state.nextId[table] = Math.max(...remaining.map(a => a.endId)) + 1;
-      } else {
-        this.state.nextId[table] = DEFAULT_STARTS[table] ?? 10001;
+    // Reclaim ID space: reset nextId per table to max(remaining allocation ends + 1, DEFAULT_START)
+    if (removed > 0) {
+      const tableMaxes = new Map<string, number>();
+      for (const a of this.state.allocations) {
+        const cur = tableMaxes.get(a.table) ?? 0;
+        if (a.endId > cur) tableMaxes.set(a.table, a.endId);
+      }
+      for (const [table, defaultStart] of Object.entries(DEFAULT_STARTS)) {
+        const maxEnd = tableMaxes.get(table);
+        // Never go below DEFAULT_STARTS (preserves separation from seed ranges)
+        this.state.nextId[table] = Math.max(
+          maxEnd != null ? maxEnd + 1 : defaultStart,
+          defaultStart,
+        );
       }
     }
 
-    return before - this.state.allocations.length;
+    return removed;
   }
 }

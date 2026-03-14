@@ -196,9 +196,14 @@ export function generateV2Data(
       }
     }
   }
-  const collateralRows = generateCollateralRows(stateMap, facilityIds, dates, registry, collateralAssetMap);
-  tables.push({ schema: 'l2', table: 'collateral_snapshot', rows: collateralRows });
-  tableBreakdown['collateral_snapshot'] = collateralRows.length;
+  const collateralOutput = generateCollateralRows(stateMap, facilityIds, dates, registry, collateralAssetMap);
+  // Insert auto-created L1 collateral_asset_master rows BEFORE L2 snapshots
+  if (collateralOutput.autoCreatedAssets.length > 0) {
+    tables.push({ schema: 'l2', table: 'collateral_asset_master', rows: collateralOutput.autoCreatedAssets });
+    tableBreakdown['collateral_asset_master'] = collateralOutput.autoCreatedAssets.length;
+  }
+  tables.push({ schema: 'l2', table: 'collateral_snapshot', rows: collateralOutput.snapshots });
+  tableBreakdown['collateral_snapshot'] = collateralOutput.snapshots.length;
 
   // 10. Profitability
   const profitabilityRows = generateProfitabilityRows(stateMap, facilityIds, dates, registry);

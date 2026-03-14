@@ -713,7 +713,7 @@ export function validateV2Output(
 
   const VALID_CREDIT_STATUS_CODES = new Set([1, 3, 4, 5, 9, 10]);
   const VALID_LIMIT_STATUS_CODES = new Set(['NEAR_LIMIT', 'WITHIN_LIMIT', 'OVER_LIMIT', 'INACTIVE']);
-  const VALID_COLLATERAL_TYPE_IDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const VALID_COLLATERAL_TYPE_IDS = new Set([100001, 100002, 100003, 100004, 100005, 100006, 100007, 100008, 100009, 100010]);
 
   for (const td of output.tables) {
     for (const row of td.rows) {
@@ -735,14 +735,14 @@ export function validateV2Output(
       // collateral_type_id FK
       if ('collateral_type_id' in row && row.collateral_type_id !== null && row.collateral_type_id !== undefined) {
         if (!VALID_COLLATERAL_TYPE_IDS.has(row.collateral_type_id as number)) {
-          warnings.push(`${td.schema}.${td.table}: collateral_type_id ${row.collateral_type_id} not in L1 collateral_type_dim (1-10)`);
+          warnings.push(`${td.schema}.${td.table}: collateral_type_id ${row.collateral_type_id} not in L1 collateral_type_dim (100001-100010)`);
           break;
         }
       }
-      // source_system_id FK — should be 1 (DATA_FACTORY_V2)
+      // source_system_id FK — should be 1400001 (DATA_FACTORY_V2 in l1.source_system_registry)
       if ('source_system_id' in row && row.source_system_id !== null && row.source_system_id !== undefined) {
-        if (row.source_system_id !== 1) {
-          warnings.push(`${td.schema}.${td.table}: unexpected source_system_id ${row.source_system_id} (expected 1)`);
+        if (row.source_system_id !== 1400001) {
+          warnings.push(`${td.schema}.${td.table}: unexpected source_system_id ${row.source_system_id} (expected 1400001)`);
           break;
         }
       }

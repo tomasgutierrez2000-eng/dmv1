@@ -123,7 +123,9 @@ export function isTestDate(
 ): boolean {
   const month = new Date(date + 'T00:00:00Z').getUTCMonth() + 1;
   const day = new Date(date + 'T00:00:00Z').getUTCDate();
-  const isMonthEnd = day >= 25;
+  // Test dates are typically the last business day of the relevant month
+  // Window wide enough to catch weekly snapshots (day >= 20 covers ~10 days)
+  const isMonthEnd = day >= 20;
 
   const quarterEndMonths = [3, 6, 9, 12];
   const semiEndMonths = [6, 12];

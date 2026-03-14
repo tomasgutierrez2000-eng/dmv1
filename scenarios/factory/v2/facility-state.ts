@@ -471,6 +471,13 @@ export function evolveFacilityState(
     state.next_test_date = nextTestDate(date, state.covenant_package.test_frequency);
   }
 
+  // ── Step 8b: Covenant-aware credit status adjustment ──
+  // An unwaived covenant breach should push status to at least WATCH
+  if (state.credit_status === 'PERFORMING' &&
+      state.covenants.some(c => c.is_breached && !c.waiver_active)) {
+    state.credit_status = 'WATCH';
+  }
+
   // ── Step 9: IFRS 9 staging ──
   state.ifrs9_stage = determineIFRS9Stage(state);
 

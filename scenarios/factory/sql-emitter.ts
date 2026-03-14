@@ -136,12 +136,12 @@ export function formatSqlValue(columnName: string, value: unknown): string {
     return value ? `'${String(value)}'` : 'NULL';
   }
 
-  // BOOLEAN-like columns: _flag → quoted string
+  // BOOLEAN columns: _flag → PostgreSQL boolean literal (unquoted TRUE/FALSE)
   if (columnName.endsWith('_flag')) {
     const v = String(value).toUpperCase();
-    if (v === 'TRUE' || v === 'Y' || v === '1') return "'Y'";
-    if (v === 'FALSE' || v === 'N' || v === '0') return "'N'";
-    return `'${v}'`;
+    if (v === 'TRUE' || v === 'Y' || v === '1') return 'TRUE';
+    if (v === 'FALSE' || v === 'N' || v === '0') return 'FALSE';
+    return 'NULL';
   }
 
   // String columns: everything else → quoted string
@@ -155,9 +155,9 @@ export function formatSqlValue(columnName: string, value: unknown): string {
     return String(value);
   }
 
-  // Boolean → quoted Y/N
+  // Boolean → PostgreSQL boolean literal
   if (typeof value === 'boolean') {
-    return value ? "'Y'" : "'N'";
+    return value ? 'TRUE' : 'FALSE';
   }
 
   return `'${String(value).replace(/'/g, "''")}'`;

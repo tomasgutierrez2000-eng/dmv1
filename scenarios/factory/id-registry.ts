@@ -9,7 +9,7 @@
  * State persists to JSON for incremental scenario generation.
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, renameSync } from 'fs';
 import path from 'path';
 
 export interface AllocationBlock {
@@ -52,8 +52,12 @@ const DEFAULT_STARTS: Record<string, number> = {
   deal_pipeline_fact:             5100,
   limit_utilization_event:        5100,
 
-  // L2 composite-PK tables don't need auto-increment IDs
-  // (they use facility_id + as_of_date as PK)
+  // L2 surrogate-PK tables (generators allocate IDs via registry)
+  facility_exposure_snapshot:     50001,  // seed 1-10000
+  position:                       50001,
+  position_detail:                50001,
+  cash_flow:                      50001,
+  facility_lender_allocation:     100001, // gsib-enrichment was using module-level counter
 };
 
 /** Reserved ranges that must never be allocated */
@@ -73,6 +77,9 @@ const RESERVED_RANGES: { table: string; label: string; start: number; end: numbe
   { table: 'credit_event',            label: 'S1-S18',  start: 5001, end: 5199 },
   { table: 'risk_flag',               label: 'S1-S18',  start: 5001, end: 5199 },
   { table: 'collateral_asset_master', label: 'S1-S18',  start: 50101, end: 50200 },
+
+  // L2 surrogate-PK seed ranges
+  { table: 'facility_exposure_snapshot', label: 'SEED', start: 1, end: 10000 },
 ];
 
 export class IDRegistry {
@@ -148,9 +155,11 @@ export class IDRegistry {
     );
   }
 
-  /** Persist state to JSON */
+  /** Persist state to JSON (atomic: write tmp + rename to prevent corruption) */
   save(): void {
-    writeFileSync(this.persistPath, JSON.stringify(this.state, null, 2) + '\n');
+    const tmp = this.persistPath + '.tmp';
+    writeFileSync(tmp, JSON.stringify(this.state, null, 2) + '\n');
+    renameSync(tmp, this.persistPath);
   }
 
   /** Get summary stats */

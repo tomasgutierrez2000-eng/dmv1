@@ -3,7 +3,7 @@
  * Reads: drawn_amount, committed_amount, undrawn_amount, lifecycle_stage
  */
 import type { FacilityState, FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -43,7 +43,7 @@ export function generateExposureRows(
         number_of_facilities: 1,
         limit_status_code: utilization > 0.90 ? 'NEAR_LIMIT' : 'WITHIN_LIMIT',
         internal_risk_rating_bucket_code: state.internal_rating,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

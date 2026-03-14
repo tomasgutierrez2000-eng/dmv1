@@ -3,7 +3,7 @@
  * Reads: collateral_value, collateral_type, ltv_ratio
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round, seededRng } from '../prng';
 
@@ -78,7 +78,7 @@ export function generateCollateralRows(
         mitigant_group_code: MITIGANT_GROUP_MAP[state.collateral_type] ?? 'NONE',
         mitigant_subtype: state.collateral_type,
         is_risk_shifting_flag: state.collateral_type === 'CASH',
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

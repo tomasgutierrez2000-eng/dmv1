@@ -27,6 +27,7 @@ import {
   type TableData as SqlEmitterTableData,
 } from './sql-emitter';
 import type { TableData as V2TableData } from './v2/types';
+import { validateV2Output } from './validator';
 import type { StoryArc, RatingTier, SizeProfile } from '../../scripts/shared/mvp-config';
 import type { TimeFrequency } from './v2/types';
 
@@ -188,13 +189,14 @@ function chainToV2Tables(chain: L1Chain): V2TableData[] {
     if (rows.length > 0) tables.push({ schema, table, rows });
   };
 
-  push('l1', 'counterparty', chain.counterparties as unknown as Record<string, unknown>[]);
-  push('l1', 'credit_agreement_master', chain.agreements as unknown as Record<string, unknown>[]);
-  push('l1', 'facility_master', chain.facilities as unknown as Record<string, unknown>[]);
-  if (chain.hierarchies) push('l1', 'counterparty_hierarchy', chain.hierarchies as unknown as Record<string, unknown>[]);
+  // Schema must match actual PostgreSQL DDL (02-l2-ddl.sql for master tables, 01-l1-ddl.sql for dims)
+  push('l2', 'counterparty', chain.counterparties as unknown as Record<string, unknown>[]);
+  push('l2', 'credit_agreement_master', chain.agreements as unknown as Record<string, unknown>[]);
+  push('l2', 'facility_master', chain.facilities as unknown as Record<string, unknown>[]);
+  if (chain.hierarchies) push('l2', 'counterparty_hierarchy', chain.hierarchies as unknown as Record<string, unknown>[]);
   if (chain.collateral_assets) push('l1', 'collateral_asset_master', chain.collateral_assets as unknown as Record<string, unknown>[]);
   if (chain.limit_rules) push('l1', 'limit_rule', chain.limit_rules as unknown as Record<string, unknown>[]);
-  if (chain.facility_lender_allocations) push('l1', 'facility_lender_allocation', chain.facility_lender_allocations as unknown as Record<string, unknown>[]);
+  if (chain.facility_lender_allocations) push('l2', 'facility_lender_allocation', chain.facility_lender_allocations as unknown as Record<string, unknown>[]);
 
   return tables;
 }
@@ -296,6 +298,28 @@ async function main() {
       // Generate L2 data via v2 engine
       const v2Output = generateV2Data(chain, v2Config, registry);
 
+      // Validate before any write — catches FK, PK, financial, covenant, IFRS9 issues
+      const validation = validateV2Output(chain, v2Output, config);
+      if (!validation.valid) {
+        console.log(`   ⚠ Validation FAILED: ${validation.errors.length} error(s)`);
+        for (const err of validation.errors.slice(0, 5)) {
+          console.log(`     ✗ ${err}`);
+        }
+        if (validation.errors.length > 5) {
+          console.log(`     ... and ${validation.errors.length - 5} more`);
+        }
+        allValid = false;
+        continue; // Skip this scenario — do not write bad data
+      }
+      if (validation.warnings.length > 0) {
+        console.log(`   ⚠ ${validation.warnings.length} warning(s)${args.verbose ? ':' : ' (use --verbose to see)'}`);
+        if (args.verbose) {
+          for (const w of validation.warnings.slice(0, 10)) {
+            console.log(`     ⚡ ${w}`);
+          }
+        }
+      }
+
       // Combine L1 + L2 tables
       const l1Tables = chainToV2Tables(chain);
       const allTables = [...l1Tables, ...v2Output.tables];
@@ -303,7 +327,7 @@ async function main() {
 
       // Show stats
       const { tableBreakdown } = v2Output.stats;
-      console.log(`   ✓ Generated | ${scenarioRows} rows across ${allTables.length} tables`);
+      console.log(`   ✓ Validated + Generated | ${scenarioRows} rows across ${allTables.length} tables`);
       console.log(`   Dates: ${v2Output.dates.length} snapshots (${v2Output.dates[0]} → ${v2Output.dates[v2Output.dates.length - 1]})`);
 
       if (args.verbose) {

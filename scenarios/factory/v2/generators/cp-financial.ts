@@ -3,7 +3,7 @@
  * Reads: aggregated counterparty-level financials
  */
 import type { FacilityStateMap, CounterpartyFinancials, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -59,7 +59,7 @@ export function generateCounterpartyFinancialRows(
         tangible_net_worth_usd: round(fin.tangible_net_worth, 2),
         expected_drawdown_amt: null,
         fee_income_amt: null,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

@@ -3,7 +3,7 @@
  * Reads: events_this_period[] from FacilityState
  */
 import type { FacilityState, FacilityStateMap, FacilityEvent, SqlRow } from '../types';
-import { stateKey, CREDIT_STATUS_CODE } from '../types';
+import { stateKey, CREDIT_STATUS_CODE, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { EventCooldownTracker, categorizeEvents } from '../event-engine';
 
@@ -55,7 +55,7 @@ export function generateEventRows(
             : null,
           recovery_amount_usd: null,
           currency_code: state.currency_code,
-          source_system_id: 1,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });
@@ -75,7 +75,7 @@ export function generateEventRows(
           flag_severity: evt.severity,
           flag_scope: 'FACILITY',
           flag_trigger_value: extractTriggerValue(evt),
-          source_system_id: 1,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });
@@ -98,7 +98,7 @@ export function generateEventRows(
           as_of_date: evt.date,
           identified_date: evt.date,
           completed_date: evt.date,
-          source_system_id: 1,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });
@@ -117,7 +117,7 @@ export function generateEventRows(
           exception_severity: evt.severity,
           exception_status: 'OPEN',
           identified_date: evt.date,
-          source_system_id: 1,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });

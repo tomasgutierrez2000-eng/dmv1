@@ -3,7 +3,7 @@
  * Reads: drawn_amount, credit_status, days_past_due
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round, seededRng } from '../prng';
 
@@ -49,7 +49,7 @@ export function generatePositionRows(
         is_trading_banking_book_flag: false,
         exposure_type_code: 'CREDIT',
         product_code: state.product_type,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });
@@ -72,7 +72,7 @@ export function generatePositionRows(
         origination_date: state.origination_date,
         maturity_date: state.maturity_date,
         ccf: state.ccf,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

@@ -3,7 +3,7 @@
  * Reads: spread_bps, all_in_rate_pct, fee_rate_pct, base_rate_pct, cost_of_funds_pct
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 import { getBenchmarkName } from '../market-environment';
@@ -41,7 +41,7 @@ export function generatePricingRows(
         is_pricing_exception_flag: false,
         pricing_exception_status: null,
         min_spread_threshold_bps: null,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

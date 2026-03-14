@@ -3,7 +3,7 @@
  * Reads: pd_annual, lgd_current, ccf, risk_weight_pct, internal_rating
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import { round } from '../prng';
 
 export function generateRiskRows(
@@ -30,7 +30,7 @@ export function generateRiskRows(
         risk_weight_std_pct: round(state.risk_weight_pct, 6),
         risk_weight_erba_pct: round(state.risk_weight_pct * 0.95, 6),
         is_defaulted_flag: state.credit_status === 'DEFAULT',
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

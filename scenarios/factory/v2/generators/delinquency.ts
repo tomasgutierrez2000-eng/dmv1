@@ -3,7 +3,7 @@
  * Reads: days_past_due, credit_status
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -55,7 +55,7 @@ export function generateDelinquencyRows(
         overdue_amt_31_60: dpd > 30 && dpd <= 60 ? overdueInterest : 0,
         overdue_amt_61_90_plus: dpd > 60 ? overdueInterest + overduePrincipal : 0,
         last_payment_received_date: dpd === 0 ? date : null,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

@@ -20,6 +20,7 @@ import {
   type EnrichedFacility,
   type EnrichedAllocation,
 } from './gsib-enrichment';
+import { seededRng } from './v2/prng';
 
 /* ────────────────── Output Types ────────────────── */
 
@@ -100,7 +101,8 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
   }
 
   // 5. Build lender allocations (100% bank share for each facility)
-  const facility_lender_allocations = facilities.map(enrichLenderAllocation);
+  const allocIds = registry.allocate('facility_lender_allocation', facilities.length, config.scenario_id);
+  const facility_lender_allocations = facilities.map((fac, i) => enrichLenderAllocation(fac, allocIds[i]));
 
   // 6. Build optional components based on scenario type
 
@@ -108,6 +110,7 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
   let hierarchies: HierarchyRow[] | undefined;
   if (cpCount > 1 && (config.type === 'EXPOSURE_BREACH' || config.type === 'SYNDICATED_FACILITY')) {
     const lastDate = config.timeline.as_of_dates[config.timeline.as_of_dates.length - 1];
+    const hierarchyRng = seededRng(`hierarchy-${config.scenario_id}`);
     hierarchies = [];
     // First counterparty is parent (self-referencing)
     hierarchies.push({
@@ -124,7 +127,7 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
         as_of_date: lastDate,
         immediate_parent_id: cpIds[0],
         ultimate_parent_id: cpIds[0],
-        ownership_pct: Math.round(50 + Math.random() * 50),
+        ownership_pct: Math.round(50 + hierarchyRng() * 50),
       });
     }
   }
@@ -135,9 +138,11 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
     const assetCount = config.l2_tables?.collateral_snapshot?.asset_count ?? 8;
     const assetIds = registry.allocate('collateral_asset_master', assetCount, config.scenario_id);
     const cpCountry = config.counterparties[0]?.country ?? 'US';
+    // Valid collateral_type_ids from l1.collateral_type seed data
+    const VALID_COLLATERAL_TYPE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     collateral_assets = assetIds.map((id, i) => ({
       collateral_asset_id: id,
-      collateral_type_id: ((i % 10) + 1),  // 1-10
+      collateral_type_id: VALID_COLLATERAL_TYPE_IDS[i % VALID_COLLATERAL_TYPE_IDS.length],
       counterparty_id: cpIds[i % cpCount],
       country_code: cpCountry,
       currency_code: cpCountry === 'US' ? 'USD' : cpCountry === 'GB' ? 'GBP' : 'USD',

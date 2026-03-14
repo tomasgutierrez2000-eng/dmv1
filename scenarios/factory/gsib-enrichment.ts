@@ -144,7 +144,13 @@ export function enrichCounterparty(
   const rng = mulberry32(hashStr(`cp.${counterpartyId}.${profile.legal_name}`));
   const tier = RATING_TIER_MAP[profile.rating_tier];
   const industryMap = INDUSTRY_GSIB_MAP[profile.industry_id] ?? INDUSTRY_GSIB_MAP[1];
+  if (!INDUSTRY_GSIB_MAP[profile.industry_id]) {
+    console.warn(`GSIB enrichment: unknown industry_id ${profile.industry_id} for ${profile.legal_name}, defaulting to TMT (1)`);
+  }
   const countryMap = COUNTRY_MAP[profile.country] ?? COUNTRY_MAP['US'];
+  if (!COUNTRY_MAP[profile.country]) {
+    console.warn(`GSIB enrichment: unknown country '${profile.country}' for ${profile.legal_name}, defaulting to US`);
+  }
 
   // Determine counterparty type
   const counterpartyType = profile.counterparty_type ??
@@ -422,12 +428,14 @@ export interface EnrichedAllocation {
   effective_end_date: null;
 }
 
-let _allocIdCounter = 100000;
-
-export function enrichLenderAllocation(facility: EnrichedFacility): EnrichedAllocation {
-  _allocIdCounter++;
+/**
+ * Build a lender allocation row for a facility.
+ * @param facility  The enriched facility
+ * @param allocationId  Pre-allocated ID from IDRegistry
+ */
+export function enrichLenderAllocation(facility: EnrichedFacility, allocationId: number): EnrichedAllocation {
   return {
-    lender_allocation_id: _allocIdCounter,
+    lender_allocation_id: allocationId,
     facility_id: facility.facility_id,
     legal_entity_id: facility.ledger_account_id <= 5 ? facility.ledger_account_id : 1,
     allocation_role: 'LEAD_ARRANGER',
@@ -436,9 +444,4 @@ export function enrichLenderAllocation(facility: EnrichedFacility): EnrichedAllo
     effective_start_date: facility.origination_date,
     effective_end_date: null,
   };
-}
-
-/** Reset allocation ID counter (for re-generation) */
-export function resetAllocationCounter(): void {
-  _allocIdCounter = 100000;
 }

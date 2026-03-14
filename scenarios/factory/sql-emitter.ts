@@ -22,9 +22,9 @@ export const LOAD_ORDER: string[] = [
 
   // L1/L2 reference data (parents first)
   'l2.counterparty',
-  'l1.credit_agreement_master',
+  'l2.credit_agreement_master',
   'l2.facility_master',
-  'l1.counterparty_hierarchy',
+  'l2.counterparty_hierarchy',
   'l1.sccl_counterparty_group',
   'l1.sccl_counterparty_group_member',
   'l1.control_relationship',
@@ -48,6 +48,7 @@ export const LOAD_ORDER: string[] = [
   'l2.collateral_snapshot',
   'l2.counterparty_rating_observation',
   'l2.counterparty_financial_snapshot',
+  'l2.ecl_provision_snapshot',
   'l2.financial_metric_observation',
   'l2.limit_contribution_snapshot',
   'l2.limit_utilization_event',

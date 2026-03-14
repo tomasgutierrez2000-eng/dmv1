@@ -3,7 +3,7 @@
  * Reads: drawn per counterparty vs limits
  */
 import type { FacilityState, FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -59,7 +59,7 @@ export function generateLimitRows(
         contribution_amount_usd: round(totalDrawn, 2),
         contribution_pct: round(utilizationPct, 6),
         currency_code: 'USD',
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });
@@ -75,7 +75,7 @@ export function generateLimitRows(
         utilized_amount_usd: round(totalDrawn, 2),
         available_amount: round(limitAmount - totalDrawn, 2),
         currency_code: 'USD',
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

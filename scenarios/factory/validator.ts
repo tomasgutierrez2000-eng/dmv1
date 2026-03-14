@@ -639,7 +639,48 @@ export function validateV2Output(
     }
   }
 
-  // ── 10. Data Completeness ──
+  // ── 10. L1 Reference Code Validation ──
+  // Verify that FK code values in generated rows match valid L1 dim table entries.
+
+  const VALID_CREDIT_STATUS_CODES = new Set([1, 3, 4, 5, 9, 10]);
+  const VALID_LIMIT_STATUS_CODES = new Set(['NEAR_LIMIT', 'WITHIN_LIMIT', 'OVER_LIMIT', 'INACTIVE']);
+  const VALID_COLLATERAL_TYPE_IDS = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+  for (const td of output.tables) {
+    for (const row of td.rows) {
+      // credit_status_code FK
+      if ('credit_status_code' in row && row.credit_status_code !== null && row.credit_status_code !== undefined) {
+        const code = typeof row.credit_status_code === 'string' ? parseInt(row.credit_status_code, 10) : row.credit_status_code as number;
+        if (!isNaN(code) && !VALID_CREDIT_STATUS_CODES.has(code)) {
+          warnings.push(`${td.schema}.${td.table}: credit_status_code ${row.credit_status_code} not in L1 credit_status_dim`);
+          break;
+        }
+      }
+      // limit_status_code FK
+      if ('limit_status_code' in row && row.limit_status_code !== null && row.limit_status_code !== undefined) {
+        if (!VALID_LIMIT_STATUS_CODES.has(row.limit_status_code as string)) {
+          warnings.push(`${td.schema}.${td.table}: limit_status_code '${row.limit_status_code}' not in known set`);
+          break;
+        }
+      }
+      // collateral_type_id FK
+      if ('collateral_type_id' in row && row.collateral_type_id !== null && row.collateral_type_id !== undefined) {
+        if (!VALID_COLLATERAL_TYPE_IDS.has(row.collateral_type_id as number)) {
+          warnings.push(`${td.schema}.${td.table}: collateral_type_id ${row.collateral_type_id} not in L1 collateral_type_dim (1-10)`);
+          break;
+        }
+      }
+      // source_system_id FK — should be 1 (DATA_FACTORY_V2)
+      if ('source_system_id' in row && row.source_system_id !== null && row.source_system_id !== undefined) {
+        if (row.source_system_id !== 1) {
+          warnings.push(`${td.schema}.${td.table}: unexpected source_system_id ${row.source_system_id} (expected 1)`);
+          break;
+        }
+      }
+    }
+  }
+
+  // ── 11. Data Completeness ──
 
   if (chain.counterparties.length === 0) errors.push('No counterparties generated');
   if (chain.facilities.length === 0) errors.push('No facilities generated');
@@ -678,8 +719,9 @@ function guessPKFields(table: string, sampleRow: Record<string, unknown>): strin
     facility_delinquency_snapshot: ['facility_id', 'as_of_date'],
     facility_profitability_snapshot: ['facility_id', 'as_of_date'],
     collateral_snapshot: ['collateral_asset_id', 'as_of_date'],
-    counterparty_rating_observation: ['counterparty_id', 'as_of_date'],
+    // counterparty_rating_observation has observation_id as PK (handled by single-PK fallback)
     counterparty_financial_snapshot: ['counterparty_id', 'as_of_date'],
+    ecl_provision_snapshot: ['facility_id', 'as_of_date'],
     limit_contribution_snapshot: ['limit_rule_id', 'facility_id', 'as_of_date'],
   };
 
@@ -698,7 +740,7 @@ function guessPKFields(table: string, sampleRow: Record<string, unknown>): strin
   }
 
   // Common single PK field names
-  for (const f of ['position_id', 'credit_event_id', 'risk_flag_id', 'amendment_id', 'exception_id', 'cash_flow_id', 'approval_id', 'observation_id', 'attribution_id']) {
+  for (const f of ['position_id', 'credit_event_id', 'risk_flag_id', 'amendment_id', 'exception_id', 'cash_flow_id', 'approval_id', 'observation_id', 'attribution_id', 'provision_id']) {
     if (f in sampleRow) return [f];
   }
 

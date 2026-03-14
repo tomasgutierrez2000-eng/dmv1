@@ -8,6 +8,9 @@
 
 import type { StoryArc, RatingTier, SizeProfile } from '../../../scripts/shared/mvp-config';
 
+/** Source system ID for all factory-generated data. Matches l1.source_system_dim PK=1. */
+export const FACTORY_SOURCE_SYSTEM_ID = 1;
+
 // ─── Product Types ──────────────────────────────────────────────────────
 
 export type ProductType =

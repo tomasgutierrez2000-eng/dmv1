@@ -3,7 +3,7 @@
  * Reads: internal_rating, external_rating, pd_annual
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 
 export function generateRatingRows(
@@ -39,7 +39,7 @@ export function generateRatingRows(
         is_internal_flag: true,
         pd_implied: state.pd_annual.toFixed(6),
         risk_rating_status: state.credit_status === 'PERFORMING' ? 'ACTIVE' : 'UNDER_REVIEW',
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });
@@ -58,7 +58,7 @@ export function generateRatingRows(
           is_internal_flag: false,
           pd_implied: state.pd_annual.toFixed(6),
           risk_rating_status: 'ACTIVE',
-          source_system_id: 1,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });
@@ -78,7 +78,7 @@ export function generateRatingRows(
           is_internal_flag: false,
           pd_implied: state.pd_annual.toFixed(6),
           risk_rating_status: 'ACTIVE',
-          source_system_id: 1,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });

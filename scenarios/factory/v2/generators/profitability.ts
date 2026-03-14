@@ -3,7 +3,7 @@
  * Reads: NII = drawn * (all_in - cof), fee income, allocated equity
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -55,7 +55,7 @@ export function generateProfitabilityRows(
         avg_earning_assets_amt: round(state.drawn_amount, 2),
         avg_nonearning_assets_amt: round(state.undrawn_amount * 0.10, 2),
         base_currency_code: state.currency_code,
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

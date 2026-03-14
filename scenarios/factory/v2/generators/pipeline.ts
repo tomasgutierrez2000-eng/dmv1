@@ -3,7 +3,7 @@
  * New facilities entering the pipeline
  */
 import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round, seededRng, pick } from '../prng';
 
@@ -56,7 +56,7 @@ export function generatePipelineRows(
         ? state.committed_amount / state.collateral_value : 0, 4),
       currency_code: state.currency_code,
       record_level_code: 'FACILITY',
-      source_system_id: 1,
+      source_system_id: FACTORY_SOURCE_SYSTEM_ID,
       record_source: 'DATA_FACTORY_V2',
       created_by: 'factory_v2',
     });

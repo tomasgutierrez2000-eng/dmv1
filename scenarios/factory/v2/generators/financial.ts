@@ -3,7 +3,7 @@
  * Reads: counterparty financials, facility-level amounts
  */
 import type { FacilityState, FacilityStateMap, CounterpartyFinancials, SqlRow } from '../types';
-import { stateKey } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round, seededRng } from '../prng';
 
@@ -54,7 +54,7 @@ export function generateFinancialRows(
         interest_expense_amt: interestExp,
         principal_payment_amt: principalPayment,
         reporting_period: getReportingPeriod(date),
-        source_system_id: 1,
+        source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',
       });

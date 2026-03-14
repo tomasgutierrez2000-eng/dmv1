@@ -18,12 +18,12 @@ export default function IngredientFieldsTable({ fields }: { fields: IngredientFi
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-700 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
-            <th className="py-2 pr-4">Layer</th>
-            <th className="py-2 pr-4">Table</th>
-            <th className="py-2 pr-4">Field</th>
-            <th className="py-2 pr-4">Description</th>
-            <th className="py-2 pr-4">Data Type</th>
-            <th className="py-2">Sample</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Layer</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Table</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Field</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Description</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Data Type</th>
+            <th className="py-2 whitespace-nowrap">Sample</th>
           </tr>
         </thead>
         <tbody>
@@ -34,8 +34,8 @@ export default function IngredientFieldsTable({ fields }: { fields: IngredientFi
                   {f.layer}
                 </span>
               </td>
-              <td className="py-2 pr-4 font-mono text-xs text-gray-300">{f.table}</td>
-              <td className="py-2 pr-4 font-mono text-xs text-purple-300">{f.field}</td>
+              <td className="py-2 pr-4 font-mono text-xs text-gray-300 whitespace-nowrap">{f.table}</td>
+              <td className="py-2 pr-4 font-mono text-xs text-purple-300 whitespace-nowrap">{f.field}</td>
               <td className="py-2 pr-4 text-gray-400">{f.description}</td>
               <td className="py-2 pr-4 font-mono text-[11px] text-gray-500">{f.data_type ?? '—'}</td>
               <td className="py-2 font-mono text-[11px] text-gray-500">{f.sample_value ?? '—'}</td>

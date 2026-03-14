@@ -14,11 +14,11 @@ export default function LevelRollupTable({ levels }: { levels: LevelDefinition[]
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-700 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
-            <th className="py-2 pr-4">Level</th>
-            <th className="py-2 pr-4">Display Name</th>
-            <th className="py-2 pr-4 text-center">In Record</th>
-            <th className="py-2 pr-4">Sourcing</th>
-            <th className="py-2">Level Logic</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Level</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Display Name</th>
+            <th className="py-2 pr-4 text-center whitespace-nowrap">In Record</th>
+            <th className="py-2 pr-4 whitespace-nowrap">Sourcing</th>
+            <th className="py-2 whitespace-nowrap">Level Logic</th>
           </tr>
         </thead>
         <tbody>
@@ -29,7 +29,7 @@ export default function LevelRollupTable({ levels }: { levels: LevelDefinition[]
                   {ROLLUP_LEVEL_LABELS[ld.level as RollupLevelKey] ?? ld.level}
                 </span>
               </td>
-              <td className="py-3 pr-4 text-gray-300">{ld.dashboard_display_name}</td>
+              <td className="py-3 pr-4 text-gray-300 whitespace-nowrap">{ld.dashboard_display_name}</td>
               <td className="py-3 pr-4 text-center">
                 {ld.in_record ? (
                   <span className="inline-block w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs leading-5 text-center">Y</span>

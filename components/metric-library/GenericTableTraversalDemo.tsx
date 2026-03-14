@@ -106,14 +106,14 @@ function buildDimensionDemos(config: TraversalConfig, metricName: string): Dimen
  * LAYOUT CONSTANTS
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const CARD_W = 176;
-const CARD_GAP = 24;
-const CARD_H_BASE = 52;
+const CARD_W = 220;
+const CARD_GAP = 28;
+const CARD_H_BASE = 56;
 const FIELD_H = 20;
-const ROW_HEIGHT = 172;
+const ROW_HEIGHT = 180;
 const SVG_PAD = 16;
-const NAME_MAX_CHARS = 12;
-const VALUE_MAX_CHARS = 12;
+const NAME_MAX_CHARS = 22;
+const VALUE_MAX_CHARS = 14;
 
 const PLAYBACK_BASE_MS = 5000;
 const SPEED_OPTIONS = [
@@ -133,7 +133,7 @@ function getCardPositions(
     const t = tables[tid];
     if (!t) continue;
     const isCalc = t.layer === 'L3';
-    const fieldCount = isCalc ? 1 : Math.min(t.fields.length, 4);
+    const fieldCount = isCalc ? 1 : Math.min(t.fields.length, 5);
     const h = CARD_H_BASE + fieldCount * FIELD_H;
     const y = t.layer === 'L1' ? ROW_HEIGHT : SVG_PAD;
     positions[tid] = { x: xCursor, y, h };
@@ -170,7 +170,7 @@ function TableCard({
 }) {
   const isCalc = tableDef.layer === 'L3';
   const glowColor = isCalc ? '#10b981' : tableDef.layer === 'L1' ? '#3b82f6' : '#f59e0b';
-  const shortName = tableDef.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).slice(0, 20);
+  const shortName = tableDef.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).slice(0, 28);
 
   return (
     <g style={{
@@ -202,16 +202,16 @@ function TableCard({
       </text>
       {/* Full name */}
       <text x={x + 8} y={y + 40} fill="#6b7280" fontSize={8} fontFamily="monospace">
-        {tableDef.name.length > 30 ? tableDef.name.slice(0, 28) + '\u2026' : tableDef.name}
+        {tableDef.name.length > 38 ? tableDef.name.slice(0, 36) + '\u2026' : tableDef.name}
       </text>
 
       {/* Fields or result */}
       {isCalc && sampleResult && isActive ? (
         <text x={x + w / 2} y={y + 58} textAnchor="middle" fill="#6ee7b7" fontSize={10} fontWeight={700} fontFamily="monospace">
-          {sampleResult.length > 28 ? sampleResult.slice(0, 26) + '\u2026' : sampleResult}
+          {sampleResult.length > 36 ? sampleResult.slice(0, 34) + '\u2026' : sampleResult}
         </text>
       ) : (
-        tableDef.fields.slice(0, 4).map((field, i) => {
+        tableDef.fields.slice(0, 5).map((field, i) => {
           const isHighlighted = isActive && fieldsToShow.includes(field.name);
           const fy = y + CARD_H_BASE + i * FIELD_H;
           const nameDisplay = field.name.length > NAME_MAX_CHARS ? field.name.slice(0, NAME_MAX_CHARS - 1) + '\u2026' : field.name;
@@ -304,7 +304,7 @@ function AnimatedArrow({
         <g style={{ animation: 'ttd-fadeIn 0.6s ease-out 0.4s both' }}>
           <rect x={labelX - 4} y={labelY - 10} width={Math.min(joinKey.length * 5 + 16, 200)} height={16} rx={4} fill="rgba(0,0,0,0.85)" stroke={color} strokeWidth={0.5} opacity={0.9} />
           <text x={labelX + 2} y={labelY + 1} fill={color} fontSize={8} fontFamily="monospace" fontWeight={600}>
-            ON {joinKey.length > 28 ? joinKey.slice(0, 26) + '\u2026' : joinKey}
+            ON {joinKey.length > 36 ? joinKey.slice(0, 34) + '\u2026' : joinKey}
           </text>
         </g>
       )}
@@ -552,7 +552,7 @@ export default function GenericTableTraversalDemo({
 
       {/* SVG Diagram */}
       <div className="px-2 pt-6 pb-3 overflow-x-auto overflow-y-hidden">
-        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="block mx-auto" style={{ minWidth: '100%', maxWidth: Math.min(svgW, 900) }} preserveAspectRatio="xMidYMid meet">
+        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="block" style={{ minWidth: svgW }}>
           <defs>
             <marker id="arrow-active" markerWidth={8} markerHeight={8} refX={7} refY={4} orient="auto">
               <polygon points="0 0, 8 4, 0 8" fill="#a855f7" />

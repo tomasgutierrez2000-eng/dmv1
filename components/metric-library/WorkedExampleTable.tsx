@@ -197,10 +197,10 @@ export function EntityTable({
       <table className="w-full text-sm">
         <thead>
           <tr className="text-[10px] uppercase tracking-wider text-gray-500 border-b border-gray-800">
-            <th className="text-left py-2 px-3 font-semibold">Facility</th>
-            {showPositionCount && <th className="text-center py-2 px-3 font-semibold">Positions</th>}
+            <th className="text-left py-2 px-3 font-semibold min-w-[240px]">Facility</th>
+            {showPositionCount && <th className="text-center py-2 px-3 font-semibold whitespace-nowrap">Positions</th>}
             {columns.map((col) => (
-              <th key={col.field} className="text-right py-2 px-3 font-semibold">
+              <th key={col.field} className="text-right py-2 px-3 font-semibold whitespace-nowrap">
                 {col.header}
               </th>
             ))}
@@ -212,7 +212,7 @@ export function EntityTable({
               <React.Fragment key={g.label}>
                 {/* Group header */}
                 <tr className="bg-gray-800/30">
-                  <td colSpan={totalColSpan} className="py-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  <td colSpan={totalColSpan} className="py-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 whitespace-nowrap">
                     {g.label}
                   </td>
                 </tr>
@@ -284,12 +284,12 @@ function EntityRow({
   return (
     <tr className="border-b border-gray-800/50 hover:bg-white/[0.02]">
       {/* Facility name cell */}
-      <td className="py-2 px-3">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] text-gray-500">{entity.entity_id}</span>
-          <span className="text-gray-300">{entity.entity_name}</span>
+      <td className="py-2 px-3 min-w-[240px]">
+        <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+          <span className="font-mono text-[10px] text-gray-500 flex-shrink-0">{entity.entity_id}</span>
+          <span className="text-gray-300 text-sm">{entity.entity_name}</span>
         </div>
-        <div className="text-[10px] text-gray-600 mt-0.5">{entity.counterparty_name}</div>
+        <div className="text-[10px] text-gray-600 mt-0.5 whitespace-nowrap">{entity.counterparty_name}</div>
       </td>
       {/* Position count */}
       {showPositionCount && (
@@ -306,7 +306,7 @@ function EntityRow({
           : 'text-gray-200';
         const fontWeight = col.is_result ? 'font-semibold' : '';
         return (
-          <td key={col.field} className={`py-2 px-3 text-right font-mono ${fontWeight} ${colorClass}`}>
+          <td key={col.field} className={`py-2 px-3 text-right font-mono whitespace-nowrap ${fontWeight} ${colorClass}`}>
             {formatCellValue(val, col)}
           </td>
         );
@@ -342,7 +342,7 @@ function SubtotalRow({
 
   return (
     <tr className={`${isGrand ? 'font-semibold' : ''} ${bgClass}`}>
-      <td className={`py-${isGrand ? '2' : '1.5'} px-3 text-gray-${isGrand ? '300' : '500'} text-xs ${isGrand ? 'uppercase tracking-wider' : 'italic'}`}>
+      <td className={`py-${isGrand ? '2' : '1.5'} px-3 text-gray-${isGrand ? '300' : '500'} text-xs min-w-[240px] whitespace-nowrap ${isGrand ? 'uppercase tracking-wider' : 'italic'}`}>
         {label}
       </td>
       {showPositionCount && (
@@ -354,7 +354,7 @@ function SubtotalRow({
         const sub = computeSubtotal(entities, col, config);
         if (!sub) {
           return (
-            <td key={col.field} className="py-1.5 px-3 text-right font-mono text-xs text-gray-400">
+            <td key={col.field} className="py-1.5 px-3 text-right font-mono text-xs text-gray-400 whitespace-nowrap">
               —
             </td>
           );
@@ -369,7 +369,7 @@ function SubtotalRow({
         return (
           <td
             key={col.field}
-            className={`py-${isGrand ? '2' : '1.5'} px-3 text-right font-mono ${
+            className={`py-${isGrand ? '2' : '1.5'} px-3 text-right font-mono whitespace-nowrap ${
               isGrand && col.is_result ? 'font-bold text-lg' : 'text-xs'
             } ${col.is_result ? colorClass : (isGrand ? 'text-emerald-400' : 'text-gray-400')}`}
           >

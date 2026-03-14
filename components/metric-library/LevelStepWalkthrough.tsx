@@ -77,9 +77,9 @@ export default function LevelStepWalkthrough({ steps, title, subtitle }: LevelSt
     <div className="rounded-xl border border-gray-800 bg-black/30 p-4">
       {/* Header with controls */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs font-bold text-white truncate">{title}</span>
-          {subtitle && <span className="text-[9px] text-gray-600 truncate hidden sm:inline">{subtitle}</span>}
+        <div className="flex items-baseline gap-2 min-w-0 flex-wrap">
+          <span className="text-xs font-bold text-white">{title}</span>
+          {subtitle && <span className="text-[9px] text-gray-600 hidden sm:inline">{subtitle}</span>}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {activeStep === -1 ? (
@@ -171,16 +171,16 @@ export default function LevelStepWalkthrough({ steps, title, subtitle }: LevelSt
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-baseline gap-2 flex-wrap">
                     <span
-                      className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                      className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded flex-shrink-0 ${
                         isActive ? `${fc.bg} ${fc.text}` : 'bg-white/5 text-gray-600'
                       }`}
                     >
                       {step.layer}
                     </span>
-                    <code className={`text-[10px] font-mono ${isActive ? fc.text : 'text-gray-500'}`}>{step.table}</code>
-                    <span className="text-[9px] text-gray-600">{step.action}</span>
+                    <code className={`text-[10px] font-mono break-all ${isActive ? fc.text : 'text-gray-500'}`}>{step.table}</code>
+                    <span className="text-[9px] text-gray-600 break-words">{step.action}</span>
                   </div>
                   {(isActive || isPast) && (
                     <div className="mt-1">

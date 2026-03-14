@@ -5,6 +5,7 @@ import {
   GitBranch, Loader2, CheckCircle2, XCircle, Play,
   BarChart3, AlertTriangle,
 } from 'lucide-react';
+import { formatMetricValue } from '@/lib/governance/drill-down';
 
 interface ResultRow {
   dimension_key: unknown;
@@ -192,7 +193,7 @@ export default function RollupResultsPane({
                 <div className="flex items-center gap-3">
                   <div>
                     <span className={`text-lg font-bold tabular-nums ${avg !== null ? colorFn(avg) : 'text-gray-500'}`}>
-                      {avg !== null ? `${avg.toFixed(1)}%` : 'N/A'}
+                      {avg !== null ? formatMetricValue(avg, item?.unit_type) : 'N/A'}
                     </span>
                     <span className="text-[10px] text-gray-600 ml-1">avg</span>
                   </div>
@@ -246,7 +247,7 @@ export default function RollupResultsPane({
                     </span>
                     {delta !== null && (
                       <span className={pass ? 'text-emerald-400' : 'text-amber-400'}>
-                        {pass ? 'OK' : `Δ${delta.toFixed(1)}%`}
+                        {pass ? 'OK' : `Δ${formatMetricValue(delta, item?.unit_type)}`}
                       </span>
                     )}
                   </div>
@@ -265,7 +266,8 @@ export default function RollupResultsPane({
               const vals = (facResult?.rows ?? []).map(r => Number(r.metric_value)).filter(v => !isNaN(v));
               const sorted = [...vals].sort((a, b) => a - b);
               const median = sorted.length > 0 ? sorted[Math.floor(sorted.length / 2)] : null;
-              const highLtv = vals.filter(v => v > 100).length;
+              const isPctType = item?.unit_type === 'PERCENTAGE' || item?.unit_type === 'RATIO' || item?.unit_type === 'RATE';
+              const highPctCount = isPctType ? vals.filter(v => v > 100).length : 0;
 
               return (
                 <div className="grid grid-cols-2 gap-2 text-[10px]">
@@ -276,20 +278,22 @@ export default function RollupResultsPane({
                   <div>
                     <span className="text-gray-600">Median</span>
                     <span className={`block font-semibold ${median !== null ? colorFn(median) : 'text-gray-500'}`}>
-                      {median !== null ? `${median.toFixed(1)}%` : 'N/A'}
+                      {median !== null ? formatMetricValue(median, item?.unit_type) : 'N/A'}
                     </span>
                   </div>
-                  <div>
-                    <span className="text-gray-600">&gt; 100%</span>
-                    <span className={`block font-semibold ${highLtv > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                      {highLtv} facilities
-                    </span>
-                  </div>
+                  {isPctType && (
+                    <div>
+                      <span className="text-gray-600">&gt; 100%</span>
+                      <span className={`block font-semibold ${highPctCount > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                        {highPctCount} facilities
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <span className="text-gray-600">Range</span>
                     <span className="block text-gray-300 font-semibold">
                       {sorted.length > 0
-                        ? `${sorted[0].toFixed(0)}% – ${sorted[sorted.length - 1].toFixed(0)}%`
+                        ? `${formatMetricValue(sorted[0], item?.unit_type)} – ${formatMetricValue(sorted[sorted.length - 1], item?.unit_type)}`
                         : 'N/A'}
                     </span>
                   </div>

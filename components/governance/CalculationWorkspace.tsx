@@ -2,12 +2,16 @@
 
 import { useState, useCallback } from 'react';
 import {
-  Play, Loader2, Code2, AlertTriangle, ArrowUpDown,
-  ChevronDown, ChevronRight, TrendingUp, TrendingDown, Pencil,
+  Play, Loader2, Code2, AlertTriangle, ArrowUpDown, Pencil,
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import FormulaEditor from './FormulaEditor';
+import DrillDownRow from './DrillDownRow';
 import type { CatalogueItem, LevelDefinition } from '@/lib/metric-library/types';
+import {
+  CHILD_LEVEL, drillLevelToTab, formatMetricValue, formatNumber,
+  type DrillLevel, type DrillDownNode,
+} from '@/lib/governance/drill-down';
 
 /** Map tab key to catalogue level_definitions level key. */
 const TAB_TO_LEVEL: Record<string, string> = {
@@ -187,13 +191,6 @@ function metricColor(
   return 'text-gray-300';
 }
 
-function formatNumber(val: unknown): string {
-  if (val === null || val === undefined) return 'N/A';
-  const n = Number(val);
-  if (isNaN(n)) return String(val);
-  return n.toLocaleString(undefined, { maximumFractionDigits: 1 });
-}
-
 /**
  * Center pane: formula display, level selector, and live result table.
  */
@@ -211,8 +208,11 @@ export default function CalculationWorkspace({
   const [durationMs, setDurationMs] = useState<number | null>(null);
   const [showSql, setShowSql] = useState(false);
   const [sortAsc, setSortAsc] = useState(true);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [showFormulaEditor, setShowFormulaEditor] = useState(false);
+
+  // Drill-down state
+  const [drillDownMap, setDrillDownMap] = useState<Map<string, DrillDownNode>>(new Map());
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
 
   const levelFormulas = getFormulasForItem(item);
   const formula = levelFormulas[activeLevel] ?? LTV_FALLBACK_FORMULAS[activeLevel];
@@ -224,6 +224,8 @@ export default function CalculationWorkspace({
     setError(null);
     setRows([]);
     setDurationMs(null);
+    setDrillDownMap(new Map());
+    setExpandedPaths(new Set());
 
     try {
       const res = await fetch('/api/metrics/governance/calculator', {
@@ -253,6 +255,99 @@ export default function CalculationWorkspace({
     }
   }, [asOfDate, activeLevel, formula, onResultsChange]);
 
+  /** Fetch child-level data for a drill-down expansion. */
+  const fetchDrillDown = useCallback(async (
+    pathKey: string,
+    parentLevel: DrillLevel,
+    parentDimKey: string,
+  ) => {
+    const childLevel = CHILD_LEVEL[parentLevel];
+    if (!childLevel || !asOfDate) return;
+
+    // Set loading state
+    setDrillDownMap(prev => {
+      const next = new Map(prev);
+      next.set(pathKey, {
+        parentLevel,
+        parentDimKey,
+        childLevel,
+        rows: [],
+        loading: true,
+        error: null,
+      });
+      return next;
+    });
+
+    try {
+      // Get the child-level formula SQL (for position level, API uses direct query)
+      const childTabKey = drillLevelToTab(childLevel);
+      const childFormula = childTabKey ? levelFormulas[childTabKey] : null;
+
+      const res = await fetch('/api/metrics/governance/calculator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sql: childFormula?.sql ?? formula.sql,
+          as_of_date: asOfDate,
+          level: childLevel,
+          max_rows: 200,
+          drill_down: {
+            parent_level: parentLevel,
+            parent_dim_key: parentDimKey,
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
+
+      setDrillDownMap(prev => {
+        const next = new Map(prev);
+        next.set(pathKey, {
+          parentLevel,
+          parentDimKey,
+          childLevel,
+          rows: data.rows ?? [],
+          loading: false,
+          error: null,
+        });
+        return next;
+      });
+    } catch (err) {
+      setDrillDownMap(prev => {
+        const next = new Map(prev);
+        next.set(pathKey, {
+          parentLevel,
+          parentDimKey,
+          childLevel,
+          rows: [],
+          loading: false,
+          error: err instanceof Error ? err.message : 'Drill-down failed',
+        });
+        return next;
+      });
+    }
+  }, [asOfDate, levelFormulas, formula]);
+
+  /** Toggle expand/collapse for a dimension row. */
+  const toggleExpand = useCallback((pathKey: string, level: DrillLevel, dimKey: string) => {
+    setExpandedPaths(prev => {
+      const next = new Set(prev);
+      if (next.has(pathKey)) {
+        next.delete(pathKey);
+      } else {
+        next.add(pathKey);
+        // Fetch if not already loaded
+        if (!drillDownMap.has(pathKey)) {
+          fetchDrillDown(pathKey, level, dimKey);
+        }
+      }
+      return next;
+    });
+  }, [drillDownMap, fetchDrillDown]);
+
   const sortedRows = [...rows].sort((a, b) => {
     const va = Number(a.metric_value) || 0;
     const vb = Number(b.metric_value) || 0;
@@ -261,8 +356,9 @@ export default function CalculationWorkspace({
 
   // Compute summary stats
   const values = rows.map(r => Number(r.metric_value)).filter(v => !isNaN(v) && v !== null);
-  const avgLtv = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
-  const highLtv = values.filter(v => v > 100).length;
+  const avgValue = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+  const isPctType = item?.unit_type === 'PERCENTAGE' || item?.unit_type === 'RATIO' || item?.unit_type === 'RATE';
+  const highPctCount = isPctType ? values.filter(v => v > 100).length : 0;
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -272,7 +368,7 @@ export default function CalculationWorkspace({
           <button
             key={tab.key}
             type="button"
-            onClick={() => { setActiveLevel(tab.key); setRows([]); setError(null); }}
+            onClick={() => { setActiveLevel(tab.key); setRows([]); setError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors
               ${activeLevel === tab.key
                 ? 'bg-pwc-orange/20 text-pwc-orange border border-pwc-orange/40'
@@ -390,10 +486,10 @@ export default function CalculationWorkspace({
               <span>{rows.length} results</span>
               {durationMs !== null && <span>{durationMs}ms</span>}
               {asOfDate && <span>as_of: {asOfDate}</span>}
-              <span>Avg: <span className={metricColorFn(avgLtv)}>{avgLtv.toFixed(1)}%</span></span>
-              {highLtv > 0 && (item?.unit_type === 'PERCENTAGE' || item?.unit_type === 'RATIO') && (
+              <span>Avg: <span className={metricColorFn(avgValue)}>{formatMetricValue(avgValue, item?.unit_type)}</span></span>
+              {highPctCount > 0 && (
                 <span className="text-red-400">
-                  {highLtv} &gt;100%
+                  {highPctCount} &gt;100%
                 </span>
               )}
             </div>
@@ -408,44 +504,36 @@ export default function CalculationWorkspace({
                       onClick={() => setSortAsc(!sortAsc)}
                       className="flex items-center gap-1 ml-auto hover:text-gray-300 transition-colors"
                     >
-                      {item?.abbreviation ?? 'Value'} %
+                      {item?.abbreviation ?? 'Value'}{isPctType ? ' %' : ''}
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
                   {/* Show additional columns if present */}
-                  {rows[0] && Object.keys(rows[0]).filter(k => k !== 'dimension_key' && k !== 'metric_value').map(k => (
+                  {rows[0] && Object.keys(rows[0]).filter(k => k !== 'dimension_key' && k !== 'metric_value' && k !== 'dimension_label').map(k => (
                     <th key={k} className="text-right px-4 py-2 font-medium">{k.replace(/_/g, ' ')}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {sortedRows.map((row, idx) => {
-                  const val = Number(row.metric_value);
-                  const dimKey = String(row.dimension_key ?? '');
-                  const isExpanded = expandedRow === dimKey;
-                  const extraKeys = Object.keys(row).filter(k => k !== 'dimension_key' && k !== 'metric_value');
+                  const topExtraKeys = Object.keys(row).filter(
+                    k => k !== 'dimension_key' && k !== 'metric_value' && k !== 'dimension_label'
+                  );
 
                   return (
-                    <tr
+                    <DrillDownRow
                       key={idx}
-                      onClick={() => setExpandedRow(isExpanded ? null : dimKey)}
-                      className="border-b border-pwc-gray-light/20 hover:bg-pwc-gray-light/10 cursor-pointer transition-colors"
-                    >
-                      <td className="px-4 py-2 font-mono text-gray-300 flex items-center gap-1.5">
-                        {isExpanded ? <ChevronDown className="w-3 h-3 text-gray-500" /> : <ChevronRight className="w-3 h-3 text-gray-500" />}
-                        {dimKey}
-                      </td>
-                      <td className={`px-4 py-2 text-right font-semibold tabular-nums ${isNaN(val) ? 'text-gray-500' : metricColorFn(val)}`}>
-                        {isNaN(val) ? 'N/A' : `${val.toFixed(1)}%`}
-                        {!isNaN(val) && val > 100 && <TrendingUp className="w-3 h-3 inline ml-1 text-red-400" />}
-                        {!isNaN(val) && val < 50 && <TrendingDown className="w-3 h-3 inline ml-1 text-emerald-400" />}
-                      </td>
-                      {extraKeys.map(k => (
-                        <td key={k} className="px-4 py-2 text-right text-gray-400 tabular-nums">
-                          {formatNumber(row[k])}
-                        </td>
-                      ))}
-                    </tr>
+                      level={activeLevel as DrillLevel}
+                      row={row}
+                      depth={0}
+                      pathPrefix=""
+                      drillDownMap={drillDownMap}
+                      expandedPaths={expandedPaths}
+                      onToggleExpand={toggleExpand}
+                      metricColorFn={metricColorFn}
+                      extraKeys={topExtraKeys}
+                      unitType={item?.unit_type}
+                    />
                   );
                 })}
               </tbody>

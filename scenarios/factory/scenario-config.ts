@@ -255,6 +255,11 @@ export function parseScenarioYaml(filePath: string): ScenarioConfig {
     limit: parsed.limit,
     l2_tables: parsed.l2_tables,
     verification: parsed.verification,
+    // V2 extensions — pass through from YAML (all have defaults in buildV2Config)
+    market_environment: parsed.market_environment,
+    time_series: parsed.time_series,
+    lifecycle: parsed.lifecycle,
+    covenants: parsed.covenants,
   };
 }
 

@@ -113,15 +113,15 @@ export interface EnrichedCounterparty {
   external_rating_sp: string;
   fr2590_counterparty_type: string;
   internal_risk_rating: string;
-  is_affiliated: string;
-  is_central_counterparty: string;
-  is_financial_institution: string;
-  is_insider: string;
-  is_multilateral_dev_bank: string;
+  is_affiliated_flag: string;
+  is_central_counterparty_flag: string;
+  is_financial_institution_flag: string;
+  is_insider_flag: string;
+  is_multilateral_dev_bank_flag: string;
   is_parent_flag: string;
-  is_public_sector_entity: string;
-  is_regulated_entity: string;
-  is_sovereign: string;
+  is_public_sector_entity_flag: string;
+  is_regulated_entity_flag: string;
+  is_sovereign_flag: string;
   lei_code: string;
   lgd_unsecured: number;
   pd_annual: number;
@@ -130,6 +130,8 @@ export interface EnrichedCounterparty {
   effective_start_date: string;
   effective_end_date: null;
   is_current_flag: string;
+  record_source?: string;
+  created_by?: string;
 }
 
 /**
@@ -188,15 +190,15 @@ export function enrichCounterparty(
     external_rating_sp: profile.external_rating_sp ?? pick(rng, tier.spRatings),
     fr2590_counterparty_type: industryMap.fr2590Type === 'FI' ? 'FINANCIAL' : 'NON_FINANCIAL',
     internal_risk_rating: profile.internal_risk_rating ?? pick(rng, tier.internalGrades),
-    is_affiliated: 'N',
-    is_central_counterparty: 'N',
-    is_financial_institution: ['BANK', 'FI', 'INS', 'FUND'].includes(industryMap.entityTypeCode) ? 'Y' : 'N',
-    is_insider: 'N',
-    is_multilateral_dev_bank: 'N',
+    is_affiliated_flag: 'N',
+    is_central_counterparty_flag: 'N',
+    is_financial_institution_flag: ['BANK', 'FI', 'INS', 'FUND'].includes(industryMap.entityTypeCode) ? 'Y' : 'N',
+    is_insider_flag: 'N',
+    is_multilateral_dev_bank_flag: 'N',
     is_parent_flag: rng() > 0.6 ? 'Y' : 'N',
-    is_public_sector_entity: 'N',
-    is_regulated_entity: ['BANK', 'FI', 'INS'].includes(industryMap.entityTypeCode) ? 'Y' : 'N',
-    is_sovereign: 'N',
+    is_public_sector_entity_flag: 'N',
+    is_regulated_entity_flag: ['BANK', 'FI', 'INS'].includes(industryMap.entityTypeCode) ? 'Y' : 'N',
+    is_sovereign_flag: 'N',
     lei_code: lei,
     lgd_unsecured: profile.lgd_unsecured ?? tier.lgd,
     pd_annual: profile.pd_annual ?? Math.round((tier.pdLow + rng() * (tier.pdHigh - tier.pdLow)) * 10000) / 10000,
@@ -205,6 +207,8 @@ export function enrichCounterparty(
     effective_start_date: '2020-01-01',
     effective_end_date: null,
     is_current_flag: 'Y',
+    record_source: 'DATA_FACTORY_V2',
+    created_by: 'data-factory-v2',
   };
 }
 
@@ -273,6 +277,8 @@ export interface EnrichedFacility {
   effective_start_date: string;
   effective_end_date: null;
   is_current_flag: string;
+  record_source?: string;
+  created_by?: string;
 }
 
 /**
@@ -344,12 +350,12 @@ export function enrichFacilities(
       currency_code: countryMap.currency,
       origination_date: originDate,
       maturity_date: maturityDate,
-      portfolio_id: ratingTier.startsWith('IG') ? pick(rng, [1, 3, 5, 6]) : pick(rng, [2, 9, 10]),
+      portfolio_id: ratingTier.startsWith('IG') ? pick(rng, [810001, 810003, 810005, 810006]) : pick(rng, [810002, 810009, 810010]),
       industry_code: industryCodes[counterparty.industry_id] ?? 'IND',
-      lob_segment_id: (facId % 249) + 1,
-      product_node_id: pick(rng, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-      rate_index_id: pick(rng, [1, 2, 3, 4, 5]),
-      ledger_account_id: pick(rng, [1, 2, 3, 4, 5, 6, 7, 8]),
+      lob_segment_id: pick(rng, [400001, 400002, 400003, 400004, 400005, 400006, 400007, 400008, 400009, 400010]),
+      product_node_id: pick(rng, [410001, 410002, 410003, 410004, 410005, 410006, 410007, 410008, 410009, 410010]),
+      rate_index_id: pick(rng, [500001, 500002, 500003, 500004, 500005]),
+      ledger_account_id: pick(rng, [510001, 510002, 510003, 510004, 510005, 510006, 510007, 510008]),
       product_id: pick(rng, [1, 2, 3, 4, 5]),
       region_code: countryMap.region,
       interest_rate_type: slot.isRevolving || rng() < 0.6 ? 'FLOATING' : 'FIXED',
@@ -365,6 +371,8 @@ export function enrichFacilities(
       effective_start_date: '2024-01-01',
       effective_end_date: null,
       is_current_flag: 'Y',
+      record_source: 'DATA_FACTORY_V2',
+      created_by: 'data-factory-v2',
     };
   });
 }
@@ -384,6 +392,8 @@ export interface EnrichedAgreement {
   effective_start_date: string;
   effective_end_date: null;
   is_current_flag: string;
+  record_source?: string;
+  created_by?: string;
 }
 
 export function enrichAgreement(
@@ -412,6 +422,8 @@ export function enrichAgreement(
     effective_start_date: '2024-01-01',
     effective_end_date: null,
     is_current_flag: 'Y',
+    record_source: 'DATA_FACTORY_V2',
+    created_by: 'data-factory-v2',
   };
 }
 
@@ -426,6 +438,8 @@ export interface EnrichedAllocation {
   is_current_flag: string;
   effective_start_date: string;
   effective_end_date: null;
+  record_source?: string;
+  created_by?: string;
 }
 
 /**
@@ -443,5 +457,7 @@ export function enrichLenderAllocation(facility: EnrichedFacility, allocationId:
     is_current_flag: 'Y',
     effective_start_date: facility.origination_date,
     effective_end_date: null,
+    record_source: 'DATA_FACTORY_V2',
+    created_by: 'data-factory-v2',
   };
 }

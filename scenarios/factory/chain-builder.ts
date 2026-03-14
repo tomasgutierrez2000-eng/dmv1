@@ -40,6 +40,8 @@ export interface HierarchyRow {
   immediate_parent_id: number;
   ultimate_parent_id: number;
   ownership_pct: number;
+  record_source?: string;
+  created_by?: string;
 }
 
 export interface CollateralAssetRow {
@@ -51,6 +53,12 @@ export interface CollateralAssetRow {
   legal_entity_id: number;
   effective_start_date: string;
   description: string;
+  collateral_status?: string;
+  is_current_flag?: boolean;
+  is_regulatory_eligible_flag?: boolean;
+  source_system_id?: number;
+  record_source?: string;
+  created_by?: string;
 }
 
 export interface LimitRuleRow {
@@ -58,6 +66,8 @@ export interface LimitRuleRow {
   limit_type: string;
   limit_amount_usd: number;
   counterparty_id: number | null;
+  record_source?: string;
+  created_by?: string;
 }
 
 /* ────────────────── Chain Builder ────────────────── */
@@ -119,6 +129,8 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
       immediate_parent_id: cpIds[0],
       ultimate_parent_id: cpIds[0],
       ownership_pct: 100,
+      record_source: 'DATA_FACTORY_V2',
+      created_by: 'data-factory-v2',
     });
     // Rest are children of the first
     for (let i = 1; i < cpCount; i++) {
@@ -128,6 +140,8 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
         immediate_parent_id: cpIds[0],
         ultimate_parent_id: cpIds[0],
         ownership_pct: Math.round(50 + hierarchyRng() * 50),
+        record_source: 'DATA_FACTORY_V2',
+        created_by: 'data-factory-v2',
       });
     }
   }
@@ -139,7 +153,7 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
     const assetIds = registry.allocate('collateral_asset_master', assetCount, config.scenario_id);
     const cpCountry = config.counterparties[0]?.country ?? 'US';
     // Valid collateral_type_ids from l1.collateral_type seed data
-    const VALID_COLLATERAL_TYPE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const VALID_COLLATERAL_TYPE_IDS = [100001, 100002, 100003, 100004, 100005, 100006, 100007, 100008, 100009, 100010];
     collateral_assets = assetIds.map((id, i) => ({
       collateral_asset_id: id,
       collateral_type_id: VALID_COLLATERAL_TYPE_IDS[i % VALID_COLLATERAL_TYPE_IDS.length],
@@ -149,6 +163,12 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
       legal_entity_id: ((i % 12) + 1),     // 1-12
       effective_start_date: '2024-01-01',
       description: `Property ${i + 1} — ${config.name}`,
+      collateral_status: 'ACTIVE',
+      is_current_flag: true,
+      is_regulatory_eligible_flag: true,
+      source_system_id: 1400001,
+      record_source: 'DATA_FACTORY_V2',
+      created_by: 'data-factory-v2',
     }));
   }
 
@@ -161,6 +181,8 @@ export function buildL1Chain(config: ScenarioConfig, registry: IDRegistry): L1Ch
       limit_type: config.limit.limit_type ?? 'SINGLE_NAME',
       limit_amount_usd: config.limit.limit_amount,
       counterparty_id: cpIds[0],
+      record_source: 'DATA_FACTORY_V2',
+      created_by: 'data-factory-v2',
     }];
   }
 

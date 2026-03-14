@@ -123,8 +123,8 @@ export function isTestDate(
   const month = new Date(date + 'T00:00:00Z').getUTCMonth() + 1;
   const day = new Date(date + 'T00:00:00Z').getUTCDate();
   // Test dates are typically the last business day of the relevant month
-  // Approximate: any date in the last 5 days of a quarter-end month
-  const isMonthEnd = day >= 25;
+  // Window wide enough to catch weekly snapshots (day >= 20 covers ~10 days)
+  const isMonthEnd = day >= 20;
 
   switch (testFrequency) {
     case 'QUARTERLY':

@@ -27,14 +27,31 @@ const MITIGANT_GROUP_MAP: Record<string, string> = {
   NONE: 'NONE',
 };
 
+/** Map collateral type string to collateral_type_dim IDs (100001-100010). */
+const COLLATERAL_TYPE_ID_MAP: Record<string, number> = {
+  RE: 100001,
+  RECEIVABLES: 100002,
+  FLEET: 100003,
+  EQUIPMENT: 100004,
+  CASH: 100005,
+};
+
+export interface CollateralOutput {
+  snapshots: SqlRow[];
+  /** Auto-created collateral_asset_master rows for facilities with no pre-existing L1 asset. */
+  autoCreatedAssets: SqlRow[];
+}
+
 export function generateCollateralRows(
   stateMap: FacilityStateMap,
   facilityIds: number[],
   dates: string[],
   registry: IDRegistry,
   collateralAssetMap: Map<number, number>, // facility_id → collateral_asset_id
-): SqlRow[] {
-  const rows: SqlRow[] = [];
+): CollateralOutput {
+  const snapshots: SqlRow[] = [];
+  const autoCreatedAssets: SqlRow[] = [];
+  const preExistingAssetIds = new Set(collateralAssetMap.values());
 
   for (const date of dates) {
     for (const facId of facilityIds) {
@@ -49,6 +66,23 @@ export function generateCollateralRows(
       if (!assetId) {
         assetId = registry.allocate('collateral_asset', 1)[0];
         collateralAssetMap.set(facId, assetId);
+        // Create the L2 collateral_asset_master row (FK parent for collateral_snapshot)
+        autoCreatedAssets.push({
+          collateral_asset_id: assetId,
+          collateral_type_id: COLLATERAL_TYPE_ID_MAP[state.collateral_type] ?? 100001,
+          counterparty_id: state.counterparty_id,
+          country_code: state.country_code,
+          currency_code: state.currency_code,
+          legal_entity_id: ((facId % 12) + 1),
+          effective_start_date: date,
+          description: `Collateral asset — facility ${facId}`,
+          collateral_status: 'ACTIVE',
+          is_current_flag: true,
+          is_regulatory_eligible_flag: true,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
+          record_source: 'DATA_FACTORY_V2',
+          created_by: 'factory_v2',
+        });
       }
 
       // Haircut percentage based on collateral type
@@ -61,7 +95,7 @@ export function generateCollateralRows(
       const eligibleAmount = round(state.collateral_value * (1 - haircutPct), 2);
       const allocatedAmount = round(Math.min(eligibleAmount, state.drawn_amount), 2);
 
-      rows.push({
+      snapshots.push({
         collateral_snapshot_id: snapshotId,
         collateral_asset_id: assetId,
         as_of_date: date,
@@ -85,5 +119,5 @@ export function generateCollateralRows(
     }
   }
 
-  return rows;
+  return { snapshots, autoCreatedAssets };
 }

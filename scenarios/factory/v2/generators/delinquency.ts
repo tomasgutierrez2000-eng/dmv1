@@ -2,8 +2,8 @@
  * Generator: facility_delinquency_snapshot
  * Reads: days_past_due, credit_status
  */
-import type { FacilityStateMap, SqlRow } from '../types';
-import { stateKey, FACTORY_SOURCE_SYSTEM_ID } from '../types';
+import type { FacilityStateMap, SqlRow, CreditStatus } from '../types';
+import { stateKey, FACTORY_SOURCE_SYSTEM_ID, CREDIT_STATUS_CODE } from '../types';
 import type { IDRegistry } from '../../id-registry';
 import { round } from '../prng';
 
@@ -23,10 +23,9 @@ export function generateDelinquencyRows(
       const snapshotId = registry.allocate('facility_delinquency_snapshot', 1)[0];
       const dpd = state.days_past_due;
 
-      // DPD bucket
-      let bucketCode = 'CURRENT';
-      if (dpd > 0 && dpd <= 30) bucketCode = '1-30';
-      else if (dpd > 30 && dpd <= 60) bucketCode = '31-60';
+      // DPD bucket — must match l1.dpd_bucket_dim codes: '0-30', '31-60', '61-90', '90+'
+      let bucketCode = '0-30';
+      if (dpd > 30 && dpd <= 60) bucketCode = '31-60';
       else if (dpd > 60 && dpd <= 90) bucketCode = '61-90';
       else if (dpd > 90) bucketCode = '90+';
 
@@ -41,7 +40,7 @@ export function generateDelinquencyRows(
         as_of_date: date,
         counterparty_id: state.counterparty_id,
         currency_code: state.currency_code,
-        credit_status_code: state.credit_status,
+        credit_status_code: String(CREDIT_STATUS_CODE[state.credit_status as CreditStatus] ?? 1),
         days_past_due: dpd,
         days_past_due_max: dpd, // Same as current for generated data
         delinquency_bucket_code: bucketCode,

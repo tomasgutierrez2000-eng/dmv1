@@ -174,6 +174,25 @@ export class IDRegistry {
   deallocate(scenarioId: string): number {
     const before = this.state.allocations.length;
     this.state.allocations = this.state.allocations.filter(a => a.scenarioId !== scenarioId);
-    return before - this.state.allocations.length;
+    const removed = before - this.state.allocations.length;
+
+    // Reclaim ID space: reset nextId per table to max(remaining allocation ends + 1, DEFAULT_START)
+    if (removed > 0) {
+      const tableMaxes = new Map<string, number>();
+      for (const a of this.state.allocations) {
+        const cur = tableMaxes.get(a.table) ?? 0;
+        if (a.endId > cur) tableMaxes.set(a.table, a.endId);
+      }
+      for (const [table, defaultStart] of Object.entries(DEFAULT_STARTS)) {
+        const maxEnd = tableMaxes.get(table);
+        // Never go below DEFAULT_STARTS (preserves separation from seed ranges)
+        this.state.nextId[table] = Math.max(
+          maxEnd != null ? maxEnd + 1 : defaultStart,
+          defaultStart,
+        );
+      }
+    }
+
+    return removed;
   }
 }

@@ -128,28 +128,30 @@ export function generateEventRows(
   return { creditEvents, riskFlags, amendments, exceptions };
 }
 
+/** Map event types to l1.credit_event_type_dim codes (numeric VARCHAR '1'-'10'). */
 function mapCreditEventTypeCode(type: string): string {
   const map: Record<string, string> = {
-    FAILURE_TO_PAY: 'FAILURE_TO_PAY',
-    BANKRUPTCY: 'BANKRUPTCY',
-    RESTRUCTURING: 'RESTRUCTURING',
-    RATING_DOWNGRADE: 'RATING_DOWNGRADE',
-    CROSS_DEFAULT: 'CROSS_DEFAULT',
-    OBLIGATION_ACCELERATION: 'OBLIGATION_ACCELERATION',
+    FAILURE_TO_PAY: '1',
+    BANKRUPTCY: '2',
+    OBLIGATION_ACCELERATION: '3',
+    RESTRUCTURING: '5',
+    CROSS_DEFAULT: '8',
+    RATING_DOWNGRADE: '10',
   };
-  return map[type] ?? type;
+  return map[type] ?? '1'; // Default to FAILURE_TO_PAY
 }
 
+/** Map event types to l1.amendment_type_dim codes. */
 function mapAmendmentTypeCode(type: string): string {
   const map: Record<string, string> = {
     COVENANT_WAIVER: 'WAIVER',
     MATURITY_EXTENSION: 'EXTENSION',
     FACILITY_INCREASE: 'INCREASE',
-    SPREAD_REDUCTION: 'REPRICING',
-    COLLATERAL_RELEASE: 'COLLATERAL',
-    COVENANT_RESET: 'RESET',
+    SPREAD_REDUCTION: 'PRICING',
+    COLLATERAL_RELEASE: 'SECURITY',
+    COVENANT_RESET: 'COVENANT',
   };
-  return map[type] ?? type;
+  return map[type] ?? 'FACILITY'; // Default to FACILITY
 }
 
 function extractTriggerValue(evt: FacilityEvent): number | null {

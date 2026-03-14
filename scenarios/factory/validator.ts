@@ -496,6 +496,75 @@ export function validateV2Output(
     }
   }
 
+  // ── 2b. Inter-L2 FK References ──
+
+  const creditEventIds = new Set<number>();
+  const amendmentEventIds = new Set<number>();
+  const positionIds = new Set<number>();
+  const collateralAssetIds = new Set<number>();
+  const limitRuleIds = new Set<number>();
+
+  for (const td of output.tables) {
+    if (td.table === 'credit_event') {
+      for (const r of td.rows) creditEventIds.add(r.credit_event_id as number);
+    }
+    if (td.table === 'amendment_event') {
+      for (const r of td.rows) amendmentEventIds.add(r.amendment_id as number);
+    }
+    if (td.table === 'position') {
+      for (const r of td.rows) positionIds.add(r.position_id as number);
+    }
+  }
+  if (chain.collateral_assets) {
+    for (const a of chain.collateral_assets) collateralAssetIds.add((a as any).collateral_asset_id);
+  }
+  if (chain.limit_rules) {
+    for (const r of chain.limit_rules) limitRuleIds.add(r.limit_rule_id);
+  }
+
+  for (const td of output.tables) {
+    if (td.table === 'credit_event_facility_link') {
+      for (const row of td.rows) {
+        if (!creditEventIds.has(row.credit_event_id as number)) {
+          errors.push(`credit_event_facility_link: credit_event_id ${row.credit_event_id} not in generated credit_events`);
+          break;
+        }
+      }
+    }
+    if (td.table === 'amendment_change_detail') {
+      for (const row of td.rows) {
+        if (!amendmentEventIds.has(row.amendment_id as number)) {
+          errors.push(`amendment_change_detail: amendment_id ${row.amendment_id} not in generated amendment_events`);
+          break;
+        }
+      }
+    }
+    if (td.table === 'collateral_snapshot' && collateralAssetIds.size > 0) {
+      for (const row of td.rows) {
+        if ('collateral_asset_id' in row && !collateralAssetIds.has(row.collateral_asset_id as number)) {
+          warnings.push(`collateral_snapshot: collateral_asset_id ${row.collateral_asset_id} not in L1 collateral_asset_master`);
+          break;
+        }
+      }
+    }
+    if (td.table === 'limit_contribution_snapshot' && limitRuleIds.size > 0) {
+      for (const row of td.rows) {
+        if ('limit_rule_id' in row && !limitRuleIds.has(row.limit_rule_id as number)) {
+          errors.push(`limit_contribution_snapshot: limit_rule_id ${row.limit_rule_id} not in L1 limit_rules`);
+          break;
+        }
+      }
+    }
+    if (td.table === 'position_detail') {
+      for (const row of td.rows) {
+        if ('position_id' in row && !positionIds.has(row.position_id as number)) {
+          errors.push(`position_detail: position_id ${row.position_id} not in generated positions`);
+          break;
+        }
+      }
+    }
+  }
+
   // ── 3. PK Uniqueness ──
 
   for (const td of output.tables) {

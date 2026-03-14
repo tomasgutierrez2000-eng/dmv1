@@ -43,6 +43,7 @@ interface CliArgs {
   frequency: TimeFrequency; // Time series frequency
   startDate: string;       // Time series start date
   endDate: string;         // Time series end date
+  deterministic: boolean;  // Freeze metadata timestamps for deterministic output
 }
 
 const DEFAULT_START = '2024-07-01';
@@ -61,6 +62,7 @@ function parseArgs(): CliArgs {
     frequency: DEFAULT_FREQUENCY,
     startDate: DEFAULT_START,
     endDate: DEFAULT_END,
+    deterministic: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -91,6 +93,9 @@ function parseArgs(): CliArgs {
       case '--clean':
         result.clean = true;
         break;
+      case '--deterministic':
+        result.deterministic = true;
+        break;
       case '--frequency':
       case '-f':
         result.frequency = args[++i].toUpperCase() as TimeFrequency;
@@ -114,6 +119,11 @@ function parseArgs(): CliArgs {
   }
 
   return result;
+}
+
+/** Normalize scenario ID: strip leading zeros from numeric portion (S019 → S19). */
+function normalizeScenarioId(id: string): string {
+  return id.replace(/^(S)0+(\d+)$/i, '$1$2').toUpperCase();
 }
 
 /* ────────────────── V2 Config Builder ────────────────── */
@@ -166,6 +176,7 @@ function buildV2Config(
   }
 
   return {
+    scenarioId: config.scenario_id,
     market,
     timeSeries: {
       start_date: timeSeries.start_date ?? cliArgs.startDate,
@@ -227,6 +238,7 @@ async function main() {
   } else {
     const narrativesDir = path.join(__dirname, '..', 'narratives');
     configs = args.scenarios.map(id => {
+      const normalizedId = normalizeScenarioId(id);
       const patterns = [
         `${id}.yaml`, `${id}.yml`,
         `${id.toUpperCase()}.yaml`, `${id.toLowerCase()}.yaml`,
@@ -237,9 +249,11 @@ async function main() {
         } catch { /* continue */ }
       }
       const all = loadAllScenarios(narrativesDir);
-      const match = all.find(c => c.scenario_id === id || c.scenario_id === id.toUpperCase());
+      const match = all.find(c =>
+        normalizeScenarioId(c.scenario_id) === normalizedId
+      );
       if (match) return match;
-      throw new Error(`Scenario not found: ${id}`);
+      throw new Error(`Scenario not found: ${id} (normalized: ${normalizedId})`);
     });
     console.log(`Processing ${configs.length} scenario(s): ${configs.map(c => c.scenario_id).join(', ')}`);
   }
@@ -358,6 +372,7 @@ async function main() {
           scenarioId: config.scenario_id,
           scenarioName: config.name,
           narrative: config.narrative,
+          generatedAt: args.deterministic ? 'DETERMINISTIC' : undefined,
         });
         allSqlEmitterTables.push(...sqlTables);
       }
@@ -380,7 +395,7 @@ async function main() {
 
   // SQL file output
   if (!args.dryRun && !args.validateOnly && !useDb && allV2Tables.length > 0) {
-    writeToSqlFile(allV2Tables, sqlOutputPath);
+    writeToSqlFile(allV2Tables, sqlOutputPath, args.deterministic ? 'DETERMINISTIC' : undefined);
   }
 
   // Post-insert verification (DB mode)

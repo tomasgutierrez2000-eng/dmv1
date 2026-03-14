@@ -206,17 +206,19 @@ export interface EmitOptions {
   scenarioId: string;
   scenarioName: string;
   narrative: string;
+  generatedAt?: string;
 }
 
 /**
  * Emit a complete SQL file for a scenario, with tables in correct load order.
  */
 export function emitScenarioSql(tables: TableData[], opts: EmitOptions): string {
+  const ts = opts.generatedAt ?? new Date().toISOString();
   const lines: string[] = [
     `-- ${'═'.repeat(65)}`,
     `-- Scenario ${opts.scenarioId}: ${opts.scenarioName}`,
     `-- ${opts.narrative.slice(0, 120)}`,
-    `-- Generated: ${new Date().toISOString()}`,
+    `-- Generated: ${ts}`,
     `-- ${'═'.repeat(65)}`,
     '',
     'SET search_path TO l1, l2, public;',
@@ -289,11 +291,12 @@ INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_t
 /**
  * Emit combined SQL for multiple scenarios.
  */
-export function emitCombinedSql(scenarioSqls: string[]): string {
+export function emitCombinedSql(scenarioSqls: string[], generatedAt?: string): string {
+  const ts = generatedAt ?? new Date().toISOString();
   const header = [
     `-- ${'═'.repeat(65)}`,
     '-- Factory-Generated Scenario Data',
-    `-- Generated: ${new Date().toISOString()}`,
+    `-- Generated: ${ts}`,
     `-- Scenarios: ${scenarioSqls.length}`,
     '-- Load AFTER: 05-scenario-seed.sql',
     `-- ${'═'.repeat(65)}`,

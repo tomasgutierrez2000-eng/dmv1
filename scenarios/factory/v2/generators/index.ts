@@ -38,10 +38,13 @@ import { generateLimitRows } from './limits';
 import { generatePipelineRows } from './pipeline';
 import { generateCounterpartyFinancialRows } from './cp-financial';
 import { generateProvisionRows } from './provision';
+import { generateStressTestRows } from './stress-test';
 
 // ─── Configuration ─────────────────────────────────────────────────────
 
 export interface V2GeneratorConfig {
+  /** Scenario identifier (e.g., "S19"). */
+  scenarioId?: string;
   /** Market environment configuration. */
   market?: V2MarketConfig;
   /** Time series configuration. */
@@ -208,6 +211,10 @@ export function generateV2Data(
     tables.push({ schema: 'l2', table: 'credit_event', rows: eventRows.creditEvents });
     tableBreakdown['credit_event'] = eventRows.creditEvents.length;
   }
+  if (eventRows.creditEventFacilityLinks.length > 0) {
+    tables.push({ schema: 'l2', table: 'credit_event_facility_link', rows: eventRows.creditEventFacilityLinks });
+    tableBreakdown['credit_event_facility_link'] = eventRows.creditEventFacilityLinks.length;
+  }
   if (eventRows.riskFlags.length > 0) {
     tables.push({ schema: 'l2', table: 'risk_flag', rows: eventRows.riskFlags });
     tableBreakdown['risk_flag'] = eventRows.riskFlags.length;
@@ -215,6 +222,10 @@ export function generateV2Data(
   if (eventRows.amendments.length > 0) {
     tables.push({ schema: 'l2', table: 'amendment_event', rows: eventRows.amendments });
     tableBreakdown['amendment_event'] = eventRows.amendments.length;
+  }
+  if (eventRows.amendmentChangeDetails.length > 0) {
+    tables.push({ schema: 'l2', table: 'amendment_change_detail', rows: eventRows.amendmentChangeDetails });
+    tableBreakdown['amendment_change_detail'] = eventRows.amendmentChangeDetails.length;
   }
   if (eventRows.exceptions.length > 0) {
     tables.push({ schema: 'l2', table: 'exception_event', rows: eventRows.exceptions });
@@ -256,6 +267,19 @@ export function generateV2Data(
   if (provisionRows.length > 0) {
     tables.push({ schema: 'l2', table: 'ecl_provision_snapshot', rows: provisionRows });
     tableBreakdown['ecl_provision_snapshot'] = provisionRows.length;
+  }
+
+  // 16. Stress Test (result + breach)
+  const stressRows = generateStressTestRows(
+    stateMap, facilityIds, dates, registry, market, config.scenarioId ?? 'v2',
+  );
+  if (stressRows.results.length > 0) {
+    tables.push({ schema: 'l2', table: 'stress_test_result', rows: stressRows.results });
+    tableBreakdown['stress_test_result'] = stressRows.results.length;
+  }
+  if (stressRows.breaches.length > 0) {
+    tables.push({ schema: 'l2', table: 'stress_test_breach', rows: stressRows.breaches });
+    tableBreakdown['stress_test_breach'] = stressRows.breaches.length;
   }
 
   // ── Stats ──

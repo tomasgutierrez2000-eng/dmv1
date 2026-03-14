@@ -139,14 +139,18 @@ const COMMITMENT_PARAMS: Record<SizeProfile, { mu: number; sigma: number; lo: nu
   SMALL: { mu: Math.log(50_000_000),    sigma: 0.45, lo: 20_000_000,  hi: 100_000_000 },
 };
 
-/** Industry multipliers on commitment (e.g., Energy is capital-intensive). */
+/** Industry multipliers on commitment (keyed to scenario taxonomy 1-10). */
 const INDUSTRY_COMMITMENT_MULT: Record<number, number> = {
-  21: 1.30,  // Energy — capital-intensive
-  23: 1.15,  // Construction
-  31: 1.10,  // Manufacturing
-  11: 0.85,  // Agriculture — lower scale
-  54: 0.90,  // Professional services
-  52: 1.20,  // Finance — larger facilities
+  1:  1.20,  // Financial Services — larger facilities
+  2:  0.90,  // Technology/Healthcare — lower capital intensity
+  3:  1.20,  // Banks — larger facilities
+  4:  1.30,  // Energy — capital-intensive
+  5:  1.10,  // Industrials/Manufacturing
+  6:  0.85,  // Consumer Staples/Agri — lower scale
+  7:  1.00,  // Retail
+  8:  1.15,  // Utilities/Transportation
+  9:  1.10,  // Materials
+  10: 1.05,  // Real Estate
 };
 
 /** Sample a realistic committed amount. */
@@ -402,31 +406,31 @@ export function sampleTenorYears(rng: () => number, productType: ProductType): n
  */
 export function seasonalMultiplier(industryId: number, month: number): number {
   switch (industryId) {
-    case 44: case 45: // Retail
-      // Q4 holiday season spike
-      if (month >= 10 && month <= 12) return 1.20 + (month - 10) * 0.05; // 1.20, 1.25, 1.30
-      if (month >= 1 && month <= 2) return 0.85; // Post-holiday low
+    case 7: // Retail — Q4 holiday season spike
+      if (month >= 10 && month <= 12) return 1.20 + (month - 10) * 0.05;
+      if (month >= 1 && month <= 2) return 0.85;
       return 1.00;
-    case 21: // Energy
-      // Winter demand peak
+    case 4: // Energy — winter demand peak
       if (month >= 11 || month <= 2) return 1.15;
-      if (month >= 6 && month <= 8) return 0.90; // Summer low
+      if (month >= 6 && month <= 8) return 0.90;
       return 1.00;
-    case 11: // Agriculture
-      // Spring planting season
+    case 6: // Consumer Staples/Agri — spring planting season
       if (month >= 3 && month <= 5) return 1.25;
-      if (month >= 9 && month <= 10) return 1.10; // Harvest financing
+      if (month >= 9 && month <= 10) return 1.10;
       return 0.90;
-    case 23: // Construction
-      // Summer peak
+    case 5: // Industrials/Manufacturing — summer peak
       if (month >= 5 && month <= 9) return 1.10;
-      if (month >= 12 || month <= 2) return 0.85; // Winter slowdown
+      if (month >= 12 || month <= 2) return 0.85;
       return 1.00;
-    case 72: // Hospitality
-      if (month >= 5 && month <= 8) return 1.15; // Summer travel
-      if (month === 12) return 1.10; // Holiday travel
+    case 8: // Utilities/Transportation — summer travel
+      if (month >= 5 && month <= 8) return 1.15;
+      if (month === 12) return 1.10;
       return 0.95;
+    case 10: // Real Estate — spring/summer activity
+      if (month >= 4 && month <= 8) return 1.10;
+      if (month >= 11 || month <= 1) return 0.90;
+      return 1.00;
     default:
-      return 1.00; // No seasonal pattern
+      return 1.00;
   }
 }

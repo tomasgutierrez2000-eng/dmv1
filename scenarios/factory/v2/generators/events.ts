@@ -9,8 +9,10 @@ import { EventCooldownTracker, categorizeEvents } from '../event-engine';
 
 export interface EventRows {
   creditEvents: SqlRow[];
+  creditEventFacilityLinks: SqlRow[];
   riskFlags: SqlRow[];
   amendments: SqlRow[];
+  amendmentChangeDetails: SqlRow[];
   exceptions: SqlRow[];
 }
 
@@ -21,8 +23,10 @@ export function generateEventRows(
   registry: IDRegistry,
 ): EventRows {
   const creditEvents: SqlRow[] = [];
+  const creditEventFacilityLinks: SqlRow[] = [];
   const riskFlags: SqlRow[] = [];
   const amendments: SqlRow[] = [];
+  const amendmentChangeDetails: SqlRow[] = [];
   const exceptions: SqlRow[] = [];
 
   const cooldowns = new EventCooldownTracker();
@@ -38,7 +42,7 @@ export function generateEventRows(
       const prevState = prevDate ? stateMap.get(stateKey(facId, prevDate)) ?? null : null;
       const categorized = categorizeEvents(state, prevState, date, cooldowns);
 
-      // Credit events
+      // Credit events + facility links
       for (const evt of categorized.creditEvents) {
         const eventId = registry.allocate('credit_event', 1)[0];
         creditEvents.push({
@@ -59,6 +63,20 @@ export function generateEventRows(
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
         });
+
+        // Emit facility link rows for each affected facility
+        const affectedFacilities = evt.facility_ids.length > 0 ? evt.facility_ids : [facId];
+        for (const linkFacId of affectedFacilities) {
+          const linkId = registry.allocate('credit_event_facility_link', 1)[0];
+          creditEventFacilityLinks.push({
+            credit_event_facility_link_id: linkId,
+            credit_event_id: eventId,
+            facility_id: linkFacId,
+            as_of_date: evt.date,
+            source_system_id: FACTORY_SOURCE_SYSTEM_ID,
+            record_source: 'DATA_FACTORY_V2',
+          });
+        }
       }
 
       // Risk flags
@@ -81,7 +99,7 @@ export function generateEventRows(
         });
       }
 
-      // Amendments
+      // Amendments + change details
       for (const evt of categorized.amendments) {
         const amendId = registry.allocate('amendment_event', 1)[0];
         amendments.push({
@@ -101,6 +119,19 @@ export function generateEventRows(
           source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
+        });
+
+        // Emit change detail row describing what changed
+        const detailId = registry.allocate('amendment_change_detail', 1)[0];
+        const { changeField, oldValue, newValue } = inferAmendmentChange(evt, prevState, state);
+        amendmentChangeDetails.push({
+          change_detail_id: detailId,
+          amendment_id: amendId,
+          change_field: changeField,
+          old_value: oldValue,
+          new_value: newValue,
+          source_system_id: FACTORY_SOURCE_SYSTEM_ID,
+          record_source: 'DATA_FACTORY_V2',
         });
       }
 
@@ -125,7 +156,7 @@ export function generateEventRows(
     }
   }
 
-  return { creditEvents, riskFlags, amendments, exceptions };
+  return { creditEvents, creditEventFacilityLinks, riskFlags, amendments, amendmentChangeDetails, exceptions };
 }
 
 function mapCreditEventTypeCode(type: string): string {
@@ -153,8 +184,53 @@ function mapAmendmentTypeCode(type: string): string {
 }
 
 function extractTriggerValue(evt: FacilityEvent): number | null {
-  // Try to parse a numeric value from the description
   const match = evt.description.match(/([\d.]+)%/);
   if (match) return parseFloat(match[1]);
   return null;
+}
+
+function inferAmendmentChange(
+  evt: FacilityEvent,
+  prevState: FacilityState | null,
+  currentState: FacilityState,
+): { changeField: string; oldValue: string; newValue: string } {
+  switch (evt.type) {
+    case 'COVENANT_WAIVER':
+    case 'COVENANT_RESET':
+      return {
+        changeField: 'covenant_status',
+        oldValue: 'BREACHED',
+        newValue: evt.type === 'COVENANT_WAIVER' ? 'WAIVED' : 'RESET',
+      };
+    case 'MATURITY_EXTENSION':
+      return {
+        changeField: 'maturity_date',
+        oldValue: prevState?.maturity_date ?? 'UNKNOWN',
+        newValue: currentState.maturity_date,
+      };
+    case 'FACILITY_INCREASE':
+      return {
+        changeField: 'committed_amount',
+        oldValue: String(prevState?.committed_amount ?? 0),
+        newValue: String(currentState.committed_amount),
+      };
+    case 'SPREAD_REDUCTION':
+      return {
+        changeField: 'spread_bps',
+        oldValue: String(prevState?.spread_bps ?? 0),
+        newValue: String(currentState.spread_bps),
+      };
+    case 'COLLATERAL_RELEASE':
+      return {
+        changeField: 'collateral_value',
+        oldValue: String(prevState?.collateral_value ?? 0),
+        newValue: String(currentState.collateral_value),
+      };
+    default:
+      return {
+        changeField: evt.type.toLowerCase(),
+        oldValue: 'PREVIOUS',
+        newValue: 'CURRENT',
+      };
+  }
 }

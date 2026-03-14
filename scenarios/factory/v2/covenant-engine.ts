@@ -119,21 +119,50 @@ export function initializeCovenantStates(pkg: CovenantPackage): CovenantState[] 
 export function isTestDate(
   date: string,
   testFrequency: 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL',
+  previousDate?: string,
 ): boolean {
   const month = new Date(date + 'T00:00:00Z').getUTCMonth() + 1;
   const day = new Date(date + 'T00:00:00Z').getUTCDate();
-  // Test dates are typically the last business day of the relevant month
-  // Approximate: any date in the last 5 days of a quarter-end month
   const isMonthEnd = day >= 25;
 
-  switch (testFrequency) {
-    case 'QUARTERLY':
-      return isMonthEnd && (month === 3 || month === 6 || month === 9 || month === 12);
-    case 'SEMI_ANNUAL':
-      return isMonthEnd && (month === 6 || month === 12);
-    case 'ANNUAL':
-      return isMonthEnd && month === 12;
+  const quarterEndMonths = [3, 6, 9, 12];
+  const semiEndMonths = [6, 12];
+
+  // Direct hit: date falls in the last few days of a test month
+  const directHit = (() => {
+    switch (testFrequency) {
+      case 'QUARTERLY':
+        return isMonthEnd && quarterEndMonths.includes(month);
+      case 'SEMI_ANNUAL':
+        return isMonthEnd && semiEndMonths.includes(month);
+      case 'ANNUAL':
+        return isMonthEnd && month === 12;
+    }
+  })();
+
+  if (directHit) return true;
+
+  // Proximity check: if a quarter-end fell between previousDate and date,
+  // treat this date as the closest available test date.
+  if (previousDate) {
+    const prevMonth = new Date(previousDate + 'T00:00:00Z').getUTCMonth() + 1;
+    const prevYear = new Date(previousDate + 'T00:00:00Z').getUTCFullYear();
+    const curYear = new Date(date + 'T00:00:00Z').getUTCFullYear();
+
+    const testMonths = testFrequency === 'QUARTERLY' ? quarterEndMonths
+      : testFrequency === 'SEMI_ANNUAL' ? semiEndMonths
+      : [12];
+
+    // Check if any test month boundary was crossed between previous and current date
+    const prevTotal = prevYear * 12 + prevMonth;
+    const curTotal = curYear * 12 + month;
+    for (let m = prevTotal + 1; m <= curTotal; m++) {
+      const mo = ((m - 1) % 12) + 1;
+      if (testMonths.includes(mo)) return true;
+    }
   }
+
+  return false;
 }
 
 /**
@@ -248,6 +277,7 @@ export function testCovenants(
   state: FacilityState,
   financials: CounterpartyFinancials,
   date: string,
+  previousDate?: string,
 ): CovenantTestResult {
   if (!state.covenant_package) {
     return { updatedStates: [], events: [], hasBreach: false, hasWarning: false };
@@ -256,7 +286,7 @@ export function testCovenants(
   const pkg = state.covenant_package;
 
   // Check if this is a test date
-  if (!isTestDate(date, pkg.test_frequency)) {
+  if (!isTestDate(date, pkg.test_frequency, previousDate)) {
     return {
       updatedStates: state.covenants,
       events: [],
@@ -364,31 +394,53 @@ export function checkCrossDefault(
   breachedFacilityId: number,
   counterpartyFacilities: FacilityState[],
   crossDefaultThreshold: number,
+  currentDate?: string,
 ): FacilityEvent[] {
   const events: FacilityEvent[] = [];
   const breachedFacility = counterpartyFacilities.find(f => f.facility_id === breachedFacilityId);
   if (!breachedFacility) return events;
 
-  // Cross-default triggers if breached facility's exposure exceeds threshold
-  // relative to total counterparty exposure
-  const totalExposure = counterpartyFacilities.reduce((sum, f) => sum + f.drawn_amount, 0);
-  const breachedExposure = breachedFacility.drawn_amount;
+  const eventDate = breachedFacility.covenants.find(c => c.is_breached)?.last_test_date
+    ?? currentDate ?? '1970-01-01';
 
-  if (totalExposure > 0 && breachedExposure / totalExposure >= crossDefaultThreshold) {
-    // Cross-default triggers on all other facilities
-    const otherFacilities = counterpartyFacilities
-      .filter(f => f.facility_id !== breachedFacilityId)
-      .map(f => f.facility_id);
+  // Primary scope: facilities under the same credit agreement
+  const sameAgreement = counterpartyFacilities.filter(
+    f => f.credit_agreement_id === breachedFacility.credit_agreement_id
+      && f.facility_id !== breachedFacilityId
+  );
+  const agreementExposure = sameAgreement.reduce((s, f) => s + f.drawn_amount, 0)
+    + breachedFacility.drawn_amount;
 
-    if (otherFacilities.length > 0) {
+  if (agreementExposure > 0
+    && breachedFacility.drawn_amount / agreementExposure >= crossDefaultThreshold
+    && sameAgreement.length > 0) {
+    events.push({
+      type: 'CROSS_DEFAULT',
+      date: eventDate,
+      description: `Cross-default triggered by facility ${breachedFacilityId} within agreement ${breachedFacility.credit_agreement_id} (${(breachedFacility.drawn_amount / agreementExposure * 100).toFixed(1)}% of agreement exposure)`,
+      severity: 'CRITICAL',
+      triggered_by: `cross_default_${breachedFacilityId}`,
+      facility_ids: sameAgreement.map(f => f.facility_id),
+      counterparty_id: breachedFacility.counterparty_id,
+    });
+  }
+
+  // Secondary scope: other agreements for the same counterparty (warning-level contagion)
+  const otherAgreements = counterpartyFacilities.filter(
+    f => f.credit_agreement_id !== breachedFacility.credit_agreement_id
+      && f.facility_id !== breachedFacilityId
+  );
+  if (otherAgreements.length > 0) {
+    const totalExposure = counterpartyFacilities.reduce((s, f) => s + f.drawn_amount, 0);
+    if (totalExposure > 0
+      && breachedFacility.drawn_amount / totalExposure >= crossDefaultThreshold) {
       events.push({
-        type: 'CROSS_DEFAULT',
-        date: breachedFacility.covenants.find(c => c.is_breached)?.last_test_date
-          ?? new Date().toISOString().slice(0, 10),
-        description: `Cross-default triggered by facility ${breachedFacilityId} breach (${(breachedExposure / totalExposure * 100).toFixed(1)}% of total exposure)`,
-        severity: 'CRITICAL',
-        triggered_by: `cross_default_${breachedFacilityId}`,
-        facility_ids: otherFacilities,
+        type: 'CROSS_DEFAULT_CONTAGION',
+        date: eventDate,
+        description: `Cross-default contagion from agreement ${breachedFacility.credit_agreement_id} to other counterparty agreements`,
+        severity: 'HIGH',
+        triggered_by: `cross_default_contagion_${breachedFacilityId}`,
+        facility_ids: otherAgreements.map(f => f.facility_id),
         counterparty_id: breachedFacility.counterparty_id,
       });
     }

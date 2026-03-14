@@ -9,7 +9,7 @@
  * State persists to JSON for incremental scenario generation.
  */
 
-import { readFileSync, writeFileSync, existsSync, renameSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, renameSync, mkdirSync } from 'fs';
 import path from 'path';
 
 export interface AllocationBlock {
@@ -157,6 +157,10 @@ export class IDRegistry {
 
   /** Persist state to JSON (atomic: write tmp + rename to prevent corruption) */
   save(): void {
+    const dir = path.dirname(this.persistPath);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
     const tmp = this.persistPath + '.tmp';
     writeFileSync(tmp, JSON.stringify(this.state, null, 2) + '\n');
     renameSync(tmp, this.persistPath);
@@ -173,7 +177,20 @@ export class IDRegistry {
   /** Remove all allocations for a scenario (allows re-generation) */
   deallocate(scenarioId: string): number {
     const before = this.state.allocations.length;
+    const removed = this.state.allocations.filter(a => a.scenarioId === scenarioId);
     this.state.allocations = this.state.allocations.filter(a => a.scenarioId !== scenarioId);
+
+    // Rewind nextId for affected tables so re-runs reuse the same ID ranges
+    const affectedTables = new Set(removed.map(a => a.table));
+    for (const table of affectedTables) {
+      const remaining = this.state.allocations.filter(a => a.table === table);
+      if (remaining.length > 0) {
+        this.state.nextId[table] = Math.max(...remaining.map(a => a.endId)) + 1;
+      } else {
+        this.state.nextId[table] = DEFAULT_STARTS[table] ?? 10001;
+      }
+    }
+
     return before - this.state.allocations.length;
   }
 }

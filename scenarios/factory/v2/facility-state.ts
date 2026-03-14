@@ -102,11 +102,15 @@ function initialCreditStatus(arc: StoryArc): CreditStatus {
 function inferCollateralType(industryId: number, productType: ProductType): string {
   if (productType === 'LETTER_OF_CREDIT') return 'CASH';
   switch (industryId) {
-    case 53: return 'RE'; // Real estate
-    case 21: case 31: case 32: case 33: return 'EQUIPMENT'; // Energy, manufacturing
-    case 44: case 45: case 42: return 'RECEIVABLES'; // Retail, wholesale
-    case 48: case 49: return 'FLEET'; // Transportation
-    default: return 'NONE';
+    case 10: return 'RE';           // Real Estate
+    case 4: case 5: case 9:        // Energy, Industrials, Materials
+      return 'EQUIPMENT';
+    case 7: case 6:                 // Retail, Consumer Staples/Agri
+      return 'RECEIVABLES';
+    case 8:  return 'FLEET';        // Utilities/Transportation
+    case 1: case 3:                 // Financial Services, Banks
+      return 'CASH';
+    default: return 'NONE';         // Tech/Healthcare (2) and others
   }
 }
 
@@ -250,8 +254,8 @@ export function initializeFacilityState(
     covenants: covenantStates,
     next_test_date: nextTestDate(initialDate, covenantPackage.test_frequency),
 
-    // Lifecycle
-    lifecycle_stage: productConfig.bulletDraw ? 'FUNDED' : 'COMMITMENT',
+    // Lifecycle — if drawn > 0 at init, skip COMMITMENT to avoid phantom transition
+    lifecycle_stage: (productConfig.bulletDraw || drawn > 0) ? 'FUNDED' : 'COMMITMENT',
     origination_date: facility.origination_date,
     maturity_date: facility.maturity_date,
     remaining_tenor_months: remainingTenor,
@@ -434,14 +438,13 @@ export function evolveFacilityState(
   const spreadMultCurve = STORY_SPREAD_MULTIPLIERS[arc] ?? [1.0, 1.0, 1.0, 1.0, 1.0];
   const spreadMult = interpolateArcValue(date, dates, spreadMultCurve);
   state.spread_bps = evolveSpread(rng, state.spread_bps, state.rating_tier, spreadMult, dt);
-  // Add sector stress spread adder
-  state.spread_bps += sectorCondition.spread_adder_bps;
 
   // ── Step 6: Pricing ──
+  // Apply sector stress adder only to the all-in rate, not to the base spread
   const utilization = state.committed_amount > 0
     ? state.drawn_amount / state.committed_amount : 0;
   state.all_in_rate_pct = calculateAllInRate(
-    state.base_rate_pct, state.spread_bps, state.product_type, utilization,
+    state.base_rate_pct, state.spread_bps + sectorCondition.spread_adder_bps, state.product_type, utilization,
   );
   state.last_rate_reset_date = date;
 
@@ -460,7 +463,8 @@ export function evolveFacilityState(
   }
 
   // ── Step 8: Covenant testing ──
-  const covResult = testCovenants(rng, state, financials, date);
+  const previousDate = dateIdx > 0 ? dates[dateIdx - 1] : undefined;
+  const covResult = testCovenants(rng, state, financials, date, previousDate);
   state.covenants = covResult.updatedStates;
   state.events_this_period.push(...covResult.events);
   if (state.covenant_package) {
@@ -506,6 +510,14 @@ export function evolveFacilityState(
 // ─── IFRS 9 Staging ────────────────────────────────────────────────────
 
 function determineIFRS9Stage(state: FacilityState): IFRS9Stage {
+  // Stage 3 is sticky: once assigned, it persists until an explicit cure event
+  if (state.ifrs9_stage === 3) {
+    const hasCureEvent = state.events_this_period.some(
+      e => e.type === 'IFRS9_CURE' || e.type === 'RESTRUCTURE_CURE'
+    );
+    if (!hasCureEvent) return 3;
+  }
+
   // Stage 3: DPD > 90 or DEFAULT status
   if (state.days_past_due > 90 || state.credit_status === 'DEFAULT') {
     return 3;
@@ -763,6 +775,7 @@ export class FacilityStateManager {
             fac.facility_id,
             currentFacilities,
             fac.covenant_package?.cross_default_threshold ?? 0.50,
+            date,
           );
           for (const evt of crossEvents) {
             // Add cross-default events to affected facilities

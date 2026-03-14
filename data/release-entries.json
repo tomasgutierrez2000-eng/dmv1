@@ -1682,6 +1682,14 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "position",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "position_detail",
     "field": "is_delinquent_payment_flag",
     "changeType": "Added",
@@ -1698,8 +1706,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "position_detail",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "position_detail",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.position_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "exposure_counterparty_attribution",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.exposure_counterparty_attribution"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "exposure_counterparty_attribution",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.exposure_counterparty_attribution"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "exposure_counterparty_attribution",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.exposure_counterparty_attribution"
   },
@@ -1714,6 +1754,14 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_exposure_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "netting_set_exposure_snapshot",
     "field": "load_batch_id",
     "changeType": "Added",
@@ -1722,8 +1770,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "netting_set_exposure_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.netting_set_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "netting_set_exposure_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.netting_set_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "facility_lob_attribution",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_lob_attribution"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_lob_attribution",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_lob_attribution"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_lob_attribution",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.facility_lob_attribution"
   },
@@ -1740,6 +1820,14 @@
     "layer": "L2",
     "table": "collateral_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.collateral_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "collateral_snapshot",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.collateral_snapshot"
   },
@@ -1770,6 +1858,22 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_delinquency_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_delinquency_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "facility_pricing_snapshot",
     "field": "is_prepayment_penalty_flag",
     "changeType": "Added",
@@ -1794,8 +1898,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_pricing_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_pricing_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_pricing_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_pricing_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "facility_profitability_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_profitability_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_profitability_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_profitability_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_profitability_snapshot",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.facility_profitability_snapshot"
   },
@@ -1810,8 +1946,48 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "limit_contribution_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_contribution_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "limit_contribution_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_contribution_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "limit_utilization_event",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_utilization_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "limit_utilization_event",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_utilization_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "limit_utilization_event",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_utilization_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "limit_utilization_event",
+    "field": "event_ts",
     "changeType": "Added",
     "rationale": "Field added to L2.limit_utilization_event"
   },
@@ -1826,8 +2002,48 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "amendment_change_detail",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.amendment_change_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "amendment_change_detail",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.amendment_change_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "amendment_change_detail",
+    "field": "event_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L2.amendment_change_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "amendment_event",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.amendment_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "amendment_event",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.amendment_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "amendment_event",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.amendment_event"
   },
@@ -1842,8 +2058,48 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "credit_event",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_event",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "credit_event_facility_link",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_event_facility_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_event_facility_link",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_event_facility_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_event_facility_link",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_event_facility_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_event_facility_link",
+    "field": "event_ts",
     "changeType": "Added",
     "rationale": "Field added to L2.credit_event_facility_link"
   },
@@ -1858,8 +2114,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "stress_test_breach",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.stress_test_breach"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "stress_test_breach",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.stress_test_breach"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "deal_pipeline_fact",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.deal_pipeline_fact"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "deal_pipeline_fact",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.deal_pipeline_fact"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "deal_pipeline_fact",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.deal_pipeline_fact"
   },
@@ -1874,8 +2162,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "counterparty_rating_observation",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_rating_observation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_rating_observation",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_rating_observation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "financial_metric_observation",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.financial_metric_observation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "financial_metric_observation",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.financial_metric_observation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "financial_metric_observation",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.financial_metric_observation"
   },
@@ -1890,8 +2210,48 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "exception_event",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.exception_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "exception_event",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.exception_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "exception_event",
+    "field": "event_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L2.exception_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "risk_flag",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.risk_flag"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "risk_flag",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.risk_flag"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "risk_flag",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.risk_flag"
   },
@@ -1906,8 +2266,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "counterparty_financial_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.counterparty_financial_snapshot"
   },
@@ -1930,6 +2322,22 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "facility_credit_approval",
     "field": "is_exception_flag",
     "changeType": "Added",
@@ -1946,8 +2354,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_credit_approval",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_credit_approval"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_credit_approval",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_credit_approval"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "counterparty",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.counterparty"
   },
@@ -1970,6 +2410,22 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "legal_entity",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.legal_entity"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "legal_entity",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.legal_entity"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "instrument_master",
     "field": "is_active_flag",
     "changeType": "Added",
@@ -1986,8 +2442,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "instrument_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.instrument_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "instrument_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.instrument_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "credit_agreement_master",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_agreement_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_agreement_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_agreement_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_agreement_master",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.credit_agreement_master"
   },
@@ -2026,6 +2514,22 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "contract_master",
     "field": "load_batch_id",
     "changeType": "Added",
@@ -2034,8 +2538,32 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "contract_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.contract_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "contract_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.contract_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "netting_agreement",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.netting_agreement"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "netting_agreement",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.netting_agreement"
   },
@@ -2058,8 +2586,32 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "netting_set",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.netting_set"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "netting_set",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.netting_set"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "netting_set_link",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.netting_set_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "netting_set_link",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.netting_set_link"
   },
@@ -2074,8 +2626,32 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "csa_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.csa_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "csa_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.csa_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "margin_agreement",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.margin_agreement"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "margin_agreement",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.margin_agreement"
   },
@@ -2106,8 +2682,32 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "collateral_asset_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.collateral_asset_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "collateral_asset_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.collateral_asset_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "collateral_link",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.collateral_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "collateral_link",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.collateral_link"
   },
@@ -2130,8 +2730,32 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "crm_protection_master",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.crm_protection_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "crm_protection_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.crm_protection_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "protection_link",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.protection_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "protection_link",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.protection_link"
   },
@@ -2154,8 +2778,24 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "risk_mitigant_master",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.risk_mitigant_master"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "risk_mitigant_link",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.risk_mitigant_link"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "risk_mitigant_link",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.risk_mitigant_link"
   },
@@ -2170,8 +2810,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "counterparty_hierarchy",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_hierarchy"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_hierarchy",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_hierarchy"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "legal_entity_hierarchy",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.legal_entity_hierarchy"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "legal_entity_hierarchy",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.legal_entity_hierarchy"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "legal_entity_hierarchy",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.legal_entity_hierarchy"
   },
@@ -2186,8 +2858,24 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "control_relationship",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.control_relationship"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "economic_interdependence_relationship",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.economic_interdependence_relationship"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "economic_interdependence_relationship",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.economic_interdependence_relationship"
   },
@@ -2202,8 +2890,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "credit_agreement_counterparty_participation",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_agreement_counterparty_participation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "credit_agreement_counterparty_participation",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.credit_agreement_counterparty_participation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "facility_counterparty_participation",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_counterparty_participation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_counterparty_participation",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_counterparty_participation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_counterparty_participation",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.facility_counterparty_participation"
   },
@@ -2218,8 +2938,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_lender_allocation",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_lender_allocation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_lender_allocation",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_lender_allocation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "fx_rate",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.fx_rate"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "fx_rate",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.fx_rate"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "fx_rate",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.fx_rate"
   },
@@ -2234,8 +2986,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "payment_ledger",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.payment_ledger"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "payment_ledger",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.payment_ledger"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "limit_assignment_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_assignment_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "limit_assignment_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.limit_assignment_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "limit_assignment_snapshot",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.limit_assignment_snapshot"
   },
@@ -2266,8 +3050,40 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "ecl_staging_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.ecl_staging_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "ecl_staging_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.ecl_staging_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "forbearance_event",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.forbearance_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "forbearance_event",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.forbearance_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "forbearance_event",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.forbearance_event"
   },
@@ -2282,6 +3098,14 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "gl_account_balance_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.gl_account_balance_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "gl_journal_entry",
     "field": "load_batch_id",
     "changeType": "Added",
@@ -2290,8 +3114,32 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "gl_journal_entry",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.gl_journal_entry"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "watchlist_entry",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.watchlist_entry"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "watchlist_entry",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.watchlist_entry"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "watchlist_entry",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.watchlist_entry"
   },
@@ -2308,6 +3156,22 @@
     "layer": "L2",
     "table": "capital_position_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "raw_record_id",
     "changeType": "Added",
     "rationale": "Field added to L2.capital_position_snapshot"
   },
@@ -2401,6 +3265,22 @@
   },
   {
     "date": "2026-03-14",
+    "layer": "L2",
+    "table": "duns_entity_observation",
+    "field": "source_system_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.duns_entity_observation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "duns_entity_observation",
+    "field": "raw_record_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L2.duns_entity_observation"
+  },
+  {
+    "date": "2026-03-14",
     "layer": "L3",
     "table": "cash_flow_calc",
     "field": "load_batch_id",
@@ -2460,6 +3340,14 @@
     "layer": "L3",
     "table": "facility_exposure_calc",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_exposure_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_exposure_calc",
+    "field": "total_collateral_mv_usd",
     "changeType": "Added",
     "rationale": "Field added to L3.facility_exposure_calc"
   },
@@ -2530,6 +3418,14 @@
   {
     "date": "2026-03-14",
     "layer": "L3",
+    "table": "exposure_metric_cube",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.exposure_metric_cube"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
     "table": "risk_metric_cube",
     "field": "created_by",
     "changeType": "Added",
@@ -2540,6 +3436,14 @@
     "layer": "L3",
     "table": "risk_metric_cube",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.risk_metric_cube"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "risk_metric_cube",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.risk_metric_cube"
   },
@@ -2564,6 +3468,14 @@
     "layer": "L3",
     "table": "counterparty_exposure_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.counterparty_exposure_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_exposure_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.counterparty_exposure_summary"
   },
@@ -2594,6 +3506,14 @@
   {
     "date": "2026-03-14",
     "layer": "L3",
+    "table": "facility_exposure_summary",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_exposure_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
     "table": "portfolio_summary",
     "field": "created_by",
     "changeType": "Added",
@@ -2604,6 +3524,14 @@
     "layer": "L3",
     "table": "portfolio_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.portfolio_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "portfolio_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.portfolio_summary"
   },
@@ -2620,6 +3548,14 @@
     "layer": "L3",
     "table": "crm_allocation_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.crm_allocation_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "crm_allocation_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.crm_allocation_summary"
   },
@@ -2636,6 +3572,14 @@
     "layer": "L3",
     "table": "collateral_portfolio_valuation",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.collateral_portfolio_valuation"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "collateral_portfolio_valuation",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.collateral_portfolio_valuation"
   },
@@ -2652,6 +3596,14 @@
     "layer": "L3",
     "table": "limit_current_state",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.limit_current_state"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "limit_current_state",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.limit_current_state"
   },
@@ -2668,6 +3620,14 @@
     "layer": "L3",
     "table": "limit_utilization_timeseries",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.limit_utilization_timeseries"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "limit_utilization_timeseries",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.limit_utilization_timeseries"
   },
@@ -2684,6 +3644,14 @@
     "layer": "L3",
     "table": "limit_attribution_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.limit_attribution_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "limit_attribution_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.limit_attribution_summary"
   },
@@ -2700,6 +3668,14 @@
     "layer": "L3",
     "table": "limit_breach_fact",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.limit_breach_fact"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "limit_breach_fact",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.limit_breach_fact"
   },
@@ -2730,6 +3706,14 @@
   {
     "date": "2026-03-14",
     "layer": "L3",
+    "table": "credit_event_summary",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.credit_event_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
     "table": "rating_migration_summary",
     "field": "created_by",
     "changeType": "Added",
@@ -2740,6 +3724,14 @@
     "layer": "L3",
     "table": "rating_migration_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.rating_migration_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "rating_migration_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.rating_migration_summary"
   },
@@ -2756,6 +3748,14 @@
     "layer": "L3",
     "table": "default_loss_recovery_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.default_loss_recovery_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "default_loss_recovery_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.default_loss_recovery_summary"
   },
@@ -2772,6 +3772,14 @@
     "layer": "L3",
     "table": "report_run",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.report_run"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "report_run",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.report_run"
   },
@@ -2788,6 +3796,14 @@
     "layer": "L3",
     "table": "report_cell_value",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.report_cell_value"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "report_cell_value",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.report_cell_value"
   },
@@ -2804,6 +3820,14 @@
     "layer": "L3",
     "table": "report_cell_contribution_fact",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.report_cell_contribution_fact"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "report_cell_contribution_fact",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.report_cell_contribution_fact"
   },
@@ -2820,6 +3844,14 @@
     "layer": "L3",
     "table": "report_cell_rule_execution",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.report_cell_rule_execution"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "report_cell_rule_execution",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.report_cell_rule_execution"
   },
@@ -2850,6 +3882,14 @@
   {
     "date": "2026-03-14",
     "layer": "L3",
+    "table": "report_validation_result",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.report_validation_result"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
     "table": "fr2590_position_snapshot",
     "field": "created_by",
     "changeType": "Added",
@@ -2860,6 +3900,14 @@
     "layer": "L3",
     "table": "fr2590_position_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.fr2590_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "fr2590_position_snapshot",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.fr2590_position_snapshot"
   },
@@ -2876,6 +3924,14 @@
     "layer": "L3",
     "table": "fr2590_counterparty_aggregate",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.fr2590_counterparty_aggregate"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "fr2590_counterparty_aggregate",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.fr2590_counterparty_aggregate"
   },
@@ -2892,6 +3948,14 @@
     "layer": "L3",
     "table": "lob_exposure_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_exposure_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "lob_exposure_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.lob_exposure_summary"
   },
@@ -3004,6 +4068,14 @@
     "layer": "L3",
     "table": "kpi_period_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.kpi_period_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "kpi_period_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.kpi_period_summary"
   },
@@ -3020,6 +4092,14 @@
     "layer": "L3",
     "table": "risk_appetite_metric_state",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.risk_appetite_metric_state"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "risk_appetite_metric_state",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.risk_appetite_metric_state"
   },
@@ -3036,6 +4116,14 @@
     "layer": "L3",
     "table": "executive_highlight_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.executive_highlight_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "executive_highlight_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.executive_highlight_summary"
   },
@@ -3052,6 +4140,14 @@
     "layer": "L3",
     "table": "counterparty_detail_snapshot",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.counterparty_detail_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_detail_snapshot",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.counterparty_detail_snapshot"
   },
@@ -3068,6 +4164,14 @@
     "layer": "L3",
     "table": "limit_tier_status_matrix",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.limit_tier_status_matrix"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "limit_tier_status_matrix",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.limit_tier_status_matrix"
   },
@@ -3084,6 +4188,14 @@
     "layer": "L3",
     "table": "limit_counterparty_movement",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.limit_counterparty_movement"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "limit_counterparty_movement",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.limit_counterparty_movement"
   },
@@ -3100,6 +4212,14 @@
     "layer": "L3",
     "table": "data_quality_score_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.data_quality_score_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_score_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.data_quality_score_summary"
   },
@@ -3130,6 +4250,14 @@
   {
     "date": "2026-03-14",
     "layer": "L3",
+    "table": "legal_entity_risk_profile",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.legal_entity_risk_profile"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
     "table": "data_quality_attribute_score",
     "field": "created_by",
     "changeType": "Added",
@@ -3140,6 +4268,14 @@
     "layer": "L3",
     "table": "data_quality_attribute_score",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.data_quality_attribute_score"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_attribute_score",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.data_quality_attribute_score"
   },
@@ -3156,6 +4292,14 @@
     "layer": "L3",
     "table": "data_quality_trend",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.data_quality_trend"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "data_quality_trend",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.data_quality_trend"
   },
@@ -3172,6 +4316,14 @@
     "layer": "L3",
     "table": "stress_test_result_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.stress_test_result_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_result_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.stress_test_result_summary"
   },
@@ -3188,6 +4340,14 @@
     "layer": "L3",
     "table": "stress_test_breach_detail",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.stress_test_breach_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "stress_test_breach_detail",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.stress_test_breach_detail"
   },
@@ -3204,6 +4364,14 @@
     "layer": "L3",
     "table": "regulatory_compliance_state",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.regulatory_compliance_state"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "regulatory_compliance_state",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.regulatory_compliance_state"
   },
@@ -3220,6 +4388,14 @@
     "layer": "L3",
     "table": "facility_timeline_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_timeline_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_timeline_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.facility_timeline_summary"
   },
@@ -3236,6 +4412,14 @@
     "layer": "L3",
     "table": "amendment_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.amendment_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "amendment_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.amendment_summary"
   },
@@ -3252,6 +4436,14 @@
     "layer": "L3",
     "table": "amendment_detail",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.amendment_detail"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "amendment_detail",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.amendment_detail"
   },
@@ -3290,6 +4482,14 @@
   {
     "date": "2026-03-14",
     "layer": "L3",
+    "table": "facility_detail_snapshot",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_detail_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
     "table": "lob_risk_ratio_summary",
     "field": "created_by",
     "changeType": "Added",
@@ -3300,6 +4500,14 @@
     "layer": "L3",
     "table": "lob_risk_ratio_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_risk_ratio_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "lob_risk_ratio_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.lob_risk_ratio_summary"
   },
@@ -3316,6 +4524,14 @@
     "layer": "L3",
     "table": "lob_deterioration_summary",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_deterioration_summary"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "lob_deterioration_summary",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.lob_deterioration_summary"
   },
@@ -3332,6 +4548,14 @@
     "layer": "L3",
     "table": "lob_rating_distribution",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_rating_distribution"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "lob_rating_distribution",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.lob_rating_distribution"
   },
@@ -3348,6 +4572,14 @@
     "layer": "L3",
     "table": "lob_top_contributors",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.lob_top_contributors"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "lob_top_contributors",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.lob_top_contributors"
   },
@@ -3364,6 +4596,14 @@
     "layer": "L3",
     "table": "metric_value_fact",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.metric_value_fact"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "metric_value_fact",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.metric_value_fact"
   },
@@ -3380,6 +4620,22 @@
     "layer": "L3",
     "table": "calc_audit_log",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.calc_audit_log"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "calc_audit_log",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.calc_audit_log"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "calc_audit_log",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.calc_audit_log"
   },
@@ -3396,6 +4652,22 @@
     "layer": "L3",
     "table": "calc_run",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.calc_run"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "calc_run",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.calc_run"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "calc_run",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.calc_run"
   },
@@ -3412,6 +4684,22 @@
     "layer": "L3",
     "table": "calc_validation_result",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.calc_validation_result"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "calc_validation_result",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.calc_validation_result"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "calc_validation_result",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.calc_validation_result"
   },
@@ -3428,6 +4716,14 @@
     "layer": "L3",
     "table": "metric_result",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.metric_result"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "metric_result",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.metric_result"
   },
@@ -3444,6 +4740,46 @@
     "layer": "L3",
     "table": "facility_risk_calc",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_risk_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_risk_calc",
+    "field": "expected_loss_rate_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_risk_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_risk_calc",
+    "field": "risk_weight_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_risk_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_risk_calc",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_risk_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_risk_calc",
+    "field": "record_source",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_risk_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_risk_calc",
+    "field": "load_timestamp",
     "changeType": "Added",
     "rationale": "Field added to L3.facility_risk_calc"
   },
@@ -3460,6 +4796,14 @@
     "layer": "L3",
     "table": "netting_set_exposure_calc",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.netting_set_exposure_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "netting_set_exposure_calc",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.netting_set_exposure_calc"
   },
@@ -3476,6 +4820,14 @@
     "layer": "L3",
     "table": "facility_stress_test_calc",
     "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to L3.facility_stress_test_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "facility_stress_test_calc",
+    "field": "updated_ts",
     "changeType": "Added",
     "rationale": "Field added to L3.facility_stress_test_calc"
   },
@@ -3590,6 +4942,302 @@
     "field": "load_batch_id",
     "changeType": "Added",
     "rationale": "Field added to L3.segment_capital_consumption"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "legal_entity_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "cet1_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "tier1_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "total_capital_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "tier1_leverage_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "leverage_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "tlac_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "slr_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "rwa_std_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "rwa_erba_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "total_capital_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "created_by",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "capital_position_calc",
+    "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.capital_position_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "counterparty_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "net_income_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "total_assets_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "total_liabilities_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "total_debt_service_amt",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "created_by",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "exception_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "days_open",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "breach_pct",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "updated_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "created_by",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L3",
+    "table": "exception_event_calc",
+    "field": "load_batch_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.exception_event_calc"
   },
   {
     "date": "2026-03-14",
@@ -4138,6 +5786,46 @@
   {
     "date": "2026-03-14",
     "layer": "L2",
+    "table": "facility_exposure_snapshot",
+    "field": "net_exposure_usd",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_exposure_snapshot",
+    "field": "rwa_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_exposure_snapshot",
+    "field": "total_collateral_mv_usd",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "netting_set_exposure_snapshot",
+    "field": "netted_exposure_amount",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.netting_set_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "netting_set_exposure_snapshot",
+    "field": "netting_benefit_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.netting_set_exposure_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
     "table": "collateral_snapshot",
     "field": "risk_shifting_flag",
     "changeType": "Removed",
@@ -4174,6 +5862,134 @@
     "field": "pricing_exception_flag",
     "changeType": "Removed",
     "rationale": "Field removed from L2.facility_pricing_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "exception_event",
+    "field": "breach_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.exception_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "exception_event",
+    "field": "days_open",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.exception_event"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "total_debt_service_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "dscr_value",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "ltv_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "net_income_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "interest_rate_sensitivity_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "net_income_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "total_assets_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "total_liabilities_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "total_debt_service_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "ead_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "expected_loss_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "rwa_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "risk_weight_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "expected_loss_rate_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_risk_snapshot"
   },
   {
     "date": "2026-03-14",
@@ -4289,6 +6105,86 @@
   },
   {
     "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "cet1_ratio_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "tier1_ratio_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "total_capital_ratio_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "tier1_leverage_ratio_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "leverage_ratio_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "tlac_ratio_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "slr_pct",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "total_capital_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "rwa_std_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "rwa_erba_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-14",
     "layer": "L3",
     "table": "ecl_provision_calc",
     "field": "stage_transfer_flag",
@@ -4379,7 +6275,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "counterparty_role_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.counterparty_role_dim"
   },
@@ -5067,7 +6963,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "scenario_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.scenario_dim"
   },
@@ -5091,7 +6987,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "context_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.context_dim"
   },
@@ -5251,7 +7147,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "country_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.country_dim"
   },
@@ -5291,7 +7187,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "region_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.region_dim"
   },
@@ -5315,7 +7211,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "currency_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.currency_dim"
   },
@@ -5403,7 +7299,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "regulatory_jurisdiction",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.regulatory_jurisdiction"
   },
@@ -5635,7 +7531,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "metric_definition_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L1.metric_definition_dim"
   },
@@ -6027,7 +7923,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "limit_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.limit_status_dim"
   },
@@ -6115,7 +8011,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "rating_change_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.rating_change_status_dim"
   },
@@ -6355,7 +8251,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "ecl_stage_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.ecl_stage_dim"
   },
@@ -6435,7 +8331,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "forbearance_type_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.forbearance_type_dim"
   },
@@ -6515,7 +8411,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "impairment_model_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.impairment_model_dim"
   },
@@ -6603,7 +8499,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "watchlist_category_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.watchlist_category_dim"
   },
@@ -6699,7 +8595,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "equity_allocation_config",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.equity_allocation_config"
   },
@@ -6979,7 +8875,7 @@
     "date": "2026-03-12",
     "layer": "L2",
     "table": "position",
-    "field": "is_trading_banking_book_flag",
+    "field": "trading_banking_book_flag",
     "changeType": "Added",
     "rationale": "Field added to L2.position"
   },
@@ -8187,7 +10083,7 @@
     "date": "2026-03-12",
     "layer": "L2",
     "table": "facility_risk_snapshot",
-    "field": "is_defaulted_flag",
+    "field": "defaulted_flag",
     "changeType": "Added",
     "rationale": "Field added to L2.facility_risk_snapshot"
   },
@@ -8387,7 +10283,7 @@
     "date": "2026-03-12",
     "layer": "L2",
     "table": "facility_master",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L2.facility_master"
   },
@@ -8747,7 +10643,7 @@
     "date": "2026-03-12",
     "layer": "L2",
     "table": "risk_mitigant_master",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to L2.risk_mitigant_master"
   },
@@ -9339,7 +11235,7 @@
     "date": "2026-03-12",
     "layer": "L2",
     "table": "ecl_staging_snapshot",
-    "field": "is_significant_increase_flag",
+    "field": "significant_increase_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.ecl_staging_snapshot"
   },
@@ -9347,7 +11243,7 @@
     "date": "2026-03-12",
     "layer": "L2",
     "table": "ecl_staging_snapshot",
-    "field": "is_credit_impaired_flag",
+    "field": "credit_impaired_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.ecl_staging_snapshot"
   },
@@ -10819,7 +12715,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "ecl_provision_calc",
-    "field": "is_stage_transfer_flag",
+    "field": "stage_transfer_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.ecl_provision_calc"
   },
@@ -11211,7 +13107,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "facility_pricing_calc",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.facility_pricing_calc"
   },
@@ -13267,7 +15163,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "counterparty_derived",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.counterparty_derived"
   },
@@ -13275,7 +15171,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "counterparty_derived",
-    "field": "is_has_cross_entity_flag",
+    "field": "has_cross_entity_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.counterparty_derived"
   },
@@ -13931,7 +15827,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "desk_derived",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.desk_derived"
   },
@@ -13939,7 +15835,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "desk_derived",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.desk_derived"
   },
@@ -14779,7 +16675,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "facility_derived",
-    "field": "is_facility_active_flag",
+    "field": "facility_active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.facility_derived"
   },
@@ -14803,7 +16699,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "facility_derived",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.facility_derived"
   },
@@ -14811,7 +16707,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "facility_derived",
-    "field": "is_has_cross_entity_flag",
+    "field": "has_cross_entity_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.facility_derived"
   },
@@ -14819,7 +16715,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "facility_derived",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.facility_derived"
   },
@@ -15419,7 +17315,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "portfolio_derived",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.portfolio_derived"
   },
@@ -15427,7 +17323,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "portfolio_derived",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.portfolio_derived"
   },
@@ -16139,7 +18035,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "segment_derived",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.segment_derived"
   },
@@ -16147,7 +18043,7 @@
     "date": "2026-03-12",
     "layer": "L3",
     "table": "segment_derived",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.segment_derived"
   },
@@ -17131,7 +19027,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "equity_allocation_config",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.equity_allocation_config"
   },
@@ -17203,7 +19099,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "exception_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.exception_status_dim"
   },
@@ -17259,7 +19155,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "limit_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.limit_status_dim"
   },
@@ -17315,7 +19211,7 @@
     "date": "2026-03-12",
     "layer": "L1",
     "table": "rating_change_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.rating_change_status_dim"
   },
@@ -17803,7 +19699,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "facility_pricing_snapshot",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to L2.facility_pricing_snapshot"
   },
@@ -18195,7 +20091,7 @@
     "date": "2026-03-10",
     "layer": "L1",
     "table": "limit_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.limit_status_dim"
   },
@@ -18251,7 +20147,7 @@
     "date": "2026-03-10",
     "layer": "L1",
     "table": "rating_change_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.rating_change_status_dim"
   },
@@ -19107,7 +21003,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "position",
-    "field": "is_trading_banking_book_flag",
+    "field": "trading_banking_book_flag",
     "changeType": "Removed",
     "rationale": "Field removed from L2.position"
   },
@@ -19467,7 +21363,7 @@
     "date": "2026-03-10",
     "layer": "L3",
     "table": "facility_pricing_calc",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L3.facility_pricing_calc"
   },
@@ -19899,7 +21795,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "facility_pricing_snapshot",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Removed",
     "rationale": "Field removed from L2.facility_pricing_snapshot"
   },
@@ -21003,7 +22899,7 @@
     "date": "2026-03-10",
     "layer": "L1",
     "table": "risk_rating_tier_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.risk_rating_tier_dim"
   },
@@ -21059,7 +22955,7 @@
     "date": "2026-03-10",
     "layer": "L1",
     "table": "dpd_bucket_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.dpd_bucket_dim"
   },
@@ -21115,7 +23011,7 @@
     "date": "2026-03-10",
     "layer": "L1",
     "table": "utilization_status_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.utilization_status_dim"
   },
@@ -21171,7 +23067,7 @@
     "date": "2026-03-10",
     "layer": "L1",
     "table": "origination_date_bucket_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.origination_date_bucket_dim"
   },
@@ -21579,7 +23475,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "legal_entity",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.legal_entity"
   },
@@ -21731,7 +23627,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "instrument_master",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.instrument_master"
   },
@@ -22211,7 +24107,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "facility_master",
-    "field": "is_prepayment_penalty_flag",
+    "field": "prepayment_penalty_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.facility_master"
   },
@@ -22259,7 +24155,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "facility_master",
-    "field": "is_revolving_flag",
+    "field": "revolving_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.facility_master"
   },
@@ -22595,7 +24491,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "netting_set",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.netting_set"
   },
@@ -23139,7 +25035,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "collateral_asset_master",
-    "field": "is_insurance_flag",
+    "field": "insurance_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.collateral_asset_master"
   },
@@ -23187,7 +25083,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "collateral_asset_master",
-    "field": "is_regulatory_eligible_flag",
+    "field": "regulatory_eligible_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.collateral_asset_master"
   },
@@ -23427,7 +25323,7 @@
     "date": "2026-03-10",
     "layer": "L2",
     "table": "crm_protection_master",
-    "field": "is_enforceable_flag",
+    "field": "enforceable_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.crm_protection_master"
   },
@@ -26403,7 +28299,7 @@
     "date": "2026-03-05",
     "layer": "L2",
     "table": "facility_credit_approval",
-    "field": "is_exception_flag",
+    "field": "exception_flag",
     "changeType": "Added",
     "rationale": "Field added to new L2.facility_credit_approval"
   },
@@ -26515,7 +28411,7 @@
     "date": "2026-03-04",
     "layer": "L1",
     "table": "internal_risk_rating_bucket_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.internal_risk_rating_bucket_dim"
   },
@@ -26563,7 +28459,7 @@
     "date": "2026-03-04",
     "layer": "L1",
     "table": "pricing_tier_dim",
-    "field": "is_active_flag",
+    "field": "active_flag",
     "changeType": "Added",
     "rationale": "Field added to new L1.pricing_tier_dim"
   },
@@ -26747,7 +28643,7 @@
     "date": "2026-02-28",
     "layer": "L3",
     "table": "facility_detail_snapshot",
-    "field": "is_facility_active_flag",
+    "field": "facility_active_flag",
     "changeType": "Added",
     "rationale": "Propagates L1 facility_master.is_active_flag to L3 facility detail for snapshot-level filtering"
   },
@@ -27499,7 +29395,7 @@
     "date": "2026-02-25",
     "layer": "L3",
     "table": "facility_detail_snapshot",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Removed",
     "rationale": "Was atomic, not calculated — moved to L2.facility_pricing_snapshot"
   },
@@ -27635,7 +29531,7 @@
     "date": "2026-02-24",
     "layer": "L2",
     "table": "position_detail",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Required by delinquency metrics — gap analysis against data element audit"
   },
@@ -27667,7 +29563,7 @@
     "date": "2026-02-24",
     "layer": "L2",
     "table": "facility_delinquency_snapshot",
-    "field": "is_delinquent_payment_flag",
+    "field": "delinquent_payment_flag",
     "changeType": "Added",
     "rationale": "Facility-level delinquency flag for snapshot reporting"
   },
@@ -27707,7 +29603,7 @@
     "date": "2026-02-24",
     "layer": "L2",
     "table": "facility_pricing_snapshot",
-    "field": "is_pricing_exception_flag",
+    "field": "pricing_exception_flag",
     "changeType": "Added",
     "rationale": "Flags facilities with non-standard pricing"
   },

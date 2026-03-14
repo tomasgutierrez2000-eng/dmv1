@@ -1,5 +1,5 @@
 /**
- * L3 Table manifest — 82 tables (69 original + 8 capital + 5 dashboard derived).
+ * L3 Table manifest — 84 tables (68 original + 8 capital + 5 dashboard derived + 3 layer-integrity overlays).
  * Matches sql/l3/01_DDL_all_tables.sql and execution order in 06_ORCHESTRATOR.sql.
  * T51-T52: Calculated overlay tables (derived fields split from L2 snapshots).
  * T53-T54: Promoted from L2 (entirely computed tables).
@@ -111,6 +111,11 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T80', name: 'desk_derived',                         category: 'Dashboard Derived',                       tier: 4 },
   { id: 'T81', name: 'portfolio_derived',                    category: 'Dashboard Derived',                       tier: 4 },
   { id: 'T82', name: 'segment_derived',                      category: 'Dashboard Derived',                       tier: 4 },
+
+  // ── Layer Integrity Overlays (migration 011) ──
+  { id: 'T83', name: 'capital_position_calc',                category: 'Capital & Equity',                        tier: 1 },
+  { id: 'T84', name: 'counterparty_financial_calc',          category: 'Counterparty Analytics',                  tier: 1 },
+  { id: 'T85', name: 'exception_event_calc',                 category: 'Limits & Appetite',                       tier: 1 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

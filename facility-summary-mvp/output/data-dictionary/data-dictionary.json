@@ -214,16 +214,7 @@
           "description": "Jurisdiction/regulator context",
           "category": "SCCL Grouping",
           "why_required": "SCCL rules differ by jurisdiction",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "regulatory_jurisdiction",
-              "field": "jurisdiction_code"
-            }
-          }
+          "data_type": "VARCHAR(20)"
         },
         {
           "name": "run_version_id",
@@ -2476,16 +2467,7 @@
           "name": "rating_scale_id",
           "description": "",
           "category": "Source & taxonomy",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_scale_dim",
-              "field": "rating_scale_id"
-            }
-          }
+          "data_type": "BIGINT"
         },
         {
           "name": "grade_code",
@@ -2628,31 +2610,13 @@
           "name": "rating_scale_id",
           "description": "",
           "category": "Run & reporting",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_scale_dim",
-              "field": "rating_scale_id"
-            }
-          }
+          "data_type": "BIGINT"
         },
         {
           "name": "rating_source_id",
           "description": "Rating source being mapped",
           "category": "Ratings",
           "why_required": "Allows multi-source normalization",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "rating_source",
-              "field": "rating_source_id"
-            }
-          },
           "data_type": "BIGINT"
         },
         {
@@ -8217,6 +8181,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -8535,6 +8504,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -8697,6 +8676,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -8807,16 +8796,7 @@
           "description": "FR 2590 category code",
           "category": "Exposure",
           "why_required": "FR2590 toggle grouping (Page 2)",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "fr2590_category_dim",
-              "field": "fr2590_category_code"
-            }
-          }
+          "data_type": "VARCHAR(20)"
         },
         {
           "name": "gross_exposure_usd",
@@ -8839,14 +8819,6 @@
           "why_required": "Page 7 LoB breakdown",
           "simplification_note": "L2 review addition",
           "data_type": "BIGINT"
-        },
-        {
-          "name": "net_exposure_usd",
-          "description": "Net exposure after CRM (USD)",
-          "category": "Exposure",
-          "why_required": "Gross/Net toggle Pages 2,3,6,7",
-          "simplification_note": "L2 review addition",
-          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "product_node_id",
@@ -8893,31 +8865,10 @@
           "data_type": "VARCHAR(50)"
         },
         {
-          "name": "rwa_amt",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
           "name": "internal_risk_rating_bucket_code",
           "description": "",
           "category": "Exposure & collateral snapshots",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "internal_risk_rating_bucket_dim",
-              "field": "internal_risk_rating_bucket_code"
-            }
-          }
-        },
-        {
-          "name": "total_collateral_mv_usd",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
+          "data_type": "VARCHAR(20)"
         },
         {
           "name": "bank_share_pct",
@@ -8959,6 +8910,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -8988,12 +8944,6 @@
             "is_composite": true
           },
           "data_type": "DATE"
-        },
-        {
-          "name": "netted_exposure_amount",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "NUMERIC(18,2)"
         },
         {
           "name": "gross_exposure_amount",
@@ -9064,12 +9014,6 @@
           "data_type": "NUMERIC(18,2)"
         },
         {
-          "name": "netting_benefit_amt",
-          "description": "",
-          "category": "Exposure & collateral snapshots",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
@@ -9103,6 +9047,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -9227,6 +9181,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -9404,6 +9368,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -9609,6 +9578,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -9798,6 +9777,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -9968,6 +9957,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -9984,12 +9983,7 @@
           "simplification_note": "L2 review new table",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_rule",
-              "field": "limit_rule_id"
-            }
+            "is_composite": true
           },
           "data_type": "BIGINT"
         },
@@ -10109,6 +10103,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -10125,12 +10129,7 @@
           "simplification_note": "FK renamed: limit_definition → limit_rule",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "limit_rule",
-              "field": "limit_rule_id"
-            }
+            "is_composite": true
           },
           "data_type": "BIGINT"
         },
@@ -10228,6 +10227,21 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "event_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10348,6 +10362,21 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "event_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10541,6 +10570,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -10697,6 +10736,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -10808,6 +10857,21 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "event_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -10986,6 +11050,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -11193,6 +11267,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -11366,6 +11450,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -11544,6 +11638,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -11642,20 +11746,6 @@
           "category": "Exceptions",
           "why_required": "Quantifies exposure impact of the exception",
           "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "breach_pct",
-          "description": "Percentage overage/underage relative to the threshold",
-          "category": "Exceptions",
-          "why_required": "Normalised severity for comparison across exceptions",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "days_open",
-          "description": "Calculated: days from identified_date to today (or actual_remediation_date)",
-          "category": "Exceptions",
-          "why_required": "Aging metric for exception management",
-          "data_type": "INTEGER"
         },
         {
           "name": "exception_description",
@@ -11801,6 +11891,21 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "event_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -11944,6 +12049,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -11979,12 +12094,6 @@
         },
         {
           "name": "noi_amt",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "total_debt_service_amt",
           "description": "",
           "category": "L2",
           "data_type": "NUMERIC(18,2)"
@@ -12038,30 +12147,6 @@
           "data_type": "BIGINT"
         },
         {
-          "name": "dscr_value",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(12,6)"
-        },
-        {
-          "name": "ltv_pct",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "net_income_amt",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "interest_rate_sensitivity_pct",
-          "description": "",
-          "category": "L2",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
@@ -12095,6 +12180,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -12168,12 +12263,6 @@
           "data_type": "NUMERIC(18,2)"
         },
         {
-          "name": "net_income_amt",
-          "description": "",
-          "category": "Uncategorized",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
           "name": "interest_expense_amt",
           "description": "",
           "category": "Uncategorized",
@@ -12198,18 +12287,6 @@
           "data_type": "NUMERIC(18,2)"
         },
         {
-          "name": "total_assets_amt",
-          "description": "",
-          "category": "Uncategorized",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "total_liabilities_amt",
-          "description": "",
-          "category": "Uncategorized",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
           "name": "shareholders_equity_amt",
           "description": "",
           "category": "Uncategorized",
@@ -12225,12 +12302,6 @@
           "name": "noi_amt",
           "description": "",
           "category": "Uncategorized",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "total_debt_service_amt",
-          "description": "",
-          "why_required": "",
           "data_type": "NUMERIC(18,2)"
         },
         {
@@ -12284,6 +12355,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -12351,30 +12432,6 @@
           "data_type": "NUMERIC(6,4)"
         },
         {
-          "name": "ead_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "expected_loss_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "rwa_amt",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(18,2)"
-        },
-        {
-          "name": "risk_weight_pct",
-          "description": "",
-          "why_required": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
           "name": "internal_risk_rating",
           "description": "",
           "why_required": "",
@@ -12394,11 +12451,6 @@
               "field": "currency_code"
             }
           }
-        },
-        {
-          "name": "expected_loss_rate_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
         },
         {
           "name": "updated_ts",
@@ -12463,6 +12515,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -12610,6 +12672,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -12916,6 +12988,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -13069,6 +13151,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -13237,6 +13329,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -13378,6 +13480,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -13725,6 +13837,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -13783,13 +13905,31 @@
           "name": "counterparty_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
         },
         {
           "name": "facility_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
         },
         {
           "name": "instrument_id",
@@ -13801,13 +13941,31 @@
           "name": "legal_entity_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "legal_entity",
+              "field": "legal_entity_id"
+            }
+          }
         },
         {
           "name": "netting_set_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "netting_set",
+              "field": "netting_set_id"
+            }
+          }
         },
         {
           "name": "product_node_id",
@@ -13852,6 +14010,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -13998,6 +14166,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -14121,6 +14294,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -14235,6 +14418,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -14370,6 +14558,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -14505,6 +14703,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -14738,6 +14941,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -14869,6 +15082,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15022,6 +15240,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15159,6 +15387,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15303,6 +15536,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15417,6 +15655,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15532,6 +15775,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15664,6 +15917,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15790,6 +16053,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -15919,6 +16187,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16054,6 +16327,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16189,6 +16472,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16320,6 +16613,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16450,6 +16753,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16613,6 +16926,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16627,7 +16950,12 @@
           "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
           }
         },
         {
@@ -16636,7 +16964,12 @@
           "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
-            "is_composite": true
+            "is_composite": true,
+            "fk_target": {
+              "layer": "L1",
+              "table": "limit_rule",
+              "field": "limit_rule_id"
+            }
           }
         },
         {
@@ -16671,7 +17004,16 @@
         {
           "name": "currency_code",
           "description": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(20)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "created_ts",
@@ -16707,6 +17049,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16835,6 +17187,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -16964,6 +17326,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -17023,7 +17395,16 @@
         {
           "name": "currency_code",
           "description": "",
-          "data_type": "VARCHAR(30)"
+          "data_type": "VARCHAR(30)",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "currency_dim",
+              "field": "currency_code"
+            }
+          }
         },
         {
           "name": "reporting_currency_amt",
@@ -17043,7 +17424,16 @@
         {
           "name": "source_system_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "created_ts",
@@ -17079,6 +17469,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -17154,12 +17549,30 @@
         {
           "name": "counterparty_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "counterparty",
+              "field": "counterparty_id"
+            }
+          }
         },
         {
           "name": "facility_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L2",
+              "table": "facility_master",
+              "field": "facility_id"
+            }
+          }
         },
         {
           "name": "product_code",
@@ -17179,7 +17592,16 @@
         {
           "name": "source_system_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": false,
+            "is_composite": false,
+            "fk_target": {
+              "layer": "L1",
+              "table": "source_system_registry",
+              "field": "source_system_id"
+            }
+          }
         },
         {
           "name": "created_ts",
@@ -17210,6 +17632,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -17329,6 +17756,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -17375,52 +17812,12 @@
           }
         },
         {
-          "name": "cet1_ratio_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "tier1_ratio_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "total_capital_ratio_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "tier1_leverage_ratio_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "leverage_ratio_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "tlac_ratio_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "slr_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
           "name": "tier1_capital_amt",
           "description": "",
           "data_type": "NUMERIC(20,4)"
         },
         {
           "name": "cet1_capital_amt",
-          "description": "",
-          "data_type": "NUMERIC(20,4)"
-        },
-        {
-          "name": "total_capital_amt",
           "description": "",
           "data_type": "NUMERIC(20,4)"
         },
@@ -17441,16 +17838,6 @@
         },
         {
           "name": "tlac_amt",
-          "description": "",
-          "data_type": "NUMERIC(20,4)"
-        },
-        {
-          "name": "rwa_std_amt",
-          "description": "",
-          "data_type": "NUMERIC(20,4)"
-        },
-        {
-          "name": "rwa_erba_amt",
           "description": "",
           "data_type": "NUMERIC(20,4)"
         },
@@ -17478,6 +17865,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     },
@@ -17548,6 +17945,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "source_system_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "raw_record_id",
+          "description": "",
+          "data_type": "VARCHAR(200)"
         }
       ]
     }
@@ -18099,7 +18506,7 @@
         {
           "name": "utilization_status_code",
           "description": "",
-          "data_type": "VARCHAR(20)",
+          "data_type": "VARCHAR(30)",
           "pk_fk": {
             "is_pk": false,
             "is_composite": false,
@@ -18113,12 +18520,12 @@
         {
           "name": "risk_rating_tier_code",
           "description": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "limit_status_code",
           "description": "",
-          "data_type": "VARCHAR(20)"
+          "data_type": "VARCHAR(30)"
         },
         {
           "name": "coverage_ratio_pct",
@@ -18169,6 +18576,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "total_collateral_mv_usd",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
         }
       ]
     },
@@ -18784,6 +19196,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -18955,6 +19372,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19216,6 +19638,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19362,6 +19789,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19479,6 +19911,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19638,6 +20075,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19743,6 +20185,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19902,6 +20349,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -19989,6 +20441,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20106,6 +20563,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20199,6 +20661,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20339,6 +20806,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20438,6 +20910,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20537,6 +21014,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20624,6 +21106,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20699,6 +21186,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20792,6 +21284,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20885,6 +21382,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -20971,6 +21473,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -21112,6 +21619,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -21217,6 +21729,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -21430,6 +21947,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -22350,6 +22872,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -22527,6 +23054,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -22620,6 +23152,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -22869,6 +23406,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -22974,6 +23516,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23067,6 +23614,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23172,6 +23724,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23312,6 +23869,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23393,6 +23955,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23462,6 +24029,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23603,6 +24175,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23702,6 +24279,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23795,6 +24377,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23876,6 +24463,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -23957,6 +24549,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24062,6 +24659,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24371,6 +24973,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24470,6 +25077,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24599,6 +25211,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24686,6 +25303,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24785,6 +25407,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -24896,6 +25523,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25037,6 +25669,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25184,6 +25826,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25295,6 +25947,16 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25418,6 +26080,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25489,6 +26156,31 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "expected_loss_rate_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "risk_weight_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25544,6 +26236,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -25631,6 +26328,11 @@
           "name": "load_batch_id",
           "description": "",
           "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     },
@@ -26449,6 +27151,217 @@
           "data_type": "VARCHAR(100)"
         }
       ]
+    },
+    {
+      "name": "capital_position_calc",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "legal_entity_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "cet1_ratio_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "tier1_ratio_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "total_capital_ratio_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "tier1_leverage_ratio_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "leverage_ratio_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "tlac_ratio_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "slr_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "rwa_std_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "rwa_erba_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_capital_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        }
+      ]
+    },
+    {
+      "name": "counterparty_financial_calc",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_liabilities_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "total_debt_service_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        }
+      ]
+    },
+    {
+      "name": "exception_event_calc",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "exception_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "days_open",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "breach_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        }
+      ]
     }
   ],
   "relationships": [
@@ -26711,14 +27624,6 @@
     {
       "from_layer": "L1",
       "from_table": "rating_grade_dim",
-      "from_field": "rating_scale_id",
-      "to_layer": "L1",
-      "to_table": "rating_scale_dim",
-      "to_field": "rating_scale_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "rating_grade_dim",
       "from_field": "source_system_id",
       "to_layer": "L1",
       "to_table": "source_system_registry",
@@ -26739,22 +27644,6 @@
       "to_layer": "L1",
       "to_table": "model_registry_dim",
       "to_field": "model_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "rating_mapping",
-      "from_field": "rating_scale_id",
-      "to_layer": "L1",
-      "to_table": "rating_scale_dim",
-      "to_field": "rating_scale_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "rating_mapping",
-      "from_field": "rating_source_id",
-      "to_layer": "L1",
-      "to_table": "rating_source",
-      "to_field": "rating_source_id"
     },
     {
       "from_layer": "L1",
@@ -26891,14 +27780,6 @@
       "to_layer": "L1",
       "to_table": "source_system_registry",
       "to_field": "source_system_id"
-    },
-    {
-      "from_layer": "L1",
-      "from_table": "sccl_counterparty_group",
-      "from_field": "jurisdiction_code",
-      "to_layer": "L1",
-      "to_table": "regulatory_jurisdiction",
-      "to_field": "jurisdiction_code"
     },
     {
       "from_layer": "L1",
@@ -27067,6 +27948,38 @@
       "to_layer": "L1",
       "to_table": "source_system_registry",
       "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "contract_master",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "contract_master",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "contract_master",
+      "from_field": "legal_entity_id",
+      "to_layer": "L2",
+      "to_table": "legal_entity",
+      "to_field": "legal_entity_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "contract_master",
+      "from_field": "netting_set_id",
+      "to_layer": "L2",
+      "to_table": "netting_set",
+      "to_field": "netting_set_id"
     },
     {
       "from_layer": "L2",
@@ -27518,22 +28431,6 @@
     },
     {
       "from_layer": "L2",
-      "from_table": "facility_exposure_snapshot",
-      "from_field": "fr2590_category_code",
-      "to_layer": "L1",
-      "to_table": "fr2590_category_dim",
-      "to_field": "fr2590_category_code"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "facility_exposure_snapshot",
-      "from_field": "internal_risk_rating_bucket_code",
-      "to_layer": "L1",
-      "to_table": "internal_risk_rating_bucket_dim",
-      "to_field": "internal_risk_rating_bucket_code"
-    },
-    {
-      "from_layer": "L2",
       "from_table": "facility_financial_snapshot",
       "from_field": "facility_id",
       "to_layer": "L2",
@@ -27782,6 +28679,46 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_account_balance_snapshot",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "counterparty_id",
+      "to_layer": "L2",
+      "to_table": "counterparty",
+      "to_field": "counterparty_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "gl_journal_entry",
+      "from_field": "source_system_id",
+      "to_layer": "L1",
+      "to_table": "source_system_registry",
+      "to_field": "source_system_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "instrument_master",
       "from_field": "country_code",
       "to_layer": "L1",
@@ -27822,6 +28759,30 @@
     },
     {
       "from_layer": "L2",
+      "from_table": "limit_assignment_snapshot",
+      "from_field": "currency_code",
+      "to_layer": "L1",
+      "to_table": "currency_dim",
+      "to_field": "currency_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_assignment_snapshot",
+      "from_field": "facility_id",
+      "to_layer": "L2",
+      "to_table": "facility_master",
+      "to_field": "facility_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_assignment_snapshot",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id"
+    },
+    {
+      "from_layer": "L2",
       "from_table": "limit_contribution_snapshot",
       "from_field": "counterparty_id",
       "to_layer": "L2",
@@ -27838,27 +28799,11 @@
     },
     {
       "from_layer": "L2",
-      "from_table": "limit_contribution_snapshot",
-      "from_field": "limit_rule_id",
-      "to_layer": "L1",
-      "to_table": "limit_rule",
-      "to_field": "limit_rule_id"
-    },
-    {
-      "from_layer": "L2",
       "from_table": "limit_utilization_event",
       "from_field": "counterparty_id",
       "to_layer": "L2",
       "to_table": "counterparty",
       "to_field": "counterparty_id"
-    },
-    {
-      "from_layer": "L2",
-      "from_table": "limit_utilization_event",
-      "from_field": "limit_rule_id",
-      "to_layer": "L1",
-      "to_table": "limit_rule",
-      "to_field": "limit_rule_id"
     },
     {
       "from_layer": "L2",
@@ -28259,6 +29204,70 @@
       "to_layer": "L1",
       "to_table": "enterprise_business_taxonomy",
       "to_field": "managed_segment_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "rating_grade_dim",
+      "from_field": "rating_scale_id",
+      "to_layer": "L1",
+      "to_table": "rating_scale_dim",
+      "to_field": "rating_scale_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "rating_mapping",
+      "from_field": "rating_scale_id",
+      "to_layer": "L1",
+      "to_table": "rating_scale_dim",
+      "to_field": "rating_scale_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "rating_mapping",
+      "from_field": "rating_source_id",
+      "to_layer": "L1",
+      "to_table": "rating_source",
+      "to_field": "rating_source_id"
+    },
+    {
+      "from_layer": "L1",
+      "from_table": "sccl_counterparty_group",
+      "from_field": "jurisdiction_code",
+      "to_layer": "L1",
+      "to_table": "regulatory_jurisdiction",
+      "to_field": "jurisdiction_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_exposure_snapshot",
+      "from_field": "fr2590_category_code",
+      "to_layer": "L1",
+      "to_table": "fr2590_category_dim",
+      "to_field": "fr2590_category_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "facility_exposure_snapshot",
+      "from_field": "internal_risk_rating_bucket_code",
+      "to_layer": "L1",
+      "to_table": "internal_risk_rating_bucket_dim",
+      "to_field": "internal_risk_rating_bucket_code"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_contribution_snapshot",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id"
+    },
+    {
+      "from_layer": "L2",
+      "from_table": "limit_utilization_event",
+      "from_field": "limit_rule_id",
+      "to_layer": "L1",
+      "to_table": "limit_rule",
+      "to_field": "limit_rule_id"
     },
     {
       "from_layer": "L2",

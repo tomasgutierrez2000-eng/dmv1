@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-03-14T02:16:32.952Z",
+  "createdAt": "2026-03-14T02:46:18.830Z",
   "tables": [
     {
       "layer": "L1",
@@ -3901,6 +3901,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4045,6 +4048,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4105,6 +4114,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4158,9 +4173,6 @@
           "name": "lob_segment_id"
         },
         {
-          "name": "net_exposure_usd"
-        },
-        {
           "name": "product_node_id"
         },
         {
@@ -4182,13 +4194,7 @@
           "name": "limit_status_code"
         },
         {
-          "name": "rwa_amt"
-        },
-        {
           "name": "internal_risk_rating_bucket_code"
-        },
-        {
-          "name": "total_collateral_mv_usd"
         },
         {
           "name": "bank_share_pct"
@@ -4213,6 +4219,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4225,9 +4234,6 @@
         },
         {
           "name": "as_of_date"
-        },
-        {
-          "name": "netted_exposure_amount"
         },
         {
           "name": "gross_exposure_amount"
@@ -4254,9 +4260,6 @@
           "name": "pfe_usd"
         },
         {
-          "name": "netting_benefit_amt"
-        },
-        {
           "name": "updated_ts"
         },
         {
@@ -4276,6 +4279,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4330,6 +4339,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4408,6 +4423,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4492,6 +4510,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4573,6 +4597,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4645,6 +4675,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4699,6 +4735,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4750,6 +4792,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
+        },
+        {
+          "name": "event_ts"
         }
       ]
     },
@@ -4801,6 +4852,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
+        },
+        {
+          "name": "event_ts"
         }
       ]
     },
@@ -4876,6 +4936,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4939,6 +5005,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -4987,6 +5059,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
+        },
+        {
+          "name": "event_ts"
         }
       ]
     },
@@ -5053,6 +5134,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5137,6 +5224,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5206,6 +5299,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5275,6 +5374,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5311,12 +5416,6 @@
         },
         {
           "name": "breach_amount_usd"
-        },
-        {
-          "name": "breach_pct"
-        },
-        {
-          "name": "days_open"
         },
         {
           "name": "exception_description"
@@ -5377,6 +5476,15 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
+        },
+        {
+          "name": "event_ts"
         }
       ]
     },
@@ -5437,6 +5545,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5452,9 +5566,6 @@
         },
         {
           "name": "noi_amt"
-        },
-        {
-          "name": "total_debt_service_amt"
         },
         {
           "name": "operating_expense_amt"
@@ -5481,18 +5592,6 @@
           "name": "financial_snapshot_id"
         },
         {
-          "name": "dscr_value"
-        },
-        {
-          "name": "ltv_pct"
-        },
-        {
-          "name": "net_income_amt"
-        },
-        {
-          "name": "interest_rate_sensitivity_pct"
-        },
-        {
           "name": "updated_ts"
         },
         {
@@ -5512,6 +5611,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5541,9 +5646,6 @@
           "name": "operating_expense_amt"
         },
         {
-          "name": "net_income_amt"
-        },
-        {
           "name": "interest_expense_amt"
         },
         {
@@ -5556,12 +5658,6 @@
           "name": "amortization_amt"
         },
         {
-          "name": "total_assets_amt"
-        },
-        {
-          "name": "total_liabilities_amt"
-        },
-        {
           "name": "shareholders_equity_amt"
         },
         {
@@ -5569,9 +5665,6 @@
         },
         {
           "name": "noi_amt"
-        },
-        {
-          "name": "total_debt_service_amt"
         },
         {
           "name": "tangible_net_worth_usd"
@@ -5602,6 +5695,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5628,25 +5727,10 @@
           "name": "ccf"
         },
         {
-          "name": "ead_amt"
-        },
-        {
-          "name": "expected_loss_amt"
-        },
-        {
-          "name": "rwa_amt"
-        },
-        {
-          "name": "risk_weight_pct"
-        },
-        {
           "name": "internal_risk_rating"
         },
         {
           "name": "currency_code"
-        },
-        {
-          "name": "expected_loss_rate_pct"
         },
         {
           "name": "updated_ts"
@@ -5680,6 +5764,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5749,6 +5839,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5893,6 +5989,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -5968,6 +6070,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6046,6 +6154,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6106,6 +6220,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6244,6 +6364,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6310,6 +6436,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6382,6 +6514,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6442,6 +6577,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6493,6 +6634,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6559,6 +6703,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6625,6 +6775,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6727,6 +6880,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6787,6 +6946,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6853,6 +7015,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6916,6 +7084,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -6982,6 +7153,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7033,6 +7207,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7081,6 +7258,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7141,6 +7324,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7198,6 +7387,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7252,6 +7444,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7309,6 +7504,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7366,6 +7567,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7426,6 +7633,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7486,6 +7699,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7552,6 +7771,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7603,6 +7828,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7663,6 +7894,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7729,6 +7966,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7795,6 +8038,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7873,6 +8119,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7933,6 +8182,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -7950,34 +8205,10 @@
           "name": "currency_code"
         },
         {
-          "name": "cet1_ratio_pct"
-        },
-        {
-          "name": "tier1_ratio_pct"
-        },
-        {
-          "name": "total_capital_ratio_pct"
-        },
-        {
-          "name": "tier1_leverage_ratio_pct"
-        },
-        {
-          "name": "leverage_ratio_pct"
-        },
-        {
-          "name": "tlac_ratio_pct"
-        },
-        {
-          "name": "slr_pct"
-        },
-        {
           "name": "tier1_capital_amt"
         },
         {
           "name": "cet1_capital_amt"
-        },
-        {
-          "name": "total_capital_amt"
         },
         {
           "name": "rwa_amt"
@@ -7990,12 +8221,6 @@
         },
         {
           "name": "tlac_amt"
-        },
-        {
-          "name": "rwa_std_amt"
-        },
-        {
-          "name": "rwa_erba_amt"
         },
         {
           "name": "source_filing_code"
@@ -8011,6 +8236,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -8047,6 +8278,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "source_system_id"
+        },
+        {
+          "name": "raw_record_id"
         }
       ]
     },
@@ -8386,6 +8623,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "total_collateral_mv_usd"
         }
       ]
     },
@@ -8728,6 +8968,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -8815,6 +9058,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -8944,6 +9190,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9019,6 +9268,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9079,6 +9331,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9160,6 +9415,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9214,6 +9472,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9295,6 +9556,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9340,6 +9604,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9400,6 +9667,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9448,6 +9718,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9520,6 +9793,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9571,6 +9847,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9622,6 +9901,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9667,6 +9949,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9706,6 +9991,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9754,6 +10042,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9802,6 +10093,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9847,6 +10141,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9919,6 +10216,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -9973,6 +10273,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10081,6 +10384,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10552,6 +10858,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10642,6 +10951,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10690,6 +11002,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10816,6 +11131,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10870,6 +11188,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10918,6 +11239,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -10972,6 +11296,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11044,6 +11371,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11086,6 +11416,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11122,6 +11455,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11194,6 +11530,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11245,6 +11584,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11293,6 +11635,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11335,6 +11680,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11377,6 +11725,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11431,6 +11782,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11584,6 +11938,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11635,6 +11992,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11701,6 +12061,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11746,6 +12109,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11797,6 +12163,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11854,6 +12223,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -11926,6 +12298,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -12001,6 +12379,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -12058,6 +12442,12 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -12121,6 +12511,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -12157,6 +12550,21 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "expected_loss_rate_pct"
+        },
+        {
+          "name": "risk_weight_pct"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "record_source"
+        },
+        {
+          "name": "load_timestamp"
         }
       ]
     },
@@ -12184,6 +12592,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -12229,6 +12640,9 @@
         },
         {
           "name": "load_batch_id"
+        },
+        {
+          "name": "updated_ts"
         }
       ]
     },
@@ -12616,6 +13030,126 @@
         },
         {
           "name": "most_binding_constraint"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "capital_position_calc",
+      "fields": [
+        {
+          "name": "legal_entity_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "cet1_ratio_pct"
+        },
+        {
+          "name": "tier1_ratio_pct"
+        },
+        {
+          "name": "total_capital_ratio_pct"
+        },
+        {
+          "name": "tier1_leverage_ratio_pct"
+        },
+        {
+          "name": "leverage_ratio_pct"
+        },
+        {
+          "name": "tlac_ratio_pct"
+        },
+        {
+          "name": "slr_pct"
+        },
+        {
+          "name": "rwa_std_amt"
+        },
+        {
+          "name": "rwa_erba_amt"
+        },
+        {
+          "name": "total_capital_amt"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "counterparty_financial_calc",
+      "fields": [
+        {
+          "name": "counterparty_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "net_income_amt"
+        },
+        {
+          "name": "total_assets_amt"
+        },
+        {
+          "name": "total_liabilities_amt"
+        },
+        {
+          "name": "total_debt_service_amt"
+        },
+        {
+          "name": "created_ts"
+        },
+        {
+          "name": "updated_ts"
+        },
+        {
+          "name": "created_by"
+        },
+        {
+          "name": "load_batch_id"
+        }
+      ]
+    },
+    {
+      "layer": "L3",
+      "tableName": "exception_event_calc",
+      "fields": [
+        {
+          "name": "exception_id"
+        },
+        {
+          "name": "as_of_date"
+        },
+        {
+          "name": "days_open"
+        },
+        {
+          "name": "breach_pct"
         },
         {
           "name": "created_ts"

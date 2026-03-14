@@ -715,33 +715,26 @@ export function runStoryArcChecks(
         }
         break;
       }
-      case 'DEFAULT': {
-        const statuses = allSeries.filter(e => e.credit_status_code !== undefined).map(e => e.credit_status_code!);
-        if (!statuses.some(s => s === 10)) {
-          warnings.push(`Story DEFAULT CP ${cpId}: never reached credit_status_code=10`);
-        }
-        if (!cpHasDefaultEvent.has(cpId)) {
-          warnings.push(`Story DEFAULT CP ${cpId}: no default credit event`);
-        }
-        break;
-      }
-      case 'RECOVERY': {
+      case 'RECOVERING': {
         if (pds.length >= 2 && pds[pds.length - 1] > pds[0] * 1.1) {
-          warnings.push(`Story RECOVERY CP ${cpId}: PD rose ${pds[0].toFixed(4)}→${pds[pds.length-1].toFixed(4)}`);
+          warnings.push(`Story RECOVERING CP ${cpId}: PD rose ${pds[0].toFixed(4)}→${pds[pds.length-1].toFixed(4)}`);
         }
         // Drawn should trend down
         if (drawnVals.length >= 2 && drawnVals[drawnVals.length - 1] > drawnVals[0] * 1.15) {
-          warnings.push(`Story RECOVERY CP ${cpId}: drawn increased — expected decrease`);
+          warnings.push(`Story RECOVERING CP ${cpId}: drawn increased — expected decrease`);
         }
         break;
       }
-      case 'BAU': {
+      case 'STABLE_IG':
+      case 'STEADY_HY':
+      case 'GROWING':
+      case 'NEW_RELATIONSHIP': {
         if (drawnVals.length >= 3) {
           const mean = drawnVals.reduce((s, v) => s + v, 0) / drawnVals.length;
           if (mean > 0) {
             const maxChange = Math.max(...drawnVals.slice(1).map((v, i) => Math.abs(v - drawnVals[i]) / mean));
             if (maxChange > 0.30) {
-              warnings.push(`Story BAU CP ${cpId}: MoM drawn change ${(maxChange*100).toFixed(1)}% — too volatile`);
+              warnings.push(`Story ${arc} CP ${cpId}: MoM drawn change ${(maxChange*100).toFixed(1)}% — too volatile`);
             }
           }
         }
@@ -1055,13 +1048,13 @@ export function runPortfolioDistribution(
   }
 
   // ── Currency diversity ──
-  const currencies = new Set(chain.facilities.map(f => (f as Record<string, unknown>).currency_code as string).filter(Boolean));
+  const currencies = new Set(chain.facilities.map(f => (f as unknown as Record<string, unknown>).currency_code as string).filter(Boolean));
   if (chain.facilities.length >= 10 && currencies.size === 1) {
     warnings.push(`Distribution: all ${chain.facilities.length} facilities use ${[...currencies][0]} — no currency diversification`);
   }
 
   // ── Product mix ──
-  const productTypes = chain.facilities.map(f => (f as Record<string, unknown>).facility_type_code as string);
+  const productTypes = chain.facilities.map(f => (f as unknown as Record<string, unknown>).facility_type_code as string);
   const uniqueProducts = new Set(productTypes.filter(Boolean));
   if (chain.facilities.length >= 6 && uniqueProducts.size === 1) {
     warnings.push(`Distribution: all facilities are ${[...uniqueProducts][0]} — no product diversification`);

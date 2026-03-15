@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import type { L3Metric, DashboardPage, SourceField } from '@/data/l3-metrics';
+import type { L3Metric, DashboardPage, SourceField, CalculationDimension } from '@/data/l3-metrics';
 import { getMetricsCustomPath, getProjectRoot } from '@/lib/config';
 
 export interface CustomMetricsFile {
@@ -89,6 +89,7 @@ function readYamlMetricStubs(): L3Metric[] {
         let name = metricId;
         let formula = metricId;
         let formulaSQL: string | undefined;
+        let formulasByDimension: Partial<Record<CalculationDimension, { formula: string; formulaSQL?: string }>> | undefined;
         let description = `YAML metric ${metricId}`;
         const sourceFields: SourceField[] = [];
 
@@ -99,12 +100,32 @@ function readYamlMetricStubs(): L3Metric[] {
             name = (def.name as string) || metricId;
             description = (def.description as string) || description;
 
+            const YAML_LEVEL_TO_DIMENSION: Record<string, CalculationDimension> = {
+              facility: 'facility',
+              counterparty: 'counterparty',
+              desk: 'L3',
+              portfolio: 'L2',
+              business_segment: 'L1',
+            };
+
             const levels = def.levels as Record<string, Record<string, string>> | undefined;
             if (levels) {
-              const first = levels[Object.keys(levels)[0]];
+              const levelKeys = Object.keys(levels);
+              const first = levels[levelKeys[0]];
               if (first) {
                 formula = first.formula_text || first.formula_sql || metricId;
                 formulaSQL = first.formula_sql;
+              }
+              // Populate formulasByDimension from all YAML levels
+              for (const [levelName, levelDef] of Object.entries(levels)) {
+                const dim = YAML_LEVEL_TO_DIMENSION[levelName];
+                if (dim && levelDef.formula_sql) {
+                  if (!formulasByDimension) formulasByDimension = {};
+                  formulasByDimension[dim] = {
+                    formula: levelDef.formula_text || levelDef.formula_sql,
+                    formulaSQL: levelDef.formula_sql,
+                  };
+                }
               }
             }
 
@@ -133,6 +154,7 @@ function readYamlMetricStubs(): L3Metric[] {
           metricType: 'Derived',
           formula,
           formulaSQL,
+          formulasByDimension,
           description,
           displayFormat: '',
           sampleValue: '',

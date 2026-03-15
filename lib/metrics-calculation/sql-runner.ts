@@ -78,8 +78,9 @@ function adaptSql(sql: string): string {
   const firstStmt = normalized.split(';')[0]?.trim() ?? normalized;
   if (!firstStmt.toLowerCase().startsWith('select')) return normalized;
   normalized = firstStmt;
-  normalized = normalized.replace(/\bL1\.(\w+)/g, 'l1_$1');
-  normalized = normalized.replace(/\bL2\.(\w+)/g, 'l2_$1');
+  normalized = normalized.replace(/\b[Ll]1\.(\w+)/g, 'l1_$1');
+  normalized = normalized.replace(/\b[Ll]2\.(\w+)/g, 'l2_$1');
+  normalized = normalized.replace(/\b[Ll]3\.(\w+)/g, 'l3_$1');
   return normalized;
 }
 
@@ -99,28 +100,21 @@ const CACHE_TTL_MS = 60_000; // 1 minute
 
 function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; error?: string } {
   const data: SampleDataByTable = {};
-  const needsL1 = tableKeys.some((k) => k.startsWith('L1.'));
-  const needsL2 = tableKeys.some((k) => k.startsWith('L2.'));
   const now = Date.now();
   const cacheStale = now - _cacheTs > CACHE_TTL_MS;
 
+  // Always load both files so we can fall back across layers
   const l1Path = getSampleDataL1Path();
   const l2Path = getSampleDataL2Path();
   try {
-    if (needsL1) {
-      if (!_cachedL1 || cacheStale) {
-        if (!fs.existsSync(l1Path)) {
-          return { data: {}, error: `L1 sample data not found at ${l1Path}. Run: npx tsx scripts/l1/generate.ts` };
-        }
+    if (!_cachedL1 || cacheStale) {
+      if (fs.existsSync(l1Path)) {
         _cachedL1 = JSON.parse(fs.readFileSync(l1Path, 'utf-8')) as SampleDataByTable;
         _cacheTs = now;
       }
     }
-    if (needsL2) {
-      if (!_cachedL2 || cacheStale) {
-        if (!fs.existsSync(l2Path)) {
-          return { data: {}, error: `L2 sample data not found at ${l2Path}. Run: npx tsx scripts/l2/generate.ts` };
-        }
+    if (!_cachedL2 || cacheStale) {
+      if (fs.existsSync(l2Path)) {
         _cachedL2 = JSON.parse(fs.readFileSync(l2Path, 'utf-8')) as SampleDataByTable;
         _cacheTs = now;
       }
@@ -131,7 +125,13 @@ function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; error?:
 
   const all = { ...(_cachedL1 ?? {}), ...(_cachedL2 ?? {}) };
   for (const key of tableKeys) {
-    const entry = all[key];
+    let entry = all[key];
+    // Fall back: if L2.table not found, try L1.table (and vice versa)
+    if (!entry || !Array.isArray(entry.columns)) {
+      const tableName = key.replace(/^L[12]\./, '');
+      const altKey = key.startsWith('L2.') ? `L1.${tableName}` : `L2.${tableName}`;
+      entry = all[altKey];
+    }
     if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {
       return { data: {}, error: `No sample data for table: ${key}` };
     }

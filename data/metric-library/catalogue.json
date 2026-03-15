@@ -40823,7 +40823,7 @@
         "dashboard_display_name": "Number of Loans (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fec.number_of_loans, 0))",
+        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT p.position_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -40880,14 +40880,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(COALESCE(fec.number_of_loans, 0)) AS metric_value\nFROM l3.facility_exposure_calc fec\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fec.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fec.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  COUNT(DISTINCT p.position_id) AS metric_value\nFROM l2.position p\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = p.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE p.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Number of Loans (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fec.number_of_loans, 0))",
+        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT p.position_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -40944,14 +40944,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(COALESCE(fec.number_of_loans, 0)) AS metric_value\nFROM l3.facility_exposure_calc fec\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fec.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE fec.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT p.position_id) AS metric_value\nFROM l2.position p\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = p.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE p.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Number of Loans (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fec.number_of_loans, 0))",
+        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT p.position_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -41008,14 +41008,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(COALESCE(fec.number_of_loans, 0)) AS metric_value\nFROM l3.facility_exposure_calc fec\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fec.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE fec.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT p.position_id) AS metric_value\nFROM l2.position p\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = p.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE p.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Number of Loans (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(COALESCE(fec.number_of_loans, 0))",
+        "level_logic": "1. LOAD  l2.position  (p)\n   WHERE p.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = p.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT p.position_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -41072,7 +41072,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(COALESCE(fec.number_of_loans, 0)) AS metric_value\nFROM l3.facility_exposure_calc fec\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fec.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE fec.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT p.position_id) AS metric_value\nFROM l2.position p\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = p.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE p.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {

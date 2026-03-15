@@ -65,8 +65,54 @@ async function initSqlJsEngine() {
   });
 }
 
+/** Module-level cache for the sql.js WASM engine (heavy to init, safe to reuse). */
+let _sqlEngine: { Database: new () => any } | null = null;
+
+async function getSqlJsEngine(): Promise<{ Database: new () => any }> {
+  if (_sqlEngine) return _sqlEngine;
+  _sqlEngine = await initSqlJsEngine();
+  return _sqlEngine;
+}
+
 function tableKeyToSqliteName(tableKey: string): string {
   return tableKey.replace('.', '_').toLowerCase();
+}
+
+/**
+ * Replace GREATEST/LEAST two-arg calls with CASE WHEN, handling nested parentheses.
+ * e.g. GREATEST(COALESCE(a, 0), COALESCE(b, 0)) → CASE WHEN (...) > (...) THEN (...) ELSE (...) END
+ */
+function replaceBalancedTwoArg(sql: string, funcName: string, op: string): string {
+  const pattern = new RegExp(`\\b${funcName}\\s*\\(`, 'gi');
+  let result = '';
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(sql)) !== null) {
+    result += sql.slice(lastIndex, match.index);
+    const startAfterParen = match.index + match[0].length;
+    // Walk forward tracking parenthesis depth to find the matching close paren
+    let depth = 1;
+    let commaPos = -1;
+    let i = startAfterParen;
+    for (; i < sql.length && depth > 0; i++) {
+      if (sql[i] === '(') depth++;
+      else if (sql[i] === ')') { depth--; if (depth === 0) break; }
+      else if (sql[i] === ',' && depth === 1 && commaPos === -1) commaPos = i;
+    }
+    if (depth === 0 && commaPos !== -1) {
+      const arg1 = sql.slice(startAfterParen, commaPos).trim();
+      const arg2 = sql.slice(commaPos + 1, i).trim();
+      result += `CASE WHEN (${arg1}) ${op} (${arg2}) THEN (${arg1}) ELSE (${arg2}) END`;
+      lastIndex = i + 1;
+    } else {
+      // Couldn't parse — leave original text
+      result += match[0];
+      lastIndex = startAfterParen;
+    }
+  }
+  result += sql.slice(lastIndex);
+  return result;
 }
 
 function adaptSql(sql: string): string {
@@ -76,11 +122,45 @@ function adaptSql(sql: string): string {
     .join('\n')
     .trim();
   const firstStmt = normalized.split(';')[0]?.trim() ?? normalized;
-  if (!firstStmt.toLowerCase().startsWith('select')) return normalized;
+  const lower = firstStmt.toLowerCase();
+  if (!lower.startsWith('select') && !lower.startsWith('with')) return normalized;
   normalized = firstStmt;
+
+  // Schema prefixes: l1.table → l1_table
   normalized = normalized.replace(/\b[Ll]1\.(\w+)/g, 'l1_$1');
   normalized = normalized.replace(/\b[Ll]2\.(\w+)/g, 'l2_$1');
   normalized = normalized.replace(/\b[Ll]3\.(\w+)/g, 'l3_$1');
+
+  // PostgreSQL type casts: strip ::type (SQLite doesn't support them)
+  normalized = normalized.replace(/::(date|numeric|text|integer|bigint|boolean|varchar(\(\d+\))?|real|float|double precision)/gi, '');
+
+  // GREATEST(a, b) → CASE WHEN (a) > (b) THEN (a) ELSE (b) END
+  // Uses balanced-paren extraction to handle nested function calls
+  normalized = replaceBalancedTwoArg(normalized, 'GREATEST', '>');
+  // LEAST(a, b) → CASE WHEN (a) < (b) THEN (a) ELSE (b) END
+  normalized = replaceBalancedTwoArg(normalized, 'LEAST', '<');
+
+  // DATE_TRUNC('month', x) → strftime('%Y-%m-01', x)
+  normalized = normalized.replace(/DATE_TRUNC\s*\(\s*'month'\s*,\s*([^)]+)\)/gi,
+    "strftime('%Y-%m-01', $1)");
+  // DATE_TRUNC('year', x) → strftime('%Y-01-01', x)
+  normalized = normalized.replace(/DATE_TRUNC\s*\(\s*'year'\s*,\s*([^)]+)\)/gi,
+    "strftime('%Y-01-01', $1)");
+
+  // EXTRACT(YEAR FROM x) → CAST(strftime('%Y', x) AS INTEGER)
+  normalized = normalized.replace(/EXTRACT\s*\(\s*YEAR\s+FROM\s+([^)]+)\)/gi,
+    "CAST(strftime('%Y', $1) AS INTEGER)");
+  // EXTRACT(MONTH FROM x) → CAST(strftime('%m', x) AS INTEGER)
+  normalized = normalized.replace(/EXTRACT\s*\(\s*MONTH\s+FROM\s+([^)]+)\)/gi,
+    "CAST(strftime('%m', $1) AS INTEGER)");
+
+  // CURRENT_DATE → date('now')
+  normalized = normalized.replace(/\bCURRENT_DATE\b/gi, "date('now')");
+
+  // Boolean literals: TRUE/true → 1, FALSE/false → 0
+  normalized = normalized.replace(/\bTRUE\b/gi, '1');
+  normalized = normalized.replace(/\bFALSE\b/gi, '0');
+
   return normalized;
 }
 
@@ -95,35 +175,46 @@ function inferColumnType(colValues: unknown[]): string {
 /** Module-level cache to avoid re-reading large JSON files on every metric run. */
 let _cachedL1: SampleDataByTable | null = null;
 let _cachedL2: SampleDataByTable | null = null;
-let _cacheTs = 0;
+let _cacheL1Ts = 0;
+let _cacheL2Ts = 0;
+let _cacheL1Mtime = 0;
+let _cacheL2Mtime = 0;
 const CACHE_TTL_MS = 60_000; // 1 minute
 
-function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; error?: string } {
+function getFileMtimeMs(filePath: string): number {
+  try { return fs.statSync(filePath).mtimeMs; } catch { return 0; }
+}
+
+function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; missingTables: string[] } {
   const data: SampleDataByTable = {};
   const now = Date.now();
-  const cacheStale = now - _cacheTs > CACHE_TTL_MS;
 
   // Always load both files so we can fall back across layers
   const l1Path = getSampleDataL1Path();
   const l2Path = getSampleDataL2Path();
   try {
-    if (!_cachedL1 || cacheStale) {
+    const l1Mtime = getFileMtimeMs(l1Path);
+    if (!_cachedL1 || now - _cacheL1Ts > CACHE_TTL_MS || l1Mtime !== _cacheL1Mtime) {
       if (fs.existsSync(l1Path)) {
         _cachedL1 = JSON.parse(fs.readFileSync(l1Path, 'utf-8')) as SampleDataByTable;
-        _cacheTs = now;
+        _cacheL1Ts = now;
+        _cacheL1Mtime = l1Mtime;
       }
     }
-    if (!_cachedL2 || cacheStale) {
+    const l2Mtime = getFileMtimeMs(l2Path);
+    if (!_cachedL2 || now - _cacheL2Ts > CACHE_TTL_MS || l2Mtime !== _cacheL2Mtime) {
       if (fs.existsSync(l2Path)) {
         _cachedL2 = JSON.parse(fs.readFileSync(l2Path, 'utf-8')) as SampleDataByTable;
-        _cacheTs = now;
+        _cacheL2Ts = now;
+        _cacheL2Mtime = l2Mtime;
       }
     }
   } catch {
-    return { data: {}, error: 'Failed to read sample data files' };
+    return { data: {}, missingTables: tableKeys };
   }
 
   const all = { ...(_cachedL1 ?? {}), ...(_cachedL2 ?? {}) };
+  const missingTables: string[] = [];
   for (const key of tableKeys) {
     let entry = all[key];
     // Fall back: if L2.table not found, try L1.table (and vice versa)
@@ -133,15 +224,16 @@ function loadSampleData(tableKeys: string[]): { data: SampleDataByTable; error?:
       entry = all[altKey];
     }
     if (!entry || !Array.isArray(entry.columns) || !Array.isArray(entry.rows)) {
-      return { data: {}, error: `No sample data for table: ${key}` };
+      missingTables.push(key);
+      continue; // Skip missing tables instead of failing entirely
     }
     data[key] = entry;
   }
-  return { data };
+  return { data, missingTables };
 }
 
 export function getDistinctAsOfDates(tableKeys: string[]): string[] {
-  const { data } = loadSampleData(tableKeys.filter((k) => k.startsWith('L2.')));
+  const { data } = loadSampleData(tableKeys.filter((k) => k.startsWith('L2.') || k.startsWith('L1.')));
   const dates = new Set<string>();
   for (const entry of Object.values(data)) {
     const colIdx = entry.columns.indexOf('as_of_date');
@@ -160,11 +252,12 @@ export async function runSqlMetric(input: {
   asOfDate: string | null;
 }): Promise<RunMetricOutput> {
   const { rawSql, tableKeys } = input;
-  const { data: sampleData, error: loadError } = loadSampleData(tableKeys);
-  if (loadError) {
+  const { data: sampleData, missingTables } = loadSampleData(tableKeys);
+  // If ALL tables are missing, fail early
+  if (missingTables.length === tableKeys.length && tableKeys.length > 0) {
     return {
       ok: false,
-      error: loadError,
+      error: `No sample data for tables: ${missingTables.join(', ')}`,
       code: 'SAMPLE_DATA_MISSING',
       hint: 'Generate L1/L2 sample data (npm run generate:l1, npm run generate:l2) or set SAMPLE_DATA_L1_PATH / SAMPLE_DATA_L2_PATH.',
     };
@@ -181,13 +274,24 @@ export async function runSqlMetric(input: {
   for (const key of tableKeys) {
     inputRowCounts[key] = sampleData[key]?.rows?.length ?? 0;
   }
+  const warnings = missingTables.length > 0
+    ? [`Missing sample data for: ${missingTables.join(', ')} (empty stub tables used)`]
+    : undefined;
 
   try {
-    const SQL = await initSqlJsEngine();
+    const SQL = await getSqlJsEngine();
     const db = new SQL.Database();
 
     try {
+      // Create empty stub tables for missing sample data (allows LEFT JOINs to succeed)
+      for (const missing of missingTables) {
+        const sqlName = tableKeyToSqliteName(missing);
+        db.run(`CREATE TABLE "${sqlName}" (_stub INTEGER)`);
+        inputRowCounts[missing] = 0;
+      }
+
       for (const tableKey of tableKeys) {
+        if (missingTables.includes(tableKey)) continue; // already created as stub
         const entry = sampleData[tableKey]!;
         const sqlName = tableKeyToSqliteName(tableKey);
         const columns = entry.columns;
@@ -250,6 +354,7 @@ export async function runSqlMetric(input: {
           sqlExecuted,
           result: { type: 'scalar', value: null },
           asOfDateUsed: dateToUse,
+          warnings,
         };
       }
 
@@ -262,6 +367,7 @@ export async function runSqlMetric(input: {
           sqlExecuted,
           result: { type: 'scalar', value: scalar },
           asOfDateUsed: dateToUse,
+          warnings,
         };
       }
 
@@ -283,6 +389,7 @@ export async function runSqlMetric(input: {
         sqlExecuted,
         result: { type: 'grouped', rows: groupedRows },
         asOfDateUsed: dateToUse,
+        warnings,
       };
     } finally {
       try {

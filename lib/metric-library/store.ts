@@ -6,6 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getMetricLibraryDir } from '@/lib/config';
+import { withLockedJsonFile } from '@/lib/governance/safe-file-writer';
 import type { MetricDomain, ParentMetric, MetricVariant, CatalogueItem } from './types';
 
 function getLibraryPaths() {
@@ -99,7 +100,18 @@ export function saveCatalogueItems(items: CatalogueItem[]): void {
   writeJson(getLibraryPaths().catalogue, items);
 }
 
-export function upsertCatalogueItem(item: CatalogueItem): void {
+/** Atomic upsert with mutex locking to prevent concurrent write races. */
+export async function upsertCatalogueItem(item: CatalogueItem): Promise<void> {
+  await withLockedJsonFile<CatalogueItem[]>(getLibraryPaths().catalogue, (all) => {
+    const idx = all.findIndex((i) => i.item_id === item.item_id);
+    if (idx >= 0) all[idx] = item;
+    else all.push(item);
+    return all;
+  });
+}
+
+/** Synchronous upsert (legacy — prefer async upsertCatalogueItem). */
+export function upsertCatalogueItemSync(item: CatalogueItem): void {
   const all = readJson<CatalogueItem[]>(getLibraryPaths().catalogue, []);
   const idx = all.findIndex((i) => i.item_id === item.item_id);
   if (idx >= 0) all[idx] = item;

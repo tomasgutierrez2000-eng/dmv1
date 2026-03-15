@@ -62,7 +62,7 @@ export async function generateAndPersistDemoData(
   if (!item) return false;
 
   item.demo_data = demoData;
-  upsertCatalogueItem(item);
+  await upsertCatalogueItem(item);
   return true;
 }
 

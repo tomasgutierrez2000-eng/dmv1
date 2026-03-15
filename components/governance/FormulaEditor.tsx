@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Code2, Sparkles, CheckCircle2, XCircle, Loader2,
-  AlertTriangle, Copy, Check, Beaker, ChevronDown, ChevronUp,
+  AlertTriangle, Copy, Check, Beaker, ChevronDown, ChevronUp, RotateCcw,
 } from 'lucide-react';
 
 interface FormulaEditorProps {
@@ -15,8 +15,14 @@ interface FormulaEditorProps {
   onCancel: () => void;
 }
 
+/** localStorage key for draft auto-save. */
+function draftKey(itemId: string, level: string): string {
+  return `formula-editor-draft:${itemId}:${level}`;
+}
+
 /**
  * Dual-mode formula editor: Natural Language (AI) + SQL direct editing.
+ * Includes validation guard, error feedback loop, and draft auto-save.
  */
 export default function FormulaEditor({
   currentSql,
@@ -32,6 +38,7 @@ export default function FormulaEditor({
   const [generatedSql, setGeneratedSql] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [validating, setValidating] = useState(false);
+  const [validated, setValidated] = useState(false);
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
     error?: string | null;
@@ -47,24 +54,111 @@ export default function FormulaEditor({
   } | null>(null);
   const [sandboxError, setSandboxError] = useState<string | null>(null);
   const [showSandboxDetails, setShowSandboxDetails] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const autoValidateRef = useRef(false);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const handleGenerateSql = useCallback(async () => {
-    if (!nlPrompt.trim()) return;
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => { timersRef.current.forEach(clearTimeout); };
+  }, []);
+
+  // Restore draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(draftKey(itemId, level));
+      if (saved) {
+        const draft = JSON.parse(saved) as { mode?: string; nlPrompt?: string; sqlText?: string; generatedSql?: string };
+        if (draft.mode === 'nl' || draft.mode === 'sql') setMode(draft.mode);
+        if (draft.nlPrompt) setNlPrompt(draft.nlPrompt);
+        if (draft.sqlText && draft.sqlText !== currentSql) setSqlText(draft.sqlText);
+        if (draft.generatedSql) setGeneratedSql(draft.generatedSql);
+        setDraftRestored(true);
+        const t = setTimeout(() => setDraftRestored(false), 5000);
+        timersRef.current.push(t);
+      }
+    } catch { /* ignore localStorage errors */ }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-save draft to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(draftKey(itemId, level), JSON.stringify({
+        mode, nlPrompt, sqlText, generatedSql,
+      }));
+    } catch { /* ignore */ }
+  }, [mode, nlPrompt, sqlText, generatedSql, itemId, level]);
+
+  // Reset validation when active SQL changes
+  useEffect(() => {
+    setValidated(false);
+    setValidationResult(null);
+  }, [generatedSql, sqlText, mode]);
+
+  const handleValidateSql = useCallback(async (sql: string) => {
+    setValidating(true);
+    setValidationResult(null);
+    setValidated(false);
+
+    try {
+      const res = await fetch('/api/metrics/governance/validate-sql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sql }),
+      });
+      const data = await res.json();
+      const isValid = !!data.valid;
+      setValidationResult({
+        valid: isValid,
+        error: data.error,
+        warnings: data.warnings ?? [],
+      });
+      setValidated(isValid);
+    } catch (err) {
+      setValidationResult({
+        valid: false,
+        error: err instanceof Error ? err.message : 'Validation failed',
+        warnings: [],
+      });
+      setValidated(false);
+    } finally {
+      setValidating(false);
+    }
+  }, []);
+
+  const handleGenerateSql = useCallback(async (errorContext?: string) => {
+    const promptText = nlPrompt.trim();
+    if (!promptText && !errorContext) return;
     setGenerating(true);
     setGeneratedSql(null);
+    autoValidateRef.current = true;
 
     try {
       const res = await fetch('/api/metrics/governance/nl-to-sql', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: nlPrompt.trim(),
-          context: { item_id: itemId, level, current_sql: currentSql },
+          prompt: promptText || 'Fix the SQL error',
+          context: {
+            item_id: itemId,
+            level,
+            current_sql: currentSql,
+            error_context: errorContext,
+          },
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Generation failed');
       setGeneratedSql(data.sql ?? null);
+
+      // Show schema warnings if any
+      if (data.schema_warnings?.length) {
+        setValidationResult({
+          valid: true,
+          error: null,
+          warnings: data.schema_warnings,
+        });
+      }
     } catch (err) {
       setGeneratedSql(null);
       setValidationResult({
@@ -77,39 +171,21 @@ export default function FormulaEditor({
     }
   }, [nlPrompt, itemId, level, currentSql]);
 
-  const handleValidateSql = useCallback(async (sql: string) => {
-    setValidating(true);
-    setValidationResult(null);
-
-    try {
-      const res = await fetch('/api/metrics/governance/validate-sql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sql }),
-      });
-      const data = await res.json();
-      setValidationResult({
-        valid: data.valid,
-        error: data.error,
-        warnings: data.warnings ?? [],
-      });
-    } catch (err) {
-      setValidationResult({
-        valid: false,
-        error: err instanceof Error ? err.message : 'Validation failed',
-        warnings: [],
-      });
-    } finally {
-      setValidating(false);
+  // Auto-validate after SQL is generated
+  useEffect(() => {
+    if (generatedSql && autoValidateRef.current) {
+      autoValidateRef.current = false;
+      handleValidateSql(generatedSql);
     }
-  }, []);
+  }, [generatedSql, handleValidateSql]);
 
   const handleCopy = useCallback(() => {
     const sql = mode === 'nl' ? generatedSql : sqlText;
     if (sql) {
       navigator.clipboard.writeText(sql);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      const t = setTimeout(() => setCopied(false), 2000);
+      timersRef.current.push(t);
     }
   }, [mode, generatedSql, sqlText]);
 
@@ -146,10 +222,36 @@ export default function FormulaEditor({
     }
   }, [mode, generatedSql, sqlText, currentSql, itemId, level, asOfDate]);
 
+  /** Error feedback: send validation error back to AI for correction. */
+  const handleFixWithAi = useCallback(() => {
+    const errorMsg = validationResult?.error ?? 'Unknown error';
+    handleGenerateSql(errorMsg);
+  }, [validationResult, handleGenerateSql]);
+
+  const handleAccept = useCallback((sql: string) => {
+    // Clear draft on accept
+    try { localStorage.removeItem(draftKey(itemId, level)); } catch { /* ignore */ }
+    onAccept(sql);
+  }, [itemId, level, onAccept]);
+
+  const handleCancel = useCallback(() => {
+    // Clear draft on cancel
+    try { localStorage.removeItem(draftKey(itemId, level)); } catch { /* ignore */ }
+    onCancel();
+  }, [itemId, level, onCancel]);
+
   const activeSql = mode === 'nl' ? (generatedSql ?? '') : sqlText;
 
   return (
     <div className="rounded-lg border border-pwc-gray-light bg-pwc-gray overflow-hidden">
+      {/* Draft restored banner */}
+      {draftRestored && (
+        <div className="px-4 py-1.5 bg-blue-500/10 border-b border-blue-500/20 text-blue-400 text-[10px] flex items-center gap-1.5">
+          <RotateCcw className="w-3 h-3" />
+          Previous draft restored
+        </div>
+      )}
+
       {/* Mode tabs */}
       <div className="flex items-center border-b border-pwc-gray-light">
         <button
@@ -205,7 +307,7 @@ export default function FormulaEditor({
 
           <button
             type="button"
-            onClick={handleGenerateSql}
+            onClick={() => handleGenerateSql()}
             disabled={generating || !nlPrompt.trim()}
             className="flex items-center gap-1.5 px-4 py-2 bg-pwc-orange text-white rounded-lg text-sm font-medium
                        hover:bg-pwc-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -232,8 +334,10 @@ export default function FormulaEditor({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onAccept(generatedSql)}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs bg-emerald-500/20 text-emerald-400 rounded hover:bg-emerald-500/30 transition-colors"
+                  onClick={() => handleAccept(generatedSql)}
+                  disabled={!validated}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs bg-emerald-500/20 text-emerald-400 rounded hover:bg-emerald-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={!validated ? 'Validate SQL before accepting' : undefined}
                 >
                   Accept
                 </button>
@@ -297,7 +401,7 @@ export default function FormulaEditor({
           ) : (
             <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           )}
-          <div>
+          <div className="flex-1">
             <p className="text-xs font-medium">
               {validationResult.valid ? 'SQL is valid' : validationResult.error}
             </p>
@@ -310,6 +414,18 @@ export default function FormulaEditor({
                   </p>
                 ))}
               </div>
+            )}
+            {/* Error feedback: Fix with AI button */}
+            {!validationResult.valid && mode === 'nl' && (
+              <button
+                type="button"
+                onClick={handleFixWithAi}
+                disabled={generating}
+                className="mt-2 flex items-center gap-1 px-3 py-1.5 text-xs bg-pwc-orange/20 text-pwc-orange rounded hover:bg-pwc-orange/30 transition-colors disabled:opacity-50"
+              >
+                <Sparkles className="w-3 h-3" />
+                Fix with AI
+              </button>
             )}
           </div>
         </div>
@@ -377,20 +493,24 @@ export default function FormulaEditor({
         </button>
         <button
           type="button"
-          onClick={() => onAccept(activeSql)}
-          disabled={!activeSql.trim()}
+          onClick={() => handleAccept(activeSql)}
+          disabled={!activeSql.trim() || !validated}
           className="flex items-center gap-1.5 px-4 py-2 bg-pwc-orange text-white rounded-lg text-sm font-medium
                      hover:bg-pwc-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title={!validated ? 'Validate SQL before saving' : undefined}
         >
           Save Formula
         </button>
         <button
           type="button"
-          onClick={onCancel}
+          onClick={handleCancel}
           className="px-4 py-2 text-gray-400 hover:text-gray-300 text-sm transition-colors"
         >
           Cancel
         </button>
+        {!validated && activeSql.trim() && (
+          <span className="text-[10px] text-gray-500 ml-auto">Validate SQL to enable Save</span>
+        )}
       </div>
     </div>
   );

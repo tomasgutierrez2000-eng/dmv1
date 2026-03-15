@@ -10,6 +10,8 @@ export interface RunMetricResult {
     | { type: 'scalar'; value: number | null }
     | { type: 'grouped'; rows: { dimension_value: string | number; metric_value: number }[] };
   asOfDateUsed: string | null;
+  /** Non-fatal warnings (e.g. missing sample data tables that were stubbed). */
+  warnings?: string[];
 }
 
 export interface RunMetricError {

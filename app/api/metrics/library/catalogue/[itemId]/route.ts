@@ -81,8 +81,8 @@ export async function PUT(
       changeType = 'STATUS_CHANGE';
     }
 
-    // Save the updated item
-    upsertCatalogueItem(updated);
+    // Save the updated item (async with mutex locking)
+    await upsertCatalogueItem(updated);
 
     // Fire-and-forget: log the change for audit trail
     const reason = parseChangeReason(req);

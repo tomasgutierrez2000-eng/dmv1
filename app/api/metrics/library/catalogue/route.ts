@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       return jsonError('item_id, item_name, and kind are required', { status: 400 });
     }
 
-    upsertCatalogueItem(body);
+    await upsertCatalogueItem(body);
     return jsonSuccess(body, 201);
   } catch (err) {
     const normalized = normalizeCaughtError(err);

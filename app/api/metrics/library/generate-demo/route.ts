@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     // Persist if requested
     if (persist && result.demo_data) {
       item.demo_data = result.demo_data;
-      upsertCatalogueItem(item);
+      await upsertCatalogueItem(item);
     }
 
     return jsonSuccess({

@@ -40,7 +40,7 @@ function getPool(): pg.Pool {
       idleTimeoutMillis: 120_000,   // 2 min idle cleanup
       connectionTimeoutMillis: 10_000,
     });
-    _pool.on('error', () => {});    // Suppress unhandled pool errors
+    _pool.on('error', (err) => { console.error('[sandbox-runner] Pool error:', err.message); });
   }
   return _pool;
 }
@@ -167,13 +167,14 @@ export async function validateSqlSyntax(
     await client.query(`SET statement_timeout = 10000`); // 10s for validation
     const stmtName = `_validate_${Date.now()}`;
     const sqlForPrepare = substituteBindParamsForValidation(sql);
-    await client.query({ text: `PREPARE ${stmtName} AS $1`, values: [sqlForPrepare] });
+    await client.query(`PREPARE ${stmtName} AS ${sqlForPrepare}`);
     await client.query(`DEALLOCATE ${stmtName}`);
     return { valid: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return { valid: false, error: msg };
   } finally {
+    try { await client.query('RESET statement_timeout'); } catch { /* ignore */ }
     client.release();
   }
 }

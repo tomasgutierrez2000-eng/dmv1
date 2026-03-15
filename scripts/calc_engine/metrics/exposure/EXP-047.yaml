@@ -44,6 +44,21 @@ source_tables:
     role: DIMENSION
   - name: is_active_flag
     role: FILTER
+- schema: l2
+  table: fx_rate
+  alias: fx
+  join_type: LEFT
+  join_on: "fx.from_currency_code = fm.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date"
+  fields:
+  - name: from_currency_code
+    role: JOIN_KEY
+  - name: to_currency_code
+    role: FILTER
+  - name: rate
+    role: MEASURE
+    description: "Spot FX rate for converting to USD reporting currency"
+  - name: as_of_date
+    role: JOIN_KEY
 - schema: l1
   table: enterprise_business_taxonomy
   alias: ebt
@@ -71,7 +86,8 @@ levels:
   counterparty:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(ebitda) / SUM(total_debt_service) per counterparty.
+      SUM(ebitda × fx_rate) / SUM(total_debt_service × fx_rate) per counterparty.
+      Amounts converted to USD via l2.fx_rate before aggregation.
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
@@ -81,12 +97,16 @@ levels:
       FROM (
         SELECT
           ffs.facility_id,
-          ffs.ebitda_amt AS numerator_val,
-          ffs.total_debt_service_amt AS denominator_val
+          ffs.ebitda_amt * COALESCE(fx.rate, 1) AS numerator_val,
+          ffs.total_debt_service_amt * COALESCE(fx.rate, 1) AS denominator_val
         FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -96,7 +116,8 @@ levels:
   desk:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(ebitda) / SUM(total_debt_service) per L3 desk segment.
+      SUM(ebitda × fx_rate) / SUM(total_debt_service × fx_rate) per L3 desk segment.
+      Amounts converted to USD via l2.fx_rate before aggregation.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -106,12 +127,16 @@ levels:
       FROM (
         SELECT
           ffs.facility_id,
-          ffs.ebitda_amt AS numerator_val,
-          ffs.total_debt_service_amt AS denominator_val
+          ffs.ebitda_amt * COALESCE(fx.rate, 1) AS numerator_val,
+          ffs.total_debt_service_amt * COALESCE(fx.rate, 1) AS denominator_val
         FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -123,7 +148,8 @@ levels:
   portfolio:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(ebitda) / SUM(total_debt_service) per L2 portfolio segment.
+      SUM(ebitda × fx_rate) / SUM(total_debt_service × fx_rate) per L2 portfolio segment.
+      Amounts converted to USD via l2.fx_rate before aggregation.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -133,12 +159,16 @@ levels:
       FROM (
         SELECT
           ffs.facility_id,
-          ffs.ebitda_amt AS numerator_val,
-          ffs.total_debt_service_amt AS denominator_val
+          ffs.ebitda_amt * COALESCE(fx.rate, 1) AS numerator_val,
+          ffs.total_debt_service_amt * COALESCE(fx.rate, 1) AS denominator_val
         FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm
@@ -152,7 +182,8 @@ levels:
   business_segment:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(ebitda) / SUM(total_debt_service) per L1 business segment.
+      SUM(ebitda × fx_rate) / SUM(total_debt_service × fx_rate) per L1 business segment.
+      Amounts converted to USD via l2.fx_rate before aggregation.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
@@ -162,12 +193,16 @@ levels:
       FROM (
         SELECT
           ffs.facility_id,
-          ffs.ebitda_amt AS numerator_val,
-          ffs.total_debt_service_amt AS denominator_val
+          ffs.ebitda_amt * COALESCE(fx.rate, 1) AS numerator_val,
+          ffs.total_debt_service_amt * COALESCE(fx.rate, 1) AS denominator_val
         FROM l3.facility_financial_calc ffs
         INNER JOIN l2.facility_master fm
           ON fm.facility_id = ffs.facility_id
           AND fm.is_active_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = ffs.as_of_date
         WHERE ffs.as_of_date = :as_of_date
       ) fac
       INNER JOIN l2.facility_master fm

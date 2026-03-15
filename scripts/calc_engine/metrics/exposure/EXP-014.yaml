@@ -61,6 +61,24 @@ source_tables:
       - name: principal_payment_amt
         role: MEASURE
         description: "Principal payments — component of Total Debt Service denominator"
+      - name: currency_code
+        role: JOIN_KEY
+        description: "Original currency of financial amounts — used for FX conversion"
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date"
+    fields:
+      - name: from_currency_code
+        role: JOIN_KEY
+      - name: to_currency_code
+        role: FILTER
+      - name: rate
+        role: MEASURE
+        description: "Spot FX rate for converting to USD reporting currency"
+      - name: as_of_date
+        role: JOIN_KEY
   - schema: l2
     table: facility_master
     alias: fm
@@ -114,20 +132,25 @@ levels:
       For each counterparty:
         1. LOAD all facility-level ingredients (noi_amt, interest_expense_amt,
            principal_payment_amt) for facilities belonging to this counterparty
-        2. COMPUTE SUM(noi_amt) across all facilities = Counterparty Cashflow
-        3. COMPUTE SUM(interest_expense_amt + principal_payment_amt) = Counterparty Debt Service
-        4. COMPUTE Counterparty DSCR = Counterparty Cashflow / Counterparty Debt Service
-      Sum-ratio rollup preserves ingredient traceability.
+        2. CONVERT amounts to USD via l2.fx_rate spot rate (COALESCE to 1 for USD-denominated)
+        3. COMPUTE SUM(noi_amt × fx_rate) across all facilities = Counterparty Cashflow (USD)
+        4. COMPUTE SUM((interest_expense + principal_payment) × fx_rate) = Counterparty Debt Service (USD)
+        5. COMPUTE Counterparty DSCR = Counterparty Cashflow / Counterparty Debt Service
+      Sum-ratio rollup with FX conversion preserves ingredient traceability across currencies.
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(ffs.noi_amt)
-          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+        SUM(ffs.noi_amt * COALESCE(fx.rate, 1))
+          / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)
           AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       WHERE ffs.as_of_date = :as_of_date
         AND ffs.noi_amt IS NOT NULL
       GROUP BY fm.counterparty_id
@@ -137,19 +160,24 @@ levels:
       For each L3 Desk segment:
         1. LOOKUP managed_segment_id from enterprise_business_taxonomy
            via facility_master.lob_segment_id
-        2. COMPUTE SUM(noi_amt) / SUM(interest_expense + principal_payment)
+        2. CONVERT amounts to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(noi_amt × fx_rate) / SUM((interest_expense + principal_payment) × fx_rate)
            for all facilities mapped to this desk
-      Sum-ratio rollup: aggregate ingredients first, then divide.
+      Sum-ratio rollup with FX conversion: aggregate USD-converted ingredients first, then divide.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(ffs.noi_amt)
-          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+        SUM(ffs.noi_amt * COALESCE(fx.rate, 1))
+          / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)
           AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       WHERE ffs.as_of_date = :as_of_date
@@ -160,19 +188,24 @@ levels:
     formula_text: |
       For each L2 Portfolio segment:
         1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
-        2. COMPUTE SUM(noi_amt) / SUM(interest_expense + principal_payment)
+        2. CONVERT amounts to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(noi_amt × fx_rate) / SUM((interest_expense + principal_payment) × fx_rate)
            for all facilities whose desk rolls up to this portfolio
-      Sum-ratio rollup: aggregate ingredients first, then divide.
+      Sum-ratio rollup with FX conversion: aggregate USD-converted ingredients first, then divide.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(ffs.noi_amt)
-          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+        SUM(ffs.noi_amt * COALESCE(fx.rate, 1))
+          / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)
           AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -185,19 +218,24 @@ levels:
     formula_text: |
       For each L1 Business Segment / LoB:
         1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
-        2. COMPUTE SUM(noi_amt) / SUM(interest_expense + principal_payment)
+        2. CONVERT amounts to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(noi_amt × fx_rate) / SUM((interest_expense + principal_payment) × fx_rate)
            for all facilities whose desk ultimately rolls up to this segment
-      Sum-ratio rollup: aggregate ingredients first, then divide.
+      Sum-ratio rollup with FX conversion: aggregate USD-converted ingredients first, then divide.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(ffs.noi_amt)
-          / NULLIF(SUM(ffs.interest_expense_amt + ffs.principal_payment_amt), 0)
+        SUM(ffs.noi_amt * COALESCE(fx.rate, 1))
+          / NULLIF(SUM((ffs.interest_expense_amt + ffs.principal_payment_amt) * COALESCE(fx.rate, 1)), 0)
           AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

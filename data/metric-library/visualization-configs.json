@@ -817,6 +817,14 @@
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "Spot FX rate for converting to USD reporting currency",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -841,6 +849,12 @@
         "header": "Principal Payment ($)",
         "format": "currency",
         "subtotal_fn": "sum"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       },
       {
         "field": "dscr_value",
@@ -1687,11 +1701,19 @@
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "Spot FX rate for converting to USD reporting currency",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "Lookup Position_ID for each Facility_ID, Select bank_share and cost_of_funds from Facility_ID from Facility Master THEN (unfunded_amt * bank_share ) = [Facility Debt Service w/ Bank Share]\n"
+      "formula_display": "Lookup total_debt_service_amt from facility_financial_snapshot, convert to USD via l2.fx_rate spot rate (COALESCE to 1 for USD-denominated facilities).\n"
     },
     "worked_example_columns": [
       {
@@ -1700,6 +1722,12 @@
         "format": "currency",
         "subtotal_fn": "sum",
         "is_result": true
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -2047,6 +2075,14 @@
           "sample_value": 0,
           "source_table": "facility_financial_calc",
           "source_layer": "L3"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "Spot FX rate for converting to USD reporting currency",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -2065,6 +2101,12 @@
         "header": "Total Debt Service ($)",
         "format": "currency",
         "subtotal_fn": "sum"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       },
       {
         "field": "fccr_value",

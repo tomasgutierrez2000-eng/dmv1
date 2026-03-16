@@ -15,13 +15,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": true
     },
     "instrument_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.instrument_master(instrument_id)",
+      "fk": "l2.instrument_master(instrument_id)",
       "nullable": true
     },
     "product_code": {
@@ -150,7 +150,7 @@
       "fk": null,
       "nullable": true
     },
-    "trading_banking_book_flag": {
+    "is_trading_banking_book_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -380,7 +380,7 @@
       "fk": null,
       "nullable": true
     },
-    "delinquent_payment_flag": {
+    "is_delinquent_payment_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -427,7 +427,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "exposure_amount": {
@@ -483,7 +483,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -600,46 +600,10 @@
       "fk": null,
       "nullable": true
     },
-    "number_of_loans": {
-      "type": "INTEGER",
+    "bank_share_pct": {
+      "type": "DECIMAL(10,4)",
       "pk": false,
       "fk": null,
-      "nullable": true
-    },
-    "number_of_facilities": {
-      "type": "INTEGER",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
-    "days_until_maturity": {
-      "type": "INTEGER",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
-    "facility_utilization_status": {
-      "type": "VARCHAR(30)",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
-    "limit_status_code": {
-      "type": "VARCHAR(30)",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
-    "rwa_amt": {
-      "type": "DECIMAL(18,2)",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
-    "internal_risk_rating_bucket_code": {
-      "type": "VARCHAR(20)",
-      "pk": false,
-      "fk": "l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)",
       "nullable": true
     },
     "total_collateral_mv_usd": {
@@ -653,7 +617,7 @@
     "netting_set_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.netting_set(netting_set_id)",
+      "fk": "l2.netting_set(netting_set_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -733,7 +697,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -789,7 +753,7 @@
     "collateral_asset_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.collateral_asset_master(collateral_asset_id)",
+      "fk": "l2.collateral_asset_master(collateral_asset_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -876,7 +840,7 @@
       "fk": null,
       "nullable": true
     },
-    "risk_shifting_flag": {
+    "is_risk_shifting_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -893,7 +857,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": true
     },
     "cash_flow_date": {
@@ -968,12 +932,6 @@
       "fk": null,
       "nullable": true
     },
-    "maturity_bucket_id": {
-      "type": "BIGINT",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
     "position_id": {
       "type": "BIGINT",
       "pk": false,
@@ -985,7 +943,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -1089,7 +1047,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -1110,7 +1068,7 @@
       "fk": null,
       "nullable": true
     },
-    "watch_list_flag": {
+    "is_watch_list_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1170,7 +1128,7 @@
       "fk": null,
       "nullable": true
     },
-    "delinquent_payment_flag": {
+    "is_delinquent_payment_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1199,7 +1157,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -1262,7 +1220,7 @@
       "fk": null,
       "nullable": true
     },
-    "prepayment_penalty_flag": {
+    "is_prepayment_penalty_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1280,13 +1238,7 @@
       "fk": null,
       "nullable": true
     },
-    "pricing_tier": {
-      "type": "VARCHAR(20)",
-      "pk": false,
-      "fk": "l1.pricing_tier_dim(pricing_tier_code)",
-      "nullable": true
-    },
-    "pricing_exception_flag": {
+    "is_pricing_exception_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1309,7 +1261,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -1389,7 +1341,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -1451,7 +1403,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "utilized_amount": {
@@ -1551,13 +1503,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "credit_agreement_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.credit_agreement_master(credit_agreement_id)",
+      "fk": "l2.credit_agreement_master(credit_agreement_id)",
       "nullable": false
     },
     "amendment_type_code": {
@@ -1655,7 +1607,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "credit_event_type_code": {
@@ -1735,7 +1687,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "exposure_at_default": {
@@ -1791,7 +1743,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "breach_amount": {
@@ -1853,7 +1805,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "as_of_date": {
@@ -1975,7 +1927,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -2061,13 +2013,13 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": true
     },
     "as_of_date": {
@@ -2159,13 +2111,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": true
     },
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "raised_ts": {
@@ -2299,13 +2251,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": true
     },
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "flag_type": {
@@ -2379,7 +2331,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -2407,12 +2359,6 @@
       "nullable": true
     },
     "operating_expense_amt": {
-      "type": "DECIMAL(18,2)",
-      "pk": false,
-      "fk": null,
-      "nullable": true
-    },
-    "net_income_amt": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
@@ -2460,19 +2406,19 @@
       "fk": null,
       "nullable": true
     },
-    "ebitda_amt": {
+    "expected_drawdown_amt": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
-    "noi_amt": {
+    "fee_income_amt": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
-    "total_debt_service_amt": {
+    "tangible_net_worth_usd": {
       "type": "DECIMAL(18,2)",
       "pk": false,
       "fk": null,
@@ -2483,7 +2429,7 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -2495,7 +2441,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "pd_pct": {
@@ -2563,13 +2509,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": true
     },
     "as_of_date": {
@@ -2596,7 +2542,7 @@
       "fk": null,
       "nullable": true
     },
-    "exception_flag": {
+    "is_exception_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,

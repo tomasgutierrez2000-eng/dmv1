@@ -1,6 +1,6 @@
 [
   {
-    "id": "L2.position.facility_id->L1.facility_master.facility_id",
+    "id": "L2.position.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "position",
@@ -8,16 +8,16 @@
       "tableKey": "L2.position"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.position.instrument_id->L1.instrument_master.instrument_id",
+    "id": "L2.position.instrument_id->L2.instrument_master.instrument_id",
     "source": {
       "layer": "L2",
       "table": "position",
@@ -25,12 +25,12 @@
       "tableKey": "L2.position"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "instrument_master",
       "field": "instrument_id",
-      "tableKey": "L1.instrument_master"
+      "tableKey": "L2.instrument_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -119,7 +119,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.exposure_counterparty_attribution.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.exposure_counterparty_attribution.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "exposure_counterparty_attribution",
@@ -127,12 +127,12 @@
       "tableKey": "L2.exposure_counterparty_attribution"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -153,7 +153,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_exposure_snapshot.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_exposure_snapshot.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_exposure_snapshot",
@@ -161,12 +161,12 @@
       "tableKey": "L2.facility_exposure_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -204,24 +204,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_exposure_snapshot.internal_risk_rating_bucket_code->L1.internal_risk_rating_bucket_dim.internal_risk_rating_bucket_code",
-    "source": {
-      "layer": "L2",
-      "table": "facility_exposure_snapshot",
-      "field": "internal_risk_rating_bucket_code",
-      "tableKey": "L2.facility_exposure_snapshot"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "internal_risk_rating_bucket_dim",
-      "field": "internal_risk_rating_bucket_code",
-      "tableKey": "L1.internal_risk_rating_bucket_dim"
-    },
-    "isCrossLayer": true,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L2.netting_set_exposure_snapshot.netting_set_id->L1.netting_set.netting_set_id",
+    "id": "L2.netting_set_exposure_snapshot.netting_set_id->L2.netting_set.netting_set_id",
     "source": {
       "layer": "L2",
       "table": "netting_set_exposure_snapshot",
@@ -229,12 +212,12 @@
       "tableKey": "L2.netting_set_exposure_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "netting_set",
       "field": "netting_set_id",
-      "tableKey": "L1.netting_set"
+      "tableKey": "L2.netting_set"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -255,7 +238,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_lob_attribution.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_lob_attribution.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_lob_attribution",
@@ -263,12 +246,12 @@
       "tableKey": "L2.facility_lob_attribution"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -289,7 +272,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.collateral_snapshot.collateral_asset_id->L1.collateral_asset_master.collateral_asset_id",
+    "id": "L2.collateral_snapshot.collateral_asset_id->L2.collateral_asset_master.collateral_asset_id",
     "source": {
       "layer": "L2",
       "table": "collateral_snapshot",
@@ -297,12 +280,12 @@
       "tableKey": "L2.collateral_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "collateral_asset_master",
       "field": "collateral_asset_id",
-      "tableKey": "L1.collateral_asset_master"
+      "tableKey": "L2.collateral_asset_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -323,7 +306,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.cash_flow.facility_id->L1.facility_master.facility_id",
+    "id": "L2.cash_flow.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "cash_flow",
@@ -331,12 +314,12 @@
       "tableKey": "L2.cash_flow"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -357,7 +340,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_financial_snapshot.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_financial_snapshot.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_financial_snapshot",
@@ -365,16 +348,16 @@
       "tableKey": "L2.facility_financial_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_delinquency_snapshot.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_delinquency_snapshot.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_delinquency_snapshot",
@@ -382,12 +365,12 @@
       "tableKey": "L2.facility_delinquency_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -408,7 +391,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_pricing_snapshot.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_pricing_snapshot.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_pricing_snapshot",
@@ -416,12 +399,12 @@
       "tableKey": "L2.facility_pricing_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -442,24 +425,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_pricing_snapshot.pricing_tier->L1.pricing_tier_dim.pricing_tier_code",
-    "source": {
-      "layer": "L2",
-      "table": "facility_pricing_snapshot",
-      "field": "pricing_tier",
-      "tableKey": "L2.facility_pricing_snapshot"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "pricing_tier_dim",
-      "field": "pricing_tier_code",
-      "tableKey": "L1.pricing_tier_dim"
-    },
-    "isCrossLayer": true,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L2.facility_profitability_snapshot.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_profitability_snapshot.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_profitability_snapshot",
@@ -467,12 +433,12 @@
       "tableKey": "L2.facility_profitability_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -510,7 +476,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.limit_contribution_snapshot.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.limit_contribution_snapshot.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "limit_contribution_snapshot",
@@ -518,12 +484,12 @@
       "tableKey": "L2.limit_contribution_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -561,7 +527,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.limit_utilization_event.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.limit_utilization_event.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "limit_utilization_event",
@@ -569,12 +535,12 @@
       "tableKey": "L2.limit_utilization_event"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -595,7 +561,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.amendment_event.facility_id->L1.facility_master.facility_id",
+    "id": "L2.amendment_event.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "amendment_event",
@@ -603,16 +569,16 @@
       "tableKey": "L2.amendment_event"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.amendment_event.credit_agreement_id->L1.credit_agreement_master.credit_agreement_id",
+    "id": "L2.amendment_event.credit_agreement_id->L2.credit_agreement_master.credit_agreement_id",
     "source": {
       "layer": "L2",
       "table": "amendment_event",
@@ -620,12 +586,12 @@
       "tableKey": "L2.amendment_event"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "credit_agreement_master",
       "field": "credit_agreement_id",
-      "tableKey": "L1.credit_agreement_master"
+      "tableKey": "L2.credit_agreement_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -663,7 +629,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.credit_event.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.credit_event.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "credit_event",
@@ -671,12 +637,12 @@
       "tableKey": "L2.credit_event"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -731,7 +697,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.credit_event_facility_link.facility_id->L1.facility_master.facility_id",
+    "id": "L2.credit_event_facility_link.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "credit_event_facility_link",
@@ -739,12 +705,12 @@
       "tableKey": "L2.credit_event_facility_link"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -782,7 +748,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.stress_test_breach.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.stress_test_breach.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "stress_test_breach",
@@ -790,16 +756,16 @@
       "tableKey": "L2.stress_test_breach"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.deal_pipeline_fact.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.deal_pipeline_fact.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "deal_pipeline_fact",
@@ -807,12 +773,12 @@
       "tableKey": "L2.deal_pipeline_fact"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -833,7 +799,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.counterparty_rating_observation.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.counterparty_rating_observation.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "counterparty_rating_observation",
@@ -841,12 +807,12 @@
       "tableKey": "L2.counterparty_rating_observation"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -884,7 +850,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.financial_metric_observation.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.financial_metric_observation.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "financial_metric_observation",
@@ -892,16 +858,16 @@
       "tableKey": "L2.financial_metric_observation"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.financial_metric_observation.facility_id->L1.facility_master.facility_id",
+    "id": "L2.financial_metric_observation.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "financial_metric_observation",
@@ -909,12 +875,12 @@
       "tableKey": "L2.financial_metric_observation"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -952,7 +918,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.exception_event.facility_id->L1.facility_master.facility_id",
+    "id": "L2.exception_event.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "exception_event",
@@ -960,16 +926,16 @@
       "tableKey": "L2.exception_event"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.exception_event.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.exception_event.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "exception_event",
@@ -977,16 +943,16 @@
       "tableKey": "L2.exception_event"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.risk_flag.facility_id->L1.facility_master.facility_id",
+    "id": "L2.risk_flag.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "risk_flag",
@@ -994,16 +960,16 @@
       "tableKey": "L2.risk_flag"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.risk_flag.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.risk_flag.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "risk_flag",
@@ -1011,16 +977,16 @@
       "tableKey": "L2.risk_flag"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.counterparty_financial_snapshot.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.counterparty_financial_snapshot.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "counterparty_financial_snapshot",
@@ -1028,12 +994,12 @@
       "tableKey": "L2.counterparty_financial_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -1054,7 +1020,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_risk_snapshot.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_risk_snapshot.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_risk_snapshot",
@@ -1062,16 +1028,16 @@
       "tableKey": "L2.facility_risk_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_risk_snapshot.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.facility_risk_snapshot.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "facility_risk_snapshot",
@@ -1079,12 +1045,12 @@
       "tableKey": "L2.facility_risk_snapshot"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
@@ -1105,7 +1071,7 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_credit_approval.facility_id->L1.facility_master.facility_id",
+    "id": "L2.facility_credit_approval.facility_id->L2.facility_master.facility_id",
     "source": {
       "layer": "L2",
       "table": "facility_credit_approval",
@@ -1113,16 +1079,16 @@
       "tableKey": "L2.facility_credit_approval"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "facility_master",
       "field": "facility_id",
-      "tableKey": "L1.facility_master"
+      "tableKey": "L2.facility_master"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   },
   {
-    "id": "L2.facility_credit_approval.counterparty_id->L1.counterparty.counterparty_id",
+    "id": "L2.facility_credit_approval.counterparty_id->L2.counterparty.counterparty_id",
     "source": {
       "layer": "L2",
       "table": "facility_credit_approval",
@@ -1130,12 +1096,12 @@
       "tableKey": "L2.facility_credit_approval"
     },
     "target": {
-      "layer": "L1",
+      "layer": "L2",
       "table": "counterparty",
       "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
+      "tableKey": "L2.counterparty"
     },
-    "isCrossLayer": true,
+    "isCrossLayer": false,
     "relationshipType": "primary"
   }
 ]

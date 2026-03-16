@@ -16,7 +16,6 @@ export interface ParsedMetric {
   metric_class: string;
   insight: string;
   rollup_strategy: string;
-  calculator_mode: string;
 }
 
 export interface ParsedSourceField {
@@ -60,7 +59,6 @@ const METRIC_COLUMNS: (keyof ParsedMetric)[] = [
   'metric_class',
   'insight',
   'rollup_strategy',
-  'calculator_mode',
 ];
 
 const SOURCE_FIELD_COLUMNS: (keyof ParsedSourceField)[] = [

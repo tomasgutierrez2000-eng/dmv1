@@ -2,7 +2,7 @@
  * Live Demo Data Query — pulls real facility-level data from PostgreSQL
  * to auto-populate demo_data for newly deployed metrics.
  *
- * Replaces the Python demo generator with a direct DB query approach:
+ * Direct DB query approach for demo data generation:
  * 1. Queries source tables referenced by the metric's ingredient_fields
  * 2. Joins facility_master + counterparty + hierarchy for context
  * 3. Selects a diverse sample of facilities (spread across counterparties)

@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, Info, Calculator, History } from 'lucide-react';
+import { ChevronLeft, Info, Calculator } from 'lucide-react';
 import type { CatalogueItem, MetricDomain } from '@/lib/metric-library/types';
 import { KindBadge, TypeBadge, StatusBadge } from './badges';
 import { DomainIcon } from './domain-icons';
 import { LibraryPageLoading, LibraryError } from './LibraryStates';
 import IngredientFieldsTable from './IngredientFieldsTable';
 import LevelRollupTable from './LevelRollupTable';
-import PythonCalculatorSection from './PythonCalculatorSection';
 import CatalogueDeepDive from './CatalogueDeepDive';
 import ChangeHistoryPanel from '@/components/governance/ChangeHistoryPanel';
 
@@ -168,17 +167,7 @@ export default function CatalogueItemDetailView({ itemId }: { itemId: string }) 
           </div>
         </section>
 
-        {/* ── Section 6: Python Calculator ── */}
-        <section>
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
-            Python Calculator
-          </h2>
-          <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-800">
-            <PythonCalculatorSection executableMetricId={item.executable_metric_id} />
-          </div>
-        </section>
-
-        {/* ── Section 7: Change History ── */}
+        {/* ── Section 6: Change History ── */}
         <section>
           <ChangeHistoryPanel itemId={item.item_id} />
         </section>

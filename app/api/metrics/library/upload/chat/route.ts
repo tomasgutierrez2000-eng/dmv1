@@ -30,25 +30,10 @@ function buildSystemPrompt(schemaSummary: object): string {
 The user uploaded metrics via an Excel template. The system validated them against the data dictionary and found issues.
 Your job: help resolve validation issues by suggesting fixes, answering questions, and returning corrected metric data.
 
-The calculation engine is **Python-based** (not SQL). Each metric needs a Python calculator, not SQL formulas.
-
-## Python Calculator Modes
-
-### Full Mode (BaseCalculator subclass)
-A class that extends BaseCalculator with \`metric_id\`, \`catalogue_id\`, \`name\` attributes and three methods:
-- \`facility_level(self, loader, as_of_date) -> pd.DataFrame\`
-- \`counterparty_level(self, loader, as_of_date) -> pd.DataFrame\`
-- \`desk_level(self, loader, as_of_date) -> pd.DataFrame\`
-
-### Simple Mode (facility_level function only)
-Just a standalone \`facility_level(loader, as_of_date)\` function. The system auto-generates counterparty and desk rollups from the facility-level result.
-
-## DataLoader API
-- \`loader.load_table("L2", "facility_exposure_snapshot")\` — returns a pandas DataFrame with all rows from that table
-- \`filter_by_date(df, as_of_date)\` — helper that filters a DataFrame to rows matching the given as_of_date
+The calculation engine uses **SQL formulas** defined in YAML metric files. Each metric has \`formula_sql\` at each rollup level.
 
 ## Rollup Hierarchy
-Facility → Counterparty → Desk. Each level aggregates from the level below.
+Facility → Counterparty → Desk → Portfolio → Business Segment. Each level aggregates from the level below.
 
 ## Data Model Summary
 ${JSON.stringify(schemaSummary, null, 2)}
@@ -58,8 +43,7 @@ ${JSON.stringify(schemaSummary, null, 2)}
 - When the user says "fix all" or "apply all fixes", return the corrected metrics as JSON in a \`\`\`json code block.
 - Format corrected metrics as: \`\`\`json\n{"fixed_metrics": [...]}\n\`\`\` where each metric has the same shape as the input.
 - Be concise and direct. Focus on actionable fixes.
-- If you're unsure about a correction, ask a clarifying question.
-- When suggesting calculator code, use the Python DataLoader API, not SQL queries.`;
+- If you're unsure about a correction, ask a clarifying question.`;
 }
 
 function buildUserMessage(req: ChatRequest): string {

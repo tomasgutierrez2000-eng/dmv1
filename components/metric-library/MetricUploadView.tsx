@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Upload, Download, FileText, ChevronLeft, CheckCircle, AlertTriangle,
   XCircle, ChevronDown, ChevronRight, Wand2, Loader2, Rocket, Send, BookOpen,
-  Code, X,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────
@@ -54,10 +53,8 @@ interface ChatMessage {
 export default function MetricUploadView() {
   // Upload state
   const [file, setFile] = useState<File | null>(null);
-  const [pythonFiles, setPythonFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const pythonFileRef = useRef<HTMLInputElement>(null);
 
   // Validation state
   const [validation, setValidation] = useState<ValidationReport | null>(null);
@@ -81,7 +78,6 @@ export default function MetricUploadView() {
     const f = e.target.files?.[0];
     if (f) {
       setFile(f);
-      setPythonFiles([]);
       setValidation(null);
       setMetrics(null);
       setDeployResult(null);
@@ -101,30 +97,12 @@ export default function MetricUploadView() {
     }
   }, []);
 
-  const handlePythonChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    setPythonFiles((prev) => [...prev, ...files.filter(f => f.name.endsWith('.py'))]);
-  }, []);
-
-  const handlePythonDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.py'));
-    setPythonFiles((prev) => [...prev, ...files]);
-  }, []);
-
-  const removePythonFile = useCallback((idx: number) => {
-    setPythonFiles((prev) => prev.filter((_, i) => i !== idx));
-  }, []);
-
   const handleUpload = useCallback(async () => {
     if (!file) return;
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
-      for (const pyFile of pythonFiles) {
-        formData.append('python_files', pyFile);
-      }
       const res = await fetch('/api/metrics/library/upload', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.ok === false) {
@@ -138,7 +116,7 @@ export default function MetricUploadView() {
     } finally {
       setUploading(false);
     }
-  }, [file, pythonFiles]);
+  }, [file]);
 
   const toggleMetric = useCallback((id: string) => {
     setExpandedMetrics((prev) => {
@@ -195,20 +173,12 @@ export default function MetricUploadView() {
     if (!metrics) return;
     setDeploying(true);
     try {
-      // Read Python files as text
-      const pyFilesMap: Record<string, { content: string; filename: string }> = {};
-      for (const pyFile of pythonFiles) {
-        const content = await pyFile.text();
-        pyFilesMap[pyFile.name] = { content, filename: pyFile.name };
-      }
-
       const res = await fetch('/api/metrics/library/upload/deploy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           metrics,
           dry_run: false,
-          python_files: pyFilesMap,
         }),
       });
       const data = await res.json();
@@ -218,7 +188,7 @@ export default function MetricUploadView() {
     } finally {
       setDeploying(false);
     }
-  }, [metrics, pythonFiles]);
+  }, [metrics]);
 
   // ─── Derived state ─────────────────────────────────────────────────
 
@@ -252,7 +222,7 @@ export default function MetricUploadView() {
           </h2>
           <p className="text-sm text-gray-600 mb-4">
             The Excel template includes an Instructions sheet and a Data Dictionary Reference sheet with all available tables and fields.
-            Optionally, include Python calculators for auto-generated demo data. Use the guide to help your AI fill out the templates.
+            Use the guide to help your AI fill out the templates.
           </p>
           <div className="flex flex-wrap gap-3">
             <a
@@ -260,18 +230,6 @@ export default function MetricUploadView() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
             >
               <FileText className="w-4 h-4" /> Download Excel Template (.xlsx)
-            </a>
-            <a
-              href="/api/metrics/library/upload/template/python?mode=full"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700"
-            >
-              <Code className="w-4 h-4" /> Download Python Template (Full)
-            </a>
-            <a
-              href="/api/metrics/library/upload/template/python?mode=simple"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-lg hover:bg-emerald-100 border border-emerald-200"
-            >
-              <Code className="w-4 h-4" /> Download Python Template (Simple)
             </a>
             <a
               href="/docs/metric-creation-guide.md"
@@ -290,61 +248,25 @@ export default function MetricUploadView() {
             Step 2: Upload Filled Template
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Excel drop zone */}
-            <div
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              onClick={() => fileRef.current?.click()}
-              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
-            >
-              <input ref={fileRef} type="file" accept=".xlsx,.xls" onChange={handleFileChange} className="hidden" />
-              {file ? (
-                <div className="flex items-center justify-center gap-2 text-gray-700">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium">{file.name}</span>
-                  <span className="text-gray-400 text-sm">({(file.size / 1024).toFixed(1)} KB)</span>
-                </div>
-              ) : (
-                <div className="text-gray-500">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">Drag & drop your .xlsx file here, or click to browse</p>
-                </div>
-              )}
-            </div>
-
-            {/* Python files drop zone */}
-            <div
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handlePythonDrop}
-              onClick={() => pythonFileRef.current?.click()}
-              className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-colors"
-            >
-              <input ref={pythonFileRef} type="file" accept=".py" multiple onChange={handlePythonChange} className="hidden" />
-              {pythonFiles.length > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500 mb-2">{pythonFiles.length} Python file{pythonFiles.length !== 1 ? 's' : ''}</p>
-                  {pythonFiles.map((pf, idx) => (
-                    <div key={idx} className="flex items-center justify-center gap-2 text-gray-700 text-sm">
-                      <Code className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-medium truncate max-w-[180px]">{pf.name}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); removePythonFile(idx); }}
-                        className="text-gray-400 hover:text-red-500 shrink-0"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-gray-500">
-                  <Code className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">Drag & drop .py calculator files here (optional)</p>
-                </div>
-              )}
-            </div>
+          <div
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={() => fileRef.current?.click()}
+            className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
+          >
+            <input ref={fileRef} type="file" accept=".xlsx,.xls" onChange={handleFileChange} className="hidden" />
+            {file ? (
+              <div className="flex items-center justify-center gap-2 text-gray-700">
+                <FileText className="w-5 h-5 text-blue-600" />
+                <span className="font-medium">{file.name}</span>
+                <span className="text-gray-400 text-sm">({(file.size / 1024).toFixed(1)} KB)</span>
+              </div>
+            ) : (
+              <div className="text-gray-500">
+                <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm">Drag & drop your .xlsx file here, or click to browse</p>
+              </div>
+            )}
           </div>
 
           {file && !hasValidation && (
@@ -415,24 +337,16 @@ export default function MetricUploadView() {
                   {expandedMetrics.has(mv.metric_id) && mv.issues.length > 0 && (
                     <div className="px-4 pb-3 space-y-2">
                       {mv.issues.map((issue, idx) => (
-                        <div key={idx} className={`flex items-start gap-2 text-sm ${
-                          issue.field === 'python_calculator' ? 'bg-emerald-50/50 rounded px-2 py-1 -mx-2' : ''
-                        }`}>
-                          {issue.field === 'python_calculator' ? (
-                            <Code className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
-                          ) : (
-                            <span className={`shrink-0 mt-0.5 text-xs font-medium px-1.5 py-0.5 rounded ${
-                              issue.severity === 'error' ? 'bg-red-100 text-red-700' :
-                              issue.severity === 'warning' ? 'bg-amber-100 text-amber-700' :
-                              'bg-blue-100 text-blue-700'
-                            }`}>
-                              {issue.severity}
-                            </span>
-                          )}
+                        <div key={idx} className="flex items-start gap-2 text-sm">
+                          <span className={`shrink-0 mt-0.5 text-xs font-medium px-1.5 py-0.5 rounded ${
+                            issue.severity === 'error' ? 'bg-red-100 text-red-700' :
+                            issue.severity === 'warning' ? 'bg-amber-100 text-amber-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {issue.severity}
+                          </span>
                           <div>
-                            <span className={`font-mono text-xs ${
-                              issue.field === 'python_calculator' ? 'text-emerald-600' : 'text-gray-500'
-                            }`}>{issue.field}:</span>{' '}
+                            <span className="font-mono text-xs text-gray-500">{issue.field}:</span>{' '}
                             <span className="text-gray-700">{issue.message}</span>
                             {issue.suggestion && (
                               <span className="text-blue-600 ml-1">{issue.suggestion}</span>
@@ -517,11 +431,6 @@ export default function MetricUploadView() {
             </h2>
             <p className="text-sm text-gray-600 mb-4">
               All metrics passed validation. Deploy will generate YAML definitions, sync the catalogue, and auto-populate demo data from the live database.
-              {pythonFiles.length > 0 && (
-                <span className="block mt-1 text-emerald-700">
-                  {pythonFiles.length} Python calculator{pythonFiles.length !== 1 ? 's' : ''} will also be deployed.
-                </span>
-              )}
             </p>
 
             <button

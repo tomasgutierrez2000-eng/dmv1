@@ -1,0 +1,6 @@
+.env
+.env.local
+.env.vercel
+.claude/
+scripts/sync-neon.ts
+review-findings/

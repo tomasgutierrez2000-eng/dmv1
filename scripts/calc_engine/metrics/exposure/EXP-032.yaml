@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-032"
 name: "Collateral Market Value at Origination ($)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,12 +18,16 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Original Appriased Value of pledged collateral securing exposure in USD.
+  Original appraised value of pledged collateral securing exposure, in USD.
+  At facility level, sums original_valuation_usd from collateral_snapshot
+  weighted by the bank's syndication share (bank_share_pct from
+  facility_lender_allocation). Rolls up additively through counterparty,
+  desk, portfolio, and business segment via the standard EBT hierarchy.
   Supports recovery analysis and secured lending assessment.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "CRM recognition — original collateral value (CRE 22)"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -51,6 +55,18 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = cs.facility_id AND fla.is_current_flag = 'Y'"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: bank_share_pct
+        role: MEASURE
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -66,12 +82,12 @@ levels:
   facility:
     aggregation_type: SUM
     formula_text: >
-      SUM(original_valuation_usd) per facility from collateral_snapshot. Weighted
-      by bank share percentage.
+      SUM(original_valuation_usd * bank_share_pct / 100) per facility.
+      Bank share defaults to 100% if no lender allocation record.
     formula_sql: |
       SELECT
         cs.facility_id AS dimension_key,
-        SUM(cs.original_valuation_usd
+        SUM(COALESCE(cs.original_valuation_usd, 0)
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
       FROM l2.collateral_snapshot cs
       INNER JOIN l2.facility_master fm
@@ -85,7 +101,7 @@ levels:
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level original_valuation_usd per counterparty.
+      SUM of facility-level collateral origination value per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
@@ -93,7 +109,7 @@ levels:
       FROM (
         SELECT
           cs.facility_id AS dimension_key,
-          SUM(cs.original_valuation_usd
+          SUM(COALESCE(cs.original_valuation_usd, 0)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.collateral_snapshot cs
         INNER JOIN l2.facility_master fm
@@ -112,7 +128,7 @@ levels:
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level original_valuation_usd per L3 desk segment.
+      SUM of facility-level collateral origination value per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -120,7 +136,7 @@ levels:
       FROM (
         SELECT
           cs.facility_id AS dimension_key,
-          SUM(cs.original_valuation_usd
+          SUM(COALESCE(cs.original_valuation_usd, 0)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.collateral_snapshot cs
         INNER JOIN l2.facility_master fm
@@ -141,7 +157,8 @@ levels:
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level original_valuation_usd per L2 portfolio segment.
+      SUM of facility-level collateral origination value per L2 portfolio
+      segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -149,7 +166,7 @@ levels:
       FROM (
         SELECT
           cs.facility_id AS dimension_key,
-          SUM(cs.original_valuation_usd
+          SUM(COALESCE(cs.original_valuation_usd, 0)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.collateral_snapshot cs
         INNER JOIN l2.facility_master fm
@@ -172,7 +189,7 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level original_valuation_usd per L1 business segment
+      SUM of facility-level collateral origination value per L1 business
       segment.
     formula_sql: |
       SELECT
@@ -181,7 +198,7 @@ levels:
       FROM (
         SELECT
           cs.facility_id AS dimension_key,
-          SUM(cs.original_valuation_usd
+          SUM(COALESCE(cs.original_valuation_usd, 0)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
         FROM l2.collateral_snapshot cs
         INNER JOIN l2.facility_master fm
@@ -216,17 +233,22 @@ validations:
     severity: ERROR
   - rule_id: "EXP-032-V02"
     type: NON_NEGATIVE
-    description: "original_valuation_usd must be >= 0"
+    description: "Collateral origination value must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-032-V03"
+    type: RECONCILIATION
+    description: "Sum of facility values should equal counterparty value for same-currency counterparties"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-075"
   abbreviation: "CMVA"
   insight: >
-    Amount of credit risk mitigated
+    Amount of credit risk mitigated — original appraised value of pledged
+    collateral, weighted by bank syndication share.
   rollup_strategy: "direct-sum"
   primary_value_field: "original_valuation_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "collateral"]
+tags: ["exposure", "collateral", "valuation"]
 dashboard_pages: []
 legacy_metric_ids: []

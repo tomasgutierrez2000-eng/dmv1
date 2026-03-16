@@ -2079,15 +2079,23 @@
         {
           "op": "*",
           "field": "pd_pct",
-          "label": "pd_pct",
+          "label": "Probability of default as percentage (e.g. 0.085 = 0.085%)",
           "sample_value": 0,
           "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "Committed facility amount — weight for exposure-weighted PD",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Read pd_pct from facility_risk_snapshot for each facility as-of reporting date.\n"
+      "formula_display": "Direct lookup of pd_pct from facility_risk_snapshot for each facility.\nIngredients: pd_pct (L2 facility_risk_snapshot — raw model output)\n"
     },
     "worked_example_columns": [
       {
@@ -2096,6 +2104,12 @@
         "format": "percentage",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -3054,32 +3068,66 @@
     ]
   },
   "MET-066": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "worst-case",
     "metric_fields": {
-      "primary_value": "pricing_tier_code"
+      "primary_value": "pricing_tier_ordinal"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "pricing_tier_code",
-          "label": "pricing_tier_code",
+          "field": "spread_bps",
+          "label": "Facility spread in basis points — classified against tier ranges",
           "sample_value": 0,
-          "source_table": "facility_detail_snapshot",
-          "source_layer": "L3"
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "Committed amount for exposure-weighting at aggregate levels",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "tier_ordinal",
+          "label": "Numeric ordinal for the tier (1=lowest spread, N=highest)",
+          "sample_value": 0,
+          "source_table": "pricing_tier_dim",
+          "source_layer": "L1"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read pricing_tier_code from facility_detail_snapshot for each facility as-of reporting date.\n"
+      "formula_display": "For each facility:\n  1. LOAD spread_bps from l2.facility_pricing_snapshot\n  2. RANGE-JOIN against l1.pricing_tier_dim\n     WHERE spread_bps >= spread_min_bps AND spread_bps < spread_max_bps\n  3. RETURN tier_ordinal — the numeric tier classification\n"
     },
     "worked_example_columns": [
       {
-        "field": "pricing_tier_code",
-        "header": "Pricing Tier Code",
+        "field": "spread_bps",
+        "header": "Spread (bps)",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "tier_ordinal",
+        "header": "Tier Ordinal",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "pricing_tier_ordinal",
+        "header": "Pricing Tier Ordinal",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -3144,32 +3192,52 @@
     ]
   },
   "MET-101": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "count-ratio",
     "metric_fields": {
-      "primary_value": "pricing_exception_flag"
+      "primary_value": "exception_status"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "pricing_exception_flag",
-          "label": "pricing_exception_flag",
+          "field": "is_pricing_exception_flag",
+          "label": "Boolean flag indicating pricing exception approval",
+          "sample_value": 0,
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "pricing_exception_status",
+          "label": "Exception status category (APPROVED, PENDING, DENIED)",
           "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
-      "result_format": "number",
-      "formula_display": "Calculated pricing_exception_flag per facility.\n"
+      "result_format": "percentage",
+      "formula_display": "Ordinal encoding of pricing_exception_status per facility:\n  APPROVED = 3, PENDING = 2, DENIED = 1, NONE/NULL = 0.\nIngredients: pricing_exception_status (L2 facility_pricing_snapshot)\n"
     },
     "worked_example_columns": [
       {
-        "field": "pricing_exception_flag",
-        "header": "Pricing Exception Flag",
+        "field": "is_pricing_exception_flag",
+        "header": "Is Pricing Exception Flag",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "pricing_exception_status",
+        "header": "Pricing Exception Status",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "exception_status",
+        "header": "Exception Status",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -3389,7 +3457,7 @@
         {
           "op": "*",
           "field": "origination_date",
-          "label": "Date the contract became legally effective",
+          "label": "Date the facility became legally effective",
           "sample_value": 0,
           "source_table": "facility_master",
           "source_layer": "L2"
@@ -3804,30 +3872,36 @@
   "MET-064": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "counterparty_id"
+      "primary_value": "counterparty_count"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "counterparty_id",
-          "label": "counterparty_id",
+          "label": "Counterparty ID linked to each facility",
           "sample_value": 0,
-          "source_table": "counterparty",
+          "source_table": "facility_master",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of counterparty_id from counterparty.\n"
+      "formula_display": "Direct lookup of counterparty_id from facility_master for each facility.\nReturns the counterparty associated with the facility.\n"
     },
     "worked_example_columns": [
       {
         "field": "counterparty_id",
         "header": "Counterparty Id",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "counterparty_count",
+        "header": "Counterparty Count",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },

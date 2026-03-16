@@ -5,43 +5,53 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "PRC-006"
 name: "Pricing Tier"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "pricing"
 sub_domain: "facility-pricing"
-metric_class: SOURCED
+metric_class: CALCULATED
 direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Pricing classification tier assigned to facility. Supports structured pricing
-  strategy and yield segmentation.
+  Pricing classification tier derived by range-joining the facility's
+  spread (spread_bps from L2 facility_pricing_snapshot) against the
+  pricing_tier_dim reference table (spread_min_bps/spread_max_bps).
+  Returns the tier_ordinal at facility level and at aggregate levels
+  classifies the exposure-weighted average spread into the corresponding
+  tier. Supports pricing strategy segmentation, yield curve analysis,
+  and risk-adjusted return monitoring.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "CRE30"
+    description: "Pricing and credit terms — pricing tier classification"
+  - framework: "OCC Guidance"
+    section: "2020-36"
+    description: "Pricing policy — tier segmentation and spread monitoring"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l3
-    table: facility_detail_snapshot
-    alias: fds
+  - schema: l2
+    table: facility_pricing_snapshot
+    alias: fps
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: pricing_tier_code
+      - name: spread_bps
         role: MEASURE
+        description: "Facility spread in basis points — classified against tier ranges"
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = fds.facility_id"
+    join_on: "fm.facility_id = fps.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -50,6 +60,32 @@ source_tables:
       - name: lob_segment_id
         role: DIMENSION
       - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date"
+    fields:
+      - name: committed_amount
+        role: MEASURE
+        description: "Committed amount for exposure-weighting at aggregate levels"
+  - schema: l1
+    table: pricing_tier_dim
+    alias: ptd
+    join_type: LEFT
+    join_on: "fps.spread_bps >= ptd.spread_min_bps AND fps.spread_bps < ptd.spread_max_bps"
+    fields:
+      - name: pricing_tier_code
+        role: DIMENSION
+      - name: tier_ordinal
+        role: MEASURE
+        description: "Numeric ordinal for the tier (1=lowest spread, N=highest)"
+      - name: spread_min_bps
+        role: FILTER
+      - name: spread_max_bps
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -64,98 +100,155 @@ source_tables:
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: RAW
-    formula_text: >
-      Read pricing_tier_code from facility_detail_snapshot for each facility as-of
-      reporting date.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each facility:
+        1. LOAD spread_bps from l2.facility_pricing_snapshot
+        2. RANGE-JOIN against l1.pricing_tier_dim
+           WHERE spread_bps >= spread_min_bps AND spread_bps < spread_max_bps
+        3. RETURN tier_ordinal — the numeric tier classification
+    formula_sql: |-
       SELECT
-        fds.facility_id AS dimension_key,
-        fds.pricing_tier_code AS metric_value
-      FROM l3.facility_detail_snapshot fds
-      WHERE fds.as_of_date = :as_of_date
+        fps.facility_id AS dimension_key,
+        COALESCE(ptd.tier_ordinal, 0) AS metric_value
+      FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fps.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      LEFT JOIN l1.pricing_tier_dim ptd
+        ON fps.spread_bps >= ptd.spread_min_bps
+        AND fps.spread_bps < ptd.spread_max_bps
   counterparty:
-    aggregation_type: RAW
-    formula_text: >
-      Read pricing_tier_code per counterparty.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each counterparty:
+        1. LOAD spread_bps and committed_amount per facility
+        2. COMPUTE weighted average spread:
+           SUM(spread_bps × committed_amount) / SUM(committed_amount)
+        3. RANGE-JOIN weighted avg spread against l1.pricing_tier_dim
+        4. RETURN tier_ordinal for the counterparty's blended spread
+    formula_sql: |-
       SELECT
-        fm.counterparty_id AS dimension_key,
-        fds.pricing_tier_code AS metric_value
-      FROM l3.facility_detail_snapshot fds
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fds.facility_id
-        AND fm.is_active_flag = 'Y'
-      WHERE fds.as_of_date = :as_of_date
+        cs.counterparty_id AS dimension_key,
+        COALESCE(ptd.tier_ordinal, 0) AS metric_value
+      FROM (
+        SELECT
+          fm.counterparty_id,
+          SUM(fps.spread_bps * COALESCE(fes.committed_amount, 0))
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS avg_spread_bps
+        FROM l2.facility_pricing_snapshot fps
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fps.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fps.facility_id
+          AND fes.as_of_date = fps.as_of_date
+        GROUP BY fm.counterparty_id
+      ) cs
+      LEFT JOIN l1.pricing_tier_dim ptd
+        ON cs.avg_spread_bps >= ptd.spread_min_bps
+        AND cs.avg_spread_bps < ptd.spread_max_bps
   desk:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_tier_code per L3 desk segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L3 Desk segment:
+        1. Compute exposure-weighted average spread across desk facilities
+        2. Classify against pricing_tier_dim ranges
+        3. RETURN tier_ordinal for the desk's blended spread
+    formula_sql: |-
       SELECT
-        ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        ds.managed_segment_id AS dimension_key,
+        COALESCE(ptd.tier_ordinal, 0) AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.pricing_tier_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.managed_segment_id = fm.lob_segment_id
-      GROUP BY ebt.managed_segment_id
+          ebt.managed_segment_id,
+          SUM(fps.spread_bps * COALESCE(fes.committed_amount, 0))
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS avg_spread_bps
+        FROM l2.facility_pricing_snapshot fps
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fps.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fps.facility_id
+          AND fes.as_of_date = fps.as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.managed_segment_id = fm.lob_segment_id
+        GROUP BY ebt.managed_segment_id
+      ) ds
+      LEFT JOIN l1.pricing_tier_dim ptd
+        ON ds.avg_spread_bps >= ptd.spread_min_bps
+        AND ds.avg_spread_bps < ptd.spread_max_bps
   portfolio:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_tier_code per L2 portfolio segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. Compute exposure-weighted average spread
+        3. Classify against pricing_tier_dim ranges
+    formula_sql: |-
       SELECT
-        ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        ps.managed_segment_id AS dimension_key,
+        COALESCE(ptd.tier_ordinal, 0) AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.pricing_tier_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      GROUP BY ebt_l2.managed_segment_id
+          ebt_l2.managed_segment_id,
+          SUM(fps.spread_bps * COALESCE(fes.committed_amount, 0))
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS avg_spread_bps
+        FROM l2.facility_pricing_snapshot fps
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fps.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fps.facility_id
+          AND fes.as_of_date = fps.as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        GROUP BY ebt_l2.managed_segment_id
+      ) ps
+      LEFT JOIN l1.pricing_tier_dim ptd
+        ON ps.avg_spread_bps >= ptd.spread_min_bps
+        AND ps.avg_spread_bps < ptd.spread_max_bps
   business_segment:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_tier_code per L1 business segment segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. Compute exposure-weighted average spread
+        3. Classify against pricing_tier_dim ranges
+    formula_sql: |-
       SELECT
-        ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        ss.managed_segment_id AS dimension_key,
+        COALESCE(ptd.tier_ordinal, 0) AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.pricing_tier_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      GROUP BY ebt_l1.managed_segment_id
+          ebt_l1.managed_segment_id,
+          SUM(fps.spread_bps * COALESCE(fes.committed_amount, 0))
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS avg_spread_bps
+        FROM l2.facility_pricing_snapshot fps
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fps.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fps.facility_id
+          AND fes.as_of_date = fps.as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+          ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        GROUP BY ebt_l1.managed_segment_id
+      ) ss
+      LEFT JOIN l1.pricing_tier_dim ptd
+        ON ss.avg_spread_bps >= ptd.spread_min_bps
+        AND ss.avg_spread_bps < ptd.spread_max_bps
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
 # ── OUTPUT ────────────────────────────────────────────────────
@@ -165,17 +258,25 @@ output:
 validations:
   - rule_id: "PRC-006-V01"
     type: NOT_NULL
-    description: "No null pricing_tier_code values"
+    description: "Tier ordinal must not be null for facilities with spread data"
+    severity: WARNING
+  - rule_id: "PRC-006-V02"
+    type: NON_NEGATIVE
+    description: "Tier ordinal must be >= 0"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-066"
   abbreviation: "PT"
   insight: >
-    Pricing segmentation
-  rollup_strategy: "direct-sum"
-  primary_value_field: "pricing_tier_code"
+    Pricing segmentation indicator. Classifies each facility by its
+    spread into standardized pricing tiers via range-join against
+    pricing_tier_dim. At aggregate levels, computes exposure-weighted
+    average spread first, then classifies — ensuring the portfolio-level
+    tier reflects the true blended pricing, not an average of ordinals.
+  rollup_strategy: "worst-case"
+  primary_value_field: "pricing_tier_ordinal"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["pricing", "facility-pricing"]
-dashboard_pages: []
+tags: ["pricing", "facility-pricing", "segmentation"]
+dashboard_pages: ["P3"]
 legacy_metric_ids: []

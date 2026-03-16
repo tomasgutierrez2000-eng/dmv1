@@ -296,6 +296,10 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | DRAFT metric blind trust | Upgrading DRAFT metric without reviewing SQL | DRAFT metrics often have placeholder SQL with non-existent fields/joins. When upgrading to ACTIVE, rewrite and verify ALL `formula_sql` — don't assume DRAFT SQL is correct |
 | Wrong rollup for strings | `rollup_strategy: "direct-sum"` on LoB string metric | String/hierarchy SOURCED metrics use `rollup_strategy: "none"` — `direct-sum` implies SUM() which is invalid for VARCHAR |
 | xlsx merge conflict | Binary `metrics_dimensions_filled.xlsx` always conflicts on merge | Resolve by taking the branch version (`git checkout branch -- file`), then run `calc:sync` on main to regenerate from merged YAMLs |
+| Numeric placeholder in NUMERIC fields | `pd_pct = 100.5` for all rows in `facility_risk_snapshot` | L2 seed generator produces unrealistic numeric constants — patch sample-data.json with realistic ranges (e.g., 0.03–5% for PD) |
+| Temporal flag inconsistency | `is_pricing_exception_flag` TRUE on some dates, NULL on others for same facility | Flag values must be consistent across ALL `as_of_date` rows for a given facility, or formula must filter by date |
+| Small sample modulo miss | `facility_id % 13` with only 10 facilities (ids 1–10) matches zero rows | Use explicit facility selection or row-index logic — sql.js sample has only ~10 entities |
+| CTE in formula_sql | `WITH cte AS (SELECT...) SELECT FROM cte` | `calc:sync` validator requires `formula_sql` to start with `SELECT` — convert CTEs to inline subqueries |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 
@@ -309,6 +313,8 @@ After verifying formulas execute, always check that seed data produces **meaning
 | **Threshold coverage** | Values span multiple threshold buckets | All utilization <75% → only NO_BREACH, never ELEVATED/WARNING |
 | **Placeholder detection** | No auto-generated `field_name_123` values | Seed generator fallback creates junk — grep for `_code_[0-9]` patterns |
 | **Date alignment** | Source tables have overlapping `as_of_date` | FES max=Feb but FRS max=Jan → JOIN returns 0 rows for Feb date |
+| **Status field diversity** | Categorical status fields have multiple distinct values | All `pricing_exception_status` NULL → ordinal encoding always returns 0 |
+| **Numeric range realism** | NUMERIC fields have values in GSIB-realistic ranges | `pd_pct = 100.5` makes PD metric return 100% instead of <5% |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

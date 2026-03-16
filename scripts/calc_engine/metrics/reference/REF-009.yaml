@@ -1,11 +1,11 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Contract Origination Date
+# Facility Origination Date
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-009"
-name: "Contract Origination Date"
-version: "2.0.0"
+name: "Facility Origination Date"
+version: "3.0.0"
 owner: "credit-risk"
 status: ACTIVE
 effective_date: "2026-01-01"
@@ -13,16 +13,18 @@ supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "reference"
 sub_domain: "master-data"
-metric_class: SOURCED
+metric_class: HYBRID
 direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Date on which loan or contract became legally effective. Sourced directly
-  from facility_master. At aggregate levels, returns the earliest origination
-  date (MIN) across constituent facilities — indicating the oldest vintage
-  in the book. Key contract lifecycle tracking attribute for vintage analysis
-  and portfolio seasoning assessment.
+  Facility effective date sourced from facility_master origination_date.
+  At facility and counterparty levels, returns the raw date (or earliest
+  vintage via MIN). At portfolio level, pivots to facility lifecycle
+  tracking: counts inactive facilities whose origination date falls
+  within 90 days of the reporting date, identifying the upcoming pipeline
+  of facilities about to start ("Starting 90d"). Key for vintage analysis,
+  portfolio seasoning, and facility pipeline monitoring.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
@@ -46,11 +48,12 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+        description: "Active/inactive status — pipeline count uses != 'Y'"
       - name: is_current_flag
         role: FILTER
       - name: origination_date
         role: MEASURE
-        description: "Date the contract became legally effective"
+        description: "Date the facility became legally effective"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -108,22 +111,26 @@ levels:
         AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: MIN
+    aggregation_type: CUSTOM
     formula_text: |
-      For each L2 Portfolio segment:
+      Facility pipeline tracking for each L2 Portfolio segment:
         1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
-        2. COMPUTE MIN(origination_date) — earliest vintage in portfolio
+        2. FILTER inactive facilities (is_active_flag != 'Y')
+           whose origination_date is within 90 days of current date
+        3. COMPUTE COUNT(DISTINCT facility_id) — number of upcoming facilities
+      Returns the count of facilities in the "Starting (90d)" pipeline.
+      Business rule: facilities not yet active with origination within ±90 days.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        MIN(fm.origination_date) AS metric_value
+        COUNT(DISTINCT fm.facility_id) AS metric_value
       FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      WHERE fm.is_active_flag = 'Y'
-        AND fm.is_current_flag = 'Y'
+      WHERE fm.is_current_flag = 'Y'
+        AND fm.is_active_flag != 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: MIN
@@ -156,17 +163,22 @@ validations:
     type: NOT_NULL
     description: "No null origination_date values for active facilities"
     severity: ERROR
+  - rule_id: "REF-009-V02"
+    type: NON_NEGATIVE
+    description: "Pipeline count at portfolio level must be >= 0"
+    severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-029"
-  abbreviation: "COD"
+  abbreviation: "FOD"
   insight: >
-    Contract lifecycle tracking. Earliest origination date at aggregate
-    levels reveals the oldest vintage in the book — essential for seasoning
-    analysis and portfolio age profiling.
+    Facility lifecycle tracking. Raw origination date at facility/counterparty
+    levels enables vintage analysis. Portfolio-level pipeline count identifies
+    inactive facilities approaching activation — essential for resource planning
+    and onboarding capacity management.
   rollup_strategy: "direct-sum"
   primary_value_field: "origination_date"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data", "vintage"]
+tags: ["reference", "master-data", "vintage", "pipeline"]
 dashboard_pages: []
 legacy_metric_ids: []

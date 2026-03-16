@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-024"
 name: "Participating Counterparty IDs"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,24 +18,38 @@ direction: NEUTRAL
 unit_type: COUNT
 display_format: ",.0f"
 description: >
-  Identifiers of counterparties participating in the credit structures or
-  facility as multiple-borrowers. Enables exposure attribution and concentration
-  analysis.
+  Count of distinct counterparties participating in credit structures.
+  At counterparty level, returns the counterparty identifier directly.
+  At desk and higher levels, counts distinct counterparties per segment
+  to measure borrower concentration and multi-borrower facility exposure.
+  Enables concentration analysis, relationship tracking, and syndicated
+  deal monitoring.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "CRE50"
+    description: "Large exposure and concentration risk — counterparty identification"
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Borrower identification and counterparty tracking"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: counterparty
-    alias: cp
+    table: facility_master
+    alias: fm
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: counterparty_id
         role: MEASURE
+        description: "Counterparty ID linked to each facility"
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -50,108 +64,84 @@ source_tables:
 levels:
   facility:
     aggregation_type: RAW
-    formula_text: >
-      Direct lookup of counterparty_id from counterparty.
-    formula_sql: |
+    formula_text: |
+      Direct lookup of counterparty_id from facility_master for each facility.
+      Returns the counterparty associated with the facility.
+    formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
-        cp.counterparty_id AS metric_value
+        fm.counterparty_id AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l2.counterparty cp
-        ON cp.counterparty_id = fm.counterparty_id
-        AND cp.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
     aggregation_type: RAW
-    formula_text: >
-      Direct lookup of counterparty_id from counterparty.
-    formula_sql: |
+    formula_text: |
+      Identity: returns counterparty_id for each active counterparty.
+      Enables direct counterparty identification in drill-down views.
+    formula_sql: |-
       SELECT
-        cp.counterparty_id AS dimension_key,
-        cp.counterparty_id AS metric_value
-      FROM l2.counterparty cp
-      WHERE cp.is_current_flag = 'Y'
+        fm.counterparty_id AS dimension_key,
+        fm.counterparty_id AS metric_value
+      FROM l2.facility_master fm
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level counterparty_id per L3 desk segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L3 Desk segment:
+        1. LOAD all facilities from l2.facility_master
+        2. JOIN l1.enterprise_business_taxonomy on lob_segment_id
+        3. COMPUTE COUNT(DISTINCT counterparty_id) — unique borrowers per desk
+      Measures borrower concentration within each desk.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cp.counterparty_id AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-          AND cp.is_current_flag = 'Y'
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.counterparty_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level counterparty_id per L2 portfolio segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. COMPUTE COUNT(DISTINCT counterparty_id) — unique borrowers per portfolio
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cp.counterparty_id AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-          AND cp.is_current_flag = 'Y'
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.counterparty_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level counterparty_id per L1 business segment segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. COMPUTE COUNT(DISTINCT counterparty_id) — unique borrowers per segment
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cp.counterparty_id AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-          AND cp.is_current_flag = 'Y'
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.counterparty_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -162,21 +152,24 @@ output:
 validations:
   - rule_id: "REF-024-V01"
     type: NOT_NULL
-    description: "No null counterparty_id values"
+    description: "No null counterparty_id values for active facilities"
     severity: ERROR
   - rule_id: "REF-024-V02"
     type: NON_NEGATIVE
-    description: "counterparty_id must be >= 0"
+    description: "Counterparty count must be >= 0"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-064"
   abbreviation: "PCI"
   insight: >
-    Tracking of multiple-borrower facilities
+    Borrower concentration indicator. COUNT(DISTINCT) counterparties at
+    aggregate levels reveals relationship breadth vs. concentration.
+    Low counts signal single-name concentration risk; high counts signal
+    diversified portfolios. Essential for CRE50 large-exposure monitoring.
   rollup_strategy: "direct-sum"
-  primary_value_field: "counterparty_id"
+  primary_value_field: "counterparty_count"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "concentration"]
 dashboard_pages: []
 legacy_metric_ids: []

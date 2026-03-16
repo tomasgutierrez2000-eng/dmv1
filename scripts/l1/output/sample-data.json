@@ -1376,7 +1376,9 @@
       "tier_name",
       "tier_ordinal",
       "display_order",
-      "is_active_flag"
+      "is_active_flag",
+      "spread_min_bps",
+      "spread_max_bps"
     ],
     "rows": [
       [
@@ -1384,70 +1386,90 @@
         "tier_name_1",
         1,
         1,
-        "Y"
+        "Y",
+        0,
+        100
       ],
       [
         "pricing_tier_dim_2",
         "tier_name_2",
         2,
         2,
-        "N"
+        "N",
+        100,
+        200
       ],
       [
         "pricing_tier_dim_3",
         "tier_name_3",
         3,
         3,
-        "Y"
+        "Y",
+        200,
+        350
       ],
       [
         "pricing_tier_dim_4",
         "tier_name_4",
         4,
         4,
-        "N"
+        "N",
+        350,
+        500
       ],
       [
         "pricing_tier_dim_5",
         "tier_name_5",
         5,
         5,
-        "Y"
+        "Y",
+        500,
+        750
       ],
       [
         "pricing_tier_dim_6",
         "tier_name_6",
         6,
         6,
-        "N"
+        "N",
+        750,
+        1000
       ],
       [
         "pricing_tier_dim_7",
         "tier_name_7",
         7,
         7,
-        "Y"
+        "Y",
+        1000,
+        1500
       ],
       [
         "pricing_tier_dim_8",
         "tier_name_8",
         8,
         8,
-        "N"
+        "N",
+        1500,
+        2000
       ],
       [
         "pricing_tier_dim_9",
         "tier_name_9",
         9,
         9,
-        "Y"
+        "Y",
+        2000,
+        3000
       ],
       [
         "pricing_tier_dim_10",
         "tier_name_10",
         10,
         10,
-        "N"
+        "N",
+        3000,
+        99999
       ]
     ]
   },

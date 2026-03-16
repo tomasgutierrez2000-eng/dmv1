@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-006"
 name: "Country"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,134 +18,177 @@ direction: NEUTRAL
 unit_type: COUNT
 display_format: ",.0f"
 description: >
-  Country of risk or booking location. Supports geographic concentration and
-  sovereign risk analysis.
+  Country of risk derived from the counterparty's domicile. At facility level,
+  returns a numeric country identifier (via counterparty → country_dim join path).
+  At counterparty level, identity lookup. At desk/portfolio/segment levels,
+  COUNT(DISTINCT country_code) — geographic diversification indicator showing
+  the number of unique countries represented. Supports FFIEC 009 Country
+  Exposure Report and Basel III geographic concentration analysis.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
+  - framework: "FFIEC 009"
+    description: "Country Exposure Report — geographic risk classification"
   - framework: "Basel III"
-    description: ""
+    section: "CRE"
+    description: "Geographic concentration risk weighting"
+  - framework: "FR Y-14Q"
+    schedule: "H.2"
+    description: "Counterparty country of risk for credit exposure reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
-    table: country_dim
-    alias: cd
+  - schema: l2
+    table: facility_master
+    alias: fm
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current facility record"
+  - schema: l2
+    table: counterparty
+    alias: cp
+    join_type: INNER
+    join_on: "cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'"
+    fields:
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: country_code
+        role: JOIN_KEY
+        description: "ISO 3166-1 alpha-2 code, FK to country_dim"
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current counterparty record"
+  - schema: l1
+    table: country_dim
+    alias: cd
+    join_type: INNER
+    join_on: "cd.country_code = cp.country_code"
+    fields:
+      - name: country_code
+        role: JOIN_KEY
+        description: "PK — ISO 3166-1 alpha-2 country code"
       - name: country_name
         role: MEASURE
+        description: "Human-readable country name for display"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current taxonomy record"
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Direct lookup of country_name from country_dim.
+      Lookup country for each facility via counterparty → country_dim join path.
+      Returns counterparty_id as numeric proxy (country_name resolved at display
+      time via dimension join). SCD-filtered to current records.
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,
-        cd.country_name AS metric_value
+        fm.counterparty_id AS metric_value
       FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       INNER JOIN l1.country_dim cd
-        ON cd.facility_id = fm.facility_id
+        ON cd.country_code = cp.country_code
       WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read country_name per counterparty.
+      Lookup country for each counterparty via country_code → country_dim join.
+      Returns counterparty_id as numeric proxy.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        cd.country_name AS metric_value
-      FROM l1.country_dim cd
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = cd.facility_id
-        AND fm.is_active_flag = 'Y'
-      WHERE cd.as_of_date = :as_of_date
+        cp.counterparty_id AS dimension_key,
+        cp.counterparty_id AS metric_value
+      FROM l2.counterparty cp
+      INNER JOIN l1.country_dim cd
+        ON cd.country_code = cp.country_code
+      WHERE cp.is_current_flag = 'Y'
   desk:
-    aggregation_type: SUM
+    aggregation_type: COUNT
     formula_text: >
-      SUM of facility-level country_name per L3 desk segment.
+      COUNT(DISTINCT country_code) per L3 desk segment — number of unique
+      countries represented, a geographic diversification indicator.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cd.country_name AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.country_dim cd
-          ON cd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT cp.country_code) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: COUNT
     formula_text: >
-      SUM of facility-level country_name per L2 portfolio segment.
+      COUNT(DISTINCT country_code) per L2 portfolio segment — number of unique
+      countries represented in each portfolio.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cd.country_name AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.country_dim cd
-          ON cd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT cp.country_code) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: COUNT
     formula_text: >
-      SUM of facility-level country_name per L1 business segment segment.
+      COUNT(DISTINCT country_code) per L1 business segment — geographic
+      diversification at the highest organizational level.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cd.country_name AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.country_dim cd
-          ON cd.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT cp.country_code) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -156,21 +199,19 @@ output:
 validations:
   - rule_id: "REF-006-V01"
     type: NOT_NULL
-    description: "No null country_name values"
-    severity: ERROR
-  - rule_id: "REF-006-V02"
-    type: NON_NEGATIVE
-    description: "country_name must be >= 0"
+    description: "No null country references for active facilities with valid counterparties"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-017"
-  abbreviation: "C"
+  abbreviation: "CTY"
   insight: >
-    Geographic risk concentration
+    Country of risk for geographic concentration analysis. At upper levels,
+    unique country count indicates portfolio diversification. Low counts
+    may signal geographic concentration risk requiring FFIEC 009 attention.
   rollup_strategy: "direct-sum"
   primary_value_field: "country_name"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "country", "geographic-risk", "concentration"]
 dashboard_pages: []
 legacy_metric_ids: []

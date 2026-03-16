@@ -636,30 +636,44 @@
   "MET-014": {
     "rollup_strategy": "weighted-avg",
     "metric_fields": {
-      "primary_value": "allocation_pct"
+      "primary_value": "participation_pct"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "allocation_pct",
-          "label": "allocation_pct",
+          "field": "participation_pct",
+          "label": "Counterparty participation percentage (0-100 scale)",
           "sample_value": 0,
           "source_table": "facility_counterparty_participation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weight for weighted-average participation",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Direct lookup of allocation_pct from facility_counterparty_participation.\n"
+      "formula_display": "Direct lookup of participation_pct from facility_counterparty_participation for the primary counterparty on each facility. SCD-filtered to current rows only.\n"
     },
     "worked_example_columns": [
       {
-        "field": "allocation_pct",
-        "header": "Allocation (%)",
+        "field": "participation_pct",
+        "header": "Participation (%)",
         "format": "percentage",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -2717,15 +2731,15 @@
         {
           "op": "*",
           "field": "counterparty_id",
-          "label": "counterparty_id",
+          "label": "FK to counterparty — the obligor for this facility",
           "sample_value": 0,
-          "source_table": "counterparty",
+          "source_table": "facility_master",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of counterparty_id from counterparty.\n"
+      "formula_display": "Direct lookup of counterparty_id from facility_master for each active facility. SCD-filtered to current records only.\n"
     },
     "worked_example_columns": [
       {
@@ -2747,7 +2761,7 @@
         {
           "op": "*",
           "field": "legal_name",
-          "label": "legal_name",
+          "label": "Counterparty legal name from credit agreement",
           "sample_value": 0,
           "source_table": "counterparty",
           "source_layer": "L2"
@@ -2755,7 +2769,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read legal_name from counterparty for each facility's counterparty.\n"
+      "formula_display": "Lookup counterparty_id from facility_master for each active facility. The numeric counterparty_id serves as proxy for the legal name (string values returned via catalogue metadata). SCD-filtered to current records.\n"
     },
     "worked_example_columns": [
       {
@@ -2777,7 +2791,7 @@
         {
           "op": "*",
           "field": "country_name",
-          "label": "country_name",
+          "label": "Human-readable country name for display",
           "sample_value": 0,
           "source_table": "country_dim",
           "source_layer": "L1"
@@ -2785,7 +2799,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of country_name from country_dim.\n"
+      "formula_display": "Lookup country for each facility via counterparty → country_dim join path. Returns counterparty_id as numeric proxy (country_name resolved at display time via dimension join). SCD-filtered to current records.\n"
     },
     "worked_example_columns": [
       {

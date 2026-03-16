@@ -9127,7 +9127,7 @@
         "dashboard_display_name": "Current Collateral Market Value (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY cs.facility_id\n6. COMPUTE\n   metric_value = SUM(cs.current_valuation_usd) * COALESCE(fla.bank_share_pct, 100.0) / 100.0",
+        "level_logic": "1. LOAD  l2.collateral_snapshot  (cs)\n   WHERE cs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = cs.facility_id\n   AND   fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY cs.facility_id\n6. COMPUTE\n   metric_value = SUM(cs.current_valuation_usd) * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -9220,7 +9220,7 @@
             "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  cs.facility_id                                              AS dimension_key,\n  SUM(cs.current_valuation_usd)\n    * COALESCE(fla.bank_share_pct, 100.0) / 100.0            AS metric_value\nFROM l2.collateral_snapshot cs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = cs.facility_id\n AND fm.is_active_flag = 'Y'\n AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.facility_lender_allocation fla\n  ON fla.facility_id = cs.facility_id\n AND fla.is_current_flag = 'Y'\nWHERE cs.as_of_date = :as_of_date\nGROUP BY cs.facility_id\n"
+        "formula_sql": "SELECT\n  cs.facility_id                                              AS dimension_key,\n  SUM(cs.current_valuation_usd)\n    * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0       AS metric_value\nFROM l2.collateral_snapshot cs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = cs.facility_id\n AND fm.is_active_flag = 'Y'\n AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.facility_lender_allocation fla\n  ON fla.facility_id = cs.facility_id\n AND fla.is_current_flag = 'Y'\nWHERE cs.as_of_date = :as_of_date\nGROUP BY cs.facility_id\n"
       },
       {
         "level": "counterparty",
@@ -11762,8 +11762,8 @@
     "item_name": "Counterparty Share or Allocation (%)",
     "abbreviation": "CSOA",
     "kind": "METRIC",
-    "definition": "Exposure allocated to specific counterparty representing their share of the facility which the client can draw on. Concentration KPI measuring obligor dependency risk.\n",
-    "generic_formula": "Direct lookup of allocation_pct from facility_counterparty_participation.\n",
+    "definition": "Counterparty participation share in a facility — the percentage of a syndicated or participated facility allocated to a specific counterparty. At facility level, direct lookup from facility_counterparty_participation. At counterparty level, exposure-weighted average participation across all facilities. At desk/portfolio/segment, exposure-weighted average via EBT hierarchy. Key concentration KPI for Large Exposures Framework (LEX) and Single Counterparty Credit Limit (SCCL) compliance.\n",
+    "generic_formula": "Direct lookup of participation_pct from facility_counterparty_participation for the primary counterparty on each facility. SCD-filtered to current rows only.\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
@@ -11772,12 +11772,14 @@
       "exposure"
     ],
     "regulatory_references": [
-      "Basel III"
+      "Basel III Section LEX",
+      "FR Y-14Q Schedule H.2",
+      "12 CFR 252.72"
     ],
-    "insight": "Concentration risk identification\n",
+    "insight": "Counterparty participation share — measures syndication/participation concentration. High single-counterparty shares indicate concentration risk under Basel III LEX and SCCL. Monitor for counterparties exceeding regulatory thresholds (25% of Tier 1 capital for non-GSIBs, 15% for GSIBs).\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "EXP-006",
     "normalized_de_name": "Counterparty Share or Allocation (%)",
     "data_element_in_dm": "allocation_pct",
@@ -11797,8 +11799,14 @@
         "dashboard_display_name": "Counterparty Share or Allocation (%) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = fcp.allocation_pct",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_primary_flag = <filter>\n   AND   fcp.is_current_flag = 'Y'\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fcp.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fm.facility_id AND fes.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. COMPUTE\n   metric_value = fcp.participation_pct",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
@@ -11808,8 +11816,50 @@
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
-            "field": "allocation_pct",
-            "description": "allocation_pct"
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct",
+            "description": "Counterparty participation percentage (0-100 scale)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_primary_flag",
+            "description": "Primary counterparty flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current participation row"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Exposure weight for weighted-average participation"
           },
           {
             "layer": "L1",
@@ -11822,17 +11872,29 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  fcp.allocation_pct AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.facility_counterparty_participation fcp\n  ON fcp.facility_id = fm.facility_id\nWHERE fm.is_active_flag = 'Y'\n"
+        "formula_sql": "SELECT\n  fcp.facility_id AS dimension_key,\n  fcp.participation_pct AS metric_value\nFROM l2.facility_counterparty_participation fcp\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fcp.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nWHERE fcp.is_current_flag = 'Y'\n  AND fcp.is_primary_flag = 'Y'\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Counterparty Share or Allocation (%) (counterparty)",
         "in_record": true,
-        "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = fcp.allocation_pct",
+        "sourcing_type": "Avg",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_primary_flag = <filter>\n   AND   fcp.is_current_flag = 'Y'\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fcp.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fm.facility_id AND fes.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY fcp.counterparty_id\n6. COMPUTE\n   metric_value = SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0)) / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
@@ -11842,8 +11904,50 @@
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
-            "field": "allocation_pct",
-            "description": "allocation_pct"
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct",
+            "description": "Counterparty participation percentage (0-100 scale)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_primary_flag",
+            "description": "Primary counterparty flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current participation row"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Exposure weight for weighted-average participation"
           },
           {
             "layer": "L1",
@@ -11856,17 +11960,29 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  fcp.allocation_pct AS metric_value\nFROM l2.facility_counterparty_participation fcp\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fcp.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fcp.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  fcp.counterparty_id AS dimension_key,\n  SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0))\n    / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0) AS metric_value\nFROM l2.facility_counterparty_participation fcp\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fcp.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fcp.facility_id\n  AND fes.as_of_date = :as_of_date\nWHERE fcp.is_current_flag = 'Y'\nGROUP BY fcp.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Counterparty Share or Allocation (%) (desk)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Avg",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_primary_flag = <filter>\n   AND   fcp.is_current_flag = 'Y'\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fcp.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fm.facility_id AND fes.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0)) / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
@@ -11876,8 +11992,50 @@
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
-            "field": "allocation_pct",
-            "description": "allocation_pct"
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct",
+            "description": "Counterparty participation percentage (0-100 scale)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_primary_flag",
+            "description": "Primary counterparty flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current participation row"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Exposure weight for weighted-average participation"
           },
           {
             "layer": "L1",
@@ -11890,17 +12048,29 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fcp.allocation_pct AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l2.facility_counterparty_participation fcp\n    ON fcp.facility_id = fm.facility_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0))\n    / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0) AS metric_value\nFROM l2.facility_counterparty_participation fcp\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fcp.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fcp.facility_id\n  AND fes.as_of_date = :as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nWHERE fcp.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Counterparty Share or Allocation (%) (portfolio)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Avg",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_primary_flag = <filter>\n   AND   fcp.is_current_flag = 'Y'\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fcp.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fm.facility_id AND fes.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0)) / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
@@ -11910,8 +12080,50 @@
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
-            "field": "allocation_pct",
-            "description": "allocation_pct"
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct",
+            "description": "Counterparty participation percentage (0-100 scale)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_primary_flag",
+            "description": "Primary counterparty flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current participation row"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Exposure weight for weighted-average participation"
           },
           {
             "layer": "L1",
@@ -11924,17 +12136,29 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fcp.allocation_pct AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l2.facility_counterparty_participation fcp\n    ON fcp.facility_id = fm.facility_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0))\n    / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0) AS metric_value\nFROM l2.facility_counterparty_participation fcp\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fcp.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fcp.facility_id\n  AND fes.as_of_date = :as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nWHERE fcp.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Counterparty Share or Allocation (%) (lob)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Avg",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_primary_flag = <filter>\n   AND   fcp.is_current_flag = 'Y'\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fcp.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'\n3. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fm.facility_id AND fes.as_of_date = :as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0)) / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
@@ -11944,8 +12168,50 @@
           {
             "layer": "L2",
             "table": "facility_counterparty_participation",
-            "field": "allocation_pct",
-            "description": "allocation_pct"
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "participation_pct",
+            "description": "Counterparty participation percentage (0-100 scale)"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_primary_flag",
+            "description": "Primary counterparty flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current participation row"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "Exposure weight for weighted-average participation"
           },
           {
             "layer": "L1",
@@ -11958,9 +12224,15 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fcp.allocation_pct AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l2.facility_counterparty_participation fcp\n    ON fcp.facility_id = fm.facility_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fcp.participation_pct * COALESCE(fes.drawn_amount, 0))\n    / NULLIF(SUM(COALESCE(fes.drawn_amount, 0)), 0) AS metric_value\nFROM l2.facility_counterparty_participation fcp\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fcp.facility_id\n  AND fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fcp.facility_id\n  AND fes.as_of_date = :as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE fcp.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -44060,8 +44332,8 @@
     "item_name": "Counterparty ID",
     "abbreviation": "CI",
     "kind": "METRIC",
-    "definition": "Unique system identifier assigned to the borrower or obligor. Used for exposure aggregation and risk consolidation.\n",
-    "generic_formula": "Direct lookup of counterparty_id from counterparty.\n",
+    "definition": "Unique system identifier assigned to the borrower or obligor. Used for exposure aggregation and risk consolidation across the GSIB. At facility level, returns the counterparty_id linked to each facility. At upper levels, returns COUNT(DISTINCT counterparty_id) — the number of unique obligors in each organizational segment.\n",
+    "generic_formula": "Direct lookup of counterparty_id from facility_master for each active facility. SCD-filtered to current records only.\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
@@ -44070,12 +44342,13 @@
       "reference"
     ],
     "regulatory_references": [
-      "Basel III"
+      "Basel III Section LEX",
+      "FR Y-14Q"
     ],
-    "insight": "Data linkage and drill-down\n",
+    "insight": "Obligor identifier for exposure aggregation and regulatory reporting. At upper levels, shows counterparty count — a proxy for portfolio diversification. Low counts at segment level may indicate concentration risk.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "REF-004",
     "normalized_de_name": "Counterparty ID",
     "data_element_in_dm": "counterparty_id",
@@ -44095,19 +44368,49 @@
         "dashboard_display_name": "Counterparty ID (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = cp.counterparty_id",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. COMPUTE\n   metric_value = fm.counterparty_id",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — the obligor for this facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
           },
           {
             "layer": "L2",
             "table": "counterparty",
             "field": "counterparty_id",
             "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44120,28 +44423,64 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  cp.counterparty_id AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\n"
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  fm.counterparty_id AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Counterparty ID (counterparty)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = cp.counterparty_id",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. COMPUTE\n   metric_value = cp.counterparty_id",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — the obligor for this facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
           },
           {
             "layer": "L2",
             "table": "counterparty",
             "field": "counterparty_id",
             "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44154,6 +44493,12 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
         "formula_sql": "SELECT\n  cp.counterparty_id AS dimension_key,\n  cp.counterparty_id AS metric_value\nFROM l2.counterparty cp\nWHERE cp.is_current_flag = 'Y'\n"
@@ -44163,19 +44508,49 @@
         "dashboard_display_name": "Counterparty ID (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fm.counterparty_id)",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — the obligor for this facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
           },
           {
             "layer": "L2",
             "table": "counterparty",
             "field": "counterparty_id",
             "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44188,28 +44563,64 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    cp.counterparty_id AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n    AND cp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.counterparty_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Counterparty ID (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fm.counterparty_id)",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — the obligor for this facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
           },
           {
             "layer": "L2",
             "table": "counterparty",
             "field": "counterparty_id",
             "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44222,28 +44633,64 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    cp.counterparty_id AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n    AND cp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.counterparty_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Counterparty ID (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fm.counterparty_id)",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "FK to counterparty — the obligor for this facility"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
           },
           {
             "layer": "L2",
             "table": "counterparty",
             "field": "counterparty_id",
             "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44256,9 +44703,15 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    cp.counterparty_id AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n    AND cp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.counterparty_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -44536,8 +44989,8 @@
     "item_name": "Counterparty Name",
     "abbreviation": "CN",
     "kind": "METRIC",
-    "definition": "Descriptive name of the counterparty as documented in the credit agreement. Used for reporting clarity and operational reference.\n",
-    "generic_formula": "Read legal_name from counterparty for each facility's counterparty.\n",
+    "definition": "Legal name of the counterparty as documented in the credit agreement. At facility level, returns the counterparty_id (numeric proxy for the name since metric values are numeric). At counterparty level, identity lookup. At upper levels, COUNT(DISTINCT counterparty_id) — number of unique named obligors per organizational segment. Used for reporting clarity and operational reference across all regulatory submissions.\n",
+    "generic_formula": "Lookup counterparty_id from facility_master for each active facility. The numeric counterparty_id serves as proxy for the legal name (string values returned via catalogue metadata). SCD-filtered to current records.\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
@@ -44546,12 +44999,13 @@
       "reference"
     ],
     "regulatory_references": [
-      "Basel III"
+      "FR Y-14Q",
+      "FFIEC 009"
     ],
-    "insight": "Data linkage and drill-down\n",
+    "insight": "Counterparty legal name for reporting and operational reference. At upper levels, unique counterparty count serves as a diversification indicator.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "REF-005",
     "normalized_de_name": "Counterparty Name",
     "data_element_in_dm": "legal_name",
@@ -44571,19 +45025,55 @@
         "dashboard_display_name": "Counterparty Name (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = 1",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. COMPUTE\n   metric_value = fm.counterparty_id",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
             "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
             "table": "counterparty",
             "field": "legal_name",
-            "description": "legal_name"
+            "description": "Counterparty legal name from credit agreement"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44596,28 +45086,70 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  1 AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\nWHERE fm.is_active_flag = 'Y'"
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  fm.counterparty_id AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Counterparty Name (counterparty)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "sourcing_type": "Raw",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. COMPUTE\n   metric_value = cp.counterparty_id",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
             "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
             "table": "counterparty",
             "field": "legal_name",
-            "description": "legal_name"
+            "description": "Counterparty legal name from credit agreement"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44630,28 +45162,70 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  COUNT(DISTINCT fac.facility_id) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id,\n    cp.counterparty_id\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  cp.counterparty_id AS dimension_key,\n  cp.counterparty_id AS metric_value\nFROM l2.counterparty cp\nWHERE cp.is_current_flag = 'Y'\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Counterparty Name (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fm.counterparty_id)",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
             "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
             "table": "counterparty",
             "field": "legal_name",
-            "description": "legal_name"
+            "description": "Counterparty legal name from credit agreement"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44664,28 +45238,70 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fac.facility_id) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id,\n    cp.counterparty_id\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.counterparty_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Counterparty Name (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fm.counterparty_id)",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
             "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
             "table": "counterparty",
             "field": "legal_name",
-            "description": "legal_name"
+            "description": "Counterparty legal name from credit agreement"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44698,28 +45314,70 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fac.facility_id) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id,\n    cp.counterparty_id\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.counterparty_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Counterparty Name (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (cp)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fac.facility_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = COUNT(DISTINCT fm.counterparty_id)",
         "source_references": [
           {
             "layer": "L2",
-            "table": "counterparty",
+            "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
             "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
             "table": "counterparty",
             "field": "legal_name",
-            "description": "legal_name"
+            "description": "Counterparty legal name from credit agreement"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
           },
           {
             "layer": "L1",
@@ -44732,9 +45390,15 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fac.facility_id) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id,\n    cp.counterparty_id\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty cp\n    ON cp.counterparty_id = fm.counterparty_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.counterparty_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -45015,10 +45679,10 @@
   {
     "item_id": "MET-017",
     "item_name": "Country",
-    "abbreviation": "C",
+    "abbreviation": "CTY",
     "kind": "METRIC",
-    "definition": "Country of risk or booking location. Supports geographic concentration and sovereign risk analysis.\n",
-    "generic_formula": "Direct lookup of country_name from country_dim.\n",
+    "definition": "Country of risk derived from the counterparty's domicile. At facility level, returns a numeric country identifier (via counterparty → country_dim join path). At counterparty level, identity lookup. At desk/portfolio/segment levels, COUNT(DISTINCT country_code) — geographic diversification indicator showing the number of unique countries represented. Supports FFIEC 009 Country Exposure Report and Basel III geographic concentration analysis.\n",
+    "generic_formula": "Lookup country for each facility via counterparty → country_dim join path. Returns counterparty_id as numeric proxy (country_name resolved at display time via dimension join). SCD-filtered to current records.\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
@@ -45027,12 +45691,14 @@
       "reference"
     ],
     "regulatory_references": [
-      "Basel III"
+      "FFIEC 009",
+      "Basel III Section CRE",
+      "FR Y-14Q Schedule H.2"
     ],
-    "insight": "Geographic risk concentration\n",
+    "insight": "Country of risk for geographic concentration analysis. At upper levels, unique country count indicates portfolio diversification. Low counts may signal geographic concentration risk requiring FFIEC 009 attention.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "REF-006",
     "normalized_de_name": "Country",
     "data_element_in_dm": "country_name",
@@ -45052,19 +45718,67 @@
         "dashboard_display_name": "Country (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l1.country_dim  (cd)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = cd.country_name",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. JOIN  l1.country_dim  (cd)\n   ON    cd.country_code = cp.country_code\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. COMPUTE\n   metric_value = fm.counterparty_id",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "country_code",
+            "description": "ISO 3166-1 alpha-2 code, FK to country_dim"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
+          },
           {
             "layer": "L1",
             "table": "country_dim",
-            "field": "facility_id",
-            "description": "facility_id"
+            "field": "country_code",
+            "description": "PK — ISO 3166-1 alpha-2 country code"
           },
           {
             "layer": "L1",
             "table": "country_dim",
             "field": "country_name",
-            "description": "country_name"
+            "description": "Human-readable country name for display"
           },
           {
             "layer": "L1",
@@ -45077,28 +45791,82 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  cd.country_name AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l1.country_dim cd\n  ON cd.facility_id = fm.facility_id\nWHERE fm.is_active_flag = 'Y'\n"
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  fm.counterparty_id AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nINNER JOIN l1.country_dim cd\n  ON cd.country_code = cp.country_code\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Country (counterparty)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l1.country_dim  (cd)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. COMPUTE\n   metric_value = cd.country_name",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. JOIN  l1.country_dim  (cd)\n   ON    cd.country_code = cp.country_code\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. COMPUTE\n   metric_value = cp.counterparty_id",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "country_code",
+            "description": "ISO 3166-1 alpha-2 code, FK to country_dim"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
+          },
           {
             "layer": "L1",
             "table": "country_dim",
-            "field": "facility_id",
-            "description": "facility_id"
+            "field": "country_code",
+            "description": "PK — ISO 3166-1 alpha-2 country code"
           },
           {
             "layer": "L1",
             "table": "country_dim",
             "field": "country_name",
-            "description": "country_name"
+            "description": "Human-readable country name for display"
           },
           {
             "layer": "L1",
@@ -45111,28 +45879,82 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  cd.country_name AS metric_value\nFROM l1.country_dim cd\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = cd.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE cd.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  cp.counterparty_id AS dimension_key,\n  cp.counterparty_id AS metric_value\nFROM l2.counterparty cp\nINNER JOIN l1.country_dim cd\n  ON cd.country_code = cp.country_code\nWHERE cp.is_current_flag = 'Y'\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Country (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l1.country_dim  (cd)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. JOIN  l1.country_dim  (cd)\n   ON    cd.country_code = cp.country_code\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = COUNT(DISTINCT cp.country_code)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "country_code",
+            "description": "ISO 3166-1 alpha-2 code, FK to country_dim"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
+          },
           {
             "layer": "L1",
             "table": "country_dim",
-            "field": "facility_id",
-            "description": "facility_id"
+            "field": "country_code",
+            "description": "PK — ISO 3166-1 alpha-2 country code"
           },
           {
             "layer": "L1",
             "table": "country_dim",
             "field": "country_name",
-            "description": "country_name"
+            "description": "Human-readable country name for display"
           },
           {
             "layer": "L1",
@@ -45145,28 +45967,82 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    cd.country_name AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l1.country_dim cd\n    ON cd.facility_id = fm.facility_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT cp.country_code) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Country (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l1.country_dim  (cd)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. JOIN  l1.country_dim  (cd)\n   ON    cd.country_code = cp.country_code\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = COUNT(DISTINCT cp.country_code)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "country_code",
+            "description": "ISO 3166-1 alpha-2 code, FK to country_dim"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
+          },
           {
             "layer": "L1",
             "table": "country_dim",
-            "field": "facility_id",
-            "description": "facility_id"
+            "field": "country_code",
+            "description": "PK — ISO 3166-1 alpha-2 country code"
           },
           {
             "layer": "L1",
             "table": "country_dim",
             "field": "country_name",
-            "description": "country_name"
+            "description": "Human-readable country name for display"
           },
           {
             "layer": "L1",
@@ -45179,28 +46055,82 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    cd.country_name AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l1.country_dim cd\n    ON cd.facility_id = fm.facility_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT cp.country_code) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Country (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l1.country_dim  (cd)\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n   AND   fm.is_current_flag = 'Y'\n2. JOIN  l2.counterparty  (cp)\n   ON    cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'\n3. JOIN  l1.country_dim  (cd)\n   ON    cd.country_code = cp.country_code\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = COUNT(DISTINCT cp.country_code)",
         "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current facility record"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "country_code",
+            "description": "ISO 3166-1 alpha-2 code, FK to country_dim"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current counterparty record"
+          },
           {
             "layer": "L1",
             "table": "country_dim",
-            "field": "facility_id",
-            "description": "facility_id"
+            "field": "country_code",
+            "description": "PK — ISO 3166-1 alpha-2 country code"
           },
           {
             "layer": "L1",
             "table": "country_dim",
             "field": "country_name",
-            "description": "country_name"
+            "description": "Human-readable country name for display"
           },
           {
             "layer": "L1",
@@ -45213,9 +46143,15 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    cd.country_name AS metric_value\n  FROM l2.facility_master fm\n  INNER JOIN l1.country_dim cd\n    ON cd.facility_id = fm.facility_id\n  WHERE fm.is_active_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT cp.country_code) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty cp\n  ON cp.counterparty_id = fm.counterparty_id\n  AND cp.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {

@@ -1,171 +1,196 @@
-metric_id: REF-005
-name: Counterparty Name
-version: 1.0.0
-owner: credit-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Counterparty Name
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "REF-005"
+name: "Counterparty Name"
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: reference
-sub_domain: master-data
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "reference"
+sub_domain: "master-data"
 metric_class: SOURCED
 direction: NEUTRAL
-unit_type: COUNT
-display_format: ',.0f'
-description: |
-  Descriptive name of the counterparty as documented in the credit agreement. Used for reporting clarity and operational reference.
+unit_type: ORDINAL
+display_format: ",.0f"
+description: >
+  Legal name of the counterparty as documented in the credit agreement.
+  At facility level, returns the counterparty_id (numeric proxy for the name
+  since metric values are numeric). At counterparty level, identity lookup.
+  At upper levels, COUNT(DISTINCT counterparty_id) — number of unique named
+  obligors per organizational segment. Used for reporting clarity and
+  operational reference across all regulatory submissions.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "FR Y-14Q"
+    description: "Counterparty legal name for regulatory reporting schedules"
+  - framework: "FFIEC 009"
+    description: "Country Exposure Report — counterparty name identification"
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l2
-  table: counterparty
-  alias: cp
-  join_type: BASE
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: legal_name
-    role: MEASURE
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current facility record"
+  - schema: l2
+    table: counterparty
+    alias: cp
+    join_type: INNER
+    join_on: "cp.counterparty_id = fm.counterparty_id AND cp.is_current_flag = 'Y'"
+    fields:
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: legal_name
+        role: MEASURE
+        description: "Counterparty legal name from credit agreement"
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current counterparty record"
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current taxonomy record"
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
-    formula_text: |
-      Read legal_name from counterparty for each facility's counterparty.
-    formula_sql: |-
+    formula_text: >
+      Lookup counterparty_id from facility_master for each active facility.
+      The numeric counterparty_id serves as proxy for the legal name (string
+      values returned via catalogue metadata). SCD-filtered to current records.
+    formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,
-        1 AS metric_value
+        fm.counterparty_id AS metric_value
       FROM l2.facility_master fm
       INNER JOIN l2.counterparty cp
         ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
   counterparty:
-    aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with counterparty name per counterparty.
-    formula_sql: |-
+    aggregation_type: RAW
+    formula_text: >
+      Identity — returns counterparty_id for each current counterparty.
+      Legal name resolved via counterparty dimension join at display time.
+    formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id,
-          cp.counterparty_id
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+        cp.counterparty_id AS dimension_key,
+        cp.counterparty_id AS metric_value
+      FROM l2.counterparty cp
+      WHERE cp.is_current_flag = 'Y'
   desk:
     aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with counterparty name per L3 desk segment.
-    formula_sql: |-
+    formula_text: >
+      COUNT(DISTINCT counterparty_id) per L3 desk segment — number of unique
+      named obligors in each desk.
+    formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id,
-          cp.counterparty_id
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.counterparty_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with counterparty name per L2 portfolio segment.
-    formula_sql: |-
+    formula_text: >
+      COUNT(DISTINCT counterparty_id) per L2 portfolio segment — number of
+      unique named obligors in each portfolio.
+    formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id,
-          cp.counterparty_id
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.counterparty_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with counterparty name per L1 business segment.
-    formula_sql: |-
+    formula_text: >
+      COUNT(DISTINCT counterparty_id) per L1 business segment — number of
+      unique named obligors in each business segment.
+    formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id,
-          cp.counterparty_id
-        FROM l2.facility_master fm
-        INNER JOIN l2.counterparty cp
-          ON cp.counterparty_id = fm.counterparty_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.counterparty_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
+        AND cp.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: REF-005-V01
-  type: NOT_NULL
-  description: No null legal_name values
-  severity: ERROR
-- rule_id: REF-005-V02
-  type: NON_NEGATIVE
-  description: legal_name must be >= 0
-  severity: ERROR
+  - rule_id: "REF-005-V01"
+    type: NOT_NULL
+    description: "No null counterparty references for active facilities"
+    severity: ERROR
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-016
-  abbreviation: CN
-  insight: |
-    Data linkage and drill-down
-  rollup_strategy: direct-sum
-  primary_value_field: legal_name
-tags:
-- reference
-- master-data
+  item_id: "MET-016"
+  abbreviation: "CN"
+  insight: >
+    Counterparty legal name for reporting and operational reference. At upper
+    levels, unique counterparty count serves as a diversification indicator.
+  rollup_strategy: "direct-sum"
+  primary_value_field: "legal_name"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["reference", "master-data", "counterparty", "identifier"]
 dashboard_pages: []
 legacy_metric_ids: []

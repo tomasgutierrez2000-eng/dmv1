@@ -24,6 +24,7 @@
     "hooks:install": "cp scripts/pre-commit-release-tracker.sh $(git rev-parse --git-path hooks)/pre-commit",
     "db:export": "bash scripts/export-mvp-sql.sh",
     "db:export-downloads": "tsx scripts/export-db-to-downloads.ts",
+    "db:export-ddl": "tsx scripts/export-ddl-only.ts",
     "db:load-gsib": "tsx scripts/load-gsib-export.ts",
     "db:load-gsib-fresh": "tsx scripts/load-gsib-fresh.ts",
     "db:verify-gsib": "tsx scripts/verify-gsib-load.ts",

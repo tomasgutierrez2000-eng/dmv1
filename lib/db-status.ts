@@ -69,7 +69,7 @@ const ROW_COUNTS_QUERY = `
 
 const COLUMNS_QUERY = `
   SELECT table_schema, table_name, column_name, data_type,
-         character_maximum_length, numeric_precision, numeric_scale
+         character_maximum_length, numeric_precision, numeric_scale, udt_name
   FROM information_schema.columns
   WHERE table_schema IN ('l1', 'l2', 'l3')
   ORDER BY table_schema, table_name, ordinal_position
@@ -128,7 +128,7 @@ function flattenDd(dd: DataDictionary) {
 }
 
 /** Format a PostgreSQL information_schema type into a comparable display string. */
-function formatPgColumnType(row: { data_type: string; character_maximum_length?: number | null; numeric_precision?: number | null; numeric_scale?: number | null }): string {
+function formatPgColumnType(row: { data_type: string; character_maximum_length?: number | null; numeric_precision?: number | null; numeric_scale?: number | null; udt_name?: string }): string {
   const dt = row.data_type?.toUpperCase() ?? '';
   if (dt === 'CHARACTER VARYING' || dt === 'VARCHAR') {
     return row.character_maximum_length ? `VARCHAR(${row.character_maximum_length})` : 'VARCHAR';
@@ -147,6 +147,9 @@ function formatPgColumnType(row: { data_type: string; character_maximum_length?:
   if (dt === 'DATE') return 'DATE';
   if (dt === 'TEXT') return 'TEXT';
   if (dt.includes('TIMESTAMP')) return 'TIMESTAMP';
+  if (dt === 'ARRAY' && row.udt_name) {
+    return `${row.udt_name.replace(/^_/, '')}[]`;
+  }
   return dt || 'UNKNOWN';
 }
 

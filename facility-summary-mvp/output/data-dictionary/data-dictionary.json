@@ -3947,7 +3947,7 @@
           "description": "Credit adjustment spread (bps)",
           "category": "Market Data",
           "why_required": "ISDA fallback spread",
-          "data_type": "NUMERIC(10,4)"
+          "data_type": "NUMERIC(8,2)"
         },
         {
           "name": "fallback_to_index_id",
@@ -8621,7 +8621,7 @@
           "category": "Position Core",
           "why_required": "MUST BE SOURCE SYSTEM INPUT — Loss Given Default from credit risk model (e.g., downturn LGD model). Requires collateral recovery assumptions, seniority, jurisdiction-specific recovery data not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
-          "data_type": "NUMERIC(10,6)"
+          "data_type": "VARCHAR(100)"
         },
         {
           "name": "market_value_amt",
@@ -8650,7 +8650,7 @@
           "category": "Position Core",
           "why_required": "MUST BE SOURCE SYSTEM INPUT — PIT Probability of Default from credit risk model (e.g., Moody's RiskCalc, internal IRB model). Cannot be re-derived without underlying obligor financials, market data, and model calibration.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
-          "data_type": "NUMERIC(10,6)"
+          "data_type": "VARCHAR(100)"
         },
         {
           "name": "position_currency",
@@ -8895,7 +8895,7 @@
           "category": "Position Detail",
           "why_required": "MUST BE SOURCE SYSTEM INPUT — SA-CCR Potential Future Exposure from risk engine. Requires supervisory factors, hedging set decomposition, delta adjustments not available in this data model.",
           "simplification_note": "SOURCE SYSTEM REQUIRED.",
-          "data_type": "NUMERIC(20,4)"
+          "data_type": "VARCHAR(100)"
         },
         {
           "name": "quantity",
@@ -8938,7 +8938,7 @@
           "description": "Contractual spread over index (bps)",
           "category": "Position Detail",
           "why_required": "Spread analysis (Page 7)",
-          "data_type": "NUMERIC(10,4)"
+          "data_type": "NUMERIC(8,2)"
         },
         {
           "name": "total_commitment",
@@ -8959,7 +8959,7 @@
           "description": "Unrealized gain/loss",
           "category": "Position Detail",
           "why_required": "P&L impact",
-          "data_type": "NUMERIC(20,4)"
+          "data_type": "VARCHAR(100)"
         },
         {
           "name": "product_node_id",
@@ -10196,7 +10196,7 @@
           "description": "Contractual spread in basis points",
           "category": "Financial Metrics",
           "why_required": "Spread analysis (Page 7)",
-          "data_type": "NUMERIC(10,4)"
+          "data_type": "NUMERIC(10,2)"
         },
         {
           "name": "rate_index_id",
@@ -10261,7 +10261,7 @@
           "description": "Minimum spread threshold (bps) from policy",
           "category": "Financial Metrics",
           "why_required": "Below-threshold analysis (Page 7)",
-          "data_type": "NUMERIC(10,4)"
+          "data_type": "NUMERIC(8,2)"
         },
         {
           "name": "payment_frequency",
@@ -11761,7 +11761,7 @@
           "description": "Expected tenor in months",
           "category": "Deal Pipeline",
           "why_required": "Deal tenor analysis",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "facility_id",
@@ -12768,6 +12768,11 @@
           "name": "raw_record_id",
           "description": "",
           "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "net_income_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
         }
       ]
     },
@@ -12943,6 +12948,11 @@
           "name": "raw_record_id",
           "description": "",
           "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "total_assets_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
         }
       ]
     },
@@ -14403,20 +14413,6 @@
               "layer": "L2",
               "table": "legal_entity",
               "field": "legal_entity_id"
-            }
-          }
-        },
-        {
-          "name": "org_unit_id",
-          "description": "Desk/organizational unit attribution — enables Facility→Desk referential chain",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": false,
-            "is_composite": false,
-            "fk_target": {
-              "layer": "L1",
-              "table": "org_unit_dim",
-              "field": "org_unit_id"
             }
           }
         },
@@ -18559,101 +18555,6 @@
           "data_type": "VARCHAR(100)"
         }
       ]
-    },
-    {
-      "name": "cash_flow",
-      "layer": "L2",
-      "category": "Payments",
-      "fields": [
-        {
-          "name": "cash_flow_id",
-          "description": "Cash flow event identifier",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "facility_id",
-          "description": "FK to facility_master",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_fk": true,
-            "fk_target": {
-              "layer": "L2",
-              "table": "facility_master",
-              "field": "facility_id"
-            }
-          }
-        },
-        {
-          "name": "counterparty_id",
-          "description": "FK to counterparty",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_fk": true,
-            "fk_target": {
-              "layer": "L2",
-              "table": "counterparty",
-              "field": "counterparty_id"
-            }
-          }
-        },
-        {
-          "name": "cash_flow_date",
-          "description": "Date of the cash flow event",
-          "data_type": "DATE"
-        },
-        {
-          "name": "cash_flow_type",
-          "description": "Type of cash flow (e.g., PRINCIPAL, INTEREST, FEE)",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "amount",
-          "description": "Cash flow amount",
-          "data_type": "NUMERIC(20,4)"
-        },
-        {
-          "name": "currency_code",
-          "description": "ISO currency code",
-          "data_type": "VARCHAR(20)",
-          "pk_fk": {
-            "is_fk": true,
-            "fk_target": {
-              "layer": "L1",
-              "table": "currency_dim",
-              "field": "currency_code"
-            }
-          }
-        },
-        {
-          "name": "as_of_date",
-          "description": "Snapshot date",
-          "data_type": "DATE"
-        },
-        {
-          "name": "flow_direction",
-          "description": "Direction of flow (INFLOW/OUTFLOW)",
-          "data_type": "VARCHAR(20)"
-        },
-        {
-          "name": "flow_type",
-          "description": "Detailed flow type classification",
-          "data_type": "VARCHAR(30)"
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "updated_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        }
-      ]
     }
   ],
   "L3": [
@@ -18838,106 +18739,6 @@
               "field": "rating_change_status_code"
             }
           }
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "updated_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "created_by",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "record_source",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "load_timestamp",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "load_batch_id",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "run_id",
-          "description": "",
-          "data_type": "VARCHAR(64)"
-        },
-        {
-          "name": "model_version",
-          "description": "",
-          "data_type": "VARCHAR(64)"
-        }
-      ]
-    },
-    {
-      "name": "data_quality_score_calc",
-      "layer": "L3",
-      "category": "Data Quality",
-      "fields": [
-        {
-          "name": "table_name",
-          "description": "",
-          "data_type": "VARCHAR(100)",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "as_of_date",
-          "description": "",
-          "data_type": "DATE",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": true
-          }
-        },
-        {
-          "name": "completeness_score_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "accuracy_score_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "timeliness_score_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "overall_dq_score_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "total_row_count",
-          "description": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "null_field_count",
-          "description": "",
-          "data_type": "INTEGER"
-        },
-        {
-          "name": "anomaly_count",
-          "description": "",
-          "data_type": "INTEGER"
         },
         {
           "name": "created_ts",
@@ -19601,107 +19402,6 @@
           "name": "balance_change_pct",
           "description": "",
           "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "created_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "updated_ts",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "created_by",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "record_source",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "load_timestamp",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "load_batch_id",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "run_id",
-          "description": "",
-          "data_type": "VARCHAR(64)"
-        },
-        {
-          "name": "model_version",
-          "description": "",
-          "data_type": "VARCHAR(64)"
-        }
-      ]
-    },
-    {
-      "name": "stress_test_result_calc",
-      "layer": "L3",
-      "category": "Stress Testing",
-      "fields": [
-        {
-          "name": "stress_test_result_id",
-          "description": "",
-          "data_type": "BIGINT",
-          "pk_fk": {
-            "is_pk": true,
-            "is_composite": false
-          }
-        },
-        {
-          "name": "position_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "facility_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "counterparty_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "scenario_id",
-          "description": "",
-          "data_type": "BIGINT"
-        },
-        {
-          "name": "as_of_date",
-          "description": "",
-          "data_type": "DATE"
-        },
-        {
-          "name": "stressed_exposure_amt",
-          "description": "",
-          "data_type": "NUMERIC(20,4)"
-        },
-        {
-          "name": "stressed_expected_loss",
-          "description": "",
-          "data_type": "NUMERIC(20,4)"
-        },
-        {
-          "name": "capital_impact_pct",
-          "description": "",
-          "data_type": "NUMERIC(10,6)"
-        },
-        {
-          "name": "currency_code",
-          "description": "",
-          "data_type": "VARCHAR(30)"
         },
         {
           "name": "created_ts",
@@ -22719,7 +22419,7 @@
           "name": "rank_within_entity",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "is_top_counterparty_flag",
@@ -23688,7 +23388,7 @@
           "name": "avg_expected_coverage_ratio",
           "description": "",
           "why_required": "",
-          "data_type": "NUMERIC(10,6)"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "created_ts",
@@ -24620,7 +24320,7 @@
           "name": "counterparty_count_change",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "total_utilized_exposure_amt",
@@ -24638,7 +24338,7 @@
           "name": "risk_score",
           "description": "",
           "why_required": "",
-          "data_type": "NUMERIC(10,4)"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "base_currency_code",
@@ -24854,7 +24554,7 @@
           "name": "total_dq_issues",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "reconciliation_break_count",
@@ -25207,7 +24907,7 @@
           "name": "total_dq_issues",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "created_ts",
@@ -25897,7 +25597,7 @@
           "name": "amendment_aging_days",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "created_ts",
@@ -26059,13 +25759,13 @@
           "name": "days_remaining",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "facility_duration_days",
           "description": "",
           "why_required": "",
-          "data_type": "INTEGER"
+          "data_type": "VARCHAR(255)"
         },
         {
           "name": "status_code",
@@ -26182,7 +25882,7 @@
         {
           "name": "is_deteriorated",
           "description": "",
-          "data_type": "BOOLEAN"
+          "data_type": "VARCHAR(64)"
         },
         {
           "name": "risk_rating_tier_code",
@@ -31265,6 +30965,207 @@
           "name": "updated_ts",
           "description": "",
           "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "data_quality_score_snapshot",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "table_name",
+          "description": "",
+          "data_type": "VARCHAR(100)",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": true
+          }
+        },
+        {
+          "name": "completeness_score_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "accuracy_score_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "timeliness_score_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "overall_dq_score_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "total_row_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "null_field_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "anomaly_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "run_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "model_version",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        }
+      ]
+    },
+    {
+      "name": "stress_test_result",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "stress_test_result_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "scenario_id",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "stressed_exposure_amt",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "stressed_expected_loss",
+          "description": "",
+          "data_type": "NUMERIC(20,4)"
+        },
+        {
+          "name": "capital_impact_pct",
+          "description": "",
+          "data_type": "NUMERIC(10,6)"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "run_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "model_version",
+          "description": "",
+          "data_type": "VARCHAR(64)"
         }
       ]
     }

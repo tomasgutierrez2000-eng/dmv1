@@ -1004,6 +1004,28 @@ const RATING_TYPES = ['TTC', 'ISSUER', 'TTC', 'LT_ISSUER', 'PIT', 'LT_ISSUER', '
 function ratingAgency(idx: number): string { return RATING_AGENCIES[(fid(idx) - 1 + cycle(idx)) % RATING_AGENCIES.length]; }
 function ratingType(idx: number): string { return RATING_TYPES[(fid(idx) - 1 + cycle(idx)) % RATING_TYPES.length]; }
 function isInternal(idx: number): boolean { return ratingAgency(idx) === 'INTERNAL'; }
+
+/** Compute rating change steps between prior and current cycle.
+ *  Steps = prior_migration_offset - current_migration_offset.
+ *  Positive = upgrade (better rating), negative = downgrade (worse). */
+function ratingChangeSteps(idx: number): number {
+  const f = fid(idx) - 1;
+  if (f >= 10) {
+    const arc = arcOf(idx);
+    const c = cycle(idx);
+    const currentMigration = RATING_MIGRATION[arc][c];
+    const priorMigration = c > 0 ? RATING_MIGRATION[arc][c - 1] : 0;
+    // migration > 0 = worse rating. So steps = -(current - prior)
+    return -(currentMigration - priorMigration);
+  }
+  // For base 10 facilities, use a deterministic pattern
+  const rng = mulberry32(idx * 31 + 7);
+  const r = rng();
+  if (r < 0.12) return r < 0.04 ? 2 : 1;   // 12% upgrades
+  if (r < 0.25) return r < 0.17 ? -1 : -2;  // 13% downgrades
+  return 0;  // 75% stable
+}
+
 function priorRating(idx: number): string {
   const f = fid(idx) - 1;
   // Prior is one notch above current
@@ -1542,6 +1564,17 @@ export function getL2SeedValue(
       if (columnName === 'rating_date') return eventDate(idx);
       if (columnName === 'rating_type') return ratingType(idx);
       if (columnName === 'rating_value') return isInt ? intRating(idx) : extRating(idx);
+      if (columnName === 'risk_rating_change_steps') {
+        if (!isInt) return undefined;
+        return String(ratingChangeSteps(idx));
+      }
+      if (columnName === 'risk_rating_status') {
+        if (!isInt) return undefined;
+        const steps = ratingChangeSteps(idx);
+        if (steps > 0) return 'Upgrade';
+        if (steps < 0) return 'Downgrade';
+        return 'Stable';
+      }
       break;
     }
 

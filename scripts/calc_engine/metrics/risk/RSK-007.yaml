@@ -200,7 +200,7 @@ validations:
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-074"
-  abbreviation: "RRSI"
+  abbreviation: "RRCS"
   insight: >
     Magnitude of credit quality changes — numerical notch movement
     (positive=upgrade, negative=downgrade). Aggregate levels compute

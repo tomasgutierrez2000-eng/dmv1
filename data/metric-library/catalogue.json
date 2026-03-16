@@ -66269,8 +66269,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "risk_rating_status_1",
-            "risk_rating_status": "risk_rating_status_1"
+            "metric_value": "Stable",
+            "risk_rating_status": "Upgrade"
           }
         },
         {
@@ -66323,8 +66323,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "risk_rating_status_12",
-            "risk_rating_status": "risk_rating_status_2"
+            "metric_value": "Stable"
           }
         },
         {
@@ -66377,8 +66376,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "risk_rating_status_23",
-            "risk_rating_status": "risk_rating_status_3"
+            "metric_value": "Stable",
+            "risk_rating_status": "Stable"
           }
         },
         {
@@ -66431,8 +66430,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "risk_rating_status_14",
-            "risk_rating_status": "risk_rating_status_4"
+            "metric_value": "Stable"
           }
         },
         {
@@ -66485,7 +66483,7 @@
             }
           ],
           "extra_fields": {
-            "risk_rating_status": "risk_rating_status_5"
+            "risk_rating_status": "Downgrade"
           }
         }
       ]
@@ -66494,7 +66492,7 @@
   {
     "item_id": "MET-074",
     "item_name": "Risk Rating Status - Internal Change - Steps (e.g. 1 to 3 = -3 steps)",
-    "abbreviation": "RRSI",
+    "abbreviation": "RRCS",
     "kind": "METRIC",
     "definition": "Numerical representation of internal risk rating migration expressed in notch movement. Positive values indicate upgrades (e.g. rating 3 to 1 = +2 steps), negative values indicate downgrades (e.g. rating 5 to 8 = -3 steps), zero indicates stable. At facility/counterparty level, reads the pre-computed risk_rating_change_steps from the internal rating observation. At aggregate levels (desk, portfolio, business segment), computes the rounded average of counterparty-level change steps — each counterparty counted once per segment to avoid facility-count bias. Quantifies magnitude of credit migration for portfolio-level trend analysis and stress testing.\n",
     "generic_formula": "Read risk_rating_change_steps from internal counterparty_rating_observation. Each facility inherits its counterparty's internal rating change magnitude.\n",
@@ -66880,6 +66878,60 @@
     "demo_data": {
       "facilities": [
         {
+          "facility_id": "F-1",
+          "facility_name": "Meridian Aerospace — USD Revolver 2027",
+          "counterparty_id": "CP-1",
+          "counterparty_name": "Meridian Aerospace Holdings Inc.",
+          "lob_segment_id": "SEG-1",
+          "desk_name": "Unknown",
+          "portfolio_name": "Unknown",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 250000000,
+          "collateral_value": 252000000,
+          "ltv_pct": 99.21,
+          "positions": [
+            {
+              "position_id": "P-1",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 120000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-11",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 130000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-21",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 125000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-31",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 110000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-41",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 115000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "risk_rating_change_steps": 2
+          }
+        },
+        {
           "facility_id": "F-2",
           "facility_name": "Northbridge Pharma — Term Loan B",
           "counterparty_id": "CP-2",
@@ -66929,170 +66981,113 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 12,
-            "risk_rating_change_steps": 2
+            "metric_value": 0
           }
         },
         {
-          "facility_id": "F-3",
-          "facility_name": "Pacific Ridge — Multi-Currency RCF",
-          "counterparty_id": "CP-3",
-          "counterparty_name": "Pacific Ridge Energy LLC",
-          "lob_segment_id": "SEG-3",
-          "desk_name": "Global Corporate Coverage Desk",
+          "facility_id": "F-4",
+          "facility_name": "Silverton Financial — Bridge Facility",
+          "counterparty_id": "CP-4",
+          "counterparty_name": "Silverton Financial Group",
+          "lob_segment_id": "SEG-4",
+          "desk_name": "Domestic Large-Cap Corporates Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1000000000,
-          "collateral_value": 425566666,
-          "ltv_pct": 234.98,
+          "committed_amt": 2500000000,
+          "collateral_value": 1028000000,
+          "ltv_pct": 243.19,
           "positions": [
             {
-              "position_id": "P-3",
-              "facility_id": "F-3",
+              "position_id": "P-4",
+              "facility_id": "F-4",
               "product_code": "LOAN",
-              "balance_amount": 800000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-13",
-              "facility_id": "F-3",
+              "position_id": "P-14",
+              "facility_id": "F-4",
               "product_code": "LOAN",
-              "balance_amount": 820000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-23",
-              "facility_id": "F-3",
+              "position_id": "P-24",
+              "facility_id": "F-4",
               "product_code": "LOAN",
-              "balance_amount": 780000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-33",
-              "facility_id": "F-3",
+              "position_id": "P-34",
+              "facility_id": "F-4",
               "product_code": "LOAN",
-              "balance_amount": 750000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-43",
-              "facility_id": "F-3",
+              "position_id": "P-44",
+              "facility_id": "F-4",
               "product_code": "LOAN",
-              "balance_amount": 790000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 3,
-            "risk_rating_change_steps": 3
+            "metric_value": 0
           }
         },
         {
-          "facility_id": "F-6",
-          "facility_name": "Greenfield Consumer — Syndicated RCF",
-          "counterparty_id": "CP-6",
-          "counterparty_name": "Greenfield Consumer Brands Inc.",
-          "lob_segment_id": "SEG-6",
-          "desk_name": "Public Company Coverage Desk",
-          "portfolio_name": "Large Corporate Banking",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 1500000000,
-          "collateral_value": 2283000000,
-          "ltv_pct": 65.7,
-          "positions": [
-            {
-              "position_id": "P-6",
-              "facility_id": "F-6",
-              "product_code": "LOAN",
-              "balance_amount": 1200000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-16",
-              "facility_id": "F-6",
-              "product_code": "LOAN",
-              "balance_amount": 1180000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-26",
-              "facility_id": "F-6",
-              "product_code": "LOAN",
-              "balance_amount": 1220000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-36",
-              "facility_id": "F-6",
-              "product_code": "LOAN",
-              "balance_amount": 1150000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-46",
-              "facility_id": "F-6",
-              "product_code": "LOAN",
-              "balance_amount": 1190000000,
-              "description": "Position exposure"
-            }
-          ],
-          "extra_fields": {
-            "metric_value": 16,
-            "risk_rating_change_steps": 6
-          }
-        },
-        {
-          "facility_id": "F-9",
-          "facility_name": "Ironclad Infrastructure — Global Revolver",
-          "counterparty_id": "CP-9",
-          "counterparty_name": "Ironclad Infrastructure Partners LP",
-          "lob_segment_id": "SEG-9",
-          "desk_name": "Upper Middle Market Desk",
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
+          "desk_name": "Unknown",
           "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 600000000,
-          "collateral_value": 558066666,
-          "ltv_pct": 107.51,
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
           "positions": [
             {
-              "position_id": "P-9",
-              "facility_id": "F-9",
+              "position_id": "P-8",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 600000000,
+              "balance_amount": 90000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-19",
-              "facility_id": "F-9",
+              "position_id": "P-18",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 580000000,
+              "balance_amount": 95000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-29",
-              "facility_id": "F-9",
+              "position_id": "P-28",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 620000000,
+              "balance_amount": 100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-39",
-              "facility_id": "F-9",
+              "position_id": "P-38",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 560000000,
+              "balance_amount": 85000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-49",
-              "facility_id": "F-9",
+              "position_id": "P-48",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 590000000,
+              "balance_amount": 80000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 9,
-            "risk_rating_change_steps": 9
+            "metric_value": 0
           }
         },
         {
@@ -67145,8 +67140,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 20,
-            "risk_rating_change_steps": 10
+            "metric_value": 0
           }
         }
       ]

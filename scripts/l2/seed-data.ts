@@ -1209,6 +1209,11 @@ export function getL2SeedValue(
         if (util >= 75) return 'ELEVATED';
         return 'NO_BREACH';
       }
+      if (columnName === 'days_until_maturity') {
+        // Realistic maturity: 90 to 3650 days (3 months to 10 years)
+        const maturityDays = [365, 730, 1095, 1825, 365, 180, 2555, 3650, 90, 547];
+        return maturityDays[idx];
+      }
       break;
     }
 
@@ -1380,6 +1385,11 @@ export function getL2SeedValue(
       if (columnName === 'is_prepayment_penalty_flag') return fid(idx) % 3 === 0 ? 'Y' : 'N';
       if (columnName === 'rate_cap_pct') return pick([12.00, 10.00, 12.00, 10.00, 14.00, 9.00, 12.00, 10.00, 12.00, 8.00], fid(idx) - 1);
       if (columnName === 'rate_index_code') return pick(['SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR', 'SOFR', 'EURIBOR', 'SOFR', 'SONIA', 'SOFR'], fid(idx) - 1);
+      if (columnName === 'is_pricing_exception_flag') return idx % 5 === 0 ? 'Y' : 'N';
+      if (columnName === 'pricing_exception_status') {
+        const statuses = [null, null, 'APPROVED', null, null, 'PENDING', null, null, 'DENIED', null];
+        return statuses[idx];
+      }
       break;
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1395,10 +1405,28 @@ export function getL2SeedValue(
       if (columnName === 'allocated_equity_amt') return Math.round(d * 0.08);
       if (columnName === 'avg_earning_assets_amt') return d;
       if (columnName === 'base_currency_code') return 'USD';
+      if (columnName === 'currency_code') return 'USD';
       if (columnName === 'fee_income_amt') return feeYtd(idx);
       if (columnName === 'interest_expense_amt') return Math.round(niiYtd(idx) * 0.6);
       if (columnName === 'interest_income_amt') return Math.round(niiYtd(idx) * 1.6);
       if (columnName === 'profitability_snapshot_id') return i;
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // PAYMENT_LEDGER
+    // ═══════════════════════════════════════════════════════════════════
+    case 'payment_ledger': {
+      const paymentAmounts = [25000, 50000, 75000, 100000, 150000, 200000, 250000, 300000, 350000, 400000];
+      if (columnName === 'payment_ledger_id') return i;
+      if (columnName === 'facility_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'payment_due_date') return '2025-01-15';
+      if (columnName === 'payment_received_date') return idx % 3 === 0 ? '2025-01-20' : '2025-01-14';
+      if (columnName === 'payment_amount_due') return paymentAmounts[idx];
+      if (columnName === 'payment_applied_amt') return paymentAmounts[idx];
+      if (columnName === 'currency_code') return 'USD';
+      if (columnName === 'counterparty_id') return cid(idx);
       break;
     }
 

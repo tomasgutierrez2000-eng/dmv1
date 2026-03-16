@@ -128,12 +128,23 @@ CREATE TABLE IF NOT EXISTS l1.internal_risk_rating_bucket_dim (
   is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
 );
 
+CREATE TABLE IF NOT EXISTS l1.risk_rating_tier_dim (
+  tier_code VARCHAR(20) NOT NULL PRIMARY KEY,
+  tier_name VARCHAR(200),
+  pd_min_pct NUMERIC(10,6),
+  pd_max_pct NUMERIC(10,6),
+  display_order INTEGER,
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
+);
+
 CREATE TABLE IF NOT EXISTS l1.pricing_tier_dim (
   pricing_tier_code VARCHAR(20) NOT NULL PRIMARY KEY,
   tier_name VARCHAR(200),
   tier_ordinal INTEGER,
   display_order INTEGER,
-  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
+  spread_min_bps NUMERIC(10,4),
+  spread_max_bps NUMERIC(10,4)
 );
 
 CREATE TABLE IF NOT EXISTS l1.maturity_bucket_dim (
@@ -1151,6 +1162,7 @@ CREATE TABLE IF NOT EXISTS l1.limit_rule (
   effective_from_date DATE,
   effective_to_date DATE,
   inner_threshold_pct DECIMAL(10,4),
+  is_current_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
   limit_amount_usd DECIMAL(18,2),
   limit_scope VARCHAR(30),
   limit_type VARCHAR(30),
@@ -1490,13 +1502,4 @@ CREATE TABLE IF NOT EXISTS l1.pipeline_stage_dim (
   stage_order INTEGER,
   is_active CHAR(1) DEFAULT 'Y',
   description VARCHAR(500)
-);
-
-CREATE TABLE IF NOT EXISTS l1.utilization_status_dim (
-  utilization_status_code VARCHAR(20) NOT NULL PRIMARY KEY,
-  status_name VARCHAR(200),
-  utilization_min_pct DECIMAL(10,6),
-  utilization_max_pct DECIMAL(10,6),
-  display_order INTEGER,
-  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y'
 );

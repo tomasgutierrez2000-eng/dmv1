@@ -557,6 +557,44 @@
       "nullable": false
     }
   },
+  "L1.risk_rating_tier_dim": {
+    "tier_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "tier_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pd_min_pct": {
+      "type": "NUMERIC(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "pd_max_pct": {
+      "type": "NUMERIC(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "display_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
+  },
   "L1.pricing_tier_dim": {
     "pricing_tier_code": {
       "type": "VARCHAR(20)",
@@ -587,6 +625,18 @@
       "pk": false,
       "fk": null,
       "nullable": false
+    },
+    "spread_min_bps": {
+      "type": "NUMERIC(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "spread_max_bps": {
+      "type": "NUMERIC(10,4)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L1.maturity_bucket_dim": {
@@ -665,13 +715,13 @@
       "nullable": true
     },
     "utilization_min_pct": {
-      "type": "DECIMAL(10,6)",
+      "type": "NUMERIC(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
     "utilization_max_pct": {
-      "type": "DECIMAL(10,6)",
+      "type": "NUMERIC(10,6)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -687,6 +737,24 @@
       "pk": false,
       "fk": null,
       "nullable": false
+    },
+    "is_current_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L1.fr2590_category_dim": {
@@ -4603,6 +4671,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "is_current_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
     },
     "limit_amount_usd": {
       "type": "DECIMAL(18,2)",

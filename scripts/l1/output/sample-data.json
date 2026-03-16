@@ -1370,84 +1370,198 @@
       ]
     ]
   },
+  "L1.risk_rating_tier_dim": {
+    "columns": [
+      "tier_code",
+      "tier_name",
+      "pd_min_pct",
+      "pd_max_pct",
+      "display_order",
+      "is_active_flag"
+    ],
+    "rows": [
+      [
+        "AAA",
+        "Prime",
+        0,
+        0.0002,
+        1,
+        "Y"
+      ],
+      [
+        "AA",
+        "High Grade",
+        0.0002,
+        0.001,
+        2,
+        "Y"
+      ],
+      [
+        "A",
+        "Upper Medium",
+        0.001,
+        0.005,
+        3,
+        "Y"
+      ],
+      [
+        "BBB",
+        "Lower Medium",
+        0.005,
+        0.02,
+        4,
+        "Y"
+      ],
+      [
+        "BB",
+        "Non-Investment Speculative",
+        0.02,
+        0.05,
+        5,
+        "Y"
+      ],
+      [
+        "B",
+        "Highly Speculative",
+        0.05,
+        0.1,
+        6,
+        "Y"
+      ],
+      [
+        "CCC",
+        "Substantial Risk",
+        0.1,
+        0.2,
+        7,
+        "Y"
+      ],
+      [
+        "CC",
+        "Extremely Speculative",
+        0.2,
+        0.35,
+        8,
+        "Y"
+      ],
+      [
+        "C",
+        "Default Imminent",
+        0.35,
+        0.5,
+        9,
+        "Y"
+      ],
+      [
+        "D",
+        "In Default",
+        0.5,
+        100.5,
+        10,
+        "Y"
+      ]
+    ]
+  },
   "L1.pricing_tier_dim": {
     "columns": [
       "pricing_tier_code",
       "tier_name",
       "tier_ordinal",
       "display_order",
-      "is_active_flag"
+      "is_active_flag",
+      "spread_min_bps",
+      "spread_max_bps"
     ],
     "rows": [
       [
-        "pricing_tier_dim_1",
-        "tier_name_1",
+        "T1",
+        "Ultra Prime",
         1,
         1,
-        "Y"
+        "Y",
+        0,
+        25
       ],
       [
-        "pricing_tier_dim_2",
-        "tier_name_2",
+        "T2",
+        "Prime",
         2,
         2,
-        "N"
+        "Y",
+        25,
+        50
       ],
       [
-        "pricing_tier_dim_3",
-        "tier_name_3",
+        "T3",
+        "Near Prime",
         3,
         3,
-        "Y"
+        "Y",
+        50,
+        100
       ],
       [
-        "pricing_tier_dim_4",
-        "tier_name_4",
+        "T4",
+        "Standard",
         4,
         4,
-        "N"
+        "Y",
+        100,
+        150
       ],
       [
-        "pricing_tier_dim_5",
-        "tier_name_5",
+        "T5",
+        "Standard Plus",
         5,
         5,
-        "Y"
+        "Y",
+        150,
+        250
       ],
       [
-        "pricing_tier_dim_6",
-        "tier_name_6",
+        "T6",
+        "Sub-Standard",
         6,
         6,
-        "N"
+        "Y",
+        250,
+        400
       ],
       [
-        "pricing_tier_dim_7",
-        "tier_name_7",
+        "T7",
+        "High Yield",
         7,
         7,
-        "Y"
+        "Y",
+        400,
+        600
       ],
       [
-        "pricing_tier_dim_8",
-        "tier_name_8",
+        "T8",
+        "Distressed",
         8,
         8,
-        "N"
+        "Y",
+        600,
+        900
       ],
       [
-        "pricing_tier_dim_9",
-        "tier_name_9",
+        "T9",
+        "Deep Discount",
         9,
         9,
-        "Y"
+        "Y",
+        900,
+        1200
       ],
       [
-        "pricing_tier_dim_10",
-        "tier_name_10",
+        "T10",
+        "Workout",
         10,
         10,
-        "N"
+        "Y",
+        1200,
+        9999
       ]
     ]
   },
@@ -1594,7 +1708,10 @@
       "utilization_min_pct",
       "utilization_max_pct",
       "display_order",
-      "is_active_flag"
+      "is_active_flag",
+      "is_current_flag",
+      "created_ts",
+      "updated_ts"
     ],
     "rows": [
       [
@@ -1603,7 +1720,10 @@
         0,
         74.99,
         1,
-        "Y"
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         "ELEVATED",
@@ -1611,7 +1731,10 @@
         75,
         89.99,
         2,
-        "Y"
+        "Y",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         "WARNING",
@@ -1619,7 +1742,10 @@
         90,
         99.99,
         3,
-        "Y"
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         "FULLY_UTILIZED",
@@ -1627,7 +1753,10 @@
         100,
         100,
         4,
-        "Y"
+        "Y",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         "BREACH",
@@ -1635,7 +1764,10 @@
         100.01,
         999,
         5,
-        "Y"
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         null,
@@ -1643,7 +1775,10 @@
         null,
         null,
         6,
-        "Y"
+        "Y",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         null,
@@ -1651,7 +1786,10 @@
         null,
         null,
         7,
-        "Y"
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         null,
@@ -1659,7 +1797,10 @@
         null,
         null,
         8,
-        "Y"
+        "Y",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         null,
@@ -1667,7 +1808,10 @@
         null,
         null,
         9,
-        "Y"
+        "Y",
+        "Y",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ],
       [
         null,
@@ -1675,7 +1819,10 @@
         null,
         null,
         10,
-        "Y"
+        "Y",
+        "N",
+        "2024-06-15T00:00:00.000Z",
+        "2024-06-15 12:00:00"
       ]
     ]
   },
@@ -16725,6 +16872,7 @@
       "effective_from_date",
       "effective_to_date",
       "inner_threshold_pct",
+      "is_current_flag",
       "limit_amount_usd",
       "limit_scope",
       "limit_type",
@@ -16744,6 +16892,7 @@
         "2024-01-01",
         "9999-12-31",
         80,
+        "Y",
         5000000000,
         "COUNTERPARTY",
         "HARD",
@@ -16762,6 +16911,7 @@
         "2024-01-01",
         "9999-12-31",
         75,
+        "Y",
         25000000000,
         "SECTOR",
         "HARD",
@@ -16780,6 +16930,7 @@
         "2024-01-01",
         "9999-12-31",
         80,
+        "Y",
         15000000000,
         "COUNTRY",
         "HARD",
@@ -16798,6 +16949,7 @@
         "2024-01-01",
         "9999-12-31",
         85,
+        "Y",
         10000000000,
         "PRODUCT",
         "HARD",
@@ -16816,6 +16968,7 @@
         "2024-01-01",
         "9999-12-31",
         75,
+        "Y",
         20000000000,
         "MATURITY",
         "HARD",
@@ -16834,6 +16987,7 @@
         "2024-01-01",
         "9999-12-31",
         80,
+        "Y",
         8000000000,
         "CURRENCY",
         "HARD",
@@ -16852,6 +17006,7 @@
         "2024-01-01",
         "9999-12-31",
         70,
+        "Y",
         12000000000,
         "SECTOR",
         "HARD",
@@ -16870,6 +17025,7 @@
         "2024-01-01",
         "9999-12-31",
         75,
+        "Y",
         18000000000,
         "ASSET_CLASS",
         "HARD",
@@ -16888,6 +17044,7 @@
         "2024-01-01",
         "9999-12-31",
         80,
+        "Y",
         7000000000,
         "SECTOR",
         "HARD",
@@ -16906,6 +17063,7 @@
         "2024-01-01",
         "9999-12-31",
         85,
+        "Y",
         6000000000,
         "COLLATERAL",
         "HARD",

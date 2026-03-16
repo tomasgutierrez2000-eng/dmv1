@@ -126,6 +126,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   bank_share_pct NUMERIC(10,4),
   total_collateral_mv_usd NUMERIC(18,2),
   limit_status_code VARCHAR(50),
+  days_until_maturity INTEGER,
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_exposure_snapshot_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
@@ -269,6 +270,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_pricing_snapshot (
   rate_cap_pct NUMERIC(10,4),
   rate_index_code VARCHAR(20),
   is_pricing_exception_flag CHAR(1),
+  pricing_exception_status VARCHAR(64),
   fee_rate_pct NUMERIC(10,6),
   cost_of_funds_pct NUMERIC(10,6),
   PRIMARY KEY (facility_id, as_of_date),
@@ -285,6 +287,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_profitability_snapshot (
   allocated_equity_amt NUMERIC(18,2),
   avg_earning_assets_amt NUMERIC(18,2),
   base_currency_code VARCHAR(20),
+  currency_code VARCHAR(20),
   fee_income_amt NUMERIC(18,2),
   interest_expense_amt NUMERIC(18,2),
   interest_income_amt NUMERIC(18,2),
@@ -292,6 +295,19 @@ CREATE TABLE IF NOT EXISTS l2.facility_profitability_snapshot (
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_profitability_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_profitability_snapshot_ledger_account_id FOREIGN KEY (ledger_account_id) REFERENCES l1.ledger_account_dim(ledger_account_id)
+);
+
+CREATE TABLE IF NOT EXISTS l2.payment_ledger (
+  payment_ledger_id BIGINT NOT NULL PRIMARY KEY,
+  facility_id BIGINT NOT NULL,
+  as_of_date DATE NOT NULL,
+  payment_due_date DATE,
+  payment_received_date DATE,
+  payment_amount_due NUMERIC(18,2),
+  payment_applied_amt NUMERIC(18,2),
+  currency_code VARCHAR(20),
+  counterparty_id BIGINT,
+  CONSTRAINT fk_payment_ledger_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.limit_contribution_snapshot (

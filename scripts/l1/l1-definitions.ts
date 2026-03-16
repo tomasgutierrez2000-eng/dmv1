@@ -168,6 +168,18 @@ export const L1_TABLES: TableDef[] = [
     ],
   },
   {
+    tableName: 'risk_rating_tier_dim',
+    scd: 'SCD-0',
+    columns: [
+      { name: 'tier_code', type: 'VARCHAR(20)', nullable: false, pk: true },
+      { name: 'tier_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'pd_min_pct', type: 'NUMERIC(10,6)', nullable: true },
+      { name: 'pd_max_pct', type: 'NUMERIC(10,6)', nullable: true },
+      { name: 'display_order', type: 'INTEGER', nullable: true },
+      { name: 'is_active_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
+    ],
+  },
+  {
     tableName: 'pricing_tier_dim',
     scd: 'SCD-0',
     columns: [
@@ -176,6 +188,8 @@ export const L1_TABLES: TableDef[] = [
       { name: 'tier_ordinal', type: 'INTEGER', nullable: true },
       { name: 'display_order', type: 'INTEGER', nullable: true },
       { name: 'is_active_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
+      { name: 'spread_min_bps', type: 'NUMERIC(10,4)', nullable: true },
+      { name: 'spread_max_bps', type: 'NUMERIC(10,4)', nullable: true },
     ],
   },
   {
@@ -1165,6 +1179,7 @@ export const L1_TABLES: TableDef[] = [
       { name: 'effective_from_date', type: 'DATE', nullable: true },
       { name: 'effective_to_date', type: 'DATE', nullable: true },
       { name: 'inner_threshold_pct', type: 'DECIMAL(10,4)', nullable: true },
+      { name: 'is_current_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
       { name: 'limit_amount_usd', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'limit_scope', type: 'VARCHAR(30)', nullable: true },
       { name: 'limit_type', type: 'VARCHAR(30)', nullable: true },
@@ -1499,18 +1514,6 @@ export const L1_TABLES: TableDef[] = [
       { name: 'stage_order', type: 'INTEGER', nullable: true },
       { name: 'is_active', type: 'CHAR(1)', nullable: true, default: "'Y'" },
       { name: 'description', type: 'VARCHAR(500)', nullable: true },
-    ],
-  },
-  {
-    tableName: 'utilization_status_dim',
-    scd: 'SCD-0',
-    columns: [
-      { name: 'utilization_status_code', type: 'VARCHAR(20)', nullable: false, pk: true },
-      { name: 'status_name', type: 'VARCHAR(200)', nullable: true },
-      { name: 'utilization_min_pct', type: 'DECIMAL(10,6)', nullable: true },
-      { name: 'utilization_max_pct', type: 'DECIMAL(10,6)', nullable: true },
-      { name: 'display_order', type: 'INTEGER', nullable: true },
-      { name: 'is_active_flag', type: 'CHAR(1)', nullable: false, default: "'Y'" },
     ],
   },
 ];

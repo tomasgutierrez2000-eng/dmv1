@@ -13,10 +13,10 @@ export function getTableKeysForMetric(metric: L3Metric, dimension: CalculationDi
   const resolved = resolveFormulaForDimension(metric, dimension, { allowLegacyFallback: true });
   const sql = resolved?.formulaSQL ?? '';
   if (sql) {
-    const re = /\b(L[12])\.(\w+)/g;
+    const re = /\b(l[12])\.(\w+)/gi;
     let m: RegExpExecArray | null;
     while ((m = re.exec(sql)) !== null) {
-      keys.add(`${m[1]}.${m[2]}`);
+      keys.add(`${m[1].toUpperCase()}.${m[2]}`);
     }
   }
 

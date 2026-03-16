@@ -42,7 +42,7 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: delinquent_payment_flag
+      - name: is_delinquent_payment_flag
         role: MEASURE
         description: "Delinquency indicator — 'Y' if any payment past due"
   - schema: l2
@@ -83,7 +83,7 @@ levels:
     formula_sql: |
       SELECT
         fds.facility_id AS dimension_key,
-        CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END AS metric_value
+        CASE WHEN fds.is_delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
@@ -97,7 +97,7 @@ levels:
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+        SUM(CASE WHEN fds.is_delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
@@ -112,7 +112,7 @@ levels:
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+        SUM(CASE WHEN fds.is_delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
@@ -130,7 +130,7 @@ levels:
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+        SUM(CASE WHEN fds.is_delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
@@ -151,7 +151,7 @@ levels:
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+        SUM(CASE WHEN fds.is_delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
@@ -205,7 +205,7 @@ catalogue:
     Portfolio credit stress indicator — flags facilities with any past-due
     payment for immediate attention.
   rollup_strategy: "direct-sum"
-  primary_value_field: "delinquent_payment_flag"
+  primary_value_field: "is_delinquent_payment_flag"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["exposure", "risk-metrics", "delinquency", "credit-quality"]
 dashboard_pages: ["P7"]

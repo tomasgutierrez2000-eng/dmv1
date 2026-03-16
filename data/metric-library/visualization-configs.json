@@ -3599,13 +3599,13 @@
   "MET-025": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "delinquent_payment_flag"
+      "primary_value": "is_delinquent_payment_flag"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "delinquent_payment_flag",
+          "field": "is_delinquent_payment_flag",
           "label": "Delinquency indicator — 'Y' if any payment past due",
           "sample_value": 0,
           "source_table": "facility_delinquency_snapshot",
@@ -3618,8 +3618,8 @@
     },
     "worked_example_columns": [
       {
-        "field": "delinquent_payment_flag",
-        "header": "Delinquent Payment Flag",
+        "field": "is_delinquent_payment_flag",
+        "header": "Is Delinquent Payment Flag",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -3646,7 +3646,7 @@
               "description": "as_of_date"
             },
             {
-              "name": "delinquent_payment_flag",
+              "name": "is_delinquent_payment_flag",
               "role": "MEASURE",
               "description": "Delinquency indicator — 'Y' if any payment past due"
             }
@@ -18217,7 +18217,7 @@
           "table_name": "risk_rating_tier_dim",
           "layer": "L1",
           "join_type": "LEFT",
-          "join_on": "c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true",
+          "join_on": "c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = 'Y'",
           "fields": [
             {
               "name": "tier_code",
@@ -18240,9 +18240,9 @@
               "description": "display_order"
             },
             {
-              "name": "active_flag",
+              "name": "is_active_flag",
               "role": "FILTER",
-              "description": "active_flag"
+              "description": "is_active_flag"
             }
           ],
           "purpose": "Provides display order"

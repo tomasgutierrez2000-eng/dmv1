@@ -3039,6 +3039,37 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
     }
 
+    /* ──────────── risk_rating_tier_dim ──────────── */
+    case 'risk_rating_tier_dim': {
+      const tierCodes = ['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC', 'CC', 'C', 'D'];
+      const tierNames = ['Prime', 'High Grade', 'Upper Medium', 'Lower Medium', 'Non-Investment Speculative', 'Highly Speculative', 'Substantial Risk', 'Extremely Speculative', 'Default Imminent', 'In Default'];
+      const pdMins = [0, 0.0002, 0.001, 0.005, 0.02, 0.05, 0.10, 0.20, 0.35, 0.50];
+      const pdMaxs = [0.0002, 0.001, 0.005, 0.02, 0.05, 0.10, 0.20, 0.35, 0.50, null];
+      if (columnName === 'tier_code') return tierCodes[idx];
+      if (columnName === 'tier_name') return tierNames[idx];
+      if (columnName === 'pd_min_pct') return pdMins[idx];
+      if (columnName === 'pd_max_pct') return pdMaxs[idx] ?? null;
+      if (columnName === 'display_order') return idx + 1;
+      if (columnName === 'is_active_flag') return 'Y';
+      break;
+    }
+
+    /* ──────────── pricing_tier_dim ──────────── */
+    case 'pricing_tier_dim': {
+      const ptCodes = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'];
+      const ptNames = ['Ultra Prime', 'Prime', 'Near Prime', 'Standard', 'Standard Plus', 'Sub-Standard', 'High Yield', 'Distressed', 'Deep Discount', 'Workout'];
+      const spreadMins = [0, 25, 50, 100, 150, 250, 400, 600, 900, 1200];
+      const spreadMaxs = [25, 50, 100, 150, 250, 400, 600, 900, 1200, 9999];
+      if (columnName === 'pricing_tier_code') return ptCodes[idx];
+      if (columnName === 'tier_name') return ptNames[idx];
+      if (columnName === 'tier_ordinal') return idx + 1;
+      if (columnName === 'display_order') return idx + 1;
+      if (columnName === 'is_active_flag') return 'Y';
+      if (columnName === 'spread_min_bps') return spreadMins[idx];
+      if (columnName === 'spread_max_bps') return spreadMaxs[idx];
+      break;
+    }
+
     /* ──────────── limit_rule ──────────── */
     case 'limit_rule': {
       const limitRuleCodes = ['LR-SN-001', 'LR-SC-002', 'LR-CY-003', 'LR-PD-004', 'LR-MT-005', 'LR-FX-006', 'LR-LL-007', 'LR-CRE-008', 'LR-FIG-009', 'LR-UN-010'];
@@ -3062,6 +3093,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'outer_threshold_pct') return outerThresholds[idx];
       if (columnName === 'risk_tier') return riskTiers[idx];
       if (columnName === 'is_active_flag') return 'Y';
+      if (columnName === 'is_current_flag') return 'Y';
       break;
     }
 

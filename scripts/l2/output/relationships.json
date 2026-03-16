@@ -459,6 +459,23 @@
     "relationshipType": "primary"
   },
   {
+    "id": "L2.payment_ledger.facility_id->L2.facility_master.facility_id",
+    "source": {
+      "layer": "L2",
+      "table": "payment_ledger",
+      "field": "facility_id",
+      "tableKey": "L2.payment_ledger"
+    },
+    "target": {
+      "layer": "L2",
+      "table": "facility_master",
+      "field": "facility_id",
+      "tableKey": "L2.facility_master"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
     "id": "L2.limit_contribution_snapshot.limit_rule_id->L1.limit_rule.limit_rule_id",
     "source": {
       "layer": "L2",

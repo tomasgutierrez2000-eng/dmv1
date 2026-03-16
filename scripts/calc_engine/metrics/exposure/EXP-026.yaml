@@ -7,9 +7,9 @@ metric_id: "EXP-026"
 name: "Loan to Value Ratio (%)"
 version: "1.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: DEPRECATED
 effective_date: "2026-01-01"
-supersedes: null
+supersedes: "RSK-009"
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "exposure"
 sub_domain: "risk-metrics"

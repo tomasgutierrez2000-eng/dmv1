@@ -1608,29 +1608,105 @@
       "numerator": [
         {
           "op": "*",
-          "field": "net_income_amt",
-          "label": "net_income_amt",
+          "field": "noi_amt",
+          "label": "noi_amt",
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "interest_expense_amt",
+          "label": "interest_expense_amt",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "pd_pct",
+          "label": "pd_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "lgd_pct",
+          "label": "lgd_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "Revenue – Interest Expense – Operating Cost – EL\n"
+      "formula_display": "Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). All sourced from L2 atomic tables.\n"
     },
     "worked_example_columns": [
+      {
+        "field": "noi_amt",
+        "header": "Noi ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "interest_expense_amt",
+        "header": "Interest Expense ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "pd_pct",
+        "header": "Pd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "lgd_pct",
+        "header": "Lgd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
       {
         "field": "net_income_amt",
         "header": "Net Income ($)",
         "format": "currency",
-        "subtotal_fn": "sum",
-        "is_result": true
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
   "MET-061": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "nim_pct"
     },
@@ -1641,29 +1717,29 @@
           "field": "interest_income_amt",
           "label": "interest_income_amt",
           "sample_value": 0,
-          "source_table": "facility_financial_calc",
-          "source_layer": "L3"
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
         },
         {
           "op": "*",
           "field": "interest_expense_amt",
           "label": "interest_expense_amt",
           "sample_value": 0,
-          "source_table": "facility_financial_calc",
-          "source_layer": "L3"
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
         },
         {
           "op": "*",
           "field": "avg_earning_assets_amt",
           "label": "avg_earning_assets_amt",
           "sample_value": 0,
-          "source_table": "facility_financial_calc",
-          "source_layer": "L3"
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "(Interest Income - Interst Expense)/Average Earning Assets\n"
+      "formula_display": "(Interest Income - Interest Expense) / Average Earning Assets * 100.\n"
     },
     "worked_example_columns": [
       {
@@ -1707,6 +1783,14 @@
           "sample_value": 0,
           "source_table": "facility_financial_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -1720,6 +1804,12 @@
         "format": "currency",
         "subtotal_fn": "sum",
         "is_result": true
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -3348,7 +3438,7 @@
     ]
   },
   "MET-059": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "nearest-date",
     "metric_fields": {
       "primary_value": "maturity_date"
     },

@@ -5,25 +5,26 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-027"
 name: "Net Income ($)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.1.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "exposure"
-sub_domain: "risk-metrics"
+sub_domain: "profitability"
 metric_class: CALCULATED
 direction: HIGHER_BETTER
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Profit after all expenses in USD. Indicator of borrower profitability and
-  financial sustainability.
+  Net income computed from L2 atomic inputs: NOI (Net Operating Income, which
+  equals Revenue minus Operating Expense) minus Interest Expense minus Expected
+  Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Profitability assessment for credit risk sustainability"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -35,8 +36,12 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: net_income_amt
+      - name: noi_amt
         role: MEASURE
+      - name: interest_expense_amt
+        role: MEASURE
+      - name: currency_code
+        role: DIMENSION
   - schema: l2
     table: facility_master
     alias: fm
@@ -51,6 +56,32 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: facility_risk_snapshot
+    alias: frs
+    join_type: LEFT
+    join_on: "frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date"
+    fields:
+      - name: pd_pct
+        role: MEASURE
+      - name: lgd_pct
+        role: MEASURE
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date"
+    fields:
+      - name: committed_amount
+        role: MEASURE
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -66,100 +97,158 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      Revenue – Interest Expense – Operating Cost – EL
+      Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss
+      (PD × LGD × Committed Amount). All sourced from L2 atomic tables.
     formula_sql: |
       SELECT
         ffs.facility_id AS dimension_key,
-        ffs.net_income_amt AS metric_value
-      FROM l3.facility_financial_calc ffs
+        COALESCE(ffs.noi_amt, 0)
+          - COALESCE(ffs.interest_expense_amt, 0)
+          - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
+            * COALESCE(fes.committed_amount, 0)
+        AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = ffs.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = ffs.facility_id
+        AND frs.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id
+        AND fes.as_of_date = ffs.as_of_date
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level net_income_amt per counterparty.
+      SUM of facility-level net income per counterparty, FX-converted to USD.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.net_income_amt AS metric_value
-        FROM l3.facility_financial_calc ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(ffs.noi_amt, 0)
+           - COALESCE(ffs.interest_expense_amt, 0)
+           - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
+             * COALESCE(fes.committed_amount, 0))
+          * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = ffs.facility_id
+        AND frs.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id
+        AND fes.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level net_income_amt per L3 desk segment.
+      SUM of facility-level net income per L3 desk segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.net_income_amt AS metric_value
-        FROM l3.facility_financial_calc ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(ffs.noi_amt, 0)
+           - COALESCE(ffs.interest_expense_amt, 0)
+           - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
+             * COALESCE(fes.committed_amount, 0))
+          * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = ffs.facility_id
+        AND frs.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id
+        AND fes.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level net_income_amt per L2 portfolio segment.
+      SUM of facility-level net income per L2 portfolio segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.net_income_amt AS metric_value
-        FROM l3.facility_financial_calc ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(ffs.noi_amt, 0)
+           - COALESCE(ffs.interest_expense_amt, 0)
+           - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
+             * COALESCE(fes.committed_amount, 0))
+          * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = ffs.facility_id
+        AND frs.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id
+        AND fes.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level net_income_amt per L1 business segment segment.
+      SUM of facility-level net income per L1 business segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.net_income_amt AS metric_value
-        FROM l3.facility_financial_calc ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(ffs.noi_amt, 0)
+           - COALESCE(ffs.interest_expense_amt, 0)
+           - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
+             * COALESCE(fes.committed_amount, 0))
+          * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = ffs.facility_id
+        AND frs.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id
+        AND fes.as_of_date = ffs.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -170,21 +259,23 @@ output:
 validations:
   - rule_id: "EXP-027-V01"
     type: NOT_NULL
-    description: "No null net_income_amt values"
+    description: "No null net income values"
     severity: ERROR
   - rule_id: "EXP-027-V02"
-    type: NON_NEGATIVE
-    description: "net_income_amt must be >= 0"
-    severity: ERROR
+    type: PERIOD_OVER_PERIOD
+    description: "Net income should not swing more than 50% period-over-period"
+    severity: WARNING
+    params:
+      max_change_pct: 50
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-060"
   abbreviation: "NI"
   insight: >
-    Profitability efficiency
+    Profitability efficiency — NOI minus Interest Expense minus Expected Loss
   rollup_strategy: "direct-sum"
   primary_value_field: "net_income_amt"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "profitability"]
 dashboard_pages: []
 legacy_metric_ids: []

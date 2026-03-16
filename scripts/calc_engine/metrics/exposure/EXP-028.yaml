@@ -1,180 +1,159 @@
-metric_id: EXP-028
-name: Net Interest Margin (%)
-version: 1.0.0
-owner: market-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Net Interest Margin (%)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-028"
+name: "Net Interest Margin (%)"
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: exposure
-sub_domain: risk-metrics
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "profitability"
 metric_class: CALCULATED
-direction: NEUTRAL
+direction: HIGHER_BETTER
 unit_type: PERCENTAGE
-display_format: .2f
-description: |
-  Net Interest Income divided by earning assets. Calculated margin KPI assessing pricing effectiveness and lending profitability.
+display_format: ".2f"
+description: >
+  Net Interest Income divided by Average Earning Assets. Core banking profitability
+  measure assessing pricing effectiveness and lending margin. Sourced from L2
+  facility_profitability_snapshot atomic data.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "Basel III"
+    description: "Profitability and earnings quality assessment"
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l3
-  table: facility_financial_calc
-  alias: fprs
-  join_type: BASE
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: interest_income_amt
-    role: MEASURE
-  - name: interest_expense_amt
-    role: MEASURE
-  - name: avg_earning_assets_amt
-    role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.facility_id = fprs.facility_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: counterparty_id
-    role: DIMENSION
-  - name: lob_segment_id
-    role: DIMENSION
-  - name: is_active_flag
-    role: FILTER
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l2
+    table: facility_profitability_snapshot
+    alias: fps
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: interest_income_amt
+        role: MEASURE
+      - name: interest_expense_amt
+        role: MEASURE
+      - name: avg_earning_assets_amt
+        role: MEASURE
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = fps.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: |
-      (Interest Income - Interst Expense)/Average Earning Assets
-    formula_sql: |-
+    formula_text: >
+      (Interest Income - Interest Expense) / Average Earning Assets * 100.
+    formula_sql: |
       SELECT
-        fprs.facility_id AS dimension_key,
-        (COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0))
-          / NULLIF(fprs.avg_earning_assets_amt, 0) * 100.0 AS metric_value
-      FROM l3.facility_financial_calc fprs
+        fps.facility_id AS dimension_key,
+        (COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
+          / NULLIF(fps.avg_earning_assets_amt, 0) * 100.0 AS metric_value
+      FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fprs.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
-      WHERE fprs.as_of_date = :as_of_date
+      WHERE fps.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
-    formula_text: |
-      SUM(net_interest_income) / SUM(avg_earning_assets) * 100.0 per counterparty.
-    formula_sql: |-
+    formula_text: >
+      SUM(Net Interest Income) / SUM(Avg Earning Assets) * 100 per counterparty.
+      Sum-ratio rollup preserves mathematical consistency.
+    formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
+        CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
+             ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
+                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
         END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
-          fprs.avg_earning_assets_amt AS denominator_val
-        FROM l3.facility_financial_calc fprs
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM
-    formula_text: |
-      SUM(net_interest_income) / SUM(avg_earning_assets) * 100.0 per L3 desk segment.
-    formula_sql: |-
+    formula_text: >
+      SUM(Net Interest Income) / SUM(Avg Earning Assets) * 100 per L3 desk segment.
+    formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
+        CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
+             ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
+                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
         END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
-          fprs.avg_earning_assets_amt AS denominator_val
-        FROM l3.facility_financial_calc fprs
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: CUSTOM
-    formula_text: |
-      SUM(net_interest_income) / SUM(avg_earning_assets) * 100.0 per L2 portfolio segment.
-    formula_sql: |-
+    formula_text: >
+      SUM(Net Interest Income) / SUM(Avg Earning Assets) * 100 per L2 portfolio segment.
+    formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
+        CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
+             ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
+                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
         END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
-          fprs.avg_earning_assets_amt AS denominator_val
-        FROM l3.facility_financial_calc fprs
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: CUSTOM
-    formula_text: |
-      SUM(net_interest_income) / SUM(avg_earning_assets) * 100.0 per L1 business segment.
-    formula_sql: |-
+    formula_text: >
+      SUM(Net Interest Income) / SUM(Avg Earning Assets) * 100 per L1 business segment.
+    formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
+        CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
+             ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
+                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
         END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,
-          fprs.avg_earning_assets_amt AS denominator_val
-        FROM l3.facility_financial_calc fprs
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+      FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -182,24 +161,35 @@ levels:
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: EXP-028-V01
-  type: NOT_NULL
-  description: No null nim_pct values
-  severity: ERROR
+  - rule_id: "EXP-028-V01"
+    type: NOT_NULL
+    description: "No null NIM values"
+    severity: ERROR
+  - rule_id: "EXP-028-V02"
+    type: THRESHOLD
+    description: "NIM typically 0-20%"
+    severity: WARNING
+    params:
+      min: 0
+      max: 20
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-061
-  abbreviation: NIM
-  insight: |
-    Core banking profitability
-  rollup_strategy: weighted-avg
-  primary_value_field: nim_pct
-tags:
-- exposure
-- risk-metrics
+  item_id: "MET-061"
+  abbreviation: "NIM"
+  insight: >
+    Core banking profitability — Net Interest Income as percentage of earning assets
+  rollup_strategy: "sum-ratio"
+  primary_value_field: "nim_pct"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "profitability", "margin"]
 dashboard_pages: []
 legacy_metric_ids: []

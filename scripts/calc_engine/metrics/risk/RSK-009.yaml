@@ -7,7 +7,7 @@ metric_id: "RSK-009"
 name: "Loan-to-Value Ratio (%)"
 version: "1.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -206,6 +206,13 @@ validations:
     type: NON_NEGATIVE
     description: "LTV must be >= 0"
     severity: WARNING
+  - rule_id: "RSK-009-V03"
+    type: THRESHOLD
+    description: "LTV typically 0-500%"
+    severity: WARNING
+    params:
+      min: 0
+      max: 500
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-109"

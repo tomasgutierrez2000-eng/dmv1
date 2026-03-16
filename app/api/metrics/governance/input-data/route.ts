@@ -49,6 +49,65 @@ const MAX_ROWS_CEILING = 200;
 const DEFAULT_MAX_ROWS = 50;
 const QUERY_TIMEOUT_MS = 10_000;
 
+/* ── PG Column Introspection ──────────────────────────────── */
+
+/**
+ * Query information_schema.columns to discover which columns actually
+ * exist in PostgreSQL for a set of tables. Returns a Map keyed by
+ * "schema.table" → Set<column_name>.
+ *
+ * This prevents DD-PG drift from causing "column does not exist" errors
+ * when the Data Dictionary lists columns the PG table doesn't have.
+ */
+async function fetchActualPgColumns(
+  tables: Array<{ schema: string; table: string }>,
+): Promise<Map<string, Set<string>>> {
+  const result = new Map<string, Set<string>>();
+  if (tables.length === 0) return result;
+
+  // Build a single query using IN-lists for all tables at once.
+  // Values are safe: schemas validated against ALLOWED_SCHEMAS,
+  // table names matched by TABLE_RE (alphanumeric + underscore only).
+  const schemas = Array.from(new Set(tables.map(t => t.schema))).filter(s => ALLOWED_SCHEMAS.has(s));
+  const tableNames = Array.from(new Set(tables.map(t => t.table))).filter(t => COL_NAME_RE.test(t));
+  if (schemas.length === 0 || tableNames.length === 0) return result;
+
+  const schemaList = schemas.map(s => `'${s}'`).join(', ');
+  const tableList = tableNames.map(t => `'${t}'`).join(', ');
+
+  const sql = `SELECT table_schema, table_name, column_name
+    FROM information_schema.columns
+    WHERE table_schema IN (${schemaList})
+      AND table_name IN (${tableList})
+    ORDER BY table_schema, table_name, ordinal_position`;
+
+  try {
+    const queryResult = await executeSandboxQuery(
+      sql, {}, { maxRows: 5000, timeoutMs: 5_000 },
+    );
+    for (const row of queryResult.rows) {
+      const key = `${row.table_schema}.${row.table_name}`;
+      if (!result.has(key)) result.set(key, new Set());
+      result.get(key)!.add(String(row.column_name));
+    }
+  } catch {
+    // If introspection fails, return empty map — buildTableQuery
+    // will fall back to DD columns (existing behavior)
+  }
+
+  return result;
+}
+
+/**
+ * Parse a "column X does not exist" error to extract the column name.
+ * Returns the column name or null if the error isn't column-related.
+ */
+function parseColumnNotFoundError(errorMsg: string): string | null {
+  // PostgreSQL error format: column "legal_entity_id" does not exist
+  const match = errorMsg.match(/column "([^"]+)" does not exist/i);
+  return match ? match[1] : null;
+}
+
 /* ── Scope filter mapping ───────────────────────────────────── */
 
 /** Map level → column name that acts as dimension_key at that level */
@@ -69,8 +128,10 @@ function buildScopeClause(
   scopeKey: string,
   table: string,
   ddColumns: DataDictionaryField[],
+  pgColumns?: Set<string>,
 ): { clause: string; params: Record<string, unknown> } | null {
-  const colNames = new Set(ddColumns.map(c => c.name));
+  // Use PG columns when available (prevents WHERE on non-existent columns)
+  const colNames = pgColumns ?? new Set(ddColumns.map(c => c.name));
 
   if (scopeLevel === 'facility') {
     if (colNames.has('facility_id')) {
@@ -286,36 +347,48 @@ function buildTableQuery(
   asOfDate: string,
   scope: { dimension_key: string; level: string } | undefined,
   maxRows: number,
+  pgColumns?: Set<string>,
 ): { sql: string; params: Record<string, unknown> } {
   // Decide which columns to select
   const allDDColNames = table.allDDColumns.map(c => c.name);
+
+  // Filter DD columns against actual PG columns when available.
+  // This prevents "column X does not exist" errors from DD-PG drift.
+  const verifiedColNames = pgColumns
+    ? allDDColNames.filter(c => pgColumns.has(c))
+    : allDDColNames;
+
   let selectedCols: string[];
 
   if (table.ingredientColumns.length > 0 || table.formulaRefColumns.length > 0) {
     // Build curated column list: PK + formula refs + ingredient fields + FKs
     const colSet = new Set<string>();
-    for (const pk of table.pkColumns) colSet.add(pk);
+    for (const pk of table.pkColumns) {
+      if (!pgColumns || pgColumns.has(pk)) colSet.add(pk);
+    }
     for (const col of table.formulaRefColumns) {
-      if (allDDColNames.includes(col)) colSet.add(col);
+      if (verifiedColNames.includes(col)) colSet.add(col);
     }
     for (const col of table.ingredientColumns) {
-      if (allDDColNames.includes(col)) colSet.add(col);
+      if (verifiedColNames.includes(col)) colSet.add(col);
     }
-    // Add FK columns for traceability
+    // Add FK columns for traceability — only if they exist in PG
     for (const f of table.allDDColumns) {
-      if (f.pk_fk?.fk_target && !f.pk_fk?.is_pk) colSet.add(f.name);
+      if (f.pk_fk?.fk_target && !f.pk_fk?.is_pk) {
+        if (!pgColumns || pgColumns.has(f.name)) colSet.add(f.name);
+      }
     }
-    // If very few columns, just select all (more useful for small tables)
-    if (colSet.size < 3 && allDDColNames.length <= 20) {
-      selectedCols = allDDColNames;
+    // If very few columns, select all verified columns (more useful for small tables)
+    if (colSet.size < 3 && verifiedColNames.length <= 20) {
+      selectedCols = verifiedColNames;
     } else {
-      selectedCols = allDDColNames.filter(c => colSet.has(c));
+      selectedCols = verifiedColNames.filter(c => colSet.has(c));
     }
   } else {
-    // No ingredient info — select all (capped by DD columns)
-    selectedCols = allDDColNames.length <= 30
-      ? allDDColNames
-      : allDDColNames.slice(0, 30);
+    // No ingredient info — select all verified columns (capped)
+    selectedCols = verifiedColNames.length <= 30
+      ? verifiedColNames
+      : verifiedColNames.slice(0, 30);
   }
 
   // Validate column names
@@ -328,15 +401,15 @@ function buildTableQuery(
   const whereClauses: string[] = [];
   const params: Record<string, unknown> = {};
 
-  // Filter by as_of_date if table has that column
-  if (table.hasAsOfDate) {
+  // Filter by as_of_date if table has that column (verify it exists in PG)
+  if (table.hasAsOfDate && (!pgColumns || pgColumns.has('as_of_date'))) {
     whereClauses.push('as_of_date = :as_of_date');
     params.as_of_date = asOfDate;
   }
 
   // Scope filtering
   if (scope) {
-    const scopeClause = buildScopeClause(scope.level, scope.dimension_key, table.table, table.allDDColumns);
+    const scopeClause = buildScopeClause(scope.level, scope.dimension_key, table.table, table.allDDColumns, pgColumns);
     if (scopeClause) {
       whereClauses.push(scopeClause.clause);
       Object.assign(params, scopeClause.params);
@@ -347,9 +420,11 @@ function buildTableQuery(
     sql += ` WHERE ${whereClauses.join(' AND ')}`;
   }
 
-  // Order by PK for deterministic output
+  // Order by PK for deterministic output — only PKs that exist in PG
   if (table.pkColumns.length > 0) {
-    const validPks = table.pkColumns.filter(c => COL_NAME_RE.test(c));
+    const validPks = table.pkColumns.filter(c =>
+      COL_NAME_RE.test(c) && (!pgColumns || pgColumns.has(c))
+    );
     if (validPks.length > 0) {
       sql += ` ORDER BY ${validPks.join(', ')}`;
     }
@@ -360,12 +435,14 @@ function buildTableQuery(
 
 /* ── Column metadata builder ────────────────────────────────── */
 
-function buildColumnMetadata(table: ResolvedTable): InputColumn[] {
+function buildColumnMetadata(table: ResolvedTable, pgColumns?: Set<string>): InputColumn[] {
   // Build role map from ingredient_fields context
   const highlightSet = new Set([...table.formulaRefColumns, ...table.ingredientColumns]);
 
   return table.allDDColumns
     .filter(f => COL_NAME_RE.test(f.name))
+    // Only include columns that actually exist in PG (when we have that info)
+    .filter(f => !pgColumns || pgColumns.has(f.name))
     .map(f => ({
       name: f.name,
       data_type: f.data_type ?? inferTypeFromName(f.name),
@@ -466,22 +543,56 @@ export async function POST(req: NextRequest) {
     const validTables = tables.filter(t => ALLOWED_SCHEMAS.has(t.schema));
     const maxRows = Math.min(max_rows_per_table ?? DEFAULT_MAX_ROWS, MAX_ROWS_CEILING);
 
-    // Build and execute queries in parallel
-    const queries = validTables.map(t => ({
-      table: t,
-      ...buildTableQuery(t, as_of_date, scope, maxRows),
-    }));
+    // Introspect actual PG columns to prevent DD-PG drift errors.
+    // One batch query for all tables — prevents "column X does not exist".
+    const pgColumnMap = await fetchActualPgColumns(
+      validTables.map(t => ({ schema: t.schema, table: t.table })),
+    );
+
+    // Build and execute queries with verified columns
+    const queries = validTables.map(t => {
+      const pgCols = pgColumnMap.get(`${t.schema}.${t.table}`);
+      return {
+        table: t,
+        pgColumns: pgCols,
+        ...buildTableQuery(t, as_of_date, scope, maxRows, pgCols),
+      };
+    });
+
+    // Execute with retry: if a query fails due to a missing column
+    // (edge case where introspection missed something), retry once
+    // with that column removed.
+    async function executeWithRetry(
+      querySql: string,
+      queryParams: Record<string, unknown>,
+    ): Promise<{ rows: Record<string, unknown>[]; rowCount: number; durationMs: number }> {
+      try {
+        return await executeSandboxQuery(querySql, queryParams, { maxRows, timeoutMs: QUERY_TIMEOUT_MS });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        const badCol = parseColumnNotFoundError(msg);
+        if (badCol) {
+          // Remove the offending column and retry once
+          const colRe = new RegExp(`\\b${badCol}\\b,?\\s*`, 'g');
+          let fixedSql = querySql.replace(colRe, '');
+          // Clean up trailing/leading commas in SELECT list
+          fixedSql = fixedSql.replace(/SELECT\s+,/, 'SELECT ');
+          fixedSql = fixedSql.replace(/,\s+FROM/, ' FROM');
+          return executeSandboxQuery(fixedSql, queryParams, { maxRows, timeoutMs: QUERY_TIMEOUT_MS });
+        }
+        throw err;
+      }
+    }
 
     const results = await Promise.allSettled(
-      queries.map(q =>
-        executeSandboxQuery(q.sql, q.params, { maxRows, timeoutMs: QUERY_TIMEOUT_MS }),
-      ),
+      queries.map(q => executeWithRetry(q.sql, q.params)),
     );
 
     // Assemble response
     const tableResults: InputTableResult[] = results.map((r, i) => {
       const tDef = validTables[i];
-      const columns = buildColumnMetadata(tDef);
+      const pgCols = queries[i].pgColumns;
+      const columns = buildColumnMetadata(tDef, pgCols);
       const highlighted = [...new Set([...tDef.formulaRefColumns, ...tDef.ingredientColumns])];
 
       if (r.status === 'fulfilled') {

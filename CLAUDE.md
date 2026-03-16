@@ -85,6 +85,7 @@ For EACH metric spec, perform these checks:
 - Check for inactive/draft metrics that could be updated instead of creating new
 - Verify ID follows convention: `{DOMAIN}-{NNN}` (e.g., EXP-001, CAP-005, PRC-003)
 - Verify domain/sub_domain, metric_class (SOURCED/CALCULATED/HYBRID), direction (HIGHER_BETTER/LOWER_BETTER/NEUTRAL), unit_type (CURRENCY/PERCENTAGE/RATIO/COUNT/DAYS/ORDINAL)
+- **Abbreviation uniqueness:** Verify the catalogue `abbreviation` is unique across all metrics — duplicate abbreviations (e.g., RSK-006 and RSK-007 both using "RRSI") cause confusion in the UI
 
 **1B. Source Table & Field Validation**
 - For EVERY table in `source_tables`: verify it exists in `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
@@ -217,6 +218,7 @@ SELECT counterparty_id, SUM(fac_value) AS sum_facility_vals FROM facility_vals G
 Verify test data actually exercises the metric:
 - Check if source tables have non-null values for the metric's input fields
 - Check if boolean flags have both TRUE and FALSE values (e.g., PRC-003 Exception Rate returned 0% because seed data had zero exceptions — formula was correct but untestable)
+- **If seed data is sparse or missing for the metric's primary field, add it** — update `scripts/l2/seed-data.ts` with a new helper function and run `npm run generate:l2` to regenerate sample data. Also populate PostgreSQL directly for the production database. A metric with all-NULL values is not "working".
 - Document data limitations explicitly; do not confuse them with formula bugs
 
 **5D. GSIB Risk Sanity Checks**
@@ -273,6 +275,11 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Missing COALESCE | `fes.bank_share_pct / 100` (NULL if missing) | `COALESCE(fes.bank_share_pct, 100.0) / 100.0` |
 | Missing NULLIF | `SUM(x) / SUM(y)` (div-by-zero) | `SUM(x) / NULLIF(SUM(y), 0)` |
 | FX at facility level | `* fx.rate` in facility formula | FX only at aggregate levels; facility stays local currency |
+| Invalid YAML enum | `role: WEIGHT`, `role: LABEL`, `aggregation_type: AVG` | Valid FieldRole: `MEASURE\|DIMENSION\|FILTER\|JOIN_KEY`. Valid AggregationType: `RAW\|SUM\|WEIGHTED_AVG\|COUNT\|COUNT_DISTINCT\|MIN\|MAX\|MEDIAN\|CUSTOM` |
+| Wrong join key for cp-level tables | `cro.facility_id` (doesn't exist) | Tables like `counterparty_rating_observation` have `counterparty_id`, not `facility_id` — join through `fm.counterparty_id = cro.counterparty_id` |
+| Missing bridge table joins | Direct join `fm → rmtd` (no path) | Use full bridge chain: `facility_master → risk_mitigant_link → risk_mitigant_master → risk_mitigant_type_dim` |
+| SUM of categorical values | `SUM(risk_rating_status)` at aggregate | Use CUSTOM aggregation: derive direction from `AVG(change_steps)` via CASE WHEN |
+| Seed data doesn't exercise metric | `risk_rating_change_steps` NULL for 182/183 rows | Populate seed data with realistic distributions (e.g., 12% upgrades, 13% downgrades, 75% stable) before declaring metric "working" |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

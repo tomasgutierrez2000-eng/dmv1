@@ -6404,25 +6404,27 @@
   },
   {
     "item_id": "MET-044",
-    "item_name": "Amendment ID",
-    "abbreviation": "AI",
+    "item_name": "Amendment Rate",
+    "abbreviation": "AMDR",
     "kind": "METRIC",
-    "definition": "Indicator that facility agreement has undergone amendment. Portfolio KPI (% Facilities with Amendments) signals restructuring activity.\n",
-    "generic_formula": "Read amendment_event_id from amendment_event for each facility as-of reporting date.\n",
+    "definition": "Percentage of active facilities that have undergone at least one contractual amendment. At facility level, returns a binary flag (1 = has amendment, 0 = no amendment). At counterparty and aggregate levels, computes the count-ratio: COUNT(amended facilities) / COUNT(total facilities) x 100. High amendment rates may signal portfolio stress, widespread restructuring activity, or covenant relief campaigns.\n",
+    "generic_formula": "For each active facility, check whether any amendment_event records exist via LEFT JOIN. Returns 1 (has amendment) or 0 (no amendment). A facility is considered amended if it has at least one record in the amendment_event table regardless of amendment type or status.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "ORDINAL",
     "direction": "NEUTRAL",
-    "metric_class": "SOURCED",
+    "metric_class": "CALCULATED",
     "domain_ids": [
       "amendments"
     ],
     "regulatory_references": [
-      "Basel III"
+      "OCC 2020-36",
+      "FR Y-14Q",
+      "CCAR"
     ],
-    "insight": "Frequency of contractual changes\n",
+    "insight": "Percentage of active facilities with at least one contractual amendment. Elevated rates may indicate portfolio stress, widespread covenant relief, or restructuring campaigns requiring CRO attention.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "AMD-004",
     "normalized_de_name": "Amendment ID",
     "data_element_in_dm": "amendment_event_id",
@@ -6439,29 +6441,11 @@
     "level_definitions": [
       {
         "level": "facility",
-        "dashboard_display_name": "Amendment ID (facility)",
+        "dashboard_display_name": "Amendment Rate (facility)",
         "in_record": true,
-        "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.amendment_event  (ae)\n   WHERE ae.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ae.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = ae.amendment_event_id",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.amendment_event  (ae)\n   ON    ae.facility_id = fm.facility_id\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n4. GROUP BY fm.facility_id\n5. COMPUTE\n   metric_value = CASE WHEN COUNT(ae.amendment_id) > 0 THEN 1 ELSE 0 END",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "amendment_event_id",
-            "description": "amendment_event_id"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -6487,6 +6471,18 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "amendment_id",
+            "description": "amendment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -6497,35 +6493,23 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
           }
         ],
-        "formula_sql": "SELECT\n  ae.facility_id AS dimension_key,\n  ae.amendment_event_id AS metric_value\nFROM l2.amendment_event ae\nWHERE ae.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  CASE\n    WHEN COUNT(ae.amendment_id) > 0 THEN 1\n    ELSE 0\n  END AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN l2.amendment_event ae\n  ON ae.facility_id = fm.facility_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY fm.facility_id"
       },
       {
         "level": "counterparty",
-        "dashboard_display_name": "Amendment ID (counterparty)",
+        "dashboard_display_name": "Amendment Rate (counterparty)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.amendment_event  (ae)\n   WHERE ae.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ae.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.amendment_event  (ae)\n   ON    ae.facility_id = fm.facility_id\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0)",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "amendment_event_id",
-            "description": "amendment_event_id"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -6551,6 +6535,18 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "amendment_id",
+            "description": "amendment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -6561,35 +6557,23 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ae.facility_id AS dimension_key,\n    ae.amendment_event_id AS metric_value\n  FROM l2.amendment_event ae\n  WHERE ae.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id\n"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(\n    CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END\n  ) * 100.0\n    / NULLIF(COUNT(*), 0) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN (\n  SELECT DISTINCT facility_id\n  FROM l2.amendment_event\n) amended\n  ON amended.facility_id = fm.facility_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
       },
       {
         "level": "desk",
-        "dashboard_display_name": "Amendment ID (desk)",
+        "dashboard_display_name": "Amendment Rate (desk)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.amendment_event  (ae)\n   WHERE ae.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ae.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.amendment_event  (ae)\n   ON    ae.facility_id = fm.facility_id\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0)",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "amendment_event_id",
-            "description": "amendment_event_id"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -6615,6 +6599,18 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "amendment_id",
+            "description": "amendment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -6625,35 +6621,23 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ae.facility_id AS dimension_key,\n    ae.amendment_event_id AS metric_value\n  FROM l2.amendment_event ae\n  WHERE ae.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(\n    CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END\n  ) * 100.0\n    / NULLIF(COUNT(*), 0) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN (\n  SELECT DISTINCT facility_id\n  FROM l2.amendment_event\n) amended\n  ON amended.facility_id = fm.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
-        "dashboard_display_name": "Amendment ID (portfolio)",
+        "dashboard_display_name": "Amendment Rate (portfolio)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.amendment_event  (ae)\n   WHERE ae.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ae.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.amendment_event  (ae)\n   ON    ae.facility_id = fm.facility_id\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0)",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "amendment_event_id",
-            "description": "amendment_event_id"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -6679,6 +6663,18 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "amendment_id",
+            "description": "amendment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -6689,35 +6685,23 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ae.facility_id AS dimension_key,\n    ae.amendment_event_id AS metric_value\n  FROM l2.amendment_event ae\n  WHERE ae.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(\n    CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END\n  ) * 100.0\n    / NULLIF(COUNT(*), 0) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN (\n  SELECT DISTINCT facility_id\n  FROM l2.amendment_event\n) amended\n  ON amended.facility_id = fm.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
-        "dashboard_display_name": "Amendment ID (lob)",
+        "dashboard_display_name": "Amendment Rate (lob)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.amendment_event  (ae)\n   WHERE ae.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ae.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l2.amendment_event  (ae)\n   ON    ae.facility_id = fm.facility_id\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0)",
         "source_references": [
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "as_of_date",
-            "description": "as_of_date"
-          },
-          {
-            "layer": "L2",
-            "table": "amendment_event",
-            "field": "amendment_event_id",
-            "description": "amendment_event_id"
-          },
           {
             "layer": "L2",
             "table": "facility_master",
@@ -6743,6 +6727,18 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "amendment_id",
+            "description": "amendment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "amendment_event",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -6753,281 +6749,139 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ae.facility_id AS dimension_key,\n    ae.amendment_event_id AS metric_value\n  FROM l2.amendment_event ae\n  WHERE ae.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(\n    CASE WHEN amended.facility_id IS NOT NULL THEN 1 ELSE 0 END\n  ) * 100.0\n    / NULLIF(COUNT(*), 0) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN (\n  SELECT DISTINCT facility_id\n  FROM l2.amendment_event\n) amended\n  ON amended.facility_id = fm.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {
       "facilities": [
         {
-          "facility_id": "F-1",
-          "facility_name": "Meridian Aerospace — USD Revolver 2027",
-          "counterparty_id": "CP-1",
-          "counterparty_name": "Meridian Aerospace Holdings Inc.",
-          "lob_segment_id": "SEG-1",
-          "desk_name": "Unknown",
-          "portfolio_name": "Unknown",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 250000000,
-          "collateral_value": 252000000,
-          "ltv_pct": 99.21,
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
           "positions": [
             {
-              "position_id": "P-1",
-              "facility_id": "F-1",
+              "position_id": "P-10",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 120000000,
+              "balance_amount": 2100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-406",
-              "facility_id": "F-1",
+              "position_id": "P-20",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 130000000,
+              "balance_amount": 2050000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-811",
-              "facility_id": "F-1",
+              "position_id": "P-30",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 125000000,
+              "balance_amount": 2150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1216",
-              "facility_id": "F-1",
+              "position_id": "P-40",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 110000000,
+              "balance_amount": 2000000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1621",
-              "facility_id": "F-1",
+              "position_id": "P-50",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 115000000,
+              "balance_amount": 2080000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
             "metric_value": 1,
-            "amendment_event_id": 1
+            "amendment_event_id": 10
           }
         },
         {
-          "facility_id": "F-102",
-          "facility_name": "Zenith — JPY Revolver 2026-A",
-          "counterparty_id": "CP-32",
-          "counterparty_name": "Zenith Health Systems KK",
-          "lob_segment_id": "SEG-102",
-          "desk_name": "Net Asset Value (NAV) Desk",
-          "portfolio_name": "CRE Structured Finance",
+          "facility_id": "F-11",
+          "facility_name": "Apex — USD Revolver 2025-A",
+          "counterparty_id": "CP-11",
+          "counterparty_name": "Apex Cloud Technologies Inc.",
+          "lob_segment_id": "SEG-11",
+          "desk_name": "Regional Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 846861680,
-          "collateral_value": 864928063,
-          "ltv_pct": 97.91,
-          "positions": [
-            {
-              "position_id": "P-102",
-              "facility_id": "F-102",
-              "product_code": "LOAN",
-              "balance_amount": 406493606,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-507",
-              "facility_id": "F-102",
-              "product_code": "LOAN",
-              "balance_amount": 423430840,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-912",
-              "facility_id": "F-102",
-              "product_code": "LOAN",
-              "balance_amount": 414962223,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1317",
-              "facility_id": "F-102",
-              "product_code": "LOAN",
-              "balance_amount": 398024990,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1722",
-              "facility_id": "F-102",
-              "product_code": "LOAN",
-              "balance_amount": 406493606,
-              "description": "Position exposure"
-            }
-          ],
+          "committed_amt": 414487067,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
           "extra_fields": {
-            "metric_value": 102,
-            "amendment_event_id": 102
+            "metric_value": 0
           }
         },
         {
-          "facility_id": "F-203",
-          "facility_name": "Summit Defense — USD TL-B 2026-C",
-          "counterparty_id": "CP-58",
-          "counterparty_name": "Summit Defense Systems Inc.",
-          "lob_segment_id": "SEG-203",
-          "desk_name": "Government-Insured Mortgage Desk",
-          "portfolio_name": "Residential Mortgages",
+          "facility_id": "F-112",
+          "facility_name": "Ridgeline — USD Revolver 2027-A",
+          "counterparty_id": "CP-34",
+          "counterparty_name": "Ridgeline Petroleum Corp.",
+          "lob_segment_id": "SEG-112",
+          "desk_name": "Off-Campus Student Housing Desk",
+          "portfolio_name": "Student Housing",
           "lob_name": "Corporate Banking",
-          "committed_amt": 802183051,
-          "collateral_value": 803252627,
-          "ltv_pct": 99.87,
-          "positions": [
-            {
-              "position_id": "P-203",
-              "facility_id": "F-203",
-              "product_code": "LOAN",
-              "balance_amount": 385047864,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-608",
-              "facility_id": "F-203",
-              "product_code": "LOAN",
-              "balance_amount": 401091526,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1013",
-              "facility_id": "F-203",
-              "product_code": "LOAN",
-              "balance_amount": 393069695,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1418",
-              "facility_id": "F-203",
-              "product_code": "LOAN",
-              "balance_amount": 377026034,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1823",
-              "facility_id": "F-203",
-              "product_code": "LOAN",
-              "balance_amount": 385047864,
-              "description": "Position exposure"
-            }
-          ],
+          "committed_amt": 390417405,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
           "extra_fields": {
-            "metric_value": 203,
-            "amendment_event_id": 203
+            "metric_value": 0
           }
         },
         {
-          "facility_id": "F-304",
-          "facility_name": "Transcon Rail — USD Bridge 2026-D",
-          "counterparty_id": "CP-81",
-          "counterparty_name": "Transcontinental Rail Holdings Inc.",
-          "lob_segment_id": "SEG-55",
-          "desk_name": "Lease Up Multifamily Desk",
-          "portfolio_name": "Residential",
+          "facility_id": "F-215",
+          "facility_name": "Brightstar — USD Revolver 2026-A",
+          "counterparty_id": "CP-62",
+          "counterparty_name": "Brightstar Beverage Holdings Inc.",
+          "lob_segment_id": "SEG-215",
+          "desk_name": "Unsecured Personal Lending Desk",
+          "portfolio_name": "Personal Loans",
           "lob_name": "Corporate Banking",
-          "committed_amt": 119014096,
-          "collateral_value": 122346490,
-          "ltv_pct": 97.28,
-          "positions": [
-            {
-              "position_id": "P-304",
-              "facility_id": "F-304",
-              "product_code": "LOAN",
-              "balance_amount": 57126766,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-709",
-              "facility_id": "F-304",
-              "product_code": "LOAN",
-              "balance_amount": 59507048,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1114",
-              "facility_id": "F-304",
-              "product_code": "LOAN",
-              "balance_amount": 58316907,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1519",
-              "facility_id": "F-304",
-              "product_code": "LOAN",
-              "balance_amount": 55936625,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1924",
-              "facility_id": "F-304",
-              "product_code": "LOAN",
-              "balance_amount": 57126766,
-              "description": "Position exposure"
-            }
-          ],
+          "committed_amt": 61286800,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
           "extra_fields": {
-            "metric_value": 304,
-            "amendment_event_id": 304
+            "metric_value": 0
           }
         },
         {
-          "facility_id": "F-405",
-          "facility_name": "Mountain State — USD L/C 2028-E",
-          "counterparty_id": "CP-100",
-          "counterparty_name": "Mountain State Natural Gas LLC",
-          "lob_segment_id": "SEG-156",
-          "desk_name": "Energy Commodities Desk",
-          "portfolio_name": "Commodities",
+          "facility_id": "F-311",
+          "facility_name": "Portside — SGD Revolver 2027-A",
+          "counterparty_id": "CP-83",
+          "counterparty_name": "Portside Maritime Logistics Ltd.",
+          "lob_segment_id": "SEG-62",
+          "desk_name": "Single-Tenant Net-Lease Retail Desk",
+          "portfolio_name": "Retail",
           "lob_name": "Corporate Banking",
-          "committed_amt": 4674537,
-          "collateral_value": 4649604,
-          "ltv_pct": 100.54,
-          "positions": [
-            {
-              "position_id": "P-405",
-              "facility_id": "F-405",
-              "product_code": "LOAN",
-              "balance_amount": 1402361,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-810",
-              "facility_id": "F-405",
-              "product_code": "LOAN",
-              "balance_amount": 1636088,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1215",
-              "facility_id": "F-405",
-              "product_code": "LOAN",
-              "balance_amount": 1776324,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1620",
-              "facility_id": "F-405",
-              "product_code": "LOAN",
-              "balance_amount": 1963306,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-2025",
-              "facility_id": "F-405",
-              "product_code": "LOAN",
-              "balance_amount": 2103542,
-              "description": "Position exposure"
-            }
-          ],
+          "committed_amt": 36544102,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
           "extra_fields": {
-            "metric_value": 405,
-            "amendment_event_id": 405
+            "metric_value": 0
           }
         }
       ]
@@ -51320,24 +51174,25 @@
   {
     "item_id": "MET-043",
     "item_name": "FR2590 Category",
-    "abbreviation": "FC",
+    "abbreviation": "FR2590",
     "kind": "METRIC",
-    "definition": "A classification used for reporting purposes in the FR 2590 regulatory report pertaining to financial institutions' credit exposures.\n",
-    "generic_formula": "Calculated fr2590_category_code per facility.\n",
+    "definition": "FR 2590 regulatory classification for each facility exposure. Reads the fr2590_category_code from the facility exposure snapshot and joins to the fr2590_category_dim reference table to return the human-readable category name. Used for FR 2590 supervisory reporting and exposure segmentation by product type. Facility-level only — categorical values cannot be meaningfully aggregated to higher organizational levels.\n",
+    "generic_formula": "For each facility, read the fr2590_category_code from the latest facility_exposure_snapshot, then join to fr2590_category_dim to return the human-readable category_name. Uses MAX(category_name) to handle any duplicate exposure rows per facility on the same reporting date.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "ORDINAL",
     "direction": "NEUTRAL",
-    "metric_class": "CALCULATED",
+    "metric_class": "SOURCED",
     "domain_ids": [
       "reference"
     ],
     "regulatory_references": [
+      "FR 2590",
       "Basel III"
     ],
-    "insight": "Regulatory reporting and segmentation\n",
+    "insight": "FR 2590 regulatory classification per facility exposure. Maps each facility to a standardized regulatory category for supervisory reporting and product-type segmentation.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "REF-013",
     "normalized_de_name": "FR2590 Category",
     "data_element_in_dm": "fr2590_category_code",
@@ -51357,7 +51212,7 @@
         "dashboard_display_name": "FR2590 Category (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = fes.fr2590_category_code",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. LEFT JOIN  l1.fr2590_category_dim  (fc)\n   ON    fc.fr2590_category_code = fes.fr2590_category_code\n3. GROUP BY fes.facility_id\n4. COMPUTE\n   metric_value = MAX(fc.category_name)",
         "source_references": [
           {
             "layer": "L2",
@@ -51378,50 +51233,26 @@
             "description": "fr2590_category_code"
           },
           {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "counterparty_id",
-            "description": "counterparty_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "lob_segment_id",
-            "description": "lob_segment_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "layer": "L1",
+            "table": "fr2590_category_dim",
+            "field": "fr2590_category_code",
+            "description": "fr2590_category_code"
           },
           {
             "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "managed_segment_id",
-            "description": "managed_segment_id"
-          },
-          {
-            "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "parent_segment_id",
-            "description": "parent_segment_id"
+            "table": "fr2590_category_dim",
+            "field": "category_name",
+            "description": "category_name"
           }
         ],
-        "formula_sql": "SELECT\n  fes.facility_id AS dimension_key,\n  fes.fr2590_category_code AS metric_value\nFROM l2.facility_exposure_snapshot fes\nWHERE fes.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  fes.facility_id AS dimension_key,\n  MAX(fc.category_name) AS metric_value\nFROM l2.facility_exposure_snapshot fes\nLEFT JOIN l1.fr2590_category_dim fc\n  ON fc.fr2590_category_code = fes.fr2590_category_code\nWHERE fes.as_of_date = (\n  SELECT MAX(as_of_date) FROM l2.facility_exposure_snapshot\n)\nGROUP BY fes.facility_id"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "FR2590 Category (counterparty)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. LEFT JOIN  l1.fr2590_category_dim  (fc)\n   ON    fc.fr2590_category_code = fes.fr2590_category_code\n3. COMPUTE\n   metric_value = NULL",
         "source_references": [
           {
             "layer": "L2",
@@ -51442,50 +51273,26 @@
             "description": "fr2590_category_code"
           },
           {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "counterparty_id",
-            "description": "counterparty_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "lob_segment_id",
-            "description": "lob_segment_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "layer": "L1",
+            "table": "fr2590_category_dim",
+            "field": "fr2590_category_code",
+            "description": "fr2590_category_code"
           },
           {
             "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "managed_segment_id",
-            "description": "managed_segment_id"
-          },
-          {
-            "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "parent_segment_id",
-            "description": "parent_segment_id"
+            "table": "fr2590_category_dim",
+            "field": "category_name",
+            "description": "category_name"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fes.facility_id AS dimension_key,\n    fes.fr2590_category_code AS metric_value\n  FROM l2.facility_exposure_snapshot fes\n  WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id\n"
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
       },
       {
         "level": "desk",
         "dashboard_display_name": "FR2590 Category (desk)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. LEFT JOIN  l1.fr2590_category_dim  (fc)\n   ON    fc.fr2590_category_code = fes.fr2590_category_code\n3. COMPUTE\n   metric_value = NULL",
         "source_references": [
           {
             "layer": "L2",
@@ -51506,50 +51313,26 @@
             "description": "fr2590_category_code"
           },
           {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "counterparty_id",
-            "description": "counterparty_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "lob_segment_id",
-            "description": "lob_segment_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "layer": "L1",
+            "table": "fr2590_category_dim",
+            "field": "fr2590_category_code",
+            "description": "fr2590_category_code"
           },
           {
             "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "managed_segment_id",
-            "description": "managed_segment_id"
-          },
-          {
-            "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "parent_segment_id",
-            "description": "parent_segment_id"
+            "table": "fr2590_category_dim",
+            "field": "category_name",
+            "description": "category_name"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fes.facility_id AS dimension_key,\n    fes.fr2590_category_code AS metric_value\n  FROM l2.facility_exposure_snapshot fes\n  WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "FR2590 Category (portfolio)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. LEFT JOIN  l1.fr2590_category_dim  (fc)\n   ON    fc.fr2590_category_code = fes.fr2590_category_code\n3. COMPUTE\n   metric_value = NULL",
         "source_references": [
           {
             "layer": "L2",
@@ -51570,50 +51353,26 @@
             "description": "fr2590_category_code"
           },
           {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "counterparty_id",
-            "description": "counterparty_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "lob_segment_id",
-            "description": "lob_segment_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "layer": "L1",
+            "table": "fr2590_category_dim",
+            "field": "fr2590_category_code",
+            "description": "fr2590_category_code"
           },
           {
             "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "managed_segment_id",
-            "description": "managed_segment_id"
-          },
-          {
-            "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "parent_segment_id",
-            "description": "parent_segment_id"
+            "table": "fr2590_category_dim",
+            "field": "category_name",
+            "description": "category_name"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fes.facility_id AS dimension_key,\n    fes.fr2590_category_code AS metric_value\n  FROM l2.facility_exposure_snapshot fes\n  WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
       },
       {
         "level": "lob",
         "dashboard_display_name": "FR2590 Category (lob)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. LEFT JOIN  l1.fr2590_category_dim  (fc)\n   ON    fc.fr2590_category_code = fes.fr2590_category_code\n3. COMPUTE\n   metric_value = NULL",
         "source_references": [
           {
             "layer": "L2",
@@ -51634,43 +51393,19 @@
             "description": "fr2590_category_code"
           },
           {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "facility_id",
-            "description": "facility_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "counterparty_id",
-            "description": "counterparty_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "lob_segment_id",
-            "description": "lob_segment_id"
-          },
-          {
-            "layer": "L2",
-            "table": "facility_master",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "layer": "L1",
+            "table": "fr2590_category_dim",
+            "field": "fr2590_category_code",
+            "description": "fr2590_category_code"
           },
           {
             "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "managed_segment_id",
-            "description": "managed_segment_id"
-          },
-          {
-            "layer": "L1",
-            "table": "enterprise_business_taxonomy",
-            "field": "parent_segment_id",
-            "description": "parent_segment_id"
+            "table": "fr2590_category_dim",
+            "field": "category_name",
+            "description": "category_name"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fes.facility_id AS dimension_key,\n    fes.fr2590_category_code AS metric_value\n  FROM l2.facility_exposure_snapshot fes\n  WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
       }
     ],
     "demo_data": {
@@ -51696,28 +51431,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-406",
+              "position_id": "P-11",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 130000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-811",
+              "position_id": "P-21",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 125000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1216",
+              "position_id": "P-31",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 110000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1621",
+              "position_id": "P-41",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 115000000,
@@ -51725,8 +51460,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "C&I",
-            "fr2590_category_code": "C&I"
+            "metric_value": "Loans and Leases",
+            "fr2590_category_code": "G1_B"
           }
         },
         {
@@ -51750,28 +51485,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-407",
+              "position_id": "P-12",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 440000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-812",
+              "position_id": "P-22",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 460000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1217",
+              "position_id": "P-32",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 430000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1622",
+              "position_id": "P-42",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 445000000,
@@ -51779,8 +51514,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "C&I",
-            "fr2590_category_code": "C&I"
+            "metric_value": "Loans and Leases",
+            "fr2590_category_code": "G1_B"
           }
         },
         {
@@ -51804,28 +51539,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-408",
+              "position_id": "P-13",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 820000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-813",
+              "position_id": "P-23",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 780000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1218",
+              "position_id": "P-33",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 750000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1623",
+              "position_id": "P-43",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 790000000,
@@ -51833,8 +51568,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "CRE",
-            "fr2590_category_code": "CRE"
+            "metric_value": "Loans and Leases",
+            "fr2590_category_code": "G1_B"
           }
         },
         {
@@ -51858,28 +51593,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-409",
+              "position_id": "P-14",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-814",
+              "position_id": "P-24",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1219",
+              "position_id": "P-34",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1624",
+              "position_id": "P-44",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
@@ -51887,8 +51622,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "CRE",
-            "fr2590_category_code": "CRE"
+            "metric_value": "Loans and Leases",
+            "fr2590_category_code": "G1_B"
           }
         },
         {
@@ -51912,28 +51647,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-410",
+              "position_id": "P-15",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 320000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-815",
+              "position_id": "P-25",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 380000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1220",
+              "position_id": "P-35",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 400000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1625",
+              "position_id": "P-45",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 350000000,
@@ -51941,8 +51676,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "C&I",
-            "fr2590_category_code": "C&I"
+            "metric_value": "Loans and Leases",
+            "fr2590_category_code": "G1_B"
           }
         }
       ]
@@ -68805,6 +68540,1499 @@
               "description": "Position exposure"
             }
           ]
+        }
+      ]
+    }
+  },
+  {
+    "item_id": "MET-111",
+    "item_name": "Cross Entity Exposure Flag",
+    "abbreviation": "CEEF",
+    "kind": "METRIC",
+    "definition": "Identifies facilities and counterparties with cross-entity exposure — where a single facility participates across multiple counterparties. At facility level, returns 1 if the facility has participations from more than one distinct counterparty in facility_counterparty_participation, 0 otherwise. At counterparty level, returns 1 if any of the counterparty's facilities have cross-entity participations. Flags complexity and concentration risk from intercompany exposure structures.\n",
+    "generic_formula": "For each facility, count the number of distinct counterparties in facility_counterparty_participation (current records only). If COUNT(DISTINCT counterparty_id) > 1, the facility has cross-entity exposure (flag = 1). Otherwise flag = 0.\n",
+    "data_type": "INTEGER",
+    "unit_type": "COUNT",
+    "direction": "NEUTRAL",
+    "metric_class": "CALCULATED",
+    "domain_ids": [
+      "exposure"
+    ],
+    "regulatory_references": [
+      "Basel III",
+      "FR Y-14Q",
+      "Dodd-Frank"
+    ],
+    "insight": "Boolean flag identifying facilities and counterparties with cross-entity participation — where a single facility has exposure to multiple counterparties. Flags intercompany complexity and concentration risk. Complements EXP-008 (Cross Entity Exposure Amount) which quantifies the dollar exposure.\n",
+    "number_of_instances": 5,
+    "directly_displayed": false,
+    "status": "ACTIVE",
+    "executable_metric_id": "EXP-049",
+    "normalized_de_name": "Cross Entity Exposure Flag",
+    "data_element_in_dm": "has_cross_entity_flag",
+    "ingredient_fields": [],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Cross Entity Exposure Flag (facility)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_current_flag = 'Y'\n2. GROUP BY fcp.facility_id\n3. COMPUTE\n   metric_value = CASE WHEN COUNT(DISTINCT fcp.counterparty_id) > 1 THEN 1 ELSE 0 END",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  fcp.facility_id AS dimension_key,\n  CASE\n    WHEN COUNT(DISTINCT fcp.counterparty_id) > 1 THEN 1\n    ELSE 0\n  END AS metric_value\nFROM l2.facility_counterparty_participation fcp\nWHERE fcp.is_current_flag = 'Y'\nGROUP BY fcp.facility_id"
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Cross Entity Exposure Flag (counterparty)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_current_flag = 'Y'\n2. GROUP BY fcp_outer.counterparty_id\n3. COMPUTE\n   metric_value = MAX(CASE WHEN cross_fac.cross_entity_cnt > 1 THEN 1 ELSE 0 END)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  fcp_outer.counterparty_id AS dimension_key,\n  MAX(\n    CASE\n      WHEN cross_fac.cross_entity_cnt > 1 THEN 1\n      ELSE 0\n    END\n  ) AS metric_value\nFROM l2.facility_counterparty_participation fcp_outer\nLEFT JOIN (\n  SELECT\n    facility_id,\n    COUNT(DISTINCT counterparty_id) AS cross_entity_cnt\n  FROM l2.facility_counterparty_participation\n  WHERE is_current_flag = 'Y'\n  GROUP BY facility_id\n) cross_fac\n  ON cross_fac.facility_id = fcp_outer.facility_id\nWHERE fcp_outer.is_current_flag = 'Y'\nGROUP BY fcp_outer.counterparty_id"
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Cross Entity Exposure Flag (desk)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_current_flag = 'Y'\n2. COMPUTE\n   metric_value = NULL",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Cross Entity Exposure Flag (portfolio)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_current_flag = 'Y'\n2. COMPUTE\n   metric_value = NULL",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Cross Entity Exposure Flag (lob)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_counterparty_participation  (fcp)\n   WHERE fcp.is_current_flag = 'Y'\n2. COMPUTE\n   metric_value = NULL",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_participation_id",
+            "description": "facility_participation_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_counterparty_participation",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
+      }
+    ],
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-1",
+          "facility_name": "Meridian Aerospace — USD Revolver 2027",
+          "counterparty_id": "CP-1",
+          "counterparty_name": "Meridian Aerospace Holdings Inc.",
+          "lob_segment_id": "SEG-1",
+          "desk_name": "Unknown",
+          "portfolio_name": "Unknown",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 250000000,
+          "collateral_value": 252000000,
+          "ltv_pct": 99.21,
+          "positions": [
+            {
+              "position_id": "P-1",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 120000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-11",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 130000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-21",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 125000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-31",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 110000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-41",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 115000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0
+          }
+        },
+        {
+          "facility_id": "F-102",
+          "facility_name": "Zenith — JPY Revolver 2026-A",
+          "counterparty_id": "CP-32",
+          "counterparty_name": "Zenith Health Systems KK",
+          "lob_segment_id": "SEG-102",
+          "desk_name": "Net Asset Value (NAV) Desk",
+          "portfolio_name": "CRE Structured Finance",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 846861680,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 0
+          }
+        },
+        {
+          "facility_id": "F-203",
+          "facility_name": "Summit Defense — USD TL-B 2026-C",
+          "counterparty_id": "CP-58",
+          "counterparty_name": "Summit Defense Systems Inc.",
+          "lob_segment_id": "SEG-203",
+          "desk_name": "Government-Insured Mortgage Desk",
+          "portfolio_name": "Residential Mortgages",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 802183051,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 0
+          }
+        },
+        {
+          "facility_id": "F-304",
+          "facility_name": "Transcon Rail — USD Bridge 2026-D",
+          "counterparty_id": "CP-81",
+          "counterparty_name": "Transcontinental Rail Holdings Inc.",
+          "lob_segment_id": "SEG-55",
+          "desk_name": "Lease Up Multifamily Desk",
+          "portfolio_name": "Residential",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 119014096,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 0
+          }
+        },
+        {
+          "facility_id": "F-405",
+          "facility_name": "Mountain State — USD L/C 2028-E",
+          "counterparty_id": "CP-100",
+          "counterparty_name": "Mountain State Natural Gas LLC",
+          "lob_segment_id": "SEG-156",
+          "desk_name": "Energy Commodities Desk",
+          "portfolio_name": "Commodities",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 4674537,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 0
+          }
+        }
+      ]
+    }
+  },
+  {
+    "item_id": "MET-113",
+    "item_name": "Active Flag",
+    "abbreviation": "ACTV",
+    "kind": "METRIC",
+    "definition": "Facility activity status indicator. At facility level, reads the is_active_flag from facility_master and returns 1 (active) or 0 (inactive). At counterparty level, returns 1 if any of the counterparty's facilities are active (boolean OR). Provides a baseline portfolio activity measure for CRO reporting and data quality monitoring.\n",
+    "generic_formula": "Read is_active_flag from facility_master. Returns 1 if the facility is active (is_active_flag = 'Y'), 0 otherwise. No date filtering required as is_active_flag reflects current status.\n",
+    "data_type": "INTEGER",
+    "unit_type": "COUNT",
+    "direction": "HIGHER_BETTER",
+    "metric_class": "SOURCED",
+    "domain_ids": [
+      "reference"
+    ],
+    "regulatory_references": [
+      "FR Y-14Q",
+      "Basel III"
+    ],
+    "insight": "Facility activity status flag. 1 = active, 0 = inactive. At counterparty level, 1 if any facility is active. Baseline measure for portfolio activity monitoring and data quality assurance.\n",
+    "number_of_instances": 5,
+    "directly_displayed": false,
+    "status": "ACTIVE",
+    "executable_metric_id": "REF-034",
+    "normalized_de_name": "Active Flag",
+    "data_element_in_dm": "is_active_flag",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_master",
+        "field": "is_active_flag",
+        "description": "is_active_flag",
+        "data_type": "BOOLEAN",
+        "sample_value": ""
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Active Flag (facility)",
+        "in_record": true,
+        "sourcing_type": "Raw",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n2. COMPUTE\n   metric_value = CASE WHEN fm.is_active_flag = 'Y' THEN 1 ELSE 0 END",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  CASE\n    WHEN fm.is_active_flag = 'Y' THEN 1\n    ELSE 0\n  END AS metric_value\nFROM l2.facility_master fm"
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Active Flag (counterparty)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n2. GROUP BY fm.counterparty_id\n3. COMPUTE\n   metric_value = MAX(CASE WHEN fm.is_active_flag = 'Y' THEN 1 ELSE 0 END)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  MAX(\n    CASE\n      WHEN fm.is_active_flag = 'Y' THEN 1\n      ELSE 0\n    END\n  ) AS metric_value\nFROM l2.facility_master fm\nGROUP BY fm.counterparty_id"
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Active Flag (desk)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n2. COMPUTE\n   metric_value = NULL",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          }
+        ],
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Active Flag (portfolio)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n2. COMPUTE\n   metric_value = NULL",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          }
+        ],
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Active Flag (lob)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n2. COMPUTE\n   metric_value = NULL",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          }
+        ],
+        "formula_sql": "SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0"
+      }
+    ],
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-5",
+          "facility_name": "Atlas Industrial — Working Capital RCF",
+          "counterparty_id": "CP-5",
+          "counterparty_name": "Atlas Industrial Technologies Inc.",
+          "lob_segment_id": "SEG-5",
+          "desk_name": "Multi-national / Cross-Border Corporates Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 750000000,
+          "collateral_value": 149200000,
+          "ltv_pct": 502.68,
+          "positions": [
+            {
+              "position_id": "P-5",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 275000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-15",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 320000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-25",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 380000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-35",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 400000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-45",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 350000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "is_active_flag": "N"
+          }
+        },
+        {
+          "facility_id": "F-62",
+          "facility_name": "Titan — GBP Bridge 2025-D",
+          "counterparty_id": "CP-22",
+          "counterparty_name": "Titan Cybersecurity Group Ltd.",
+          "lob_segment_id": "SEG-62",
+          "desk_name": "Single-Tenant Net-Lease Retail Desk",
+          "portfolio_name": "Retail",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 58779873,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 1,
+            "is_active_flag": "Y"
+          }
+        },
+        {
+          "facility_id": "F-179",
+          "facility_name": "Pinnacle Aero — USD Revolver 2027-A",
+          "counterparty_id": "CP-53",
+          "counterparty_name": "Pinnacle Aerospace Components Corp.",
+          "lob_segment_id": "SEG-179",
+          "desk_name": "Single Family Office Desk",
+          "portfolio_name": "Family Office Services",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 381779832,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 1,
+            "is_active_flag": "Y"
+          }
+        },
+        {
+          "facility_id": "F-288",
+          "facility_name": "Grandview — USD Bridge 2028-D",
+          "counterparty_id": "CP-78",
+          "counterparty_name": "Grandview Senior Living REIT",
+          "lob_segment_id": "SEG-39",
+          "desk_name": "Construction Office Desk",
+          "portfolio_name": "Office",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 48975927,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 1,
+            "is_active_flag": "Y"
+          }
+        },
+        {
+          "facility_id": "F-405",
+          "facility_name": "Mountain State — USD L/C 2028-E",
+          "counterparty_id": "CP-100",
+          "counterparty_name": "Mountain State Natural Gas LLC",
+          "lob_segment_id": "SEG-156",
+          "desk_name": "Energy Commodities Desk",
+          "portfolio_name": "Commodities",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 4674537,
+          "collateral_value": 0,
+          "ltv_pct": 0,
+          "positions": [],
+          "extra_fields": {
+            "metric_value": 1,
+            "is_active_flag": "Y"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "item_id": "MET-112",
+    "item_name": "Internal Risk Rating",
+    "abbreviation": "IRR",
+    "kind": "METRIC",
+    "definition": "Internal risk rating expressed as a numeric notch value. At facility level, reads the internal_risk_rating from the latest facility risk snapshot and maps it to a numeric rating_value via the rating_scale_dim reference table. At counterparty level, maps the counterparty's internal_risk_rating to a numeric notch. At desk, portfolio, and business segment levels, computes the average rating notch across distinct counterparties in the segment, then rounds to the nearest integer for a representative rating grade. Lower values indicate better credit quality.\n",
+    "generic_formula": "For each facility, read the internal_risk_rating from the latest facility_risk_snapshot (MAX as_of_date), then join to rating_scale_dim to convert the rating string to a numeric rating_value (notch ordinal). Uses MIN(rating_value) to handle potential duplicate dim matches.\n",
+    "data_type": "NUMERIC(20,4)",
+    "unit_type": "ORDINAL",
+    "direction": "LOWER_BETTER",
+    "metric_class": "HYBRID",
+    "domain_ids": [
+      "risk"
+    ],
+    "regulatory_references": [
+      "Basel III",
+      "FR Y-14Q",
+      "CCAR",
+      "OCC 2011-12"
+    ],
+    "insight": "Internal credit risk rating as a numeric notch ordinal. Facility and counterparty levels show individual ratings; desk, portfolio, and business segment levels show the average rating across distinct counterparties (rounded to nearest notch). Lower values = better credit quality. Complements RSK-001 (PD-based Risk Rating Tier) with the institution's internal rating methodology.\n",
+    "number_of_instances": 5,
+    "directly_displayed": false,
+    "status": "ACTIVE",
+    "executable_metric_id": "RSK-010",
+    "normalized_de_name": "Internal Risk Rating",
+    "data_element_in_dm": "internal_risk_rating_notch",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_risk_snapshot",
+        "field": "internal_risk_rating",
+        "description": "internal_risk_rating",
+        "data_type": "VARCHAR(64)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "counterparty",
+        "field": "internal_risk_rating",
+        "description": "internal_risk_rating",
+        "data_type": "VARCHAR(64)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L1",
+        "table": "rating_scale_dim",
+        "field": "rating_value",
+        "description": "rating_value",
+        "data_type": "NUMERIC(12,6)",
+        "sample_value": ""
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Internal Risk Rating (facility)",
+        "in_record": true,
+        "sourcing_type": "Raw",
+        "level_logic": "1. LOAD  l2.facility_risk_snapshot  (frs)\n   WHERE frs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.counterparty  (c)\n   ON    c.counterparty_id = frs.counterparty_id\n3. LEFT JOIN  l1.rating_scale_dim  (rsd)\n   ON    rsd.rating_notch = frs.internal_risk_rating AND rsd.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n6. GROUP BY frs.facility_id\n7. COMPUTE\n   metric_value = COALESCE(MIN(rsd.rating_value), 0)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "rating_notch"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "rating_value"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  frs.facility_id AS dimension_key,\n  COALESCE(MIN(rsd.rating_value), 0) AS metric_value\nFROM l2.facility_risk_snapshot frs\nLEFT JOIN l1.rating_scale_dim rsd\n  ON rsd.rating_notch = frs.internal_risk_rating\n  AND rsd.is_active_flag = 'Y'\nWHERE frs.as_of_date = (\n  SELECT MAX(as_of_date) FROM l2.facility_risk_snapshot\n)\nGROUP BY frs.facility_id"
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Internal Risk Rating (counterparty)",
+        "in_record": true,
+        "sourcing_type": "Raw",
+        "level_logic": "1. LOAD  l2.facility_risk_snapshot  (frs)\n   WHERE frs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.counterparty  (c)\n   ON    c.counterparty_id = frs.counterparty_id\n3. LEFT JOIN  l1.rating_scale_dim  (rsd)\n   ON    rsd.rating_notch = frs.internal_risk_rating AND rsd.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n6. GROUP BY c.counterparty_id\n7. COMPUTE\n   metric_value = COALESCE(MIN(rsd.rating_value), 0)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "rating_notch"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "rating_value"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  c.counterparty_id AS dimension_key,\n  COALESCE(MIN(rsd.rating_value), 0) AS metric_value\nFROM l2.counterparty c\nLEFT JOIN l1.rating_scale_dim rsd\n  ON rsd.rating_notch = c.internal_risk_rating\n  AND rsd.is_active_flag = 'Y'\nWHERE c.internal_risk_rating IS NOT NULL\nGROUP BY c.counterparty_id"
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Internal Risk Rating (desk)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_risk_snapshot  (frs)\n   WHERE frs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.counterparty  (c)\n   ON    c.counterparty_id = frs.counterparty_id\n3. LEFT JOIN  l1.rating_scale_dim  (rsd)\n   ON    rsd.rating_notch = frs.internal_risk_rating AND rsd.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n6. GROUP BY seg_cp.segment_id\n7. COMPUTE\n   metric_value = ROUND(AVG(seg_cp.rating_val))",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "rating_notch"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "rating_value"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  seg_cp.segment_id AS dimension_key,\n  ROUND(AVG(seg_cp.rating_val)) AS metric_value\nFROM (\n  SELECT\n    ebt.managed_segment_id AS segment_id,\n    c.counterparty_id,\n    MIN(rsd.rating_value) AS rating_val\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty c\n    ON c.counterparty_id = fm.counterparty_id\n  LEFT JOIN l1.rating_scale_dim rsd\n    ON rsd.rating_notch = c.internal_risk_rating\n    AND rsd.is_active_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt\n    ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n    AND c.internal_risk_rating IS NOT NULL\n  GROUP BY ebt.managed_segment_id, c.counterparty_id\n) seg_cp\nWHERE seg_cp.rating_val IS NOT NULL\nGROUP BY seg_cp.segment_id"
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Internal Risk Rating (portfolio)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_risk_snapshot  (frs)\n   WHERE frs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.counterparty  (c)\n   ON    c.counterparty_id = frs.counterparty_id\n3. LEFT JOIN  l1.rating_scale_dim  (rsd)\n   ON    rsd.rating_notch = frs.internal_risk_rating AND rsd.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n6. GROUP BY seg_cp.segment_id\n7. COMPUTE\n   metric_value = ROUND(AVG(seg_cp.rating_val))",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "rating_notch"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "rating_value"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  seg_cp.segment_id AS dimension_key,\n  ROUND(AVG(seg_cp.rating_val)) AS metric_value\nFROM (\n  SELECT\n    ebt_l2.managed_segment_id AS segment_id,\n    c.counterparty_id,\n    MIN(rsd.rating_value) AS rating_val\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty c\n    ON c.counterparty_id = fm.counterparty_id\n  LEFT JOIN l1.rating_scale_dim rsd\n    ON rsd.rating_notch = c.internal_risk_rating\n    AND rsd.is_active_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n    ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n    ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n    AND c.internal_risk_rating IS NOT NULL\n  GROUP BY ebt_l2.managed_segment_id, c.counterparty_id\n) seg_cp\nWHERE seg_cp.rating_val IS NOT NULL\nGROUP BY seg_cp.segment_id"
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Internal Risk Rating (lob)",
+        "in_record": true,
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_risk_snapshot  (frs)\n   WHERE frs.as_of_date = :as_of_date\n2. LEFT JOIN  l2.counterparty  (c)\n   ON    c.counterparty_id = frs.counterparty_id\n3. LEFT JOIN  l1.rating_scale_dim  (rsd)\n   ON    rsd.rating_notch = frs.internal_risk_rating AND rsd.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n   AND   ebt.is_current_flag = 'Y'\n6. GROUP BY seg_cp.segment_id\n7. COMPUTE\n   metric_value = ROUND(AVG(seg_cp.rating_val))",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "counterparty",
+            "field": "internal_risk_rating",
+            "description": "internal_risk_rating"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_notch",
+            "description": "rating_notch"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "rating_value",
+            "description": "rating_value"
+          },
+          {
+            "layer": "L1",
+            "table": "rating_scale_dim",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "is_active_flag",
+            "description": "is_active_flag"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "managed_segment_id",
+            "description": "managed_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "parent_segment_id",
+            "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          }
+        ],
+        "formula_sql": "SELECT\n  seg_cp.segment_id AS dimension_key,\n  ROUND(AVG(seg_cp.rating_val)) AS metric_value\nFROM (\n  SELECT\n    ebt_l1.managed_segment_id AS segment_id,\n    c.counterparty_id,\n    MIN(rsd.rating_value) AS rating_val\n  FROM l2.facility_master fm\n  INNER JOIN l2.counterparty c\n    ON c.counterparty_id = fm.counterparty_id\n  LEFT JOIN l1.rating_scale_dim rsd\n    ON rsd.rating_notch = c.internal_risk_rating\n    AND rsd.is_active_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n    ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n    ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n    ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n    AND c.internal_risk_rating IS NOT NULL\n  GROUP BY ebt_l1.managed_segment_id, c.counterparty_id\n) seg_cp\nWHERE seg_cp.rating_val IS NOT NULL\nGROUP BY seg_cp.segment_id"
+      }
+    ],
+    "demo_data": {
+      "facilities": [
+        {
+          "facility_id": "F-1",
+          "facility_name": "Meridian Aerospace — USD Revolver 2027",
+          "counterparty_id": "CP-1",
+          "counterparty_name": "Meridian Aerospace Holdings Inc.",
+          "lob_segment_id": "SEG-1",
+          "desk_name": "Unknown",
+          "portfolio_name": "Unknown",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 250000000,
+          "collateral_value": 252000000,
+          "ltv_pct": 99.21,
+          "positions": [
+            {
+              "position_id": "P-1",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 120000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-11",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 130000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-21",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 125000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-31",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 110000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-41",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 115000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "internal_risk_rating": "internal_risk_rating_1"
+          }
+        },
+        {
+          "facility_id": "F-3",
+          "facility_name": "Pacific Ridge — Multi-Currency RCF",
+          "counterparty_id": "CP-3",
+          "counterparty_name": "Pacific Ridge Energy LLC",
+          "lob_segment_id": "SEG-3",
+          "desk_name": "Global Corporate Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1000000000,
+          "collateral_value": 425566666,
+          "ltv_pct": 234.98,
+          "positions": [
+            {
+              "position_id": "P-3",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 800000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-13",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 820000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-23",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 780000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-33",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 750000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-43",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 790000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "internal_risk_rating": "internal_risk_rating_3"
+          }
+        },
+        {
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1500000000,
+          "collateral_value": 2283000000,
+          "ltv_pct": 65.7,
+          "positions": [
+            {
+              "position_id": "P-6",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1200000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-16",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1180000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-26",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1220000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-36",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-46",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1190000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "internal_risk_rating": "internal_risk_rating_6"
+          }
+        },
+        {
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
+          "desk_name": "Unknown",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
+          "positions": [
+            {
+              "position_id": "P-8",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 90000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-18",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 95000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-28",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-38",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 85000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-48",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 80000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "internal_risk_rating": "internal_risk_rating_8"
+          }
+        },
+        {
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
+          "positions": [
+            {
+              "position_id": "P-10",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-20",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2050000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-30",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-40",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2000000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-50",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2080000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0,
+            "internal_risk_rating": "internal_risk_rating_10"
+          }
         }
       ]
     }

@@ -184,32 +184,38 @@
     }
   },
   "MET-044": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "count-ratio",
     "metric_fields": {
-      "primary_value": "amendment_event_id"
+      "primary_value": "amendment_rate_pct"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "amendment_event_id",
-          "label": "amendment_event_id",
+          "field": "amendment_id",
+          "label": "amendment_id",
           "sample_value": 0,
           "source_table": "amendment_event",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
-      "result_format": "number",
-      "formula_display": "Read amendment_event_id from amendment_event for each facility as-of reporting date.\n"
+      "result_format": "percentage",
+      "formula_display": "For each active facility, check whether any amendment_event records exist via LEFT JOIN. Returns 1 (has amendment) or 0 (no amendment). A facility is considered amended if it has at least one record in the amendment_event table regardless of amendment type or status.\n"
     },
     "worked_example_columns": [
       {
-        "field": "amendment_event_id",
-        "header": "Amendment Event Id",
+        "field": "amendment_id",
+        "header": "Amendment Id",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "amendment_rate_pct",
+        "header": "Amendment Rate (%)",
+        "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -3102,9 +3108,9 @@
     ]
   },
   "MET-043": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "categorical",
     "metric_fields": {
-      "primary_value": "fr2590_category_code"
+      "primary_value": "fr2590_category"
     },
     "formula_decomposition": {
       "numerator": [
@@ -3115,19 +3121,39 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "category_name",
+          "label": "category_name",
+          "sample_value": 0,
+          "source_table": "fr2590_category_dim",
+          "source_layer": "L1"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated fr2590_category_code per facility.\n"
+      "formula_display": "For each facility, read the fr2590_category_code from the latest facility_exposure_snapshot, then join to fr2590_category_dim to return the human-readable category_name. Uses MAX(category_name) to handle any duplicate exposure rows per facility on the same reporting date.\n"
     },
     "worked_example_columns": [
       {
         "field": "fr2590_category_code",
         "header": "Fr2590 Category Code",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "category_name",
+        "header": "Category Name",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "fr2590_category",
+        "header": "Fr2590 Category",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -4137,6 +4163,106 @@
       {
         "field": "allocated_amount_usd",
         "header": "Allocated Amount Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-111": {
+    "rollup_strategy": "categorical",
+    "metric_fields": {
+      "primary_value": "has_cross_entity_flag"
+    }
+  },
+  "MET-113": {
+    "rollup_strategy": "categorical",
+    "metric_fields": {
+      "primary_value": "is_active_flag"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "is_active_flag",
+          "label": "is_active_flag",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read is_active_flag from facility_master. Returns 1 if the facility is active (is_active_flag = 'Y'), 0 otherwise. No date filtering required as is_active_flag reflects current status.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "is_active_flag",
+        "header": "Is Active Flag",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
+  },
+  "MET-112": {
+    "rollup_strategy": "simple-avg",
+    "metric_fields": {
+      "primary_value": "internal_risk_rating_notch"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "internal_risk_rating",
+          "label": "internal_risk_rating",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "internal_risk_rating",
+          "label": "internal_risk_rating",
+          "sample_value": 0,
+          "source_table": "counterparty",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rating_value",
+          "label": "rating_value",
+          "sample_value": 0,
+          "source_table": "rating_scale_dim",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "For each facility, read the internal_risk_rating from the latest facility_risk_snapshot (MAX as_of_date), then join to rating_scale_dim to convert the rating string to a numeric rating_value (notch ordinal). Uses MIN(rating_value) to handle potential duplicate dim matches.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "internal_risk_rating",
+        "header": "Internal Risk Rating",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "internal_risk_rating",
+        "header": "Internal Risk Rating",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rating_value",
+        "header": "Rating Value",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "internal_risk_rating_notch",
+        "header": "Internal Risk Rating Notch",
         "format": "number",
         "is_result": true,
         "subtotal_fn": "sum"

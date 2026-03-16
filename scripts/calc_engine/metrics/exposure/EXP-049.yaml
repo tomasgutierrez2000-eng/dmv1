@@ -1,0 +1,166 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Cross Entity Exposure Flag
+# ═══════════════════════════════════════════════════════════════
+
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-049"
+name: "Cross Entity Exposure Flag"
+version: "1.0.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
+supersedes: null
+
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "concentration-risk"
+metric_class: CALCULATED
+direction: NEUTRAL
+unit_type: COUNT
+display_format: "s"
+description: >
+  Identifies facilities and counterparties with cross-entity exposure —
+  where a single facility participates across multiple counterparties. At
+  facility level, returns 1 if the facility has participations from more
+  than one distinct counterparty in facility_counterparty_participation,
+  0 otherwise. At counterparty level, returns 1 if any of the
+  counterparty's facilities have cross-entity participations. Flags
+  complexity and concentration risk from intercompany exposure structures.
+
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: "Connected counterparty and large exposure framework — cross-entity concentration monitoring"
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 — intercompany and cross-entity exposure identification"
+  - framework: "Dodd-Frank"
+    description: "Single counterparty credit limit (SCCL) — cross-entity exposure aggregation"
+
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: facility_counterparty_participation
+    alias: fcp
+    join_type: BASE
+    fields:
+      - name: facility_participation_id
+        role: JOIN_KEY
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: CUSTOM
+    formula_text: >
+      For each facility, count the number of distinct counterparties in
+      facility_counterparty_participation (current records only). If
+      COUNT(DISTINCT counterparty_id) > 1, the facility has cross-entity
+      exposure (flag = 1). Otherwise flag = 0.
+    formula_sql: |-
+      SELECT
+        fcp.facility_id AS dimension_key,
+        CASE
+          WHEN COUNT(DISTINCT fcp.counterparty_id) > 1 THEN 1
+          ELSE 0
+        END AS metric_value
+      FROM l2.facility_counterparty_participation fcp
+      WHERE fcp.is_current_flag = 'Y'
+      GROUP BY fcp.facility_id
+  counterparty:
+    aggregation_type: CUSTOM
+    formula_text: >
+      For each counterparty, check all of its facilities in the participation
+      table. For each facility, determine if it has cross-entity exposure
+      (multiple distinct counterparties). If ANY facility belonging to this
+      counterparty has cross-entity exposure, the counterparty flag = 1.
+      Uses MAX over the facility-level flags for correct boolean OR logic.
+    formula_sql: |-
+      SELECT
+        fcp_outer.counterparty_id AS dimension_key,
+        MAX(
+          CASE
+            WHEN cross_fac.cross_entity_cnt > 1 THEN 1
+            ELSE 0
+          END
+        ) AS metric_value
+      FROM l2.facility_counterparty_participation fcp_outer
+      LEFT JOIN (
+        SELECT
+          facility_id,
+          COUNT(DISTINCT counterparty_id) AS cross_entity_cnt
+        FROM l2.facility_counterparty_participation
+        WHERE is_current_flag = 'Y'
+        GROUP BY facility_id
+      ) cross_fac
+        ON cross_fac.facility_id = fcp_outer.facility_id
+      WHERE fcp_outer.is_current_flag = 'Y'
+      GROUP BY fcp_outer.counterparty_id
+  desk:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Not applicable — cross-entity exposure flag is a facility/counterparty
+      level indicator. Desk-level analysis should use EXP-008 (Cross Entity
+      Exposure Amount) for dollar-weighted concentration risk.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+  portfolio:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Not applicable — cross-entity exposure flag is a facility/counterparty
+      level indicator. Portfolio analysis should use EXP-008 for aggregate
+      cross-entity exposure amounts.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+  business_segment:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Not applicable — cross-entity exposure flag is a facility/counterparty
+      level indicator. Segment analysis should use EXP-008 for aggregate
+      cross-entity exposure amounts.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "EXP-049-V01"
+    type: NOT_NULL
+    description: "Every facility in participation table must produce a non-null flag value"
+    severity: ERROR
+  - rule_id: "EXP-049-V02"
+    type: THRESHOLD
+    description: "Cross-entity flag must be 0 or 1 (boolean)"
+    severity: ERROR
+    params:
+      min: 0
+      max: 1
+
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-111"
+  abbreviation: "CEEF"
+  insight: >
+    Boolean flag identifying facilities and counterparties with cross-entity
+    participation — where a single facility has exposure to multiple
+    counterparties. Flags intercompany complexity and concentration risk.
+    Complements EXP-008 (Cross Entity Exposure Amount) which quantifies the
+    dollar exposure.
+  rollup_strategy: "categorical"
+  primary_value_field: "has_cross_entity_flag"
+
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "concentration-risk", "cross-entity", "intercompany"]
+dashboard_pages: []
+legacy_metric_ids: []

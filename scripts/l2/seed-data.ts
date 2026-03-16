@@ -1201,6 +1201,29 @@ export function getL2SeedValue(
       break;
 
     // ═══════════════════════════════════════════════════════════════════
+    // FACILITY_RISK_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'facility_risk_snapshot': {
+      const pdVal = pd(idx);
+      const lgdVal = lgd(idx);
+      const eadVal = committed(idx);
+      const rwPct = pdVal * lgdVal * 12.5; // simplified Basel RW proxy
+      if (columnName === 'facility_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'counterparty_id') return cid(idx);
+      if (columnName === 'pd_pct') return pdVal;
+      if (columnName === 'lgd_pct') return lgdVal;
+      if (columnName === 'ccf') return 1.0;
+      if (columnName === 'ead_amt') return eadVal;
+      if (columnName === 'expected_loss_amt') return Math.round(eadVal * pdVal / 100 * lgdVal / 100);
+      if (columnName === 'rwa_amt') return Math.round(eadVal * rwPct / 100);
+      if (columnName === 'risk_weight_pct') return Math.round(rwPct * 100) / 100;
+      if (columnName === 'internal_risk_rating') return intRating(idx);
+      if (columnName === 'currency_code') return currency(idx);
+      break;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
     // FACILITY_LOB_ATTRIBUTION
     // ═══════════════════════════════════════════════════════════════════
     case 'facility_lob_attribution':

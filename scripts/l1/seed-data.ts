@@ -1802,11 +1802,42 @@ export const GRADE_NAMES = [
   'Prime', 'High Grade', 'High Grade', 'Upper Medium Grade', 'Upper Medium Grade',
   'Lower Medium Grade', 'Lower Medium Grade', 'Lower Medium Grade', 'Non-Investment Grade Speculative', 'Non-Investment Grade Speculative',
 ];
-const GRADE_PD_12M = [0.0001, 0.0002, 0.0003, 0.0005, 0.0008, 0.0015, 0.0025, 0.0040, 0.0075, 0.0120];
-const GRADE_LGD_DOWNTURN = [0.30, 0.32, 0.35, 0.38, 0.40, 0.42, 0.45, 0.48, 0.50, 0.55];
-const GRADE_RATING_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const GRADE_INVESTMENT_FLAGS = ['Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N'];
-const GRADE_NOTCHES = ['AAA', 'AA+', 'AA', 'A+', 'A', 'BBB+', 'BBB', 'BBB-', 'BB+', 'BB'];
+// ── Full 22-notch letter scale + 10 numeric internal scale (32 total) ──
+// Indices 0-21: S&P-equivalent letter grades (AAA through D)
+// Indices 22-31: Internal 10-point numeric scale ("1" through "10")
+const GRADE_PD_12M = [
+  // Letter grades: AAA(1) through D(22) — Basel IRB calibration
+  0.0001, 0.0002, 0.0003, 0.0005, 0.0008, 0.0012, 0.0018, 0.0025,
+  0.0040, 0.0070, 0.0100, 0.0150, 0.0250, 0.0400, 0.0650, 0.1000,
+  0.1500, 0.2500, 0.3500, 0.5000, 0.7500, 1.0000,
+  // Numeric internal: 1≈AAA, 2≈AA, 3≈A, 4≈BBB+, 5≈BBB, 6≈BB, 7≈B+, 8≈B-, 9≈CCC, 10≈D
+  0.0001, 0.0003, 0.0012, 0.0025, 0.0040, 0.0150, 0.0400, 0.1000, 0.2500, 1.0000,
+];
+const GRADE_LGD_DOWNTURN = [
+  0.30, 0.30, 0.32, 0.33, 0.35, 0.37, 0.38, 0.40,
+  0.42, 0.45, 0.47, 0.48, 0.50, 0.52, 0.55, 0.58,
+  0.60, 0.65, 0.70, 0.75, 0.80, 0.85,
+  0.30, 0.32, 0.37, 0.40, 0.42, 0.48, 0.52, 0.58, 0.65, 0.85,
+];
+const GRADE_RATING_VALUES = [
+  // Letter notches: ordinal 1-22
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+  // Numeric notches: mapped to equivalent letter ordinals
+  1, 3, 6, 8, 9, 12, 14, 16, 18, 22,
+];
+const GRADE_INVESTMENT_FLAGS = [
+  // Letter: AAA-BBB- = IG, BB+ and below = non-IG
+  'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N',
+  // Numeric: 1-5 = IG, 6-10 = non-IG
+  'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N', 'N',
+];
+const GRADE_NOTCHES = [
+  // Full 22-notch S&P-equivalent letter scale
+  'AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB+', 'BBB', 'BBB-',
+  'BB+', 'BB', 'BB-', 'B+', 'B', 'B-', 'CCC+', 'CCC', 'CCC-', 'CC', 'C', 'D',
+  // Internal 10-point numeric scale
+  '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+];
 
 const RATING_SOURCE_NAMES = [
   'S&P Global Ratings', 'Moody\'s Investors Service', 'Fitch Ratings', 'DBRS Morningstar',
@@ -1817,9 +1848,39 @@ const RATING_SOURCE_TYPES = ['EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'IN
 const RATING_VENDOR_CODES = ['SP', 'MOODYS', 'FITCH', 'DBRS', 'INT_PD', 'INT_EJ', 'KBRA', 'JCR', 'CCXI', 'RAM'];
 const RATING_PRIORITIES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-const SCALE_NAMES = ['S&P Long-Term', 'Moody\'s Long-Term', 'Fitch Long-Term', 'DBRS Long-Term', 'Internal 10-Point', 'Internal Expert', 'KBRA Long-Term', 'JCR Long-Term', 'CCXI Long-Term', 'RAM Long-Term'];
-const SCALE_TYPES = ['EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'INTERNAL', 'INTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL'];
-const SCALE_COLORS = ['#2E7D32', '#388E3C', '#43A047', '#4CAF50', '#66BB6A', '#FFC107', '#FF9800', '#FF5722', '#E53935', '#B71C1C'];
+const SCALE_NAMES = [
+  // 22 letter grades: all S&P Equivalent
+  'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent',
+  'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent',
+  'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent',
+  'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent',
+  'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent', 'S&P Equivalent',
+  'S&P Equivalent', 'S&P Equivalent',
+  // 10 numeric: all Internal 10-Point
+  'Internal 10-Point', 'Internal 10-Point', 'Internal 10-Point', 'Internal 10-Point',
+  'Internal 10-Point', 'Internal 10-Point', 'Internal 10-Point', 'Internal 10-Point',
+  'Internal 10-Point', 'Internal 10-Point',
+];
+const SCALE_TYPES = [
+  // 22 letter grades: EXTERNAL
+  'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL',
+  'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL',
+  'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL',
+  'EXTERNAL', 'EXTERNAL', 'EXTERNAL', 'EXTERNAL',
+  // 10 numeric: INTERNAL
+  'INTERNAL', 'INTERNAL', 'INTERNAL', 'INTERNAL', 'INTERNAL',
+  'INTERNAL', 'INTERNAL', 'INTERNAL', 'INTERNAL', 'INTERNAL',
+];
+const SCALE_COLORS = [
+  // 22 letter grades: green → amber → red → dark gradient
+  '#1B5E20', '#2E7D32', '#388E3C', '#43A047', '#4CAF50', '#66BB6A',
+  '#81C784', '#FFC107', '#FFB300', '#FF9800', '#FF7043', '#FF5722',
+  '#F4511E', '#E64A19', '#D84315', '#BF360C', '#E53935', '#C62828',
+  '#B71C1C', '#880E4F', '#4A148C', '#311B92',
+  // 10 numeric: same gradient mapped
+  '#1B5E20', '#388E3C', '#66BB6A', '#FFC107', '#FFB300',
+  '#FF5722', '#E64A19', '#BF360C', '#C62828', '#311B92',
+];
 
 const COUNTERPARTY_ROLE_CODES = ['BORROWER', 'GUARANTOR', 'AGENT', 'LEAD_ARRANGER', 'PARTICIPANT', 'ISSUER', 'TRUSTEE', 'SERVICER', 'SPONSOR', 'SUBORDINATE'];
 const COUNTERPARTY_ROLE_NAMES = [
@@ -2266,19 +2327,24 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       break;
 
     /* ──────────── rating_scale_dim ──────────── */
-    case 'rating_scale_dim':
-      if (columnName === 'rating_scale_id') return idx + 1;
-      if (columnName === 'scale_name') return SCALE_NAMES[idx];
+    // 32 rows: indices 0-21 = letter grades (IDs 920001-920022)
+    //          indices 22-31 = numeric internal (IDs 920101-920110)
+    // Uses rowIndex directly (NOT idx) because this table has 32 entries, not 10
+    case 'rating_scale_dim': {
+      const ri = rowIndex; // full index, no modulo
+      if (columnName === 'rating_scale_id') return ri < 22 ? 920001 + ri : 920101 + (ri - 22);
+      if (columnName === 'scale_name') return SCALE_NAMES[ri];
       if (columnName === 'is_active_flag') return 'Y';
-      if (columnName === 'is_default_flag') return idx === 0 ? 'Y' : 'N';
-      if (columnName === 'display_color_hex') return SCALE_COLORS[idx];
-      if (columnName === 'is_investment_grade_flag') return GRADE_INVESTMENT_FLAGS[idx];
-      if (columnName === 'pd_implied') return GRADE_PD_12M[idx];
-      if (columnName === 'rating_grade_id') return idx + 1;
-      if (columnName === 'rating_notch') return GRADE_NOTCHES[idx];
-      if (columnName === 'rating_value') return GRADE_RATING_VALUES[idx];
-      if (columnName === 'scale_type') return SCALE_TYPES[idx];
+      if (columnName === 'is_default_flag') return ri === 0 ? 'Y' : 'N';
+      if (columnName === 'display_color_hex') return SCALE_COLORS[ri];
+      if (columnName === 'is_investment_grade_flag') return GRADE_INVESTMENT_FLAGS[ri];
+      if (columnName === 'pd_implied') return GRADE_PD_12M[ri];
+      if (columnName === 'rating_grade_id') return GRADE_RATING_VALUES[ri];
+      if (columnName === 'rating_notch') return GRADE_NOTCHES[ri];
+      if (columnName === 'rating_value') return GRADE_RATING_VALUES[ri];
+      if (columnName === 'scale_type') return SCALE_TYPES[ri];
       break;
+    }
 
     /* ──────────── crm_type_dim ──────────── */
     case 'crm_type_dim':
@@ -3608,6 +3674,7 @@ const CUSTOM_TABLE_SIZES: Record<string, number> = {
   'regulatory_capital_basis_dim': 28,
   'reporting_entity_dim': 22,
   'regulatory_mapping': 160,
+  'rating_scale_dim': 32,
 };
 
 export function getTableRowCount(tableName: string, requestedRows: number, profile?: string): number {

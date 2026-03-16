@@ -6763,6 +6763,222 @@
     "demo_data": {
       "facilities": [
         {
+          "facility_id": "F-1",
+          "facility_name": "Meridian Aerospace — USD Revolver 2027",
+          "counterparty_id": "CP-1",
+          "counterparty_name": "Meridian Aerospace Holdings Inc.",
+          "lob_segment_id": "SEG-1",
+          "desk_name": "Unknown",
+          "portfolio_name": "Unknown",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 250000000,
+          "collateral_value": 252000000,
+          "ltv_pct": 99.21,
+          "positions": [
+            {
+              "position_id": "P-1",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 120000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-11",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 130000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-21",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 125000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-31",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 110000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-41",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 115000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 1,
+            "amendment_event_id": 1
+          }
+        },
+        {
+          "facility_id": "F-3",
+          "facility_name": "Pacific Ridge — Multi-Currency RCF",
+          "counterparty_id": "CP-3",
+          "counterparty_name": "Pacific Ridge Energy LLC",
+          "lob_segment_id": "SEG-3",
+          "desk_name": "Global Corporate Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1000000000,
+          "collateral_value": 425566666,
+          "ltv_pct": 234.98,
+          "positions": [
+            {
+              "position_id": "P-3",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 800000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-13",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 820000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-23",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 780000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-33",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 750000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-43",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 790000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 1,
+            "amendment_event_id": 3
+          }
+        },
+        {
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1500000000,
+          "collateral_value": 2283000000,
+          "ltv_pct": 65.7,
+          "positions": [
+            {
+              "position_id": "P-6",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1200000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-16",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1180000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-26",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1220000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-36",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-46",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1190000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 1,
+            "amendment_event_id": 6
+          }
+        },
+        {
+          "facility_id": "F-9",
+          "facility_name": "Ironclad Infrastructure — Global Revolver",
+          "counterparty_id": "CP-9",
+          "counterparty_name": "Ironclad Infrastructure Partners LP",
+          "lob_segment_id": "SEG-9",
+          "desk_name": "Upper Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 600000000,
+          "collateral_value": 558066666,
+          "ltv_pct": 107.51,
+          "positions": [
+            {
+              "position_id": "P-9",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 600000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-19",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 580000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-29",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 620000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-39",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 560000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-49",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 590000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 1,
+            "amendment_event_id": 9
+          }
+        },
+        {
           "facility_id": "F-10",
           "facility_name": "Crestview REIT — Credit Facility",
           "counterparty_id": "CP-10",
@@ -6814,74 +7030,6 @@
           "extra_fields": {
             "metric_value": 1,
             "amendment_event_id": 10
-          }
-        },
-        {
-          "facility_id": "F-11",
-          "facility_name": "Apex — USD Revolver 2025-A",
-          "counterparty_id": "CP-11",
-          "counterparty_name": "Apex Cloud Technologies Inc.",
-          "lob_segment_id": "SEG-11",
-          "desk_name": "Regional Middle Market Desk",
-          "portfolio_name": "Middle Market Banking",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 414487067,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
-          "extra_fields": {
-            "metric_value": 0
-          }
-        },
-        {
-          "facility_id": "F-112",
-          "facility_name": "Ridgeline — USD Revolver 2027-A",
-          "counterparty_id": "CP-34",
-          "counterparty_name": "Ridgeline Petroleum Corp.",
-          "lob_segment_id": "SEG-112",
-          "desk_name": "Off-Campus Student Housing Desk",
-          "portfolio_name": "Student Housing",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 390417405,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
-          "extra_fields": {
-            "metric_value": 0
-          }
-        },
-        {
-          "facility_id": "F-215",
-          "facility_name": "Brightstar — USD Revolver 2026-A",
-          "counterparty_id": "CP-62",
-          "counterparty_name": "Brightstar Beverage Holdings Inc.",
-          "lob_segment_id": "SEG-215",
-          "desk_name": "Unsecured Personal Lending Desk",
-          "portfolio_name": "Personal Loans",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 61286800,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
-          "extra_fields": {
-            "metric_value": 0
-          }
-        },
-        {
-          "facility_id": "F-311",
-          "facility_name": "Portside — SGD Revolver 2027-A",
-          "counterparty_id": "CP-83",
-          "counterparty_name": "Portside Maritime Logistics Ltd.",
-          "lob_segment_id": "SEG-62",
-          "desk_name": "Single-Tenant Net-Lease Retail Desk",
-          "portfolio_name": "Retail",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 36544102,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
-          "extra_fields": {
-            "metric_value": 0
           }
         }
       ]
@@ -68799,69 +68947,213 @@
           }
         },
         {
-          "facility_id": "F-102",
-          "facility_name": "Zenith — JPY Revolver 2026-A",
-          "counterparty_id": "CP-32",
-          "counterparty_name": "Zenith Health Systems KK",
-          "lob_segment_id": "SEG-102",
-          "desk_name": "Net Asset Value (NAV) Desk",
-          "portfolio_name": "CRE Structured Finance",
+          "facility_id": "F-3",
+          "facility_name": "Pacific Ridge — Multi-Currency RCF",
+          "counterparty_id": "CP-3",
+          "counterparty_name": "Pacific Ridge Energy LLC",
+          "lob_segment_id": "SEG-3",
+          "desk_name": "Global Corporate Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 846861680,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
+          "committed_amt": 1000000000,
+          "collateral_value": 425566666,
+          "ltv_pct": 234.98,
+          "positions": [
+            {
+              "position_id": "P-3",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 800000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-13",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 820000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-23",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 780000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-33",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 750000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-43",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 790000000,
+              "description": "Position exposure"
+            }
+          ],
           "extra_fields": {
             "metric_value": 0
           }
         },
         {
-          "facility_id": "F-203",
-          "facility_name": "Summit Defense — USD TL-B 2026-C",
-          "counterparty_id": "CP-58",
-          "counterparty_name": "Summit Defense Systems Inc.",
-          "lob_segment_id": "SEG-203",
-          "desk_name": "Government-Insured Mortgage Desk",
-          "portfolio_name": "Residential Mortgages",
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 802183051,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
+          "committed_amt": 1500000000,
+          "collateral_value": 2283000000,
+          "ltv_pct": 65.7,
+          "positions": [
+            {
+              "position_id": "P-6",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1200000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-16",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1180000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-26",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1220000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-36",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-46",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1190000000,
+              "description": "Position exposure"
+            }
+          ],
           "extra_fields": {
             "metric_value": 0
           }
         },
         {
-          "facility_id": "F-304",
-          "facility_name": "Transcon Rail — USD Bridge 2026-D",
-          "counterparty_id": "CP-81",
-          "counterparty_name": "Transcontinental Rail Holdings Inc.",
-          "lob_segment_id": "SEG-55",
-          "desk_name": "Lease Up Multifamily Desk",
-          "portfolio_name": "Residential",
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
+          "desk_name": "Unknown",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 119014096,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
+          "positions": [
+            {
+              "position_id": "P-8",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 90000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-18",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 95000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-28",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-38",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 85000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-48",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 80000000,
+              "description": "Position exposure"
+            }
+          ],
           "extra_fields": {
             "metric_value": 0
           }
         },
         {
-          "facility_id": "F-405",
-          "facility_name": "Mountain State — USD L/C 2028-E",
-          "counterparty_id": "CP-100",
-          "counterparty_name": "Mountain State Natural Gas LLC",
-          "lob_segment_id": "SEG-156",
-          "desk_name": "Energy Commodities Desk",
-          "portfolio_name": "Commodities",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 4674537,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
+          "positions": [
+            {
+              "position_id": "P-10",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-20",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2050000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-30",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-40",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2000000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-50",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2080000000,
+              "description": "Position exposure"
+            }
+          ],
           "extra_fields": {
             "metric_value": 0
           }
@@ -69049,6 +69341,114 @@
     "demo_data": {
       "facilities": [
         {
+          "facility_id": "F-1",
+          "facility_name": "Meridian Aerospace — USD Revolver 2027",
+          "counterparty_id": "CP-1",
+          "counterparty_name": "Meridian Aerospace Holdings Inc.",
+          "lob_segment_id": "SEG-1",
+          "desk_name": "Unknown",
+          "portfolio_name": "Unknown",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 250000000,
+          "collateral_value": 252000000,
+          "ltv_pct": 99.21,
+          "positions": [
+            {
+              "position_id": "P-1",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 120000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-11",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 130000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-21",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 125000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-31",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 110000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-41",
+              "facility_id": "F-1",
+              "product_code": "LOAN",
+              "balance_amount": 115000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 1,
+            "is_active_flag": "Y"
+          }
+        },
+        {
+          "facility_id": "F-4",
+          "facility_name": "Silverton Financial — Bridge Facility",
+          "counterparty_id": "CP-4",
+          "counterparty_name": "Silverton Financial Group",
+          "lob_segment_id": "SEG-4",
+          "desk_name": "Domestic Large-Cap Corporates Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 2500000000,
+          "collateral_value": 1028000000,
+          "ltv_pct": 243.19,
+          "positions": [
+            {
+              "position_id": "P-4",
+              "facility_id": "F-4",
+              "product_code": "LOAN",
+              "balance_amount": 0,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-14",
+              "facility_id": "F-4",
+              "product_code": "LOAN",
+              "balance_amount": 0,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-24",
+              "facility_id": "F-4",
+              "product_code": "LOAN",
+              "balance_amount": 0,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-34",
+              "facility_id": "F-4",
+              "product_code": "LOAN",
+              "balance_amount": 0,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-44",
+              "facility_id": "F-4",
+              "product_code": "LOAN",
+              "balance_amount": 0,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 1,
+            "is_active_flag": "Y"
+          }
+        },
+        {
           "facility_id": "F-5",
           "facility_name": "Atlas Industrial — Working Capital RCF",
           "counterparty_id": "CP-5",
@@ -69103,72 +69503,108 @@
           }
         },
         {
-          "facility_id": "F-62",
-          "facility_name": "Titan — GBP Bridge 2025-D",
-          "counterparty_id": "CP-22",
-          "counterparty_name": "Titan Cybersecurity Group Ltd.",
-          "lob_segment_id": "SEG-62",
-          "desk_name": "Single-Tenant Net-Lease Retail Desk",
-          "portfolio_name": "Retail",
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
+          "desk_name": "Unknown",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 58779873,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
+          "positions": [
+            {
+              "position_id": "P-8",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 90000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-18",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 95000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-28",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-38",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 85000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-48",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 80000000,
+              "description": "Position exposure"
+            }
+          ],
           "extra_fields": {
             "metric_value": 1,
             "is_active_flag": "Y"
           }
         },
         {
-          "facility_id": "F-179",
-          "facility_name": "Pinnacle Aero — USD Revolver 2027-A",
-          "counterparty_id": "CP-53",
-          "counterparty_name": "Pinnacle Aerospace Components Corp.",
-          "lob_segment_id": "SEG-179",
-          "desk_name": "Single Family Office Desk",
-          "portfolio_name": "Family Office Services",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 381779832,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
-          "extra_fields": {
-            "metric_value": 1,
-            "is_active_flag": "Y"
-          }
-        },
-        {
-          "facility_id": "F-288",
-          "facility_name": "Grandview — USD Bridge 2028-D",
-          "counterparty_id": "CP-78",
-          "counterparty_name": "Grandview Senior Living REIT",
-          "lob_segment_id": "SEG-39",
-          "desk_name": "Construction Office Desk",
-          "portfolio_name": "Office",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 48975927,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
-          "extra_fields": {
-            "metric_value": 1,
-            "is_active_flag": "Y"
-          }
-        },
-        {
-          "facility_id": "F-405",
-          "facility_name": "Mountain State — USD L/C 2028-E",
-          "counterparty_id": "CP-100",
-          "counterparty_name": "Mountain State Natural Gas LLC",
-          "lob_segment_id": "SEG-156",
-          "desk_name": "Energy Commodities Desk",
-          "portfolio_name": "Commodities",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 4674537,
-          "collateral_value": 0,
-          "ltv_pct": 0,
-          "positions": [],
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
+          "positions": [
+            {
+              "position_id": "P-10",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-20",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2050000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-30",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-40",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2000000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-50",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2080000000,
+              "description": "Position exposure"
+            }
+          ],
           "extra_fields": {
             "metric_value": 1,
             "is_active_flag": "Y"
@@ -69765,60 +70201,6 @@
     "demo_data": {
       "facilities": [
         {
-          "facility_id": "F-1",
-          "facility_name": "Meridian Aerospace — USD Revolver 2027",
-          "counterparty_id": "CP-1",
-          "counterparty_name": "Meridian Aerospace Holdings Inc.",
-          "lob_segment_id": "SEG-1",
-          "desk_name": "Unknown",
-          "portfolio_name": "Unknown",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 250000000,
-          "collateral_value": 252000000,
-          "ltv_pct": 99.21,
-          "positions": [
-            {
-              "position_id": "P-1",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 120000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-11",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 130000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-21",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 125000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-31",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 110000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-41",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 115000000,
-              "description": "Position exposure"
-            }
-          ],
-          "extra_fields": {
-            "metric_value": 0,
-            "internal_risk_rating": "internal_risk_rating_1"
-          }
-        },
-        {
           "facility_id": "F-3",
           "facility_name": "Pacific Ridge — Multi-Currency RCF",
           "counterparty_id": "CP-3",
@@ -69868,62 +70250,62 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0,
-            "internal_risk_rating": "internal_risk_rating_3"
+            "metric_value": 4,
+            "internal_risk_rating": "AA-"
           }
         },
         {
-          "facility_id": "F-6",
-          "facility_name": "Greenfield Consumer — Syndicated RCF",
-          "counterparty_id": "CP-6",
-          "counterparty_name": "Greenfield Consumer Brands Inc.",
-          "lob_segment_id": "SEG-6",
-          "desk_name": "Public Company Coverage Desk",
+          "facility_id": "F-7",
+          "facility_name": "Pinnacle Healthcare — Bilateral Term",
+          "counterparty_id": "CP-7",
+          "counterparty_name": "Pinnacle Healthcare Systems Corp.",
+          "lob_segment_id": "SEG-7",
+          "desk_name": "Strategic Relationship Management Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1500000000,
-          "collateral_value": 2283000000,
-          "ltv_pct": 65.7,
+          "committed_amt": 3000000000,
+          "collateral_value": 370500000,
+          "ltv_pct": 809.72,
           "positions": [
             {
-              "position_id": "P-6",
-              "facility_id": "F-6",
+              "position_id": "P-7",
+              "facility_id": "F-7",
               "product_code": "LOAN",
-              "balance_amount": 1200000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-16",
-              "facility_id": "F-6",
+              "position_id": "P-17",
+              "facility_id": "F-7",
               "product_code": "LOAN",
-              "balance_amount": 1180000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-26",
-              "facility_id": "F-6",
+              "position_id": "P-27",
+              "facility_id": "F-7",
               "product_code": "LOAN",
-              "balance_amount": 1220000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-36",
-              "facility_id": "F-6",
+              "position_id": "P-37",
+              "facility_id": "F-7",
               "product_code": "LOAN",
-              "balance_amount": 1150000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-46",
-              "facility_id": "F-6",
+              "position_id": "P-47",
+              "facility_id": "F-7",
               "product_code": "LOAN",
-              "balance_amount": 1190000000,
+              "balance_amount": 0,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 0,
-            "internal_risk_rating": "internal_risk_rating_6"
+            "metric_value": 16,
+            "internal_risk_rating": "B-"
           }
         },
         {
@@ -69976,8 +70358,62 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0,
-            "internal_risk_rating": "internal_risk_rating_8"
+            "metric_value": 9,
+            "internal_risk_rating": "BBB"
+          }
+        },
+        {
+          "facility_id": "F-9",
+          "facility_name": "Ironclad Infrastructure — Global Revolver",
+          "counterparty_id": "CP-9",
+          "counterparty_name": "Ironclad Infrastructure Partners LP",
+          "lob_segment_id": "SEG-9",
+          "desk_name": "Upper Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 600000000,
+          "collateral_value": 558066666,
+          "ltv_pct": 107.51,
+          "positions": [
+            {
+              "position_id": "P-9",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 600000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-19",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 580000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-29",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 620000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-39",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 560000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-49",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 590000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 11,
+            "internal_risk_rating": "BB+"
           }
         },
         {
@@ -70030,8 +70466,8 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0,
-            "internal_risk_rating": "internal_risk_rating_10"
+            "metric_value": 1,
+            "internal_risk_rating": "AAA"
           }
         }
       ]

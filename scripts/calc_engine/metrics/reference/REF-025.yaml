@@ -1,29 +1,35 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Product
+# Product — Exposure by Product
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-025"
 name: "Product"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "reference"
 sub_domain: "master-data"
-metric_class: HYBRID
+metric_class: CALCULATED
 direction: NEUTRAL
-unit_type: ORDINAL
-display_format: "s"
+unit_type: CURRENCY
+display_format: "$,.0f"
 description: >
-  Product classification assigned to the contract offering. Supports product-
-  level segmentation and performance analysis.
+  Total drawn exposure (bank-share-adjusted) segmented by product
+  classification from the Enterprise Product Taxonomy. Supports
+  portfolio composition analysis and product-level concentration
+  monitoring. At facility level, returns the facility's exposure in
+  local currency. At aggregate levels, converts to USD via FX rate.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Product-level exposure segmentation for concentration risk"
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Facility-level product classification and exposure"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -35,13 +41,22 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: product_id
+      - name: drawn_amount
         role: MEASURE
+        description: "Outstanding drawn exposure"
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's syndication share percentage"
+      - name: product_node_id
+        role: DIMENSION
+        description: "FK to enterprise_product_taxonomy"
+      - name: currency_code
+        role: DIMENSION
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = fes.facility_id"
+    join_on: "fm.facility_id = fes.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -51,61 +66,89 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_product_taxonomy
+    alias: ept
+    join_type: LEFT
+    join_on: "ept.product_node_id = fes.product_node_id"
+    fields:
+      - name: product_node_id
+        role: JOIN_KEY
+      - name: product_code
+        role: DIMENSION
+        description: "Product classification code"
+      - name: product_name
+        role: DIMENSION
+        description: "Human-readable product name"
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
+        description: "FX spot rate to convert local currency to USD"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: SUM
     formula_text: >
-      SUM(product_id) per facility from facility_exposure_snapshot.
+      SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency.
+      Product classification available via enterprise_product_taxonomy join.
     formula_sql: |
       SELECT
         fes.facility_id AS dimension_key,
-        SUM(fes.product_id) AS metric_value
+        SUM(fes.drawn_amount
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0) AS metric_value
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
-      
+        AND fm.is_current_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
       GROUP BY fes.facility_id
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level product_id per counterparty.
+      SUM of facility-level drawn exposure (bank-share-adjusted, USD-converted)
+      per counterparty. FX conversion applied.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          SUM(fes.product_id) AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fes.facility_id
-          AND fm.is_active_flag = 'Y'
-      
-        WHERE fes.as_of_date = :as_of_date
-        GROUP BY fes.facility_id
-      ) fac
+        SUM(fes.drawn_amount
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+          * COALESCE(fx.rate, 1)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level product_id per L3 desk segment.
+      SUM of facility-level drawn exposure (bank-share-adjusted, USD-converted)
+      per L3 desk segment via EBT hierarchy.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -113,25 +156,29 @@ levels:
       FROM (
         SELECT
           fes.facility_id AS dimension_key,
-          SUM(fes.product_id) AS metric_value
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fes.facility_id
-          AND fm.is_active_flag = 'Y'
-      
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
         WHERE fes.as_of_date = :as_of_date
-        GROUP BY fes.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level product_id per L2 portfolio segment.
+      SUM of facility-level drawn exposure (bank-share-adjusted, USD-converted)
+      per L2 portfolio segment via EBT hierarchy (one hop up).
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -139,27 +186,32 @@ levels:
       FROM (
         SELECT
           fes.facility_id AS dimension_key,
-          SUM(fes.product_id) AS metric_value
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fes.facility_id
-          AND fm.is_active_flag = 'Y'
-      
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
         WHERE fes.as_of_date = :as_of_date
-        GROUP BY fes.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level product_id per L1 business segment segment.
+      SUM of facility-level drawn exposure (bank-share-adjusted, USD-converted)
+      per L1 business segment via EBT hierarchy (two hops up).
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
@@ -167,24 +219,29 @@ levels:
       FROM (
         SELECT
           fes.facility_id AS dimension_key,
-          SUM(fes.product_id) AS metric_value
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1) AS metric_value
         FROM l2.facility_exposure_snapshot fes
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fes.facility_id
-          AND fm.is_active_flag = 'Y'
-      
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
         WHERE fes.as_of_date = :as_of_date
-        GROUP BY fes.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.dimension_key
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -195,17 +252,26 @@ output:
 validations:
   - rule_id: "REF-025-V01"
     type: NOT_NULL
-    description: "No null product_id values"
+    description: "No null exposure values for active facilities"
     severity: ERROR
+  - rule_id: "REF-025-V02"
+    type: NON_NEGATIVE
+    description: "Drawn exposure must be >= 0"
+    severity: ERROR
+  - rule_id: "REF-025-V03"
+    type: RECONCILIATION
+    description: "SUM(facility values) should equal counterparty value for same-currency counterparties"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-068"
-  abbreviation: "P"
+  abbreviation: "PROD"
   insight: >
-    Understanding portfolio composition
+    Understanding portfolio composition — total drawn exposure segmented
+    by product classification from Enterprise Product Taxonomy.
   rollup_strategy: "direct-sum"
-  primary_value_field: "product_id"
+  primary_value_field: "drawn_amount"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "product", "concentration"]
 dashboard_pages: []
 legacy_metric_ids: []

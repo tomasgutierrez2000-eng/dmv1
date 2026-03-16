@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Risk Rating Status - External (e.g. Downgrade, Upgrade, Stable)
+# Risk Rating Status - External (Downgrade / Upgrade / Stable)
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "RSK-004"
 name: "Risk Rating Status - External (e.g. Downgrade, Upgrade, Stable)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,18 +18,21 @@ direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Derived directional indicator reflecting movement in external credit agency
-  rating and changes month over month, which depicts the month-over-month change
-  reflecting an upgrade (e.g. A to AA), downgrade (e.g., B+ to B-) or stable
-  (remaing constant month over month), as compared to prior month reporting
-  periods. Note when this is displayed at an aggregated Line of Business or
-  portfolio level, it is determined by the month-over-month change of the
-  average rating at this level. Supports benchmarking against market perception
-  and helps validate internal risk assessment trends.
+  Directional indicator of external credit rating migration, derived from
+  the sign of month-over-month rating notch changes in
+  counterparty_rating_observation. Encoded as: -1 = Downgrade, 0 = Stable,
+  +1 = Upgrade. At aggregate (desk/portfolio/segment) levels, determined by
+  the sign of the average rating change steps across all counterparties in
+  the LOB — consistent with the spec requirement that LOB-level status
+  reflects the direction of the LOB-average rating movement, not a vote
+  count of individual counterparty directions.
+  No facility-level calculation (ratings are per counterparty).
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "External rating migration monitoring for credit risk"
+  - framework: "OCC 2020-36"
+    description: "Credit risk review — rating trend analysis"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -37,17 +40,21 @@ source_tables:
     alias: cro
     join_type: BASE
     fields:
-      - name: facility_id
+      - name: counterparty_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: risk_rating_status
+      - name: risk_rating_change_steps
         role: MEASURE
+        description: "Integer notch change (positive=upgrade, negative=downgrade)"
+      - name: is_internal_flag
+        role: FILTER
+        description: "Filter to external ratings only (= 'N')"
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = cro.facility_id"
+    join_on: "fm.counterparty_id = cro.counterparty_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -57,119 +64,173 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Read risk_rating_status from counterparty_rating_observation for each
-      facility as-of reporting date.
+      Not directly applicable — ratings are per counterparty, not facility.
+      Passthrough: assigns counterparty's external rating status to each
+      of its facilities via facility_master.counterparty_id join.
     formula_sql: |
       SELECT
-        cro.facility_id AS dimension_key,
-        cro.risk_rating_status AS metric_value
-      FROM l2.counterparty_rating_observation cro
-      WHERE cro.as_of_date = :as_of_date
+        fm.facility_id AS dimension_key,
+        CASE
+          WHEN AVG(cro.risk_rating_change_steps * 1.0) < 0 THEN -1
+          WHEN AVG(cro.risk_rating_change_steps * 1.0) > 0 THEN 1
+          ELSE 0
+        END AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty_rating_observation cro
+        ON cro.counterparty_id = fm.counterparty_id
+        AND cro.is_internal_flag = 'N'
+        AND cro.as_of_date = :as_of_date
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      GROUP BY fm.facility_id
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_status per counterparty.
+      AVG of external rating change steps per counterparty, then SIGN:
+      < 0 → Downgrade (-1), = 0 → Stable (0), > 0 → Upgrade (+1).
+      Averages across multiple agency observations (Moody's, S&P, Fitch).
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_status AS metric_value
-        FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+        cro.counterparty_id AS dimension_key,
+        CASE
+          WHEN AVG(cro.risk_rating_change_steps * 1.0) < 0 THEN -1
+          WHEN AVG(cro.risk_rating_change_steps * 1.0) > 0 THEN 1
+          ELSE 0
+        END AS metric_value
+      FROM l2.counterparty_rating_observation cro
+      WHERE cro.is_internal_flag = 'N'
+        AND cro.as_of_date = :as_of_date
+      GROUP BY cro.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_status per L3 desk segment.
+      AVG of counterparty-level external rating change steps across all
+      unique counterparties in the L3 desk segment, then SIGN to classify
+      the desk-level migration direction.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        CASE
+          WHEN AVG(cp_rating.change_steps) < 0 THEN -1
+          WHEN AVG(cp_rating.change_steps) > 0 THEN 1
+          ELSE 0
+        END AS metric_value
       FROM (
         SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_status AS metric_value
+          cro.counterparty_id,
+          AVG(cro.risk_rating_change_steps * 1.0) AS change_steps
         FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        WHERE cro.is_internal_flag = 'N'
+          AND cro.as_of_date = :as_of_date
+        GROUP BY cro.counterparty_id
+      ) cp_rating
+      INNER JOIN (
+        SELECT DISTINCT counterparty_id, lob_segment_id
+        FROM l2.facility_master
+        WHERE is_active_flag = 'Y'
+          AND is_current_flag = 'Y'
+      ) fm ON fm.counterparty_id = cp_rating.counterparty_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_status per L2 portfolio segment.
+      AVG of counterparty-level external rating change steps across all
+      unique counterparties in the L2 portfolio segment (one hop up in EBT),
+      then SIGN to classify portfolio migration direction.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        CASE
+          WHEN AVG(cp_rating.change_steps) < 0 THEN -1
+          WHEN AVG(cp_rating.change_steps) > 0 THEN 1
+          ELSE 0
+        END AS metric_value
       FROM (
         SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_status AS metric_value
+          cro.counterparty_id,
+          AVG(cro.risk_rating_change_steps * 1.0) AS change_steps
         FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        WHERE cro.is_internal_flag = 'N'
+          AND cro.as_of_date = :as_of_date
+        GROUP BY cro.counterparty_id
+      ) cp_rating
+      INNER JOIN (
+        SELECT DISTINCT counterparty_id, lob_segment_id
+        FROM l2.facility_master
+        WHERE is_active_flag = 'Y'
+          AND is_current_flag = 'Y'
+      ) fm ON fm.counterparty_id = cp_rating.counterparty_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_status per L1 business segment segment.
+      AVG of counterparty-level external rating change steps across all
+      unique counterparties in the L1 business segment (two hops up in EBT),
+      then SIGN to classify segment migration direction.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        CASE
+          WHEN AVG(cp_rating.change_steps) < 0 THEN -1
+          WHEN AVG(cp_rating.change_steps) > 0 THEN 1
+          ELSE 0
+        END AS metric_value
       FROM (
         SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_status AS metric_value
+          cro.counterparty_id,
+          AVG(cro.risk_rating_change_steps * 1.0) AS change_steps
         FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        WHERE cro.is_internal_flag = 'N'
+          AND cro.as_of_date = :as_of_date
+        GROUP BY cro.counterparty_id
+      ) cp_rating
+      INNER JOIN (
+        SELECT DISTINCT counterparty_id, lob_segment_id
+        FROM l2.facility_master
+        WHERE is_active_flag = 'Y'
+          AND is_current_flag = 'Y'
+      ) fm ON fm.counterparty_id = cp_rating.counterparty_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
-depends_on: []
+depends_on:
+  - "RSK-005"
 # ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
@@ -177,17 +238,26 @@ output:
 validations:
   - rule_id: "RSK-004-V01"
     type: NOT_NULL
-    description: "No null risk_rating_status values"
+    description: "No null rating status values for counterparties with observations"
     severity: ERROR
+  - rule_id: "RSK-004-V02"
+    type: THRESHOLD
+    description: "Rating status encoded value must be -1, 0, or 1"
+    severity: ERROR
+    params:
+      min: -1
+      max: 1
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-071"
   abbreviation: "RRSE"
   insight: >
-    External risk dynamics monitoring
-  rollup_strategy: "direct-sum"
+    External risk dynamics monitoring — directional indicator of credit
+    migration (Downgrade=-1, Stable=0, Upgrade=+1) based on external
+    agency rating notch changes.
+  rollup_strategy: "weighted-avg"
   primary_value_field: "risk_rating_status"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["risk", "credit-ratings"]
+tags: ["risk", "credit-ratings", "migration", "external-rating"]
 dashboard_pages: []
 legacy_metric_ids: []

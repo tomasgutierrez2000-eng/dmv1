@@ -309,6 +309,10 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Seed data doesn't exercise metric | `risk_rating_change_steps` NULL for 929/930 rows | Populate seed data with realistic distributions via SQL migration (e.g., `UPDATE SET col = CASE WHEN id % 100 < 55 THEN 0 ...`) before declaring metric "working" |
 | Non-contiguous FK ID mapping | `410001 + ((id-1) % 123)` maps to gap IDs 410101-410123 | When remapping FK values with modulo, verify ALL mapped IDs exist in parent table — non-contiguous PK ranges have gaps that modulo doesn't avoid |
 | Dim chain completeness | `country_dim.region_code = 'AMER'` but no 'AMER' in `region_dim` | Verify full dim chain: source → bridge_dim → target_dim. Missing entries in ANY dim table silently NULL-out the entire join chain |
+| sql.js vs PG schema drift | `net_income_amt` exists in sql.js L2 but only in L3 in PG | Always test `formula_sql` against PostgreSQL — sql.js sample data adds fields to L2 tables that only exist in L3 in PG. Formulas pass sql.js but fail PG |
+| FK value range mismatch | `counterparty.industry_id = 1-10` but `industry_dim` uses NAICS codes 11+ | Verify FK values actually exist in parent dim PK range — values may be syntactically valid BIGINT but semantically wrong (no matching PK row) |
+| NULL weight column | `gross_exposure_usd` NULL for 347/2753 FES rows | Weighted avg returns NULL for entire segments when weight column has NULL gaps — verify weight columns have 100% coverage, not just formula correctness |
+| ROW_NUMBER for string rollup | `SUM(industry_name)` invalid at segment level | Use `ROW_NUMBER() OVER (PARTITION BY segment ORDER BY SUM(exposure) DESC)` to find dominant string value by exposure weight |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 

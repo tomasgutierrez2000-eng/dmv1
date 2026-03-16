@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "PRC-007"
 name: "Interest Rate Spread (%)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "market-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,26 +18,52 @@ direction: NEUTRAL
 unit_type: PERCENTAGE
 display_format: ".2f"
 description: >
-  Credit spread over reference base rate charged on exposure, expressed as
-  percentage. Represents risk premium embedded in pricing and supports yield
-  analysis.
+  Credit spread over reference base rate charged on exposure, expressed in
+  basis points. Represents risk premium embedded in pricing. Aggregated
+  using exposure-weighted average to avoid Simpson's paradox.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Pricing adequacy and yield analysis"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: facility_master
-    alias: fm
+    table: facility_pricing_snapshot
+    alias: fps
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: spread_bps
+        role: MEASURE
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date"
+    fields:
+      - name: committed_amount
+        role: MEASURE
+      - name: bank_share_pct
+        role: MEASURE
+      - name: lob_segment_id
+        role: DIMENSION
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = fps.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
       - name: is_active_flag
         role: FILTER
-      - name: interest_rate_spread_bps
-        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -51,109 +77,103 @@ source_tables:
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: CUSTOM
+    aggregation_type: RAW
     formula_text: >
-      Facility Asset Spread/ Total Outstanding Balance
-    formula_sql: |
+      Raw spread_bps from facility_pricing_snapshot for each facility.
+    formula_sql: |-
       SELECT
-        fm.facility_id AS dimension_key,
-        fm.interest_rate_spread_bps AS metric_value
-      FROM l2.facility_master fm
-      WHERE fm.is_active_flag = 'Y'
-        AND fm.is_current_flag = 'Y'
+        fps.facility_id AS dimension_key,
+        fps.spread_bps AS metric_value
+      FROM l2.facility_pricing_snapshot fps
+      WHERE fps.as_of_date = :as_of_date
   counterparty:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      Exposure-weighted average of interest_rate_spread_bps across counterparty
-      facilities.
-    formula_sql: |
+      Exposure-weighted average of spread_bps across counterparty facilities.
+      Weight = committed_amount * bank_share_pct.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.interest_rate_spread_bps AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+          AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level interest_rate_spread_bps per L3 desk segment.
-    formula_sql: |
+      Exposure-weighted average of spread_bps per L3 desk segment.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.interest_rate_spread_bps AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+          AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level interest_rate_spread_bps per L2 portfolio segment.
-    formula_sql: |
+      Exposure-weighted average of spread_bps per L2 portfolio segment.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.interest_rate_spread_bps AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+          AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level interest_rate_spread_bps per L1 business segment
-      segment.
-    formula_sql: |
+      Exposure-weighted average of spread_bps per L1 business segment.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.interest_rate_spread_bps AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
+        SUM(fps.spread_bps * fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0), 0)
+          AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -164,8 +184,19 @@ output:
 validations:
   - rule_id: "PRC-007-V01"
     type: NOT_NULL
-    description: "No null interest_rate_spread_bps values"
+    description: "No null spread_bps values"
     severity: ERROR
+  - rule_id: "PRC-007-V02"
+    type: NON_NEGATIVE
+    description: "Spread must be >= 0 (negative spread is unusual)"
+    severity: WARNING
+  - rule_id: "PRC-007-V03"
+    type: THRESHOLD
+    description: "Spread typically between 0 and 2000 bps"
+    severity: WARNING
+    params:
+      min: 0
+      max: 2000
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-081"
@@ -173,8 +204,8 @@ catalogue:
   insight: >
     Risk premium pricing level
   rollup_strategy: "weighted-avg"
-  primary_value_field: "interest_rate_spread_bps"
+  primary_value_field: "spread_bps"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["pricing", "facility-pricing"]
+tags: ["pricing", "facility-pricing", "spread"]
 dashboard_pages: []
 legacy_metric_ids: []

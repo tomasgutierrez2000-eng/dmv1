@@ -1540,7 +1540,7 @@
     ]
   },
   "MET-057": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "lgd_pct"
     },
@@ -1553,11 +1553,35 @@
           "sample_value": 0,
           "source_table": "facility_risk_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "outstanding_balance_amt",
+          "label": "outstanding_balance_amt",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Calculated lgd_pct per facility.\n"
+      "formula_display": "Direct lookup of lgd_pct per facility from facility_risk_snapshot. No aggregation needed — facility-level LGD is a sourced atomic value.\n"
     },
     "worked_example_columns": [
       {
@@ -1566,6 +1590,24 @@
         "format": "percentage",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "outstanding_balance_amt",
+        "header": "Outstanding Balance ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -3228,7 +3270,7 @@
     ]
   },
   "MET-053": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "none",
     "metric_fields": {
       "primary_value": "parent"
     },
@@ -3245,7 +3287,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+      "formula_display": "Direct lookup of parent code from enterprise_business_taxonomy via facility_master.lob_segment_id.\n"
     },
     "worked_example_columns": [
       {
@@ -3258,7 +3300,7 @@
     ]
   },
   "MET-054": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "none",
     "metric_fields": {
       "primary_value": "parent"
     },
@@ -3275,7 +3317,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+      "formula_display": "Traverse two hops up the EBT hierarchy from facility lob_segment_id to reach the L1 department ancestor and return its parent code.\n"
     },
     "worked_example_columns": [
       {
@@ -3288,7 +3330,7 @@
     ]
   },
   "MET-055": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "none",
     "metric_fields": {
       "primary_value": "parent"
     },
@@ -3305,7 +3347,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+      "formula_display": "Traverse one hop up the EBT hierarchy from facility lob_segment_id to reach the L2 portfolio ancestor and return its parent code.\n"
     },
     "worked_example_columns": [
       {
@@ -3318,7 +3360,7 @@
     ]
   },
   "MET-056": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "none",
     "metric_fields": {
       "primary_value": "parent"
     },
@@ -3335,7 +3377,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of parent from enterprise_business_taxonomy.\n"
+      "formula_display": "Direct lookup of parent code from enterprise_business_taxonomy via facility_master.lob_segment_id. For L3-assigned facilities this returns the L3 desk parent code.\n"
     },
     "worked_example_columns": [
       {

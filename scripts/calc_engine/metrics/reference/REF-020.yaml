@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Line of Business L2
+# Line of Business L2 (Portfolio)
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-020"
 name: "Line of Business L2"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,134 +18,138 @@ direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Level 2 Line of Business hierarchy for intermediate aggregation and reporting,
-  representing the Portfolio within the L1 LoB (e.g., CRE > Office)
+  Level 2 (Portfolio) Line of Business hierarchy code. For each facility,
+  traverses one hop up from the assigned EBT segment via parent_segment_id
+  to reach the L2 portfolio node, returning its parent path code.
+  Enables detailed business segment analysis (e.g. CRE > Office).
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Business line sub-classification for risk aggregation"
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 sub-line of business reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
-    table: enterprise_business_taxonomy
-    alias: ebt
+  - schema: l2
+    table: facility_master
+    alias: fm
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
-      - name: parent
-        role: MEASURE
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: JOIN_KEY
+      - name: is_active_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
-        role: DIMENSION
+        role: JOIN_KEY
+      - name: parent
+        role: MEASURE
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Direct lookup of parent from enterprise_business_taxonomy.
+      Traverse one hop up the EBT hierarchy from facility lob_segment_id
+      to reach the L2 portfolio ancestor and return its parent code.
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,
-        ebt.parent AS metric_value
+        ebt_l2.parent AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.facility_id = fm.facility_id
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read parent per counterparty.
+      Deterministic selection (MIN) of L2 portfolio parent code across
+      all facilities belonging to the counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        ebt.parent AS metric_value
-      FROM l1.enterprise_business_taxonomy ebt
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = ebt.facility_id
-        AND fm.is_active_flag = 'Y'
-      WHERE ebt.as_of_date = :as_of_date
+        MIN(ebt_l2.parent) AS metric_value
+      FROM l2.facility_master fm
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
+      GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM of facility-level parent per L3 desk segment.
+      For each L3 desk, traverse one hop up to the L2 portfolio
+      ancestor and return its parent code.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          ebt.parent AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.enterprise_business_taxonomy ebt
-          ON ebt.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(ebt_l2.parent) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM of facility-level parent per L2 portfolio segment.
+      At L2 portfolio level, the segment IS the L2 portfolio.
+      Return its own parent code directly.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          ebt.parent AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.enterprise_business_taxonomy ebt
-          ON ebt.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(ebt_l2.parent) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM of facility-level parent per L1 business segment segment.
+      For each L1 business segment, returns the L2 portfolio parent codes
+      of child portfolios. Uses MIN for deterministic string selection.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          ebt.parent AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l1.enterprise_business_taxonomy ebt
-          ON ebt.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(ebt_l2.parent) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -156,17 +160,17 @@ output:
 validations:
   - rule_id: "REF-020-V01"
     type: NOT_NULL
-    description: "No null parent values"
-    severity: ERROR
+    description: "No null L2 parent values for facilities with multi-level EBT assignment"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-055"
-  abbreviation: "LOBL"
+  abbreviation: "LOB_L2"
   insight: >
     Detailed business segment analysis
-  rollup_strategy: "direct-sum"
+  rollup_strategy: "none"
   primary_value_field: "parent"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "organizational-hierarchy"]
 dashboard_pages: []
 legacy_metric_ids: []

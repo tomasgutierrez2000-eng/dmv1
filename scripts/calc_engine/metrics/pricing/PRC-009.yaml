@@ -1,29 +1,38 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Pricing Exception Flag (Y/N)
+# Pricing Exception Status
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "PRC-009"
-name: "Pricing Exception Flag (Y/N)"
-version: "1.0.0"
+name: "Pricing Exception Status"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "pricing"
 sub_domain: "facility-pricing"
 metric_class: CALCULATED
-direction: NEUTRAL
-unit_type: ORDINAL
-display_format: "s"
+direction: LOWER_BETTER
+unit_type: PERCENTAGE
+display_format: ".2f"
 description: >
-  Boolean indicator identifying whether the exposure was approved outside
-  standard pricing policy thresholds at origination or amendment.
+  Pricing exception effectiveness metric. At facility level, returns
+  an ordinal encoding of the pricing_exception_status (APPROVED=3,
+  PENDING=2, DENIED=1, NONE=0). At aggregate levels, computes the
+  exception rate as COUNT(exception facilities) / COUNT(total facilities)
+  × 100, following the count-ratio rollup pattern. Re-counts at each
+  level to avoid Simpson's paradox. Complements PRC-003 (Exception Rate)
+  with status-level detail for governance drill-down.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "SRP30"
+    description: "Supervisory review — pricing governance and exception monitoring"
+  - framework: "OCC Guidance"
+    section: "2020-36"
+    description: "Credit underwriting — pricing exception tracking and status reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -35,8 +44,12 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: pricing_exception_flag
+      - name: is_pricing_exception_flag
         role: MEASURE
+        description: "Boolean flag indicating pricing exception approval"
+      - name: pricing_exception_status
+        role: MEASURE
+        description: "Exception status category (APPROVED, PENDING, DENIED)"
   - schema: l2
     table: facility_master
     alias: fm
@@ -50,6 +63,8 @@ source_tables:
       - name: lob_segment_id
         role: DIMENSION
       - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -65,96 +80,115 @@ source_tables:
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: >
-      Calculated pricing_exception_flag per facility.
-    formula_sql: |
+    formula_text: |
+      Ordinal encoding of pricing_exception_status per facility:
+        APPROVED = 3, PENDING = 2, DENIED = 1, NONE/NULL = 0.
+      Ingredients: pricing_exception_status (L2 facility_pricing_snapshot)
+    formula_sql: |-
       SELECT
         fps.facility_id AS dimension_key,
-        fps.pricing_exception_flag AS metric_value
-      FROM l3.facility_pricing_calc fps
-      WHERE fps.as_of_date = :as_of_date
+        CASE
+          WHEN fps.pricing_exception_status = 'APPROVED' THEN 3
+          WHEN fps.pricing_exception_status = 'PENDING' THEN 2
+          WHEN fps.pricing_exception_status = 'DENIED' THEN 1
+          ELSE 0
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fps.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
   counterparty:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_exception_flag per counterparty.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each counterparty:
+        1. LOAD is_pricing_exception_flag for all facilities
+        2. COMPUTE COUNT(exceptions) / COUNT(total facilities) × 100
+      Count-ratio rollup: re-counts from facility-level flags.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_exception_flag AS metric_value
-        FROM l3.facility_pricing_calc fps
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+        CASE WHEN COUNT(*) = 0 THEN NULL
+             ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
+                            THEN 1 ELSE 0 END) * 100.0
+                  / COUNT(*)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_exception_flag per L3 desk segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L3 Desk segment:
+        1. JOIN l1.enterprise_business_taxonomy on lob_segment_id
+        2. COMPUTE COUNT(exceptions) / COUNT(total facilities) × 100
+      Count-ratio rollup per desk.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_exception_flag AS metric_value
-        FROM l3.facility_pricing_calc fps
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+        CASE WHEN COUNT(*) = 0 THEN NULL
+             ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
+                            THEN 1 ELSE 0 END) * 100.0
+                  / COUNT(*)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_exception_flag per L2 portfolio segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. COMPUTE COUNT(exceptions) / COUNT(total facilities) × 100
+      Count-ratio rollup per portfolio. Drill-down returns exception
+      facility details: Facility_ID, Facility_Name, Counterparty_ID,
+      Counterparty_Name, Exception_Status, All_in_Rate.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_exception_flag AS metric_value
-        FROM l3.facility_pricing_calc fps
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+        CASE WHEN COUNT(*) = 0 THEN NULL
+             ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
+                            THEN 1 ELSE 0 END) * 100.0
+                  / COUNT(*)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pricing_exception_flag per L1 business segment
-      segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. COMPUTE COUNT(exceptions) / COUNT(total facilities) × 100
+      Count-ratio rollup per business segment.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          fps.pricing_exception_flag AS metric_value
-        FROM l3.facility_pricing_calc fps
-        WHERE fps.as_of_date = :as_of_date
-      ) fac
+        CASE WHEN COUNT(*) = 0 THEN NULL
+             ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
+                            THEN 1 ELSE 0 END) * 100.0
+                  / COUNT(*)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -171,19 +205,34 @@ output:
 validations:
   - rule_id: "PRC-009-V01"
     type: NOT_NULL
-    description: "No null pricing_exception_flag values"
+    description: "Exception status must not be null for active facilities"
     severity: ERROR
+  - rule_id: "PRC-009-V02"
+    type: THRESHOLD
+    description: "Exception rate at aggregate levels must be between 0% and 100%"
+    severity: ERROR
+    params:
+      min: 0
+      max: 100
+  - rule_id: "PRC-009-V03"
+    type: THRESHOLD
+    description: "Exception rate above 15% warrants governance review per OCC 2020-36"
+    severity: WARNING
+    params:
+      warning_above: 15
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-101"
-  abbreviation: "PEFY"
+  abbreviation: "PES"
   insight: >
-    Pricing governance discipline indicator; highlights exposures approved
-    outside standard pricing thresholds and signals potential margin compression
-    or policy override risk.
-  rollup_strategy: "direct-sum"
-  primary_value_field: "pricing_exception_flag"
+    Pricing governance status indicator. Facility-level status encoding
+    enables drill-down to individual exception decisions (APPROVED,
+    PENDING, DENIED). Aggregate-level exception rate measures overall
+    pricing discipline. Rates above 15% typically trigger OCC scrutiny.
+    Complements PRC-003 with status-level granularity.
+  rollup_strategy: "count-ratio"
+  primary_value_field: "exception_status"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["pricing", "facility-pricing"]
-dashboard_pages: []
+tags: ["pricing", "facility-pricing", "governance", "exceptions"]
+dashboard_pages: ["P3"]
 legacy_metric_ids: []

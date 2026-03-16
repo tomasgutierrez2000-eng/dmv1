@@ -5,26 +5,41 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-030"
 name: "Probability of Default (%)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "exposure"
 sub_domain: "risk-metrics"
 metric_class: CALCULATED
-direction: NEUTRAL
+direction: LOWER_BETTER
 unit_type: PERCENTAGE
-display_format: ".2f"
+display_format: ".4f"
 description: >
-  Model-estimated probability of default within defined horizon. Core credit
-  risk input supporting capital modeling, expected loss estimation, stress
+  Model-estimated probability of default (PD) within the defined rating
+  horizon. At facility level, sources the raw pd_pct from L2
+  facility_risk_snapshot. At aggregate levels, computes the exposure-
+  weighted average: SUM(pd_pct × committed_amount) / SUM(committed_amount).
+  This weighted-avg rollup avoids Simpson's paradox — never averages
+  pre-computed PD rates. Core credit risk input supporting IRB capital
+  modeling, expected loss estimation (EL = PD × LGD × EAD), stress
   testing, and risk appetite alignment.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "CRE30/CRE31"
+    description: "IRB approach — PD estimation and calibration requirements"
+  - framework: "IFRS 9"
+    section: "ECL"
+    description: "Expected credit loss — PD as key input parameter"
+  - framework: "CECL"
+    section: "ASC 326"
+    description: "Current expected credit losses — lifetime PD estimation"
+  - framework: "FR Y-14Q"
+    schedule: "H.1/H.2"
+    description: "Wholesale credit risk — PD reporting at facility and portfolio level"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -38,6 +53,18 @@ source_tables:
         role: FILTER
       - name: pd_pct
         role: MEASURE
+        description: "Probability of default as percentage (e.g. 0.085 = 0.085%)"
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = frs.facility_id AND fes.as_of_date = frs.as_of_date"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: committed_amount
+        role: MEASURE
+        description: "Committed facility amount — weight for exposure-weighted PD"
   - schema: l2
     table: facility_master
     alias: fm
@@ -51,6 +78,8 @@ source_tables:
       - name: lob_segment_id
         role: DIMENSION
       - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -66,96 +95,111 @@ source_tables:
 levels:
   facility:
     aggregation_type: RAW
-    formula_text: >
-      Read pd_pct from facility_risk_snapshot for each facility as-of reporting
-      date.
-    formula_sql: |
+    formula_text: |
+      Direct lookup of pd_pct from facility_risk_snapshot for each facility.
+      Ingredients: pd_pct (L2 facility_risk_snapshot — raw model output)
+    formula_sql: |-
       SELECT
         frs.facility_id AS dimension_key,
         frs.pd_pct AS metric_value
       FROM l2.facility_risk_snapshot frs
-      WHERE frs.as_of_date = :as_of_date
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = frs.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
   counterparty:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pd_pct per counterparty.
-    formula_sql: |
+    aggregation_type: WEIGHTED_AVG
+    formula_text: |
+      For each counterparty:
+        1. LOAD pd_pct and committed_amount per facility
+        2. COMPUTE exposure-weighted average PD:
+           SUM(pd_pct × committed_amount) / SUM(committed_amount)
+      Weighted-avg rollup ensures large-exposure facilities dominate the
+      counterparty-level PD, avoiding equal-weight averaging bias.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.pd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.pd_pct * COALESCE(fes.committed_amount, 0))
+          / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      AVG of facility-level pd_pct per L3 desk segment.
-    formula_sql: |
+    formula_text: |
+      For each L3 Desk segment:
+        1. LOAD pd_pct and committed_amount per facility
+        2. JOIN l1.enterprise_business_taxonomy on lob_segment_id
+        3. COMPUTE SUM(pd_pct × committed_amount) / SUM(committed_amount)
+      Weighted-avg rollup per desk.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.pd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.pd_pct * COALESCE(fes.committed_amount, 0))
+          / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      AVG of facility-level pd_pct per L2 portfolio segment.
-    formula_sql: |
+    formula_text: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. COMPUTE SUM(pd_pct × committed_amount) / SUM(committed_amount)
+      Weighted-avg rollup per portfolio. Per spec:
+      Σ(probability_of_default × Outstanding_Exposure) / Σ(Total Committed Amount)
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.pd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.pd_pct * COALESCE(fes.committed_amount, 0))
+          / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level pd_pct per L1 business segment segment.
-    formula_sql: |
+    aggregation_type: WEIGHTED_AVG
+    formula_text: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. COMPUTE SUM(pd_pct × committed_amount) / SUM(committed_amount)
+      Weighted-avg rollup per business segment.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.pd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.pd_pct * COALESCE(fes.committed_amount, 0))
+          / NULLIF(SUM(COALESCE(fes.committed_amount, 0)), 0) AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -172,17 +216,44 @@ output:
 validations:
   - rule_id: "EXP-030-V01"
     type: NOT_NULL
-    description: "No null pd_pct values"
+    description: "PD must not be null for rated facilities"
     severity: ERROR
+  - rule_id: "EXP-030-V02"
+    type: NON_NEGATIVE
+    description: "PD must be >= 0"
+    severity: ERROR
+  - rule_id: "EXP-030-V03"
+    type: THRESHOLD
+    description: "PD must be between 0% and 100%"
+    severity: ERROR
+    params:
+      min: 0
+      max: 100
+  - rule_id: "EXP-030-V04"
+    type: THRESHOLD
+    description: "Portfolio PD above 2% warrants sub-IG classification review"
+    severity: WARNING
+    params:
+      warning_above: 2
+  - rule_id: "EXP-030-V05"
+    type: PERIOD_OVER_PERIOD
+    description: "PD change > 50% quarter-over-quarter warrants investigation"
+    severity: WARNING
+    params:
+      max_change_pct: 50
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-067"
-  abbreviation: "POD"
+  abbreviation: "PD"
   insight: >
-    Expected portfolio default likelihood
+    Core credit risk parameter. Exposure-weighted PD at aggregate levels
+    reflects the true default probability of the portfolio — large
+    exposures with high PD dominate, as they should. IG portfolios
+    typically show 0.03-2% PD; sub-IG 2-10%; distressed >10%.
+    Key input to EL = PD × LGD × EAD and IRB capital calculations.
   rollup_strategy: "weighted-avg"
   primary_value_field: "pd_pct"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
-dashboard_pages: []
+tags: ["exposure", "risk-metrics", "irb", "pd", "credit-risk"]
+dashboard_pages: ["P1"]
 legacy_metric_ids: []

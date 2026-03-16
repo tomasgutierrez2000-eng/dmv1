@@ -1,11 +1,11 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Facility Type
+# Facility Type — Dominant Facility Type by Exposure
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-012"
 name: "Facility Type"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
 status: ACTIVE
 effective_date: "2026-01-01"
@@ -19,10 +19,10 @@ unit_type: ORDINAL
 display_format: "s"
 description: >
   Type of credit facility (e.g., Term Loan, Revolver, Letter of Credit).
-  Enables product-level segmentation, risk concentration analysis, and
-  performance benchmarking. At facility level returns the facility type
-  string; at aggregate levels returns the count of distinct active facilities
-  in the segment for distribution analysis.
+  At facility level, returns the facility_type string directly. At
+  counterparty and aggregate levels, returns the dominant facility type
+  by drawn exposure weight using ROW_NUMBER. Enables product-level
+  segmentation, risk concentration analysis, and performance benchmarking.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
@@ -46,6 +46,32 @@ source_tables:
         role: FILTER
       - name: is_current_flag
         role: FILTER
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = fm.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: drawn_amount
+        role: MEASURE
+        description: "Exposure weighting for dominant type selection"
+      - name: bank_share_pct
+        role: MEASURE
+      - name: currency_code
+        role: DIMENSION
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
+        description: "FX spot rate for USD conversion at aggregate levels"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -56,6 +82,8 @@ source_tables:
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
@@ -70,75 +98,159 @@ levels:
       WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
-    aggregation_type: RAW
+    aggregation_type: CUSTOM
     formula_text: >
-      Not in primary specification at counterparty level.
-      Supplementary: representative facility_type per counterparty (MIN).
+      Dominant facility type by drawn exposure weight per counterparty.
+      ROW_NUMBER partitioned by counterparty, ordered by total
+      bank-share-adjusted drawn amount descending.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        MIN(fm.facility_type) AS metric_value
-      FROM l2.facility_master fm
-      WHERE fm.is_active_flag = 'Y'
-        AND fm.is_current_flag = 'Y'
-      GROUP BY fm.counterparty_id
+        sub.counterparty_id AS dimension_key,
+        sub.facility_type AS metric_value
+      FROM (
+        SELECT
+          fm.counterparty_id,
+          fm.facility_type,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY fm.counterparty_id
+            ORDER BY SUM(fes.drawn_amount
+              * COALESCE(fes.bank_share_pct, 100.0) / 100.0) DESC
+          ) AS rn
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY fm.counterparty_id, fm.facility_type
+      ) sub
+      WHERE sub.rn = 1
   desk:
-    aggregation_type: COUNT
+    aggregation_type: CUSTOM
     formula_text: >
-      Count distinct active facilities per L3 desk segment. Provides
-      facility distribution for product mix analysis.
+      Dominant facility type by drawn exposure weight (USD-converted) per
+      L3 desk segment. ROW_NUMBER partitioned by desk, ordered by
+      total exposure descending.
     formula_sql: |
       SELECT
-        ebt.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fm.facility_id) AS metric_value
-      FROM l2.facility_master fm
-      LEFT JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.managed_segment_id = fm.lob_segment_id
+        sub.segment_id AS dimension_key,
+        sub.facility_type AS metric_value
+      FROM (
+        SELECT
+          ebt.managed_segment_id AS segment_id,
+          fm.facility_type,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1)) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY ebt.managed_segment_id
+            ORDER BY SUM(fes.drawn_amount
+              * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+              * COALESCE(fx.rate, 1)) DESC
+          ) AS rn
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.managed_segment_id = fm.lob_segment_id
           AND ebt.is_current_flag = 'Y'
-      WHERE fm.is_active_flag = 'Y'
-        AND fm.is_current_flag = 'Y'
-      GROUP BY ebt.managed_segment_id
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY ebt.managed_segment_id, fm.facility_type
+      ) sub
+      WHERE sub.rn = 1
   portfolio:
-    aggregation_type: COUNT
+    aggregation_type: CUSTOM
     formula_text: >
-      Count distinct active facilities per L2 portfolio segment. Provides
-      facility distribution for product mix analysis.
+      Dominant facility type by drawn exposure weight (USD-converted) per
+      L2 portfolio segment via EBT hierarchy (one hop up).
     formula_sql: |
       SELECT
-        ebt_l2.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fm.facility_id) AS metric_value
-      FROM l2.facility_master fm
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        sub.segment_id AS dimension_key,
+        sub.facility_type AS metric_value
+      FROM (
+        SELECT
+          ebt_l2.managed_segment_id AS segment_id,
+          fm.facility_type,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1)) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY ebt_l2.managed_segment_id
+            ORDER BY SUM(fes.drawn_amount
+              * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+              * COALESCE(fx.rate, 1)) DESC
+          ) AS rn
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
           AND ebt_l2.is_current_flag = 'Y'
-      WHERE fm.is_active_flag = 'Y'
-        AND fm.is_current_flag = 'Y'
-      GROUP BY ebt_l2.managed_segment_id
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY ebt_l2.managed_segment_id, fm.facility_type
+      ) sub
+      WHERE sub.rn = 1
   business_segment:
-    aggregation_type: COUNT
+    aggregation_type: CUSTOM
     formula_text: >
-      Count distinct active facilities per L1 business segment. Provides
-      facility distribution for product mix analysis.
+      Dominant facility type by drawn exposure weight (USD-converted) per
+      L1 business segment via EBT hierarchy (two hops up).
     formula_sql: |
       SELECT
-        ebt_l1.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fm.facility_id) AS metric_value
-      FROM l2.facility_master fm
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        sub.segment_id AS dimension_key,
+        sub.facility_type AS metric_value
+      FROM (
+        SELECT
+          ebt_l1.managed_segment_id AS segment_id,
+          fm.facility_type,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1)) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY ebt_l1.managed_segment_id
+            ORDER BY SUM(fes.drawn_amount
+              * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+              * COALESCE(fx.rate, 1)) DESC
+          ) AS rn
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
           AND ebt_l3.is_current_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
           AND ebt_l2.is_current_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+          ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
           AND ebt_l1.is_current_flag = 'Y'
-      WHERE fm.is_active_flag = 'Y'
-        AND fm.is_current_flag = 'Y'
-      GROUP BY ebt_l1.managed_segment_id
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY ebt_l1.managed_segment_id, fm.facility_type
+      ) sub
+      WHERE sub.rn = 1
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
 # ── OUTPUT ────────────────────────────────────────────────────
@@ -150,17 +262,15 @@ validations:
     type: NOT_NULL
     description: "No null facility_type values for active facilities"
     severity: ERROR
-  - rule_id: "REF-012-V02"
-    type: NON_NEGATIVE
-    description: "Facility count at aggregate levels must be non-negative"
-    severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-041"
   abbreviation: "FT"
   insight: >
-    Risk and product mix segmentation
-  rollup_strategy: "direct-sum"
+    Facility type classification. At facility level shows the type
+    string; at aggregate levels shows the dominant facility type by
+    drawn exposure weight.
+  rollup_strategy: "custom"
   primary_value_field: "facility_type"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["reference", "master-data", "product-mix"]

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drag-to-Zoom Demo – Data Model Visualizer</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .header .hint {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header .hint kbd {
+      padding: 2px 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+    .stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .stage.panning { cursor: grabbing; }
+    .stage.marquee { cursor: crosshair; }
+    .canvas {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+      background-size: 25px 25px;
+    }
+    .content {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+    .content.no-transition { transition: none; }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding: 80px;
+    }
+    .card {
+      width: 200px;
+      padding: 14px 16px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .card .title { font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+    .card .meta { font-size: 0.75rem; color: #94a3b8; }
+    .marquee-overlay {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .marquee-rect {
+      position: absolute;
+      background: rgba(59, 130, 246, 0.12);
+      border: 2px solid rgba(59, 130, 246, 0.85);
+      border-radius: 6px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+    }
+    .zoom-badge {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      z-index: 5;
+    }
+    .zoom-badge strong { color: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Drag-to-Zoom Demo</h1>
+    <div class="hint">
+      <span><kbd>Shift</kbd> + drag to draw a region → zooms into it</span>
+      <span>·</span>
+      <span>Drag (no Shift) to pan</span>
+      <span>·</span>
+      <span>Scroll to zoom</span>
+    </div>
+  </div>
+  <div class="stage" id="stage">
+    <div class="canvas" id="canvas"></div>
+    <div class="content" id="content">
+      <div class="cards" id="cards"></div>
+    </div>
+    <div class="marquee-overlay" id="marqueeOverlay"></div>
+    <div class="zoom-badge">Zoom: <strong id="zoomText">100</strong>%</div>
+  </div>
+
+  <script>
+    (function () {
+      const stage = document.getElementById('stage');
+      const content = document.getElementById('content');
+      const canvas = document.getElementById('canvas');
+      const marqueeOverlay = document.getElementById('marqueeOverlay');
+      const zoomText = document.getElementById('zoomText');
+
+      let zoom = 1;
+      let pan = { x: 0, y: 0 };
+      let isPanning = false;
+      let panStart = { x: 0, y: 0 };
+      let marqueeStart = null;
+      let marqueeCurrent = null;
+      let isAnimating = false;
+      const MIN_MARQUEE = 12;
+      const PADDING = 48;
+      const ZOOM_MIN = 0.08;
+      const ZOOM_MAX = 8;
+
+      const cards = [
+        'Accounts', 'Transactions', 'Customers', 'Products', 'Orders',
+        'Payments', 'Ledger', 'Rates', 'Portfolios', 'Holdings',
+        'Settlements', 'Counterparties', 'Currencies', 'Regulatory',
+      ];
+      const cardsEl = document.getElementById('cards');
+      cards.forEach((name, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<div class="title">${name}</div><div class="meta">Table · ${8 + (i % 5)} fields</div>`;
+        cardsEl.appendChild(card);
+      });
+
+      function getRect() { return stage.getBoundingClientRect(); }
+      function screenToWorld(sx, sy) {
+        const r = getRect();
+        const x = (sx - r.left - pan.x) / zoom;
+        const y = (sy - r.top - pan.y) / zoom;
+        return { x, y };
+      }
+      function applyTransform() {
+        content.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`;
+        zoomText.textContent = Math.round(zoom * 100);
+      }
+      function updateBackground() {
+        const r = getRect();
+        canvas.style.backgroundSize = `${25 * zoom}px ${25 * zoom}px`;
+        canvas.style.backgroundPosition = `${pan.x % (25 * zoom)}px ${pan.y % (25 * zoom)}px`;
+      }
+
+      function drawMarquee() {
+        marqueeOverlay.innerHTML = '';
+        if (!marqueeStart || !marqueeCurrent) return;
+        const r = getRect();
+        const x1 = marqueeStart.x - r.left;
+        const y1 = marqueeStart.y - r.top;
+        const x2 = marqueeCurrent.x - r.left;
+        const y2 = marqueeCurrent.y - r.top;
+        const left = Math.min(x1, x2);
+        const top = Math.min(y1, y2);
+        const width = Math.abs(x2 - x1);
+        const height = Math.abs(y2 - y1);
+        if (width < 2 && height < 2) return;
+        const rect = document.createElement('div');
+        rect.className = 'marquee-rect';
+        rect.style.left = left + 'px';
+        rect.style.top = top + 'px';
+        rect.style.width = width + 'px';
+        rect.style.height = height + 'px';
+        marqueeOverlay.appendChild(rect);
+      }
+
+      function zoomToRegion(screenLeft, screenTop, screenRight, screenBottom) {
+        const r = getRect();
+        const w1 = screenToWorld(screenLeft, screenTop);
+        const w2 = screenToWorld(screenRight, screenBottom);
+        const wMinX = Math.min(w1.x, w2.x);
+        const wMinY = Math.min(w1.y, w2.y);
+        const wWidth = Math.abs(w2.x - w1.x) || 1;
+        const wHeight = Math.abs(w2.y - w1.y) || 1;
+        const vpW = r.width;
+        const vpH = r.height;
+        const zoomX = (vpW - 2 * PADDING) / wWidth;
+        const zoomY = (vpH - 2 * PADDING) / wHeight;
+        let newZoom = Math.min(zoomX, zoomY);
+        newZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newZoom));
+        const wCx = wMinX + wWidth / 2;
+        const wCy = wMinY + wHeight / 2;
+        const newPan = {
+          x: -wCx * newZoom + vpW / 2,
+          y: -wCy * newZoom + vpH / 2,
+        };
+        isAnimating = true;
+        pan = newPan;
+        zoom = newZoom;
+        applyTransform();
+        updateBackground();
+        setTimeout(() => { isAnimating = false; }, 320);
+      }
+
+      stage.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        const rect = getRect();
+        const sx = e.clientX - rect.left;
+        const sy = e.clientY - rect.top;
+        if (e.shiftKey) {
+          marqueeStart = { x: e.clientX, y: e.clientY };
+          marqueeCurrent = { x: e.clientX, y: e.clientY };
+          stage.classList.add('marquee');
+          drawMarquee();
+        } else {
+          isPanning = true;
+          panStart = { x: e.clientX - pan.x, y: e.clientY - pan.y };
+          stage.classList.add('panning');
+          content.classList.add('no-transition');
+        }
+      });
+
+      stage.addEventListener('mousemove', (e) => {
+        if (marqueeStart && marqueeCurrent !== null) {
+          marqueeCurrent = { x: e.clientX, y: e.clientY };
+          drawMarquee();
+        } else if (isPanning) {
+          pan = { x: e.clientX - panStart.x, y: e.clientY - panStart.y };
+          applyTransform();
+          updateBackground();
+        }
+      });
+
+      stage.addEventListener('mouseup', (e) => {
+        if (e.button !== 0) return;
+        if (marqueeStart && marqueeCurrent) {
+          const r = getRect();
+          const x1 = marqueeStart.x - r.left;
+          const y1 = marqueeStart.y - r.top;
+          const x2 = marqueeCurrent.x - r.left;
+          const y2 = marqueeCurrent.y - r.top;
+          const left = Math.min(x1, x2);
+          const top = Math.min(y1, y2);
+          const width = Math.abs(x2 - x1);
+          const height = Math.abs(y2 - y1);
+          if (width >= MIN_MARQUEE && height >= MIN_MARQUEE) {
+            zoomToRegion(
+              left + r.left, top + r.top,
+              left + width + r.left, top + height + r.top
+            );
+          }
+          marqueeStart = null;
+          marqueeCurrent = null;
+          marqueeOverlay.innerHTML = '';
+          stage.classList.remove('marquee');
+        }
+        isPanning = false;
+        stage.classList.remove('panning');
+        content.classList.remove('no-transition');
+      });
+
+      stage.addEventListener('mouseleave', () => {
+        if (marqueeStart) {
+          marqueeStart = null;
+          marqueeCurrent = null;
+          marqueeOverlay.innerHTML = '';
+          stage.classList.remove('marquee');
+        }
+        isPanning = false;
+        stage.classList.remove('panning');
+        content.classList.remove('no-transition');
+      });
+
+      stage.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = getRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const factor = e.deltaY > 0 ? 0.92 : 1.08;
+        const newZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
+        const scale = newZoom / zoom;
+        pan.x = mouseX - (mouseX - pan.x) * scale;
+        pan.y = mouseY - (mouseY - pan.y) * scale;
+        zoom = newZoom;
+        applyTransform();
+        updateBackground();
+      }, { passive: false });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && marqueeStart) {
+          marqueeStart = null;
+          marqueeCurrent = null;
+          marqueeOverlay.innerHTML = '';
+          stage.classList.remove('marquee');
+        }
+      });
+
+      applyTransform();
+      updateBackground();
+    })();
+  </script>
+</body>
+</html>

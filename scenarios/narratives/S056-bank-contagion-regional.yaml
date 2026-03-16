@@ -1,0 +1,73 @@
+# S56: Bank Contagion (Regional)
+#
+# Story: Regional bank failure triggers contagion. Three bank
+# counterparties see funding stress and rating downgrades as
+# depositors and counterparties reassess exposure.
+#
+# Dashboard signal: CRO sees bank counterparty concentration,
+# rating downgrades, and cross-default risk.
+
+scenario_id: "S56"
+name: "Bank Contagion (Regional)"
+type: EVENT_CASCADE
+narrative: "Regional bank failure; 3 bank counterparties see funding stress, rating downgrades"
+
+counterparties:
+  - legal_name: "Heartland Community Bank"
+    country: US
+    industry_id: 3
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Pacific Regional Bank"
+    country: US
+    industry_id: 3
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Mountain State Bank"
+    country: US
+    industry_id: 3
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-18"
+      description: "Regional bank contagion triggers downgrades"
+      severity: HIGH
+  risk_flags:
+    - code: COUNTERPARTY_CONCENTRATION
+      severity: HIGH
+      description: "Bank counterparty exposure concentrated"
+    - code: CROSS_DEFAULT_RISK
+      severity: HIGH
+      description: "Interbank exposure contagion risk"
+    - code: DEPOSIT_OUTFLOW_RISK
+      severity: MEDIUM
+      description: "Funding stress from deposit outflow"
+
+l2_tables:
+  counterparty_rating_observation:
+    generate: true
+    ratings_before:
+      sp: "BBB-"
+      moodys: "Baa3"
+    ratings_after:
+      sp: "BB+"
+      moodys: "Ba1"
+
+verification:
+  min_rows: 6
+  key_assertion: "All 3 bank counterparties show stress and rating migration"

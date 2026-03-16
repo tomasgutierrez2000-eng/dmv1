@@ -1,0 +1,71 @@
+# S52: Currency Shock (EM)
+#
+# Story: EM currency crisis (e.g. TRY -30%, BRL -20%) stress-tests
+# the bank's cross-border portfolio. Five EM borrowers with USD
+# debt face FX-amplified losses; debt service becomes unsustainable.
+#
+# Dashboard signal: EM stress test shows FX-amplified losses across
+# Brazil, Mexico, and India portfolios.
+
+scenario_id: "S52"
+name: "Currency Shock (EM)"
+type: STRESS_TEST
+narrative: "EM currency crisis — TRY/BRL/MXN depreciation creates stress losses across 5 USD-debt borrowers"
+
+counterparties:
+  - legal_name: "Rio Commodities SA"
+    country: BR
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Mumbai Export Holdings Ltd"
+    country: IN
+    industry_id: 5
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Guadalajara Manufacturing SA"
+    country: MX
+    industry_id: 5
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "São Paulo Infrastructure"
+    country: BR
+    industry_id: 8
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Monterrey Steel Works"
+    country: MX
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: FX_EXPOSURE_AMPLIFICATION
+      severity: HIGH
+      description: "EM FX depreciation amplifies USD-equivalent exposure"
+    - code: COUNTRY_CONCENTRATION
+      severity: HIGH
+      description: "Correlated EM risk across Brazil, India, Mexico"
+
+stress_test:
+  scenario_name: "EM Currency Crisis"
+  loss_threshold_amt: 350000000
+
+verification:
+  min_rows: 10
+  key_assertion: "EM portfolio stress test shows FX-amplified losses across 3 countries"

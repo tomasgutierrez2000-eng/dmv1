@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "ignore": [".claude/**", "**/node_modules/**", "**/.next/**"],
+  "ignoreDependencies": [],
+  "entry": ["app/**/*.tsx", "app/**/*.ts", "scripts/**/*.ts"],
+  "project": ["**/*.ts", "**/*.tsx"]
+}

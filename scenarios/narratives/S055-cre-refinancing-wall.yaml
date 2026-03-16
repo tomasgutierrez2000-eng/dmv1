@@ -1,0 +1,70 @@
+# S55: CRE Refinancing Wall
+#
+# Story: Five CRE facilities maturing in 90 days; two unable to
+# refinance at current rates. Maturity concentration triggers
+# risk flags and refinancing negotiations.
+#
+# Dashboard signal: CRO sees maturity wall concentration, refinancing
+# risk flags, and collateral coverage decline.
+
+scenario_id: "S55"
+name: "CRE Refinancing Wall"
+type: MATURITY_WALL
+narrative: "5 CRE facilities maturing in 90 days; 2 unable to refinance at current rates"
+
+counterparties:
+  - legal_name: "Metro Office REIT"
+    country: US
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Regional Mall Partners"
+    country: US
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Industrial Park Holdings"
+    country: US
+    industry_id: 10
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Suburban Retail LLC"
+    country: US
+    industry_id: 10
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+  - legal_name: "Mixed-Use Development Corp"
+    country: US
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 1
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: MATURITY_CONCENTRATION
+      severity: HIGH
+      description: "5 CRE facilities maturing in 90 days"
+    - code: REFINANCING_RISK
+      severity: HIGH
+      description: "2 unable to refinance at current rates"
+    - code: COLLATERAL_COVERAGE_DECLINE
+      severity: MEDIUM
+      description: "Property values down vs loan balances"
+
+verification:
+  min_rows: 5
+  key_assertion: "5 CRE facilities show maturity wall and refinancing risk"

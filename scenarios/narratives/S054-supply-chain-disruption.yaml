@@ -1,0 +1,66 @@
+# S54: Supply Chain Disruption
+#
+# Story: Manufacturing sector stress from delayed shipments and
+# component shortages. Four counterparties face covenant breaches
+# and credit events as inventory and receivables age.
+#
+# Dashboard signal: CRO sees supply chain disruption flags,
+# covenant breaches, and credit events across manufacturing.
+
+scenario_id: "S54"
+name: "Supply Chain Disruption"
+type: DETERIORATION_TREND
+narrative: "Manufacturing sector stress; 4 counterparties with delayed shipments, covenant breaches"
+
+counterparties:
+  - legal_name: "Auto Parts Manufacturing Inc"
+    country: US
+    industry_id: 5
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Electronics Components Ltd"
+    country: GB
+    industry_id: 5
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Industrial Supplies Corp"
+    country: DE
+    industry_id: 5
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Logistics & Warehousing Co"
+    country: US
+    industry_id: 8
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: COVENANT_REVIEW
+      date: "2025-01-05"
+      description: "Supply chain breach triggers covenant review"
+      severity: MEDIUM
+  risk_flags:
+    - code: SUPPLY_CHAIN_DISRUPTION
+      severity: HIGH
+      description: "Delayed shipments and component shortages"
+    - code: REVOLVER_DRAW_SPIKE
+      severity: MEDIUM
+      description: "Working capital draw as receivables age"
+
+verification:
+  min_rows: 8
+  key_assertion: "All 4 manufacturing counterparties show supply chain stress"

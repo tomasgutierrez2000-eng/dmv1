@@ -1,0 +1,55 @@
+# S53: Interest Rate Spike
+#
+# Story: Rapid Fed hikes drive floating-rate portfolio stress.
+# Three borrowers breach DSCR covenants as debt service costs
+# rise; utilization and drawdown spike as firms tap revolvers.
+#
+# Dashboard signal: CRO sees DSCR breaches, rising utilization,
+# and covenant pressure across floating-rate portfolio.
+
+scenario_id: "S53"
+name: "Interest Rate Spike"
+type: DETERIORATION_TREND
+narrative: "Rapid Fed hikes; floating-rate portfolio utilization + drawdown; 3 borrowers breach DSCR"
+
+counterparties:
+  - legal_name: "Midwest Industrial Corp"
+    country: US
+    industry_id: 5
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Southeast Retail Holdings"
+    country: US
+    industry_id: 7
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Pacific Real Estate LLC"
+    country: US
+    industry_id: 10
+    rating_tier: HY_MID
+    story_arc: DETERIORATING
+    size: MID
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  risk_flags:
+    - code: REVOLVER_FULL_DRAW
+      severity: HIGH
+      description: "Borrowers drawing revolvers as rates spike"
+    - code: LTV_COVENANT_BREACH
+      severity: HIGH
+      description: "DSCR covenant breaches from rising rates"
+
+verification:
+  min_rows: 6
+  key_assertion: "All 3 counterparties show stress from rate spike"

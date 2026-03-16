@@ -1,0 +1,79 @@
+# S51: Oil Price Shock (War)
+#
+# Story: Geopolitical conflict drives oil prices +40%. Six energy
+# borrowers see utilization spike, covenant pressure, and rating
+# watch as refiners and producers face margin compression.
+#
+# Dashboard signal: CRO sees sector-wide stress in energy names,
+# rising utilization as stressed borrowers draw revolvers, and
+# multiple rating watch flags.
+
+scenario_id: "S51"
+name: "Oil Price Shock (War)"
+type: DETERIORATION_TREND
+narrative: "Geopolitical conflict drives oil +40%; 6 energy borrowers see utilization spike, covenant pressure, rating watch"
+
+counterparties:
+  - legal_name: "North Sea Petrochemicals Ltd"
+    country: GB
+    industry_id: 4
+    rating_tier: HY_HIGH
+    story_arc: STRESSED_SECTOR
+    size: LARGE
+  - legal_name: "Gulf Coast Refining Corp"
+    country: US
+    industry_id: 4
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: LARGE
+  - legal_name: "Arctic Energy Partners"
+    country: CA
+    industry_id: 4
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: MID
+  - legal_name: "Pacific LNG Holdings"
+    country: AU
+    industry_id: 4
+    rating_tier: HY_HIGH
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Desert Oil Services LLC"
+    country: AE
+    industry_id: 4
+    rating_tier: IG_LOW
+    story_arc: DETERIORATING
+    size: MID
+  - legal_name: "Offshore Drilling Co"
+    country: US
+    industry_id: 4
+    rating_tier: HY_MID
+    story_arc: STRESSED_SECTOR
+    size: SMALL
+
+facilities:
+  per_counterparty: 2
+
+timeline:
+  as_of_dates:
+    - "2024-11-30"
+    - "2024-12-31"
+    - "2025-01-31"
+
+events:
+  credit_events:
+    - type: DOWNGRADE
+      date: "2024-12-20"
+      description: "Oil price spike triggers sector-wide rating review"
+      severity: HIGH
+  risk_flags:
+    - code: SECTOR_CONCENTRATION
+      severity: HIGH
+      description: "Energy sector exposure stressed by oil price shock"
+    - code: RATING_MIGRATION_ADVERSE
+      severity: MEDIUM
+      description: "Multiple energy names on rating watch"
+
+verification:
+  min_rows: 12
+  key_assertion: "All 6 energy counterparties show utilization spike and sector stress"

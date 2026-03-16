@@ -1,30 +1,36 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Tangible Net Worth
+# Tangible Net Worth — Exposure-Weighted Average
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-029"
 name: "Tangible Net Worth"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "reference"
 sub_domain: "master-data"
-metric_class: SOURCED
+metric_class: HYBRID
 direction: HIGHER_BETTER
-unit_type: ORDINAL
-display_format: "s"
+unit_type: CURRENCY
+display_format: "$,.0f"
 description: >
-  Represents “hard” equity after removing intangibles; reflects true loss-
-  absorbing capacity, covenant strength, and resilience under downside
-  scenarios.
+  Counterparty tangible net worth (hard equity after removing intangibles).
+  Reflects true loss-absorbing capacity, covenant strength, and resilience
+  under downside scenarios. At facility level, returns the counterparty's
+  TNW. At counterparty level, direct read. At aggregate levels, returns
+  exposure-weighted average TNW — avoids invalid SUM of equity across
+  unrelated counterparties (consolidation accounting violation).
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Counterparty financial strength assessment for credit risk"
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Borrower financial data for credit facility underwriting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -32,17 +38,18 @@ source_tables:
     alias: cfs
     join_type: BASE
     fields:
-      - name: facility_id
+      - name: counterparty_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
       - name: tangible_net_worth_usd
         role: MEASURE
+        description: "Tangible net worth in USD"
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = cfs.facility_id"
+    join_on: "fm.counterparty_id = cfs.counterparty_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -52,6 +59,34 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = fm.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: drawn_amount
+        role: MEASURE
+        description: "Exposure weighting for weighted-average TNW"
+      - name: bank_share_pct
+        role: MEASURE
+      - name: currency_code
+        role: DIMENSION
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
+        description: "FX spot rate for USD conversion"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -62,107 +97,157 @@ source_tables:
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Read tangible_net_worth_usd from counterparty_financial_snapshot for each
-      facility as-of reporting date.
+      Read tangible_net_worth_usd from counterparty_financial_snapshot
+      for the counterparty behind each facility.
     formula_sql: |
       SELECT
-        cfs.facility_id AS dimension_key,
-        cfs.tangible_net_worth_usd AS metric_value
-      FROM l2.counterparty_financial_snapshot cfs
-      WHERE cfs.as_of_date = :as_of_date
+        fm.facility_id AS dimension_key,
+        MAX(cfs.tangible_net_worth_usd) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty_financial_snapshot cfs
+        ON cfs.counterparty_id = fm.counterparty_id
+        AND cfs.as_of_date = :as_of_date
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      GROUP BY fm.facility_id
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read tangible_net_worth_usd per counterparty.
+      Direct read of tangible_net_worth_usd per counterparty.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        cfs.tangible_net_worth_usd AS metric_value
+        cfs.counterparty_id AS dimension_key,
+        MAX(cfs.tangible_net_worth_usd) AS metric_value
       FROM l2.counterparty_financial_snapshot cfs
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = cfs.facility_id
-        AND fm.is_active_flag = 'Y'
       WHERE cfs.as_of_date = :as_of_date
+      GROUP BY cfs.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level tangible_net_worth_usd per L3 desk segment.
+      Exposure-weighted average TNW per L3 desk segment. Weights by
+      each counterparty's drawn exposure (bank-share-adjusted, USD-converted)
+      in the segment. Avoids invalid SUM of equity across counterparties.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        SUM(cp_data.tangible_net_worth_usd * cp_data.total_exposure)
+          / NULLIF(SUM(cp_data.total_exposure), 0) AS metric_value
       FROM (
         SELECT
-          cfs.facility_id AS dimension_key,
-          cfs.tangible_net_worth_usd AS metric_value
-        FROM l2.counterparty_financial_snapshot cfs
-        WHERE cfs.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+          fm.counterparty_id,
+          fm.lob_segment_id,
+          MAX(cfs.tangible_net_worth_usd) AS tangible_net_worth_usd,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1)) AS total_exposure
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l2.counterparty_financial_snapshot cfs
+          ON cfs.counterparty_id = fm.counterparty_id
+          AND cfs.as_of_date = :as_of_date
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY fm.counterparty_id, fm.lob_segment_id
+      ) cp_data
       LEFT JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.managed_segment_id = fm.lob_segment_id
-          AND ebt.is_current_flag = 'Y'
+        ON ebt.managed_segment_id = cp_data.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level tangible_net_worth_usd per L2 portfolio segment.
+      Exposure-weighted average TNW per L2 portfolio segment via
+      EBT hierarchy (one hop up).
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        SUM(cp_data.tangible_net_worth_usd * cp_data.total_exposure)
+          / NULLIF(SUM(cp_data.total_exposure), 0) AS metric_value
       FROM (
         SELECT
-          cfs.facility_id AS dimension_key,
-          cfs.tangible_net_worth_usd AS metric_value
-        FROM l2.counterparty_financial_snapshot cfs
-        WHERE cfs.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+          fm.counterparty_id,
+          fm.lob_segment_id,
+          MAX(cfs.tangible_net_worth_usd) AS tangible_net_worth_usd,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1)) AS total_exposure
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l2.counterparty_financial_snapshot cfs
+          ON cfs.counterparty_id = fm.counterparty_id
+          AND cfs.as_of_date = :as_of_date
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY fm.counterparty_id, fm.lob_segment_id
+      ) cp_data
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-          AND ebt_l3.is_current_flag = 'Y'
+        ON ebt_l3.managed_segment_id = cp_data.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-          AND ebt_l2.is_current_flag = 'Y'
+        AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level tangible_net_worth_usd per L1 business segment
-      segment.
+      Exposure-weighted average TNW per L1 business segment via
+      EBT hierarchy (two hops up).
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        SUM(cp_data.tangible_net_worth_usd * cp_data.total_exposure)
+          / NULLIF(SUM(cp_data.total_exposure), 0) AS metric_value
       FROM (
         SELECT
-          cfs.facility_id AS dimension_key,
-          cfs.tangible_net_worth_usd AS metric_value
-        FROM l2.counterparty_financial_snapshot cfs
-        WHERE cfs.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+          fm.counterparty_id,
+          fm.lob_segment_id,
+          MAX(cfs.tangible_net_worth_usd) AS tangible_net_worth_usd,
+          SUM(fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1)) AS total_exposure
+        FROM l2.facility_master fm
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l2.counterparty_financial_snapshot cfs
+          ON cfs.counterparty_id = fm.counterparty_id
+          AND cfs.as_of_date = :as_of_date
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        GROUP BY fm.counterparty_id, fm.lob_segment_id
+      ) cp_data
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-          AND ebt_l3.is_current_flag = 'Y'
+        ON ebt_l3.managed_segment_id = cp_data.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-          AND ebt_l2.is_current_flag = 'Y'
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-          AND ebt_l1.is_current_flag = 'Y'
+        AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -173,18 +258,23 @@ output:
 validations:
   - rule_id: "REF-029-V01"
     type: NOT_NULL
-    description: "No null tangible_net_worth_usd values"
+    description: "No null tangible_net_worth_usd values for counterparties with financial snapshots"
     severity: ERROR
+  - rule_id: "REF-029-V02"
+    type: NON_NEGATIVE
+    description: "TNW should be non-negative for investment-grade counterparties"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-096"
   abbreviation: "TNW"
   insight: >
-    Real equity capital available to absorb losses (excludes intangibles);
-    gauges financial stability and resilience.
-  rollup_strategy: "direct-sum"
+    Counterparty tangible net worth — hard equity excluding intangibles.
+    At facility/counterparty shows raw TNW; at aggregate levels shows
+    exposure-weighted average TNW across counterparties in the segment.
+  rollup_strategy: "weighted-avg"
   primary_value_field: "tangible_net_worth_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "financial-strength", "covenant"]
 dashboard_pages: []
 legacy_metric_ids: []

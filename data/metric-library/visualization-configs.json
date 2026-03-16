@@ -13520,10 +13520,34 @@
     }
   },
   "MET-006": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
       "primary_value": "as_of_date"
     },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "as_of_date",
+          "label": "Snapshot reporting date",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read as_of_date from facility_exposure_snapshot for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "as_of_date",
+        "header": "As Of Date",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ],
     "traversal_source_data": {
       "source_tables": [
         {
@@ -13541,11 +13565,11 @@
             },
             {
               "name": "as_of_date",
-              "role": "FILTER",
-              "description": "as_of_date"
+              "role": "MEASURE",
+              "description": "Snapshot reporting date"
             }
           ],
-          "purpose": "Provides supporting data from facility exposure snapshot"
+          "purpose": "Provides Snapshot reporting date"
         },
         {
           "alias": "fm",
@@ -13553,7 +13577,7 @@
           "table_name": "facility_master",
           "layer": "L2",
           "join_type": "INNER",
-          "join_on": "fm.facility_id = fes.facility_id",
+          "join_on": "fm.facility_id = fes.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'",
           "fields": [
             {
               "name": "facility_id",
@@ -13574,6 +13598,11 @@
               "name": "is_active_flag",
               "role": "FILTER",
               "description": "is_active_flag"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
             }
           ],
           "purpose": "Links to counterparty, lob segment for rollup grouping"
@@ -13595,6 +13624,11 @@
               "name": "parent_segment_id",
               "role": "DIMENSION",
               "description": "parent_segment_id"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
             }
           ],
           "purpose": "Resolves the organizational hierarchy (desk → portfolio → business segment) for rollup grouping"
@@ -13602,7 +13636,8 @@
       ],
       "per_level_tables": {
         "facility": [
-          "fes"
+          "fes",
+          "fm"
         ],
         "counterparty": [
           "fes",
@@ -13628,14 +13663,14 @@
         ]
       },
       "narration_context": {
-        "metric_description": "Snapshot date of the dataset used for reporting and aggregation. Serves as the temporal reference point for all balances, risk metrics, and performance indicators.\n",
-        "formula_text": "Read as_of_date from facility_exposure_snapshot for each facility as-of reporting date.\n",
+        "metric_description": "Snapshot date of the dataset used for reporting and aggregation. Serves as the temporal reference point for all balances, risk metrics, and performance indicators. At facility level, returns the as_of_date. At aggregate levels, returns MAX(as_of_date) — the latest reporting date for facilities in the segment.\n",
+        "formula_text": "Read as_of_date from facility_exposure_snapshot for each facility.\n",
         "aggregation_type_by_level": {
           "facility": "RAW",
-          "counterparty": "RAW",
-          "desk": "SUM",
-          "portfolio": "SUM",
-          "lob": "SUM"
+          "counterparty": "MAX",
+          "desk": "MAX",
+          "portfolio": "MAX",
+          "lob": "MAX"
         }
       }
     }
@@ -14921,7 +14956,7 @@
     }
   },
   "MET-041": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
       "primary_value": "facility_type"
     },
@@ -14933,6 +14968,30 @@
           "label": "facility_type",
           "sample_value": 0,
           "source_table": "facility_master",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weighting for dominant type selection",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate for USD conversion at aggregate levels",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
@@ -14947,6 +15006,24 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ],
     "traversal_source_data": {
@@ -14993,6 +15070,58 @@
           "purpose": "Provides facility type; links to counterparty, lob segment for rollup grouping"
         },
         {
+          "alias": "fes",
+          "qualified_name": "l2.facility_exposure_snapshot",
+          "table_name": "facility_exposure_snapshot",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "fes.facility_id = fm.facility_id",
+          "fields": [
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "as_of_date",
+              "role": "FILTER",
+              "description": "as_of_date"
+            },
+            {
+              "name": "drawn_amount",
+              "role": "MEASURE",
+              "description": "Exposure weighting for dominant type selection"
+            },
+            {
+              "name": "bank_share_pct",
+              "role": "MEASURE",
+              "description": "bank_share_pct"
+            },
+            {
+              "name": "currency_code",
+              "role": "DIMENSION",
+              "description": "currency_code"
+            }
+          ],
+          "purpose": "Provides Exposure weighting for dominant type selection, bank share pct"
+        },
+        {
+          "alias": "fx",
+          "qualified_name": "l2.fx_rate",
+          "table_name": "fx_rate",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date",
+          "fields": [
+            {
+              "name": "rate",
+              "role": "MEASURE",
+              "description": "FX spot rate for USD conversion at aggregate levels"
+            }
+          ],
+          "purpose": "Converts local currency amounts to USD reporting currency for cross-currency aggregation"
+        },
+        {
           "alias": "ebt",
           "qualified_name": "l1.enterprise_business_taxonomy",
           "table_name": "enterprise_business_taxonomy",
@@ -15009,6 +15138,11 @@
               "name": "parent_segment_id",
               "role": "DIMENSION",
               "description": "parent_segment_id"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
             }
           ],
           "purpose": "Resolves the organizational hierarchy (desk → portfolio → business segment) for rollup grouping"
@@ -15019,33 +15153,40 @@
           "fm"
         ],
         "counterparty": [
-          "fm"
+          "fm",
+          "fes"
         ],
         "desk": [
           "fm",
+          "fes",
+          "fx",
           "ebt"
         ],
         "portfolio": [
           "fm",
+          "fes",
+          "fx",
           "ebt_l3",
           "ebt_l2"
         ],
         "lob": [
           "fm",
+          "fes",
+          "fx",
           "ebt_l3",
           "ebt_l2",
           "ebt_l1"
         ]
       },
       "narration_context": {
-        "metric_description": "Type of credit facility (e.g., Term Loan, Revolver, Letter of Credit). Enables product-level segmentation, risk concentration analysis, and performance benchmarking. At facility level returns the facility type string; at aggregate levels returns the count of distinct active facilities in the segment for distribution analysis.\n",
+        "metric_description": "Type of credit facility (e.g., Term Loan, Revolver, Letter of Credit). At facility level, returns the facility_type string directly. At counterparty and aggregate levels, returns the dominant facility type by drawn exposure weight using ROW_NUMBER. Enables product-level segmentation, risk concentration analysis, and performance benchmarking.\n",
         "formula_text": "Direct lookup of facility_type from facility_master.\n",
         "aggregation_type_by_level": {
           "facility": "RAW",
-          "counterparty": "RAW",
-          "desk": "COUNT",
-          "portfolio": "COUNT",
-          "lob": "COUNT"
+          "counterparty": "CUSTOM",
+          "desk": "CUSTOM",
+          "portfolio": "CUSTOM",
+          "lob": "CUSTOM"
         }
       }
     }
@@ -16631,16 +16772,16 @@
     }
   },
   "MET-068": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "drawn_amount"
+      "primary_value": "product_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "drawn_amount",
-          "label": "Outstanding drawn exposure",
+          "label": "Outstanding drawn exposure (weighting for dominant product)",
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
@@ -16663,16 +16804,15 @@
         }
       ],
       "denominator": [],
-      "result_format": "currency",
-      "formula_display": "SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency. Product classification available via enterprise_product_taxonomy join.\n"
+      "result_format": "number",
+      "formula_display": "Product name lookup from enterprise_product_taxonomy via facility_exposure_snapshot.product_node_id.\n"
     },
     "worked_example_columns": [
       {
         "field": "drawn_amount",
         "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
       },
       {
         "field": "bank_share_pct",
@@ -16685,6 +16825,13 @@
         "header": "Rate",
         "format": "number",
         "subtotal_fn": "none"
+      },
+      {
+        "field": "product_name",
+        "header": "Product Name",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ],
     "traversal_source_data": {
@@ -16710,7 +16857,7 @@
             {
               "name": "drawn_amount",
               "role": "MEASURE",
-              "description": "Outstanding drawn exposure"
+              "description": "Outstanding drawn exposure (weighting for dominant product)"
             },
             {
               "name": "bank_share_pct",
@@ -16728,7 +16875,7 @@
               "description": "currency_code"
             }
           ],
-          "purpose": "Provides Outstanding drawn exposure, Bank's syndication share percentage"
+          "purpose": "Provides Outstanding drawn exposure (weighting for dominant product), Bank's syndication share percentage"
         },
         {
           "alias": "fm",
@@ -16780,17 +16927,12 @@
               "description": "product_node_id"
             },
             {
-              "name": "product_code",
-              "role": "DIMENSION",
-              "description": "Product classification code"
-            },
-            {
               "name": "product_name",
               "role": "DIMENSION",
-              "description": "Human-readable product name"
+              "description": "Human-readable product classification name"
             }
           ],
-          "purpose": "Provides grouping by product code, product name from enterprise product taxonomy"
+          "purpose": "Provides grouping by product name from enterprise product taxonomy"
         },
         {
           "alias": "fx",
@@ -16838,59 +16980,63 @@
       "per_level_tables": {
         "facility": [
           "fes",
-          "fm"
+          "fm",
+          "ept"
         ],
         "counterparty": [
           "fes",
           "fm",
-          "fx"
+          "ept"
         ],
         "desk": [
           "fes",
-          "fx",
           "fm",
+          "ept",
+          "fx",
           "ebt"
         ],
         "portfolio": [
           "fes",
-          "fx",
           "fm",
+          "ept",
+          "fx",
           "ebt_l3",
           "ebt_l2"
         ],
         "lob": [
           "fes",
-          "fx",
           "fm",
+          "ept",
+          "fx",
           "ebt_l3",
           "ebt_l2",
           "ebt_l1"
         ]
       },
       "narration_context": {
-        "metric_description": "Total drawn exposure (bank-share-adjusted) segmented by product classification from the Enterprise Product Taxonomy. Supports portfolio composition analysis and product-level concentration monitoring. At facility level, returns the facility's exposure in local currency. At aggregate levels, converts to USD via FX rate.\n",
-        "formula_text": "SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency. Product classification available via enterprise_product_taxonomy join.\n",
+        "metric_description": "Product classification from the Enterprise Product Taxonomy for each facility. At facility level, returns the product_name (e.g., Term Loan, Revolver, Letter of Credit). At aggregate levels, returns the dominant product by drawn exposure weight (bank-share-adjusted, USD-converted) using ROW_NUMBER to identify the highest-exposure product in the segment.\n",
+        "formula_text": "Product name lookup from enterprise_product_taxonomy via facility_exposure_snapshot.product_node_id.\n",
         "aggregation_type_by_level": {
-          "facility": "SUM",
-          "counterparty": "SUM",
-          "desk": "SUM",
-          "portfolio": "SUM",
-          "lob": "SUM"
+          "facility": "RAW",
+          "counterparty": "CUSTOM",
+          "desk": "CUSTOM",
+          "portfolio": "CUSTOM",
+          "lob": "CUSTOM"
         }
       }
     }
   },
   "MET-069": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "drawn_amount"
+      "primary_value": "region_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "drawn_amount",
-          "label": "Outstanding drawn exposure",
+          "label": "Outstanding drawn exposure (weighting for dominant region)",
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
@@ -16913,16 +17059,15 @@
         }
       ],
       "denominator": [],
-      "result_format": "currency",
-      "formula_display": "SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency. Region lookup: counterparty → country_dim → region_dim for context.\n"
+      "result_format": "number",
+      "formula_display": "Region name lookup via counterparty.country_code -> country_dim -> region_dim.region_name.\n"
     },
     "worked_example_columns": [
       {
         "field": "drawn_amount",
         "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
       },
       {
         "field": "bank_share_pct",
@@ -16935,6 +17080,13 @@
         "header": "Rate",
         "format": "number",
         "subtotal_fn": "none"
+      },
+      {
+        "field": "region_name",
+        "header": "Region Name",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ],
     "traversal_source_data": {
@@ -16960,7 +17112,7 @@
             {
               "name": "drawn_amount",
               "role": "MEASURE",
-              "description": "Outstanding drawn exposure"
+              "description": "Outstanding drawn exposure (weighting for dominant region)"
             },
             {
               "name": "bank_share_pct",
@@ -16973,7 +17125,7 @@
               "description": "currency_code"
             }
           ],
-          "purpose": "Provides Outstanding drawn exposure, Bank's syndication share percentage"
+          "purpose": "Provides Outstanding drawn exposure (weighting for dominant region), Bank's syndication share percentage"
         },
         {
           "alias": "fm",
@@ -17120,44 +17272,58 @@
       "per_level_tables": {
         "facility": [
           "fes",
-          "fm"
+          "fm",
+          "cp",
+          "cd",
+          "rd"
         ],
         "counterparty": [
           "fes",
           "fm",
-          "fx"
+          "cp",
+          "cd",
+          "rd"
         ],
         "desk": [
           "fes",
-          "fx",
           "fm",
+          "cp",
+          "cd",
+          "rd",
+          "fx",
           "ebt"
         ],
         "portfolio": [
           "fes",
-          "fx",
           "fm",
+          "cp",
+          "cd",
+          "rd",
+          "fx",
           "ebt_l3",
           "ebt_l2"
         ],
         "lob": [
           "fes",
-          "fx",
           "fm",
+          "cp",
+          "cd",
+          "rd",
+          "fx",
           "ebt_l3",
           "ebt_l2",
           "ebt_l1"
         ]
       },
       "narration_context": {
-        "metric_description": "Total drawn exposure (bank-share-adjusted) segmented by geographic region derived from counterparty country of domicile. Join chain: counterparty.country_code → country_dim.region_code → region_dim. Supports regional concentration monitoring and geographic risk diversification analysis per GSIB standards.\n",
-        "formula_text": "SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency. Region lookup: counterparty → country_dim → region_dim for context.\n",
+        "metric_description": "Geographic region classification derived from counterparty country of domicile. Join chain: counterparty.country_code -> country_dim.region_code -> region_dim.region_name. At facility level, returns the region name. At aggregate levels, returns the dominant region by drawn exposure weight (bank-share-adjusted, USD-converted) using ROW_NUMBER.\n",
+        "formula_text": "Region name lookup via counterparty.country_code -> country_dim -> region_dim.region_name.\n",
         "aggregation_type_by_level": {
-          "facility": "SUM",
-          "counterparty": "SUM",
-          "desk": "SUM",
-          "portfolio": "SUM",
-          "lob": "SUM"
+          "facility": "RAW",
+          "counterparty": "CUSTOM",
+          "desk": "CUSTOM",
+          "portfolio": "CUSTOM",
+          "lob": "CUSTOM"
         }
       }
     }
@@ -17522,7 +17688,7 @@
     }
   },
   "MET-096": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "weighted-avg",
     "metric_fields": {
       "primary_value": "tangible_net_worth_usd"
     },
@@ -17531,15 +17697,39 @@
         {
           "op": "*",
           "field": "tangible_net_worth_usd",
-          "label": "tangible_net_worth_usd",
+          "label": "Tangible net worth in USD",
           "sample_value": 0,
           "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weighting for weighted-average TNW",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate for USD conversion",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
-      "result_format": "number",
-      "formula_display": "Read tangible_net_worth_usd from counterparty_financial_snapshot for each facility as-of reporting date.\n"
+      "result_format": "currency",
+      "formula_display": "Read tangible_net_worth_usd from counterparty_financial_snapshot for the counterparty behind each facility.\n"
     },
     "worked_example_columns": [
       {
@@ -17548,6 +17738,24 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ],
     "traversal_source_data": {
@@ -17561,9 +17769,9 @@
           "join_on": null,
           "fields": [
             {
-              "name": "facility_id",
+              "name": "counterparty_id",
               "role": "JOIN_KEY",
-              "description": "facility_id"
+              "description": "counterparty_id"
             },
             {
               "name": "as_of_date",
@@ -17573,10 +17781,10 @@
             {
               "name": "tangible_net_worth_usd",
               "role": "MEASURE",
-              "description": "tangible_net_worth_usd"
+              "description": "Tangible net worth in USD"
             }
           ],
-          "purpose": "Provides tangible net worth usd"
+          "purpose": "Provides Tangible net worth in USD"
         },
         {
           "alias": "fm",
@@ -17584,7 +17792,7 @@
           "table_name": "facility_master",
           "layer": "L2",
           "join_type": "INNER",
-          "join_on": "fm.facility_id = cfs.facility_id",
+          "join_on": "fm.counterparty_id = cfs.counterparty_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'",
           "fields": [
             {
               "name": "facility_id",
@@ -17605,9 +17813,66 @@
               "name": "is_active_flag",
               "role": "FILTER",
               "description": "is_active_flag"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
             }
           ],
           "purpose": "Links to counterparty, lob segment for rollup grouping"
+        },
+        {
+          "alias": "fes",
+          "qualified_name": "l2.facility_exposure_snapshot",
+          "table_name": "facility_exposure_snapshot",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "fes.facility_id = fm.facility_id",
+          "fields": [
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "as_of_date",
+              "role": "FILTER",
+              "description": "as_of_date"
+            },
+            {
+              "name": "drawn_amount",
+              "role": "MEASURE",
+              "description": "Exposure weighting for weighted-average TNW"
+            },
+            {
+              "name": "bank_share_pct",
+              "role": "MEASURE",
+              "description": "bank_share_pct"
+            },
+            {
+              "name": "currency_code",
+              "role": "DIMENSION",
+              "description": "currency_code"
+            }
+          ],
+          "purpose": "Provides Exposure weighting for weighted-average TNW, bank share pct"
+        },
+        {
+          "alias": "fx",
+          "qualified_name": "l2.fx_rate",
+          "table_name": "fx_rate",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date",
+          "fields": [
+            {
+              "name": "rate",
+              "role": "MEASURE",
+              "description": "FX spot rate for USD conversion"
+            }
+          ],
+          "purpose": "Converts local currency amounts to USD reporting currency for cross-currency aggregation"
         },
         {
           "alias": "ebt",
@@ -17626,6 +17891,11 @@
               "name": "parent_segment_id",
               "role": "DIMENSION",
               "description": "parent_segment_id"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
             }
           ],
           "purpose": "Resolves the organizational hierarchy (desk → portfolio → business segment) for rollup grouping"
@@ -17633,80 +17903,134 @@
       ],
       "per_level_tables": {
         "facility": [
+          "fm",
           "cfs"
         ],
         "counterparty": [
-          "cfs",
-          "fm"
+          "cfs"
         ],
         "desk": [
-          "cfs",
           "fm",
+          "fes",
+          "cfs",
+          "fx",
           "ebt"
         ],
         "portfolio": [
-          "cfs",
           "fm",
+          "fes",
+          "cfs",
+          "fx",
           "ebt_l3",
           "ebt_l2"
         ],
         "lob": [
-          "cfs",
           "fm",
+          "fes",
+          "cfs",
+          "fx",
           "ebt_l3",
           "ebt_l2",
           "ebt_l1"
         ]
       },
       "narration_context": {
-        "metric_description": "Represents “hard” equity after removing intangibles; reflects true loss- absorbing capacity, covenant strength, and resilience under downside scenarios.\n",
-        "formula_text": "Read tangible_net_worth_usd from counterparty_financial_snapshot for each facility as-of reporting date.\n",
+        "metric_description": "Counterparty tangible net worth (hard equity after removing intangibles). Reflects true loss-absorbing capacity, covenant strength, and resilience under downside scenarios. At facility level, returns the counterparty's TNW. At counterparty level, direct read. At aggregate levels, returns exposure-weighted average TNW — avoids invalid SUM of equity across unrelated counterparties (consolidation accounting violation).\n",
+        "formula_text": "Read tangible_net_worth_usd from counterparty_financial_snapshot for the counterparty behind each facility.\n",
         "aggregation_type_by_level": {
           "facility": "RAW",
           "counterparty": "RAW",
-          "desk": "SUM",
-          "portfolio": "SUM",
-          "lob": "SUM"
+          "desk": "WEIGHTED_AVG",
+          "portfolio": "WEIGHTED_AVG",
+          "lob": "WEIGHTED_AVG"
         }
       }
     }
   },
   "MET-103": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "maturity_bucket_id"
+      "primary_value": "bucket_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "maturity_bucket_id",
-          "label": "maturity_bucket_id",
+          "field": "days_until_maturity",
+          "label": "Days remaining to facility maturity",
           "sample_value": 0,
-          "source_table": "maturity_bucket_dim",
-          "source_layer": "L1"
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weighting for dominant bucket selection",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate for USD conversion at aggregate levels",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated maturity_bucket_id per facility.\n"
+      "formula_display": "Maturity bucket lookup from maturity_bucket_dim via range join on days_until_maturity. Returns bucket_name (e.g., \"0-90 days\", \"91-180 days\", \"1-2 years\").\n"
     },
     "worked_example_columns": [
       {
-        "field": "maturity_bucket_id",
-        "header": "Maturity Bucket Id",
+        "field": "days_until_maturity",
+        "header": "Days Until Maturity",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bucket_name",
+        "header": "Bucket Name",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ],
     "traversal_source_data": {
       "source_tables": [
         {
-          "alias": "mbd",
-          "qualified_name": "l1.maturity_bucket_dim",
-          "table_name": "maturity_bucket_dim",
-          "layer": "L1",
+          "alias": "fes",
+          "qualified_name": "l2.facility_exposure_snapshot",
+          "table_name": "facility_exposure_snapshot",
+          "layer": "L2",
           "join_type": "BASE",
           "join_on": null,
           "fields": [
@@ -17716,12 +18040,120 @@
               "description": "facility_id"
             },
             {
-              "name": "maturity_bucket_id",
+              "name": "as_of_date",
+              "role": "FILTER",
+              "description": "as_of_date"
+            },
+            {
+              "name": "days_until_maturity",
               "role": "MEASURE",
-              "description": "maturity_bucket_id"
+              "description": "Days remaining to facility maturity"
+            },
+            {
+              "name": "drawn_amount",
+              "role": "MEASURE",
+              "description": "Exposure weighting for dominant bucket selection"
+            },
+            {
+              "name": "bank_share_pct",
+              "role": "MEASURE",
+              "description": "bank_share_pct"
+            },
+            {
+              "name": "currency_code",
+              "role": "DIMENSION",
+              "description": "currency_code"
             }
           ],
-          "purpose": "Provides maturity bucket id"
+          "purpose": "Provides Days remaining to facility maturity, Exposure weighting for dominant bucket selection, bank share pct"
+        },
+        {
+          "alias": "fm",
+          "qualified_name": "l2.facility_master",
+          "table_name": "facility_master",
+          "layer": "L2",
+          "join_type": "INNER",
+          "join_on": "fm.facility_id = fes.facility_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'",
+          "fields": [
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "counterparty_id",
+              "role": "DIMENSION",
+              "description": "counterparty_id"
+            },
+            {
+              "name": "lob_segment_id",
+              "role": "DIMENSION",
+              "description": "lob_segment_id"
+            },
+            {
+              "name": "is_active_flag",
+              "role": "FILTER",
+              "description": "is_active_flag"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
+            }
+          ],
+          "purpose": "Links to counterparty, lob segment for rollup grouping"
+        },
+        {
+          "alias": "mbd",
+          "qualified_name": "l1.maturity_bucket_dim",
+          "table_name": "maturity_bucket_dim",
+          "layer": "L1",
+          "join_type": "LEFT",
+          "join_on": "fes.days_until_maturity >= mbd.bucket_start_days AND fes.days_until_maturity < mbd.bucket_end_days AND mbd.is_active_flag = 'Y'",
+          "fields": [
+            {
+              "name": "maturity_bucket_id",
+              "role": "JOIN_KEY",
+              "description": "maturity_bucket_id"
+            },
+            {
+              "name": "bucket_name",
+              "role": "DIMENSION",
+              "description": "Human-readable maturity bucket name"
+            },
+            {
+              "name": "bucket_start_days",
+              "role": "FILTER",
+              "description": "bucket_start_days"
+            },
+            {
+              "name": "bucket_end_days",
+              "role": "FILTER",
+              "description": "bucket_end_days"
+            },
+            {
+              "name": "is_active_flag",
+              "role": "FILTER",
+              "description": "is_active_flag"
+            }
+          ],
+          "purpose": "Provides grouping by bucket name from maturity bucket dim"
+        },
+        {
+          "alias": "fx",
+          "qualified_name": "l2.fx_rate",
+          "table_name": "fx_rate",
+          "layer": "L2",
+          "join_type": "LEFT",
+          "join_on": "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date",
+          "fields": [
+            {
+              "name": "rate",
+              "role": "MEASURE",
+              "description": "FX spot rate for USD conversion at aggregate levels"
+            }
+          ],
+          "purpose": "Converts local currency amounts to USD reporting currency for cross-currency aggregation"
         },
         {
           "alias": "ebt",
@@ -17740,6 +18172,11 @@
               "name": "parent_segment_id",
               "role": "DIMENSION",
               "description": "parent_segment_id"
+            },
+            {
+              "name": "is_current_flag",
+              "role": "FILTER",
+              "description": "is_current_flag"
             }
           ],
           "purpose": "Resolves the organizational hierarchy (desk → portfolio → business segment) for rollup grouping"
@@ -17747,36 +18184,49 @@
       ],
       "per_level_tables": {
         "facility": [
+          "fes",
+          "fm",
           "mbd"
         ],
         "counterparty": [
+          "fes",
+          "fm",
           "mbd"
         ],
         "desk": [
+          "fes",
+          "fm",
           "mbd",
+          "fx",
           "ebt"
         ],
         "portfolio": [
+          "fes",
+          "fm",
           "mbd",
+          "fx",
           "ebt_l3",
           "ebt_l2"
         ],
         "lob": [
+          "fes",
+          "fm",
           "mbd",
+          "fx",
           "ebt_l3",
           "ebt_l2",
           "ebt_l1"
         ]
       },
       "narration_context": {
-        "metric_description": "Bucketing mechanism to calculate Maturity Dates supporting the identification of upcoming liquidations in the next 90 days\n",
-        "formula_text": "Calculated maturity_bucket_id per facility.\n",
+        "metric_description": "Maturity time bucket for each facility based on days_until_maturity from the exposure snapshot, mapped to maturity_bucket_dim via range join (bucket_start_days <= days <= bucket_end_days). At facility level, returns the bucket_name. At aggregate levels, returns the dominant maturity bucket by drawn exposure weight. Supports maturity wall identification and concentration risk monitoring.\n",
+        "formula_text": "Maturity bucket lookup from maturity_bucket_dim via range join on days_until_maturity. Returns bucket_name (e.g., \"0-90 days\", \"91-180 days\", \"1-2 years\").\n",
         "aggregation_type_by_level": {
-          "facility": "CUSTOM",
-          "counterparty": "SUM",
-          "desk": "SUM",
-          "portfolio": "SUM",
-          "lob": "SUM"
+          "facility": "RAW",
+          "counterparty": "CUSTOM",
+          "desk": "CUSTOM",
+          "portfolio": "CUSTOM",
+          "lob": "CUSTOM"
         }
       }
     }

@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-025"
 name: "Loss Given Default (%)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -16,14 +16,25 @@ sub_domain: "risk-metrics"
 metric_class: CALCULATED
 direction: LOWER_BETTER
 unit_type: PERCENTAGE
-display_format: ".2f"
+display_format: ".4f"
 description: >
-  The average expected loss rate (percent of exposure) if default occurs,
-  weighted across exposures (typically by EAD).
+  Exposure-weighted average Loss Given Default rate expressed as a decimal
+  fraction (e.g. 0.45 = 45%). At facility level, reads lgd_pct directly
+  from facility_risk_snapshot. At aggregate levels, computes the
+  commitment-adjusted weighted average: SUM(lgd_pct * outstanding_balance_amt)
+  / SUM(committed_amount), with FX conversion for cross-currency portfolios.
+  LGD represents the expected severity of loss if the obligor defaults,
+  a key input to Expected Loss (EL = PD x LGD x EAD) under Basel III IRB.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "IRB approach requires bank-estimated LGD (Foundation: supervisory; Advanced: internal)"
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 Loss Given Default field for wholesale exposures"
+  - framework: "CECL"
+    description: "LGD is a component of lifetime expected credit loss estimation"
+  - framework: "CCAR"
+    description: "Stress-tested LGD under adverse and severely adverse scenarios"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -37,6 +48,24 @@ source_tables:
         role: FILTER
       - name: lgd_pct
         role: MEASURE
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = frs.facility_id AND fes.as_of_date = frs.as_of_date"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: outstanding_balance_amt
+        role: MEASURE
+      - name: committed_amount
+        role: MEASURE
+      - name: counterparty_id
+        role: DIMENSION
+      - name: currency_code
+        role: DIMENSION
   - schema: l2
     table: facility_master
     alias: fm
@@ -55,111 +84,169 @@ source_tables:
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: from_currency_code
+        role: JOIN_KEY
+      - name: to_currency_code
+        role: FILTER
+      - name: as_of_date
+        role: JOIN_KEY
+      - name: rate
+        role: MEASURE
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: CUSTOM
+    aggregation_type: RAW
     formula_text: >
-      Calculated lgd_pct per facility.
+      Direct lookup of lgd_pct per facility from facility_risk_snapshot.
+      No aggregation needed — facility-level LGD is a sourced atomic value.
     formula_sql: |
       SELECT
         frs.facility_id AS dimension_key,
         frs.lgd_pct AS metric_value
       FROM l2.facility_risk_snapshot frs
-      WHERE frs.as_of_date = :as_of_date
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = frs.facility_id
+        AND fm.is_active_flag = 'Y'
+      WHERE frs.lgd_pct IS NOT NULL
   counterparty:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      Exposure-weighted average of lgd_pct across counterparty facilities.
+      Commitment-adjusted exposure-weighted LGD per counterparty:
+      SUM(lgd_pct * outstanding_balance_amt * fx_rate) /
+      NULLIF(SUM(committed_amount * fx_rate), 0).
+      FX conversion ensures proper weighting across multi-currency facilities.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.lgd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.lgd_pct * COALESCE(fes.outstanding_balance_amt, 0) * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0)
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE frs.lgd_pct IS NOT NULL
+        AND fes.committed_amount > 0
       GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level lgd_pct per L3 desk segment.
+      Commitment-adjusted exposure-weighted LGD per L3 desk segment:
+      SUM(lgd_pct * outstanding_balance_amt * fx_rate) /
+      NULLIF(SUM(committed_amount * fx_rate), 0).
+      Standard EBT hierarchy direct join for desk grouping.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.lgd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.lgd_pct * COALESCE(fes.outstanding_balance_amt, 0) * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0)
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE frs.lgd_pct IS NOT NULL
+        AND fes.committed_amount > 0
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level lgd_pct per L2 portfolio segment.
+      Commitment-adjusted exposure-weighted LGD per L2 portfolio segment:
+      SUM(lgd_pct * outstanding_balance_amt * fx_rate) /
+      NULLIF(SUM(committed_amount * fx_rate), 0).
+      One-hop EBT traversal for portfolio grouping.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.lgd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.lgd_pct * COALESCE(fes.outstanding_balance_amt, 0) * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0)
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE frs.lgd_pct IS NOT NULL
+        AND fes.committed_amount > 0
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: WEIGHTED_AVG
     formula_text: >
-      SUM of facility-level lgd_pct per L1 business segment segment.
+      Commitment-adjusted exposure-weighted LGD per L1 business segment:
+      SUM(lgd_pct * outstanding_balance_amt * fx_rate) /
+      NULLIF(SUM(committed_amount * fx_rate), 0).
+      Two-hop EBT traversal for business segment grouping.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          frs.lgd_pct AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-      ) fac
+        SUM(frs.lgd_pct * COALESCE(fes.outstanding_balance_amt, 0) * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0)
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE frs.lgd_pct IS NOT NULL
+        AND fes.committed_amount > 0
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -170,17 +257,32 @@ output:
 validations:
   - rule_id: "EXP-025-V01"
     type: NOT_NULL
-    description: "No null lgd_pct values"
+    description: "No null LGD values for facilities with risk snapshots"
     severity: ERROR
+  - rule_id: "EXP-025-V02"
+    type: NON_NEGATIVE
+    description: "LGD must be non-negative"
+    severity: ERROR
+  - rule_id: "EXP-025-V03"
+    type: THRESHOLD
+    description: "LGD as decimal fraction must be between 0 and 1 (0%-100%)"
+    severity: ERROR
+    params:
+      min_value: 0
+      max_value: 1
+  - rule_id: "EXP-025-V04"
+    type: RECONCILIATION
+    description: "Weighted-avg LGD at counterparty should reconcile with facility-level LGD values"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-057"
   abbreviation: "LGD"
   insight: >
     Severity of loss on default
-  rollup_strategy: "weighted-avg"
+  rollup_strategy: "sum-ratio"
   primary_value_field: "lgd_pct"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "basel-iii", "irb", "expected-loss"]
 dashboard_pages: []
 legacy_metric_ids: []

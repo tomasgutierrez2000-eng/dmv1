@@ -7,7 +7,7 @@ metric_id: "EXP-004"
 name: "Committed Exposure ($)"
 version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -51,33 +51,55 @@ source_tables:
     table: facility_lender_allocation
     alias: fla
     join_type: LEFT
-    join_on: "fla.facility_id = fm.facility_id"
+    join_on: "fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: bank_share_pct
         role: MEASURE
         description: "Bank's participation share of the facility (%)"
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current allocation row to prevent double-counting"
   - schema: l2
     table: facility_counterparty_participation
     alias: fcp
     join_type: LEFT
-    join_on: "fcp.facility_id = fm.facility_id"
+    join_on: "fcp.facility_id = fm.facility_id AND fcp.is_current_flag = 'Y'"
     fields:
       - name: counterparty_id
         role: DIMENSION
       - name: participation_pct
         role: MEASURE
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current participation row"
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fm.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = :as_of_date"
+    fields:
+      - name: from_currency_code
+        role: JOIN_KEY
+      - name: to_currency_code
+        role: FILTER
+      - name: rate
+        role: MEASURE
+        description: "FX spot rate to convert local currency amounts to USD"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current taxonomy record"
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
@@ -89,10 +111,16 @@ levels:
       SELECT
         fm.facility_id AS dimension_key,
         fm.committed_facility_amt
+          * COALESCE(fx.rate, 1)
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
       FROM l2.facility_master fm
       LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
+        AND fla.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fm.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = :as_of_date
       WHERE fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
   counterparty:
@@ -104,20 +132,27 @@ levels:
     formula_sql: |
       SELECT
         fcp.counterparty_id AS dimension_key,
-        SUM(fac.metric_value * COALESCE(fcp.participation_pct, 1.0)) AS metric_value
+        SUM(fac.metric_value * COALESCE(fcp.participation_pct, 100.0) / 100.0) AS metric_value
       FROM (
         SELECT
           fm.facility_id,
           fm.committed_facility_amt
+            * COALESCE(fx.rate, 1)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = :as_of_date
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_counterparty_participation fcp
         ON fcp.facility_id = fac.facility_id
+        AND fcp.is_current_flag = 'Y'
       GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
@@ -132,10 +167,16 @@ levels:
         SELECT
           fm.facility_id,
           fm.committed_facility_amt
+            * COALESCE(fx.rate, 1)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = :as_of_date
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
@@ -143,6 +184,7 @@ levels:
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
@@ -157,10 +199,16 @@ levels:
         SELECT
           fm.facility_id,
           fm.committed_facility_amt
+            * COALESCE(fx.rate, 1)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = :as_of_date
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
@@ -168,8 +216,10 @@ levels:
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
@@ -184,10 +234,16 @@ levels:
         SELECT
           fm.facility_id,
           fm.committed_facility_amt
+            * COALESCE(fx.rate, 1)
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fm.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = :as_of_date
         WHERE fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
       ) fac
@@ -195,10 +251,13 @@ levels:
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []

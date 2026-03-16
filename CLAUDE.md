@@ -34,7 +34,7 @@ lib/                    # Core business logic
   metric-library/       # Catalogue store & types
   deep-dive/            # Seed metrics, lineage parser, cross-tier resolver
 data/                   # Data definitions
-  l3-metrics.ts         # 105+ metric definitions (SOURCE OF TRUTH for L3 metrics)
+  l3-metrics.ts         # 106+ metric definitions (SOURCE OF TRUTH for L3 metrics)
   l3-tables.ts          # 84 L3 table definitions
   metric-library/       # catalogue.json, variants.json, parent-metrics.json, domains.json
 scripts/                # CLI data processing scripts

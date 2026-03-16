@@ -2,14 +2,16 @@
 # GSIB Metric Definition
 # Credit Agreement ID
 # ═══════════════════════════════════════════════════════════════
+
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-007"
 name: "Credit Agreement ID"
-version: "1.0.0"
+version: "1.1.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
+
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "reference"
 sub_domain: "master-data"
@@ -18,154 +20,150 @@ direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Unique identifier linking facility to governing credit agreement
-  documentation.
+  Unique identifier linking each facility to its governing credit agreement
+  documentation. Used for contract tracking, facility-to-agreement linkage,
+  and regulatory reporting. At counterparty level, returns count of distinct
+  credit agreements per borrower.
+
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Credit agreement identification for facility-level regulatory reporting"
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 — credit agreement linkage for facility reporting"
+
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: credit_agreement_master
-    alias: cam
+    table: facility_master
+    alias: fm
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: credit_agreement_id
         role: MEASURE
-  - schema: l1
-    table: enterprise_business_taxonomy
-    alias: ebt
-    join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+      - name: counterparty_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l2
+    table: credit_agreement_master
+    alias: cam
+    join_type: INNER
+    join_on: "cam.credit_agreement_id = fm.credit_agreement_id"
     fields:
-      - name: managed_segment_id
-        role: DIMENSION
-      - name: parent_segment_id
-        role: DIMENSION
+      - name: credit_agreement_id
+        role: JOIN_KEY
+
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Direct lookup of credit_agreement_id from credit_agreement_master.
-    formula_sql: |
+      Direct lookup of credit_agreement_id for each active facility via
+      facility_master joined to credit_agreement_master.
+    formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
-        cam.credit_agreement_id AS metric_value
+        fm.credit_agreement_id AS metric_value
       FROM l2.facility_master fm
       INNER JOIN l2.credit_agreement_master cam
-        ON cam.facility_id = fm.facility_id
+        ON cam.credit_agreement_id = fm.credit_agreement_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
-    aggregation_type: RAW
+    aggregation_type: COUNT_DISTINCT
     formula_text: >
-      Read credit_agreement_id per counterparty.
-    formula_sql: |
+      Count of distinct credit agreements per counterparty. Provides visibility
+      into borrower complexity and multi-agreement relationships.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        cam.credit_agreement_id AS metric_value
-      FROM l2.credit_agreement_master cam
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = cam.facility_id
-        AND fm.is_active_flag = 'Y'
-      WHERE cam.as_of_date = :as_of_date
+        COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.credit_agreement_master cam
+        ON cam.credit_agreement_id = fm.credit_agreement_id
+      WHERE fm.is_active_flag = 'Y'
+      GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: COUNT_DISTINCT
     formula_text: >
-      SUM of facility-level credit_agreement_id per L3 desk segment.
-    formula_sql: |
+      Count of distinct credit agreements per L3 desk segment via
+      enterprise_business_taxonomy.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cam.credit_agreement_id AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l2.credit_agreement_master cam
-          ON cam.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.credit_agreement_master cam
+        ON cam.credit_agreement_id = fm.credit_agreement_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: COUNT_DISTINCT
     formula_text: >
-      SUM of facility-level credit_agreement_id per L2 portfolio segment.
-    formula_sql: |
+      Count of distinct credit agreements per L2 portfolio segment.
+      Traverses EBT hierarchy L3 → L2 via parent_segment_id.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cam.credit_agreement_id AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l2.credit_agreement_master cam
-          ON cam.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.credit_agreement_master cam
+        ON cam.credit_agreement_id = fm.credit_agreement_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: COUNT_DISTINCT
     formula_text: >
-      SUM of facility-level credit_agreement_id per L1 business segment segment.
-    formula_sql: |
+      Count of distinct credit agreements per L1 business segment.
+      Full EBT hierarchy traversal L3 → L2 → L1.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          cam.credit_agreement_id AS metric_value
-        FROM l2.facility_master fm
-        INNER JOIN l2.credit_agreement_master cam
-          ON cam.facility_id = fm.facility_id
-        WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.credit_agreement_master cam
+        ON cam.credit_agreement_id = fm.credit_agreement_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
+
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+
 # ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+
 # ── VALIDATION RULES ──────────────────────────────────────────
 validations:
   - rule_id: "REF-007-V01"
     type: NOT_NULL
-    description: "No null credit_agreement_id values"
+    description: "No null credit_agreement_id values at facility level"
     severity: ERROR
+
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-018"
   abbreviation: "CAI"
   insight: >
-    Used for contract tracking
+    Contract tracking identifier linking facilities to governing credit
+    agreements. Count at counterparty level reveals multi-agreement complexity.
   rollup_strategy: "direct-sum"
   primary_value_field: "credit_agreement_id"
+
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["reference", "master-data"]
 dashboard_pages: []

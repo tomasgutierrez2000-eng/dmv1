@@ -1,184 +1,232 @@
-metric_id: RSK-001
-name: Risk Rating Tier
-version: 1.0.0
-owner: market-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Risk Rating Tier
+# ═══════════════════════════════════════════════════════════════
+
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "RSK-001"
+name: "Risk Rating Tier"
+version: "1.1.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: risk
-sub_domain: credit-ratings
+
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "risk"
+sub_domain: "credit-ratings"
 metric_class: CALCULATED
-direction: NEUTRAL
-unit_type: COUNT
-display_format: ',.0f'
-description: |
-  Most recent internal credit rating assigned at reporting date. Used for segmentation and exposure-weighted risk aggregation.
+direction: LOWER_BETTER
+unit_type: ORDINAL
+display_format: ",.0f"
+description: >
+  Risk rating tier derived from counterparty probability of default (PD).
+  Each counterparty's pd_annual is matched against the risk_rating_tier_dim
+  reference table (pd_min_pct / pd_max_pct boundaries) to assign a tier
+  classification. At facility level, the tier is inherited from the owning
+  counterparty. At aggregate levels, MAX (worst-case) tier ordinal is reported.
+
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "Basel III"
+    description: "IRB approach — PD-based risk grade assignment and segmentation"
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 — internal risk rating for facility reporting"
+  - framework: "CCAR"
+    description: "Risk tier stratification for stress testing and capital planning"
+
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l2
-  table: counterparty_rating_observation
-  alias: cro
-  join_type: BASE
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: risk_rating_status
-    role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.facility_id = cro.facility_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: counterparty_id
-    role: DIMENSION
-  - name: lob_segment_id
-    role: DIMENSION
-  - name: is_active_flag
-    role: FILTER
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l2
+    table: counterparty
+    alias: c
+    join_type: BASE
+    fields:
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: pd_annual
+        role: MEASURE
+  - schema: l1
+    table: risk_rating_tier_dim
+    alias: rrt
+    join_type: LEFT
+    join_on: "c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true"
+    fields:
+      - name: tier_code
+        role: DIMENSION
+      - name: pd_min_pct
+        role: FILTER
+      - name: pd_max_pct
+        role: FILTER
+      - name: display_order
+        role: MEASURE
+      - name: active_flag
+        role: FILTER
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: LEFT
+    join_on: "fm.counterparty_id = c.counterparty_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: RAW
-    formula_text: |
-      Read risk_rating_status from counterparty_rating_observation for each facility.
+    aggregation_type: CUSTOM
+    formula_text: >
+      For each facility, inherit the risk rating tier from the owning
+      counterparty. Join facility_master to counterparty, then range-match
+      counterparty pd_annual against risk_rating_tier_dim to derive the tier
+      ordinal (display_order).
     formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
-        cro.rating_grade_id AS metric_value
-      FROM l2.counterparty_rating_observation cro
-      INNER JOIN l2.facility_master fm
-        ON fm.counterparty_id = cro.counterparty_id
-        AND fm.is_active_flag = 'Y'
-      WHERE cro.as_of_date = :as_of_date
+        COALESCE(rrt.display_order, 0) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty c
+        ON c.counterparty_id = fm.counterparty_id
+      LEFT JOIN l1.risk_rating_tier_dim rrt
+        ON c.pd_annual >= rrt.pd_min_pct
+        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        AND rrt.active_flag = true
+      WHERE fm.is_active_flag = 'Y'
+        AND c.pd_annual IS NOT NULL
   counterparty:
-    aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with risk rating per counterparty.
+    aggregation_type: CUSTOM
+    formula_text: >
+      For each counterparty, look up pd_annual and range-match against
+      risk_rating_tier_dim where pd_annual >= pd_min_pct AND pd_annual <
+      pd_max_pct. Returns the tier ordinal (display_order). Counterparties
+      with NULL PD receive tier 0 (unrated).
     formula_sql: |-
       SELECT
-        fm.counterparty_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.counterparty_rating_observation cro
-        INNER JOIN l2.facility_master fm
-          ON fm.counterparty_id = cro.counterparty_id
-          AND fm.is_active_flag = 'Y'
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+        c.counterparty_id AS dimension_key,
+        COALESCE(rrt.display_order, 0) AS metric_value
+      FROM l2.counterparty c
+      LEFT JOIN l1.risk_rating_tier_dim rrt
+        ON c.pd_annual >= rrt.pd_min_pct
+        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        AND rrt.active_flag = true
+      WHERE c.pd_annual IS NOT NULL
   desk:
-    aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with risk rating per L3 desk segment.
+    aggregation_type: MAX
+    formula_text: >
+      Worst-case (MAX) risk rating tier ordinal across all counterparties in
+      the L3 desk segment. Higher ordinal = riskier tier. Full tier distribution
+      available via counterparty-level drill-down.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.counterparty_rating_observation cro
-        INNER JOIN l2.facility_master fm
-          ON fm.counterparty_id = cro.counterparty_id
-          AND fm.is_active_flag = 'Y'
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
+        MAX(COALESCE(rrt.display_order, 0)) AS metric_value
+      FROM l2.counterparty c
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.counterparty_id = c.counterparty_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.risk_rating_tier_dim rrt
+        ON c.pd_annual >= rrt.pd_min_pct
+        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        AND rrt.active_flag = true
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE c.pd_annual IS NOT NULL
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with risk rating per L2 portfolio segment.
+    aggregation_type: MAX
+    formula_text: >
+      Worst-case (MAX) risk rating tier ordinal per L2 portfolio segment.
+      Traverses EBT hierarchy L3 → L2 via parent_segment_id.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.counterparty_rating_observation cro
-        INNER JOIN l2.facility_master fm
-          ON fm.counterparty_id = cro.counterparty_id
-          AND fm.is_active_flag = 'Y'
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
+        MAX(COALESCE(rrt.display_order, 0)) AS metric_value
+      FROM l2.counterparty c
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.counterparty_id = c.counterparty_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.risk_rating_tier_dim rrt
+        ON c.pd_annual >= rrt.pd_min_pct
+        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        AND rrt.active_flag = true
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE c.pd_annual IS NOT NULL
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: COUNT
-    formula_text: |
-      COUNT of facilities with risk rating per L1 business segment.
+    aggregation_type: MAX
+    formula_text: >
+      Worst-case (MAX) risk rating tier ordinal per L1 business segment.
+      Full EBT hierarchy traversal L3 → L2 → L1.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        COUNT(DISTINCT fac.facility_id) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id
-        FROM l2.counterparty_rating_observation cro
-        INNER JOIN l2.facility_master fm
-          ON fm.counterparty_id = cro.counterparty_id
-          AND fm.is_active_flag = 'Y'
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
+        MAX(COALESCE(rrt.display_order, 0)) AS metric_value
+      FROM l2.counterparty c
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.counterparty_id = c.counterparty_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.risk_rating_tier_dim rrt
+        ON c.pd_annual >= rrt.pd_min_pct
+        AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
+        AND rrt.active_flag = true
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE c.pd_annual IS NOT NULL
       GROUP BY ebt_l1.managed_segment_id
+
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: RSK-001-V01
-  type: NOT_NULL
-  description: No null risk_rating_status values
-  severity: ERROR
+  - rule_id: "RSK-001-V01"
+    type: NOT_NULL
+    description: "No null tier ordinal values for counterparties with non-null PD"
+    severity: ERROR
+  - rule_id: "RSK-001-V02"
+    type: THRESHOLD
+    description: "Tier ordinal must be within valid range 0-20 (0 = unrated, 1-N = tier ordinals)"
+    severity: ERROR
+
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-021
-  abbreviation: RRT
-  insight: |
-    Portfolio risk level
-  rollup_strategy: direct-sum
-  primary_value_field: risk_rating_status
-tags:
-- risk
-- credit-ratings
+  item_id: "MET-021"
+  abbreviation: "RRT"
+  insight: >
+    Portfolio risk segmentation based on PD. Higher tier ordinal indicates
+    higher risk. Aggregate levels show worst-case tier for conservative CRO
+    view; counterparty drill-down reveals full tier distribution.
+  rollup_strategy: "worst-case"
+  primary_value_field: "risk_rating_tier"
+
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["risk", "credit-ratings", "pd", "segmentation"]
 dashboard_pages: []
 legacy_metric_ids: []

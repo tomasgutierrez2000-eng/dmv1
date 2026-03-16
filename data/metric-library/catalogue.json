@@ -45867,7 +45867,7 @@
         "dashboard_display_name": "Credit Agreement ID (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l1.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. COMPUTE\n   metric_value = fm.credit_agreement_id",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l2.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. COMPUTE\n   metric_value = fm.credit_agreement_id",
         "source_references": [
           {
             "layer": "L2",
@@ -45894,20 +45894,20 @@
             "description": "is_active_flag"
           },
           {
-            "layer": "L1",
+            "layer": "L2",
             "table": "credit_agreement_master",
             "field": "credit_agreement_id",
             "description": "credit_agreement_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  fm.credit_agreement_id AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l1.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nWHERE fm.is_active_flag = 'Y'"
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  fm.credit_agreement_id AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nWHERE fm.is_active_flag = 'Y'"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Credit Agreement ID (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l1.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l2.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -45934,20 +45934,20 @@
             "description": "is_active_flag"
           },
           {
-            "layer": "L1",
+            "layer": "L2",
             "table": "credit_agreement_master",
             "field": "credit_agreement_id",
             "description": "credit_agreement_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l1.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Credit Agreement ID (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l1.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l2.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -45974,20 +45974,20 @@
             "description": "is_active_flag"
           },
           {
-            "layer": "L1",
+            "layer": "L2",
             "table": "credit_agreement_master",
             "field": "credit_agreement_id",
             "description": "credit_agreement_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l1.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Credit Agreement ID (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l1.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l2.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -46014,20 +46014,20 @@
             "description": "is_active_flag"
           },
           {
-            "layer": "L1",
+            "layer": "L2",
             "table": "credit_agreement_master",
             "field": "credit_agreement_id",
             "description": "credit_agreement_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l1.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Credit Agreement ID (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l1.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. JOIN  l2.credit_agreement_master  (cam)\n   ON    cam.credit_agreement_id = fm.credit_agreement_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = COUNT(DISTINCT fm.credit_agreement_id)",
         "source_references": [
           {
             "layer": "L2",
@@ -46054,13 +46054,13 @@
             "description": "is_active_flag"
           },
           {
-            "layer": "L1",
+            "layer": "L2",
             "table": "credit_agreement_master",
             "field": "credit_agreement_id",
             "description": "credit_agreement_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l1.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  COUNT(DISTINCT fm.credit_agreement_id) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.credit_agreement_master cam\n  ON cam.credit_agreement_id = fm.credit_agreement_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE fm.is_active_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {
@@ -59910,7 +59910,7 @@
         "dashboard_display_name": "Risk Rating Tier (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = COALESCE(rrt.display_order, 0)",
+        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = COALESCE(rrt.display_order, 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -59951,8 +59951,8 @@
           {
             "layer": "L1",
             "table": "risk_rating_tier_dim",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "field": "active_flag",
+            "description": "active_flag"
           },
           {
             "layer": "L2",
@@ -59991,14 +59991,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  COALESCE(rrt.display_order, 0) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty c\n  ON c.counterparty_id = fm.counterparty_id\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.is_active_flag = true\nWHERE fm.is_active_flag = 'Y'\n  AND c.pd_annual IS NOT NULL"
+        "formula_sql": "SELECT\n  fm.facility_id AS dimension_key,\n  COALESCE(rrt.display_order, 0) AS metric_value\nFROM l2.facility_master fm\nINNER JOIN l2.counterparty c\n  ON c.counterparty_id = fm.counterparty_id\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.active_flag = true\nWHERE fm.is_active_flag = 'Y'\n  AND c.pd_annual IS NOT NULL"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Risk Rating Tier (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = COALESCE(rrt.display_order, 0)",
+        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = COALESCE(rrt.display_order, 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -60039,8 +60039,8 @@
           {
             "layer": "L1",
             "table": "risk_rating_tier_dim",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "field": "active_flag",
+            "description": "active_flag"
           },
           {
             "layer": "L2",
@@ -60079,14 +60079,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  c.counterparty_id AS dimension_key,\n  COALESCE(rrt.display_order, 0) AS metric_value\nFROM l2.counterparty c\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.is_active_flag = true\nWHERE c.pd_annual IS NOT NULL"
+        "formula_sql": "SELECT\n  c.counterparty_id AS dimension_key,\n  COALESCE(rrt.display_order, 0) AS metric_value\nFROM l2.counterparty c\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.active_flag = true\nWHERE c.pd_annual IS NOT NULL"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Risk Rating Tier (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = MAX(COALESCE(rrt.display_order, 0))",
+        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = MAX(COALESCE(rrt.display_order, 0))",
         "source_references": [
           {
             "layer": "L2",
@@ -60127,8 +60127,8 @@
           {
             "layer": "L1",
             "table": "risk_rating_tier_dim",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "field": "active_flag",
+            "description": "active_flag"
           },
           {
             "layer": "L2",
@@ -60167,14 +60167,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  MAX(COALESCE(rrt.display_order, 0)) AS metric_value\nFROM l2.counterparty c\nINNER JOIN l2.facility_master fm\n  ON fm.counterparty_id = c.counterparty_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.is_active_flag = true\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE c.pd_annual IS NOT NULL\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  MAX(COALESCE(rrt.display_order, 0)) AS metric_value\nFROM l2.counterparty c\nINNER JOIN l2.facility_master fm\n  ON fm.counterparty_id = c.counterparty_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.active_flag = true\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE c.pd_annual IS NOT NULL\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Risk Rating Tier (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = MAX(COALESCE(rrt.display_order, 0))",
+        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = MAX(COALESCE(rrt.display_order, 0))",
         "source_references": [
           {
             "layer": "L2",
@@ -60215,8 +60215,8 @@
           {
             "layer": "L1",
             "table": "risk_rating_tier_dim",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "field": "active_flag",
+            "description": "active_flag"
           },
           {
             "layer": "L2",
@@ -60255,14 +60255,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  MAX(COALESCE(rrt.display_order, 0)) AS metric_value\nFROM l2.counterparty c\nINNER JOIN l2.facility_master fm\n  ON fm.counterparty_id = c.counterparty_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.is_active_flag = true\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE c.pd_annual IS NOT NULL\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  MAX(COALESCE(rrt.display_order, 0)) AS metric_value\nFROM l2.counterparty c\nINNER JOIN l2.facility_master fm\n  ON fm.counterparty_id = c.counterparty_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.active_flag = true\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE c.pd_annual IS NOT NULL\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Risk Rating Tier (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = MAX(COALESCE(rrt.display_order, 0))",
+        "level_logic": "1. LOAD  l2.counterparty  (c)\n2. LEFT JOIN  l1.risk_rating_tier_dim  (rrt)\n   ON    c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true\n3. LEFT JOIN  l2.facility_master  (fm)\n   ON    fm.counterparty_id = c.counterparty_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = MAX(COALESCE(rrt.display_order, 0))",
         "source_references": [
           {
             "layer": "L2",
@@ -60303,8 +60303,8 @@
           {
             "layer": "L1",
             "table": "risk_rating_tier_dim",
-            "field": "is_active_flag",
-            "description": "is_active_flag"
+            "field": "active_flag",
+            "description": "active_flag"
           },
           {
             "layer": "L2",
@@ -60343,7 +60343,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  MAX(COALESCE(rrt.display_order, 0)) AS metric_value\nFROM l2.counterparty c\nINNER JOIN l2.facility_master fm\n  ON fm.counterparty_id = c.counterparty_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.is_active_flag = true\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE c.pd_annual IS NOT NULL\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  MAX(COALESCE(rrt.display_order, 0)) AS metric_value\nFROM l2.counterparty c\nINNER JOIN l2.facility_master fm\n  ON fm.counterparty_id = c.counterparty_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.risk_rating_tier_dim rrt\n  ON c.pd_annual >= rrt.pd_min_pct\n  AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)\n  AND rrt.active_flag = true\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE c.pd_annual IS NOT NULL\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {

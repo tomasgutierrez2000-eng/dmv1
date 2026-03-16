@@ -47,7 +47,7 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
-  - schema: l1
+  - schema: l2
     table: credit_agreement_master
     alias: cam
     join_type: INNER
@@ -68,7 +68,7 @@ levels:
         fm.facility_id AS dimension_key,
         fm.credit_agreement_id AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.credit_agreement_master cam
+      INNER JOIN l2.credit_agreement_master cam
         ON cam.credit_agreement_id = fm.credit_agreement_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
@@ -81,7 +81,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.credit_agreement_master cam
+      INNER JOIN l2.credit_agreement_master cam
         ON cam.credit_agreement_id = fm.credit_agreement_id
       WHERE fm.is_active_flag = 'Y'
       GROUP BY fm.counterparty_id
@@ -95,7 +95,7 @@ levels:
         ebt.managed_segment_id AS dimension_key,
         COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.credit_agreement_master cam
+      INNER JOIN l2.credit_agreement_master cam
         ON cam.credit_agreement_id = fm.credit_agreement_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -111,7 +111,7 @@ levels:
         ebt_l2.managed_segment_id AS dimension_key,
         COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.credit_agreement_master cam
+      INNER JOIN l2.credit_agreement_master cam
         ON cam.credit_agreement_id = fm.credit_agreement_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -129,7 +129,7 @@ levels:
         ebt_l1.managed_segment_id AS dimension_key,
         COUNT(DISTINCT fm.credit_agreement_id) AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l1.credit_agreement_master cam
+      INNER JOIN l2.credit_agreement_master cam
         ON cam.credit_agreement_id = fm.credit_agreement_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id

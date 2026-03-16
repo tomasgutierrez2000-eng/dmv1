@@ -50,7 +50,7 @@ source_tables:
     table: risk_rating_tier_dim
     alias: rrt
     join_type: LEFT
-    join_on: "c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.is_active_flag = true"
+    join_on: "c.pd_annual >= rrt.pd_min_pct AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL) AND rrt.active_flag = true"
     fields:
       - name: tier_code
         role: DIMENSION
@@ -60,7 +60,7 @@ source_tables:
         role: FILTER
       - name: display_order
         role: MEASURE
-      - name: is_active_flag
+      - name: active_flag
         role: FILTER
   - schema: l2
     table: facility_master
@@ -106,7 +106,7 @@ levels:
       LEFT JOIN l1.risk_rating_tier_dim rrt
         ON c.pd_annual >= rrt.pd_min_pct
         AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
-        AND rrt.is_active_flag = true
+        AND rrt.active_flag = true
       WHERE fm.is_active_flag = 'Y'
         AND c.pd_annual IS NOT NULL
   counterparty:
@@ -124,7 +124,7 @@ levels:
       LEFT JOIN l1.risk_rating_tier_dim rrt
         ON c.pd_annual >= rrt.pd_min_pct
         AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
-        AND rrt.is_active_flag = true
+        AND rrt.active_flag = true
       WHERE c.pd_annual IS NOT NULL
   desk:
     aggregation_type: MAX
@@ -143,7 +143,7 @@ levels:
       LEFT JOIN l1.risk_rating_tier_dim rrt
         ON c.pd_annual >= rrt.pd_min_pct
         AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
-        AND rrt.is_active_flag = true
+        AND rrt.active_flag = true
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       WHERE c.pd_annual IS NOT NULL
@@ -164,7 +164,7 @@ levels:
       LEFT JOIN l1.risk_rating_tier_dim rrt
         ON c.pd_annual >= rrt.pd_min_pct
         AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
-        AND rrt.is_active_flag = true
+        AND rrt.active_flag = true
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -187,7 +187,7 @@ levels:
       LEFT JOIN l1.risk_rating_tier_dim rrt
         ON c.pd_annual >= rrt.pd_min_pct
         AND (c.pd_annual < rrt.pd_max_pct OR rrt.pd_max_pct IS NULL)
-        AND rrt.is_active_flag = true
+        AND rrt.active_flag = true
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2

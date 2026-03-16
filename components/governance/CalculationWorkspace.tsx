@@ -2,11 +2,12 @@
 
 import { useState, useCallback } from 'react';
 import {
-  Play, Loader2, Code2, AlertTriangle, ArrowUpDown, Pencil,
+  Play, Loader2, Code2, AlertTriangle, ArrowUpDown, Pencil, Search,
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import FormulaEditor from './FormulaEditor';
 import DrillDownRow from './DrillDownRow';
+import InputDataInspector from './InputDataInspector';
 import type { CatalogueItem, LevelDefinition } from '@/lib/metric-library/types';
 import {
   CHILD_LEVEL, drillLevelToTab, formatMetricValue, formatNumber,
@@ -214,6 +215,12 @@ export default function CalculationWorkspace({
   const [drillDownMap, setDrillDownMap] = useState<Map<string, DrillDownNode>>(new Map());
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
 
+  // Input Data Inspector state
+  const [inspectorShouldFetch, setInspectorShouldFetch] = useState(false);
+  const [inspectorScopedRow, setInspectorScopedRow] = useState<{
+    dimension_key: string; level: string;
+  } | null>(null);
+
   const levelFormulas = getFormulasForItem(item);
   const formula = levelFormulas[activeLevel] ?? LTV_FALLBACK_FORMULAS[activeLevel];
   const metricColorFn = (v: number) => metricColor(v, item?.unit_type, item?.direction);
@@ -248,6 +255,10 @@ export default function CalculationWorkspace({
       setRows(resultRows);
       setDurationMs(data.duration_ms ?? null);
       onResultsChange?.(activeLevel, resultRows);
+
+      // Trigger input data inspector refresh
+      setInspectorShouldFetch(true);
+      setInspectorScopedRow(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Calculation failed');
     } finally {
@@ -347,6 +358,12 @@ export default function CalculationWorkspace({
       return next;
     });
   }, [drillDownMap, fetchDrillDown]);
+
+  /** Scope the Input Data Inspector to a specific result row. */
+  const handleScopeToRow = useCallback((dimKey: string) => {
+    setInspectorScopedRow({ dimension_key: dimKey, level: activeLevel });
+    setInspectorShouldFetch(true);
+  }, [activeLevel]);
 
   const sortedRows = [...rows].sort((a, b) => {
     const va = Number(a.metric_value) || 0;
@@ -450,95 +467,120 @@ export default function CalculationWorkspace({
         </Modal>
       )}
 
-      {/* Results */}
-      <div className="flex-1 overflow-y-auto">
-        {/* Error */}
-        {error && (
-          <div className="m-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-            {error}
-          </div>
-        )}
-
-        {/* Empty state */}
-        {!loading && !error && rows.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-            <Play className="w-8 h-8 mb-3 text-gray-600" />
-            <p className="text-sm">Click &ldquo;Run Calculation&rdquo; to execute</p>
-            {asOfDate && <p className="text-xs text-gray-600 mt-1">as_of_date: {asOfDate}</p>}
-            {!asOfDate && <p className="text-xs text-amber-400 mt-1">Loading date...</p>}
-          </div>
-        )}
-
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 text-pwc-orange animate-spin" />
-            <span className="ml-2 text-sm text-gray-400">Executing against PostgreSQL...</span>
-          </div>
-        )}
-
-        {/* Results table */}
-        {rows.length > 0 && (
-          <>
-            {/* Summary bar */}
-            <div className="px-4 py-2 bg-pwc-black/30 border-b border-pwc-gray-light/30 flex items-center gap-4 text-xs text-gray-500 shrink-0">
-              <span>{rows.length} results</span>
-              {durationMs !== null && <span>{durationMs}ms</span>}
-              {asOfDate && <span>as_of: {asOfDate}</span>}
-              <span>Avg: <span className={metricColorFn(avgValue)}>{formatMetricValue(avgValue, item?.unit_type)}</span></span>
-              {highPctCount > 0 && (
-                <span className="text-red-400">
-                  {highPctCount} &gt;100%
-                </span>
-              )}
+      {/* Results + Input Data Inspector */}
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+        {/* Results table area */}
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {/* Error */}
+          {error && (
+            <div className="m-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              {error}
             </div>
+          )}
 
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-pwc-gray z-10">
-                <tr className="text-gray-500 text-xs">
-                  <th className="text-left px-4 py-2 font-medium">Dimension Key</th>
-                  <th className="text-right px-4 py-2 font-medium">
-                    <button
-                      type="button"
-                      onClick={() => setSortAsc(!sortAsc)}
-                      className="flex items-center gap-1 ml-auto hover:text-gray-300 transition-colors"
-                    >
-                      {item?.abbreviation ?? 'Value'}{isPctType ? ' %' : ''}
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  {/* Show additional columns if present */}
-                  {rows[0] && Object.keys(rows[0]).filter(k => k !== 'dimension_key' && k !== 'metric_value' && k !== 'dimension_label').map(k => (
-                    <th key={k} className="text-right px-4 py-2 font-medium">{k.replace(/_/g, ' ')}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sortedRows.map((row, idx) => {
-                  const topExtraKeys = Object.keys(row).filter(
-                    k => k !== 'dimension_key' && k !== 'metric_value' && k !== 'dimension_label'
-                  );
+          {/* Empty state */}
+          {!loading && !error && rows.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+              <Play className="w-8 h-8 mb-3 text-gray-600" />
+              <p className="text-sm">Click &ldquo;Run Calculation&rdquo; to execute</p>
+              {asOfDate && <p className="text-xs text-gray-600 mt-1">as_of_date: {asOfDate}</p>}
+              {!asOfDate && <p className="text-xs text-amber-400 mt-1">Loading date...</p>}
+            </div>
+          )}
 
-                  return (
-                    <DrillDownRow
-                      key={idx}
-                      level={activeLevel as DrillLevel}
-                      row={row}
-                      depth={0}
-                      pathPrefix=""
-                      drillDownMap={drillDownMap}
-                      expandedPaths={expandedPaths}
-                      onToggleExpand={toggleExpand}
-                      metricColorFn={metricColorFn}
-                      extraKeys={topExtraKeys}
-                      unitType={item?.unit_type}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </>
+          {/* Loading */}
+          {loading && (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-6 h-6 text-pwc-orange animate-spin" />
+              <span className="ml-2 text-sm text-gray-400">Executing against PostgreSQL...</span>
+            </div>
+          )}
+
+          {/* Results table */}
+          {rows.length > 0 && (
+            <>
+              {/* Summary bar */}
+              <div className="px-4 py-2 bg-pwc-black/30 border-b border-pwc-gray-light/30 flex items-center gap-4 text-xs text-gray-500 shrink-0">
+                <span>{rows.length} results</span>
+                {durationMs !== null && <span>{durationMs}ms</span>}
+                {asOfDate && <span>as_of: {asOfDate}</span>}
+                <span>Avg: <span className={metricColorFn(avgValue)}>{formatMetricValue(avgValue, item?.unit_type)}</span></span>
+                {highPctCount > 0 && (
+                  <span className="text-red-400">
+                    {highPctCount} &gt;100%
+                  </span>
+                )}
+              </div>
+
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-pwc-gray z-10">
+                  <tr className="text-gray-500 text-xs">
+                    <th className="text-left px-4 py-2 font-medium">
+                      <span className="flex items-center gap-1">
+                        Dimension Key
+                        <span title="Click row icon to inspect input data">
+                          <Search className="w-3 h-3 text-gray-600" />
+                        </span>
+                      </span>
+                    </th>
+                    <th className="text-right px-4 py-2 font-medium">
+                      <button
+                        type="button"
+                        onClick={() => setSortAsc(!sortAsc)}
+                        className="flex items-center gap-1 ml-auto hover:text-gray-300 transition-colors"
+                      >
+                        {item?.abbreviation ?? 'Value'}{isPctType ? ' %' : ''}
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    {/* Show additional columns if present */}
+                    {rows[0] && Object.keys(rows[0]).filter(k => k !== 'dimension_key' && k !== 'metric_value' && k !== 'dimension_label').map(k => (
+                      <th key={k} className="text-right px-4 py-2 font-medium">{k.replace(/_/g, ' ')}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedRows.map((row, idx) => {
+                    const topExtraKeys = Object.keys(row).filter(
+                      k => k !== 'dimension_key' && k !== 'metric_value' && k !== 'dimension_label'
+                    );
+
+                    return (
+                      <DrillDownRow
+                        key={idx}
+                        level={activeLevel as DrillLevel}
+                        row={row}
+                        depth={0}
+                        pathPrefix=""
+                        drillDownMap={drillDownMap}
+                        expandedPaths={expandedPaths}
+                        onToggleExpand={toggleExpand}
+                        metricColorFn={metricColorFn}
+                        extraKeys={topExtraKeys}
+                        unitType={item?.unit_type}
+                        onScopeToRow={handleScopeToRow}
+                      />
+                    );
+                  })}
+                </tbody>
+              </table>
+            </>
+          )}
+        </div>
+
+        {/* Input Data Inspector (collapsible bottom panel) */}
+        {rows.length > 0 && (
+          <InputDataInspector
+            itemId={itemId ?? ''}
+            asOfDate={asOfDate}
+            activeLevel={activeLevel}
+            formulaSql={formula.sql}
+            shouldFetch={inspectorShouldFetch}
+            onFetchComplete={() => setInspectorShouldFetch(false)}
+            scopedRow={inspectorScopedRow}
+            unitType={item?.unit_type}
+          />
         )}
       </div>
     </div>

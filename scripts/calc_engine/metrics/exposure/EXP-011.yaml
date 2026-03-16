@@ -5,25 +5,32 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-011"
 name: "Delinquent Payment Flag"
-version: "1.0.0"
+version: "1.1.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "exposure"
 sub_domain: "risk-metrics"
-metric_class: CALCULATED
+metric_class: SOURCED
 direction: LOWER_BETTER
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Indicator that exposure is past due. Used for credit monitoring, staging
+  Binary indicator that a facility has at least one past-due payment.
+  Sourced directly from the facility delinquency snapshot
+  (delinquent_payment_flag). At aggregate levels, provides a count of
+  delinquent facilities per dimension. Used for credit monitoring, staging
   assessment, and early default identification.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "Pillar 3 — Credit Risk"
+    description: "Past-due indicator for default identification"
+  - framework: "IFRS 9"
+    section: "Stage Classification"
+    description: "30+ days past due triggers Stage 2 classification"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -37,6 +44,7 @@ source_tables:
         role: FILTER
       - name: delinquent_payment_flag
         role: MEASURE
+        description: "Delinquency indicator — 'Y' if any payment past due"
   - schema: l2
     table: facility_master
     alias: fm
@@ -51,6 +59,8 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -61,108 +71,102 @@ source_tables:
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: CUSTOM
+    aggregation_type: RAW
     formula_text: >
-      For each Facility_ID lookup the Payments records in the Payment Lockbox
-      table. For each payment record where Payment Due Date > Today() IF(COUNT IF
-      ([Pmt_Applied] <[Pmt_Due])>=1, then "Y", "N")
+      Read delinquent_payment_flag from facility delinquency snapshot.
+      Returns 1 if facility has any past-due payment, 0 otherwise.
     formula_sql: |
       SELECT
         fds.facility_id AS dimension_key,
-        fds.delinquent_payment_flag AS metric_value
+        CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level delinquent_payment_flag per counterparty.
+      Count of delinquent facilities per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fds.facility_id AS dimension_key,
-          fds.delinquent_payment_flag AS metric_value
-        FROM l2.facility_delinquency_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
+        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level delinquent_payment_flag per L3 desk segment.
+      Count of delinquent facilities per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fds.facility_id AS dimension_key,
-          fds.delinquent_payment_flag AS metric_value
-        FROM l2.facility_delinquency_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
+        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level delinquent_payment_flag per L2 portfolio segment.
+      Count of delinquent facilities per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fds.facility_id AS dimension_key,
-          fds.delinquent_payment_flag AS metric_value
-        FROM l2.facility_delinquency_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
+        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level delinquent_payment_flag per L1 business segment
-      segment.
+      Count of delinquent facilities per L1 business segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fds.facility_id AS dimension_key,
-          fds.delinquent_payment_flag AS metric_value
-        FROM l2.facility_delinquency_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
+        SUM(CASE WHEN fds.delinquent_payment_flag = 'Y' THEN 1 ELSE 0 END) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -175,15 +179,34 @@ validations:
     type: NOT_NULL
     description: "No null delinquent_payment_flag values"
     severity: ERROR
+  - rule_id: "EXP-011-V02"
+    type: THRESHOLD
+    description: "Facility-level flag must be 0 or 1"
+    severity: ERROR
+    params:
+      min_value: 0
+      max_value: 1
+  - rule_id: "EXP-011-V03"
+    type: NON_NEGATIVE
+    description: "Count of delinquent facilities must be >= 0 at all levels"
+    severity: ERROR
+  - rule_id: "EXP-011-V04"
+    type: RECONCILIATION
+    description: "Sum of facility-level flags must equal counterparty-level counts"
+    severity: WARNING
+    params:
+      levels_to_compare: [facility, counterparty, business_segment]
+      tolerance_pct: 0.01
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-025"
   abbreviation: "DPF"
   insight: >
-    Portfolio credit stress indicator
+    Portfolio credit stress indicator — flags facilities with any past-due
+    payment for immediate attention.
   rollup_strategy: "direct-sum"
   primary_value_field: "delinquent_payment_flag"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
-dashboard_pages: []
+tags: ["exposure", "risk-metrics", "delinquency", "credit-quality"]
+dashboard_pages: ["P7"]
 legacy_metric_ids: []

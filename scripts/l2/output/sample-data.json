@@ -18164,8 +18164,8 @@
         "2025-01-04",
         "TTC",
         "A+",
-        "risk_rating_status_1",
-        1
+        "Upgrade",
+        "2"
       ],
       [
         2,
@@ -18180,8 +18180,8 @@
         "2025-01-14",
         "ISSUER",
         "Baa1",
-        "risk_rating_status_2",
-        2
+        null,
+        null
       ],
       [
         3,
@@ -18196,8 +18196,8 @@
         "2025-01-24",
         "TTC",
         "AA-",
-        "risk_rating_status_3",
-        3
+        "Stable",
+        "0"
       ],
       [
         4,
@@ -18212,8 +18212,8 @@
         "2025-01-06",
         "LT_ISSUER",
         "Ba2",
-        "risk_rating_status_4",
-        4
+        null,
+        null
       ],
       [
         5,
@@ -18228,8 +18228,8 @@
         "2025-01-16",
         "PIT",
         "B+",
-        "risk_rating_status_5",
-        5
+        "Downgrade",
+        "-2"
       ],
       [
         6,
@@ -18244,8 +18244,8 @@
         "2025-01-26",
         "LT_ISSUER",
         "Aa2",
-        "risk_rating_status_6",
-        6
+        null,
+        null
       ],
       [
         7,
@@ -18260,8 +18260,8 @@
         "2025-01-08",
         "TTC",
         "B-",
-        "risk_rating_status_7",
-        7
+        "Stable",
+        "0"
       ],
       [
         8,
@@ -18276,8 +18276,8 @@
         "2025-01-18",
         "ISSUER",
         "Baa2",
-        "risk_rating_status_8",
-        8
+        null,
+        null
       ],
       [
         9,
@@ -18292,8 +18292,8 @@
         "2025-01-28",
         "PIT",
         "BB+",
-        "risk_rating_status_9",
-        9
+        "Stable",
+        "0"
       ],
       [
         10,
@@ -18308,8 +18308,8 @@
         "2025-01-10",
         "LT_ISSUER",
         "Aaa",
-        "risk_rating_status_10",
-        10
+        null,
+        null
       ],
       [
         11,
@@ -18324,8 +18324,8 @@
         "2025-01-18",
         "ISSUER",
         "A1",
-        "risk_rating_status_11",
-        11
+        null,
+        null
       ],
       [
         12,
@@ -18340,8 +18340,8 @@
         "2025-01-28",
         "TTC",
         "BBB+",
-        "risk_rating_status_12",
-        12
+        "Stable",
+        "0"
       ],
       [
         13,
@@ -18356,8 +18356,8 @@
         "2025-01-10",
         "LT_ISSUER",
         "Aa3",
-        "risk_rating_status_13",
-        13
+        null,
+        null
       ],
       [
         14,
@@ -18372,8 +18372,8 @@
         "2025-01-20",
         "PIT",
         "BB",
-        "risk_rating_status_14",
-        14
+        "Stable",
+        "0"
       ],
       [
         15,
@@ -18388,8 +18388,8 @@
         "2025-01-02",
         "LT_ISSUER",
         "B2",
-        "risk_rating_status_15",
-        15
+        null,
+        null
       ],
       [
         16,
@@ -18404,8 +18404,8 @@
         "2025-01-12",
         "TTC",
         "AA",
-        "risk_rating_status_16",
-        16
+        "Stable",
+        "0"
       ],
       [
         17,
@@ -18420,8 +18420,8 @@
         "2025-01-22",
         "ISSUER",
         "B3",
-        "risk_rating_status_17",
-        17
+        null,
+        null
       ],
       [
         18,
@@ -18436,8 +18436,8 @@
         "2025-01-04",
         "PIT",
         "BBB-",
-        "risk_rating_status_18",
-        18
+        "Stable",
+        "0"
       ],
       [
         19,
@@ -18452,8 +18452,8 @@
         "2025-01-14",
         "LT_ISSUER",
         "Ba1",
-        "risk_rating_status_19",
-        19
+        null,
+        null
       ],
       [
         20,
@@ -18468,8 +18468,8 @@
         "2025-01-24",
         "TTC",
         "AAA",
-        "risk_rating_status_20",
-        20
+        "Stable",
+        "0"
       ],
       [
         21,
@@ -18484,8 +18484,8 @@
         "2025-01-04",
         "TTC",
         "A",
-        "risk_rating_status_21",
-        21
+        "Stable",
+        "0"
       ],
       [
         22,
@@ -18500,8 +18500,8 @@
         "2025-01-14",
         "LT_ISSUER",
         "Baa2",
-        "risk_rating_status_22",
-        22
+        null,
+        null
       ],
       [
         23,
@@ -18516,8 +18516,8 @@
         "2025-01-24",
         "PIT",
         "AA-",
-        "risk_rating_status_23",
-        23
+        "Stable",
+        "0"
       ],
       [
         24,
@@ -18532,8 +18532,8 @@
         "2025-01-06",
         "LT_ISSUER",
         "Ba2",
-        "risk_rating_status_24",
-        24
+        null,
+        null
       ],
       [
         25,
@@ -18548,8 +18548,8 @@
         "2025-01-16",
         "TTC",
         "B-",
-        "risk_rating_status_25",
-        25
+        "Stable",
+        "0"
       ],
       [
         26,
@@ -18564,8 +18564,8 @@
         "2025-01-26",
         "ISSUER",
         "Aa2",
-        "risk_rating_status_26",
-        26
+        null,
+        null
       ],
       [
         27,
@@ -18580,8 +18580,8 @@
         "2025-01-08",
         "PIT",
         "CCC+",
-        "risk_rating_status_27",
-        27
+        "Downgrade",
+        "-1"
       ],
       [
         28,
@@ -18596,8 +18596,8 @@
         "2025-01-18",
         "LT_ISSUER",
         "Ba1",
-        "risk_rating_status_28",
-        28
+        null,
+        null
       ],
       [
         29,
@@ -18612,8 +18612,8 @@
         "2025-01-28",
         "TTC",
         "BB",
-        "risk_rating_status_29",
-        29
+        "Stable",
+        "0"
       ],
       [
         30,
@@ -18628,8 +18628,8 @@
         "2025-01-10",
         "ISSUER",
         "Aa1",
-        "risk_rating_status_30",
-        30
+        null,
+        null
       ],
       [
         31,
@@ -18644,8 +18644,8 @@
         "2025-01-18",
         "LT_ISSUER",
         "A1",
-        "risk_rating_status_31",
-        31
+        null,
+        null
       ],
       [
         32,
@@ -18660,8 +18660,8 @@
         "2025-01-28",
         "PIT",
         "BBB+",
-        "risk_rating_status_32",
-        32
+        "Stable",
+        "0"
       ],
       [
         33,
@@ -18676,8 +18676,8 @@
         "2025-01-10",
         "LT_ISSUER",
         "Aa3",
-        "risk_rating_status_33",
-        33
+        null,
+        null
       ],
       [
         34,
@@ -18692,8 +18692,8 @@
         "2025-01-20",
         "TTC",
         "BB+",
-        "risk_rating_status_34",
-        34
+        "Stable",
+        "0"
       ],
       [
         35,
@@ -18708,8 +18708,8 @@
         "2025-01-02",
         "ISSUER",
         "B2",
-        "risk_rating_status_35",
-        35
+        null,
+        null
       ],
       [
         36,
@@ -18724,8 +18724,8 @@
         "2025-01-12",
         "PIT",
         "AA",
-        "risk_rating_status_36",
-        36
+        "Stable",
+        "0"
       ],
       [
         37,
@@ -18740,8 +18740,8 @@
         "2025-01-22",
         "LT_ISSUER",
         "B3",
-        "risk_rating_status_37",
-        37
+        null,
+        null
       ],
       [
         38,
@@ -18756,8 +18756,8 @@
         "2025-01-04",
         "TTC",
         "BBB-",
-        "risk_rating_status_38",
-        38
+        "Stable",
+        "0"
       ],
       [
         39,
@@ -18772,8 +18772,8 @@
         "2025-01-14",
         "ISSUER",
         "Ba1",
-        "risk_rating_status_39",
-        39
+        null,
+        null
       ],
       [
         40,
@@ -18788,8 +18788,8 @@
         "2025-01-24",
         "TTC",
         "AAA",
-        "risk_rating_status_40",
-        40
+        "Upgrade",
+        "2"
       ],
       [
         41,
@@ -18804,8 +18804,8 @@
         "2025-01-04",
         "PIT",
         "A+",
-        "risk_rating_status_41",
-        41
+        "Stable",
+        "0"
       ],
       [
         42,
@@ -18820,8 +18820,8 @@
         "2025-01-14",
         "LT_ISSUER",
         "Baa1",
-        "risk_rating_status_42",
-        42
+        null,
+        null
       ],
       [
         43,
@@ -18836,8 +18836,8 @@
         "2025-01-24",
         "TTC",
         "AA-",
-        "risk_rating_status_43",
-        43
+        "Stable",
+        "0"
       ],
       [
         44,
@@ -18852,8 +18852,8 @@
         "2025-01-06",
         "ISSUER",
         "Ba2",
-        "risk_rating_status_44",
-        44
+        null,
+        null
       ],
       [
         45,
@@ -18868,8 +18868,8 @@
         "2025-01-16",
         "PIT",
         "B+",
-        "risk_rating_status_45",
-        45
+        "Stable",
+        "0"
       ],
       [
         46,
@@ -18884,8 +18884,8 @@
         "2025-01-26",
         "LT_ISSUER",
         "Aa2",
-        "risk_rating_status_46",
-        46
+        null,
+        null
       ],
       [
         47,
@@ -18900,8 +18900,8 @@
         "2025-01-08",
         "TTC",
         "B-",
-        "risk_rating_status_47",
-        47
+        "Stable",
+        "0"
       ],
       [
         48,
@@ -18916,8 +18916,8 @@
         "2025-01-18",
         "ISSUER",
         "Baa2",
-        "risk_rating_status_48",
-        48
+        null,
+        null
       ],
       [
         49,
@@ -18932,8 +18932,8 @@
         "2025-01-28",
         "TTC",
         "BB+",
-        "risk_rating_status_49",
-        49
+        "Stable",
+        "0"
       ],
       [
         50,
@@ -18948,8 +18948,8 @@
         "2025-01-10",
         "LT_ISSUER",
         "Aaa",
-        "risk_rating_status_50",
-        50
+        null,
+        null
       ]
     ]
   },

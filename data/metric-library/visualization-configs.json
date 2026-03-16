@@ -2157,11 +2157,19 @@
           "sample_value": 0,
           "source_table": "collateral_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "SUM(original_valuation_usd) per facility from collateral_snapshot. Weighted by bank share percentage.\n"
+      "formula_display": "SUM(original_valuation_usd * bank_share_pct / 100) per facility. Bank share defaults to 100% if no lender allocation record.\n"
     },
     "worked_example_columns": [
       {
@@ -2170,6 +2178,12 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -2191,7 +2205,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "SUM(risk_mitigant_subtype_code) per facility from risk_mitigant_type_dim.\n"
+      "formula_display": "COUNT DISTINCT risk_mitigant_subtype_code per facility via risk_mitigant_link -> risk_mitigant_master -> risk_mitigant_type_dim. Only active mitigants with current link status.\n"
     },
     "worked_example_columns": [
       {
@@ -2206,27 +2220,27 @@
   "MET-077": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "risk_mitigant_id"
+      "primary_value": "mitigant_category"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "risk_mitigant_id",
-          "label": "risk_mitigant_id",
+          "field": "mitigant_category",
+          "label": "mitigant_category",
           "sample_value": 0,
-          "source_table": "risk_mitigant_master",
+          "source_table": "risk_mitigant_type_dim",
           "source_layer": "L1"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "SUM(risk_mitigant_id) per facility from risk_mitigant_master.\n"
+      "formula_display": "COUNT DISTINCT mitigant_category per facility via risk_mitigant_link -> risk_mitigant_master -> risk_mitigant_type_dim. Only active mitigants with current link status.\n"
     },
     "worked_example_columns": [
       {
-        "field": "risk_mitigant_id",
-        "header": "Risk Mitigant Id",
+        "field": "mitigant_category",
+        "header": "Mitigant Category",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -4384,7 +4398,7 @@
     ]
   },
   "MET-073": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "weighted-avg",
     "metric_fields": {
       "primary_value": "risk_rating_status"
     },
@@ -4397,11 +4411,19 @@
           "sample_value": 0,
           "source_table": "counterparty_rating_observation",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "risk_rating_change_steps",
+          "label": "risk_rating_change_steps",
+          "sample_value": 0,
+          "source_table": "counterparty_rating_observation",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read risk_rating_status from counterparty_rating_observation for each facility as-of reporting date.\n"
+      "formula_display": "Read risk_rating_status from internal counterparty_rating_observation. Each facility inherits its counterparty's internal rating status.\n"
     },
     "worked_example_columns": [
       {
@@ -4410,11 +4432,17 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "risk_rating_change_steps",
+        "header": "Risk Rating Change Steps",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
   "MET-074": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "weighted-avg",
     "metric_fields": {
       "primary_value": "risk_rating_change_steps"
     },
@@ -4431,7 +4459,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read risk_rating_change_steps from counterparty_rating_observation for each facility as-of reporting date.\n"
+      "formula_display": "Read risk_rating_change_steps from internal counterparty_rating_observation. Each facility inherits its counterparty's internal rating change magnitude.\n"
     },
     "worked_example_columns": [
       {

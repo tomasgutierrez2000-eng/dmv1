@@ -85,6 +85,7 @@ For EACH metric spec, perform these checks:
 - Check for inactive/draft metrics that could be updated instead of creating new
 - Verify ID follows convention: `{DOMAIN}-{NNN}` (e.g., EXP-001, CAP-005, PRC-003)
 - Verify domain/sub_domain, metric_class (SOURCED/CALCULATED/HYBRID), direction (HIGHER_BETTER/LOWER_BETTER/NEUTRAL), unit_type (CURRENCY/PERCENTAGE/RATIO/COUNT/DAYS/ORDINAL)
+- **Abbreviation uniqueness:** Verify the catalogue `abbreviation` is unique across all metrics — duplicate abbreviations (e.g., RSK-006 and RSK-007 both using "RRSI") cause confusion in the UI
 
 **1B. Source Table & Field Validation**
 - For EVERY table in `source_tables`: verify it exists in `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
@@ -221,6 +222,7 @@ Verify test data actually exercises the metric:
 - Check dim table **match rate**: join metric source fields to dim tables and verify >95% match. Unmatched rows produce NULL/0 metric values (e.g., RSK-010 returned 0 for 85% of counterparties before rating_scale_dim expansion)
 - Verify L2 seed-data.ts has an explicit `case` handler for every table with metric-relevant fields. Tables without handlers produce placeholder strings like `'column_name_N'`
 - After expanding L1 dim tables (e.g., `CUSTOM_TABLE_SIZES`), verify the seed generator uses `rowIndex` directly, not `idx = rowIndex % N` which cycles back to early values
+- **If seed data is sparse or missing for the metric's primary field, add it** — update `scripts/l2/seed-data.ts` with a new helper function and run `npm run generate:l2` to regenerate sample data. Also populate PostgreSQL directly for the production database. A metric with all-NULL values is not "working".
 - Document data limitations explicitly; do not confuse them with formula bugs
 
 **5D. GSIB Risk Sanity Checks**
@@ -300,6 +302,11 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Temporal flag inconsistency | `is_pricing_exception_flag` TRUE on some dates, NULL on others for same facility | Flag values must be consistent across ALL `as_of_date` rows for a given facility, or formula must filter by date |
 | Small sample modulo miss | `facility_id % 13` with only 10 facilities (ids 1–10) matches zero rows | Use explicit facility selection or row-index logic — sql.js sample has only ~10 entities |
 | CTE in formula_sql | `WITH cte AS (SELECT...) SELECT FROM cte` | `calc:sync` validator requires `formula_sql` to start with `SELECT` — convert CTEs to inline subqueries |
+| Invalid YAML enum | `role: WEIGHT`, `role: LABEL`, `aggregation_type: AVG` | Valid FieldRole: `MEASURE\|DIMENSION\|FILTER\|JOIN_KEY`. Valid AggregationType: `RAW\|SUM\|WEIGHTED_AVG\|COUNT\|COUNT_DISTINCT\|MIN\|MAX\|MEDIAN\|CUSTOM` |
+| Wrong join key for cp-level tables | `cro.facility_id` (doesn't exist) | Tables like `counterparty_rating_observation` have `counterparty_id`, not `facility_id` — join through `fm.counterparty_id = cro.counterparty_id` |
+| Missing bridge table joins | Direct join `fm → rmtd` (no path) | Use full bridge chain: `facility_master → risk_mitigant_link → risk_mitigant_master → risk_mitigant_type_dim` |
+| SUM of categorical values | `SUM(risk_rating_status)` at aggregate | Use CUSTOM aggregation: derive direction from `AVG(change_steps)` via CASE WHEN |
+| Seed data doesn't exercise metric | `risk_rating_change_steps` NULL for 182/183 rows | Populate seed data with realistic distributions (e.g., 12% upgrades, 13% downgrades, 75% stable) before declaring metric "working" |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 

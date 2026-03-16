@@ -361,6 +361,7 @@ export const L1_TABLES: TableDef[] = [
       { name: 'substatus', type: 'INTEGER', nullable: true },
       { name: 'substatus_effective_to_date', type: 'DATE', nullable: true },
       { name: 'tree_level', type: 'INTEGER', nullable: true },
+      { name: 'is_current_flag', type: 'CHAR(1)', nullable: true, default: "'Y'" },
     ],
   },
   {
@@ -387,6 +388,7 @@ export const L1_TABLES: TableDef[] = [
       { name: 'substatus', type: 'INTEGER', nullable: true },
       { name: 'substatus_effective_to_date', type: 'DATE', nullable: true },
       { name: 'tree_level', type: 'INTEGER', nullable: true },
+      { name: 'is_current_flag', type: 'CHAR(1)', nullable: true, default: "'Y'" },
     ],
   },
   {

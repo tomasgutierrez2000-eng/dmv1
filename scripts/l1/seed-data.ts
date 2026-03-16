@@ -2381,6 +2381,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'status') return 'ACTIVE';
       if (columnName === 'substatus') return 0;
       if (columnName === 'tree_level') return EBT_TREE_LEVELS[rowIndex];
+      if (columnName === 'is_current_flag') return 'Y';
       break;
 
     /* ──────────── enterprise_product_taxonomy ──────────── */
@@ -2401,6 +2402,7 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'status') return 'ACTIVE';
       if (columnName === 'substatus') return 0;
       if (columnName === 'tree_level') return 3;
+      if (columnName === 'is_current_flag') return 'Y';
       break;
 
     /* ──────────── portfolio_dim ──────────── */

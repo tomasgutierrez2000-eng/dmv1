@@ -46739,165 +46739,165 @@
           }
         },
         {
-          "facility_id": "F-101",
-          "facility_name": "BioHaven — USD L/C 2024-D",
-          "counterparty_id": "CP-31",
-          "counterparty_name": "BioHaven Labs Corp.",
-          "lob_segment_id": "SEG-101",
-          "desk_name": "Capital Call Line Desk",
-          "portfolio_name": "CRE Structured Finance",
+          "facility_id": "F-104",
+          "facility_name": "Zenith — JPY TL-B 2026-C",
+          "counterparty_id": "CP-32",
+          "counterparty_name": "Zenith Health Systems KK",
+          "lob_segment_id": "SEG-104",
+          "desk_name": "Medical Office Buildings Desk",
+          "portfolio_name": "Healthcare Real Estate",
           "lob_name": "Corporate Banking",
-          "committed_amt": 13495144,
-          "collateral_value": 13603106,
-          "ltv_pct": 99.21,
+          "committed_amt": 846861680,
+          "collateral_value": 870573807,
+          "ltv_pct": 97.28,
           "positions": [
             {
-              "position_id": "P-101",
-              "facility_id": "F-101",
+              "position_id": "P-104",
+              "facility_id": "F-104",
               "product_code": "LOAN",
-              "balance_amount": 4048543,
+              "balance_amount": 406493606,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-506",
-              "facility_id": "F-101",
+              "position_id": "P-509",
+              "facility_id": "F-104",
               "product_code": "LOAN",
-              "balance_amount": 4723300,
+              "balance_amount": 423430840,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-911",
-              "facility_id": "F-101",
+              "position_id": "P-914",
+              "facility_id": "F-104",
               "product_code": "LOAN",
-              "balance_amount": 5128155,
+              "balance_amount": 414962223,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1316",
-              "facility_id": "F-101",
+              "position_id": "P-1319",
+              "facility_id": "F-104",
               "product_code": "LOAN",
-              "balance_amount": 5667960,
+              "balance_amount": 398024990,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1721",
-              "facility_id": "F-101",
+              "position_id": "P-1724",
+              "facility_id": "F-104",
               "product_code": "LOAN",
-              "balance_amount": 6072815,
+              "balance_amount": 406493606,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 101,
-            "days_until_maturity": 101
+            "metric_value": 104,
+            "days_until_maturity": 104
           }
         },
         {
-          "facility_id": "F-217",
-          "facility_name": "Brightstar — USD TL-B 2026-C",
-          "counterparty_id": "CP-62",
-          "counterparty_name": "Brightstar Beverage Holdings Inc.",
-          "lob_segment_id": "SEG-217",
-          "desk_name": "Unknown",
-          "portfolio_name": "Consumer Deposits",
+          "facility_id": "F-206",
+          "facility_name": "Summit Defense — USD Revolver 2026-F",
+          "counterparty_id": "CP-58",
+          "counterparty_name": "Summit Defense Systems Inc.",
+          "lob_segment_id": "SEG-206",
+          "desk_name": "HELOC Desk",
+          "portfolio_name": "Home Equity / HELOC",
           "lob_name": "Corporate Banking",
-          "committed_amt": 61286800,
-          "collateral_value": 60551359,
-          "ltv_pct": 101.21,
-          "positions": [
-            {
-              "position_id": "P-217",
-              "facility_id": "F-217",
-              "product_code": "LOAN",
-              "balance_amount": 29417664,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-622",
-              "facility_id": "F-217",
-              "product_code": "LOAN",
-              "balance_amount": 30643400,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1027",
-              "facility_id": "F-217",
-              "product_code": "LOAN",
-              "balance_amount": 30030532,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1432",
-              "facility_id": "F-217",
-              "product_code": "LOAN",
-              "balance_amount": 28804796,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1837",
-              "facility_id": "F-217",
-              "product_code": "LOAN",
-              "balance_amount": 29417664,
-              "description": "Position exposure"
-            }
-          ],
-          "extra_fields": {
-            "metric_value": 217,
-            "days_until_maturity": 217
-          }
-        },
-        {
-          "facility_id": "F-309",
-          "facility_name": "Blue Horizon — USD Bridge 2025-D",
-          "counterparty_id": "CP-82",
-          "counterparty_name": "Blue Horizon Aviation Corp.",
-          "lob_segment_id": "SEG-60",
-          "desk_name": "Power Centers Desk",
-          "portfolio_name": "Retail",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 197579463,
-          "collateral_value": 200477297,
+          "committed_amt": 668485876,
+          "collateral_value": 678290336,
           "ltv_pct": 98.55,
           "positions": [
             {
-              "position_id": "P-309",
-              "facility_id": "F-309",
+              "position_id": "P-206",
+              "facility_id": "F-206",
               "product_code": "LOAN",
-              "balance_amount": 148184597,
+              "balance_amount": 320873220,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-714",
-              "facility_id": "F-309",
+              "position_id": "P-611",
+              "facility_id": "F-206",
               "product_code": "LOAN",
-              "balance_amount": 138305624,
+              "balance_amount": 334242938,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1119",
-              "facility_id": "F-309",
+              "position_id": "P-1016",
+              "facility_id": "F-206",
               "product_code": "LOAN",
-              "balance_amount": 118547678,
+              "balance_amount": 327558079,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1524",
-              "facility_id": "F-309",
+              "position_id": "P-1421",
+              "facility_id": "F-206",
               "product_code": "LOAN",
-              "balance_amount": 98789732,
+              "balance_amount": 314188362,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1929",
-              "facility_id": "F-309",
+              "position_id": "P-1826",
+              "facility_id": "F-206",
               "product_code": "LOAN",
-              "balance_amount": 88910758,
+              "balance_amount": 320873220,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 309,
-            "days_until_maturity": 309
+            "metric_value": 206,
+            "days_until_maturity": 206
+          }
+        },
+        {
+          "facility_id": "F-301",
+          "facility_name": "Transcon Rail — USD Revolver 2026-A",
+          "counterparty_id": "CP-81",
+          "counterparty_name": "Transcontinental Rail Holdings Inc.",
+          "lob_segment_id": "SEG-52",
+          "desk_name": "Multifamily Rental Desk",
+          "portfolio_name": "Residential",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 158685462,
+          "collateral_value": 159954943,
+          "ltv_pct": 99.21,
+          "positions": [
+            {
+              "position_id": "P-301",
+              "facility_id": "F-301",
+              "product_code": "LOAN",
+              "balance_amount": 76169022,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-706",
+              "facility_id": "F-301",
+              "product_code": "LOAN",
+              "balance_amount": 79342731,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-1111",
+              "facility_id": "F-301",
+              "product_code": "LOAN",
+              "balance_amount": 77755876,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-1516",
+              "facility_id": "F-301",
+              "product_code": "LOAN",
+              "balance_amount": 74582167,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-1921",
+              "facility_id": "F-301",
+              "product_code": "LOAN",
+              "balance_amount": 76169022,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 301,
+            "days_until_maturity": 301
           }
         },
         {

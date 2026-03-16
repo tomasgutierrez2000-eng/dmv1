@@ -153,23 +153,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.instrument_identifier.instrument_id->L1.instrument_master.instrument_id",
-    "source": {
-      "layer": "L1",
-      "table": "instrument_identifier",
-      "field": "instrument_id",
-      "tableKey": "L1.instrument_identifier"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "instrument_master",
-      "field": "instrument_id",
-      "tableKey": "L1.instrument_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.instrument_identifier.source_system_id->L1.source_system_registry.source_system_id",
     "source": {
       "layer": "L1",
@@ -187,40 +170,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.credit_agreement_master.borrower_counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "credit_agreement_master",
-      "field": "borrower_counterparty_id",
-      "tableKey": "L1.credit_agreement_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.credit_agreement_master.lender_legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "credit_agreement_master",
-      "field": "lender_legal_entity_id",
-      "tableKey": "L1.credit_agreement_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.credit_agreement_master.currency_code->L1.currency_dim.currency_code",
     "source": {
       "layer": "L1",
@@ -233,40 +182,6 @@
       "table": "currency_dim",
       "field": "currency_code",
       "tableKey": "L1.currency_dim"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.facility_master.credit_agreement_id->L1.credit_agreement_master.credit_agreement_id",
-    "source": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "credit_agreement_id",
-      "tableKey": "L1.facility_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "credit_agreement_master",
-      "field": "credit_agreement_id",
-      "tableKey": "L1.credit_agreement_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.facility_master.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "counterparty_id",
-      "tableKey": "L1.facility_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -374,108 +289,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.netting_agreement.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "netting_agreement",
-      "field": "counterparty_id",
-      "tableKey": "L1.netting_agreement"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.netting_set.netting_agreement_id->L1.netting_agreement.netting_agreement_id",
-    "source": {
-      "layer": "L1",
-      "table": "netting_set",
-      "field": "netting_agreement_id",
-      "tableKey": "L1.netting_set"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "netting_agreement",
-      "field": "netting_agreement_id",
-      "tableKey": "L1.netting_agreement"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.netting_set_link.netting_set_id->L1.netting_set.netting_set_id",
-    "source": {
-      "layer": "L1",
-      "table": "netting_set_link",
-      "field": "netting_set_id",
-      "tableKey": "L1.netting_set_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "netting_set",
-      "field": "netting_set_id",
-      "tableKey": "L1.netting_set"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.netting_set_link.facility_id->L1.facility_master.facility_id",
-    "source": {
-      "layer": "L1",
-      "table": "netting_set_link",
-      "field": "facility_id",
-      "tableKey": "L1.netting_set_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "facility_id",
-      "tableKey": "L1.facility_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.csa_master.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "csa_master",
-      "field": "counterparty_id",
-      "tableKey": "L1.csa_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.margin_agreement.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "margin_agreement",
-      "field": "counterparty_id",
-      "tableKey": "L1.margin_agreement"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.collateral_asset_master.collateral_type_id->L1.collateral_type.collateral_type_id",
     "source": {
       "layer": "L1",
@@ -488,23 +301,6 @@
       "table": "collateral_type",
       "field": "collateral_type_id",
       "tableKey": "L1.collateral_type"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.collateral_asset_master.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "collateral_asset_master",
-      "field": "counterparty_id",
-      "tableKey": "L1.collateral_asset_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -539,40 +335,6 @@
       "table": "currency_dim",
       "field": "currency_code",
       "tableKey": "L1.currency_dim"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.collateral_asset_master.legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "collateral_asset_master",
-      "field": "legal_entity_id",
-      "tableKey": "L1.collateral_asset_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.collateral_link.collateral_asset_id->L1.collateral_asset_master.collateral_asset_id",
-    "source": {
-      "layer": "L1",
-      "table": "collateral_link",
-      "field": "collateral_asset_id",
-      "tableKey": "L1.collateral_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "collateral_asset_master",
-      "field": "collateral_asset_id",
-      "tableKey": "L1.collateral_asset_master"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -799,23 +561,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.crm_protection_master.beneficiary_legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "crm_protection_master",
-      "field": "beneficiary_legal_entity_id",
-      "tableKey": "L1.crm_protection_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.crm_protection_master.currency_code->L1.currency_dim.currency_code",
     "source": {
       "layer": "L1",
@@ -833,57 +578,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.protection_link.protection_id->L1.crm_protection_master.protection_id",
-    "source": {
-      "layer": "L1",
-      "table": "protection_link",
-      "field": "protection_id",
-      "tableKey": "L1.protection_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "crm_protection_master",
-      "field": "protection_id",
-      "tableKey": "L1.crm_protection_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.protection_link.facility_id->L1.facility_master.facility_id",
-    "source": {
-      "layer": "L1",
-      "table": "protection_link",
-      "field": "facility_id",
-      "tableKey": "L1.protection_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "facility_id",
-      "tableKey": "L1.facility_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.risk_mitigant_master.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "risk_mitigant_master",
-      "field": "counterparty_id",
-      "tableKey": "L1.risk_mitigant_master"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.risk_mitigant_master.risk_mitigant_subtype_code->L1.risk_mitigant_type_dim.risk_mitigant_subtype_code",
     "source": {
       "layer": "L1",
@@ -896,40 +590,6 @@
       "table": "risk_mitigant_type_dim",
       "field": "risk_mitigant_subtype_code",
       "tableKey": "L1.risk_mitigant_type_dim"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.risk_mitigant_link.risk_mitigant_id->L1.risk_mitigant_master.risk_mitigant_id",
-    "source": {
-      "layer": "L1",
-      "table": "risk_mitigant_link",
-      "field": "risk_mitigant_id",
-      "tableKey": "L1.risk_mitigant_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "risk_mitigant_master",
-      "field": "risk_mitigant_id",
-      "tableKey": "L1.risk_mitigant_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.risk_mitigant_link.facility_id->L1.facility_master.facility_id",
-    "source": {
-      "layer": "L1",
-      "table": "risk_mitigant_link",
-      "field": "facility_id",
-      "tableKey": "L1.risk_mitigant_link"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "facility_id",
-      "tableKey": "L1.facility_master"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -969,159 +629,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.counterparty_hierarchy.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "counterparty_hierarchy",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty_hierarchy"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.counterparty_hierarchy.immediate_parent_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "counterparty_hierarchy",
-      "field": "immediate_parent_id",
-      "tableKey": "L1.counterparty_hierarchy"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.counterparty_hierarchy.ultimate_parent_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "counterparty_hierarchy",
-      "field": "ultimate_parent_id",
-      "tableKey": "L1.counterparty_hierarchy"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.legal_entity_hierarchy.legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "legal_entity_hierarchy",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity_hierarchy"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.legal_entity_hierarchy.parent_legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "legal_entity_hierarchy",
-      "field": "parent_legal_entity_id",
-      "tableKey": "L1.legal_entity_hierarchy"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.control_relationship.parent_counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "control_relationship",
-      "field": "parent_counterparty_id",
-      "tableKey": "L1.control_relationship"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.control_relationship.subsidiary_counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "control_relationship",
-      "field": "subsidiary_counterparty_id",
-      "tableKey": "L1.control_relationship"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.economic_interdependence_relationship.counterparty_id_1->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "economic_interdependence_relationship",
-      "field": "counterparty_id_1",
-      "tableKey": "L1.economic_interdependence_relationship"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.economic_interdependence_relationship.counterparty_id_2->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "economic_interdependence_relationship",
-      "field": "counterparty_id_2",
-      "tableKey": "L1.economic_interdependence_relationship"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.economic_interdependence_relationship.source_system_id->L1.source_system_registry.source_system_id",
     "source": {
       "layer": "L1",
@@ -1134,40 +641,6 @@
       "table": "source_system_registry",
       "field": "source_system_id",
       "tableKey": "L1.source_system_registry"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.credit_agreement_counterparty_participation.credit_agreement_id->L1.credit_agreement_master.credit_agreement_id",
-    "source": {
-      "layer": "L1",
-      "table": "credit_agreement_counterparty_participation",
-      "field": "credit_agreement_id",
-      "tableKey": "L1.credit_agreement_counterparty_participation"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "credit_agreement_master",
-      "field": "credit_agreement_id",
-      "tableKey": "L1.credit_agreement_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.credit_agreement_counterparty_participation.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "credit_agreement_counterparty_participation",
-      "field": "counterparty_id",
-      "tableKey": "L1.credit_agreement_counterparty_participation"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -1190,40 +663,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.facility_counterparty_participation.facility_id->L1.facility_master.facility_id",
-    "source": {
-      "layer": "L1",
-      "table": "facility_counterparty_participation",
-      "field": "facility_id",
-      "tableKey": "L1.facility_counterparty_participation"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "facility_id",
-      "tableKey": "L1.facility_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.facility_counterparty_participation.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "facility_counterparty_participation",
-      "field": "counterparty_id",
-      "tableKey": "L1.facility_counterparty_participation"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.facility_counterparty_participation.counterparty_role_code->L1.counterparty_role_dim.counterparty_role_code",
     "source": {
       "layer": "L1",
@@ -1241,40 +680,6 @@
     "relationshipType": "primary"
   },
   {
-    "id": "L1.facility_lender_allocation.facility_id->L1.facility_master.facility_id",
-    "source": {
-      "layer": "L1",
-      "table": "facility_lender_allocation",
-      "field": "facility_id",
-      "tableKey": "L1.facility_lender_allocation"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "facility_master",
-      "field": "facility_id",
-      "tableKey": "L1.facility_master"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.facility_lender_allocation.legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "facility_lender_allocation",
-      "field": "legal_entity_id",
-      "tableKey": "L1.facility_lender_allocation"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
     "id": "L1.sccl_counterparty_group_member.sccl_group_id->L1.sccl_counterparty_group.sccl_group_id",
     "source": {
       "layer": "L1",
@@ -1287,23 +692,6 @@
       "table": "sccl_counterparty_group",
       "field": "sccl_group_id",
       "tableKey": "L1.sccl_counterparty_group"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.sccl_counterparty_group_member.counterparty_id->L1.counterparty.counterparty_id",
-    "source": {
-      "layer": "L1",
-      "table": "sccl_counterparty_group_member",
-      "field": "counterparty_id",
-      "tableKey": "L1.sccl_counterparty_group_member"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "counterparty",
-      "field": "counterparty_id",
-      "tableKey": "L1.counterparty"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -1372,23 +760,6 @@
       "table": "source_system_registry",
       "field": "source_system_id",
       "tableKey": "L1.source_system_registry"
-    },
-    "isCrossLayer": false,
-    "relationshipType": "primary"
-  },
-  {
-    "id": "L1.reporting_entity_dim.legal_entity_id->L1.legal_entity.legal_entity_id",
-    "source": {
-      "layer": "L1",
-      "table": "reporting_entity_dim",
-      "field": "legal_entity_id",
-      "tableKey": "L1.reporting_entity_dim"
-    },
-    "target": {
-      "layer": "L1",
-      "table": "legal_entity",
-      "field": "legal_entity_id",
-      "tableKey": "L1.legal_entity"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"
@@ -1525,6 +896,57 @@
       "table": "source_system_registry",
       "field": "source_system_id",
       "tableKey": "L1.source_system_registry"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.lob_hierarchy_config.root_segment_id->L1.enterprise_business_taxonomy.managed_segment_id",
+    "source": {
+      "layer": "L1",
+      "table": "lob_hierarchy_config",
+      "field": "root_segment_id",
+      "tableKey": "L1.lob_hierarchy_config"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_business_taxonomy",
+      "field": "managed_segment_id",
+      "tableKey": "L1.enterprise_business_taxonomy"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.limit_assignment.limit_rule_id->L1.limit_rule.limit_rule_id",
+    "source": {
+      "layer": "L1",
+      "table": "limit_assignment",
+      "field": "limit_rule_id",
+      "tableKey": "L1.limit_assignment"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "limit_rule",
+      "field": "limit_rule_id",
+      "tableKey": "L1.limit_rule"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
+    "id": "L1.limit_assignment.lob_segment_id->L1.enterprise_business_taxonomy.managed_segment_id",
+    "source": {
+      "layer": "L1",
+      "table": "limit_assignment",
+      "field": "lob_segment_id",
+      "tableKey": "L1.limit_assignment"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "enterprise_business_taxonomy",
+      "field": "managed_segment_id",
+      "tableKey": "L1.enterprise_business_taxonomy"
     },
     "isCrossLayer": false,
     "relationshipType": "primary"

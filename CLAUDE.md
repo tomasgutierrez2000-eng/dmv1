@@ -273,6 +273,53 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Missing COALESCE | `fes.bank_share_pct / 100` (NULL if missing) | `COALESCE(fes.bank_share_pct, 100.0) / 100.0` |
 | Missing NULLIF | `SUM(x) / SUM(y)` (div-by-zero) | `SUM(x) / NULLIF(SUM(y), 0)` |
 | FX at facility level | `* fx.rate` in facility formula | FX only at aggregate levels; facility stays local currency |
+| Homogeneous seed arrays | `FR2590_CATS_BASE = ['G1_B' x10]` | Use diverse values matching dim table PKs — single-value arrays make metrics return identical results for all rows |
+| L2 table missing handler | `facility_risk_snapshot` had no `case` in `getL2SeedValue()` | Every L2 table with metric-relevant fields needs an explicit handler; fallback produces `'column_name_N'` strings |
+| L1 seed index cycling | `idx = rowIndex % 10` for 32-row `rating_scale_dim` | Use `rowIndex` directly (not `idx`) when `CUSTOM_TABLE_SIZES` exceeds the default cycle length |
+| Boolean leak in VARCHAR | `internal_risk_rating = 'true'` (JS boolean serialized) | Ensure seed generators return string values, not booleans, for VARCHAR columns |
+| FK-safe dim expansion | `DELETE FROM rating_scale_dim` fails on FK constraint | Use `UPDATE` existing rows + `INSERT` new rows to preserve FK references from child tables |
+| SUM of strings | `SUM(legal_name)` at counterparty | For text/ID fields: use `COUNT(DISTINCT id)`. For hierarchy/LoB string metrics: use `MIN()` for deterministic string selection |
+| SUM of IDs | `SUM(legal_entity_id)` at counterparty | Summing IDs is meaningless — use `COUNT(DISTINCT)` |
+| Wrong ingredient_fields | `ingredient_fields` lists `position.lgd_estimate` | Must match actual formula sources — verify after `calc:sync` (sync preserves manual edits but YAML-generated fields may be stale from DRAFT) |
+| Wrong CACP role code | `SYNDICATE_MEMBER` in CACP insert | Check `l1.counterparty_role_dim` for valid FK codes before INSERT — use `PARTICIPANT` |
+| Placeholder seed values | `limit_status_code_1`, `limit_status_code_2` junk | L2 seed generator fallback creates `'column_name_N'` — add explicit handler in `getL2SeedValue()` |
+| No dimension diversity | All FES rows have `legal_entity_id = 1` | Distribute across available entities: `SET legal_entity_id = CASE WHEN facility_id % 10 IN (0,1,2) THEN 1 ...` |
+| No syndication data | 0 syndicated facilities — all CACP entries single-participant | Add `PARTICIPANT` rows for multi-bank agreements: `INSERT INTO cacp ... 'PARTICIPANT'` |
+| Non-existent JOIN field | `ebt.facility_id` in EBT join (field doesn't exist) | Always verify JOIN fields exist in the target table via DD. EBT correct join: `ebt.managed_segment_id = fm.lob_segment_id` |
+| Missing EBT is_current_flag | `LEFT JOIN ebt ON ebt.managed_segment_id = fm.lob_segment_id` | ALL EBT joins MUST include `AND ebt.is_current_flag = 'Y'` — without it, historical/inactive nodes pollute results |
+| NULL weight propagation | `SUM(lgd_pct * outstanding_balance_amt)` returns NULL if outstanding is NULL | Use `COALESCE(weight_field, 0)` on weighting fields: `SUM(lgd_pct * COALESCE(outstanding_balance_amt, 0))` — NULL in ANY term nullifies the entire row's contribution |
+| YAML THRESHOLD nesting | `min_value: 0` / `max_value: 1` at validation top level | THRESHOLD `min_value`/`max_value` must be under `params:` key: `params: { min_value: 0, max_value: 1 }` — calc:sync schema validation rejects top-level placement |
+| DRAFT metric blind trust | Upgrading DRAFT metric without reviewing SQL | DRAFT metrics often have placeholder SQL with non-existent fields/joins. When upgrading to ACTIVE, rewrite and verify ALL `formula_sql` — don't assume DRAFT SQL is correct |
+| Wrong rollup for strings | `rollup_strategy: "direct-sum"` on LoB string metric | String/hierarchy SOURCED metrics use `rollup_strategy: "none"` — `direct-sum` implies SUM() which is invalid for VARCHAR |
+| xlsx merge conflict | Binary `metrics_dimensions_filled.xlsx` always conflicts on merge | Resolve by taking the branch version (`git checkout branch -- file`), then run `calc:sync` on main to regenerate from merged YAMLs |
+| Numeric placeholder in NUMERIC fields | `pd_pct = 100.5` for all rows in `facility_risk_snapshot` | L2 seed generator produces unrealistic numeric constants — patch sample-data.json with realistic ranges (e.g., 0.03–5% for PD) |
+| Temporal flag inconsistency | `is_pricing_exception_flag` TRUE on some dates, NULL on others for same facility | Flag values must be consistent across ALL `as_of_date` rows for a given facility, or formula must filter by date |
+| Small sample modulo miss | `facility_id % 13` with only 10 facilities (ids 1–10) matches zero rows | Use explicit facility selection or row-index logic — sql.js sample has only ~10 entities |
+| CTE in formula_sql | `WITH cte AS (SELECT...) SELECT FROM cte` | `calc:sync` validator requires `formula_sql` to start with `SELECT` — convert CTEs to inline subqueries |
+| Invalid YAML enum | `role: WEIGHT`, `role: LABEL`, `aggregation_type: AVG` | Valid FieldRole: `MEASURE\|DIMENSION\|FILTER\|JOIN_KEY`. Valid AggregationType: `RAW\|SUM\|WEIGHTED_AVG\|COUNT\|COUNT_DISTINCT\|MIN\|MAX\|MEDIAN\|CUSTOM` |
+| Wrong join key for cp-level tables | `cro.facility_id` (doesn't exist) | Tables like `counterparty_rating_observation` have `counterparty_id`, not `facility_id` — join through `fm.counterparty_id = cro.counterparty_id` |
+| Missing bridge table joins | Direct join `fm → rmtd` (no path) | Use full bridge chain: `facility_master → risk_mitigant_link → risk_mitigant_master → risk_mitigant_type_dim` |
+| SUM of categorical values | `SUM(risk_rating_status)` at aggregate | Use CUSTOM aggregation: derive direction from `AVG(change_steps)` via CASE WHEN |
+| Seed data doesn't exercise metric | `risk_rating_change_steps` NULL for 929/930 rows | Populate seed data with realistic distributions via SQL migration (e.g., `UPDATE SET col = CASE WHEN id % 100 < 55 THEN 0 ...`) before declaring metric "working" |
+| Non-contiguous FK ID mapping | `410001 + ((id-1) % 123)` maps to gap IDs 410101-410123 | When remapping FK values with modulo, verify ALL mapped IDs exist in parent table — non-contiguous PK ranges have gaps that modulo doesn't avoid |
+| Dim chain completeness | `country_dim.region_code = 'AMER'` but no 'AMER' in `region_dim` | Verify full dim chain: source → bridge_dim → target_dim. Missing entries in ANY dim table silently NULL-out the entire join chain |
+
+### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
+
+After verifying formulas execute, always check that seed data produces **meaningful, diverse results** — not just non-null:
+
+| Check | What to verify | Common failure |
+|-------|---------------|----------------|
+| **Boolean diversity** | Both TRUE and FALSE values for flag fields | All flags same value → metric always 0 or 100% |
+| **FK participation** | Multi-participant records exist (e.g., CACP) | All agreements single-participant → syndication always 0 |
+| **Dimension diversity** | Multiple distinct values for categorical fields | All rows point to same entity → COUNT(DISTINCT) always 1 |
+| **Threshold coverage** | Values span multiple threshold buckets | All utilization <75% → only NO_BREACH, never ELEVATED/WARNING |
+| **Placeholder detection** | No auto-generated `field_name_123` values | Seed generator fallback creates junk — grep for `_code_[0-9]` patterns |
+| **Date alignment** | Source tables have overlapping `as_of_date` | FES max=Feb but FRS max=Jan → JOIN returns 0 rows for Feb date |
+| **Status field diversity** | Categorical status fields have multiple distinct values | All `pricing_exception_status` NULL → ordinal encoding always returns 0 |
+| **Numeric range realism** | NUMERIC fields have values in GSIB-realistic ranges | `pd_pct = 100.5` makes PD metric return 100% instead of <5% |
+| **NULL sparsity** | Metric-critical fields have >10% non-null values | Column exists with correct type but 99.9% NULL → metric appears broken (e.g., 1/930 `risk_rating_change_steps`) |
+| **FK ID contiguity** | Remapped FK values all exist in parent table | Modulo remapping into non-contiguous PK ranges creates orphaned references in gaps |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

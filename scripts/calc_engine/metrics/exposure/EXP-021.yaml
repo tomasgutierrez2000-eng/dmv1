@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Facility Utilization Status (e.g., Sufficient, Approaching, Fully Utilized)
+# Utilization Status (Utilized Exposure to Committed Exposure)
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-021"
-name: "Facility Utilization Status (e.g., Sufficient, Approaching, Fully Utilized)"
+name: "Utilization Status (Utilized Exposure to Committed Exposure)"
 version: "1.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,32 +18,40 @@ direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Derived categorical classification (Sufficient, Approaching, Fully Utilized)
-  of utilization level based on current drawn exposure relative to committed
-  amount. Operational KPI providing early warning insight into limit pressure,
-  liquidity usage, and potential capacity constraints.
+  Derived categorical classification of utilization level based on current
+  drawn exposure relative to committed amount. Maps facility utilization
+  percentage against l1.utilization_status_dim threshold ranges to return
+  status labels (e.g., Sufficient, Approaching, Fully Utilized). Operational
+  KPI providing early warning insight into limit pressure, liquidity usage,
+  and potential capacity constraints.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Exposure utilization monitoring for limit management"
+  - framework: "OCC 2020-36"
+    description: "Credit concentration and limit exhaustion risk indicators"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l3
-    table: facility_detail_snapshot
-    alias: fds
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: utilization_status_code
+      - name: drawn_amount
         role: MEASURE
+      - name: committed_amount
+        role: MEASURE
+      - name: currency_code
+        role: DIMENSION
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = fds.facility_id"
+    join_on: "fm.facility_id = fes.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -52,6 +60,26 @@ source_tables:
       - name: lob_segment_id
         role: DIMENSION
       - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l1
+    table: utilization_status_dim
+    alias: usd
+    join_type: LEFT
+    join_on: "utilization_pct >= usd.utilization_min_pct AND utilization_pct < usd.utilization_max_pct"
+    fields:
+      - name: utilization_status_code
+        role: JOIN_KEY
+      - name: status_name
+        role: MEASURE
+      - name: utilization_min_pct
+        role: FILTER
+      - name: utilization_max_pct
+        role: FILTER
+      - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -63,109 +91,182 @@ source_tables:
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      Calculated utilization_status_code per facility.
+      For each facility, compute utilization_pct from L2 atomic data
+      (drawn_amount / committed_amount * 100), then match against
+      l1.utilization_status_dim threshold ranges
+      (utilization_min_pct <= pct < utilization_max_pct) to return status_name.
     formula_sql: |
       SELECT
-        fds.facility_id AS dimension_key,
-        fds.utilization_status_code AS metric_value
-      FROM l3.facility_detail_snapshot fds
-      WHERE fds.as_of_date = :as_of_date
+        util.facility_id AS dimension_key,
+        usd.status_name AS metric_value
+      FROM (
+        SELECT
+          fes.facility_id,
+          COALESCE(fes.drawn_amount, 0) * 100.0
+            / NULLIF(fes.committed_amount, 0) AS utilization_pct
+        FROM l2.facility_exposure_snapshot fes
+        WHERE fes.as_of_date = :as_of_date
+      ) util
+      LEFT JOIN l1.utilization_status_dim usd
+        ON util.utilization_pct >= usd.utilization_min_pct
+        AND util.utilization_pct < usd.utilization_max_pct
+        AND usd.is_active_flag = 'Y'
+        AND usd.is_current_flag = 'Y'
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM(facility-level utilization_status_code) per counterparty.
+      Compute counterparty-level utilization pct via sum-ratio with FX
+      conversion: SUM(drawn * fx) / SUM(committed * fx) * 100. Then look up
+      status from utilization_status_dim threshold ranges.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        cp_util.counterparty_id AS dimension_key,
+        usd.status_name AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.utilization_status_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+          fm.counterparty_id,
+          SUM(COALESCE(fes.drawn_amount, 0) * COALESCE(fx.rate, 1)) * 100.0
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0) * COALESCE(fx.rate, 1)), 0) AS utilization_pct
+        FROM l2.facility_exposure_snapshot fes
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fes.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fes.as_of_date = :as_of_date
+        GROUP BY fm.counterparty_id
+      ) cp_util
+      LEFT JOIN l1.utilization_status_dim usd
+        ON cp_util.utilization_pct >= usd.utilization_min_pct
+        AND cp_util.utilization_pct < usd.utilization_max_pct
+        AND usd.is_active_flag = 'Y'
+        AND usd.is_current_flag = 'Y'
   desk:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level utilization_status_code per L3 desk segment.
+      Compute L3 desk-level utilization pct via sum-ratio with FX conversion,
+      then look up status from utilization_status_dim threshold ranges.
     formula_sql: |
       SELECT
-        ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        desk_util.managed_segment_id AS dimension_key,
+        usd.status_name AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.utilization_status_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.managed_segment_id = fm.lob_segment_id
-      GROUP BY ebt.managed_segment_id
+          ebt.managed_segment_id,
+          SUM(COALESCE(fes.drawn_amount, 0) * COALESCE(fx.rate, 1)) * 100.0
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0) * COALESCE(fx.rate, 1)), 0) AS utilization_pct
+        FROM l2.facility_exposure_snapshot fes
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fes.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fes.as_of_date = :as_of_date
+        GROUP BY ebt.managed_segment_id
+      ) desk_util
+      LEFT JOIN l1.utilization_status_dim usd
+        ON desk_util.utilization_pct >= usd.utilization_min_pct
+        AND desk_util.utilization_pct < usd.utilization_max_pct
+        AND usd.is_active_flag = 'Y'
+        AND usd.is_current_flag = 'Y'
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level utilization_status_code per L2 portfolio segment.
+      Compute L2 portfolio-level utilization pct via sum-ratio with FX
+      conversion (one-hop EBT hierarchy), then look up status from
+      utilization_status_dim threshold ranges.
     formula_sql: |
       SELECT
-        ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        port_util.managed_segment_id AS dimension_key,
+        usd.status_name AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.utilization_status_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      GROUP BY ebt_l2.managed_segment_id
+          ebt_l2.managed_segment_id,
+          SUM(COALESCE(fes.drawn_amount, 0) * COALESCE(fx.rate, 1)) * 100.0
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0) * COALESCE(fx.rate, 1)), 0) AS utilization_pct
+        FROM l2.facility_exposure_snapshot fes
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fes.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fes.as_of_date = :as_of_date
+        GROUP BY ebt_l2.managed_segment_id
+      ) port_util
+      LEFT JOIN l1.utilization_status_dim usd
+        ON port_util.utilization_pct >= usd.utilization_min_pct
+        AND port_util.utilization_pct < usd.utilization_max_pct
+        AND usd.is_active_flag = 'Y'
+        AND usd.is_current_flag = 'Y'
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level utilization_status_code per L1 business segment
-      segment.
+      Compute L1 business segment-level utilization pct via sum-ratio with FX
+      conversion (two-hop EBT hierarchy), then look up status from
+      utilization_status_dim threshold ranges.
     formula_sql: |
       SELECT
-        ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        seg_util.managed_segment_id AS dimension_key,
+        usd.status_name AS metric_value
       FROM (
         SELECT
-          fds.facility_id AS dimension_key,
-          fds.utilization_status_code AS metric_value
-        FROM l3.facility_detail_snapshot fds
-        WHERE fds.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      GROUP BY ebt_l1.managed_segment_id
+          ebt_l1.managed_segment_id,
+          SUM(COALESCE(fes.drawn_amount, 0) * COALESCE(fx.rate, 1)) * 100.0
+            / NULLIF(SUM(COALESCE(fes.committed_amount, 0) * COALESCE(fx.rate, 1)), 0) AS utilization_pct
+        FROM l2.facility_exposure_snapshot fes
+        INNER JOIN l2.facility_master fm
+          ON fm.facility_id = fes.facility_id
+          AND fm.is_active_flag = 'Y'
+          AND fm.is_current_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+          ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = fes.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = fes.as_of_date
+        WHERE fes.as_of_date = :as_of_date
+        GROUP BY ebt_l1.managed_segment_id
+      ) seg_util
+      LEFT JOIN l1.utilization_status_dim usd
+        ON seg_util.utilization_pct >= usd.utilization_min_pct
+        AND seg_util.utilization_pct < usd.utilization_max_pct
+        AND usd.is_active_flag = 'Y'
+        AND usd.is_current_flag = 'Y'
 # ── DEPENDENCIES ──────────────────────────────────────────────
-depends_on: []
+depends_on:
+  - "EXP-038"
 # ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
@@ -173,17 +274,21 @@ output:
 validations:
   - rule_id: "EXP-021-V01"
     type: NOT_NULL
-    description: "No null utilization_status_code values"
+    description: "No null utilization status values for facilities with committed exposure"
+    severity: WARNING
+  - rule_id: "EXP-021-V02"
+    type: THRESHOLD
+    description: "Status must be a valid utilization_status_dim value"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-040"
-  abbreviation: "FUSE"
+  abbreviation: "US"
   insight: >
     Risk of limit exhaustion
-  rollup_strategy: "direct-sum"
-  primary_value_field: "utilization_status_code"
+  rollup_strategy: "sum-ratio"
+  primary_value_field: "utilization_status"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "utilization"]
 dashboard_pages: []
 legacy_metric_ids: []

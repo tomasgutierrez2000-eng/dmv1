@@ -1476,32 +1476,80 @@
     ]
   },
   "MET-040": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
-      "primary_value": "utilization_status_code"
+      "primary_value": "utilization_status"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "utilization_status_code",
-          "label": "utilization_status_code",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
           "sample_value": 0,
-          "source_table": "facility_detail_snapshot",
-          "source_layer": "L3"
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "status_name",
+          "label": "status_name",
+          "sample_value": 0,
+          "source_table": "utilization_status_dim",
+          "source_layer": "L1"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated utilization_status_code per facility.\n"
+      "formula_display": "For each facility, compute utilization_pct from L2 atomic data (drawn_amount / committed_amount * 100), then match against l1.utilization_status_dim threshold ranges (utilization_min_pct <= pct < utilization_max_pct) to return status_name.\n"
     },
     "worked_example_columns": [
       {
-        "field": "utilization_status_code",
-        "header": "Utilization Status Code",
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "status_name",
+        "header": "Status Name",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "utilization_status",
+        "header": "Utilization Status",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -2683,11 +2731,27 @@
           "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_facility_amt",
+          "label": "committed_facility_amt",
+          "sample_value": 0,
+          "source_table": "facility_master",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Fee Income / Average Balance\n"
+      "formula_display": "Direct lookup of fee_rate_pct from l2.facility_pricing_snapshot.\n"
     },
     "worked_example_columns": [
       {
@@ -2696,6 +2760,18 @@
         "format": "percentage",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "committed_facility_amt",
+        "header": "Committed Facility ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -3139,13 +3215,13 @@
           "field": "facility_type",
           "label": "facility_type",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
+          "source_table": "facility_master",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read facility_type from facility_exposure_snapshot for each facility as-of reporting date.\n"
+      "formula_display": "Direct lookup of facility_type from facility_master.\n"
     },
     "worked_example_columns": [
       {

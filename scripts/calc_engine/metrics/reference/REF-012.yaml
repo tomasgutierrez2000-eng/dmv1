@@ -7,7 +7,7 @@ metric_id: "REF-012"
 name: "Facility Type"
 version: "1.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,39 +18,33 @@ direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Type of credit facility (e.g., Term Loan, Revolver, Letter of Credit). Enables
-  product-level segmentation, risk concentration analysis, and performance
-  benchmarking.
+  Type of credit facility (e.g., Term Loan, Revolver, Letter of Credit).
+  Enables product-level segmentation, risk concentration analysis, and
+  performance benchmarking. At facility level returns the facility type
+  string; at aggregate levels returns the count of distinct active facilities
+  in the segment for distribution analysis.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Product-level segmentation for concentration risk reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: facility_exposure_snapshot
-    alias: fes
+    table: facility_master
+    alias: fm
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
-      - name: as_of_date
-        role: FILTER
       - name: facility_type
         role: MEASURE
-  - schema: l2
-    table: facility_master
-    alias: fm
-    join_type: INNER
-    join_on: "fm.facility_id = fes.facility_id"
-    fields:
-      - name: facility_id
-        role: JOIN_KEY
       - name: counterparty_id
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
       - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -67,101 +61,77 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Read facility_type from facility_exposure_snapshot for each facility as-of
-      reporting date.
+      Direct lookup of facility_type from facility_master.
     formula_sql: |
       SELECT
-        fes.facility_id AS dimension_key,
-        fes.facility_type AS metric_value
-      FROM l2.facility_exposure_snapshot fes
-      WHERE fes.as_of_date = :as_of_date
+        fm.facility_id AS dimension_key,
+        fm.facility_type AS metric_value
+      FROM l2.facility_master fm
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM(facility-level facility_type) per counterparty.
+      Not in primary specification at counterparty level.
+      Supplementary: representative facility_type per counterparty (MIN).
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_type AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(fm.facility_type) AS metric_value
+      FROM l2.facility_master fm
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: COUNT
     formula_text: >
-      SUM of facility-level facility_type per L3 desk segment.
+      Count distinct active facilities per L3 desk segment. Provides
+      facility distribution for product mix analysis.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_type AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.facility_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: COUNT
     formula_text: >
-      SUM of facility-level facility_type per L2 portfolio segment.
+      Count distinct active facilities per L2 portfolio segment. Provides
+      facility distribution for product mix analysis.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_type AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.facility_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: COUNT
     formula_text: >
-      SUM of facility-level facility_type per L1 business segment segment.
+      Count distinct active facilities per L1 business segment. Provides
+      facility distribution for product mix analysis.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.facility_type AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        COUNT(DISTINCT fm.facility_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -172,7 +142,11 @@ output:
 validations:
   - rule_id: "REF-012-V01"
     type: NOT_NULL
-    description: "No null facility_type values"
+    description: "No null facility_type values for active facilities"
+    severity: ERROR
+  - rule_id: "REF-012-V02"
+    type: NON_NEGATIVE
+    description: "Facility count at aggregate levels must be non-negative"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
@@ -183,6 +157,6 @@ catalogue:
   rollup_strategy: "direct-sum"
   primary_value_field: "facility_type"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "product-mix"]
 dashboard_pages: []
 legacy_metric_ids: []

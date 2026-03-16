@@ -79,7 +79,7 @@ levels:
       \  FROM l2.facility_master fm\n  LEFT JOIN l2.credit_agreement_counterparty_participation cacp\n    ON cacp.credit_agreement_id\
       \ = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag = 'Y'\n  GROUP BY fm.facility_id\n\
       ) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN\
-      \ l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
+      \ l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id"
   portfolio:
     aggregation_type: SUM
     formula_text: 'SUM of facility-level is_syndicated_flag per L2 portfolio segment.
@@ -91,7 +91,8 @@ levels:
       \    ON cacp.credit_agreement_id = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag\
       \ = 'Y'\n  GROUP BY fm.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
       \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY\
+      \    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n\
+      \    AND ebt_l2.is_current_flag = 'Y'\nGROUP BY\
       \ ebt_l2.managed_segment_id"
   business_segment:
     aggregation_type: SUM
@@ -104,8 +105,9 @@ levels:
       \    ON cacp.credit_agreement_id = fm.credit_agreement_id\n    AND cacp.is_current_flag = 'Y'\n  WHERE fm.is_active_flag\
       \ = 'Y'\n  GROUP BY fm.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
       \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN\
-      \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
+      \    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n\
+      \    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN\
+      \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id"
 depends_on: []
 output:
   table: metric_result

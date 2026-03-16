@@ -242,8 +242,10 @@ levels:
          ON    fm.facility_id = fac.facility_id
       3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3)
          ON    ebt_l3.managed_segment_id = fm.lob_segment_id
+           AND ebt_l3.is_current_flag = 'Y'
       4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l2)
          ON    ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+           AND ebt_l2.is_current_flag = 'Y'
       5. GROUP BY ebt_l2.managed_segment_id
       6. COMPUTE
          metric_value = SUM(facility_outstanding)

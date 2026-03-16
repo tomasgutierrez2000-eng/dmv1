@@ -56,9 +56,97 @@ function validateSqlSafety(metric: MetricDefinition): string[] {
   return errors;
 }
 
+/**
+ * Formula logic linter — catches common GSIB formula bugs at load-time.
+ * Returns warnings (non-blocking) to shift-left bug detection during calc:sync.
+ */
+function validateFormulaLogic(metric: MetricDefinition): string[] {
+  const warnings: string[] = [];
+
+  for (const [level, formula] of Object.entries(metric.levels)) {
+    const sql = formula.formula_sql;
+
+    // Rule 1: EBT join completeness — every LEFT JOIN l1.enterprise_business_taxonomy
+    // must include AND <alias>.is_current_flag = 'Y'
+    const ebtJoinRegex = /LEFT\s+JOIN\s+l1\.enterprise_business_taxonomy\s+(\w+)\s*\n?\s*ON\s+/gi;
+    let m;
+    while ((m = ebtJoinRegex.exec(sql)) !== null) {
+      const alias = m[1];
+      // Look for the alias.is_current_flag within the next ~300 chars (same JOIN clause)
+      const searchWindow = sql.substring(m.index, Math.min(m.index + 300, sql.length));
+      if (!searchWindow.includes(`${alias}.is_current_flag`)) {
+        warnings.push(
+          `${metric.metric_id}.${level}: EBT alias "${alias}" missing AND ${alias}.is_current_flag = 'Y'`
+        );
+      }
+    }
+
+    // Rule 2: Division without NULLIF — catches SUM(x)/SUM(y) without safe wrapper
+    const unsafeDivRegex = /\/\s*(?!NULLIF\b)(?:SUM|COUNT|AVG)\s*\(/gi;
+    if (unsafeDivRegex.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: division without NULLIF() — risk of division by zero`
+      );
+    }
+
+    // Rule 3: Boolean syntax — must use = 'Y' not = TRUE/true
+    if (/=\s*(TRUE|FALSE)\b/i.test(sql) && !/=\s*'[YN]'/.test(sql.substring(0, sql.search(/=\s*(TRUE|FALSE)\b/i) + 20))) {
+      // Only warn if the TRUE/FALSE appears in a comparison context (not inside a string)
+      const withoutStrings = sql.replace(/'[^']*'/g, '');
+      if (/=\s*(TRUE|FALSE)\b/i.test(withoutStrings)) {
+        warnings.push(
+          `${metric.metric_id}.${level}: use = 'Y' for boolean flags, not = TRUE/FALSE`
+        );
+      }
+    }
+
+    // Rule 4: PostgreSQL-only casts
+    if (/::(?:FLOAT|INT|TEXT|NUMERIC|BIGINT|VARCHAR|INTEGER|REAL|DOUBLE)/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: PostgreSQL-specific cast (::TYPE) — use * 1.0 for float math`
+      );
+    }
+
+    // Rule 5: WHERE before last JOIN
+    const withoutStrings = sql.replace(/'[^']*'/g, '');
+    const whereIdx = withoutStrings.search(/\bWHERE\b/i);
+    const joinMatches = [...withoutStrings.matchAll(/\b(?:LEFT\s+|INNER\s+|CROSS\s+)?JOIN\b/gi)];
+    const lastJoinIdx = joinMatches.length > 0 ? Math.max(...joinMatches.map((jm) => jm.index ?? -1)) : -1;
+    if (whereIdx > -1 && lastJoinIdx > -1 && whereIdx < lastJoinIdx) {
+      warnings.push(
+        `${metric.metric_id}.${level}: WHERE clause before last JOIN — SQL syntax error`
+      );
+    }
+
+    // Rule 6: FX rate without COALESCE
+    if (/\bfx\.rate\b/.test(sql) && !/COALESCE\s*\([^)]*fx\.rate/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: fx.rate used without COALESCE() — NULL rates will propagate`
+      );
+    }
+
+    // Rule 7: SUM of date fields
+    if (/\bSUM\s*\(\s*\w+\.\w+_date\b/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: SUM() of a date field — use MIN/MAX for date aggregation`
+      );
+    }
+
+    // Rule 8: AVG of ratios/percentages at aggregate levels (not facility)
+    if (level !== 'facility' && /\bAVG\s*\(\s*\w+\.\w+_(?:pct|ratio)\b/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: AVG() of ratio/pct at aggregate level — use sum-ratio to avoid Simpson's paradox`
+      );
+    }
+  }
+
+  return warnings;
+}
+
 export interface LoadResult {
   metrics: MetricDefinition[];
   errors: string[];
+  warnings: string[];
 }
 
 /**
@@ -72,6 +160,7 @@ export function loadMetricDefinitions(metricsDir?: string): LoadResult {
   const yamlFiles = findYamlFiles(dir);
   const metrics: MetricDefinition[] = [];
   const errors: string[] = [];
+  const warnings: string[] = [];
   const seenIds = new Set<string>();
 
   for (const filePath of yamlFiles) {
@@ -106,6 +195,14 @@ export function loadMetricDefinitions(metricsDir?: string): LoadResult {
         continue;
       }
 
+      // Formula logic linting (warnings — non-blocking, does not prevent metric loading)
+      const logicWarnings = validateFormulaLogic(metric);
+      if (logicWarnings.length > 0) {
+        for (const w of logicWarnings) {
+          warnings.push(`${relPath}: ${w}`);
+        }
+      }
+
       metric._file_path = filePath;
       metric._loaded_at = new Date().toISOString();
       metrics.push(metric);
@@ -129,5 +226,5 @@ export function loadMetricDefinitions(metricsDir?: string): LoadResult {
   // Sort by metric_id for deterministic output
   metrics.sort((a, b) => a.metric_id.localeCompare(b.metric_id));
 
-  return { metrics, errors };
+  return { metrics, errors, warnings };
 }

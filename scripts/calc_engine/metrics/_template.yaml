@@ -97,6 +97,7 @@ levels:
       INNER JOIN l2.facility_master fm ON fm.facility_id = fes.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+          AND ebt.is_current_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
 
@@ -111,8 +112,10 @@ levels:
       INNER JOIN l2.facility_master fm ON fm.facility_id = fes.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+          AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+          AND ebt_l2.is_current_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
 
@@ -127,10 +130,13 @@ levels:
       INNER JOIN l2.facility_master fm ON fm.facility_id = fes.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+          AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+          AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+          AND ebt_l1.is_current_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 

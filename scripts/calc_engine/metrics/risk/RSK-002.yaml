@@ -158,6 +158,7 @@ levels:
          ON    rs.rating_notch = pos.external_risk_rating
       4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
          ON    ebt.managed_segment_id = fm.lob_segment_id
+           AND ebt.is_current_flag = 'Y'
       5. GROUP BY ebt.managed_segment_id
       6. COMPUTE
          metric_value = ROUND(AVG(rating_value))

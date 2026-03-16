@@ -74,17 +74,23 @@ source_tables:
     table: facility_counterparty_participation
     alias: fcp
     join_type: INNER
-    join_on: "fcp.facility_id = fm.facility_id"
+    join_on: "fcp.facility_id = fm.facility_id AND fcp.is_current_flag = 'Y'"
     fields:
+      - name: facility_id
+        role: JOIN_KEY
+        description: "Foreign key to facility_master"
       - name: counterparty_id
         role: DIMENSION
       - name: participation_pct
         role: MEASURE
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current participation row"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
@@ -162,6 +168,7 @@ levels:
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+          AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
@@ -190,8 +197,10 @@ levels:
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+          AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+          AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
@@ -220,10 +229,13 @@ levels:
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+          AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+          AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+          AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []

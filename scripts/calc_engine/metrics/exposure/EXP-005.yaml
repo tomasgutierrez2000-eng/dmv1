@@ -104,6 +104,9 @@ source_tables:
     join_type: LEFT
     join_on: "fcp.facility_id = fm.facility_id AND fcp.is_current_flag = 'Y'"
     fields:
+      - name: facility_id
+        role: JOIN_KEY
+        description: "Foreign key to facility_master"
       - name: counterparty_id
         role: DIMENSION
       - name: participation_pct

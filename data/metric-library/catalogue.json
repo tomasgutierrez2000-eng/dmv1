@@ -25026,9 +25026,49 @@
       {
         "layer": "L2",
         "table": "facility_financial_snapshot",
-        "field": "net_income_amt",
-        "description": "net_income_amt",
+        "field": "noi_amt",
+        "description": "noi_amt",
         "data_type": "NUMERIC(20,4)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_financial_snapshot",
+        "field": "interest_expense_amt",
+        "description": "interest_expense_amt",
+        "data_type": "NUMERIC(20,4)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_risk_snapshot",
+        "field": "pd_pct",
+        "description": "pd_pct",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_risk_snapshot",
+        "field": "lgd_pct",
+        "description": "lgd_pct",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "committed_amount",
+        "description": "committed_amount",
+        "data_type": "VARCHAR(64)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "fx_rate",
+        "field": "rate",
+        "description": "rate",
+        "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
     ],
@@ -25587,7 +25627,11 @@
           ],
           "extra_fields": {
             "metric_value": -245750250,
-            "net_income_amt": 100.5
+            "noi_amt": 9216000,
+            "interest_expense_amt": 2460000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 250000000
           }
         },
         {
@@ -25641,7 +25685,11 @@
           ],
           "extra_fields": {
             "metric_value": -1433266300,
-            "net_income_amt": 100.5
+            "noi_amt": 104371200,
+            "interest_expense_amt": 22600000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 1500000000
           }
         },
         {
@@ -25695,7 +25743,11 @@
           ],
           "extra_fields": {
             "metric_value": -399966360,
-            "net_income_amt": 100.5
+            "noi_amt": 6128640,
+            "interest_expense_amt": 2085000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 400000000
           }
         },
         {
@@ -25749,7 +25801,11 @@
           ],
           "extra_fields": {
             "metric_value": -593692760,
-            "net_income_amt": 100.5
+            "noi_amt": 28122240,
+            "interest_expense_amt": 15800000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 600000000
           }
         },
         {
@@ -25803,7 +25859,11 @@
           ],
           "extra_fields": {
             "metric_value": -4972777800,
-            "net_income_amt": 100.5
+            "noi_amt": 115147200,
+            "interest_expense_amt": 37800000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 5000000000
           }
         }
       ]
@@ -25835,24 +25895,24 @@
     "data_element_in_dm": "nim_pct",
     "ingredient_fields": [
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_profitability_snapshot",
         "field": "interest_income_amt",
         "description": "interest_income_amt",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_profitability_snapshot",
         "field": "interest_expense_amt",
         "description": "interest_expense_amt",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_profitability_snapshot",
         "field": "avg_earning_assets_amt",
         "description": "avg_earning_assets_amt",
         "data_type": "NUMERIC(20,4)",
@@ -26293,7 +26353,10 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0.7796
+            "metric_value": 0.7796,
+            "interest_income_amt": 9979200,
+            "interest_expense_amt": 3742200,
+            "avg_earning_assets_amt": 800000000
           }
         },
         {
@@ -26346,7 +26409,10 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0.3535
+            "metric_value": 0.3535,
+            "interest_income_amt": 6787200,
+            "interest_expense_amt": 2545200,
+            "avg_earning_assets_amt": 1200000000
           }
         },
         {
@@ -26399,7 +26465,10 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0.5738
+            "metric_value": 0.5738,
+            "interest_income_amt": 826200,
+            "interest_expense_amt": 309825,
+            "avg_earning_assets_amt": 90000000
           }
         },
         {
@@ -26452,7 +26521,10 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0.7323
+            "metric_value": 0.7323,
+            "interest_income_amt": 7029600,
+            "interest_expense_amt": 2636100,
+            "avg_earning_assets_amt": 600000000
           }
         },
         {
@@ -26505,7 +26577,10 @@
             }
           ],
           "extra_fields": {
-            "metric_value": 0.2846
+            "metric_value": 0.2846,
+            "interest_income_amt": 9563400,
+            "interest_expense_amt": 3586275,
+            "avg_earning_assets_amt": 2100000000
           }
         }
       ]

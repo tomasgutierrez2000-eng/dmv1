@@ -40,10 +40,6 @@ export async function GET() {
     ['metric_class', 'Yes', 'How is it sourced?', 'SOURCED, CALCULATED, HYBRID'],
     ['insight', 'No', 'Why this metric matters', ''],
     ['rollup_strategy', 'No', 'How to aggregate across levels', 'direct-sum, sum-ratio, weighted-avg'],
-    ['calculator_mode', 'No', 'Python calculator type to use', 'full, simple, (leave empty for no calculator)'],
-    [],
-    ['─── Python Calculator ───'],
-    ['Upload a .py calculator file alongside this Excel. Set calculator_mode to "full" (complete BaseCalculator subclass) or "simple" (just a facility_level function).'],
     [],
     ['─── Column Reference: SourceFields Sheet ───'],
     ['Column', 'Required', 'Description', 'Valid Values'],
@@ -62,7 +58,7 @@ export async function GET() {
   const metricsHeaders = [
     'metric_id', 'name', 'domain', 'abbreviation', 'definition', 'generic_formula',
     'unit_type', 'direction', 'metric_class', 'insight',
-    'rollup_strategy', 'calculator_mode',
+    'rollup_strategy',
   ];
   const metricsExample = [
     'EXP-099', 'Example: Total Drawn Exposure', 'exposure', 'DRAWN',
@@ -70,7 +66,7 @@ export async function GET() {
     'SUM(drawn_amount)',
     'CURRENCY', 'NEUTRAL', 'CALCULATED',
     'Core exposure metric tracking total utilization.',
-    'direct-sum', 'simple',
+    'direct-sum',
   ];
 
   // ── Sheet 3: SourceFields (with example rows) ──────────────────────

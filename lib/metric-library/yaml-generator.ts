@@ -31,7 +31,6 @@ export function getYamlFilePath(metricId: string, domain: string): string {
  */
 export function generateYamlFromUpload(
   metric: MetricWithSources,
-  options?: { hasPythonCalculator?: boolean }
 ): string {
   const today = formatDate(new Date());
   const metricId = metric.metric_id;
@@ -48,15 +47,6 @@ export function generateYamlFromUpload(
   const insight = metric.insight ?? `Tracks ${name.toLowerCase()} across the portfolio.`;
   const rollupStrategy = metric.rollup_strategy ?? 'direct-sum';
 
-  // Determine if this metric has a Python calculator
-  const hasCalculator =
-    options?.hasPythonCalculator ||
-    metric.calculator_mode === 'full' ||
-    metric.calculator_mode === 'simple';
-
-  // Derive calculator module name from metric ID (e.g., "EXP-050" -> "exp_050")
-  const calculatorModule = metricId.toLowerCase().replace(/-/g, '_');
-
   // Build source tables section
   const sourceTablesYaml = buildSourceTables(metric);
 
@@ -68,11 +58,6 @@ export function generateYamlFromUpload(
 
   // Build catalogue
   const catalogueYaml = buildCatalogue(metricId, abbreviation, insight, rollupStrategy);
-
-  // Build optional calculator_module line
-  const calculatorLine = hasCalculator
-    ? `\ncalculator_module: "${calculatorModule}"`
-    : '';
 
   return `\
 # ${'═'.repeat(63)}
@@ -110,7 +95,6 @@ levels:
 ${levelsYaml}
 
 depends_on: []
-${calculatorLine}
 
 output:
   table: metric_result
@@ -297,28 +281,11 @@ function buildLevels(
   const aggType = inferAggregationType(rollupStrategy);
   const facilityAggType = rollupStrategy === 'direct-sum' ? 'RAW' : aggType;
 
-  const hasCalculator =
-    metric.calculator_mode === 'full' || metric.calculator_mode === 'simple';
-
-  const facilityFormulaText = hasCalculator
-    ? 'Calculated by Python calculator'
-    : genericFormula || `${metric.name} per facility`;
-
-  const counterpartyFormulaText = hasCalculator
-    ? 'Calculated by Python calculator'
-    : 'Aggregated per counterparty';
-
-  const deskFormulaText = hasCalculator
-    ? 'Calculated by Python calculator'
-    : 'Aggregated per desk segment';
-
-  const portfolioFormulaText = hasCalculator
-    ? 'Calculated by Python calculator'
-    : 'Aggregated per portfolio segment';
-
-  const segmentFormulaText = hasCalculator
-    ? 'Calculated by Python calculator'
-    : 'Aggregated per business segment';
+  const facilityFormulaText = genericFormula || `${metric.name} per facility`;
+  const counterpartyFormulaText = 'Aggregated per counterparty';
+  const deskFormulaText = 'Aggregated per desk segment';
+  const portfolioFormulaText = 'Aggregated per portfolio segment';
+  const segmentFormulaText = 'Aggregated per business segment';
 
   return `\
   facility:

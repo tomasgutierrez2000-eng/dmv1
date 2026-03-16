@@ -5,7 +5,7 @@
  * - One CATALOGUE ITEM = one business concept (metric or raw data element).
  * - Each item has per-level definitions showing how it rolls up across the hierarchy.
  * - Rollup hierarchy: Facility → Counterparty → Desk → Portfolio → Business Segment.
- * - Flat structure: easy to map to DB rows or Python dicts.
+ * - Flat structure: easy to map to DB rows or dicts.
  */
 
 /** Canonical order for aggregation hierarchy. */

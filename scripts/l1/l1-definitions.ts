@@ -713,6 +713,8 @@ export const L1_TABLES: TableDef[] = [
       { name: 'product_node_id', type: 'BIGINT', nullable: false, fk: 'l1.enterprise_product_taxonomy(product_node_id)' },
       { name: 'rate_index_id', type: 'BIGINT', nullable: false, fk: 'l1.interest_rate_index_dim(rate_index_id)' },
       { name: 'ledger_account_id', type: 'BIGINT', nullable: false, fk: 'l1.ledger_account_dim(ledger_account_id)' },
+      { name: 'legal_entity_id', type: 'BIGINT', nullable: true, fk: 'l1.legal_entity(legal_entity_id)' },
+      { name: 'profit_center_code', type: 'VARCHAR(30)', nullable: true },
       { name: 'created_ts', type: 'TIMESTAMP', nullable: false, default: 'CURRENT_TIMESTAMP' },
       { name: 'updated_ts', type: 'TIMESTAMP', nullable: true },
       { name: 'all_in_rate_pct', type: 'DECIMAL(10,4)', nullable: true },

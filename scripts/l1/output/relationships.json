@@ -289,6 +289,23 @@
     "relationshipType": "primary"
   },
   {
+    "id": "L1.facility_master.legal_entity_id->L1.legal_entity.legal_entity_id",
+    "source": {
+      "layer": "L1",
+      "table": "facility_master",
+      "field": "legal_entity_id",
+      "tableKey": "L1.facility_master"
+    },
+    "target": {
+      "layer": "L1",
+      "table": "legal_entity",
+      "field": "legal_entity_id",
+      "tableKey": "L1.legal_entity"
+    },
+    "isCrossLayer": false,
+    "relationshipType": "primary"
+  },
+  {
     "id": "L1.collateral_asset_master.collateral_type_id->L1.collateral_type.collateral_type_id",
     "source": {
       "layer": "L1",

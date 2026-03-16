@@ -648,6 +648,8 @@ CREATE TABLE IF NOT EXISTS l1.facility_master (
   product_node_id BIGINT NOT NULL,
   rate_index_id BIGINT NOT NULL,
   ledger_account_id BIGINT NOT NULL,
+  legal_entity_id BIGINT,
+  profit_center_code VARCHAR(30),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
   all_in_rate_pct DECIMAL(10,4),
@@ -678,7 +680,8 @@ CREATE TABLE IF NOT EXISTS l1.facility_master (
   CONSTRAINT fk_facility_master_lob_segment_id FOREIGN KEY (lob_segment_id) REFERENCES l1.enterprise_business_taxonomy(managed_segment_id),
   CONSTRAINT fk_facility_master_product_node_id FOREIGN KEY (product_node_id) REFERENCES l1.enterprise_product_taxonomy(product_node_id),
   CONSTRAINT fk_facility_master_rate_index_id FOREIGN KEY (rate_index_id) REFERENCES l1.interest_rate_index_dim(rate_index_id),
-  CONSTRAINT fk_facility_master_ledger_account_id FOREIGN KEY (ledger_account_id) REFERENCES l1.ledger_account_dim(ledger_account_id)
+  CONSTRAINT fk_facility_master_ledger_account_id FOREIGN KEY (ledger_account_id) REFERENCES l1.ledger_account_dim(ledger_account_id),
+  CONSTRAINT fk_facility_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.contract_master (

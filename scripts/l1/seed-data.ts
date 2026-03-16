@@ -2698,6 +2698,8 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'is_revolving_flag') return REVOLVING_FLAGS[idx];
       if (columnName === 'industry_code') return INDUSTRY_CODES[idx];
       if (columnName === 'is_active_flag') return FACILITY_STATUSES[idx] === 'ACTIVE' ? 'Y' : 'N';
+      if (columnName === 'legal_entity_id') return (idx % 10) + 1; // distribute across legal entities 1-10
+      if (columnName === 'profit_center_code') return ['PC-100', 'PC-200', 'PC-300', 'PC-400', 'PC-500', 'PC-100', 'PC-200', 'PC-300', 'PC-400', 'PC-500'][idx];
       break;
 
     /* ──────────── contract_master ──────────── */

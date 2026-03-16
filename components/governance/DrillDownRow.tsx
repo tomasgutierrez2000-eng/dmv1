@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Loader2, ChevronDown, ChevronRight, AlertTriangle, Search } from 'lucide-react';
 import {
   CHILD_LEVEL, formatNumber, formatMetricValue,
   type DrillLevel, type DrillDownNode,
@@ -24,6 +24,7 @@ interface DrillDownRowProps {
   metricColorFn: (v: number) => string;
   extraKeys: string[];
   unitType?: string;
+  onScopeToRow?: (dimKey: string) => void;
 }
 
 const DEPTH_BG = [
@@ -46,6 +47,7 @@ export default function DrillDownRow({
   metricColorFn,
   extraKeys,
   unitType,
+  onScopeToRow,
 }: DrillDownRowProps) {
   const dimKey = String(row.dimension_key ?? '');
   const pathKey = pathPrefix ? `${pathPrefix}/${level}:${dimKey}` : `${level}:${dimKey}`;
@@ -65,7 +67,7 @@ export default function DrillDownRow({
       {/* Main row */}
       <tr
         onClick={canDrillDown ? () => onToggleExpand(pathKey, level, dimKey) : undefined}
-        className={`border-b border-pwc-gray-light/20 hover:bg-pwc-gray-light/10 transition-colors
+        className={`group/row border-b border-pwc-gray-light/20 hover:bg-pwc-gray-light/10 transition-colors
           ${canDrillDown ? 'cursor-pointer' : ''}
           ${isExpanded ? DEPTH_BG[Math.min(depth, DEPTH_BG.length - 1)] : ''}
         `}
@@ -90,6 +92,16 @@ export default function DrillDownRow({
                 </span>
               )}
             </span>
+            {onScopeToRow && depth === 0 && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onScopeToRow(dimKey); }}
+                className="ml-auto p-0.5 rounded text-gray-600 hover:text-pwc-orange hover:bg-pwc-orange/10 transition-colors opacity-0 group-hover/row:opacity-100"
+                title="Scope input data to this row"
+              >
+                <Search className="w-3 h-3" />
+              </button>
+            )}
           </span>
         </td>
         <td className={`px-4 py-2 text-right font-semibold tabular-nums ${isNaN(val) ? 'text-gray-500' : isPosition ? 'text-gray-300' : metricColorFn(val)}`}>
@@ -162,6 +174,7 @@ export default function DrillDownRow({
                     metricColorFn={metricColorFn}
                     extraKeys={childExtraKeys}
                     unitType={unitType}
+                    onScopeToRow={onScopeToRow}
                   />
                 );
               })}

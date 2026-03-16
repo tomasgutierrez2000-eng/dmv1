@@ -306,7 +306,9 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Wrong join key for cp-level tables | `cro.facility_id` (doesn't exist) | Tables like `counterparty_rating_observation` have `counterparty_id`, not `facility_id` — join through `fm.counterparty_id = cro.counterparty_id` |
 | Missing bridge table joins | Direct join `fm → rmtd` (no path) | Use full bridge chain: `facility_master → risk_mitigant_link → risk_mitigant_master → risk_mitigant_type_dim` |
 | SUM of categorical values | `SUM(risk_rating_status)` at aggregate | Use CUSTOM aggregation: derive direction from `AVG(change_steps)` via CASE WHEN |
-| Seed data doesn't exercise metric | `risk_rating_change_steps` NULL for 182/183 rows | Populate seed data with realistic distributions (e.g., 12% upgrades, 13% downgrades, 75% stable) before declaring metric "working" |
+| Seed data doesn't exercise metric | `risk_rating_change_steps` NULL for 929/930 rows | Populate seed data with realistic distributions via SQL migration (e.g., `UPDATE SET col = CASE WHEN id % 100 < 55 THEN 0 ...`) before declaring metric "working" |
+| Non-contiguous FK ID mapping | `410001 + ((id-1) % 123)` maps to gap IDs 410101-410123 | When remapping FK values with modulo, verify ALL mapped IDs exist in parent table — non-contiguous PK ranges have gaps that modulo doesn't avoid |
+| Dim chain completeness | `country_dim.region_code = 'AMER'` but no 'AMER' in `region_dim` | Verify full dim chain: source → bridge_dim → target_dim. Missing entries in ANY dim table silently NULL-out the entire join chain |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 
@@ -322,6 +324,8 @@ After verifying formulas execute, always check that seed data produces **meaning
 | **Date alignment** | Source tables have overlapping `as_of_date` | FES max=Feb but FRS max=Jan → JOIN returns 0 rows for Feb date |
 | **Status field diversity** | Categorical status fields have multiple distinct values | All `pricing_exception_status` NULL → ordinal encoding always returns 0 |
 | **Numeric range realism** | NUMERIC fields have values in GSIB-realistic ranges | `pd_pct = 100.5` makes PD metric return 100% instead of <5% |
+| **NULL sparsity** | Metric-critical fields have >10% non-null values | Column exists with correct type but 99.9% NULL → metric appears broken (e.g., 1/930 `risk_rating_change_steps`) |
+| **FK ID contiguity** | Remapped FK values all exist in parent table | Modulo remapping into non-contiguous PK ranges creates orphaned references in gaps |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

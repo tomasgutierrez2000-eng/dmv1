@@ -51608,8 +51608,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "Loans and Leases",
-            "fr2590_category_code": "G1_B"
+            "fr2590_category_code": 1
           }
         },
         {
@@ -51662,8 +51661,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "Loans and Leases",
-            "fr2590_category_code": "G1_B"
+            "fr2590_category_code": 2
           }
         },
         {
@@ -51716,8 +51714,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "Loans and Leases",
-            "fr2590_category_code": "G1_B"
+            "fr2590_category_code": 3
           }
         },
         {
@@ -51770,8 +51767,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "Loans and Leases",
-            "fr2590_category_code": "G1_B"
+            "fr2590_category_code": 4
           }
         },
         {
@@ -51824,8 +51820,7 @@
             }
           ],
           "extra_fields": {
-            "metric_value": "Loans and Leases",
-            "fr2590_category_code": "G1_B"
+            "fr2590_category_code": 5
           }
         }
       ]

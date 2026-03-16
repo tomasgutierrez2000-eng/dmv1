@@ -26539,8 +26539,8 @@
     "item_name": "Net Income ($)",
     "abbreviation": "NI",
     "kind": "METRIC",
-    "definition": "Profit after all expenses in USD. Indicator of borrower profitability and financial sustainability.\n",
-    "generic_formula": "Revenue – Interest Expense – Operating Cost – EL\n",
+    "definition": "Net income computed from L2 atomic inputs: NOI (Net Operating Income, which equals Revenue minus Operating Expense) minus Interest Expense minus Expected Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability.\n",
+    "generic_formula": "Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss (PD × LGD × Committed Amount). All sourced from L2 atomic tables.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "HIGHER_BETTER",
@@ -26551,10 +26551,10 @@
     "regulatory_references": [
       "Basel III"
     ],
-    "insight": "Profitability efficiency\n",
+    "insight": "Profitability efficiency — NOI minus Interest Expense minus Expected Loss\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "EXP-027",
     "normalized_de_name": "Net Income ($)",
     "data_element_in_dm": "net_income_amt",
@@ -26562,9 +26562,49 @@
       {
         "layer": "L2",
         "table": "facility_financial_snapshot",
-        "field": "net_income_amt",
-        "description": "net_income_amt",
+        "field": "noi_amt",
+        "description": "noi_amt",
         "data_type": "NUMERIC(20,4)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_financial_snapshot",
+        "field": "interest_expense_amt",
+        "description": "interest_expense_amt",
+        "data_type": "NUMERIC(20,4)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_risk_snapshot",
+        "field": "pd_pct",
+        "description": "pd_pct",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_risk_snapshot",
+        "field": "lgd_pct",
+        "description": "lgd_pct",
+        "data_type": "NUMERIC(10,6)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "committed_amount",
+        "description": "committed_amount",
+        "data_type": "VARCHAR(64)",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "fx_rate",
+        "field": "rate",
+        "description": "rate",
+        "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
     ],
@@ -26574,7 +26614,7 @@
         "dashboard_display_name": "Net Income ($) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = ffs.net_income_amt",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. COMPUTE\n   metric_value = COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)",
         "source_references": [
           {
             "layer": "L2",
@@ -26591,8 +26631,20 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "net_income_amt",
-            "description": "net_income_amt"
+            "field": "noi_amt",
+            "description": "noi_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "interest_expense_amt",
+            "description": "interest_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -26619,6 +26671,30 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "pd_pct",
+            "description": "pd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "lgd_pct",
+            "description": "lgd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "committed_amount",
+            "description": "committed_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -26631,14 +26707,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ffs.facility_id AS dimension_key,\n  ffs.net_income_amt AS metric_value\nFROM l3.facility_financial_calc ffs\nWHERE ffs.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  ffs.facility_id AS dimension_key,\n  COALESCE(ffs.noi_amt, 0)\n    - COALESCE(ffs.interest_expense_amt, 0)\n    - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n      * COALESCE(fes.committed_amount, 0)\n  AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Net Income ($) (counterparty)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY fm.counterparty_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -26655,8 +26731,20 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "net_income_amt",
-            "description": "net_income_amt"
+            "field": "noi_amt",
+            "description": "noi_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "interest_expense_amt",
+            "description": "interest_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -26683,6 +26771,30 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "pd_pct",
+            "description": "pd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "lgd_pct",
+            "description": "lgd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "committed_amount",
+            "description": "committed_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -26695,14 +26807,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.net_income_amt AS metric_value\n  FROM l3.facility_financial_calc ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id\n"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Net Income ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt.managed_segment_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -26719,8 +26831,20 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "net_income_amt",
-            "description": "net_income_amt"
+            "field": "noi_amt",
+            "description": "noi_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "interest_expense_amt",
+            "description": "interest_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -26747,6 +26871,30 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "pd_pct",
+            "description": "pd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "lgd_pct",
+            "description": "lgd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "committed_amount",
+            "description": "committed_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -26759,14 +26907,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.net_income_amt AS metric_value\n  FROM l3.facility_financial_calc ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Net Income ($) (portfolio)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt_l2.managed_segment_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -26783,8 +26931,20 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "net_income_amt",
-            "description": "net_income_amt"
+            "field": "noi_amt",
+            "description": "noi_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "interest_expense_amt",
+            "description": "interest_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -26811,6 +26971,30 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "pd_pct",
+            "description": "pd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "lgd_pct",
+            "description": "lgd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "committed_amount",
+            "description": "committed_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -26823,14 +27007,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.net_income_amt AS metric_value\n  FROM l3.facility_financial_calc ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Net Income ($) (lob)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = ffs.facility_id AND frs.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n6. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n7. GROUP BY ebt_l1.managed_segment_id\n8. COMPUTE\n   metric_value = SUM((COALESCE(ffs.noi_amt, 0) - COALESCE(ffs.interest_expense_amt, 0) - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01 * COALESCE(fes.committed_amount, 0)) * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -26847,8 +27031,20 @@
           {
             "layer": "L2",
             "table": "facility_financial_snapshot",
-            "field": "net_income_amt",
-            "description": "net_income_amt"
+            "field": "noi_amt",
+            "description": "noi_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "interest_expense_amt",
+            "description": "interest_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -26875,6 +27071,30 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "pd_pct",
+            "description": "pd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "lgd_pct",
+            "description": "lgd_pct"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "committed_amount",
+            "description": "committed_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -26887,7 +27107,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.net_income_amt AS metric_value\n  FROM l3.facility_financial_calc ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(\n    (COALESCE(ffs.noi_amt, 0)\n     - COALESCE(ffs.interest_expense_amt, 0)\n     - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01\n       * COALESCE(fes.committed_amount, 0))\n    * COALESCE(fx.rate, 1)\n  ) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = ffs.facility_id\n  AND frs.as_of_date = ffs.as_of_date\nLEFT JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = ffs.facility_id\n  AND fes.as_of_date = ffs.as_of_date\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -26913,28 +27133,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-406",
+              "position_id": "P-11",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 130000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-811",
+              "position_id": "P-21",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 125000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1216",
+              "position_id": "P-31",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 110000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1621",
+              "position_id": "P-41",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 115000000,
@@ -26942,219 +27162,244 @@
             }
           ],
           "extra_fields": {
-            "net_income_amt": 100.5
+            "metric_value": -245750250,
+            "noi_amt": 9216000,
+            "interest_expense_amt": 2460000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 250000000
           }
         },
         {
-          "facility_id": "F-2",
-          "facility_name": "Northbridge Pharma — Term Loan B",
-          "counterparty_id": "CP-2",
-          "counterparty_name": "Northbridge Pharmaceuticals Corp.",
-          "lob_segment_id": "SEG-2",
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1500000000,
+          "collateral_value": 2283000000,
+          "ltv_pct": 65.7,
+          "positions": [
+            {
+              "position_id": "P-6",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1200000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-16",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1180000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-26",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1220000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-36",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-46",
+              "facility_id": "F-6",
+              "product_code": "LOAN",
+              "balance_amount": 1190000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": -1433266300,
+            "noi_amt": 104371200,
+            "interest_expense_amt": 22600000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 1500000000
+          }
+        },
+        {
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
           "desk_name": "Unknown",
-          "portfolio_name": "Large Corporate Banking",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 500000000,
-          "collateral_value": 612800000,
-          "ltv_pct": 81.59,
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
           "positions": [
             {
-              "position_id": "P-2",
-              "facility_id": "F-2",
+              "position_id": "P-8",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 450000000,
+              "balance_amount": 90000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-407",
-              "facility_id": "F-2",
+              "position_id": "P-18",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 440000000,
+              "balance_amount": 95000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-812",
-              "facility_id": "F-2",
+              "position_id": "P-28",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 460000000,
+              "balance_amount": 100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1217",
-              "facility_id": "F-2",
+              "position_id": "P-38",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 430000000,
+              "balance_amount": 85000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1622",
-              "facility_id": "F-2",
+              "position_id": "P-48",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 445000000,
+              "balance_amount": 80000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "net_income_amt": 100.5
+            "metric_value": -399966360,
+            "noi_amt": 6128640,
+            "interest_expense_amt": 2085000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 400000000
           }
         },
         {
-          "facility_id": "F-3",
-          "facility_name": "Pacific Ridge — Multi-Currency RCF",
-          "counterparty_id": "CP-3",
-          "counterparty_name": "Pacific Ridge Energy LLC",
-          "lob_segment_id": "SEG-3",
-          "desk_name": "Global Corporate Coverage Desk",
-          "portfolio_name": "Large Corporate Banking",
+          "facility_id": "F-9",
+          "facility_name": "Ironclad Infrastructure — Global Revolver",
+          "counterparty_id": "CP-9",
+          "counterparty_name": "Ironclad Infrastructure Partners LP",
+          "lob_segment_id": "SEG-9",
+          "desk_name": "Upper Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1000000000,
-          "collateral_value": 425566666,
-          "ltv_pct": 234.98,
+          "committed_amt": 600000000,
+          "collateral_value": 558066666,
+          "ltv_pct": 107.51,
           "positions": [
             {
-              "position_id": "P-3",
-              "facility_id": "F-3",
+              "position_id": "P-9",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 800000000,
+              "balance_amount": 600000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-408",
-              "facility_id": "F-3",
+              "position_id": "P-19",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 820000000,
+              "balance_amount": 580000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-813",
-              "facility_id": "F-3",
+              "position_id": "P-29",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 780000000,
+              "balance_amount": 620000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1218",
-              "facility_id": "F-3",
+              "position_id": "P-39",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 750000000,
+              "balance_amount": 560000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1623",
-              "facility_id": "F-3",
+              "position_id": "P-49",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 790000000,
+              "balance_amount": 590000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "net_income_amt": 100.5
+            "metric_value": -593692760,
+            "noi_amt": 28122240,
+            "interest_expense_amt": 15800000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 600000000
           }
         },
         {
-          "facility_id": "F-4",
-          "facility_name": "Silverton Financial — Bridge Facility",
-          "counterparty_id": "CP-4",
-          "counterparty_name": "Silverton Financial Group",
-          "lob_segment_id": "SEG-4",
-          "desk_name": "Domestic Large-Cap Corporates Desk",
-          "portfolio_name": "Large Corporate Banking",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000,
-          "collateral_value": 1028000000,
-          "ltv_pct": 243.19,
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
           "positions": [
             {
-              "position_id": "P-4",
-              "facility_id": "F-4",
+              "position_id": "P-10",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 2100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-409",
-              "facility_id": "F-4",
+              "position_id": "P-20",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 2050000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-814",
-              "facility_id": "F-4",
+              "position_id": "P-30",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 2150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1219",
-              "facility_id": "F-4",
+              "position_id": "P-40",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 2000000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1624",
-              "facility_id": "F-4",
+              "position_id": "P-50",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 2080000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "net_income_amt": 100.5
-          }
-        },
-        {
-          "facility_id": "F-5",
-          "facility_name": "Atlas Industrial — Working Capital RCF",
-          "counterparty_id": "CP-5",
-          "counterparty_name": "Atlas Industrial Technologies Inc.",
-          "lob_segment_id": "SEG-5",
-          "desk_name": "Multi-national / Cross-Border Corporates Desk",
-          "portfolio_name": "Large Corporate Banking",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 750000000,
-          "collateral_value": 149200000,
-          "ltv_pct": 502.68,
-          "positions": [
-            {
-              "position_id": "P-5",
-              "facility_id": "F-5",
-              "product_code": "LOAN",
-              "balance_amount": 275000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-410",
-              "facility_id": "F-5",
-              "product_code": "LOAN",
-              "balance_amount": 320000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-815",
-              "facility_id": "F-5",
-              "product_code": "LOAN",
-              "balance_amount": 380000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1220",
-              "facility_id": "F-5",
-              "product_code": "LOAN",
-              "balance_amount": 400000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1625",
-              "facility_id": "F-5",
-              "product_code": "LOAN",
-              "balance_amount": 350000000,
-              "description": "Position exposure"
-            }
-          ],
-          "extra_fields": {
-            "net_income_amt": 100.5
+            "metric_value": -4972777800,
+            "noi_amt": 115147200,
+            "interest_expense_amt": 37800000,
+            "pd_pct": 100.5,
+            "lgd_pct": 100.5,
+            "committed_amount": 5000000000
           }
         }
       ]
@@ -27165,11 +27410,11 @@
     "item_name": "Net Interest Margin (%)",
     "abbreviation": "NIM",
     "kind": "METRIC",
-    "definition": "Net Interest Income divided by earning assets. Calculated margin KPI assessing pricing effectiveness and lending profitability.\n",
-    "generic_formula": "(Interest Income - Interst Expense)/Average Earning Assets\n",
+    "definition": "Net Interest Income divided by Average Earning Assets. Core banking profitability measure assessing pricing effectiveness and lending margin. Sourced from L2 facility_profitability_snapshot atomic data.\n",
+    "generic_formula": "(Interest Income - Interest Expense) / Average Earning Assets * 100.\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
-    "direction": "NEUTRAL",
+    "direction": "HIGHER_BETTER",
     "metric_class": "CALCULATED",
     "domain_ids": [
       "exposure"
@@ -27177,33 +27422,33 @@
     "regulatory_references": [
       "Basel III"
     ],
-    "insight": "Core banking profitability\n",
+    "insight": "Core banking profitability — Net Interest Income as percentage of earning assets\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "EXP-028",
     "normalized_de_name": "Net Interest Margin (%)",
     "data_element_in_dm": "nim_pct",
     "ingredient_fields": [
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_profitability_snapshot",
         "field": "interest_income_amt",
         "description": "interest_income_amt",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_profitability_snapshot",
         "field": "interest_expense_amt",
         "description": "interest_expense_amt",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_profitability_snapshot",
         "field": "avg_earning_assets_amt",
         "description": "avg_earning_assets_amt",
         "data_type": "NUMERIC(20,4)",
@@ -27216,35 +27461,35 @@
         "dashboard_display_name": "Net Interest Margin (%) (facility)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = (COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0)) / NULLIF(fprs.avg_earning_assets_amt, 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = (COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0)) / NULLIF(fps.avg_earning_assets_amt, 0) * 100.0",
         "source_references": [
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -27285,42 +27530,42 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fprs.facility_id AS dimension_key,\n  (COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0))\n    / NULLIF(fprs.avg_earning_assets_amt, 0) * 100.0 AS metric_value\nFROM l3.facility_financial_calc fprs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date"
+        "formula_sql": "SELECT\n  fps.facility_id AS dimension_key,\n  (COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))\n    / NULLIF(fps.avg_earning_assets_amt, 0) * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fps\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fps.as_of_date = :as_of_date\n"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Net Interest Margin (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY fm.counterparty_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0)) / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0 END",
         "source_references": [
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -27361,42 +27606,42 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,\n    fprs.avg_earning_assets_amt AS denominator_val\n  FROM l3.facility_financial_calc fprs\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL\n       ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))\n            / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0\n  END AS metric_value\nFROM l2.facility_profitability_snapshot fps\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fps.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Net Interest Margin (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0)) / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0 END",
         "source_references": [
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -27437,42 +27682,42 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,\n    fprs.avg_earning_assets_amt AS denominator_val\n  FROM l3.facility_financial_calc fprs\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL\n       ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))\n            / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0\n  END AS metric_value\nFROM l2.facility_profitability_snapshot fps\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Net Interest Margin (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0)) / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0 END",
         "source_references": [
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -27513,42 +27758,42 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,\n    fprs.avg_earning_assets_amt AS denominator_val\n  FROM l3.facility_financial_calc fprs\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL\n       ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))\n            / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0\n  END AS metric_value\nFROM l2.facility_profitability_snapshot fps\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Net Interest Margin (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l3.facility_financial_calc  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0)) / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0 END",
         "source_references": [
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "facility_id",
             "description": "facility_id"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "as_of_date",
             "description": "as_of_date"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_income_amt",
             "description": "interest_income_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "interest_expense_amt",
             "description": "interest_expense_amt"
           },
           {
-            "layer": "L3",
-            "table": "facility_financial_calc",
+            "layer": "L2",
+            "table": "facility_profitability_snapshot",
             "field": "avg_earning_assets_amt",
             "description": "avg_earning_assets_amt"
           },
@@ -27589,111 +27834,11 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    COALESCE(fprs.interest_income_amt, 0) - COALESCE(fprs.interest_expense_amt, 0) AS numerator_val,\n    fprs.avg_earning_assets_amt AS denominator_val\n  FROM l3.facility_financial_calc fprs\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL\n       ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))\n            / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0\n  END AS metric_value\nFROM l2.facility_profitability_snapshot fps\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
       "facilities": [
-        {
-          "facility_id": "F-1",
-          "facility_name": "Meridian Aerospace — USD Revolver 2027",
-          "counterparty_id": "CP-1",
-          "counterparty_name": "Meridian Aerospace Holdings Inc.",
-          "lob_segment_id": "SEG-1",
-          "desk_name": "Unknown",
-          "portfolio_name": "Unknown",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 250000000,
-          "collateral_value": 252000000,
-          "ltv_pct": 99.21,
-          "positions": [
-            {
-              "position_id": "P-1",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 120000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-406",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 130000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-811",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 125000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1216",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 110000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1621",
-              "facility_id": "F-1",
-              "product_code": "LOAN",
-              "balance_amount": 115000000,
-              "description": "Position exposure"
-            }
-          ]
-        },
-        {
-          "facility_id": "F-2",
-          "facility_name": "Northbridge Pharma — Term Loan B",
-          "counterparty_id": "CP-2",
-          "counterparty_name": "Northbridge Pharmaceuticals Corp.",
-          "lob_segment_id": "SEG-2",
-          "desk_name": "Unknown",
-          "portfolio_name": "Large Corporate Banking",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 500000000,
-          "collateral_value": 612800000,
-          "ltv_pct": 81.59,
-          "positions": [
-            {
-              "position_id": "P-2",
-              "facility_id": "F-2",
-              "product_code": "LOAN",
-              "balance_amount": 450000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-407",
-              "facility_id": "F-2",
-              "product_code": "LOAN",
-              "balance_amount": 440000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-812",
-              "facility_id": "F-2",
-              "product_code": "LOAN",
-              "balance_amount": 460000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1217",
-              "facility_id": "F-2",
-              "product_code": "LOAN",
-              "balance_amount": 430000000,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1622",
-              "facility_id": "F-2",
-              "product_code": "LOAN",
-              "balance_amount": 445000000,
-              "description": "Position exposure"
-            }
-          ]
-        },
         {
           "facility_id": "F-3",
           "facility_name": "Pacific Ridge — Multi-Currency RCF",
@@ -27715,134 +27860,264 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-408",
+              "position_id": "P-13",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 820000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-813",
+              "position_id": "P-23",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 780000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1218",
+              "position_id": "P-33",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 750000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1623",
+              "position_id": "P-43",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 790000000,
               "description": "Position exposure"
             }
-          ]
+          ],
+          "extra_fields": {
+            "metric_value": 0.7796,
+            "interest_income_amt": 9979200,
+            "interest_expense_amt": 3742200,
+            "avg_earning_assets_amt": 800000000
+          }
         },
         {
-          "facility_id": "F-4",
-          "facility_name": "Silverton Financial — Bridge Facility",
-          "counterparty_id": "CP-4",
-          "counterparty_name": "Silverton Financial Group",
-          "lob_segment_id": "SEG-4",
-          "desk_name": "Domestic Large-Cap Corporates Desk",
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000,
-          "collateral_value": 1028000000,
-          "ltv_pct": 243.19,
+          "committed_amt": 1500000000,
+          "collateral_value": 2283000000,
+          "ltv_pct": 65.7,
           "positions": [
             {
-              "position_id": "P-4",
-              "facility_id": "F-4",
+              "position_id": "P-6",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 1200000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-409",
-              "facility_id": "F-4",
+              "position_id": "P-16",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 1180000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-814",
-              "facility_id": "F-4",
+              "position_id": "P-26",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 1220000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1219",
-              "facility_id": "F-4",
+              "position_id": "P-36",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 1150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1624",
-              "facility_id": "F-4",
+              "position_id": "P-46",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 1190000000,
               "description": "Position exposure"
             }
-          ]
+          ],
+          "extra_fields": {
+            "metric_value": 0.3535,
+            "interest_income_amt": 6787200,
+            "interest_expense_amt": 2545200,
+            "avg_earning_assets_amt": 1200000000
+          }
         },
         {
-          "facility_id": "F-5",
-          "facility_name": "Atlas Industrial — Working Capital RCF",
-          "counterparty_id": "CP-5",
-          "counterparty_name": "Atlas Industrial Technologies Inc.",
-          "lob_segment_id": "SEG-5",
-          "desk_name": "Multi-national / Cross-Border Corporates Desk",
-          "portfolio_name": "Large Corporate Banking",
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
+          "desk_name": "Unknown",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 750000000,
-          "collateral_value": 149200000,
-          "ltv_pct": 502.68,
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
           "positions": [
             {
-              "position_id": "P-5",
-              "facility_id": "F-5",
+              "position_id": "P-8",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 275000000,
+              "balance_amount": 90000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-410",
-              "facility_id": "F-5",
+              "position_id": "P-18",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 320000000,
+              "balance_amount": 95000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-815",
-              "facility_id": "F-5",
+              "position_id": "P-28",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 380000000,
+              "balance_amount": 100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1220",
-              "facility_id": "F-5",
+              "position_id": "P-38",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 400000000,
+              "balance_amount": 85000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1625",
-              "facility_id": "F-5",
+              "position_id": "P-48",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 350000000,
+              "balance_amount": 80000000,
               "description": "Position exposure"
             }
-          ]
+          ],
+          "extra_fields": {
+            "metric_value": 0.5738,
+            "interest_income_amt": 826200,
+            "interest_expense_amt": 309825,
+            "avg_earning_assets_amt": 90000000
+          }
+        },
+        {
+          "facility_id": "F-9",
+          "facility_name": "Ironclad Infrastructure — Global Revolver",
+          "counterparty_id": "CP-9",
+          "counterparty_name": "Ironclad Infrastructure Partners LP",
+          "lob_segment_id": "SEG-9",
+          "desk_name": "Upper Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 600000000,
+          "collateral_value": 558066666,
+          "ltv_pct": 107.51,
+          "positions": [
+            {
+              "position_id": "P-9",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 600000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-19",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 580000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-29",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 620000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-39",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 560000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-49",
+              "facility_id": "F-9",
+              "product_code": "LOAN",
+              "balance_amount": 590000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0.7323,
+            "interest_income_amt": 7029600,
+            "interest_expense_amt": 2636100,
+            "avg_earning_assets_amt": 600000000
+          }
+        },
+        {
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
+          "positions": [
+            {
+              "position_id": "P-10",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2100000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-20",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2050000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-30",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2150000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-40",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2000000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-50",
+              "facility_id": "F-10",
+              "product_code": "LOAN",
+              "balance_amount": 2080000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 0.2846,
+            "interest_income_amt": 9563400,
+            "interest_expense_amt": 3586275,
+            "avg_earning_assets_amt": 2100000000
+          }
         }
       ]
     }
@@ -27852,22 +28127,22 @@
     "item_name": "Operating Cost ($)",
     "abbreviation": "OC",
     "kind": "METRIC",
-    "definition": "Allocated operating or servicing cost associated with exposure.\n",
+    "definition": "Allocated operating or servicing cost associated with each facility. Direct-sum rollup at all aggregate levels with FX conversion to USD.\n",
     "generic_formula": "Read operating_expense_amt from facility_financial_snapshot for each facility as-of reporting date.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
-    "metric_class": "CALCULATED",
+    "metric_class": "SOURCED",
     "domain_ids": [
       "exposure"
     ],
     "regulatory_references": [
       "Basel III"
     ],
-    "insight": "Expense monitoring\n",
+    "insight": "Expense monitoring — allocated operating and servicing costs per facility\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "EXP-029",
     "normalized_de_name": "Operating Cost ($)",
     "data_element_in_dm": "operating_expense_amt",
@@ -27887,7 +28162,7 @@
         "dashboard_display_name": "Operating Cost ($) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = ffs.operating_expense_amt",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = ffs.operating_expense_amt",
         "source_references": [
           {
             "layer": "L2",
@@ -27909,6 +28184,12 @@
           },
           {
             "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
+          },
+          {
+            "layer": "L2",
             "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
@@ -27930,6 +28211,12 @@
             "table": "facility_master",
             "field": "is_active_flag",
             "description": "is_active_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
           },
           {
             "layer": "L1",
@@ -27950,8 +28237,8 @@
         "level": "counterparty",
         "dashboard_display_name": "Operating Cost ($) (counterparty)",
         "in_record": true,
-        "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. COMPUTE\n   metric_value = ffs.operating_expense_amt",
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -27970,6 +28257,12 @@
             "table": "facility_financial_snapshot",
             "field": "operating_expense_amt",
             "description": "operating_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -27996,6 +28289,12 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -28008,14 +28307,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  ffs.operating_expense_amt AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE ffs.as_of_date = :as_of_date\n"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Operating Cost ($) (desk)",
         "in_record": true,
         "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt.managed_segment_id\n5. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -28034,6 +28333,12 @@
             "table": "facility_financial_snapshot",
             "field": "operating_expense_amt",
             "description": "operating_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -28060,6 +28365,12 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -28072,14 +28383,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.operating_expense_amt AS metric_value\n  FROM l2.facility_financial_snapshot ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Operating Cost ($) (portfolio)",
         "in_record": true,
-        "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l2.managed_segment_id\n5. COMPUTE\n   metric_value = AVG(fac.metric_value)",
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -28098,6 +28409,12 @@
             "table": "facility_financial_snapshot",
             "field": "operating_expense_amt",
             "description": "operating_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -28124,6 +28441,12 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -28136,14 +28459,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  AVG(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.operating_expense_amt AS metric_value\n  FROM l2.facility_financial_snapshot ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Operating Cost ($) (lob)",
         "in_record": true,
-        "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n4. GROUP BY ebt_l1.managed_segment_id\n5. COMPUTE\n   metric_value = AVG(fac.metric_value)",
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_financial_snapshot  (ffs)\n   WHERE ffs.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = ffs.facility_id\n   AND   fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1))",
         "source_references": [
           {
             "layer": "L2",
@@ -28162,6 +28485,12 @@
             "table": "facility_financial_snapshot",
             "field": "operating_expense_amt",
             "description": "operating_expense_amt"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_financial_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
           },
           {
             "layer": "L2",
@@ -28188,6 +28517,12 @@
             "description": "is_active_flag"
           },
           {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -28200,7 +28535,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  AVG(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    ffs.facility_id AS dimension_key,\n    ffs.operating_expense_amt AS metric_value\n  FROM l2.facility_financial_snapshot ffs\n  WHERE ffs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value\nFROM l2.facility_financial_snapshot ffs\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = ffs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = ffs.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = ffs.as_of_date\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE ffs.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -28226,28 +28561,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-409",
+              "position_id": "P-14",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-814",
+              "position_id": "P-24",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1219",
+              "position_id": "P-34",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1624",
+              "position_id": "P-44",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
@@ -28260,219 +28595,219 @@
           }
         },
         {
-          "facility_id": "F-18",
-          "facility_name": "Quantum — USD Term Loan 2027-B",
-          "counterparty_id": "CP-12",
-          "counterparty_name": "Quantum Signal Communications Corp.",
-          "lob_segment_id": "SEG-18",
-          "desk_name": "Unknown",
-          "portfolio_name": "Specialized Industries",
+          "facility_id": "F-5",
+          "facility_name": "Atlas Industrial — Working Capital RCF",
+          "counterparty_id": "CP-5",
+          "counterparty_name": "Atlas Industrial Technologies Inc.",
+          "lob_segment_id": "SEG-5",
+          "desk_name": "Multi-national / Cross-Border Corporates Desk",
+          "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2104939352,
-          "collateral_value": 2149844723,
-          "ltv_pct": 97.91,
+          "committed_amt": 750000000,
+          "collateral_value": 149200000,
+          "ltv_pct": 502.68,
           "positions": [
+            {
+              "position_id": "P-5",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 275000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-15",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 320000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-25",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 380000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-35",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 400000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-45",
+              "facility_id": "F-5",
+              "product_code": "LOAN",
+              "balance_amount": 350000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 50793600,
+            "operating_expense_amt": 50793600
+          }
+        },
+        {
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
+          "desk_name": "Unknown",
+          "portfolio_name": "Middle Market Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
+          "positions": [
+            {
+              "position_id": "P-8",
+              "facility_id": "F-8",
+              "product_code": "LOAN",
+              "balance_amount": 90000000,
+              "description": "Position exposure"
+            },
             {
               "position_id": "P-18",
-              "facility_id": "F-18",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 841975741,
+              "balance_amount": 95000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-423",
-              "facility_id": "F-18",
+              "position_id": "P-28",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 947222708,
+              "balance_amount": 100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-828",
-              "facility_id": "F-18",
+              "position_id": "P-38",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 1052469676,
+              "balance_amount": 85000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1233",
-              "facility_id": "F-18",
+              "position_id": "P-48",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 1157716644,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1638",
-              "facility_id": "F-18",
-              "product_code": "LOAN",
-              "balance_amount": 1220864824,
+              "balance_amount": 80000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 286675900,
-            "operating_expense_amt": 286675900
+            "metric_value": 7800087,
+            "operating_expense_amt": 7800087
           }
         },
         {
-          "facility_id": "F-36",
-          "facility_name": "Vertex — EUR L/C 2024-E",
-          "counterparty_id": "CP-16",
-          "counterparty_name": "Vertex Telecom Networks SA",
-          "lob_segment_id": "SEG-36",
-          "desk_name": "CBD Office Desk",
-          "portfolio_name": "Office",
+          "facility_id": "F-9",
+          "facility_name": "Ironclad Infrastructure — Global Revolver",
+          "counterparty_id": "CP-9",
+          "counterparty_name": "Ironclad Infrastructure Partners LP",
+          "lob_segment_id": "SEG-9",
+          "desk_name": "Upper Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 152164702,
-          "collateral_value": 154396448,
-          "ltv_pct": 98.55,
+          "committed_amt": 600000000,
+          "collateral_value": 558066666,
+          "ltv_pct": 107.51,
           "positions": [
             {
-              "position_id": "P-36",
-              "facility_id": "F-36",
+              "position_id": "P-9",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 73039057,
+              "balance_amount": 600000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-441",
-              "facility_id": "F-36",
+              "position_id": "P-19",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 76082351,
+              "balance_amount": 580000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-846",
-              "facility_id": "F-36",
+              "position_id": "P-29",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 74560704,
+              "balance_amount": 620000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1251",
-              "facility_id": "F-36",
+              "position_id": "P-39",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 71517410,
+              "balance_amount": 560000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1656",
-              "facility_id": "F-36",
+              "position_id": "P-49",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 73039057,
+              "balance_amount": 590000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 18426384,
-            "operating_expense_amt": 18426384
+            "metric_value": 31712313,
+            "operating_expense_amt": 31712313
           }
         },
         {
-          "facility_id": "F-63",
-          "facility_name": "Titan — GBP L/C 2025-E",
-          "counterparty_id": "CP-22",
-          "counterparty_name": "Titan Cybersecurity Group Ltd.",
-          "lob_segment_id": "SEG-63",
-          "desk_name": "Lease Up Retail Desk",
-          "portfolio_name": "Retail",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 58779873,
-          "collateral_value": 58858249,
-          "ltv_pct": 99.87,
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
           "positions": [
             {
-              "position_id": "P-63",
-              "facility_id": "F-63",
+              "position_id": "P-10",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 28214339,
+              "balance_amount": 2100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-468",
-              "facility_id": "F-63",
+              "position_id": "P-20",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 29389937,
+              "balance_amount": 2050000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-873",
-              "facility_id": "F-63",
+              "position_id": "P-30",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 28802138,
+              "balance_amount": 2150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1278",
-              "facility_id": "F-63",
+              "position_id": "P-40",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 27626540,
+              "balance_amount": 2000000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1683",
-              "facility_id": "F-63",
+              "position_id": "P-50",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 28214339,
+              "balance_amount": 2080000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 2201333,
-            "operating_expense_amt": 2201333
-          }
-        },
-        {
-          "facility_id": "F-154",
-          "facility_name": "Northern Trust Re — GBP Revolver 2028-A",
-          "counterparty_id": "CP-48",
-          "counterparty_name": "Northern Trust Reinsurance Ltd.",
-          "lob_segment_id": "SEG-154",
-          "desk_name": "FX Options Desk",
-          "portfolio_name": "Foreign Exchange",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 101665355,
-          "collateral_value": 104511984,
-          "ltv_pct": 97.28,
-          "positions": [
-            {
-              "position_id": "P-154",
-              "facility_id": "F-154",
-              "product_code": "LOAN",
-              "balance_amount": 48799370,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-559",
-              "facility_id": "F-154",
-              "product_code": "LOAN",
-              "balance_amount": 50832678,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-964",
-              "facility_id": "F-154",
-              "product_code": "LOAN",
-              "balance_amount": 49816024,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1369",
-              "facility_id": "F-154",
-              "product_code": "LOAN",
-              "balance_amount": 47782717,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1774",
-              "facility_id": "F-154",
-              "product_code": "LOAN",
-              "balance_amount": 48799370,
-              "description": "Position exposure"
-            }
-          ],
-          "extra_fields": {
-            "metric_value": 5927291,
-            "operating_expense_amt": 5927291
+            "metric_value": 213844800,
+            "operating_expense_amt": 213844800
           }
         }
       ]
@@ -58258,7 +58593,7 @@
     "item_name": "Maturity Date",
     "abbreviation": "MD",
     "kind": "METRIC",
-    "definition": "Contractual date on which the facility or loan is scheduled to mature. Used to assess duration exposure, refinancing risk, and liquidity planning.\n",
+    "definition": "Contractual date on which the facility or loan is scheduled to mature. Used to assess duration exposure, refinancing risk, and liquidity planning. At aggregate levels, returns the nearest (MIN) maturity date as a risk indicator.\n",
     "generic_formula": "Direct lookup of maturity_date from facility_master.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "ORDINAL",
@@ -58270,10 +58605,10 @@
     "regulatory_references": [
       "Basel III"
     ],
-    "insight": "Portfolio refinancing and liquidity risk\n",
+    "insight": "Portfolio refinancing and liquidity risk — nearest maturity at aggregate levels\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "REF-022",
     "normalized_de_name": "Maturity Date",
     "data_element_in_dm": "maturity_date",
@@ -58314,6 +58649,18 @@
             "description": "maturity_date"
           },
           {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -58332,8 +58679,8 @@
         "level": "counterparty",
         "dashboard_display_name": "Maturity Date (counterparty)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = MIN(fm.maturity_date)",
         "source_references": [
           {
             "layer": "L2",
@@ -58354,6 +58701,18 @@
             "description": "maturity_date"
           },
           {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -58366,14 +58725,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fm.maturity_date AS metric_value\n  FROM l2.facility_master fm\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id\n"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  MIN(fm.maturity_date) AS metric_value\nFROM l2.facility_master fm\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY fm.counterparty_id\n"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Maturity Date (desk)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = MIN(fm.maturity_date)",
         "source_references": [
           {
             "layer": "L2",
@@ -58394,6 +58753,18 @@
             "description": "maturity_date"
           },
           {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -58406,14 +58777,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fm.maturity_date AS metric_value\n  FROM l2.facility_master fm\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  MIN(fm.maturity_date) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Maturity Date (portfolio)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = MIN(fm.maturity_date)",
         "source_references": [
           {
             "layer": "L2",
@@ -58434,6 +58805,18 @@
             "description": "maturity_date"
           },
           {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -58446,14 +58829,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fm.maturity_date AS metric_value\n  FROM l2.facility_master fm\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  MIN(fm.maturity_date) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Maturity Date (lob)",
         "in_record": true,
-        "sourcing_type": "Agg",
-        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fac.metric_value)",
+        "sourcing_type": "Calc",
+        "level_logic": "1. LOAD  l2.facility_master  (fm)\n   WHERE fm.is_active_flag = 'Y'\n2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = MIN(fm.maturity_date)",
         "source_references": [
           {
             "layer": "L2",
@@ -58474,6 +58857,18 @@
             "description": "maturity_date"
           },
           {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "lob_segment_id",
+            "description": "lob_segment_id"
+          },
+          {
             "layer": "L1",
             "table": "enterprise_business_taxonomy",
             "field": "managed_segment_id",
@@ -58486,7 +58881,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    fm.facility_id AS dimension_key,\n    fm.maturity_date AS metric_value\n  FROM l2.facility_master fm\n  WHERE fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  MIN(fm.maturity_date) AS metric_value\nFROM l2.facility_master fm\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE fm.is_active_flag = 'Y'\n  AND fm.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -58512,28 +58907,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-406",
+              "position_id": "P-11",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 130000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-811",
+              "position_id": "P-21",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 125000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1216",
+              "position_id": "P-31",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 110000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1621",
+              "position_id": "P-41",
               "facility_id": "F-1",
               "product_code": "LOAN",
               "balance_amount": 115000000,
@@ -58566,28 +58961,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-407",
+              "position_id": "P-12",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 440000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-812",
+              "position_id": "P-22",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 460000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1217",
+              "position_id": "P-32",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 430000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1622",
+              "position_id": "P-42",
               "facility_id": "F-2",
               "product_code": "LOAN",
               "balance_amount": 445000000,
@@ -58620,28 +59015,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-408",
+              "position_id": "P-13",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 820000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-813",
+              "position_id": "P-23",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 780000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1218",
+              "position_id": "P-33",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 750000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1623",
+              "position_id": "P-43",
               "facility_id": "F-3",
               "product_code": "LOAN",
               "balance_amount": 790000000,
@@ -58674,28 +59069,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-409",
+              "position_id": "P-14",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-814",
+              "position_id": "P-24",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1219",
+              "position_id": "P-34",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1624",
+              "position_id": "P-44",
               "facility_id": "F-4",
               "product_code": "LOAN",
               "balance_amount": 0,
@@ -58728,28 +59123,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-410",
+              "position_id": "P-15",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 320000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-815",
+              "position_id": "P-25",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 380000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1220",
+              "position_id": "P-35",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 400000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1625",
+              "position_id": "P-45",
               "facility_id": "F-5",
               "product_code": "LOAN",
               "balance_amount": 350000000,
@@ -69829,7 +70224,7 @@
     "insight": "Loss severity risk indicator — higher LTV means less collateral protection relative to the loan amount\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "RSK-009",
     "normalized_de_name": "Loan-to-Value Ratio (%)",
     "data_element_in_dm": "ltv_pct",
@@ -70176,6 +70571,61 @@
     "demo_data": {
       "facilities": [
         {
+          "facility_id": "F-3",
+          "facility_name": "Pacific Ridge — Multi-Currency RCF",
+          "counterparty_id": "CP-3",
+          "counterparty_name": "Pacific Ridge Energy LLC",
+          "lob_segment_id": "SEG-3",
+          "desk_name": "Global Corporate Coverage Desk",
+          "portfolio_name": "Large Corporate Banking",
+          "lob_name": "Corporate Banking",
+          "committed_amt": 1000000000,
+          "collateral_value": 425566666,
+          "ltv_pct": 234.98,
+          "positions": [
+            {
+              "position_id": "P-3",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 800000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-13",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 820000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-23",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 780000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-33",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 750000000,
+              "description": "Position exposure"
+            },
+            {
+              "position_id": "P-43",
+              "facility_id": "F-3",
+              "product_code": "LOAN",
+              "balance_amount": 790000000,
+              "description": "Position exposure"
+            }
+          ],
+          "extra_fields": {
+            "metric_value": 234.9808,
+            "committed_facility_amt": 1000000000,
+            "current_valuation_usd": 84433333
+          }
+        },
+        {
           "facility_id": "F-6",
           "facility_name": "Greenfield Consumer — Syndicated RCF",
           "counterparty_id": "CP-6",
@@ -70196,28 +70646,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-411",
+              "position_id": "P-16",
               "facility_id": "F-6",
               "product_code": "LOAN",
               "balance_amount": 1180000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-816",
+              "position_id": "P-26",
               "facility_id": "F-6",
               "product_code": "LOAN",
               "balance_amount": 1220000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1221",
+              "position_id": "P-36",
               "facility_id": "F-6",
               "product_code": "LOAN",
               "balance_amount": 1150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1626",
+              "position_id": "P-46",
               "facility_id": "F-6",
               "product_code": "LOAN",
               "balance_amount": 1190000000,
@@ -70251,28 +70701,28 @@
               "description": "Position exposure"
             },
             {
-              "position_id": "P-412",
+              "position_id": "P-17",
               "facility_id": "F-7",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-817",
+              "position_id": "P-27",
               "facility_id": "F-7",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1222",
+              "position_id": "P-37",
               "facility_id": "F-7",
               "product_code": "LOAN",
               "balance_amount": 0,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1627",
+              "position_id": "P-47",
               "facility_id": "F-7",
               "product_code": "LOAN",
               "balance_amount": 0,
@@ -70286,168 +70736,113 @@
           }
         },
         {
-          "facility_id": "F-291",
-          "facility_name": "Harbor Point — USD Revolver 2027-A",
-          "counterparty_id": "CP-79",
-          "counterparty_name": "Harbor Point Mixed-Use LP",
-          "lob_segment_id": "SEG-42",
+          "facility_id": "F-8",
+          "facility_name": "Westlake Materials — L/C Facility",
+          "counterparty_id": "CP-8",
+          "counterparty_name": "Westlake Materials Group Ltd.",
+          "lob_segment_id": "SEG-8",
           "desk_name": "Unknown",
-          "portfolio_name": "Affordable Housing Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 13265778,
-          "collateral_value": 13371906,
-          "ltv_pct": 99.21,
+          "committed_amt": 400000000,
+          "collateral_value": 485133334,
+          "ltv_pct": 82.45,
           "positions": [
             {
-              "position_id": "P-291",
-              "facility_id": "F-291",
+              "position_id": "P-8",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 9949334,
+              "balance_amount": 90000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-696",
-              "facility_id": "F-291",
+              "position_id": "P-18",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 9286045,
+              "balance_amount": 95000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1101",
-              "facility_id": "F-291",
+              "position_id": "P-28",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 7959467,
+              "balance_amount": 100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1506",
-              "facility_id": "F-291",
+              "position_id": "P-38",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 6632889,
+              "balance_amount": 85000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1911",
-              "facility_id": "F-291",
+              "position_id": "P-48",
+              "facility_id": "F-8",
               "product_code": "LOAN",
-              "balance_amount": 5969600,
+              "balance_amount": 80000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 99.2063,
-            "committed_facility_amt": 13265778,
-            "current_valuation_usd": 2653156
+            "metric_value": 82.4516,
+            "committed_facility_amt": 400000000,
+            "current_valuation_usd": 96266667
           }
         },
         {
-          "facility_id": "F-353",
-          "facility_name": "Catalyst Chem — USD Revolver 2030-F",
-          "counterparty_id": "CP-90",
-          "counterparty_name": "Catalyst Chemical Holdings Inc.",
-          "lob_segment_id": "SEG-104",
-          "desk_name": "Medical Office Buildings Desk",
-          "portfolio_name": "Healthcare Real Estate",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 73907486,
-          "collateral_value": 74006028,
-          "ltv_pct": 99.87,
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
           "positions": [
             {
-              "position_id": "P-353",
-              "facility_id": "F-353",
+              "position_id": "P-10",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 35475593,
+              "balance_amount": 2100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-758",
-              "facility_id": "F-353",
+              "position_id": "P-20",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 36953743,
+              "balance_amount": 2050000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1163",
-              "facility_id": "F-353",
+              "position_id": "P-30",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 36214668,
+              "balance_amount": 2150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1568",
-              "facility_id": "F-353",
+              "position_id": "P-40",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 34736518,
+              "balance_amount": 2000000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-1973",
-              "facility_id": "F-353",
+              "position_id": "P-50",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 35475593,
+              "balance_amount": 2080000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "metric_value": 99.8668,
-            "committed_facility_amt": 73907486,
-            "current_valuation_usd": 14682954
-          }
-        },
-        {
-          "facility_id": "F-382",
-          "facility_name": "Great Lakes PL — USD TL-B 2026-C",
-          "counterparty_id": "CP-96",
-          "counterparty_name": "Great Lakes Power & Light Corp.",
-          "lob_segment_id": "SEG-133",
-          "desk_name": "Unknown",
-          "portfolio_name": "Sponsor Coverage",
-          "lob_name": "Corporate Banking",
-          "committed_amt": 197969037,
-          "collateral_value": 202192374,
-          "ltv_pct": 97.91,
-          "positions": [
-            {
-              "position_id": "P-382",
-              "facility_id": "F-382",
-              "product_code": "LOAN",
-              "balance_amount": 95025138,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-787",
-              "facility_id": "F-382",
-              "product_code": "LOAN",
-              "balance_amount": 98984519,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1192",
-              "facility_id": "F-382",
-              "product_code": "LOAN",
-              "balance_amount": 97004828,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-1597",
-              "facility_id": "F-382",
-              "product_code": "LOAN",
-              "balance_amount": 93045447,
-              "description": "Position exposure"
-            },
-            {
-              "position_id": "P-2002",
-              "facility_id": "F-382",
-              "product_code": "LOAN",
-              "balance_amount": 95025138,
-              "description": "Position exposure"
-            }
-          ],
-          "extra_fields": {
-            "metric_value": 97.9112,
-            "committed_facility_amt": 197969037,
-            "current_valuation_usd": 40121724
+            "metric_value": 312.0839,
+            "committed_facility_amt": 5000000000,
+            "current_valuation_usd": 317866667
           }
         }
       ]

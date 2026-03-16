@@ -5,24 +5,25 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-029"
 name: "Operating Cost ($)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "exposure"
-sub_domain: "risk-metrics"
-metric_class: CALCULATED
+sub_domain: "profitability"
+metric_class: SOURCED
 direction: LOWER_BETTER
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Allocated operating or servicing cost associated with exposure.
+  Allocated operating or servicing cost associated with each facility. Direct-sum
+  rollup at all aggregate levels with FX conversion to USD.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Operational cost monitoring for efficiency assessment"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -36,6 +37,8 @@ source_tables:
         role: FILTER
       - name: operating_expense_amt
         role: MEASURE
+      - name: currency_code
+        role: DIMENSION
   - schema: l2
     table: facility_master
     alias: fm
@@ -50,6 +53,14 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = ffs.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = ffs.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -74,86 +85,88 @@ levels:
       FROM l2.facility_financial_snapshot ffs
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
-    aggregation_type: RAW
+    aggregation_type: SUM
     formula_text: >
-      Read operating_expense_amt per counterparty.
+      SUM of facility-level operating_expense_amt per counterparty, FX-converted to USD.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        ffs.operating_expense_amt AS metric_value
+        SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       WHERE ffs.as_of_date = :as_of_date
+      GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level operating_expense_amt per L3 desk segment.
+      SUM of facility-level operating_expense_amt per L3 desk segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.operating_expense_amt AS metric_value
-        FROM l2.facility_financial_snapshot ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: WEIGHTED_AVG
+    aggregation_type: SUM
     formula_text: >
-      AVG of facility-level operating_expense_amt per L2 portfolio segment.
+      SUM of facility-level operating_expense_amt per L2 portfolio segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.operating_expense_amt AS metric_value
-        FROM l2.facility_financial_snapshot ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: WEIGHTED_AVG
+    aggregation_type: SUM
     formula_text: >
-      AVG of facility-level operating_expense_amt per L1 business segment segment.
+      SUM of facility-level operating_expense_amt per L1 business segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ffs.facility_id AS dimension_key,
-          ffs.operating_expense_amt AS metric_value
-        FROM l2.facility_financial_snapshot ffs
-        WHERE ffs.as_of_date = :as_of_date
-      ) fac
+        SUM(ffs.operating_expense_amt * COALESCE(fx.rate, 1)) AS metric_value
+      FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = ffs.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = ffs.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE ffs.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -168,17 +181,21 @@ validations:
     severity: ERROR
   - rule_id: "EXP-029-V02"
     type: NON_NEGATIVE
-    description: "operating_expense_amt must be >= 0"
+    description: "Operating cost must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-029-V03"
+    type: RECONCILIATION
+    description: "SUM of facility operating costs should equal counterparty total"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-062"
   abbreviation: "OC"
   insight: >
-    Expense monitoring
+    Expense monitoring — allocated operating and servicing costs per facility
   rollup_strategy: "direct-sum"
   primary_value_field: "operating_expense_amt"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "profitability", "cost"]
 dashboard_pages: []
 legacy_metric_ids: []

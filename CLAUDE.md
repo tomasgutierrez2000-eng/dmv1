@@ -282,13 +282,20 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | L1 seed index cycling | `idx = rowIndex % 10` for 32-row `rating_scale_dim` | Use `rowIndex` directly (not `idx`) when `CUSTOM_TABLE_SIZES` exceeds the default cycle length |
 | Boolean leak in VARCHAR | `internal_risk_rating = 'true'` (JS boolean serialized) | Ensure seed generators return string values, not booleans, for VARCHAR columns |
 | FK-safe dim expansion | `DELETE FROM rating_scale_dim` fails on FK constraint | Use `UPDATE` existing rows + `INSERT` new rows to preserve FK references from child tables |
-| SUM of strings | `SUM(legal_name)` at counterparty | Use `COUNT(DISTINCT id)` for text/ID fields at aggregate levels |
+| SUM of strings | `SUM(legal_name)` at counterparty | For text/ID fields: use `COUNT(DISTINCT id)`. For hierarchy/LoB string metrics: use `MIN()` for deterministic string selection |
 | SUM of IDs | `SUM(legal_entity_id)` at counterparty | Summing IDs is meaningless — use `COUNT(DISTINCT)` |
 | Wrong ingredient_fields | `ingredient_fields` lists `position.lgd_estimate` | Must match actual formula sources — verify after `calc:sync` (sync preserves manual edits but YAML-generated fields may be stale from DRAFT) |
 | Wrong CACP role code | `SYNDICATE_MEMBER` in CACP insert | Check `l1.counterparty_role_dim` for valid FK codes before INSERT — use `PARTICIPANT` |
 | Placeholder seed values | `limit_status_code_1`, `limit_status_code_2` junk | L2 seed generator fallback creates `'column_name_N'` — add explicit handler in `getL2SeedValue()` |
 | No dimension diversity | All FES rows have `legal_entity_id = 1` | Distribute across available entities: `SET legal_entity_id = CASE WHEN facility_id % 10 IN (0,1,2) THEN 1 ...` |
 | No syndication data | 0 syndicated facilities — all CACP entries single-participant | Add `PARTICIPANT` rows for multi-bank agreements: `INSERT INTO cacp ... 'PARTICIPANT'` |
+| Non-existent JOIN field | `ebt.facility_id` in EBT join (field doesn't exist) | Always verify JOIN fields exist in the target table via DD. EBT correct join: `ebt.managed_segment_id = fm.lob_segment_id` |
+| Missing EBT is_current_flag | `LEFT JOIN ebt ON ebt.managed_segment_id = fm.lob_segment_id` | ALL EBT joins MUST include `AND ebt.is_current_flag = 'Y'` — without it, historical/inactive nodes pollute results |
+| NULL weight propagation | `SUM(lgd_pct * outstanding_balance_amt)` returns NULL if outstanding is NULL | Use `COALESCE(weight_field, 0)` on weighting fields: `SUM(lgd_pct * COALESCE(outstanding_balance_amt, 0))` — NULL in ANY term nullifies the entire row's contribution |
+| YAML THRESHOLD nesting | `min_value: 0` / `max_value: 1` at validation top level | THRESHOLD `min_value`/`max_value` must be under `params:` key: `params: { min_value: 0, max_value: 1 }` — calc:sync schema validation rejects top-level placement |
+| DRAFT metric blind trust | Upgrading DRAFT metric without reviewing SQL | DRAFT metrics often have placeholder SQL with non-existent fields/joins. When upgrading to ACTIVE, rewrite and verify ALL `formula_sql` — don't assume DRAFT SQL is correct |
+| Wrong rollup for strings | `rollup_strategy: "direct-sum"` on LoB string metric | String/hierarchy SOURCED metrics use `rollup_strategy: "none"` — `direct-sum` implies SUM() which is invalid for VARCHAR |
+| xlsx merge conflict | Binary `metrics_dimensions_filled.xlsx` always conflicts on merge | Resolve by taking the branch version (`git checkout branch -- file`), then run `calc:sync` on main to regenerate from merged YAMLs |
 
 ### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
 

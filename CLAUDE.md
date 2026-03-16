@@ -65,20 +65,193 @@ Pipeline: `runMetricCalculation()` → `resolveFormulaForDimension()` → escape
 - Or pre-defined `nodes[]` + `edges[]` for complex DAGs
 - Narrative parser in `lib/deep-dive/lineage-parser.ts` extracts steps from pipe-delimited level logic
 
-## Adding a New Metric (Automated Pipeline)
-**One command:** Write YAML → `npm run calc:full` → catalogue + demo + viz config all auto-generated.
+## Adding a New Metric (Parallel Worktree Workflow)
 
-1. **Write YAML** in `scripts/calc_engine/metrics/{domain}/{METRIC_ID}.yaml` with `catalogue` block:
-   ```yaml
-   catalogue:
-     item_id: "MET-XXX"           # Catalogue ID (default: metric_id)
-     abbreviation: "SHORT_NAME"   # For UI display
-     insight: "Business insight..."
-     rollup_strategy: "direct-sum" # or "sum-ratio", "weighted-avg"
-     primary_value_field: "result_field_name"
-   ```
-2. **(Optional) Write Python calculator** in `scripts/calc_engine/calculators/` for auto-generated demo data. Register in `__init__.py`.
-3. **Run `npm run calc:full`** — syncs YAML → Excel + catalogue (creates if new), generates ingredient_fields from YAML source_tables, builds viz config, runs Python demo generator.
+Multiple sessions can implement metrics in parallel, each in its own git worktree/branch. Follow this 6-phase workflow EXACTLY.
+
+### Parallel Safety Rules
+- **Conflict-safe files** (unique per metric, no merge issues): YAML files in `scripts/calc_engine/metrics/{domain}/`
+- **Conflict-prone files** (shared, additive conflicts easy to resolve at merge): `data/metric-library/catalogue.json`, `data/metric-library/visualization-configs.json`
+- **Do NOT modify** `data/l3-metrics.ts` or `data/metric-library/domains.json` unless absolutely necessary — flag for user
+- After ALL parallel sessions merge to main, run `npm run calc:sync` once from main to reconcile catalogue.json from all YAMLs
+- Do not run `calc:full` — use `calc:sync` + individual `calc:demo` per metric to avoid regenerating all 100+ existing metrics
+
+### Phase 1: Thorough Spec Review (CRITICAL — before writing any code)
+For EACH metric spec, perform these checks:
+
+**1A. Identification & Duplicate Check**
+- Search existing YAMLs: `scripts/calc_engine/metrics/**/*.yaml` for metric_id collisions
+- Search `data/metric-library/catalogue.json` for existing metrics covering the same business concept (by name, abbreviation, keywords)
+- Check for inactive/draft metrics that could be updated instead of creating new
+- Verify ID follows convention: `{DOMAIN}-{NNN}` (e.g., EXP-001, CAP-005, PRC-003)
+- Verify domain/sub_domain, metric_class (SOURCED/CALCULATED/HYBRID), direction (HIGHER_BETTER/LOWER_BETTER/NEUTRAL), unit_type (CURRENCY/PERCENTAGE/RATIO/COUNT/DAYS/ORDINAL)
+
+**1B. Source Table & Field Validation**
+- For EVERY table in `source_tables`: verify it exists in `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
+- For EVERY field referenced: verify **exact field name** exists in that table in the DD — subtle mismatches (e.g., `pricing_exception_flag` vs `is_pricing_exception_flag`) cause silent failures
+- Verify schema assignments: `l1` = reference/dim, `l2` = atomic/snapshot, `l3` = derived/calc
+- **Layer convention:** Source fields should come from L1+L2 (atomic inputs). If spec sources from L3 tables, flag it — the metric should compute from atomic ingredients, not pre-derived values (e.g., EXP-016 was wrong: sourced `l3.facility_stress_test_calc.stressed_expected_loss` instead of computing base EL from `l2.facility_risk_snapshot` PD × LGD × committed)
+
+**1C. Formula & SQL Validation**
+Every `formula_sql` MUST:
+- Return exactly two columns: `dimension_key` and `metric_value`
+- Use `NULLIF(x, 0)` before division to prevent division-by-zero
+- Use `COALESCE()` for nullable fields (e.g., `COALESCE(fes.bank_share_pct, 100.0)`, `COALESCE(fx.rate, 1)`)
+- Use only SELECT statements (no INSERT/UPDATE/DELETE/DROP), no semicolons
+- Have all JOINs BEFORE the WHERE clause (SQL syntax error caught in PRC-003: WHERE appeared before LEFT JOIN)
+- Use `= 'Y'` for boolean flag comparisons (NOT `= TRUE` or `= true`) — this is the ONLY syntax that works in both PostgreSQL (BOOLEAN) and sql.js (TEXT with 'Y'/'N' storage)
+- NOT use `::FLOAT` or other PostgreSQL-specific casts — sql.js (SQLite) doesn't support them. Use `* 1.0` or `* 100.0` for float math
+
+**1D. Rollup Strategy Validation**
+- **direct-sum**: For additive measures (amounts, counts). `SUM(value)` at every level. FX conversion: `SUM(value * COALESCE(fx.rate, 1))`
+- **sum-ratio**: For ratios/percentages. `SUM(numerator) / NULLIF(SUM(denominator), 0)` at every level. NEVER average pre-computed rates — this causes mathematical inconsistency (Simpson's paradox)
+- **count-ratio**: For percentage-of-count metrics. `SUM(CASE flag) / COUNT(*)` at every level. Re-count at each level, never average
+- **weighted-avg**: For averages weighted by exposure. `SUM(value * weight) / NULLIF(SUM(weight), 0)`
+- Verify the declared `rollup_strategy` in the catalogue block matches the actual SQL at each level (caught in EXP-015: declared `weighted-avg` but SQL used broken `SUM/AVG` of percentages)
+- For date fields: use `MIN` or `MAX` aggregation, NEVER `SUM` (caught in REF-009: SUM of dates is mathematically invalid)
+
+**1E. EBT Hierarchy Pattern (desk/portfolio/segment levels)**
+```sql
+-- Desk (L3): direct join
+LEFT JOIN l1.enterprise_business_taxonomy ebt
+  ON ebt.managed_segment_id = fm.lob_segment_id
+
+-- Portfolio (L2): one hop up
+LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+  ON ebt_l3.managed_segment_id = fm.lob_segment_id
+LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+
+-- Business Segment (L1): two hops up
+LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+  ON ebt_l3.managed_segment_id = fm.lob_segment_id
+LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+```
+
+**1F. FX Conversion Pattern (aggregate levels only)**
+```sql
+LEFT JOIN l2.fx_rate fx
+  ON fx.from_currency_code = fes.currency_code
+  AND fx.to_currency_code = 'USD'
+  AND fx.as_of_date = fes.as_of_date
+-- Usage: multiply by COALESCE(fx.rate, 1)
+```
+FX conversion is applied at counterparty and above (not at facility level — facility values stay in local currency).
+
+**1G. Validation Rules Check**
+- Minimum: `NOT_NULL` + either `NON_NEGATIVE` or `THRESHOLD`
+- Ratio metrics: `THRESHOLD` with min/max (e.g., 0–100% for percentages)
+- Additive metrics: `RECONCILIATION` rule (facility sum should equal counterparty sum)
+- Time-series metrics: `PERIOD_OVER_PERIOD` with `max_change_pct`
+
+### Phase 2: Present Review Findings
+Present structured summary per metric:
+```
+### Metric: [METRIC-ID] — [Name]
+- Status: PASS / PASS WITH NOTES / NEEDS CHANGES
+- Existing match: None / [item_id] — recommend update
+- Source tables: All verified / [issues]
+- Formula issues: None / [list]
+- Rollup strategy: Correct / Should be [X] instead of [Y]
+- Missing validations: [list]
+- Business logic: Sound / [concerns]
+```
+**Wait for user confirmation before Phase 3.** Do not write any files until approved.
+
+### Phase 3: YAML Authoring
+1. Create YAML at `scripts/calc_engine/metrics/{domain}/{METRIC_ID}.yaml`
+2. Include ALL sections: identification, classification, regulatory_references, source_tables, levels (all 5), dependencies, output, validation_rules, catalogue, metadata
+3. Set `status: ACTIVE` unless user specifies otherwise
+4. Use EBT hierarchy pattern for desk/portfolio/segment levels
+5. Use FX conversion pattern at aggregate levels for CURRENCY metrics
+
+### Phase 4: Sync & Test (from worktree directory!)
+**CRITICAL: Run all commands from the worktree directory**, not the main repo. Running from main reads stale YAML and produces misleading errors.
+
+```bash
+# 1. Sync YAML → catalogue + Excel
+npm run calc:sync
+
+# 2. Generate demo data for each new metric (use MET-XXX catalogue IDs, NOT YAML IDs)
+npm run calc:demo -- --metric MET-XXX --persist --force
+
+# 3. Run calculation engine tests (must be 0 failures)
+npm run test:calc-engine
+```
+
+**Common calc:demo failures and fixes:**
+- `"no such column: xxx"` for fields that exist in DD → sql.js sample data is stale → run `npm run generate:l2`
+- `"no such table: xxx"` referencing old L3 tables → running from main repo instead of worktree, or stale executable_metric_id
+- Wrong metric ID format → use `MET-029` (catalogue ID), not `REF-009` (YAML ID)
+
+### Phase 5: Database & Risk Verification (MANDATORY)
+
+**5A. PostgreSQL Formula Testing**
+Execute each level's `formula_sql` directly against PostgreSQL:
+```bash
+source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" -c "SQL_HERE"
+```
+- Test at minimum: facility level + one aggregate level (counterparty or business_segment with full EBT hierarchy)
+- Verify SQL executes without errors, returns rows, produces non-null values
+- Note: PostgreSQL uses `BOOLEAN` for `_flag` columns; `= 'Y'` works (PG accepts 'Y' as boolean literal)
+
+**5B. Rollup Reconciliation**
+For direct-sum metrics: verify `SUM(facility values) = counterparty value` for same-currency counterparties:
+```sql
+-- Step 1: Get facility-level values
+WITH facility_vals AS (
+  SELECT fm.counterparty_id, frs.facility_id, SUM(<formula>) AS fac_value
+  FROM ... GROUP BY fm.counterparty_id, frs.facility_id
+)
+SELECT counterparty_id, SUM(fac_value) AS sum_facility_vals FROM facility_vals GROUP BY counterparty_id;
+
+-- Step 2: Compare against counterparty-level formula output
+-- Values should match for same-currency counterparties
+-- FX-driven differences are EXPECTED for multi-currency counterparties
+```
+
+**5C. Seed Data Coverage**
+Verify test data actually exercises the metric:
+- Check if source tables have non-null values for the metric's input fields
+- Check if boolean flags have both TRUE and FALSE values (e.g., PRC-003 Exception Rate returned 0% because seed data had zero exceptions — formula was correct but untestable)
+- Document data limitations explicitly; do not confuse them with formula bugs
+
+**5D. GSIB Risk Sanity Checks**
+Validate output magnitudes against domain knowledge:
+
+| Metric Type | Healthy Range | Warning | Critical |
+|------------|--------------|---------|----------|
+| PD (%) | 0.03–2% (IG) | 2–10% (sub-IG) | >10% (distressed) |
+| LGD (%) | 30% (sr. secured) – 45% (unsecured) | 50–65% | >70% |
+| EL Rate (%) | 0.01–0.5% (IG) | 0.5–2% | >5% (stressed) |
+| EL $ | Proportional to PD×LGD×EAD | — | — |
+| DSCR | >1.25x | 1.0–1.25x | <1.0x |
+| LTV (%) | <65% (CRE) | 65–80% | >80% |
+| Exception Rate (%) | <5% | 5–15% | >15% (OCC 2020-36) |
+| Utilization (%) | 30–70% typical | >90% | >100% (over-draw) |
+| Maturity (days) | Industry-dependent | Concentration risk | Wall/cliff |
+
+### Phase 6: Commit
+```bash
+git add scripts/calc_engine/metrics/{domain}/*.yaml \
+       data/metric-library/catalogue.json \
+       data/metric-library/visualization-configs.json \
+       data/metrics_dimensions_filled.xlsx \
+       scripts/l2/output/*  # if L2 sample data was regenerated
+```
+Commit message format:
+```
+Add {N} {domain} metrics: {ID-1}, {ID-2}, ...
+
+- {ID-1}: {name} ({brief description})
+- {ID-2}: {name} ({brief description})
+
+Spec reviewed: source tables verified against DD, formulas validated
+against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
+```
 
 ### Individual commands
 - `npm run calc:sync` — YAML → Excel + catalogue (no demo data)
@@ -86,35 +259,20 @@ Pipeline: `runMetricCalculation()` → `resolveFormulaForDimension()` → escape
 - `npm run calc:demo:all` — generate demo for all metrics with calculators
 - `npm run calc:full` — calc:sync + calc:demo:all
 
-### Metric Verification Protocol (MANDATORY after writing/fixing YAML metrics)
-After writing or modifying YAML metrics, run this full verification chain before committing:
+### Common YAML Formula Bugs (Lessons Learned)
 
-1. **Worktree awareness:** When working in a git worktree, `calc:demo` and `calc:sync` must run from the **worktree directory** (not the main repo), otherwise the commands read stale YAML from main and produce misleading errors like "no such table" or "no such column" referencing old table names.
-
-2. **calc:sync + calc:demo:** Run `npm run calc:sync` then `npm run calc:demo -- --metric MET-XXX --persist --force` for each metric. Confirms sql.js (SQLite) execution succeeds. Use **MET-XXX catalogue IDs** (not YAML metric IDs like EXP-015).
-
-3. **Regenerate L2 sample data if needed:** If calc:demo fails with "no such column" for fields that exist in the data dictionary (e.g., `bank_share_pct`, `is_pricing_exception_flag`), the sql.js sample data is stale. Run `npm run generate:l2` to regenerate from current `l2-definitions.ts`.
-
-4. **PostgreSQL database testing:** Execute each level's `formula_sql` directly against PostgreSQL to verify:
-   - All SQL executes without errors (syntax, missing columns, type mismatches)
-   - Results return rows (not empty sets)
-   - Test at least facility AND one aggregate level (counterparty or business_segment)
-   - Connection: `source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" -c "SQL_HERE"`
-
-5. **Rollup reconciliation:** For direct-sum metrics (EL$), verify `SUM(facility values) = counterparty value` for same-currency counterparties. For multi-currency counterparties, expect FX-driven differences — this is correct behavior (facility EL is local currency, aggregate EL is USD-converted).
-
-6. **Boolean flag compatibility:** Use `= 'Y'` for boolean flag comparisons in YAML SQL — works in both PostgreSQL (accepts 'Y' as boolean literal) and sql.js (text comparison with 'Y'/'N' storage). Do NOT use `= TRUE` (fails in sql.js) or `= true` (PostgreSQL-only).
-
-7. **Seed data coverage:** Verify that test data actually exercises the metric. Example: PRC-003 (Exception Rate) returned 0% because no facilities had `is_pricing_exception_flag = TRUE` in seed data. The formula was correct but untestable with existing data. Document data limitations; do not confuse them with formula bugs.
-
-8. **GSIB risk sanity checks:** Validate output magnitudes against domain knowledge:
-   - PD: 0.03%–10% typical for GSIB IRB books (investment-grade to sub-investment-grade)
-   - LGD: 30%–70% (30% senior secured, 45% unsecured, 65%+ subordinated)
-   - EL Rate: 0.01%–0.5% for investment-grade; >5% signals stressed portfolio
-   - DSCR: >1.25x healthy; <1.0x insufficient debt coverage
-   - Exception Rate: 5–15% typical; >15% triggers regulatory scrutiny (OCC 2020-36)
-
-9. **test:calc-engine:** Run `npm run test:calc-engine` — must be 0 failures before committing.
+| Bug | Example | Fix |
+|-----|---------|-----|
+| SUM of dates | `SUM(origination_date)` at counterparty | Use `MIN()` or `MAX()` for date aggregation |
+| Average of ratios | `AVG(el_rate_pct)` at counterparty | Use sum-ratio: `SUM(PD×LGD×Committed)/SUM(Committed)` |
+| WHERE before JOIN | `WHERE ... LEFT JOIN ebt` | All JOINs must come before WHERE clause |
+| Wrong source layer | Source from `l3.stress_test_calc` | Compute from L2 atomic inputs (PD, LGD, committed) |
+| Wrong field name | `pricing_exception_flag` | Check exact name in DD: `is_pricing_exception_flag` |
+| PostgreSQL-only cast | `value::FLOAT` | Use `value * 1.0` — sql.js doesn't support `::` |
+| Wrong boolean compare | `= TRUE` or `= true` | Use `= 'Y'` — works in both PG and sql.js |
+| Missing COALESCE | `fes.bank_share_pct / 100` (NULL if missing) | `COALESCE(fes.bank_share_pct, 100.0) / 100.0` |
+| Missing NULLIF | `SUM(x) / SUM(y)` (div-by-zero) | `SUM(x) / NULLIF(SUM(y), 0)` |
+| FX at facility level | `* fx.rate` in facility formula | FX only at aggregate levels; facility stays local currency |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

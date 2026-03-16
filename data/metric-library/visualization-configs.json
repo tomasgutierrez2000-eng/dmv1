@@ -3548,10 +3548,34 @@
     ]
   },
   "MET-006": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
       "primary_value": "as_of_date"
-    }
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "as_of_date",
+          "label": "Snapshot reporting date",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "number",
+      "formula_display": "Read as_of_date from facility_exposure_snapshot for each facility.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "as_of_date",
+        "header": "As Of Date",
+        "format": "number",
+        "subtotal_fn": "none",
+        "is_result": true
+      }
+    ]
   },
   "MET-007": {
     "rollup_strategy": "weighted-avg",
@@ -3820,7 +3844,7 @@
     ]
   },
   "MET-041": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
       "primary_value": "facility_type"
     },
@@ -3832,6 +3856,30 @@
           "label": "facility_type",
           "sample_value": 0,
           "source_table": "facility_master",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weighting for dominant type selection",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate for USD conversion at aggregate levels",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
@@ -3846,6 +3894,24 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -4212,16 +4278,16 @@
     ]
   },
   "MET-068": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "drawn_amount"
+      "primary_value": "product_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "drawn_amount",
-          "label": "Outstanding drawn exposure",
+          "label": "Outstanding drawn exposure (weighting for dominant product)",
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
@@ -4244,16 +4310,15 @@
         }
       ],
       "denominator": [],
-      "result_format": "currency",
-      "formula_display": "SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency. Product classification available via enterprise_product_taxonomy join.\n"
+      "result_format": "number",
+      "formula_display": "Product name lookup from enterprise_product_taxonomy via facility_exposure_snapshot.product_node_id.\n"
     },
     "worked_example_columns": [
       {
         "field": "drawn_amount",
         "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
       },
       {
         "field": "bank_share_pct",
@@ -4266,20 +4331,27 @@
         "header": "Rate",
         "format": "number",
         "subtotal_fn": "none"
+      },
+      {
+        "field": "product_name",
+        "header": "Product Name",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
   "MET-069": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "drawn_amount"
+      "primary_value": "region_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "drawn_amount",
-          "label": "Outstanding drawn exposure",
+          "label": "Outstanding drawn exposure (weighting for dominant region)",
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
@@ -4302,16 +4374,15 @@
         }
       ],
       "denominator": [],
-      "result_format": "currency",
-      "formula_display": "SUM(drawn_amount × bank_share_pct / 100) per facility. Local currency. Region lookup: counterparty → country_dim → region_dim for context.\n"
+      "result_format": "number",
+      "formula_display": "Region name lookup via counterparty.country_code -> country_dim -> region_dim.region_name.\n"
     },
     "worked_example_columns": [
       {
         "field": "drawn_amount",
         "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
       },
       {
         "field": "bank_share_pct",
@@ -4324,6 +4395,13 @@
         "header": "Rate",
         "format": "number",
         "subtotal_fn": "none"
+      },
+      {
+        "field": "region_name",
+        "header": "Region Name",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -4402,7 +4480,7 @@
     ]
   },
   "MET-096": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "weighted-avg",
     "metric_fields": {
       "primary_value": "tangible_net_worth_usd"
     },
@@ -4411,15 +4489,39 @@
         {
           "op": "*",
           "field": "tangible_net_worth_usd",
-          "label": "tangible_net_worth_usd",
+          "label": "Tangible net worth in USD",
           "sample_value": 0,
           "source_table": "counterparty_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weighting for weighted-average TNW",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate for USD conversion",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
-      "result_format": "number",
-      "formula_display": "Read tangible_net_worth_usd from counterparty_financial_snapshot for each facility as-of reporting date.\n"
+      "result_format": "currency",
+      "formula_display": "Read tangible_net_worth_usd from counterparty_financial_snapshot for the counterparty behind each facility.\n"
     },
     "worked_example_columns": [
       {
@@ -4428,36 +4530,102 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
   "MET-103": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "custom",
     "metric_fields": {
-      "primary_value": "maturity_bucket_id"
+      "primary_value": "bucket_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "maturity_bucket_id",
-          "label": "maturity_bucket_id",
+          "field": "days_until_maturity",
+          "label": "Days remaining to facility maturity",
           "sample_value": 0,
-          "source_table": "maturity_bucket_dim",
-          "source_layer": "L1"
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "Exposure weighting for dominant bucket selection",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate for USD conversion at aggregate levels",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated maturity_bucket_id per facility.\n"
+      "formula_display": "Maturity bucket lookup from maturity_bucket_dim via range join on days_until_maturity. Returns bucket_name (e.g., \"0-90 days\", \"91-180 days\", \"1-2 years\").\n"
     },
     "worked_example_columns": [
       {
-        "field": "maturity_bucket_id",
-        "header": "Maturity Bucket Id",
+        "field": "days_until_maturity",
+        "header": "Days Until Maturity",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bucket_name",
+        "header": "Bucket Name",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },

@@ -1179,6 +1179,14 @@ export function getL2SeedValue(
       if (columnName === 'undrawn_commitment_amt') return undrawn;
       if (columnName === 'total_collateral_mv_usd') return val;
       if (columnName === 'internal_risk_rating_bucket_code') return String((idx % 10) + 1);
+      if (columnName === 'limit_status_code') {
+        const util = d > 0 && c > 0 ? (d / c) * 100 : 0;
+        if (util >= 100.01) return 'BREACH';
+        if (util >= 100) return 'FULLY_UTILIZED';
+        if (util >= 90) return 'WARNING';
+        if (util >= 75) return 'ELEVATED';
+        return 'NO_BREACH';
+      }
       break;
     }
 

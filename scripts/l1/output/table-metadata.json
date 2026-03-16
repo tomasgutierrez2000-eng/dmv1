@@ -5974,5 +5974,43 @@
       "fk": null,
       "nullable": true
     }
+  },
+  "L1.utilization_status_dim": {
+    "utilization_status_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "status_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilization_min_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilization_max_pct": {
+      "type": "DECIMAL(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "display_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    }
   }
 }

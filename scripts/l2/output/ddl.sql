@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   undrawn_commitment_amt NUMERIC(18,2),
   bank_share_pct NUMERIC(10,4),
   total_collateral_mv_usd NUMERIC(18,2),
+  limit_status_code VARCHAR(50),
   PRIMARY KEY (facility_id, as_of_date),
   CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_exposure_snapshot_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),

@@ -2244,6 +2244,23 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'regulatory_framework') return 'US Basel III (Final Rule)';
       break;
 
+    /* ──────────── utilization_status_dim (5 rows — threshold ranges) ──────────── */
+    case 'utilization_status_dim': {
+      const UTIL_CODES = ['NO_BREACH', 'ELEVATED', 'WARNING', 'FULLY_UTILIZED', 'BREACH'];
+      const UTIL_NAMES = ['No Breach', 'Elevated Utilization', 'Warning', 'Fully Utilized', 'Breach'];
+      const UTIL_MIN_PCTS = [0.0, 75.0, 90.0, 100.0, 100.01];
+      const UTIL_MAX_PCTS = [74.99, 89.99, 99.99, 100.0, 999.0];
+      const uIdx = rowIndex % UTIL_CODES.length;
+      if (columnName === 'utilization_status_code') return UTIL_CODES[uIdx];
+      if (columnName === 'status_name') return UTIL_NAMES[uIdx];
+      if (columnName === 'utilization_min_pct') return UTIL_MIN_PCTS[uIdx];
+      if (columnName === 'utilization_max_pct') return UTIL_MAX_PCTS[uIdx];
+      if (columnName === 'display_order') return uIdx + 1;
+      if (columnName === 'is_active_flag') return 'Y';
+      if (columnName === 'is_current_flag') return 'Y';
+      break;
+    }
+
     /* ──────────── fr2590_category_dim (31 rows — SCCL) ──────────── */
     case 'fr2590_category_dim': {
       const fIdx = rowIndex % FR2590_CATEGORY_CODES.length;
@@ -3585,7 +3602,7 @@ const DIMENSION_TABLES = new Set([
   'amendment_status_dim', 'amendment_type_dim', 'default_definition_dim', 'maturity_bucket_dim',
   'fr2590_category_dim', 'counterparty_role_dim', 'rating_scale_dim', 'crm_type_dim',
   'date_dim', 'date_time_dim', 'regulatory_capital_basis_dim', 'risk_mitigant_type_dim',
-  'reporting_calendar_dim', 'scenario_dim',
+  'reporting_calendar_dim', 'scenario_dim', 'utilization_status_dim',
 ]);
 
 /** Tables that should stay at 10 rows even when scaling (internal config/metadata). */
@@ -3608,6 +3625,7 @@ const CUSTOM_TABLE_SIZES: Record<string, number> = {
   'regulatory_capital_basis_dim': 28,
   'reporting_entity_dim': 22,
   'regulatory_mapping': 160,
+  'utilization_status_dim': 5,
 };
 
 export function getTableRowCount(tableName: string, requestedRows: number, profile?: string): number {

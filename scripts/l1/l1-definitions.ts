@@ -195,6 +195,21 @@ export const L1_TABLES: TableDef[] = [
     ],
   },
   {
+    tableName: 'utilization_status_dim',
+    scd: 'SCD-0',
+    columns: [
+      { name: 'utilization_status_code', type: 'VARCHAR(20)', nullable: false, pk: true },
+      { name: 'status_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'utilization_min_pct', type: 'NUMERIC(10,6)', nullable: true },
+      { name: 'utilization_max_pct', type: 'NUMERIC(10,6)', nullable: true },
+      { name: 'display_order', type: 'INTEGER', nullable: true },
+      { name: 'is_active_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
+      { name: 'is_current_flag', type: 'CHAR(1)', nullable: false, check: "value IN ('Y','N')", default: "'Y'" },
+      { name: 'created_ts', type: 'TIMESTAMP', nullable: false, default: 'CURRENT_TIMESTAMP' },
+      { name: 'updated_ts', type: 'TIMESTAMP', nullable: true },
+    ],
+  },
+  {
     tableName: 'fr2590_category_dim',
     scd: 'SCD-0',
     columns: [

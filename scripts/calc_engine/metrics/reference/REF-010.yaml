@@ -7,7 +7,7 @@ metric_id: "REF-010"
 name: "Facility ID"
 version: "1.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -24,7 +24,7 @@ description: >
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Facility-level identification for regulatory reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -35,6 +35,8 @@ source_tables:
       - name: facility_id
         role: JOIN_KEY
       - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
         role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
@@ -62,87 +64,62 @@ levels:
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read facility_id per counterparty.
+      Representative facility_id per counterparty (MIN).
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        fm.facility_id AS metric_value
+        MIN(fm.facility_id) AS metric_value
       FROM l2.facility_master fm
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fm.facility_id
-        AND fm.is_active_flag = 'Y'
-      WHERE fm.as_of_date = :as_of_date
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM of facility-level facility_id per L3 desk segment.
+      Representative facility_id per L3 desk segment (MIN).
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.facility_id AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(fm.facility_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM of facility-level facility_id per L2 portfolio segment.
+      Representative facility_id per L2 portfolio segment (MIN).
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.facility_id AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(fm.facility_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: RAW
     formula_text: >
-      SUM of facility-level facility_id per L1 business segment segment.
+      Representative facility_id per L1 business segment (MIN).
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fm.facility_id AS dimension_key,
-          fm.facility_id AS metric_value
-        FROM l2.facility_master fm
-        WHERE fm.is_active_flag = 'Y'
-          AND fm.is_current_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        MIN(fm.facility_id) AS metric_value
+      FROM l2.facility_master fm
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -154,6 +131,10 @@ validations:
   - rule_id: "REF-010-V01"
     type: NOT_NULL
     description: "No null facility_id values"
+    severity: ERROR
+  - rule_id: "REF-010-V02"
+    type: NON_NEGATIVE
+    description: "Facility ID must be a positive integer"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:

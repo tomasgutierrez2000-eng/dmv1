@@ -1,0 +1,144 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Active Flag
+# ═══════════════════════════════════════════════════════════════
+
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "REF-034"
+name: "Active Flag"
+version: "1.0.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
+supersedes: null
+
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "reference"
+sub_domain: "master-data"
+metric_class: SOURCED
+direction: HIGHER_BETTER
+unit_type: COUNT
+display_format: "s"
+description: >
+  Facility activity status indicator. At facility level, reads the
+  is_active_flag from facility_master and returns 1 (active) or 0
+  (inactive). At counterparty level, returns 1 if any of the
+  counterparty's facilities are active (boolean OR). Provides a baseline
+  portfolio activity measure for CRO reporting and data quality monitoring.
+
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 — facility status reporting for large institution supervision"
+  - framework: "Basel III"
+    description: "Active exposure identification for RWA and capital requirement calculations"
+
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: MEASURE
+
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: >
+      Read is_active_flag from facility_master. Returns 1 if the facility
+      is active (is_active_flag = 'Y'), 0 otherwise. No date filtering
+      required as is_active_flag reflects current status.
+    formula_sql: |-
+      SELECT
+        fm.facility_id AS dimension_key,
+        CASE
+          WHEN fm.is_active_flag = 'Y' THEN 1
+          ELSE 0
+        END AS metric_value
+      FROM l2.facility_master fm
+  counterparty:
+    aggregation_type: MAX
+    formula_text: >
+      For each counterparty, check if any of its facilities are active.
+      Uses MAX over the facility-level boolean flags — if any facility
+      is active (1), the counterparty is considered active (1). Returns
+      0 only if ALL facilities for the counterparty are inactive.
+    formula_sql: |-
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        MAX(
+          CASE
+            WHEN fm.is_active_flag = 'Y' THEN 1
+            ELSE 0
+          END
+        ) AS metric_value
+      FROM l2.facility_master fm
+      GROUP BY fm.counterparty_id
+  desk:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Not applicable — active flag is a facility/counterparty level
+      indicator. Desk-level portfolio activity analysis should use
+      count-based metrics or exposure-weighted activity rates.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+  portfolio:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Not applicable — active flag is a facility/counterparty level
+      indicator. Portfolio-level analysis should aggregate exposure
+      amounts filtered by active status.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+  business_segment:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Not applicable — active flag is a facility/counterparty level
+      indicator. Business segment analysis should aggregate exposure
+      amounts filtered by active status.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "REF-034-V01"
+    type: NOT_NULL
+    description: "Every facility must have a non-null active flag value"
+    severity: ERROR
+  - rule_id: "REF-034-V02"
+    type: THRESHOLD
+    description: "Active flag must be 0 or 1 (boolean)"
+    severity: ERROR
+    params:
+      min: 0
+      max: 1
+
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-113"
+  abbreviation: "ACTV"
+  insight: >
+    Facility activity status flag. 1 = active, 0 = inactive. At
+    counterparty level, 1 if any facility is active. Baseline measure for
+    portfolio activity monitoring and data quality assurance.
+  rollup_strategy: "categorical"
+  primary_value_field: "is_active_flag"
+
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["reference", "master-data", "facility-status", "data-quality"]
+dashboard_pages: []
+legacy_metric_ids: []

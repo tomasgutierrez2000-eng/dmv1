@@ -400,7 +400,7 @@ const RISK_FLAG_TYPES = ['CONCENTRATION', 'WATCH_LIST', 'COVENANT_BREACH', 'MATU
 const RISK_FLAG_TYPES_ALT = ['SECTOR', 'MATURITY_1Y', 'COUNTRY', 'COVENANT_BREACH', 'WATCH_LIST', 'CONCENTRATION', 'MATURITY_1Y', 'SECTOR', 'COUNTRY', 'CONCENTRATION'];
 
 const LOB_NAMES_BASE = ['IB_LEVERAGED', 'IB_IG', 'CRE_OFFICE', 'CRE_MULTI', 'ABL_RETAIL', 'IB_IG', 'MM_SPONSOR', 'ABL_HEALTHCARE', 'IB_LEVERAGED', 'IB_IG'];
-const FR2590_CATS_BASE = ['G1_B', 'G1_B', 'G1_B', 'G1_B', 'G1_B', 'G1_B', 'G1_B', 'G1_B', 'G1_B', 'G1_B'];
+const FR2590_CATS_BASE = ['1', '2', '3', '4', '5', '1', '2', '9', '10', '1'];
 const EXPOSURE_TYPES_BASE = ['FUNDED', 'FUNDED', 'UNFUNDED', 'FUNDED', 'FUNDED', 'FUNDED', 'UNFUNDED', 'FUNDED', 'FUNDED', 'FUNDED'];
 
 const PIPELINE_STAGES_ALL = ['PITCH', 'TERM_SHEET', 'DOCS', 'CLOSING', 'WON', 'PITCH', 'TERM_SHEET', 'DOCS', 'CLOSING', 'LOST'];
@@ -1207,6 +1207,29 @@ export function getL2SeedValue(
       if (columnName === 'pfe_usd') return pfeUsd(idx);
       if (columnName === 'netting_benefit_amt') return nettingBenefit(idx);
       break;
+
+    // ═══════════════════════════════════════════════════════════════════
+    // FACILITY_RISK_SNAPSHOT
+    // ═══════════════════════════════════════════════════════════════════
+    case 'facility_risk_snapshot': {
+      const pdVal = pd(idx);
+      const lgdVal = lgd(idx);
+      const eadVal = committed(idx);
+      const rwPct = pdVal * lgdVal * 12.5; // simplified Basel RW proxy
+      if (columnName === 'facility_id') return fid(idx);
+      if (columnName === 'as_of_date') return AS_OF;
+      if (columnName === 'counterparty_id') return cid(idx);
+      if (columnName === 'pd_pct') return pdVal;
+      if (columnName === 'lgd_pct') return lgdVal;
+      if (columnName === 'ccf') return 1.0;
+      if (columnName === 'ead_amt') return eadVal;
+      if (columnName === 'expected_loss_amt') return Math.round(eadVal * pdVal / 100 * lgdVal / 100);
+      if (columnName === 'rwa_amt') return Math.round(eadVal * rwPct / 100);
+      if (columnName === 'risk_weight_pct') return Math.round(rwPct * 100) / 100;
+      if (columnName === 'internal_risk_rating') return intRating(idx);
+      if (columnName === 'currency_code') return currency(idx);
+      break;
+    }
 
     // ═══════════════════════════════════════════════════════════════════
     // FACILITY_LOB_ATTRIBUTION

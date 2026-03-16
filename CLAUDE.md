@@ -34,7 +34,7 @@ lib/                    # Core business logic
   metric-library/       # Catalogue store & types
   deep-dive/            # Seed metrics, lineage parser, cross-tier resolver
 data/                   # Data definitions
-  l3-metrics.ts         # 106+ metric definitions (SOURCE OF TRUTH for L3 metrics)
+  l3-metrics.ts         # 109+ metric definitions (SOURCE OF TRUTH for L3 metrics)
   l3-tables.ts          # 84 L3 table definitions
   metric-library/       # catalogue.json, variants.json, parent-metrics.json, domains.json
 scripts/                # CLI data processing scripts
@@ -217,6 +217,10 @@ SELECT counterparty_id, SUM(fac_value) AS sum_facility_vals FROM facility_vals G
 Verify test data actually exercises the metric:
 - Check if source tables have non-null values for the metric's input fields
 - Check if boolean flags have both TRUE and FALSE values (e.g., PRC-003 Exception Rate returned 0% because seed data had zero exceptions — formula was correct but untestable)
+- Check categorical fields have **diverse values** matching the dim table (e.g., FR2590 had only 1 of 11 codes — metric worked but returned identical values for every facility)
+- Check dim table **match rate**: join metric source fields to dim tables and verify >95% match. Unmatched rows produce NULL/0 metric values (e.g., RSK-010 returned 0 for 85% of counterparties before rating_scale_dim expansion)
+- Verify L2 seed-data.ts has an explicit `case` handler for every table with metric-relevant fields. Tables without handlers produce placeholder strings like `'column_name_N'`
+- After expanding L1 dim tables (e.g., `CUSTOM_TABLE_SIZES`), verify the seed generator uses `rowIndex` directly, not `idx = rowIndex % N` which cycles back to early values
 - Document data limitations explicitly; do not confuse them with formula bugs
 
 **5D. GSIB Risk Sanity Checks**
@@ -273,6 +277,31 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Missing COALESCE | `fes.bank_share_pct / 100` (NULL if missing) | `COALESCE(fes.bank_share_pct, 100.0) / 100.0` |
 | Missing NULLIF | `SUM(x) / SUM(y)` (div-by-zero) | `SUM(x) / NULLIF(SUM(y), 0)` |
 | FX at facility level | `* fx.rate` in facility formula | FX only at aggregate levels; facility stays local currency |
+| Homogeneous seed arrays | `FR2590_CATS_BASE = ['G1_B' x10]` | Use diverse values matching dim table PKs — single-value arrays make metrics return identical results for all rows |
+| L2 table missing handler | `facility_risk_snapshot` had no `case` in `getL2SeedValue()` | Every L2 table with metric-relevant fields needs an explicit handler; fallback produces `'column_name_N'` strings |
+| L1 seed index cycling | `idx = rowIndex % 10` for 32-row `rating_scale_dim` | Use `rowIndex` directly (not `idx`) when `CUSTOM_TABLE_SIZES` exceeds the default cycle length |
+| Boolean leak in VARCHAR | `internal_risk_rating = 'true'` (JS boolean serialized) | Ensure seed generators return string values, not booleans, for VARCHAR columns |
+| FK-safe dim expansion | `DELETE FROM rating_scale_dim` fails on FK constraint | Use `UPDATE` existing rows + `INSERT` new rows to preserve FK references from child tables |
+| SUM of strings | `SUM(legal_name)` at counterparty | Use `COUNT(DISTINCT id)` for text/ID fields at aggregate levels |
+| SUM of IDs | `SUM(legal_entity_id)` at counterparty | Summing IDs is meaningless — use `COUNT(DISTINCT)` |
+| Wrong ingredient_fields | `ingredient_fields` lists `position.lgd_estimate` | Must match actual formula sources — verify after `calc:sync` (sync preserves manual edits but YAML-generated fields may be stale from DRAFT) |
+| Wrong CACP role code | `SYNDICATE_MEMBER` in CACP insert | Check `l1.counterparty_role_dim` for valid FK codes before INSERT — use `PARTICIPANT` |
+| Placeholder seed values | `limit_status_code_1`, `limit_status_code_2` junk | L2 seed generator fallback creates `'column_name_N'` — add explicit handler in `getL2SeedValue()` |
+| No dimension diversity | All FES rows have `legal_entity_id = 1` | Distribute across available entities: `SET legal_entity_id = CASE WHEN facility_id % 10 IN (0,1,2) THEN 1 ...` |
+| No syndication data | 0 syndicated facilities — all CACP entries single-participant | Add `PARTICIPANT` rows for multi-bank agreements: `INSERT INTO cacp ... 'PARTICIPANT'` |
+
+### PostgreSQL Seed Data Quality Checklist (Phase 5C Extended)
+
+After verifying formulas execute, always check that seed data produces **meaningful, diverse results** — not just non-null:
+
+| Check | What to verify | Common failure |
+|-------|---------------|----------------|
+| **Boolean diversity** | Both TRUE and FALSE values for flag fields | All flags same value → metric always 0 or 100% |
+| **FK participation** | Multi-participant records exist (e.g., CACP) | All agreements single-participant → syndication always 0 |
+| **Dimension diversity** | Multiple distinct values for categorical fields | All rows point to same entity → COUNT(DISTINCT) always 1 |
+| **Threshold coverage** | Values span multiple threshold buckets | All utilization <75% → only NO_BREACH, never ELEVATED/WARNING |
+| **Placeholder detection** | No auto-generated `field_name_123` values | Seed generator fallback creates junk — grep for `_code_[0-9]` patterns |
+| **Date alignment** | Source tables have overlapping `as_of_date` | FES max=Feb but FRS max=Jan → JOIN returns 0 rows for Feb date |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

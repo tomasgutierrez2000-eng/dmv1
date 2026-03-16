@@ -2,28 +2,38 @@
 # GSIB Metric Definition
 # FR2590 Category
 # ═══════════════════════════════════════════════════════════════
+
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-013"
 name: "FR2590 Category"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
+
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "reference"
-sub_domain: "master-data"
-metric_class: CALCULATED
+sub_domain: "regulatory-classification"
+metric_class: SOURCED
 direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  A classification used for reporting purposes in the FR 2590 regulatory report
-  pertaining to financial institutions' credit exposures.
+  FR 2590 regulatory classification for each facility exposure. Reads the
+  fr2590_category_code from the facility exposure snapshot and joins to the
+  fr2590_category_dim reference table to return the human-readable category
+  name. Used for FR 2590 supervisory reporting and exposure segmentation by
+  product type. Facility-level only — categorical values cannot be
+  meaningfully aggregated to higher organizational levels.
+
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
+  - framework: "FR 2590"
+    description: "Large Financial Institution Supervision — credit exposure classification by product type for regulatory reporting"
   - framework: "Basel III"
-    description: ""
+    description: "Regulatory reporting segmentation for credit exposure monitoring and supervisory review"
+
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -37,150 +47,107 @@ source_tables:
         role: FILTER
       - name: fr2590_category_code
         role: MEASURE
-  - schema: l2
-    table: facility_master
-    alias: fm
-    join_type: INNER
-    join_on: "fm.facility_id = fes.facility_id"
-    fields:
-      - name: facility_id
-        role: JOIN_KEY
-      - name: counterparty_id
-        role: DIMENSION
-      - name: lob_segment_id
-        role: DIMENSION
-      - name: is_active_flag
-        role: FILTER
   - schema: l1
-    table: enterprise_business_taxonomy
-    alias: ebt
+    table: fr2590_category_dim
+    alias: fc
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "fc.fr2590_category_code = fes.fr2590_category_code"
     fields:
-      - name: managed_segment_id
-        role: DIMENSION
-      - name: parent_segment_id
-        role: DIMENSION
+      - name: fr2590_category_code
+        role: JOIN_KEY
+      - name: category_name
+        role: MEASURE
+
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      Calculated fr2590_category_code per facility.
-    formula_sql: |
+      For each facility, read the fr2590_category_code from the latest
+      facility_exposure_snapshot, then join to fr2590_category_dim to return
+      the human-readable category_name. Uses MAX(category_name) to handle
+      any duplicate exposure rows per facility on the same reporting date.
+    formula_sql: |-
       SELECT
         fes.facility_id AS dimension_key,
-        fes.fr2590_category_code AS metric_value
+        MAX(fc.category_name) AS metric_value
       FROM l2.facility_exposure_snapshot fes
-      WHERE fes.as_of_date = :as_of_date
+      LEFT JOIN l1.fr2590_category_dim fc
+        ON fc.fr2590_category_code = fes.fr2590_category_code
+      WHERE fes.as_of_date = (
+        SELECT MAX(as_of_date) FROM l2.facility_exposure_snapshot
+      )
+      GROUP BY fes.facility_id
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level fr2590_category_code per counterparty.
-    formula_sql: |
-      SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.fr2590_category_code AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+      Not applicable — FR2590 category is a per-facility categorical
+      classification that cannot be meaningfully aggregated to counterparty
+      level. Use facility-level drill-down for category distribution.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
   desk:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level fr2590_category_code per L3 desk segment.
-    formula_sql: |
-      SELECT
-        ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.fr2590_category_code AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.managed_segment_id = fm.lob_segment_id
-      GROUP BY ebt.managed_segment_id
+      Not applicable — FR2590 category is a per-facility categorical
+      classification. Desk-level analysis should use facility-level data
+      grouped by FR2590 category as a dimension.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level fr2590_category_code per L2 portfolio segment.
-    formula_sql: |
-      SELECT
-        ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.fr2590_category_code AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      GROUP BY ebt_l2.managed_segment_id
+      Not applicable — FR2590 category is a per-facility categorical
+      classification. Portfolio-level reporting uses FR2590 as a grouping
+      dimension, not as an aggregated metric.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level fr2590_category_code per L1 business segment segment.
-    formula_sql: |
-      SELECT
-        ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.fr2590_category_code AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      GROUP BY ebt_l1.managed_segment_id
+      Not applicable — FR2590 category is a per-facility categorical
+      classification. Business segment reporting uses FR2590 as a grouping
+      dimension, not as an aggregated metric.
+    formula_sql: |-
+      SELECT NULL AS dimension_key, NULL AS metric_value WHERE 1 = 0
+
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+
 # ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+
 # ── VALIDATION RULES ──────────────────────────────────────────
 validations:
   - rule_id: "REF-013-V01"
     type: NOT_NULL
-    description: "No null fr2590_category_code values"
+    description: "Each facility exposure must have a non-null fr2590_category_code"
+    severity: WARNING
+  - rule_id: "REF-013-V02"
+    type: CUSTOM_SQL
+    description: "Every fr2590_category_code in facility_exposure_snapshot must exist in fr2590_category_dim"
     severity: ERROR
+    custom_sql: |-
+      SELECT COUNT(*) AS orphan_count
+      FROM l2.facility_exposure_snapshot fes
+      LEFT JOIN l1.fr2590_category_dim fc
+        ON fc.fr2590_category_code = fes.fr2590_category_code
+      WHERE fc.fr2590_category_code IS NULL
+        AND fes.fr2590_category_code IS NOT NULL
+
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-043"
-  abbreviation: "FC"
+  abbreviation: "FR2590"
   insight: >
-    Regulatory reporting and segmentation
-  rollup_strategy: "direct-sum"
-  primary_value_field: "fr2590_category_code"
+    FR 2590 regulatory classification per facility exposure. Maps each
+    facility to a standardized regulatory category for supervisory reporting
+    and product-type segmentation.
+  rollup_strategy: "categorical"
+  primary_value_field: "fr2590_category"
+
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "regulatory-classification", "fr2590", "supervisory-reporting"]
 dashboard_pages: []
 legacy_metric_ids: []

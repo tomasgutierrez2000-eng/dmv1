@@ -1,0 +1,291 @@
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Internal Risk Rating
+# ═══════════════════════════════════════════════════════════════
+
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "RSK-010"
+name: "Internal Risk Rating"
+version: "1.0.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
+supersedes: null
+
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "risk"
+sub_domain: "credit-ratings"
+metric_class: HYBRID
+direction: LOWER_BETTER
+unit_type: ORDINAL
+display_format: ",.0f"
+description: >
+  Internal risk rating expressed as a numeric notch value. At facility
+  level, reads the internal_risk_rating from the latest facility risk
+  snapshot and maps it to a numeric rating_value via the rating_scale_dim
+  reference table. At counterparty level, maps the counterparty's
+  internal_risk_rating to a numeric notch. At desk, portfolio, and
+  business segment levels, computes the average rating notch across
+  distinct counterparties in the segment, then rounds to the nearest
+  integer for a representative rating grade. Lower values indicate
+  better credit quality.
+
+# ── REGULATORY REFERENCES ─────────────────────────────────────
+regulatory_references:
+  - framework: "Basel III"
+    description: "IRB approach — internal credit risk rating systems for PD estimation and risk segmentation"
+  - framework: "FR Y-14Q"
+    description: "Schedule H.1 — internal risk rating for facility and counterparty reporting"
+  - framework: "CCAR"
+    description: "Internal rating distribution for stress testing, migration analysis, and capital planning"
+  - framework: "OCC 2011-12"
+    description: "Credit risk rating system standards for national banks and federal savings associations"
+
+# ── SOURCE TABLES ─────────────────────────────────────────────
+source_tables:
+  - schema: l2
+    table: facility_risk_snapshot
+    alias: frs
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: internal_risk_rating
+        role: MEASURE
+      - name: counterparty_id
+        role: DIMENSION
+  - schema: l2
+    table: counterparty
+    alias: c
+    join_type: LEFT
+    join_on: "c.counterparty_id = frs.counterparty_id"
+    fields:
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: internal_risk_rating
+        role: MEASURE
+  - schema: l1
+    table: rating_scale_dim
+    alias: rsd
+    join_type: LEFT
+    join_on: "rsd.rating_notch = frs.internal_risk_rating AND rsd.is_active_flag = 'Y'"
+    fields:
+      - name: rating_notch
+        role: JOIN_KEY
+      - name: rating_value
+        role: MEASURE
+      - name: is_active_flag
+        role: FILTER
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: LEFT
+    join_on: "fm.counterparty_id = c.counterparty_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+
+# ── LEVEL FORMULAS ────────────────────────────────────────────
+levels:
+  facility:
+    aggregation_type: RAW
+    formula_text: >
+      For each facility, read the internal_risk_rating from the latest
+      facility_risk_snapshot (MAX as_of_date), then join to rating_scale_dim
+      to convert the rating string to a numeric rating_value (notch ordinal).
+      Uses MIN(rating_value) to handle potential duplicate dim matches.
+    formula_sql: |-
+      SELECT
+        frs.facility_id AS dimension_key,
+        COALESCE(MIN(rsd.rating_value), 0) AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      LEFT JOIN l1.rating_scale_dim rsd
+        ON rsd.rating_notch = frs.internal_risk_rating
+        AND rsd.is_active_flag = 'Y'
+      WHERE frs.as_of_date = (
+        SELECT MAX(as_of_date) FROM l2.facility_risk_snapshot
+      )
+      GROUP BY frs.facility_id
+  counterparty:
+    aggregation_type: RAW
+    formula_text: >
+      For each counterparty, read the internal_risk_rating from the
+      counterparty table, then join to rating_scale_dim to convert to a
+      numeric rating_value. Uses MIN(rating_value) for deduplication.
+    formula_sql: |-
+      SELECT
+        c.counterparty_id AS dimension_key,
+        COALESCE(MIN(rsd.rating_value), 0) AS metric_value
+      FROM l2.counterparty c
+      LEFT JOIN l1.rating_scale_dim rsd
+        ON rsd.rating_notch = c.internal_risk_rating
+        AND rsd.is_active_flag = 'Y'
+      WHERE c.internal_risk_rating IS NOT NULL
+      GROUP BY c.counterparty_id
+  desk:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Average internal risk rating notch across distinct counterparties in
+      each L3 desk segment. Inner query ensures each counterparty is counted
+      once per segment (avoids weighting by facility count). Result is
+      rounded to nearest integer for a representative rating grade. Uses
+      EBT direct join for L3 desk lookup.
+    formula_sql: |-
+      SELECT
+        seg_cp.segment_id AS dimension_key,
+        ROUND(AVG(seg_cp.rating_val)) AS metric_value
+      FROM (
+        SELECT
+          ebt.managed_segment_id AS segment_id,
+          c.counterparty_id,
+          MIN(rsd.rating_value) AS rating_val
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty c
+          ON c.counterparty_id = fm.counterparty_id
+        LEFT JOIN l1.rating_scale_dim rsd
+          ON rsd.rating_notch = c.internal_risk_rating
+          AND rsd.is_active_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.managed_segment_id = fm.lob_segment_id
+          AND ebt.is_current_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
+          AND c.internal_risk_rating IS NOT NULL
+        GROUP BY ebt.managed_segment_id, c.counterparty_id
+      ) seg_cp
+      WHERE seg_cp.rating_val IS NOT NULL
+      GROUP BY seg_cp.segment_id
+  portfolio:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Average internal risk rating notch across distinct counterparties per
+      L2 portfolio segment. Traverses EBT hierarchy L3 → L2 via
+      parent_segment_id. Each counterparty counted once per portfolio for
+      a true counterparty-level average, then rounded.
+    formula_sql: |-
+      SELECT
+        seg_cp.segment_id AS dimension_key,
+        ROUND(AVG(seg_cp.rating_val)) AS metric_value
+      FROM (
+        SELECT
+          ebt_l2.managed_segment_id AS segment_id,
+          c.counterparty_id,
+          MIN(rsd.rating_value) AS rating_val
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty c
+          ON c.counterparty_id = fm.counterparty_id
+        LEFT JOIN l1.rating_scale_dim rsd
+          ON rsd.rating_notch = c.internal_risk_rating
+          AND rsd.is_active_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+          AND ebt_l3.is_current_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+          AND ebt_l2.is_current_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
+          AND c.internal_risk_rating IS NOT NULL
+        GROUP BY ebt_l2.managed_segment_id, c.counterparty_id
+      ) seg_cp
+      WHERE seg_cp.rating_val IS NOT NULL
+      GROUP BY seg_cp.segment_id
+  business_segment:
+    aggregation_type: CUSTOM
+    formula_text: >
+      Average internal risk rating notch across distinct counterparties per
+      L1 business segment. Full EBT hierarchy traversal L3 → L2 → L1. Each
+      counterparty counted once per business segment, averaged, and rounded
+      to nearest integer for a representative segment rating grade.
+    formula_sql: |-
+      SELECT
+        seg_cp.segment_id AS dimension_key,
+        ROUND(AVG(seg_cp.rating_val)) AS metric_value
+      FROM (
+        SELECT
+          ebt_l1.managed_segment_id AS segment_id,
+          c.counterparty_id,
+          MIN(rsd.rating_value) AS rating_val
+        FROM l2.facility_master fm
+        INNER JOIN l2.counterparty c
+          ON c.counterparty_id = fm.counterparty_id
+        LEFT JOIN l1.rating_scale_dim rsd
+          ON rsd.rating_notch = c.internal_risk_rating
+          AND rsd.is_active_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+          AND ebt_l3.is_current_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+          AND ebt_l2.is_current_flag = 'Y'
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+          ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+          AND ebt_l1.is_current_flag = 'Y'
+        WHERE fm.is_active_flag = 'Y'
+          AND c.internal_risk_rating IS NOT NULL
+        GROUP BY ebt_l1.managed_segment_id, c.counterparty_id
+      ) seg_cp
+      WHERE seg_cp.rating_val IS NOT NULL
+      GROUP BY seg_cp.segment_id
+
+# ── DEPENDENCIES ──────────────────────────────────────────────
+depends_on: []
+
+# ── OUTPUT ────────────────────────────────────────────────────
+output:
+  table: metric_result
+
+# ── VALIDATION RULES ──────────────────────────────────────────
+validations:
+  - rule_id: "RSK-010-V01"
+    type: NOT_NULL
+    description: "No null rating values for counterparties with non-null internal_risk_rating"
+    severity: ERROR
+  - rule_id: "RSK-010-V02"
+    type: NON_NEGATIVE
+    description: "Rating notch value must be non-negative (0 = unrated sentinel)"
+    severity: ERROR
+  - rule_id: "RSK-010-V03"
+    type: THRESHOLD
+    description: "Rating notch value must be within valid scale range (0-30 typical for GSIB internal scales)"
+    severity: WARNING
+    params:
+      min: 0
+      max: 30
+
+# ── CATALOGUE ─────────────────────────────────────────────────
+catalogue:
+  item_id: "MET-112"
+  abbreviation: "IRR"
+  insight: >
+    Internal credit risk rating as a numeric notch ordinal. Facility and
+    counterparty levels show individual ratings; desk, portfolio, and
+    business segment levels show the average rating across distinct
+    counterparties (rounded to nearest notch). Lower values = better
+    credit quality. Complements RSK-001 (PD-based Risk Rating Tier) with
+    the institution's internal rating methodology.
+  rollup_strategy: "simple-avg"
+  primary_value_field: "internal_risk_rating_notch"
+
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["risk", "credit-ratings", "internal-rating", "portfolio-quality"]
+dashboard_pages: []
+legacy_metric_ids: []

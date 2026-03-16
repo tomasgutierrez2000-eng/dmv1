@@ -4,6 +4,7 @@
  */
 
 import { readDataDictionary, type DataDictionary } from '@/lib/data-dictionary';
+import { formatPgType } from '@/lib/introspect';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -127,30 +128,20 @@ function flattenDd(dd: DataDictionary) {
   return map;
 }
 
-/** Format a PostgreSQL information_schema type into a comparable display string. */
+/**
+ * Format a PostgreSQL information_schema column row into a display type string.
+ * Delegates to the canonical formatPgType() from introspect.ts to guarantee
+ * the same formatting used when writing data-dictionary.json. This eliminates
+ * any drift caused by formatter divergence.
+ */
 function formatPgColumnType(row: { data_type: string; character_maximum_length?: number | null; numeric_precision?: number | null; numeric_scale?: number | null; udt_name?: string }): string {
-  const dt = row.data_type?.toUpperCase() ?? '';
-  if (dt === 'CHARACTER VARYING' || dt === 'VARCHAR') {
-    return row.character_maximum_length ? `VARCHAR(${row.character_maximum_length})` : 'VARCHAR';
-  }
-  if (dt === 'NUMERIC' || dt === 'DECIMAL') {
-    if (row.numeric_precision != null && row.numeric_scale != null) {
-      return `NUMERIC(${row.numeric_precision},${row.numeric_scale})`;
-    }
-    if (row.numeric_precision != null) return `NUMERIC(${row.numeric_precision})`;
-    return 'NUMERIC';
-  }
-  if (dt === 'INTEGER') return 'INTEGER';
-  if (dt === 'BIGINT') return 'BIGINT';
-  if (dt === 'SMALLINT') return 'SMALLINT';
-  if (dt === 'BOOLEAN') return 'BOOLEAN';
-  if (dt === 'DATE') return 'DATE';
-  if (dt === 'TEXT') return 'TEXT';
-  if (dt.includes('TIMESTAMP')) return 'TIMESTAMP';
-  if (dt === 'ARRAY' && row.udt_name) {
-    return `${row.udt_name.replace(/^_/, '')}[]`;
-  }
-  return dt || 'UNKNOWN';
+  return formatPgType(
+    row.data_type ?? '',
+    row.character_maximum_length ?? null,
+    row.numeric_precision ?? null,
+    row.numeric_scale ?? null,
+    row.udt_name ?? '',
+  );
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────

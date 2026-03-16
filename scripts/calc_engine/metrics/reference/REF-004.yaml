@@ -79,7 +79,7 @@ levels:
     aggregation_type: RAW
     formula_text: >
       Direct lookup of counterparty_id from facility_master for each active facility.
-      SCD-filtered to current records only.
+      Uses current records only (SCD2 filtered).
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,

@@ -98,7 +98,7 @@ levels:
     formula_text: >
       Lookup country for each facility via counterparty → country_dim join path.
       Returns counterparty_id as numeric proxy (country_name resolved at display
-      time via dimension join). SCD-filtered to current records.
+      time via dimension join). Uses current records only.
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,

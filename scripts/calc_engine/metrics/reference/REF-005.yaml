@@ -82,7 +82,8 @@ levels:
     formula_text: >
       Lookup counterparty_id from facility_master for each active facility.
       The numeric counterparty_id serves as proxy for the legal name (string
-      values returned via catalogue metadata). SCD-filtered to current records.
+      values resolved via counterparty dimension join at display time).
+      Uses current records only.
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,

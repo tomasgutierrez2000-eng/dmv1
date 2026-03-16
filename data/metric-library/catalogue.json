@@ -10805,8 +10805,8 @@
     "item_name": "Cost of Funds ($)",
     "abbreviation": "COF",
     "kind": "METRIC",
-    "definition": "The portion of total funding-related expense attributed to a specific exposure or portfolio. At facility level, calculated as SUM across all positions of (funded_amount * interest_rate), adjusted for bank share. At counterparty level, further adjusted by counterparty participation_pct. At desk/portfolio/segment levels, aggregated as SUM.\n",
-    "generic_formula": "For each position under the facility: funded_amount * interest_rate = Position Cost of Funds. Adjusted by bank_share: SUM(funded_amount * interest_rate) * bank_share_pct / 100. Joins position_detail → position (for facility_id) → facility_master.\n",
+    "definition": "The portion of total funding-related expense attributed to a specific exposure or portfolio. At facility level, calculated as SUM across all positions of (funded_amount * interest_rate), converted to USD via FX rate and adjusted for bank share. At counterparty level, further adjusted by counterparty participation_pct. At desk/portfolio/segment levels, aggregated as SUM via EBT hierarchy.\n",
+    "generic_formula": "For each position under the facility, compute funded_amount x interest_rate, convert to USD using the FX spot rate (defaults to 1.0 for USD positions). Sum across all positions, then multiply by the bank's share percentage. Result = annual cost of funds for this facility in USD.\n",
     "data_type": "NUMERIC(20,4)",
     "unit_type": "CURRENCY",
     "direction": "LOWER_BETTER",
@@ -10863,6 +10863,12 @@
           },
           {
             "layer": "L2",
+            "table": "position",
+            "field": "currency_code",
+            "description": "Position currency for FX conversion"
+          },
+          {
+            "layer": "L2",
             "table": "position_detail",
             "field": "funded_amount",
             "description": "Utilized balance per position"
@@ -10871,7 +10877,7 @@
             "layer": "L2",
             "table": "position_detail",
             "field": "interest_rate",
-            "description": "Funding rate per position"
+            "description": "Funding rate per position (decimal, e.g. 0.05 = 5%)"
           },
           {
             "layer": "L2",
@@ -10993,6 +10999,12 @@
           },
           {
             "layer": "L2",
+            "table": "position",
+            "field": "currency_code",
+            "description": "Position currency for FX conversion"
+          },
+          {
+            "layer": "L2",
             "table": "position_detail",
             "field": "funded_amount",
             "description": "Utilized balance per position"
@@ -11001,7 +11013,7 @@
             "layer": "L2",
             "table": "position_detail",
             "field": "interest_rate",
-            "description": "Funding rate per position"
+            "description": "Funding rate per position (decimal, e.g. 0.05 = 5%)"
           },
           {
             "layer": "L2",
@@ -11094,7 +11106,7 @@
             "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  fcp.counterparty_id AS dimension_key,\n  SUM(fac.metric_value * COALESCE(fcp.participation_pct, 100.0) / 100.0) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_counterparty_participation fcp\n  ON fcp.facility_id = fac.facility_id\n  AND fcp.is_current_flag = 'Y'\nGROUP BY fcp.counterparty_id\n"
+        "formula_sql": "SELECT\n  fcp.counterparty_id AS dimension_key,\n  SUM(fac.metric_value * COALESCE(fcp.participation_pct, 100.0) / 100.0) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = pos.currency_code\n    AND fx.to_currency_code = 'USD'\n    AND fx.as_of_date = pos.as_of_date\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_counterparty_participation fcp\n  ON fcp.facility_id = fac.facility_id\n  AND fcp.is_current_flag = 'Y'\nGROUP BY fcp.counterparty_id\n"
       },
       {
         "level": "desk",
@@ -11123,6 +11135,12 @@
           },
           {
             "layer": "L2",
+            "table": "position",
+            "field": "currency_code",
+            "description": "Position currency for FX conversion"
+          },
+          {
+            "layer": "L2",
             "table": "position_detail",
             "field": "funded_amount",
             "description": "Utilized balance per position"
@@ -11131,7 +11149,7 @@
             "layer": "L2",
             "table": "position_detail",
             "field": "interest_rate",
-            "description": "Funding rate per position"
+            "description": "Funding rate per position (decimal, e.g. 0.05 = 5%)"
           },
           {
             "layer": "L2",
@@ -11224,7 +11242,7 @@
             "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = pos.currency_code\n    AND fx.to_currency_code = 'USD'\n    AND fx.as_of_date = pos.as_of_date\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id\n"
       },
       {
         "level": "portfolio",
@@ -11253,6 +11271,12 @@
           },
           {
             "layer": "L2",
+            "table": "position",
+            "field": "currency_code",
+            "description": "Position currency for FX conversion"
+          },
+          {
+            "layer": "L2",
             "table": "position_detail",
             "field": "funded_amount",
             "description": "Utilized balance per position"
@@ -11261,7 +11285,7 @@
             "layer": "L2",
             "table": "position_detail",
             "field": "interest_rate",
-            "description": "Funding rate per position"
+            "description": "Funding rate per position (decimal, e.g. 0.05 = 5%)"
           },
           {
             "layer": "L2",
@@ -11354,7 +11378,7 @@
             "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = pos.currency_code\n    AND fx.to_currency_code = 'USD'\n    AND fx.as_of_date = pos.as_of_date\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id\n"
       },
       {
         "level": "lob",
@@ -11383,6 +11407,12 @@
           },
           {
             "layer": "L2",
+            "table": "position",
+            "field": "currency_code",
+            "description": "Position currency for FX conversion"
+          },
+          {
+            "layer": "L2",
             "table": "position_detail",
             "field": "funded_amount",
             "description": "Utilized balance per position"
@@ -11391,7 +11421,7 @@
             "layer": "L2",
             "table": "position_detail",
             "field": "interest_rate",
-            "description": "Funding rate per position"
+            "description": "Funding rate per position (decimal, e.g. 0.05 = 5%)"
           },
           {
             "layer": "L2",
@@ -11484,7 +11514,7 @@
             "description": "SCD filter — only current taxonomy record"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n    pos.facility_id,\n    SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)\n      * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value\n  FROM l2.position_detail pd\n  INNER JOIN l2.position pos\n    ON pos.position_id = pd.position_id\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = pos.facility_id\n    AND fm.is_active_flag = 'Y'\n    AND fm.is_current_flag = 'Y'\n  LEFT JOIN l2.facility_lender_allocation fla\n    ON fla.facility_id = pos.facility_id\n    AND fla.is_current_flag = 'Y'\n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = pos.currency_code\n    AND fx.to_currency_code = 'USD'\n    AND fx.as_of_date = pos.as_of_date\n  WHERE pos.as_of_date = :as_of_date\n  GROUP BY pos.facility_id\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id\n"
       }
     ],
     "demo_data": {
@@ -11763,7 +11793,7 @@
     "abbreviation": "CSOA",
     "kind": "METRIC",
     "definition": "Counterparty participation share in a facility — the percentage of a syndicated or participated facility allocated to a specific counterparty. At facility level, direct lookup from facility_counterparty_participation. At counterparty level, exposure-weighted average participation across all facilities. At desk/portfolio/segment, exposure-weighted average via EBT hierarchy. Key concentration KPI for Large Exposures Framework (LEX) and Single Counterparty Credit Limit (SCCL) compliance.\n",
-    "generic_formula": "Direct lookup of participation_pct from facility_counterparty_participation for the primary counterparty on each facility. SCD-filtered to current rows only.\n",
+    "generic_formula": "Direct lookup of participation_pct from facility_counterparty_participation for the primary counterparty on each facility. Uses current records only.\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
@@ -44333,7 +44363,7 @@
     "abbreviation": "CI",
     "kind": "METRIC",
     "definition": "Unique system identifier assigned to the borrower or obligor. Used for exposure aggregation and risk consolidation across the GSIB. At facility level, returns the counterparty_id linked to each facility. At upper levels, returns COUNT(DISTINCT counterparty_id) — the number of unique obligors in each organizational segment.\n",
-    "generic_formula": "Direct lookup of counterparty_id from facility_master for each active facility. SCD-filtered to current records only.\n",
+    "generic_formula": "Direct lookup of counterparty_id from facility_master for each active facility. Uses current records only (SCD2 filtered).\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
@@ -44990,7 +45020,7 @@
     "abbreviation": "CN",
     "kind": "METRIC",
     "definition": "Legal name of the counterparty as documented in the credit agreement. At facility level, returns the counterparty_id (numeric proxy for the name since metric values are numeric). At counterparty level, identity lookup. At upper levels, COUNT(DISTINCT counterparty_id) — number of unique named obligors per organizational segment. Used for reporting clarity and operational reference across all regulatory submissions.\n",
-    "generic_formula": "Lookup counterparty_id from facility_master for each active facility. The numeric counterparty_id serves as proxy for the legal name (string values returned via catalogue metadata). SCD-filtered to current records.\n",
+    "generic_formula": "Lookup counterparty_id from facility_master for each active facility. The numeric counterparty_id serves as proxy for the legal name (string values resolved via counterparty dimension join at display time). Uses current records only.\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",
@@ -45682,7 +45712,7 @@
     "abbreviation": "CTY",
     "kind": "METRIC",
     "definition": "Country of risk derived from the counterparty's domicile. At facility level, returns a numeric country identifier (via counterparty → country_dim join path). At counterparty level, identity lookup. At desk/portfolio/segment levels, COUNT(DISTINCT country_code) — geographic diversification indicator showing the number of unique countries represented. Supports FFIEC 009 Country Exposure Report and Basel III geographic concentration analysis.\n",
-    "generic_formula": "Lookup country for each facility via counterparty → country_dim join path. Returns counterparty_id as numeric proxy (country_name resolved at display time via dimension join). SCD-filtered to current records.\n",
+    "generic_formula": "Lookup country for each facility via counterparty → country_dim join path. Returns counterparty_id as numeric proxy (country_name resolved at display time via dimension join). Uses current records only.\n",
     "data_type": "INTEGER",
     "unit_type": "COUNT",
     "direction": "NEUTRAL",

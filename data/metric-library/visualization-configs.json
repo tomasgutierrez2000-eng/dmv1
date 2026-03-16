@@ -559,7 +559,7 @@
         {
           "op": "*",
           "field": "interest_rate",
-          "label": "Funding rate per position",
+          "label": "Funding rate per position (decimal, e.g. 0.05 = 5%)",
           "sample_value": 0,
           "source_table": "position_detail",
           "source_layer": "L2"
@@ -591,7 +591,7 @@
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each position under the facility: funded_amount * interest_rate = Position Cost of Funds. Adjusted by bank_share: SUM(funded_amount * interest_rate) * bank_share_pct / 100. Joins position_detail → position (for facility_id) → facility_master.\n"
+      "formula_display": "For each position under the facility, compute funded_amount x interest_rate, convert to USD using the FX spot rate (defaults to 1.0 for USD positions). Sum across all positions, then multiply by the bank's share percentage. Result = annual cost of funds for this facility in USD.\n"
     },
     "worked_example_columns": [
       {
@@ -659,7 +659,7 @@
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Direct lookup of participation_pct from facility_counterparty_participation for the primary counterparty on each facility. SCD-filtered to current rows only.\n"
+      "formula_display": "Direct lookup of participation_pct from facility_counterparty_participation for the primary counterparty on each facility. Uses current records only.\n"
     },
     "worked_example_columns": [
       {
@@ -2739,7 +2739,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of counterparty_id from facility_master for each active facility. SCD-filtered to current records only.\n"
+      "formula_display": "Direct lookup of counterparty_id from facility_master for each active facility. Uses current records only (SCD2 filtered).\n"
     },
     "worked_example_columns": [
       {
@@ -2769,7 +2769,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Lookup counterparty_id from facility_master for each active facility. The numeric counterparty_id serves as proxy for the legal name (string values returned via catalogue metadata). SCD-filtered to current records.\n"
+      "formula_display": "Lookup counterparty_id from facility_master for each active facility. The numeric counterparty_id serves as proxy for the legal name (string values resolved via counterparty dimension join at display time). Uses current records only.\n"
     },
     "worked_example_columns": [
       {
@@ -2799,7 +2799,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Lookup country for each facility via counterparty → country_dim join path. Returns counterparty_id as numeric proxy (country_name resolved at display time via dimension join). SCD-filtered to current records.\n"
+      "formula_display": "Lookup country for each facility via counterparty → country_dim join path. Returns counterparty_id as numeric proxy (country_name resolved at display time via dimension join). Uses current records only.\n"
     },
     "worked_example_columns": [
       {

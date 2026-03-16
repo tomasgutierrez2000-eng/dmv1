@@ -97,7 +97,7 @@ levels:
     aggregation_type: RAW
     formula_text: >
       Direct lookup of participation_pct from facility_counterparty_participation
-      for the primary counterparty on each facility. SCD-filtered to current rows only.
+      for the primary counterparty on each facility. Uses current records only.
     formula_sql: |
       SELECT
         fcp.facility_id AS dimension_key,

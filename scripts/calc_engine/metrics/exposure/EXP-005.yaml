@@ -5,7 +5,7 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-005"
 name: "Cost of Funds ($)"
-version: "2.0.0"
+version: "2.1.0"
 owner: "credit-risk"
 status: ACTIVE
 effective_date: "2026-01-01"
@@ -20,9 +20,10 @@ display_format: "$,.0f"
 description: >
   The portion of total funding-related expense attributed to a specific
   exposure or portfolio. At facility level, calculated as SUM across all
-  positions of (funded_amount * interest_rate), adjusted for bank share.
-  At counterparty level, further adjusted by counterparty participation_pct.
-  At desk/portfolio/segment levels, aggregated as SUM.
+  positions of (funded_amount * interest_rate), converted to USD via FX
+  rate and adjusted for bank share. At counterparty level, further adjusted
+  by counterparty participation_pct. At desk/portfolio/segment levels,
+  aggregated as SUM via EBT hierarchy.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
@@ -43,6 +44,9 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
+      - name: currency_code
+        role: JOIN_KEY
+        description: "Position currency for FX conversion"
   - schema: l2
     table: position_detail
     alias: pd
@@ -54,7 +58,7 @@ source_tables:
         description: "Utilized balance per position"
       - name: interest_rate
         role: MEASURE
-        description: "Funding rate per position"
+        description: "Funding rate per position (decimal, e.g. 0.05 = 5%)"
   - schema: l2
     table: facility_master
     alias: fm
@@ -126,9 +130,10 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      For each position under the facility: funded_amount * interest_rate = Position Cost of Funds.
-      Adjusted by bank_share: SUM(funded_amount * interest_rate) * bank_share_pct / 100.
-      Joins position_detail → position (for facility_id) → facility_master.
+      For each position under the facility, compute funded_amount x interest_rate,
+      convert to USD using the FX spot rate (defaults to 1.0 for USD positions).
+      Sum across all positions, then multiply by the bank's share percentage.
+      Result = annual cost of funds for this facility in USD.
     formula_sql: |
       SELECT
         pos.facility_id AS dimension_key,
@@ -153,8 +158,9 @@ levels:
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      For each counterparty: SUM of facility-level cost of funds weighted by
-      counterparty participation_pct from facility_counterparty_participation.
+      Sum each facility's cost of funds (USD, bank-share-adjusted), then weight
+      by the counterparty's participation percentage. Aggregates across all
+      facilities where the counterparty has a current participation record.
     formula_sql: |
       SELECT
         fcp.counterparty_id AS dimension_key,
@@ -162,7 +168,7 @@ levels:
       FROM (
         SELECT
           pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
+          SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)
             * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
         FROM l2.position_detail pd
         INNER JOIN l2.position pos
@@ -174,6 +180,10 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = pos.facility_id
           AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = pos.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = pos.as_of_date
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id
       ) fac
@@ -184,7 +194,8 @@ levels:
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level cost of funds (bank-share-adjusted) per L3 desk segment.
+      Sum of facility-level cost of funds (USD, bank-share-adjusted) for all
+      facilities assigned to each L3 desk segment in the organizational hierarchy.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -192,7 +203,7 @@ levels:
       FROM (
         SELECT
           pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
+          SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)
             * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
         FROM l2.position_detail pd
         INNER JOIN l2.position pos
@@ -204,6 +215,10 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = pos.facility_id
           AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = pos.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = pos.as_of_date
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id
       ) fac
@@ -216,7 +231,9 @@ levels:
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level cost of funds (bank-share-adjusted) per L2 portfolio segment.
+      Sum of facility-level cost of funds (USD, bank-share-adjusted) for all
+      facilities within each L2 portfolio segment, traversing the EBT hierarchy
+      from desk (L3) to portfolio (L2) via parent_segment_id.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -224,7 +241,7 @@ levels:
       FROM (
         SELECT
           pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
+          SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)
             * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
         FROM l2.position_detail pd
         INNER JOIN l2.position pos
@@ -236,6 +253,10 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = pos.facility_id
           AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = pos.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = pos.as_of_date
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id
       ) fac
@@ -251,7 +272,9 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level cost of funds (bank-share-adjusted) per L1 business segment.
+      Sum of facility-level cost of funds (USD, bank-share-adjusted) for all
+      facilities within each L1 business segment, traversing the full EBT
+      hierarchy from desk (L3) through portfolio (L2) to segment (L1).
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
@@ -259,7 +282,7 @@ levels:
       FROM (
         SELECT
           pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
+          SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)
             * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
         FROM l2.position_detail pd
         INNER JOIN l2.position pos
@@ -271,6 +294,10 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = pos.facility_id
           AND fla.is_current_flag = 'Y'
+        LEFT JOIN l2.fx_rate fx
+          ON fx.from_currency_code = pos.currency_code
+          AND fx.to_currency_code = 'USD'
+          AND fx.as_of_date = pos.as_of_date
         WHERE pos.as_of_date = :as_of_date
         GROUP BY pos.facility_id
       ) fac

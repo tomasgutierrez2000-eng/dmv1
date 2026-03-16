@@ -2,14 +2,16 @@
 # GSIB Metric Definition
 # Cross Entity Exposure Amount
 # ═══════════════════════════════════════════════════════════════
+
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-008"
 name: "Cross Entity Exposure Amount"
-version: "1.0.0"
+version: "1.1.0"
 owner: "market-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
+
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "exposure"
 sub_domain: "risk-metrics"
@@ -18,20 +20,63 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Total exposure amount allocated across multiple legal entities. Supports
-  intra-group concentration transparency.
+  Total committed exposure amount (bank share) allocated across multiple legal
+  entities for facilities flagged as cross-entity. Quantifies inter-entity
+  concentration risk and supports intra-group transparency for GSIB reporting.
+  Sources from counterparty_derived (L3) for the cross-entity flag and
+  facility_exposure_snapshot (L2) for committed amounts.
+
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Large exposure framework — intra-group and cross-entity concentration"
+  - framework: "FR 2590"
+    description: "Interconnectedness indicator — intra-financial system assets/liabilities"
+
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l3
-    table: counterparty_exposure_summary
-    alias: ces
+    table: counterparty_derived
+    alias: cd
     join_type: BASE
     fields:
-      - name: total_cross_entity_exposure_usd
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: has_cross_entity_flag
+        role: FILTER
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = cd.facility_id AND fes.as_of_date = :as_of_date"
+    fields:
+      - name: committed_amount
+        role: MEASURE
+      - name: as_of_date
+        role: FILTER
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = cd.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l2
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = cd.facility_id AND fla.is_current_flag = 'Y'"
+    fields:
+      - name: bank_share_pct
         role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
@@ -43,79 +88,83 @@ source_tables:
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: SUM
     formula_text: >
-      SUM(total_cross_entity_exposure_usd) per facility from
-      counterparty_exposure_summary. Weighted by bank share percentage.
-    formula_sql: |
+      For each facility flagged as cross-entity, committed exposure amount
+      weighted by the bank's participation share (bank_share_pct). Facilities
+      without cross-entity flag are excluded.
+    formula_sql: |-
       SELECT
-        ces.facility_id AS dimension_key,
-        SUM(ces.total_cross_entity_exposure_usd
+        cd.facility_id AS dimension_key,
+        SUM(fes.committed_amount
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-      FROM l3.counterparty_exposure_summary ces
+      FROM l3.counterparty_derived cd
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = cd.facility_id
+        AND fes.as_of_date = :as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = ces.facility_id
+        ON fm.facility_id = cd.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l2.facility_lender_allocation fla
-        ON fla.facility_id = ces.facility_id
+        ON fla.facility_id = cd.facility_id
         AND fla.is_current_flag = 'Y'
-      WHERE ces.as_of_date = :as_of_date
-      GROUP BY ces.facility_id
+      WHERE cd.has_cross_entity_flag = true
+      GROUP BY cd.facility_id
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_cross_entity_exposure_usd per counterparty.
-    formula_sql: |
+      For each counterparty, sum of bank-share-weighted committed amounts
+      across all facilities flagged as cross-entity.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          ces.facility_id AS dimension_key,
-          SUM(ces.total_cross_entity_exposure_usd
-            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.counterparty_exposure_summary ces
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = ces.facility_id
-          AND fm.is_active_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = ces.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE ces.as_of_date = :as_of_date
-        GROUP BY ces.facility_id
-      ) fac
+        SUM(fes.committed_amount
+          * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
+      FROM l3.counterparty_derived cd
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = cd.facility_id
+        AND fes.as_of_date = :as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = cd.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = cd.facility_id
+        AND fla.is_current_flag = 'Y'
+      WHERE cd.has_cross_entity_flag = true
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_cross_entity_exposure_usd per L3 desk segment.
-    formula_sql: |
+      Sum of cross-entity committed exposure per L3 desk segment via
+      enterprise_business_taxonomy.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          ces.facility_id AS dimension_key,
-          SUM(ces.total_cross_entity_exposure_usd
+          cd.facility_id,
+          SUM(fes.committed_amount
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.counterparty_exposure_summary ces
+        FROM l3.counterparty_derived cd
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = cd.facility_id
+          AND fes.as_of_date = :as_of_date
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = ces.facility_id
+          ON fm.facility_id = cd.facility_id
           AND fm.is_active_flag = 'Y'
         LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = ces.facility_id
+          ON fla.facility_id = cd.facility_id
           AND fla.is_current_flag = 'Y'
-        WHERE ces.as_of_date = :as_of_date
-        GROUP BY ces.facility_id
+        WHERE cd.has_cross_entity_flag = true
+        GROUP BY cd.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
@@ -123,29 +172,32 @@ levels:
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_cross_entity_exposure_usd per L2 portfolio
-      segment.
-    formula_sql: |
+      Sum of cross-entity committed exposure per L2 portfolio segment.
+      Traverses EBT hierarchy L3 → L2 via parent_segment_id.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          ces.facility_id AS dimension_key,
-          SUM(ces.total_cross_entity_exposure_usd
+          cd.facility_id,
+          SUM(fes.committed_amount
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.counterparty_exposure_summary ces
+        FROM l3.counterparty_derived cd
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = cd.facility_id
+          AND fes.as_of_date = :as_of_date
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = ces.facility_id
+          ON fm.facility_id = cd.facility_id
           AND fm.is_active_flag = 'Y'
         LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = ces.facility_id
+          ON fla.facility_id = cd.facility_id
           AND fla.is_current_flag = 'Y'
-        WHERE ces.as_of_date = :as_of_date
-        GROUP BY ces.facility_id
+        WHERE cd.has_cross_entity_flag = true
+        GROUP BY cd.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -155,29 +207,32 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_cross_entity_exposure_usd per L1 business
-      segment segment.
-    formula_sql: |
+      Sum of cross-entity committed exposure per L1 business segment.
+      Full EBT hierarchy traversal L3 → L2 → L1.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          ces.facility_id AS dimension_key,
-          SUM(ces.total_cross_entity_exposure_usd
+          cd.facility_id,
+          SUM(fes.committed_amount
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.counterparty_exposure_summary ces
+        FROM l3.counterparty_derived cd
+        INNER JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = cd.facility_id
+          AND fes.as_of_date = :as_of_date
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = ces.facility_id
+          ON fm.facility_id = cd.facility_id
           AND fm.is_active_flag = 'Y'
         LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = ces.facility_id
+          ON fla.facility_id = cd.facility_id
           AND fla.is_current_flag = 'Y'
-        WHERE ces.as_of_date = :as_of_date
-        GROUP BY ces.facility_id
+        WHERE cd.has_cross_entity_flag = true
+        GROUP BY cd.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fac.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -186,30 +241,40 @@ levels:
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
       GROUP BY ebt_l1.managed_segment_id
+
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+
 # ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+
 # ── VALIDATION RULES ──────────────────────────────────────────
 validations:
   - rule_id: "EXP-008-V01"
     type: NOT_NULL
-    description: "No null total_cross_entity_exposure_usd values"
+    description: "No null cross-entity exposure values"
     severity: ERROR
   - rule_id: "EXP-008-V02"
     type: NON_NEGATIVE
-    description: "total_cross_entity_exposure_usd must be >= 0"
+    description: "Cross-entity exposure amount must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-008-V03"
+    type: RECONCILIATION
+    description: "Sum of facility-level values equals counterparty-level total per counterparty (tolerance 0.01%)"
+    severity: WARNING
+
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-020"
   abbreviation: "CEEA"
   insight: >
-    Quantifies inter-entity risk
+    Quantifies inter-entity concentration risk. Elevated cross-entity exposure
+    signals potential contagion across legal entities within the group.
   rollup_strategy: "direct-sum"
   primary_value_field: "total_cross_entity_exposure_usd"
+
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "cross-entity", "concentration"]
 dashboard_pages: []
 legacy_metric_ids: []

@@ -672,21 +672,21 @@
       "numerator": [
         {
           "op": "*",
-          "field": "internal_risk_rating",
-          "label": "internal_risk_rating",
+          "field": "flag_code",
+          "label": "flag_code",
           "sample_value": 0,
-          "source_table": "facility_risk_snapshot",
+          "source_table": "risk_flag",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Binary flag: 1 if criticized rating (internal_risk_rating >= 6), 0 otherwise.\n"
+      "formula_display": "For each facility, count active risk flags where flag_code = 'CRITICIZED' and the flag has not been cleared (cleared_ts IS NULL).\n"
     },
     "worked_example_columns": [
       {
-        "field": "internal_risk_rating",
-        "header": "Internal Risk Rating",
+        "field": "flag_code",
+        "header": "Flag Code",
         "format": "number",
         "subtotal_fn": "none"
       },
@@ -708,24 +708,44 @@
       "numerator": [
         {
           "op": "*",
-          "field": "total_cross_entity_exposure_usd",
-          "label": "total_cross_entity_exposure_usd",
+          "field": "committed_amount",
+          "label": "committed_amount",
           "sample_value": 0,
-          "source_table": "counterparty_exposure_summary",
-          "source_layer": "L3"
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "SUM(total_cross_entity_exposure_usd) per facility from counterparty_exposure_summary. Weighted by bank share percentage.\n"
+      "formula_display": "For each facility flagged as cross-entity, committed exposure amount weighted by the bank's participation share (bank_share_pct). Facilities without cross-entity flag are excluded.\n"
     },
     "worked_example_columns": [
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
       {
         "field": "total_cross_entity_exposure_usd",
         "header": "Total Cross Entity Exposure Usd",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -738,24 +758,58 @@
       "numerator": [
         {
           "op": "*",
-          "field": "dpd_bucket_code",
-          "label": "dpd_bucket_code",
+          "field": "payment_due_date",
+          "label": "payment_due_date",
           "sample_value": 0,
-          "source_table": "facility_delinquency_snapshot",
+          "source_table": "payment_ledger",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "payment_amount_due",
+          "label": "payment_amount_due",
+          "sample_value": 0,
+          "source_table": "payment_ledger",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "payment_applied_amt",
+          "label": "payment_applied_amt",
+          "sample_value": 0,
+          "source_table": "payment_ledger",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "For each Facility_ID lookup the Payments records in the Payment Lockbox table, For each payment record where [Payment_Due_Date] > Today() IF ([Pmt_Applied] <[Pmt_Due])>=1, THEN Today() - [Payment_due_date] ==[Days Overdue] SELECT MAX ([Days Overdue] then lookup in Payments Overdue bucket)\n"
+      "formula_display": "For each facility, lookup payment records in payment_ledger where payment_due_date < reporting date and payment_applied_amt < payment_amount_due (underpaid). Calculate days overdue = reporting date minus payment_due_date. Take MAX days overdue, then classify into overdue bucket: 1 (0-30), 2 (31-60), 3 (61-90+).\n"
     },
     "worked_example_columns": [
+      {
+        "field": "payment_due_date",
+        "header": "Payment Due Date",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "payment_amount_due",
+        "header": "Payment Amount Due",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "payment_applied_amt",
+        "header": "Payment Applied ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
       {
         "field": "dpd_bucket_code",
         "header": "Dpd Bucket Code",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -2809,13 +2863,13 @@
           "field": "credit_agreement_id",
           "label": "credit_agreement_id",
           "sample_value": 0,
-          "source_table": "credit_agreement_master",
+          "source_table": "facility_master",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of credit_agreement_id from credit_agreement_master.\n"
+      "formula_display": "Direct lookup of credit_agreement_id for each active facility via facility_master joined to credit_agreement_master.\n"
     },
     "worked_example_columns": [
       {
@@ -3578,32 +3632,52 @@
     ]
   },
   "MET-021": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "worst-case",
     "metric_fields": {
-      "primary_value": "risk_rating_status"
+      "primary_value": "risk_rating_tier"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "risk_rating_status",
-          "label": "risk_rating_status",
+          "field": "pd_annual",
+          "label": "pd_annual",
           "sample_value": 0,
-          "source_table": "counterparty_rating_observation",
+          "source_table": "counterparty",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "display_order",
+          "label": "display_order",
+          "sample_value": 0,
+          "source_table": "risk_rating_tier_dim",
+          "source_layer": "L1"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read risk_rating_status from counterparty_rating_observation for each facility.\n"
+      "formula_display": "For each facility, inherit the risk rating tier from the owning counterparty. Join facility_master to counterparty, then range-match counterparty pd_annual against risk_rating_tier_dim to derive the tier ordinal (display_order).\n"
     },
     "worked_example_columns": [
       {
-        "field": "risk_rating_status",
-        "header": "Risk Rating Status",
+        "field": "pd_annual",
+        "header": "Pd Annual",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "display_order",
+        "header": "Display Order",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "risk_rating_tier",
+        "header": "Risk Rating Tier",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },

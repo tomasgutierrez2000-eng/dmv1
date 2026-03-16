@@ -38,6 +38,7 @@ export default function DbStatusDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [exactLoading, setExactLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   // Database selector
   const [databases, setDatabases] = useState<{ id: string; label: string }[]>([]);
@@ -116,6 +117,25 @@ export default function DbStatusDashboard() {
     }
   }, [fetchStatus]);
 
+  /** Re-introspect database and refresh data dictionary to eliminate stale field drift. */
+  const handleSyncDictionary = useCallback(async () => {
+    setSyncing(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (selectedDb) params.set('db', selectedDb);
+      const qs = params.toString();
+      const res = await fetch(`/api/db-status${qs ? `?${qs}` : ''}`, { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Sync failed');
+      setData(json as DbStatusResult);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSyncing(false);
+    }
+  }, [selectedDb]);
+
   const toggleSort = useCallback(
     (field: SortField) => {
       if (sortField === field) {
@@ -150,8 +170,10 @@ export default function DbStatusDashboard() {
       filtered = filtered.filter((t) => t.layer === filterLayer);
     }
 
-    // Status filter
-    if (filterStatus !== 'all') {
+    // Status filter (including special 'field_drift' pseudo-status)
+    if (filterStatus === 'field_drift') {
+      filtered = filtered.filter((t) => t.fieldDrift.length > 0);
+    } else if (filterStatus !== 'all') {
       filtered = filtered.filter((t) => t.status === filterStatus);
     }
 
@@ -234,6 +256,17 @@ export default function DbStatusDashboard() {
               <Hash className="w-4 h-4" />
               {exactLoading ? 'Counting...' : 'Exact counts'}
             </button>
+            {data && data.summary.tablesWithFieldDrift > 0 && (
+              <button
+                onClick={handleSyncDictionary}
+                disabled={syncing || !data?.connected}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Re-introspect database and update data dictionary to eliminate field drift"
+              >
+                <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                {syncing ? 'Syncing...' : 'Sync Dictionary'}
+              </button>
+            )}
             <button
               onClick={handleRefresh}
               disabled={refreshing}
@@ -428,10 +461,22 @@ function SummaryCards({
       activeBg: 'bg-orange-100 border-orange-400 ring-2 ring-orange-300',
       filter: 'not_in_dd',
     },
+    ...(data.summary.tablesWithFieldDrift > 0
+      ? [
+          {
+            label: `Field drift (${data.summary.totalFieldDrifts} fields)`,
+            value: data.summary.tablesWithFieldDrift,
+            color: 'text-purple-600',
+            bg: 'bg-purple-50 border-purple-200 hover:bg-purple-100',
+            activeBg: 'bg-purple-100 border-purple-400 ring-2 ring-purple-300',
+            filter: 'field_drift' as string,
+          },
+        ]
+      : []),
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-3">
+    <div className={`grid gap-3 ${cards.length > 4 ? 'grid-cols-5' : 'grid-cols-4'}`}>
       {cards.map((c) => {
         const isActive = activeFilter === c.filter;
         return (

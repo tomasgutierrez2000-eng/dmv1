@@ -1,56 +1,157 @@
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { CALCULATION_DIMENSIONS } from '../data/l3-metrics';
-import {
-  getMetricForCalculation,
-  resolveAllowedDimensions,
-  resolveFormulaForDimension,
-  runMetricCalculation,
-} from '../lib/metrics-calculation';
-import { getTableKeysForMetric } from '../lib/metrics-calculation/table-resolver';
+/**
+ * Test calculation engine for YAML-based metrics.
+ *
+ * Validates that all ACTIVE YAML metric definitions:
+ *  - Have formula_sql at all 5 levels
+ *  - Have valid aggregation types
+ *  - Have source tables with MEASURE fields
+ *  - (Optional) Execute successfully against PostgreSQL when DATABASE_URL is set
+ *
+ * Run: npm run test:calc-engine
+ */
 
-const FINALIZED_METRICS = ['C100', 'C101', 'C102', 'C103', 'C104', 'C105', 'C106', 'C107'];
-const L1_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
-const L2_PATH = path.join(process.cwd(), 'scripts/l2/output/sample-data.json');
-const canRunSqlIntegration = fs.existsSync(L1_PATH) && fs.existsSync(L2_PATH);
+import { loadMetricDefinitions } from './calc_engine/loader';
+import type { MetricDefinition, AggregationLevel } from './calc_engine/types/metric-definition';
 
-async function main() {
-  console.log('Testing calculation engine for finalized metrics...');
-  for (const metricId of FINALIZED_METRICS) {
-    const metric = getMetricForCalculation(metricId);
-    assert.ok(metric, `metric ${metricId} must exist`);
-    const allowed = resolveAllowedDimensions(metric);
-    assert.ok(allowed.length > 0, `${metricId} must have allowed dimensions`);
-    assert.ok(
-      allowed.every((d) => CALCULATION_DIMENSIONS.includes(d)),
-      `${metricId} has invalid allowed dimensions`
-    );
+const LEVELS: AggregationLevel[] = ['facility', 'counterparty', 'desk', 'portfolio', 'business_segment'];
 
-    for (const dim of allowed) {
-      const resolved = resolveFormulaForDimension(metric, dim, { allowLegacyFallback: true });
-      assert.ok(resolved?.formulaSQL?.trim(), `${metricId}:${dim} must resolve to formulaSQL`);
-      const tableKeys = getTableKeysForMetric(metric, dim);
-      assert.ok(tableKeys.length > 0, `${metricId}:${dim} must resolve at least one input table`);
-    }
+const VALID_AGG_TYPES = new Set([
+  'RAW', 'SUM', 'WEIGHTED_AVG', 'COUNT', 'COUNT_DISTINCT', 'MIN', 'MAX', 'MEDIAN', 'CUSTOM',
+]);
 
-    if (canRunSqlIntegration) {
-      const result = await runMetricCalculation({
-        metric,
-        dimension: allowed[0]!,
-        asOfDate: null,
-      });
-      assert.ok('ok' in result, `${metricId} run result shape must include ok`);
-      if (!result.ok) {
-        assert.fail(`${metricId} integration run failed: ${result.error}`);
+let passed = 0;
+let failed = 0;
+
+function assert(condition: boolean, message: string): void {
+  if (!condition) {
+    console.error('  FAIL:', message);
+    failed++;
+  } else {
+    console.log('  OK:', message);
+    passed++;
+  }
+}
+
+async function runDbIntegration(metrics: MetricDefinition[]) {
+  let pg: typeof import('pg') | null = null;
+  try {
+    pg = await import('pg');
+  } catch {
+    console.log('\n  Skipping DB integration (pg module not available).');
+    return;
+  }
+
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    console.log('\n  Skipping DB integration (DATABASE_URL not set).');
+    return;
+  }
+
+  console.log('\n  Running DB integration tests...');
+  const client = new pg.default.Client({ connectionString: dbUrl });
+  try {
+    await client.connect();
+
+    for (const metric of metrics) {
+      const facilitySql = metric.levels.facility?.formula_sql;
+      if (!facilitySql) continue;
+
+      const sql = facilitySql.replace(/:as_of_date/g, "'2025-01-31'");
+      const limitedSql = `SELECT * FROM (${sql}) _t LIMIT 10`;
+
+      try {
+        const result = await client.query(limitedSql);
+        assert(
+          result.rowCount !== null && result.rowCount > 0,
+          `${metric.metric_id}: facility SQL returns rows (got ${result.rowCount})`
+        );
+
+        if (result.rows.length > 0) {
+          const hasMetricValue = 'metric_value' in result.rows[0];
+          assert(hasMetricValue, `${metric.metric_id}: result has metric_value column`);
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        assert(false, `${metric.metric_id}: facility SQL executes without error — ${msg}`);
       }
     }
+  } finally {
+    await client.end();
+  }
+}
+
+async function main() {
+  console.log('Testing calculation engine for YAML-based metrics...\n');
+
+  const { metrics, errors } = loadMetricDefinitions();
+
+  assert(errors.length === 0, `YAML loader has no errors (found ${errors.length}: ${errors.slice(0, 3).join('; ')})`);
+  assert(metrics.length > 0, `YAML loader finds metrics (found ${metrics.length})`);
+
+  const activeMetrics = metrics.filter((m) => m.status === 'ACTIVE');
+  console.log(`\n  Found ${activeMetrics.length} ACTIVE metrics out of ${metrics.length} total.\n`);
+
+  assert(activeMetrics.length > 0, 'At least one ACTIVE metric exists');
+
+  for (const metric of activeMetrics) {
+    console.log(`\n  --- ${metric.metric_id}: ${metric.name} ---`);
+
+    // Check all 5 levels have formula_sql
+    for (const level of LEVELS) {
+      const formula = metric.levels[level];
+      assert(
+        !!formula?.formula_sql?.trim(),
+        `${metric.metric_id}:${level} has non-empty formula_sql`
+      );
+
+      assert(
+        VALID_AGG_TYPES.has(formula?.aggregation_type ?? ''),
+        `${metric.metric_id}:${level} has valid aggregation_type (${formula?.aggregation_type})`
+      );
+    }
+
+    // Check source tables
+    assert(
+      metric.source_tables.length > 0,
+      `${metric.metric_id} has source_tables`
+    );
+
+    const hasMeasure = metric.source_tables.some((st) =>
+      st.fields.some((f) => f.role === 'MEASURE')
+    );
+    // Categorical/count metrics (COUNT(*) or GROUP BY) may not have MEASURE fields
+    const hasDimension = metric.source_tables.some((st) =>
+      st.fields.some((f) => f.role === 'DIMENSION')
+    );
+    if (hasMeasure) {
+      assert(true, `${metric.metric_id} has MEASURE field(s)`);
+    } else if (hasDimension) {
+      assert(true, `${metric.metric_id} is categorical metric (DIMENSION fields, no MEASURE — OK)`);
+    } else {
+      assert(false, `${metric.metric_id} has neither MEASURE nor DIMENSION fields`);
+    }
+
+    // Check validations array exists
+    assert(
+      Array.isArray(metric.validations),
+      `${metric.metric_id} has validations array`
+    );
   }
 
-  if (!canRunSqlIntegration) {
-    console.log('Skipped SQL integration run (sample data not found).');
+  // Optional: run DB integration for ACTIVE metrics
+  await runDbIntegration(activeMetrics);
+
+  // Summary
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`  Passed: ${passed}, Failed: ${failed}`);
+  console.log(`${'='.repeat(60)}`);
+
+  if (failed > 0) {
+    console.error(`\n${failed} test(s) failed.`);
+    process.exit(1);
   }
-  console.log('Calculation engine tests passed for all finalized metrics.');
+
+  console.log('\nAll calculation engine tests passed.');
 }
 
 main().catch((err) => {

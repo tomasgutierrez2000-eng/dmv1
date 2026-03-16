@@ -1459,6 +1459,94 @@ function validateMetricGovernance(ddLookup: DDLookup): CheckResult[] {
     results.push(check('11.3', 11, 'Catalogue status distribution', details, severity));
   }
 
+  // 11.4 SCD2 is_current_flag enforcement on YAML formulas
+  {
+    const issues: string[] = [];
+    // Build set of tables that have is_current_flag in the data dictionary
+    const scd2Tables = new Set<string>();
+    for (const layer of ['L1', 'L2', 'L3'] as const) {
+      for (const t of ddLookup.dd[layer]) {
+        const hasFlag = t.fields.some((f) => f.name === 'is_current_flag');
+        if (hasFlag) {
+          scd2Tables.add(`${layer.toLowerCase()}.${t.name}`);
+        }
+      }
+    }
+
+    let yamlMetrics: { metrics: Array<{ metric_id: string; source_tables: Array<{ schema: string; table: string }>; levels: Record<string, { formula_sql?: string }> }>; errors: string[] } | null = null;
+    try {
+      const { loadMetricDefinitions } = require('./calc_engine/loader');
+      yamlMetrics = loadMetricDefinitions();
+    } catch {
+      // YAML loader not available — skip
+    }
+
+    if (yamlMetrics && yamlMetrics.metrics.length > 0) {
+      const levels = ['facility', 'counterparty', 'desk', 'portfolio', 'business_segment'] as const;
+      for (const metric of yamlMetrics.metrics) {
+        // Find which source tables are SCD2
+        const scd2Sources = metric.source_tables.filter((st) =>
+          scd2Tables.has(`${st.schema}.${st.table}`)
+        );
+        if (scd2Sources.length === 0) continue;
+
+        for (const level of levels) {
+          const formula = metric.levels[level];
+          if (!formula?.formula_sql) continue;
+          const sql = formula.formula_sql.toLowerCase();
+          for (const st of scd2Sources) {
+            // Check formula references is_current_flag or is_active_flag (both are valid SCD filters)
+            const hasScdFilter = sql.includes('is_current_flag') || sql.includes('is_active_flag');
+            if (!hasScdFilter) {
+              if (issues.length < 20) {
+                issues.push(`${metric.metric_id} level ${level}: joins SCD2 table ${st.schema}.${st.table} but formula_sql does not filter on is_current_flag or is_active_flag`);
+              }
+            }
+          }
+        }
+      }
+    }
+    const scd2Count = issues.length;
+    if (scd2Count > 20) {
+      issues.push(`... and ${scd2Count - 20} more`);
+    }
+    results.push(check('11.4', 11, `SCD2 is_current_flag enforcement (${scd2Tables.size} SCD2 tables)`, issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
+  // 11.5 FX conversion on WEIGHTED_AVG currency-amount metrics
+  {
+    const issues: string[] = [];
+    let yamlMetrics: { metrics: Array<{ metric_id: string; unit_type?: string; source_tables: Array<{ schema: string; table: string }>; levels: Record<string, { aggregation_type?: string; formula_sql?: string; weighting_field?: string }> }>; errors: string[] } | null = null;
+    try {
+      const { loadMetricDefinitions } = require('./calc_engine/loader');
+      yamlMetrics = loadMetricDefinitions();
+    } catch {
+      // YAML loader not available — skip
+    }
+
+    if (yamlMetrics && yamlMetrics.metrics.length > 0) {
+      const aggregateLevels = ['counterparty', 'desk', 'portfolio', 'business_segment'] as const;
+      for (const metric of yamlMetrics.metrics) {
+        for (const level of aggregateLevels) {
+          const formula = metric.levels[level];
+          if (!formula) continue;
+          if (formula.aggregation_type !== 'WEIGHTED_AVG') continue;
+          // Check if weighting uses a currency amount field
+          const weight = formula.weighting_field || '';
+          const sql = (formula.formula_sql || '').toLowerCase();
+          const usesCurrencyWeight = /committed_amount|_amt/i.test(weight) || /committed_amount.*coalesce/i.test(sql);
+          if (!usesCurrencyWeight) continue;
+          // Check if FX conversion is present
+          const hasFx = sql.includes('fx_rate') || sql.includes('fx.rate');
+          if (!hasFx) {
+            issues.push(`${metric.metric_id} level ${level}: WEIGHTED_AVG uses currency amount weight but no FX conversion`);
+          }
+        }
+      }
+    }
+    results.push(check('11.5', 11, 'FX conversion on WEIGHTED_AVG currency metrics', issues, issues.length > 0 ? 'WARN' : 'PASS'));
+  }
+
   return results;
 }
 

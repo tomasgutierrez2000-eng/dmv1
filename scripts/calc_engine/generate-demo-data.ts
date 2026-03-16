@@ -18,6 +18,7 @@ import { hideBin } from 'yargs/helpers';
 import { getMetricLibraryDir } from '@/lib/config';
 import { DataLoader } from './data-loader';
 import { generateDemoData } from './demo-generator';
+import { loadMetricDefinitions } from './loader';
 import type { CatalogueItem } from '@/lib/metric-library/types';
 
 const DEFAULT_AS_OF_DATE = process.env.DEFAULT_AS_OF_DATE ?? '2025-01-31';
@@ -160,6 +161,121 @@ async function generateAll(
   console.log(`  Failed:    ${failed}`);
 }
 
+/**
+ * Compare existing demo_data metric values against live DB values.
+ * Diagnostic only — does not edit catalogue.
+ */
+async function validateDemoData(catalogue: CatalogueItem[], asOfDate: string): Promise<void> {
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is required for --validate');
+    process.exit(1);
+  }
+
+  const { metrics } = loadMetricDefinitions();
+  const loader = new DataLoader();
+
+  console.log('\n  Demo Data Validation — Comparing demo vs DB');
+  console.log('  ' + '═'.repeat(80));
+
+  let totalFacilities = 0;
+  let driftCount = 0;
+  const itemsChecked: string[] = [];
+
+  try {
+    for (const item of catalogue) {
+      if (!item.demo_data?.facilities?.length) continue;
+
+      // Find matching YAML metric
+      const metric = metrics.find(
+        (m) => m.metric_id === item.item_id || m.metric_id === item.executable_metric_id
+      );
+      if (!metric) continue;
+
+      const facilitySql = metric.levels.facility?.formula_sql;
+      if (!facilitySql) continue;
+
+      // Execute facility-level SQL against DB
+      let dbResult;
+      try {
+        dbResult = await loader.query(facilitySql, { as_of_date: asOfDate });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`\n  ${item.item_id} (${item.item_name}): SQL error — ${msg.slice(0, 80)}`);
+        continue;
+      }
+      if (!dbResult || dbResult.rows.length === 0) continue;
+
+      // Build lookup: dimension_key → metric_value
+      const dbValues = new Map<string, number>();
+      for (const row of dbResult.rows) {
+        const key = String(row.dimension_key ?? '');
+        const val = Number(row.metric_value ?? 0);
+        if (key) dbValues.set(key, val);
+      }
+
+      // Compare each demo facility
+      let itemDriftCount = 0;
+      const facilityResults: Array<{ id: string; demo: number; db: number; pct: number; status: string }> = [];
+
+      for (const fac of item.demo_data.facilities) {
+        totalFacilities++;
+        const facId = fac.facility_id;
+
+        // Try to find a demo metric value
+        const demoValue = fac.extra_fields
+          ? Number(Object.values(fac.extra_fields).find((v) => typeof v === 'number') ?? fac.ltv_pct ?? 0)
+          : fac.dscr_value ?? fac.ltv_pct ?? 0;
+
+        const dbValue = dbValues.get(facId) ?? dbValues.get(String(Number(facId)));
+        if (dbValue === undefined) {
+          facilityResults.push({ id: facId, demo: demoValue, db: NaN, pct: NaN, status: 'NOT_IN_DB' });
+          continue;
+        }
+
+        const diff = Math.abs(demoValue - dbValue);
+        const pct = dbValue === 0 ? (demoValue === 0 ? 0 : 100) : (diff / Math.abs(dbValue)) * 100;
+        const status = pct > 5 ? 'DRIFT' : 'OK';
+        if (pct > 5) {
+          itemDriftCount++;
+          driftCount++;
+        }
+
+        facilityResults.push({ id: facId, demo: demoValue, db: dbValue, pct, status });
+      }
+
+      itemsChecked.push(item.item_id);
+
+      // Print per-item results
+      console.log(`\n  ${item.item_id} (${item.item_name}):`);
+      console.log(`  ${'Facility'.padEnd(12)} ${'Demo'.padEnd(14)} ${'DB'.padEnd(14)} ${'Drift %'.padEnd(10)} Status`);
+      console.log(`  ${'─'.repeat(12)} ${'─'.repeat(14)} ${'─'.repeat(14)} ${'─'.repeat(10)} ${'─'.repeat(10)}`);
+
+      for (const r of facilityResults) {
+        console.log(
+          `  ${r.id.padEnd(12)} ${(isNaN(r.demo) ? 'N/A' : r.demo.toFixed(4)).padEnd(14)} ${(isNaN(r.db) ? 'N/A' : r.db.toFixed(4)).padEnd(14)} ${(isNaN(r.pct) ? 'N/A' : r.pct.toFixed(2) + '%').padEnd(10)} ${r.status}`
+        );
+      }
+
+      if (itemDriftCount > 0) {
+        console.log(`  ⚠ ${itemDriftCount}/${item.demo_data.facilities.length} facilities have drift > 5%`);
+      }
+    }
+  } finally {
+    await loader.close();
+  }
+
+  // Summary
+  console.log(`\n  ${'─'.repeat(60)}`);
+  console.log(`  Items checked: ${itemsChecked.length}`);
+  console.log(`  Total facilities: ${totalFacilities}`);
+  console.log(`  Facilities with drift > 5%: ${driftCount}`);
+  console.log(`  ${'─'.repeat(60)}`);
+
+  if (itemsChecked.length === 0) {
+    console.log('\n  No catalogue items with demo_data and matching YAML metrics found.');
+  }
+}
+
 async function main(): Promise<void> {
   const argv = await yargs(hideBin(process.argv))
     .option('metric', {
@@ -206,9 +322,19 @@ async function main(): Promise<void> {
       default: false,
       describe: 'Force JSON sample data (skip PostgreSQL)',
     })
+    .option('validate', {
+      type: 'boolean',
+      default: false,
+      describe: 'Compare existing demo_data against DB values (diagnostic only, no edits)',
+    })
+    .option('from-db', {
+      type: 'boolean',
+      default: false,
+      describe: 'Generate demo data from live DB instead of sample data',
+    })
     .check((argv) => {
-      if (!argv.metric && !argv.all) {
-        throw new Error('--metric or --all is required');
+      if (!argv.metric && !argv.all && !argv.validate) {
+        throw new Error('--metric, --all, or --validate is required');
       }
       return true;
     })
@@ -216,7 +342,16 @@ async function main(): Promise<void> {
     .argv;
 
   const catalogue = loadCatalogue();
-  const loader = new DataLoader({ forceJson: argv['force-json'] });
+
+  // ── Validate mode: compare demo data against DB ──────────
+  if (argv.validate) {
+    await validateDemoData(catalogue, argv['as-of-date']);
+    return;
+  }
+
+  const loader = new DataLoader({
+    forceJson: argv['force-json'] || !argv['from-db'],
+  });
 
   try {
     if (argv.all) {

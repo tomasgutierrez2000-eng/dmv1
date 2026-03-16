@@ -112,7 +112,7 @@ levels:
       SELECT
         cs.facility_id                                              AS dimension_key,
         SUM(cs.current_valuation_usd)
-          * COALESCE(fla.bank_share_pct, 100.0) / 100.0            AS metric_value
+          * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0       AS metric_value
       FROM l2.collateral_snapshot cs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = cs.facility_id

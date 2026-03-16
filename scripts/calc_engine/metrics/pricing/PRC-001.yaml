@@ -1,6 +1,6 @@
 metric_id: PRC-001
 name: All in Rate (%)
-version: 1.0.0
+version: 1.1.0
 owner: market-risk
 status: ACTIVE
 effective_date: '2026-01-01'
@@ -42,11 +42,13 @@ source_tables:
     role: MEASURE
   - name: bank_share_pct
     role: MEASURE
+  - name: currency_code
+    role: JOIN_KEY
 - schema: l2
   table: facility_master
   alias: fm
   join_type: INNER
-  join_on: fm.facility_id = fps.facility_id
+  join_on: fm.facility_id = fps.facility_id AND fm.is_active_flag = 'Y'
   fields:
   - name: facility_id
     role: JOIN_KEY
@@ -60,12 +62,26 @@ source_tables:
   table: enterprise_business_taxonomy
   alias: ebt
   join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
+  join_on: ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'
   fields:
   - name: managed_segment_id
     role: DIMENSION
   - name: parent_segment_id
     role: DIMENSION
+  - name: is_current_flag
+    role: FILTER
+- schema: l2
+  table: fx_rate
+  alias: fx
+  join_type: LEFT
+  join_on: fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date
+  fields:
+  - name: from_currency_code
+    role: JOIN_KEY
+  - name: to_currency_code
+    role: FILTER
+  - name: rate
+    role: MEASURE
 levels:
   facility:
     aggregation_type: RAW
@@ -82,15 +98,15 @@ levels:
       WHERE fps.as_of_date = :as_of_date
   counterparty:
     aggregation_type: WEIGHTED_AVG
-    weighting_field: committed_amount * bank_share_pct
+    weighting_field: committed_amount * bank_share_pct * fx_rate
     formula_text: |
-      For each Counterparty_ID, lookup Facility_IDs in Facility Master where IS(Counterparty_ID), SELECT all_in_rate_pct. Weight by bank share committed amount (committed_amount * bank_share_pct). Weighted average = SUM(rate * weight) / SUM(weight).
+      For each Counterparty_ID, lookup Facility_IDs in Facility Master where IS(Counterparty_ID), SELECT all_in_rate_pct. Weight by FX-converted bank share committed amount (committed_amount * bank_share_pct * fx_rate). Weighted average = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
-             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
-                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -99,19 +115,23 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: WEIGHTED_AVG
-    weighting_field: committed_amount * bank_share_pct
+    weighting_field: committed_amount * bank_share_pct * fx_rate
     formula_text: |
-      For each L3 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by bank share committed exposure (committed_amount * bank_share_pct). Weighted average = SUM(rate * weight) / SUM(weight).
+      For each L3 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by FX-converted bank share committed exposure (committed_amount * bank_share_pct * fx_rate). Weighted average = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
-             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
-                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -122,18 +142,23 @@ levels:
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: CUSTOM
     formula_text: |
-      For each L2 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by bank share committed exposure (committed_amount * bank_share_pct). Calculated = SUM(rate * weight) / SUM(weight).
+      For each L2 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by FX-converted bank share committed exposure (committed_amount * bank_share_pct * fx_rate). Calculated = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
-             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
-                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -144,20 +169,26 @@ levels:
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: CUSTOM
     formula_text: |
-      For each L1 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by bank share committed exposure (committed_amount * bank_share_pct). Calculated = SUM(rate * weight) / SUM(weight).
+      For each L1 LoB, lookup lob_segment_id from enterprise_business_taxonomy, then lookup facility_id in Facility Master where IS(lob_segment_id). SELECT all_in_rate_pct, weight by FX-converted bank share committed exposure (committed_amount * bank_share_pct * fx_rate). Calculated = SUM(rate * weight) / SUM(weight).
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL
-             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
-                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL
+             ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
+                  / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_exposure_snapshot fes
@@ -168,10 +199,17 @@ levels:
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 depends_on: []

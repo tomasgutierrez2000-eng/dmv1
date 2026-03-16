@@ -139,29 +139,139 @@ yargs(hideBin(process.argv))
   // ── validate ─────────────────────────────────────────────
   .command(
     'validate',
-    'Run validation checks on existing results',
+    'Validate metric formulas against PostgreSQL (or post-calc results with --run-id)',
     (y) =>
       y
         .option('run-id', {
           type: 'string',
-          describe: 'Run ID to validate',
-          demandOption: true,
+          describe: 'Run ID to validate post-calc results (omit for formula validation)',
         })
         .option('metrics', {
           alias: 'm',
           type: 'array',
           string: true,
-          describe: 'Specific metrics to validate',
+          describe: 'Specific metric IDs to validate',
+        })
+        .option('domain', {
+          type: 'array',
+          string: true,
+          describe: 'Filter by domain',
+        })
+        .option('levels', {
+          alias: 'l',
+          type: 'array',
+          string: true,
+          describe: 'Specific levels to validate',
+        })
+        .option('as-of-date', {
+          alias: 'd',
+          type: 'string',
+          describe: 'Reporting date (YYYY-MM-DD)',
+          default: '2025-01-31',
+        })
+        .option('include-draft', {
+          type: 'boolean',
+          describe: 'Include DRAFT status metrics',
+          default: false,
         })
         .option('severity', {
           type: 'string',
-          describe: 'Minimum severity to report',
+          describe: 'Minimum severity to report (for --run-id mode)',
           choices: ['ERROR', 'WARNING', 'INFO'],
           default: 'WARNING',
+        })
+        .option('verbose', {
+          alias: 'v',
+          type: 'boolean',
+          describe: 'Detailed logging',
+          default: false,
         }),
     async (argv) => {
-      console.log(`\n  Validate command — run-id: ${argv.runId}`);
-      console.log(`  (Not yet implemented — requires a completed run to validate against)`);
+      if (argv.runId) {
+        // Post-calc validation mode (existing run)
+        console.log(`\n  Validate command — run-id: ${argv.runId}`);
+        console.log(`  (Post-calc validation requires a completed run — use 'run' command first)`);
+        return;
+      }
+
+      // Formula validation mode
+      console.log(`\n  GSIB Formula Validator`);
+      console.log(`  ═══════════════════════════════════════════`);
+      console.log(`  as_of_date: ${argv.asOfDate}`);
+
+      const { validateFormulas, printValidationSummary } = await import(
+        './engine/formula-validator'
+      );
+
+      const summary = await validateFormulas({
+        metricIds: argv.metrics,
+        domains: argv.domain,
+        levels: argv.levels as AggregationLevel[] | undefined,
+        asOfDate: argv.asOfDate,
+        includeDraft: argv.includeDraft,
+        verbose: argv.verbose,
+      });
+
+      printValidationSummary(summary);
+
+      // Exit code: 2 if FAIL, 1 if WARN, 0 if PASS
+      process.exit(summary.failed > 0 ? 2 : summary.warned > 0 ? 1 : 0);
+    }
+  )
+
+  // ── promote ─────────────────────────────────────────────
+  .command(
+    'promote',
+    'Promote a metric from DRAFT to ACTIVE (or demote with --demote)',
+    (y) =>
+      y
+        .option('metric-id', {
+          alias: 'm',
+          type: 'string',
+          describe: 'Metric ID to promote',
+          demandOption: true,
+        })
+        .option('as-of-date', {
+          alias: 'd',
+          type: 'string',
+          describe: 'Reporting date for validation (YYYY-MM-DD)',
+          default: '2025-01-31',
+        })
+        .option('dry-run', {
+          type: 'boolean',
+          describe: 'Check eligibility without applying changes',
+          default: false,
+        })
+        .option('demote', {
+          type: 'boolean',
+          describe: 'Demote from ACTIVE to DRAFT',
+          default: false,
+        })
+        .option('verbose', {
+          alias: 'v',
+          type: 'boolean',
+          describe: 'Detailed logging',
+          default: false,
+        }),
+    async (argv) => {
+      console.log(`\n  GSIB Metric Promoter`);
+      console.log(`  ═══════════════════════════════════════════`);
+
+      const { promoteMetric, printPromotionResult } = await import(
+        './engine/promoter'
+      );
+
+      const result = await promoteMetric({
+        metricId: argv.metricId,
+        asOfDate: argv.asOfDate,
+        dryRun: argv.dryRun,
+        demote: argv.demote,
+        verbose: argv.verbose,
+      });
+
+      printPromotionResult(result, argv.dryRun);
+
+      process.exit(result.success ? 0 : 1);
     }
   )
 

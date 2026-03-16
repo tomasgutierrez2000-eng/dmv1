@@ -144,6 +144,15 @@ export interface CatalogueItem {
   spec_discrepancy_notes?: string[];
   /** Tolerance (in %) for rollup reconciliation avg-diff check. Default 5. */
   reconciliation_tolerance_pct?: number;
+  /** Evidence from calc:promote — records what was validated at promotion time. */
+  validation_evidence?: {
+    promoted_at: string;
+    promoted_by: string;
+    as_of_date: string;
+    validation_results: Record<string, boolean>;
+    db_row_counts?: Record<string, number>;
+    prior_status?: string;
+  };
 }
 
 /* ── Legacy types (kept for backward compat during migration) ── */

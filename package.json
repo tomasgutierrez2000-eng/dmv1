@@ -48,6 +48,8 @@
     "calc:sync": "npm run calc:sync:excel && npm run calc:sync:catalogue",
     "calc:demo": "tsx scripts/calc_engine/generate-demo-data.ts",
     "calc:demo:all": "tsx scripts/calc_engine/generate-demo-data.ts --all --persist --force",
+    "calc:validate": "tsx scripts/calc_engine/cli.ts validate",
+    "calc:promote": "tsx scripts/calc_engine/cli.ts promote",
     "calc:full": "npm run calc:sync && npm run calc:demo:all",
     "calc:populate-l3": "tsx scripts/calc_engine/populate-l3.ts",
     "factory:generate": "tsx scenarios/factory/scenario-runner.ts --all",

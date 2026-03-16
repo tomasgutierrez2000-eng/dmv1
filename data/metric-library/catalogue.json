@@ -36144,7 +36144,7 @@
         "dashboard_display_name": "All in Rate (%) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. COMPUTE\n   metric_value = fps.all_in_rate_pct",
+        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id AND fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date\n6. COMPUTE\n   metric_value = fps.all_in_rate_pct",
         "source_references": [
           {
             "layer": "L2",
@@ -36190,6 +36190,12 @@
           },
           {
             "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
+          },
+          {
+            "layer": "L2",
             "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
@@ -36223,6 +36229,30 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "from_currency_code",
+            "description": "from_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "to_currency_code",
+            "description": "to_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
           }
         ],
         "formula_sql": "SELECT\n  fps.facility_id AS dimension_key,\n  fps.all_in_rate_pct AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fps.as_of_date = :as_of_date"
@@ -36232,7 +36262,7 @@
         "dashboard_display_name": "All in Rate (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY fm.counterparty_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) END",
+        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id AND fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date\n6. GROUP BY fm.counterparty_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) END",
         "source_references": [
           {
             "layer": "L2",
@@ -36278,6 +36308,12 @@
           },
           {
             "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
+          },
+          {
+            "layer": "L2",
             "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
@@ -36311,16 +36347,40 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "from_currency_code",
+            "description": "from_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "to_currency_code",
+            "description": "to_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fps.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = fes.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = fes.as_of_date\nWHERE fps.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id"
       },
       {
         "level": "desk",
         "dashboard_display_name": "All in Rate (%) (desk)",
         "in_record": true,
         "sourcing_type": "Avg",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) END",
+        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id AND fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) END",
         "source_references": [
           {
             "layer": "L2",
@@ -36366,6 +36426,12 @@
           },
           {
             "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
+          },
+          {
+            "layer": "L2",
             "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
@@ -36399,16 +36465,40 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "from_currency_code",
+            "description": "from_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "to_currency_code",
+            "description": "to_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n  AND ebt.is_current_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = fes.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = fes.as_of_date\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "All in Rate (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l2.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) END",
+        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id AND fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) END",
         "source_references": [
           {
             "layer": "L2",
@@ -36454,6 +36544,12 @@
           },
           {
             "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
+          },
+          {
+            "layer": "L2",
             "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
@@ -36487,16 +36583,40 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "from_currency_code",
+            "description": "from_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "to_currency_code",
+            "description": "to_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = fes.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = fes.as_of_date\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
         "dashboard_display_name": "All in Rate (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id\n   AND   fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n5. GROUP BY ebt_l1.managed_segment_id\n6. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) END",
+        "level_logic": "1. LOAD  l2.facility_pricing_snapshot  (fps)\n   WHERE fps.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fps.facility_id AND fm.is_active_flag = 'Y'\n4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'\n5. LEFT JOIN  l2.fx_rate  (fx)\n   ON    fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) END",
         "source_references": [
           {
             "layer": "L2",
@@ -36542,6 +36662,12 @@
           },
           {
             "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "currency_code",
+            "description": "currency_code"
+          },
+          {
+            "layer": "L2",
             "table": "facility_master",
             "field": "facility_id",
             "description": "facility_id"
@@ -36575,9 +36701,33 @@
             "table": "enterprise_business_taxonomy",
             "field": "parent_segment_id",
             "description": "parent_segment_id"
+          },
+          {
+            "layer": "L1",
+            "table": "enterprise_business_taxonomy",
+            "field": "is_current_flag",
+            "description": "is_current_flag"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "from_currency_code",
+            "description": "from_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "to_currency_code",
+            "description": "to_currency_code"
+          },
+          {
+            "layer": "L2",
+            "table": "fx_rate",
+            "field": "rate",
+            "description": "rate"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1)) = 0 THEN NULL\n       ELSE SUM(fps.all_in_rate_pct * fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n            / SUM(fes.committed_amount * COALESCE(fes.bank_share_pct, 1) * COALESCE(fx.rate, 1))\n  END AS metric_value\nFROM l2.facility_pricing_snapshot fps\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fps.facility_id\n  AND fes.as_of_date = fps.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fps.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n  AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n  AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n  AND ebt_l1.is_current_flag = 'Y'\nLEFT JOIN l2.fx_rate fx\n  ON fx.from_currency_code = fes.currency_code\n  AND fx.to_currency_code = 'USD'\n  AND fx.as_of_date = fes.as_of_date\nWHERE fps.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {

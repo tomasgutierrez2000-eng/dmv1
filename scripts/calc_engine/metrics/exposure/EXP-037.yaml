@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-037"
 name: "Total Debt Service ($)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "market-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,12 +18,13 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Total principal and interest obligations due within reporting period in
-  millions USD. Used in repayment capacity and covenant analysis.
+  Total principal and interest obligations due within reporting period.
+  Facility level in local currency; counterparty and above converted to USD.
+  Used in repayment capacity and covenant analysis.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Repayment capacity assessment"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -35,11 +36,15 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: total_debt_service_amt
+      - name: interest_expense_amt
+        role: MEASURE
+      - name: principal_payment_amt
         role: MEASURE
       - name: currency_code
         role: JOIN_KEY
         description: "Original currency of financial amounts — used for FX conversion"
+      - name: counterparty_id
+        role: JOIN_KEY
   - schema: l2
     table: fx_rate
     alias: fx
@@ -84,26 +89,24 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      Lookup total_debt_service_amt from facility_financial_snapshot, convert to USD
-      via l2.fx_rate spot rate (COALESCE to 1 for USD-denominated facilities).
-    formula_sql: |
+      Interest Expense + Principal Payment from facility_financial_snapshot.
+      Facility level stays in local currency (no FX conversion).
+    formula_sql: |-
       SELECT
         ffs.facility_id AS dimension_key,
-        ffs.total_debt_service_amt * COALESCE(fx.rate, 1) AS metric_value
+        COALESCE(ffs.interest_expense_amt, 0) + COALESCE(ffs.principal_payment_amt, 0)
+          AS metric_value
       FROM l2.facility_financial_snapshot ffs
-      LEFT JOIN l2.fx_rate fx
-        ON fx.from_currency_code = ffs.currency_code
-        AND fx.to_currency_code = 'USD'
-        AND fx.as_of_date = ffs.as_of_date
       WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_debt_service_amt converted to USD per counterparty.
-    formula_sql: |
+      SUM of facility-level TDS converted to USD per counterparty.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(ffs.total_debt_service_amt * COALESCE(fx.rate, 1)) AS metric_value
+        SUM((COALESCE(ffs.interest_expense_amt, 0) + COALESCE(ffs.principal_payment_amt, 0))
+            * COALESCE(fx.rate, 1)) AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
@@ -117,11 +120,12 @@ levels:
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_debt_service_amt converted to USD per L3 desk segment.
-    formula_sql: |
+      SUM of facility-level TDS converted to USD per L3 desk segment.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(ffs.total_debt_service_amt * COALESCE(fx.rate, 1)) AS metric_value
+        SUM((COALESCE(ffs.interest_expense_amt, 0) + COALESCE(ffs.principal_payment_amt, 0))
+            * COALESCE(fx.rate, 1)) AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
@@ -137,11 +141,12 @@ levels:
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_debt_service_amt converted to USD per L2 portfolio segment.
-    formula_sql: |
+      SUM of facility-level TDS converted to USD per L2 portfolio segment.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(ffs.total_debt_service_amt * COALESCE(fx.rate, 1)) AS metric_value
+        SUM((COALESCE(ffs.interest_expense_amt, 0) + COALESCE(ffs.principal_payment_amt, 0))
+            * COALESCE(fx.rate, 1)) AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
@@ -159,12 +164,12 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level total_debt_service_amt converted to USD per L1 business
-      segment.
-    formula_sql: |
+      SUM of facility-level TDS converted to USD per L1 business segment.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(ffs.total_debt_service_amt * COALESCE(fx.rate, 1)) AS metric_value
+        SUM((COALESCE(ffs.interest_expense_amt, 0) + COALESCE(ffs.principal_payment_amt, 0))
+            * COALESCE(fx.rate, 1)) AS metric_value
       FROM l2.facility_financial_snapshot ffs
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
@@ -190,12 +195,18 @@ output:
 validations:
   - rule_id: "EXP-037-V01"
     type: NOT_NULL
-    description: "No null total_debt_service_amt values"
+    description: "No null total_debt_service values"
     severity: ERROR
   - rule_id: "EXP-037-V02"
     type: NON_NEGATIVE
-    description: "total_debt_service_amt must be >= 0"
+    description: "Total debt service must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-037-V03"
+    type: RECONCILIATION
+    description: "SUM(facility TDS) should equal counterparty TDS for same-currency counterparties"
+    severity: ERROR
+    params:
+      tolerance_pct: 0.01
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-082"
@@ -205,6 +216,6 @@ catalogue:
   rollup_strategy: "direct-sum"
   primary_value_field: "total_debt_service_amt"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "debt-service"]
 dashboard_pages: []
 legacy_metric_ids: []

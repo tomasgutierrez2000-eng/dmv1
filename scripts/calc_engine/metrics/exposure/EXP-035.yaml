@@ -1,134 +1,189 @@
-metric_id: EXP-035
-name: Return on Assets (%)
-version: 1.0.0
-owner: market-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Return on Assets (%)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-035"
+name: "Return on Assets (%)"
+version: "2.0.0"
+owner: "market-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: exposure
-sub_domain: risk-metrics
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "risk-metrics"
 metric_class: CALCULATED
 direction: NEUTRAL
 unit_type: PERCENTAGE
-display_format: .2f
-description: |
-  Net Income divided by Total Assets. Calculated efficiency KPI measuring asset productivity and overall financial performance.
+display_format: ".2f"
+description: >
+  Net Income divided by Total Assets (at counterparty level) or Committed
+  Exposure bank-share (at facility level). Measures asset utilization
+  efficiency and overall financial performance.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "Basel III"
+    description: "Asset productivity and return analysis"
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l2
-  table: counterparty_financial_snapshot
-  alias: cfs
-  join_type: BASE
-  fields:
-  - name: counterparty_id
-    role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: net_income_amt
-    role: MEASURE
-  - name: total_assets_amt
-    role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.counterparty_id = cfs.counterparty_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: counterparty_id
-    role: DIMENSION
-  - name: lob_segment_id
-    role: DIMENSION
-  - name: is_active_flag
-    role: FILTER
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l2
+    table: facility_financial_snapshot
+    alias: ffs
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: net_income_amt
+        role: MEASURE
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: currency_code
+        role: JOIN_KEY
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = ffs.facility_id AND fes.as_of_date = ffs.as_of_date"
+    fields:
+      - name: committed_amount
+        role: MEASURE
+      - name: bank_share_pct
+        role: MEASURE
+      - name: gross_exposure_usd
+        role: MEASURE
+      - name: lob_segment_id
+        role: DIMENSION
+  - schema: l2
+    table: counterparty_financial_snapshot
+    alias: cfs
+    join_type: BASE
+    fields:
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: revenue_amt
+        role: MEASURE
+      - name: operating_expense_amt
+        role: MEASURE
+      - name: interest_expense_amt
+        role: MEASURE
+      - name: tax_expense_amt
+        role: MEASURE
+      - name: total_assets_amt
+        role: MEASURE
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = ffs.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: |
-      Facility Net Income / Facility Exposure
+    formula_text: >
+      Facility Net Income / Committed Exposure (Bank Share portion only).
     formula_sql: |-
       SELECT
-        fm.facility_id AS dimension_key,
-        cfs.net_income_amt / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
-      FROM l2.counterparty_financial_snapshot cfs
-      INNER JOIN l2.facility_master fm
-        ON fm.counterparty_id = cfs.counterparty_id
-        AND fm.is_active_flag = 'Y'
-      WHERE cfs.as_of_date = :as_of_date
+        ffs.facility_id AS dimension_key,
+        ffs.net_income_amt
+          / NULLIF(fes.committed_amount * COALESCE(fes.bank_share_pct, 100.0) / 100.0, 0)
+          * 100.0 AS metric_value
+      FROM l2.facility_financial_snapshot ffs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = ffs.facility_id
+        AND fes.as_of_date = ffs.as_of_date
+      WHERE ffs.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
-    formula_text: |
-      Net Income / Total Assets * 100 per counterparty (direct from financials).
+    formula_text: >
+      Counterparty Net Income / Total Assets * 100. Net income computed from
+      revenue minus expenses.
     formula_sql: |-
       SELECT
         cfs.counterparty_id AS dimension_key,
-        cfs.net_income_amt / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
+        (COALESCE(cfs.revenue_amt, 0) - COALESCE(cfs.operating_expense_amt, 0)
+         - COALESCE(cfs.interest_expense_amt, 0) - COALESCE(cfs.tax_expense_amt, 0))
+          / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
       FROM l2.counterparty_financial_snapshot cfs
       WHERE cfs.as_of_date = :as_of_date
   desk:
     aggregation_type: WEIGHTED_AVG
-    formula_text: |
+    formula_text: >
       Exposure-weighted average ROA per L3 desk segment.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fes_w.gross_exposure_usd) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fes_w.gross_exposure_usd)
-                  / SUM(fes_w.gross_exposure_usd)
+        CASE WHEN SUM(fes.gross_exposure_usd) = 0 THEN NULL
+             ELSE SUM(cp_roa.metric_value * fes.gross_exposure_usd)
+                  / SUM(fes.gross_exposure_usd)
         END AS metric_value
       FROM (
         SELECT
           cfs.counterparty_id,
-          cfs.net_income_amt / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
+          (COALESCE(cfs.revenue_amt, 0) - COALESCE(cfs.operating_expense_amt, 0)
+           - COALESCE(cfs.interest_expense_amt, 0) - COALESCE(cfs.tax_expense_amt, 0))
+            / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
-      ) fac
+      ) cp_roa
       INNER JOIN l2.facility_master fm
-        ON fm.counterparty_id = fac.counterparty_id
+        ON fm.counterparty_id = cp_roa.counterparty_id
         AND fm.is_active_flag = 'Y'
-      INNER JOIN l2.facility_exposure_snapshot fes_w
-        ON fes_w.facility_id = fm.facility_id
-        AND fes_w.as_of_date = :as_of_date
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fm.facility_id
+        AND fes.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: WEIGHTED_AVG
-    formula_text: |
+    formula_text: >
       Exposure-weighted average ROA per L2 portfolio segment.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fes_w.gross_exposure_usd) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fes_w.gross_exposure_usd)
-                  / SUM(fes_w.gross_exposure_usd)
+        CASE WHEN SUM(fes.gross_exposure_usd) = 0 THEN NULL
+             ELSE SUM(cp_roa.metric_value * fes.gross_exposure_usd)
+                  / SUM(fes.gross_exposure_usd)
         END AS metric_value
       FROM (
         SELECT
           cfs.counterparty_id,
-          cfs.net_income_amt / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
+          (COALESCE(cfs.revenue_amt, 0) - COALESCE(cfs.operating_expense_amt, 0)
+           - COALESCE(cfs.interest_expense_amt, 0) - COALESCE(cfs.tax_expense_amt, 0))
+            / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
-      ) fac
+      ) cp_roa
       INNER JOIN l2.facility_master fm
-        ON fm.counterparty_id = fac.counterparty_id
+        ON fm.counterparty_id = cp_roa.counterparty_id
         AND fm.is_active_flag = 'Y'
-      INNER JOIN l2.facility_exposure_snapshot fes_w
-        ON fes_w.facility_id = fm.facility_id
-        AND fes_w.as_of_date = :as_of_date
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fm.facility_id
+        AND fes.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -136,28 +191,30 @@ levels:
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: WEIGHTED_AVG
-    formula_text: |
+    formula_text: >
       Exposure-weighted average ROA per L1 business segment.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fes_w.gross_exposure_usd) = 0 THEN NULL
-             ELSE SUM(fac.metric_value * fes_w.gross_exposure_usd)
-                  / SUM(fes_w.gross_exposure_usd)
+        CASE WHEN SUM(fes.gross_exposure_usd) = 0 THEN NULL
+             ELSE SUM(cp_roa.metric_value * fes.gross_exposure_usd)
+                  / SUM(fes.gross_exposure_usd)
         END AS metric_value
       FROM (
         SELECT
           cfs.counterparty_id,
-          cfs.net_income_amt / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
+          (COALESCE(cfs.revenue_amt, 0) - COALESCE(cfs.operating_expense_amt, 0)
+           - COALESCE(cfs.interest_expense_amt, 0) - COALESCE(cfs.tax_expense_amt, 0))
+            / NULLIF(cfs.total_assets_amt, 0) * 100.0 AS metric_value
         FROM l2.counterparty_financial_snapshot cfs
         WHERE cfs.as_of_date = :as_of_date
-      ) fac
+      ) cp_roa
       INNER JOIN l2.facility_master fm
-        ON fm.counterparty_id = fac.counterparty_id
+        ON fm.counterparty_id = cp_roa.counterparty_id
         AND fm.is_active_flag = 'Y'
-      INNER JOIN l2.facility_exposure_snapshot fes_w
-        ON fes_w.facility_id = fm.facility_id
-        AND fes_w.as_of_date = :as_of_date
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fm.facility_id
+        AND fes.as_of_date = :as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
@@ -165,23 +222,33 @@ levels:
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
       GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: EXP-035-V01
-  type: NOT_NULL
-  description: No null roa_pct values
-  severity: ERROR
+  - rule_id: "EXP-035-V01"
+    type: NOT_NULL
+    description: "No null roa_pct values"
+    severity: ERROR
+  - rule_id: "EXP-035-V02"
+    type: THRESHOLD
+    description: "ROA typically between -50% and +50%"
+    severity: WARNING
+    params:
+      min: -50
+      max: 50
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-078
-  abbreviation: ROA
-  insight: |
+  item_id: "MET-078"
+  abbreviation: "ROA"
+  insight: >
     Asset utilization efficiency
-  rollup_strategy: weighted-avg
-  primary_value_field: roa_pct
-tags:
-- exposure
-- risk-metrics
+  rollup_strategy: "weighted-avg"
+  primary_value_field: "roa_pct"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "risk-metrics", "profitability"]
 dashboard_pages: []
 legacy_metric_ids: []

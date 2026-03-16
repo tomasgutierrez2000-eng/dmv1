@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Sector
+# Sector (Industry)
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-027"
 name: "Sector"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -19,22 +19,59 @@ unit_type: ORDINAL
 display_format: "s"
 description: >
   Industry sector classification of the counterparty, enabling sector
-  concentration risk assessment.
+  concentration risk assessment. Facility and counterparty levels return
+  industry_name. Aggregate levels return the dominant industry (highest
+  total exposure) per segment.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Sector concentration risk"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l1
-    table: industry_dim
-    alias: ind
+  - schema: l2
+    table: facility_master
+    alias: fm
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l2
+    table: counterparty
+    alias: cp
+    join_type: INNER
+    join_on: "cp.counterparty_id = fm.counterparty_id"
+    fields:
+      - name: counterparty_id
+        role: JOIN_KEY
+      - name: industry_id
+        role: JOIN_KEY
+  - schema: l1
+    table: industry_dim
+    alias: ind
+    join_type: INNER
+    join_on: "ind.industry_id = cp.industry_id"
+    fields:
+      - name: industry_id
+        role: JOIN_KEY
       - name: industry_name
         role: MEASURE
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = fm.facility_id"
+    fields:
+      - name: gross_exposure_usd
+        role: MEASURE
+        description: "Used for weighting at aggregate levels"
+      - name: as_of_date
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -50,103 +87,127 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Direct lookup of industry_name from industry_dim.
-    formula_sql: |
+      Lookup industry_name via facility_master -> counterparty -> industry_dim.
+    formula_sql: |-
       SELECT
         fm.facility_id AS dimension_key,
         ind.industry_name AS metric_value
       FROM l2.facility_master fm
+      INNER JOIN l2.counterparty cp
+        ON cp.counterparty_id = fm.counterparty_id
       INNER JOIN l1.industry_dim ind
-        ON ind.facility_id = fm.facility_id
+        ON ind.industry_id = cp.industry_id
       WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: RAW
     formula_text: >
-      Read industry_name per counterparty.
-    formula_sql: |
+      Lookup industry_name directly from counterparty -> industry_dim.
+    formula_sql: |-
       SELECT
-        fm.counterparty_id AS dimension_key,
+        cp.counterparty_id AS dimension_key,
         ind.industry_name AS metric_value
-      FROM l1.industry_dim ind
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = ind.facility_id
-        AND fm.is_active_flag = 'Y'
-      WHERE ind.as_of_date = :as_of_date
+      FROM l2.counterparty cp
+      INNER JOIN l1.industry_dim ind
+        ON ind.industry_id = cp.industry_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level industry_name per L3 desk segment.
-    formula_sql: |
+      Dominant industry (highest gross exposure) per L3 desk segment.
+    formula_sql: |-
       SELECT
-        ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        sub.segment_id AS dimension_key,
+        sub.industry_name AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          ind.industry_name AS metric_value
+          ebt.managed_segment_id AS segment_id,
+          ind.industry_name,
+          SUM(COALESCE(fes.gross_exposure_usd, 0)) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY ebt.managed_segment_id
+            ORDER BY SUM(COALESCE(fes.gross_exposure_usd, 0)) DESC
+          ) AS rn
         FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
+          ON cp.counterparty_id = fm.counterparty_id
         INNER JOIN l1.industry_dim ind
-          ON ind.facility_id = fm.facility_id
+          ON ind.industry_id = cp.industry_id
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt
+          ON ebt.managed_segment_id = fm.lob_segment_id
         WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt
-        ON ebt.managed_segment_id = fm.lob_segment_id
-      GROUP BY ebt.managed_segment_id
+        GROUP BY ebt.managed_segment_id, ind.industry_name
+      ) sub
+      WHERE sub.rn = 1
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level industry_name per L2 portfolio segment.
-    formula_sql: |
+      Dominant industry (highest gross exposure) per L2 portfolio segment.
+    formula_sql: |-
       SELECT
-        ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        sub.segment_id AS dimension_key,
+        sub.industry_name AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          ind.industry_name AS metric_value
+          ebt_l2.managed_segment_id AS segment_id,
+          ind.industry_name,
+          SUM(COALESCE(fes.gross_exposure_usd, 0)) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY ebt_l2.managed_segment_id
+            ORDER BY SUM(COALESCE(fes.gross_exposure_usd, 0)) DESC
+          ) AS rn
         FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
+          ON cp.counterparty_id = fm.counterparty_id
         INNER JOIN l1.industry_dim ind
-          ON ind.facility_id = fm.facility_id
+          ON ind.industry_id = cp.industry_id
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
         WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      GROUP BY ebt_l2.managed_segment_id
+        GROUP BY ebt_l2.managed_segment_id, ind.industry_name
+      ) sub
+      WHERE sub.rn = 1
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level industry_name per L1 business segment segment.
-    formula_sql: |
+      Dominant industry (highest gross exposure) per L1 business segment.
+    formula_sql: |-
       SELECT
-        ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        sub.segment_id AS dimension_key,
+        sub.industry_name AS metric_value
       FROM (
         SELECT
-          fm.facility_id AS dimension_key,
-          ind.industry_name AS metric_value
+          ebt_l1.managed_segment_id AS segment_id,
+          ind.industry_name,
+          SUM(COALESCE(fes.gross_exposure_usd, 0)) AS total_exp,
+          ROW_NUMBER() OVER (
+            PARTITION BY ebt_l1.managed_segment_id
+            ORDER BY SUM(COALESCE(fes.gross_exposure_usd, 0)) DESC
+          ) AS rn
         FROM l2.facility_master fm
+        INNER JOIN l2.counterparty cp
+          ON cp.counterparty_id = fm.counterparty_id
         INNER JOIN l1.industry_dim ind
-          ON ind.facility_id = fm.facility_id
+          ON ind.industry_id = cp.industry_id
+        LEFT JOIN l2.facility_exposure_snapshot fes
+          ON fes.facility_id = fm.facility_id
+          AND fes.as_of_date = :as_of_date
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+          ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+          ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+          ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
         WHERE fm.is_active_flag = 'Y'
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-        ON ebt_l3.managed_segment_id = fm.lob_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-      GROUP BY ebt_l1.managed_segment_id
+        GROUP BY ebt_l1.managed_segment_id, ind.industry_name
+      ) sub
+      WHERE sub.rn = 1
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
 # ── OUTPUT ────────────────────────────────────────────────────
@@ -164,9 +225,9 @@ catalogue:
   abbreviation: "S"
   insight: >
     Industry risk concentration
-  rollup_strategy: "direct-sum"
+  rollup_strategy: "custom"
   primary_value_field: "industry_name"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
+tags: ["reference", "master-data", "concentration"]
 dashboard_pages: []
 legacy_metric_ids: []

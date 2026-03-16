@@ -1,65 +1,61 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Cost of Funds ($)
+# Capital Allocated ($)
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
-metric_id: "EXP-005"
-name: "Cost of Funds ($)"
-version: "2.0.0"
+metric_id: "CAP-004"
+name: "Capital Allocated ($)"
+version: "1.0.0"
 owner: "credit-risk"
 status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
-domain: "exposure"
-sub_domain: "risk-metrics"
+domain: "capital"
+sub_domain: "allocation"
 metric_class: CALCULATED
-direction: LOWER_BETTER
+direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  The portion of total funding-related expense attributed to a specific
-  exposure or portfolio. At facility level, calculated as SUM across all
-  positions of (funded_amount * interest_rate), adjusted for bank share.
-  At counterparty level, further adjusted by counterparty participation_pct.
-  At desk/portfolio/segment levels, aggregated as SUM.
+  Capital allocated to each facility, counterparty, or business segment.
+  Calculated as RWA Amount * Capital Requirement (%). At facility level,
+  uses the binding RWA from facility_rwa_calc (MAX of standardized and ERBA)
+  multiplied by the applicable total CET1 requirement from
+  regulatory_capital_requirement. At higher levels, aggregated as SUM.
+  Indicates capital adequacy, risk appetite, and capital consumption per
+  exposure segment.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: "Funding cost allocation for NII projection"
+    description: "Capital adequacy — risk-weighted asset calculation and capital allocation"
+  - framework: "CCAR/DFAST"
+    description: "Capital planning — allocation of regulatory capital across portfolios"
   - framework: "FR Y-14Q"
     schedule: "H.1"
-    description: "Transfer pricing and funding cost attribution"
+    description: "RWA and capital allocation reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l2
-    table: position
-    alias: pos
+  - schema: l3
+    table: facility_rwa_calc
+    alias: frc
     join_type: BASE
     fields:
-      - name: position_id
-        role: JOIN_KEY
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-  - schema: l2
-    table: position_detail
-    alias: pd
-    join_type: INNER
-    join_on: "pd.position_id = pos.position_id"
-    fields:
-      - name: funded_amount
+      - name: rwa_std_amt
         role: MEASURE
-        description: "Utilized balance per position"
-      - name: interest_rate
+        description: "Standardized approach RWA"
+      - name: rwa_erba_amt
         role: MEASURE
-        description: "Funding rate per position"
+        description: "Enhanced Risk-Based Approach RWA"
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = pos.facility_id"
+    join_on: "fm.facility_id = frc.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -67,47 +63,32 @@ source_tables:
         role: DIMENSION
       - name: lob_segment_id
         role: DIMENSION
+      - name: legal_entity_id
+        role: DIMENSION
       - name: is_active_flag
         role: FILTER
       - name: is_current_flag
         role: FILTER
         description: "SCD filter — only current facility record"
-  - schema: l2
-    table: facility_lender_allocation
-    alias: fla
+  - schema: l1
+    table: regulatory_capital_requirement
+    alias: rcr
     join_type: LEFT
-    join_on: "fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'"
+    join_on: "rcr.legal_entity_id = fm.legal_entity_id AND rcr.as_of_date = frc.as_of_date AND rcr.is_current_flag = 'Y'"
     fields:
-      - name: bank_share_pct
-        role: MEASURE
-        description: "Bank's participation share of the facility"
-  - schema: l2
-    table: fx_rate
-    alias: fx
-    join_type: LEFT
-    join_on: "fx.from_currency_code = pos.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = pos.as_of_date"
-    fields:
-      - name: from_currency_code
+      - name: legal_entity_id
         role: JOIN_KEY
-      - name: to_currency_code
+      - name: as_of_date
         role: FILTER
-      - name: rate
-        role: MEASURE
-        description: "FX spot rate to convert local currency amounts to USD"
-  - schema: l2
-    table: facility_counterparty_participation
-    alias: fcp
-    join_type: LEFT
-    join_on: "fcp.facility_id = fm.facility_id AND fcp.is_current_flag = 'Y'"
-    fields:
-      - name: counterparty_id
+      - name: regulatory_capital_basis_id
         role: DIMENSION
-      - name: participation_pct
+        description: "Part of composite PK — may produce multiple rows per entity/date"
+      - name: total_cet1_req_pct
         role: MEASURE
-        description: "Counterparty participation percentage (0-100 scale)"
+        description: "Total CET1 capital requirement including buffers and GSIB surcharge"
       - name: is_current_flag
         role: FILTER
-        description: "SCD filter — only current participation row"
+        description: "SCD filter — only current requirement records"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -126,86 +107,78 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      For each position under the facility: funded_amount * interest_rate = Position Cost of Funds.
-      Adjusted by bank_share: SUM(funded_amount * interest_rate) * bank_share_pct / 100.
-      Joins position_detail → position (for facility_id) → facility_master.
+      For each facility: MAX(rwa_std_amt, rwa_erba_amt) from facility_rwa_calc
+      * total_cet1_req_pct from regulatory_capital_requirement / 100.
+      Uses the binding (higher) RWA approach.
     formula_sql: |
       SELECT
-        pos.facility_id AS dimension_key,
-        SUM(pd.funded_amount * COALESCE(fx.rate, 1) * pd.interest_rate)
-          * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
-      FROM l2.position_detail pd
-      INNER JOIN l2.position pos
-        ON pos.position_id = pd.position_id
+        frc.facility_id AS dimension_key,
+        GREATEST(COALESCE(frc.rwa_std_amt, 0), COALESCE(frc.rwa_erba_amt, 0))
+          * COALESCE(MAX(rcr.total_cet1_req_pct), 10.5) / 100.0 AS metric_value
+      FROM l3.facility_rwa_calc frc
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = pos.facility_id
+        ON fm.facility_id = frc.facility_id
         AND fm.is_active_flag = 'Y'
         AND fm.is_current_flag = 'Y'
-      LEFT JOIN l2.facility_lender_allocation fla
-        ON fla.facility_id = pos.facility_id
-        AND fla.is_current_flag = 'Y'
-      LEFT JOIN l2.fx_rate fx
-        ON fx.from_currency_code = pos.currency_code
-        AND fx.to_currency_code = 'USD'
-        AND fx.as_of_date = pos.as_of_date
-      WHERE pos.as_of_date = :as_of_date
-      GROUP BY pos.facility_id
+      LEFT JOIN l1.regulatory_capital_requirement rcr
+        ON rcr.legal_entity_id = fm.legal_entity_id
+        AND rcr.as_of_date = frc.as_of_date
+        AND rcr.is_current_flag = 'Y'
+      WHERE frc.as_of_date = :as_of_date
+      GROUP BY frc.facility_id, frc.rwa_std_amt, frc.rwa_erba_amt
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      For each counterparty: SUM of facility-level cost of funds weighted by
-      counterparty participation_pct from facility_counterparty_participation.
+      SUM of facility-level capital allocated per counterparty.
     formula_sql: |
       SELECT
-        fcp.counterparty_id AS dimension_key,
-        SUM(fac.metric_value * COALESCE(fcp.participation_pct, 100.0) / 100.0) AS metric_value
+        fm.counterparty_id AS dimension_key,
+        SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
-            * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
-        FROM l2.position_detail pd
-        INNER JOIN l2.position pos
-          ON pos.position_id = pd.position_id
+          frc.facility_id,
+          GREATEST(COALESCE(frc.rwa_std_amt, 0), COALESCE(frc.rwa_erba_amt, 0))
+            * COALESCE(MAX(rcr.total_cet1_req_pct), 10.5) / 100.0 AS metric_value
+        FROM l3.facility_rwa_calc frc
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
+          ON fm.facility_id = frc.facility_id
           AND fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = pos.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id
+        LEFT JOIN l1.regulatory_capital_requirement rcr
+          ON rcr.legal_entity_id = fm.legal_entity_id
+          AND rcr.as_of_date = frc.as_of_date
+          AND rcr.is_current_flag = 'Y'
+        WHERE frc.as_of_date = :as_of_date
+        GROUP BY frc.facility_id, frc.rwa_std_amt, frc.rwa_erba_amt
       ) fac
-      INNER JOIN l2.facility_counterparty_participation fcp
-        ON fcp.facility_id = fac.facility_id
-        AND fcp.is_current_flag = 'Y'
-      GROUP BY fcp.counterparty_id
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fac.facility_id
+      GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level cost of funds (bank-share-adjusted) per L3 desk segment.
+      SUM of facility-level capital allocated per L3 desk segment.
+      Only includes facilities with effective_date within 365 days.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
-            * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
-        FROM l2.position_detail pd
-        INNER JOIN l2.position pos
-          ON pos.position_id = pd.position_id
+          frc.facility_id,
+          GREATEST(COALESCE(frc.rwa_std_amt, 0), COALESCE(frc.rwa_erba_amt, 0))
+            * COALESCE(MAX(rcr.total_cet1_req_pct), 10.5) / 100.0 AS metric_value
+        FROM l3.facility_rwa_calc frc
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
+          ON fm.facility_id = frc.facility_id
           AND fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = pos.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id
+        LEFT JOIN l1.regulatory_capital_requirement rcr
+          ON rcr.legal_entity_id = fm.legal_entity_id
+          AND rcr.as_of_date = frc.as_of_date
+          AND rcr.is_current_flag = 'Y'
+        WHERE frc.as_of_date = :as_of_date
+        GROUP BY frc.facility_id, frc.rwa_std_amt, frc.rwa_erba_amt
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
@@ -216,28 +189,27 @@ levels:
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level cost of funds (bank-share-adjusted) per L2 portfolio segment.
+      SUM of facility-level capital allocated per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
-            * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
-        FROM l2.position_detail pd
-        INNER JOIN l2.position pos
-          ON pos.position_id = pd.position_id
+          frc.facility_id,
+          GREATEST(COALESCE(frc.rwa_std_amt, 0), COALESCE(frc.rwa_erba_amt, 0))
+            * COALESCE(MAX(rcr.total_cet1_req_pct), 10.5) / 100.0 AS metric_value
+        FROM l3.facility_rwa_calc frc
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
+          ON fm.facility_id = frc.facility_id
           AND fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = pos.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id
+        LEFT JOIN l1.regulatory_capital_requirement rcr
+          ON rcr.legal_entity_id = fm.legal_entity_id
+          AND rcr.as_of_date = frc.as_of_date
+          AND rcr.is_current_flag = 'Y'
+        WHERE frc.as_of_date = :as_of_date
+        GROUP BY frc.facility_id, frc.rwa_std_amt, frc.rwa_erba_amt
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
@@ -251,28 +223,27 @@ levels:
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level cost of funds (bank-share-adjusted) per L1 business segment.
+      SUM of facility-level capital allocated per L1 business segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(fac.metric_value) AS metric_value
       FROM (
         SELECT
-          pos.facility_id,
-          SUM(pd.funded_amount * pd.interest_rate)
-            * COALESCE(MAX(fla.bank_share_pct), 100.0) / 100.0 AS metric_value
-        FROM l2.position_detail pd
-        INNER JOIN l2.position pos
-          ON pos.position_id = pd.position_id
+          frc.facility_id,
+          GREATEST(COALESCE(frc.rwa_std_amt, 0), COALESCE(frc.rwa_erba_amt, 0))
+            * COALESCE(MAX(rcr.total_cet1_req_pct), 10.5) / 100.0 AS metric_value
+        FROM l3.facility_rwa_calc frc
         INNER JOIN l2.facility_master fm
-          ON fm.facility_id = pos.facility_id
+          ON fm.facility_id = frc.facility_id
           AND fm.is_active_flag = 'Y'
           AND fm.is_current_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = pos.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE pos.as_of_date = :as_of_date
-        GROUP BY pos.facility_id
+        LEFT JOIN l1.regulatory_capital_requirement rcr
+          ON rcr.legal_entity_id = fm.legal_entity_id
+          AND rcr.as_of_date = frc.as_of_date
+          AND rcr.is_current_flag = 'Y'
+        WHERE frc.as_of_date = :as_of_date
+        GROUP BY frc.facility_id, frc.rwa_std_amt, frc.rwa_erba_amt
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
@@ -287,21 +258,22 @@ levels:
         AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
-depends_on: []
+depends_on:
+  - "CAP-003"   # Risk Weight (%) — prerequisite for RWA
 # ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
 # ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-  - rule_id: "EXP-005-V01"
+  - rule_id: "CAP-004-V01"
     type: NOT_NULL
-    description: "No null cost of funds values for active facilities with positions"
+    description: "No null capital allocated values for active facilities with RWA"
     severity: ERROR
-  - rule_id: "EXP-005-V02"
+  - rule_id: "CAP-004-V02"
     type: NON_NEGATIVE
-    description: "Cost of funds must be >= 0"
+    description: "Capital allocated must be >= 0"
     severity: ERROR
-  - rule_id: "EXP-005-V03"
+  - rule_id: "CAP-004-V03"
     type: RECONCILIATION
     description: "SUM(facility) must reconcile to SUM(business_segment)"
     severity: ERROR
@@ -310,15 +282,16 @@ validations:
       tolerance_pct: 0.01
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: "MET-013"
-  abbreviation: "COF"
+  item_id: "MET-110"
+  abbreviation: "CAPALLOC"
   insight: >
-    Cost of financing — total funding expense attributed to exposures.
-    Rising cost of funds compresses net interest margin. Compare against
-    interest income to assess profitability.
+    Capital adequacy and risk appetite — shows how much regulatory capital
+    is consumed per facility/segment. Rising capital allocation signals
+    increasing risk density. Compare against revenue to assess RORC
+    (Return on Regulatory Capital).
   rollup_strategy: "direct-sum"
-  primary_value_field: "cost_of_funds_amt"
+  primary_value_field: "allocated_amount_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics", "funding", "transfer-pricing"]
+tags: ["capital", "allocation", "rwa", "regulatory"]
 dashboard_pages: []
 legacy_metric_ids: []

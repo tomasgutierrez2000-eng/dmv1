@@ -7,7 +7,7 @@ metric_id: "EXP-001"
 name: "Current Collateral Market Value"
 version: "1.1.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ──────────────────────────────────────────
@@ -67,6 +67,9 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current facility record"
   - schema: l2
     table: facility_lender_allocation
     alias: fla
@@ -85,12 +88,15 @@ source_tables:
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current taxonomy record"
 # ── LEVEL FORMULAS ──────────────────────────────────────────
 # All levels apply bank_share_pct consistently for cross-level reconciliation.
 # COALESCE(bank_share_pct, 100.0) assumes 100% bank ownership when no allocation exists.
@@ -111,6 +117,7 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = cs.facility_id
        AND fm.is_active_flag = 'Y'
+       AND fm.is_current_flag = 'Y'
       LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = cs.facility_id
        AND fla.is_current_flag = 'Y'
@@ -143,6 +150,7 @@ levels:
         ON fla.facility_id = fm.facility_id
        AND fla.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
@@ -170,7 +178,9 @@ levels:
        AND fla.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
@@ -199,9 +209,12 @@ levels:
        AND fla.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
@@ -230,11 +243,15 @@ levels:
        AND fla.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ────────────────────────────────────────────
 depends_on: []

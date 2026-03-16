@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "PRC-002"
 name: "Base Interest Rate (%)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -19,15 +19,14 @@ unit_type: PERCENTAGE
 display_format: ".2f"
 description: >
   Reference benchmark interest rate applicable to the exposure (e.g., SOFR,
-  Prime). Forms base component of total facility pricing - weighted average
-  applied based on underlying contract value and base rate. Reflects the
-  weighted average base rate of underlying contracts for a facility, separately
-  displays the average base rate across all contracts within a Line of Business
-  level
+  Prime). Forms base component of total facility pricing. At facility level,
+  reads the raw base_rate_pct from the pricing snapshot. At counterparty and
+  higher levels, computes an exposure-weighted average using committed exposure
+  amounts to reflect portfolio-level rate exposure.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Interest rate risk in the banking book (IRRBB)"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -55,125 +54,205 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: LEFT
+    join_on: "fes.facility_id = fps.facility_id AND fes.as_of_date = fps.as_of_date"
+    fields:
+      - name: committed_amount
+        role: MEASURE
+        description: "Used as weighting factor for exposure-weighted average at rollup levels"
+  - schema: l2
+    table: facility_lender_allocation
+    alias: fla
+    join_type: LEFT
+    join_on: "fla.facility_id = fps.facility_id AND fla.is_current_flag = 'Y'"
+    fields:
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's participation share — applied to weighting factor at rollup levels"
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current allocation row"
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: from_currency_code
+        role: JOIN_KEY
+      - name: to_currency_code
+        role: FILTER
+      - name: rate
+        role: MEASURE
+        description: "FX spot rate to convert committed_amount weighting factor to USD"
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+        description: "SCD filter — only current taxonomy record"
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: WEIGHTED_AVG
+    aggregation_type: RAW
     formula_text: >
-      Exposure-weighted average of base_rate_pct per facility.
+      Raw base_rate_pct from facility_pricing_snapshot for each active facility.
     formula_sql: |
       SELECT
         fps.facility_id AS dimension_key,
-        SUM(fps.base_rate_pct * fps.committed_amount)
-          / NULLIF(SUM(fps.committed_amount), 0) AS metric_value
+        fps.base_rate_pct AS metric_value
       FROM l2.facility_pricing_snapshot fps
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fps.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fps.as_of_date = :as_of_date
-      GROUP BY fps.facility_id
   counterparty:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
       Exposure-weighted average of base_rate_pct across counterparty facilities.
+      Weight = committed_amount * bank_share_pct / 100 (bank's pro-rata committed exposure).
+      Formula: SUM(base_rate_pct * bank_adj_committed) / SUM(bank_adj_committed).
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          SUM(fps.base_rate_pct * fps.committed_amount)
-            / NULLIF(SUM(fps.committed_amount), 0) AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
-        GROUP BY fps.facility_id
-      ) fac
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
+             ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = fps.facility_id
+        AND fla.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level base_rate_pct per L3 desk segment.
+      Exposure-weighted average of base_rate_pct per L3 desk segment.
+      Weight = committed_amount * bank_share_pct / 100 (bank's pro-rata committed exposure).
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          SUM(fps.base_rate_pct * fps.committed_amount)
-            / NULLIF(SUM(fps.committed_amount), 0) AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
-        GROUP BY fps.facility_id
-      ) fac
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
+             ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = fps.facility_id
+        AND fla.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level base_rate_pct per L2 portfolio segment.
+      Exposure-weighted average of base_rate_pct per L2 portfolio segment.
+      Weight = committed_amount * bank_share_pct / 100 (bank's pro-rata committed exposure).
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          SUM(fps.base_rate_pct * fps.committed_amount)
-            / NULLIF(SUM(fps.committed_amount), 0) AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
-        GROUP BY fps.facility_id
-      ) fac
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
+             ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = fps.facility_id
+        AND fla.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: WEIGHTED_AVG
     formula_text: >
-      AVG of facility-level base_rate_pct per L1 business segment segment.
+      Exposure-weighted average of base_rate_pct per L1 business segment.
+      Weight = committed_amount * bank_share_pct / 100 (bank's pro-rata committed exposure).
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fps.facility_id AS dimension_key,
-          SUM(fps.base_rate_pct * fps.committed_amount)
-            / NULLIF(SUM(fps.committed_amount), 0) AS metric_value
-        FROM l2.facility_pricing_snapshot fps
-        WHERE fps.as_of_date = :as_of_date
-        GROUP BY fps.facility_id
-      ) fac
+        CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
+             ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+        END AS metric_value
+      FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fps.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fps.facility_id
+        AND fes.as_of_date = fps.as_of_date
+      LEFT JOIN l2.facility_lender_allocation fla
+        ON fla.facility_id = fps.facility_id
+        AND fla.is_current_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fps.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -186,15 +265,21 @@ validations:
     type: NOT_NULL
     description: "No null base_rate_pct values"
     severity: ERROR
+  - rule_id: "PRC-002-V02"
+    type: NON_NEGATIVE
+    description: "base_rate_pct must be >= 0"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-008"
   abbreviation: "BIR"
   insight: >
-    Market interest rate impact
+    Market interest rate impact — exposure-weighted average benchmark rate
+    across the portfolio. Rising rates increase interest income but also
+    borrower debt burden.
   rollup_strategy: "weighted-avg"
   primary_value_field: "base_rate_pct"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["pricing", "facility-pricing"]
+tags: ["pricing", "facility-pricing", "interest-rate"]
 dashboard_pages: []
 legacy_metric_ids: []

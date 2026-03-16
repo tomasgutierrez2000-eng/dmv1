@@ -374,30 +374,92 @@
   "MET-010": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "contractual_amt"
+      "primary_value": "cashflow_amt"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "contractual_amt",
-          "label": "contractual_amt",
+          "field": "interest_income_amt",
+          "label": "Facility-level interest income",
           "sample_value": 0,
-          "source_table": "cash_flow",
+          "source_table": "facility_profitability_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "noi_amt",
+          "label": "Net Operating Income — used for CRE counterparty cashflow",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "ebitda_amt",
+          "label": "EBITDA — used for non-CRE counterparty cashflow",
+          "sample_value": 0,
+          "source_table": "facility_financial_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share for bank-share-adjusted interest income",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate to convert local currency amounts to USD",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "[Facility Cashflow]==[Facility Interest Income w/ Bank Share]\n"
+      "formula_display": "[Facility Cashflow] == [Facility Interest Income w/ Bank Share]. For each active facility: interest_income_amt * bank_share_pct / 100.\n"
     },
     "worked_example_columns": [
       {
-        "field": "contractual_amt",
-        "header": "Contractual ($)",
+        "field": "interest_income_amt",
+        "header": "Interest Income ($)",
         "format": "currency",
-        "subtotal_fn": "sum",
-        "is_result": true
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "noi_amt",
+        "header": "Noi ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "ebitda_amt",
+        "header": "Ebitda ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "cashflow_amt",
+        "header": "Cashflow ($)",
+        "format": "currency",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -431,6 +493,14 @@
           "sample_value": 0,
           "source_table": "facility_counterparty_participation",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate to convert local currency amounts to USD",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
@@ -457,6 +527,12 @@
         "subtotal_fn": "none"
       },
       {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
         "field": "committed_exposure_usd",
         "header": "Committed Exposure Usd",
         "format": "number",
@@ -468,30 +544,92 @@
   "MET-013": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "funded_amount"
+      "primary_value": "cost_of_funds_amt"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "funded_amount",
-          "label": "funded_amount",
+          "label": "Utilized balance per position",
           "sample_value": 0,
           "source_table": "position_detail",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "interest_rate",
+          "label": "Funding rate per position",
+          "sample_value": 0,
+          "source_table": "position_detail",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share of the facility",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate to convert local currency amounts to USD",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "Counterparty participation percentage (0-100 scale)",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "Lookup Position_ID for each Facility_ID, Select bank_share from Facility_ID from Faciltiy Master THEN contract_amt * bank_share* Interest Rate = [Position Cost of Funds w/ Bank Share] (AKA Utilized Exposure * Interest Rate)  SUM([Position Interest Income w/ Bank Share] across all Position_IDs ==[Facility Cost of Funds w/ Bank Share]\n"
+      "formula_display": "For each position under the facility: funded_amount * interest_rate = Position Cost of Funds. Adjusted by bank_share: SUM(funded_amount * interest_rate) * bank_share_pct / 100. Joins position_detail → position (for facility_id) → facility_master.\n"
     },
     "worked_example_columns": [
       {
         "field": "funded_amount",
         "header": "Funded Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "interest_rate",
+        "header": "Interest Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "cost_of_funds_amt",
+        "header": "Cost Of Funds ($)",
+        "format": "currency",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -2219,11 +2357,35 @@
           "sample_value": 0,
           "source_table": "facility_pricing_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "Used as weighting factor for exposure-weighted average at rollup levels",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation share — applied to weighting factor at rollup levels",
+          "sample_value": 0,
+          "source_table": "facility_lender_allocation",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "FX spot rate to convert committed_amount weighting factor to USD",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Exposure-weighted average of base_rate_pct per facility.\n"
+      "formula_display": "Raw base_rate_pct from facility_pricing_snapshot for each active facility.\n"
     },
     "worked_example_columns": [
       {
@@ -2232,6 +2394,24 @@
         "format": "percentage",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -3712,6 +3892,70 @@
         "field": "ltv_pct",
         "header": "Ltv (%)",
         "format": "percentage",
+        "is_result": true,
+        "subtotal_fn": "sum"
+      }
+    ]
+  },
+  "MET-110": {
+    "rollup_strategy": "direct-sum",
+    "metric_fields": {
+      "primary_value": "allocated_amount_usd"
+    },
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "rwa_std_amt",
+          "label": "Standardized approach RWA",
+          "sample_value": 0,
+          "source_table": "facility_rwa_calc",
+          "source_layer": "L3"
+        },
+        {
+          "op": "*",
+          "field": "rwa_erba_amt",
+          "label": "Enhanced Risk-Based Approach RWA",
+          "sample_value": 0,
+          "source_table": "facility_rwa_calc",
+          "source_layer": "L3"
+        },
+        {
+          "op": "*",
+          "field": "total_cet1_req_pct",
+          "label": "Total CET1 capital requirement including buffers and GSIB surcharge",
+          "sample_value": 0,
+          "source_table": "regulatory_capital_requirement",
+          "source_layer": "L1"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "For each facility: MAX(rwa_std_amt, rwa_erba_amt) from facility_rwa_calc * total_cet1_req_pct from regulatory_capital_requirement / 100. Uses the binding (higher) RWA approach.\n"
+    },
+    "worked_example_columns": [
+      {
+        "field": "rwa_std_amt",
+        "header": "Rwa Std ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "rwa_erba_amt",
+        "header": "Rwa Erba ($)",
+        "format": "currency",
+        "subtotal_fn": "sum"
+      },
+      {
+        "field": "total_cet1_req_pct",
+        "header": "Total Cet1 Req (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "allocated_amount_usd",
+        "header": "Allocated Amount Usd",
+        "format": "number",
         "is_result": true,
         "subtotal_fn": "sum"
       }

@@ -95,15 +95,8 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T68', name: 'ecl_allowance_movement',              category: 'ECL/Impairment',                          tier: 2 },
   { id: 'T69', name: 'watchlist_movement_summary',           category: 'Watchlist',                               tier: 2 },
 
-  // ── Capital Metrics (migration 002-capital-metrics) ──
+  // ── Stress Testing ──
   { id: 'T70', name: 'stress_test_result_calc',              category: 'Stress Testing',                          tier: 1 },
-  { id: 'T71', name: 'facility_rwa_calc',                    category: 'Capital & Equity',                        tier: 1 },
-  { id: 'T72', name: 'capital_binding_constraint',           category: 'Capital & Equity',                        tier: 1 },
-  { id: 'T73', name: 'facility_capital_consumption',         category: 'Capital & Equity',                        tier: 2 },
-  { id: 'T74', name: 'counterparty_capital_consumption',     category: 'Capital & Equity',                        tier: 2 },
-  { id: 'T75', name: 'desk_capital_consumption',             category: 'Capital & Equity',                        tier: 2 },
-  { id: 'T76', name: 'portfolio_capital_consumption',        category: 'Capital & Equity',                        tier: 2 },
-  { id: 'T77', name: 'segment_capital_consumption',          category: 'Capital & Equity',                        tier: 3 },
 
   // ── Dashboard Derived (wide denormalized tables for CRO dashboard) ──
   { id: 'T78', name: 'facility_derived',                     category: 'Dashboard Derived',                       tier: 4 },

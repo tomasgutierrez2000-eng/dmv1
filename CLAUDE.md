@@ -86,6 +86,36 @@ Pipeline: `runMetricCalculation()` → `resolveFormulaForDimension()` → escape
 - `npm run calc:demo:all` — generate demo for all metrics with calculators
 - `npm run calc:full` — calc:sync + calc:demo:all
 
+### Metric Verification Protocol (MANDATORY after writing/fixing YAML metrics)
+After writing or modifying YAML metrics, run this full verification chain before committing:
+
+1. **Worktree awareness:** When working in a git worktree, `calc:demo` and `calc:sync` must run from the **worktree directory** (not the main repo), otherwise the commands read stale YAML from main and produce misleading errors like "no such table" or "no such column" referencing old table names.
+
+2. **calc:sync + calc:demo:** Run `npm run calc:sync` then `npm run calc:demo -- --metric MET-XXX --persist --force` for each metric. Confirms sql.js (SQLite) execution succeeds. Use **MET-XXX catalogue IDs** (not YAML metric IDs like EXP-015).
+
+3. **Regenerate L2 sample data if needed:** If calc:demo fails with "no such column" for fields that exist in the data dictionary (e.g., `bank_share_pct`, `is_pricing_exception_flag`), the sql.js sample data is stale. Run `npm run generate:l2` to regenerate from current `l2-definitions.ts`.
+
+4. **PostgreSQL database testing:** Execute each level's `formula_sql` directly against PostgreSQL to verify:
+   - All SQL executes without errors (syntax, missing columns, type mismatches)
+   - Results return rows (not empty sets)
+   - Test at least facility AND one aggregate level (counterparty or business_segment)
+   - Connection: `source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" -c "SQL_HERE"`
+
+5. **Rollup reconciliation:** For direct-sum metrics (EL$), verify `SUM(facility values) = counterparty value` for same-currency counterparties. For multi-currency counterparties, expect FX-driven differences — this is correct behavior (facility EL is local currency, aggregate EL is USD-converted).
+
+6. **Boolean flag compatibility:** Use `= 'Y'` for boolean flag comparisons in YAML SQL — works in both PostgreSQL (accepts 'Y' as boolean literal) and sql.js (text comparison with 'Y'/'N' storage). Do NOT use `= TRUE` (fails in sql.js) or `= true` (PostgreSQL-only).
+
+7. **Seed data coverage:** Verify that test data actually exercises the metric. Example: PRC-003 (Exception Rate) returned 0% because no facilities had `is_pricing_exception_flag = TRUE` in seed data. The formula was correct but untestable with existing data. Document data limitations; do not confuse them with formula bugs.
+
+8. **GSIB risk sanity checks:** Validate output magnitudes against domain knowledge:
+   - PD: 0.03%–10% typical for GSIB IRB books (investment-grade to sub-investment-grade)
+   - LGD: 30%–70% (30% senior secured, 45% unsecured, 65%+ subordinated)
+   - EL Rate: 0.01%–0.5% for investment-grade; >5% signals stressed portfolio
+   - DSCR: >1.25x healthy; <1.0x insufficient debt coverage
+   - Exception Rate: 5–15% typical; >15% triggers regulatory scrutiny (OCC 2020-36)
+
+9. **test:calc-engine:** Run `npm run test:calc-engine` — must be 0 failures before committing.
+
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`
 2. If executable: add L3Metric entry to `data/l3-metrics.ts` with `formulaSQL` and `sourceFields`

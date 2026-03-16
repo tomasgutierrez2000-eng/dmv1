@@ -1,140 +1,216 @@
-metric_id: EXP-012
-name: Delinquent Amount ($)
-version: 1.0.0
-owner: credit-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Delinquent Amount ($)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-012"
+name: "Delinquent Amount ($)"
+version: "1.1.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: exposure
-sub_domain: risk-metrics
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "risk-metrics"
 metric_class: CALCULATED
 direction: LOWER_BETTER
 unit_type: CURRENCY
-display_format: $,.0f
-description: 'Total outstanding exposure that is contractually past due in USD. Provides direct measurement of impaired balances
-  and supports staging and loss forecasting analysis.
-
-  '
+display_format: "$,.0f"
+description: >
+  Total outstanding exposure that is contractually past due in USD.
+  Calculated as overdue_principal_amt + overdue_interest_amt from the
+  facility delinquency snapshot. Provides direct measurement of impaired
+  balances and supports staging, loss forecasting, and reserve analysis.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "Basel III"
+    section: "Pillar 3 — Credit Risk"
+    description: "Past-due exposure amounts for credit quality disclosure"
+  - framework: "FR Y-14Q"
+    section: "Schedule H.1"
+    description: "Delinquent balance reporting for supervisory stress testing"
+  - framework: "IFRS 9"
+    section: "ECL Measurement"
+    description: "Overdue amounts inform expected credit loss calculations"
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l2
-  table: facility_delinquency_snapshot
-  alias: fds
-  join_type: BASE
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: overdue_principal_amt
-    role: MEASURE
-  - name: overdue_interest_amt
-    role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.facility_id = fds.facility_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: counterparty_id
-    role: DIMENSION
-  - name: lob_segment_id
-    role: DIMENSION
-  - name: is_active_flag
-    role: FILTER
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l2
+    table: facility_delinquency_snapshot
+    alias: fds
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: overdue_principal_amt
+        role: MEASURE
+        description: "Overdue principal balance in USD"
+      - name: overdue_interest_amt
+        role: MEASURE
+        description: "Overdue accrued interest in USD"
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = fds.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: 'For each Facility_ID lookup the Payments records in the Payment Lockbox table. For each payment record
-      where [Payment_Due_Date] > Today() IF(COUNT IF ([Pmt_Applied] <[Pmt_Due])>=1, then [Payment_Amt_Due]+[Fee_Due]-[Payment
-      Applied] == [Deliquent Payment Amount]) SUM([Deliquent Payment Amount] across all payment records where IS(Facility_ID))
-
-      '
-    formula_sql: "SELECT\n  fds.facility_id AS dimension_key,\n  COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt,\
-      \ 0) AS metric_value\nFROM l2.facility_delinquency_snapshot fds\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id\
-      \ = fds.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fds.as_of_date = :as_of_date"
+    formula_text: >
+      Sum of overdue principal and interest for each facility:
+      COALESCE(overdue_principal_amt, 0) + COALESCE(overdue_interest_amt, 0).
+    formula_sql: |
+      SELECT
+        fds.facility_id AS dimension_key,
+        COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt, 0) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
-    formula_text: 'SUM of facility-level total_overdue_amt per counterparty.
-
-      '
-    formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
-      \    fds.facility_id AS dimension_key,\n    COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt,\
-      \ 0) AS metric_value\n  FROM l2.facility_delinquency_snapshot fds\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id\
-      \ = fds.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fds.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master\
-      \ fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+    formula_text: >
+      SUM of facility-level total_overdue_amt per counterparty.
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        SUM(COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt, 0)) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
+      GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
-    formula_text: 'SUM of facility-level total_overdue_amt per L3 desk segment.
-
-      '
-    formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
-      \    fds.facility_id AS dimension_key,\n    COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt,\
-      \ 0) AS metric_value\n  FROM l2.facility_delinquency_snapshot fds\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id\
-      \ = fds.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fds.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master\
-      \ fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy\
-      \ ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\nGROUP BY ebt.managed_segment_id"
+    formula_text: >
+      SUM of facility-level total_overdue_amt per L3 desk segment.
+    formula_sql: |
+      SELECT
+        ebt.managed_segment_id AS dimension_key,
+        SUM(COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt, 0)) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt
+        ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
+      GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
-    formula_text: 'SUM of facility-level total_overdue_amt per L2 portfolio segment.
-
-      '
-    formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
-      \  SELECT\n    fds.facility_id AS dimension_key,\n    COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt,\
-      \ 0) AS metric_value\n  FROM l2.facility_delinquency_snapshot fds\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id\
-      \ = fds.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fds.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master\
-      \ fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy\
-      \ ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON\
-      \ ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY ebt_l2.managed_segment_id"
+    formula_text: >
+      SUM of facility-level total_overdue_amt per L2 portfolio segment.
+    formula_sql: |
+      SELECT
+        ebt_l2.managed_segment_id AS dimension_key,
+        SUM(COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt, 0)) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
+      GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
-    formula_text: 'SUM of facility-level total_overdue_amt per L1 business segment segment.
-
-      '
-    formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
-      \  SELECT\n    fds.facility_id AS dimension_key,\n    COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt,\
-      \ 0) AS metric_value\n  FROM l2.facility_delinquency_snapshot fds\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id\
-      \ = fds.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fds.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master\
-      \ fm\n  ON fm.facility_id = fac.dimension_key\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy\
-      \ ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON\
-      \ ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id\
-      \ = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
+    formula_text: >
+      SUM of facility-level total_overdue_amt per L1 business segment.
+    formula_sql: |
+      SELECT
+        ebt_l1.managed_segment_id AS dimension_key,
+        SUM(COALESCE(fds.overdue_principal_amt, 0) + COALESCE(fds.overdue_interest_amt, 0)) AS metric_value
+      FROM l2.facility_delinquency_snapshot fds
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fds.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
+        ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
+        ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
+        ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
+      GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: EXP-012-V01
-  type: NOT_NULL
-  description: No null total_overdue_amt values
-  severity: ERROR
-- rule_id: EXP-012-V02
-  type: NON_NEGATIVE
-  description: total_overdue_amt must be >= 0
-  severity: ERROR
+  - rule_id: "EXP-012-V01"
+    type: NOT_NULL
+    description: "No null total_overdue_amt values"
+    severity: ERROR
+  - rule_id: "EXP-012-V02"
+    type: NON_NEGATIVE
+    description: "total_overdue_amt must be >= 0"
+    severity: ERROR
+  - rule_id: "EXP-012-V03"
+    type: RECONCILIATION
+    description: "Sum of facility-level overdue amounts must equal counterparty-level totals"
+    severity: WARNING
+    params:
+      levels_to_compare: [facility, counterparty, business_segment]
+      tolerance_pct: 0.01
+  - rule_id: "EXP-012-V04"
+    type: PERIOD_OVER_PERIOD
+    description: "Flag significant changes in delinquent amounts between periods"
+    severity: WARNING
+    params:
+      max_change_pct: 20.0
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-026
-  abbreviation: DA
-  insight: 'Scale of overdue payments
-
-    '
-  rollup_strategy: direct-sum
-  primary_value_field: total_overdue_amt
-tags:
-- exposure
-- risk-metrics
-dashboard_pages: []
+  item_id: "MET-026"
+  abbreviation: "DA"
+  insight: >
+    Scale of overdue payments — total past-due principal and interest
+    across the portfolio. Rising amounts indicate growing credit stress.
+  rollup_strategy: "direct-sum"
+  primary_value_field: "total_overdue_amt"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "risk-metrics", "delinquency", "credit-quality"]
+dashboard_pages: ["P7"]
 legacy_metric_ids: []

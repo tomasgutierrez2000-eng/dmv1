@@ -828,7 +828,7 @@
     ]
   },
   "MET-024": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "delinquency_rate_pct"
     },
@@ -837,15 +837,15 @@
         {
           "op": "*",
           "field": "days_past_due",
-          "label": "days_past_due",
+          "label": "Number of days past due — >0 indicates delinquency",
           "sample_value": 0,
           "source_table": "facility_delinquency_snapshot",
           "source_layer": "L2"
         },
         {
           "op": "*",
-          "field": "delinquent_payment_flag",
-          "label": "delinquent_payment_flag",
+          "field": "is_delinquent_payment_flag",
+          "label": "Boolean delinquency indicator",
           "sample_value": 0,
           "source_table": "facility_delinquency_snapshot",
           "source_layer": "L2"
@@ -853,7 +853,7 @@
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Binary flag: 1 if delinquency (days_past_due > 0), 0 otherwise.\n"
+      "formula_display": "Binary flag: 1.0 if delinquency (days_past_due > 0), 0.0 otherwise.\n"
     },
     "worked_example_columns": [
       {
@@ -863,8 +863,8 @@
         "subtotal_fn": "none"
       },
       {
-        "field": "delinquent_payment_flag",
-        "header": "Delinquent Payment Flag",
+        "field": "is_delinquent_payment_flag",
+        "header": "Is Delinquent Payment Flag",
         "format": "number",
         "subtotal_fn": "none"
       },
@@ -887,7 +887,7 @@
         {
           "op": "*",
           "field": "delinquent_payment_flag",
-          "label": "delinquent_payment_flag",
+          "label": "Delinquency indicator — 'Y' if any payment past due",
           "sample_value": 0,
           "source_table": "facility_delinquency_snapshot",
           "source_layer": "L2"
@@ -895,7 +895,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "For each Facility_ID lookup the Payments records in the Payment Lockbox table. For each payment record where Payment Due Date > Today() IF(COUNT IF ([Pmt_Applied] <[Pmt_Due])>=1, then \"Y\", \"N\")\n"
+      "formula_display": "Read delinquent_payment_flag from facility delinquency snapshot. Returns 1 if facility has any past-due payment, 0 otherwise.\n"
     },
     "worked_example_columns": [
       {
@@ -917,7 +917,7 @@
         {
           "op": "*",
           "field": "overdue_principal_amt",
-          "label": "overdue_principal_amt",
+          "label": "Overdue principal balance in USD",
           "sample_value": 0,
           "source_table": "facility_delinquency_snapshot",
           "source_layer": "L2"
@@ -925,7 +925,7 @@
         {
           "op": "*",
           "field": "overdue_interest_amt",
-          "label": "overdue_interest_amt",
+          "label": "Overdue accrued interest in USD",
           "sample_value": 0,
           "source_table": "facility_delinquency_snapshot",
           "source_layer": "L2"
@@ -933,7 +933,7 @@
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each Facility_ID lookup the Payments records in the Payment Lockbox table. For each payment record where [Payment_Due_Date] > Today() IF(COUNT IF ([Pmt_Applied] <[Pmt_Due])>=1, then [Payment_Amt_Due]+[Fee_Due]-[Payment Applied] == [Deliquent Payment Amount]) SUM([Deliquent Payment Amount] across all payment records where IS(Facility_ID))\n"
+      "formula_display": "Sum of overdue principal and interest for each facility: COALESCE(overdue_principal_amt, 0) + COALESCE(overdue_interest_amt, 0).\n"
     },
     "worked_example_columns": [
       {
@@ -958,40 +958,10 @@
     ]
   },
   "MET-027": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "direct-sum",
     "metric_fields": {
       "primary_value": "is_deteriorated"
-    },
-    "formula_decomposition": {
-      "numerator": [
-        {
-          "op": "*",
-          "field": "risk_rating_status",
-          "label": "risk_rating_status",
-          "sample_value": 0,
-          "source_table": "counterparty_rating_observation",
-          "source_layer": "L2"
-        }
-      ],
-      "denominator": [],
-      "result_format": "number",
-      "formula_display": "Read is_deteriorated from facility_detail_snapshot for each facility as-of reporting date.\n"
-    },
-    "worked_example_columns": [
-      {
-        "field": "risk_rating_status",
-        "header": "Risk Rating Status",
-        "format": "number",
-        "subtotal_fn": "none"
-      },
-      {
-        "field": "is_deteriorated",
-        "header": "Is Deteriorated",
-        "format": "number",
-        "is_result": true,
-        "subtotal_fn": "sum"
-      }
-    ]
+    }
   },
   "MET-028": {
     "rollup_strategy": "sum-ratio",
@@ -3006,7 +2976,7 @@
     ]
   },
   "MET-023": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "worst-case",
     "metric_fields": {
       "primary_value": "days_until_maturity"
     },
@@ -3015,7 +2985,7 @@
         {
           "op": "*",
           "field": "days_until_maturity",
-          "label": "days_until_maturity",
+          "label": "Pre-computed (maturity_date - as_of_date) in calendar days",
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
@@ -3023,7 +2993,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "[Maturity_Date] - Today()  OR [facility_master.effective_start_date] - Today()\n"
+      "formula_display": "Read days_until_maturity from facility_exposure_snapshot for each active, current facility as of the reporting date.\n"
     },
     "worked_example_columns": [
       {

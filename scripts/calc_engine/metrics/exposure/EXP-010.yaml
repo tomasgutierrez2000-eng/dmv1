@@ -1,171 +1,232 @@
-metric_id: EXP-010
-name: Delinquency Rate (%)
-version: 1.0.0
-owner: credit-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Delinquency Rate (%)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-010"
+name: "Delinquency Rate (%)"
+version: "1.1.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: exposure
-sub_domain: risk-metrics
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "risk-metrics"
 metric_class: CALCULATED
 direction: LOWER_BETTER
 unit_type: PERCENTAGE
-display_format: .2f
-description: |
-  Calculated as Count of Delinquent Loans / Total Loans × 100. Portfolio stress KPI measuring prevalence of past-due exposures.
+display_format: ".2f"
+description: >
+  Calculated as Count of Delinquent Facilities / Total Facilities x 100.
+  Portfolio stress KPI measuring prevalence of past-due exposures across
+  the credit book. A facility is delinquent if days_past_due > 0. At
+  aggregate levels, re-derives the ratio from component sums (sum-ratio
+  pattern) to avoid average-of-ratios bias.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "Basel III"
+    section: "Pillar 3 — Credit Risk"
+    description: "Past-due exposure ratio for credit quality assessment"
+  - framework: "FR Y-14Q"
+    section: "Schedule H.1"
+    description: "Delinquency status reporting for supervisory stress testing"
+  - framework: "IFRS 9"
+    section: "Stage Classification"
+    description: "Delinquency rates inform expected credit loss staging"
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l2
-  table: facility_delinquency_snapshot
-  alias: fds
-  join_type: BASE
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: days_past_due
-    role: MEASURE
-  - name: delinquent_payment_flag
-    role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.facility_id = fds.facility_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: counterparty_id
-    role: DIMENSION
-  - name: lob_segment_id
-    role: DIMENSION
-  - name: is_active_flag
-    role: FILTER
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l2
+    table: facility_delinquency_snapshot
+    alias: fds
+    join_type: BASE
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: days_past_due
+        role: MEASURE
+        description: "Number of days past due — >0 indicates delinquency"
+      - name: is_delinquent_payment_flag
+        role: MEASURE
+        description: "Boolean delinquency indicator"
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = fds.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+      - name: is_current_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
-    formula_text: |
-      Binary flag: 1 if delinquency (days_past_due > 0), 0 otherwise.
-    formula_sql: |-
+    formula_text: >
+      Binary flag: 1.0 if delinquency (days_past_due > 0), 0.0 otherwise.
+    formula_sql: |
       SELECT
         fds.facility_id AS dimension_key,
-        CASE WHEN fds.days_past_due > 0 THEN 1.0 ELSE 0.0 END AS metric_value
+        CASE WHEN COALESCE(fds.days_past_due, 0) > 0 THEN 1.0 ELSE 0.0 END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
-    formula_text: |
+    formula_text: >
       Percentage of facilities with delinquency (days_past_due > 0) per counterparty.
-    formula_sql: |-
+      Re-derived as SUM(delinquent) / COUNT(total) x 100.
+    formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
         CASE WHEN COUNT(*) = 0 THEN NULL
-             ELSE SUM(CASE WHEN fds.days_past_due > 0 THEN 1 ELSE 0 END)::FLOAT
-                  / COUNT(*) * 100.0
+             ELSE SUM(CASE WHEN COALESCE(fds.days_past_due, 0) > 0 THEN 1 ELSE 0 END)
+                  * 100.0 / COUNT(*)
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fds.as_of_date = :as_of_date
-
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM
-    formula_text: |
+    formula_text: >
       Percentage of facilities with delinquency (days_past_due > 0) per L3 desk.
-    formula_sql: |-
+    formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
         CASE WHEN COUNT(*) = 0 THEN NULL
-             ELSE SUM(CASE WHEN fds.days_past_due > 0 THEN 1 ELSE 0 END)::FLOAT
-                  / COUNT(*) * 100.0
+             ELSE SUM(CASE WHEN COALESCE(fds.days_past_due, 0) > 0 THEN 1 ELSE 0 END)
+                  * 100.0 / COUNT(*)
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
-      WHERE fds.as_of_date = :as_of_date
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: CUSTOM
-    formula_text: |
+    formula_text: >
       Percentage of facilities with delinquency (days_past_due > 0) per L2 portfolio.
-    formula_sql: |-
+    formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         CASE WHEN COUNT(*) = 0 THEN NULL
-             ELSE SUM(CASE WHEN fds.days_past_due > 0 THEN 1 ELSE 0 END)::FLOAT
-                  / COUNT(*) * 100.0
+             ELSE SUM(CASE WHEN COALESCE(fds.days_past_due, 0) > 0 THEN 1 ELSE 0 END)
+                  * 100.0 / COUNT(*)
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
-      WHERE fds.as_of_date = :as_of_date
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: CUSTOM
-    formula_text: |
+    formula_text: >
       Percentage of facilities with delinquency (days_past_due > 0) per L1 business segment.
-    formula_sql: |-
+    formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         CASE WHEN COUNT(*) = 0 THEN NULL
-             ELSE SUM(CASE WHEN fds.days_past_due > 0 THEN 1 ELSE 0 END)::FLOAT
-                  / COUNT(*) * 100.0
+             ELSE SUM(CASE WHEN COALESCE(fds.days_past_due, 0) > 0 THEN 1 ELSE 0 END)
+                  * 100.0 / COUNT(*)
         END AS metric_value
       FROM l2.facility_delinquency_snapshot fds
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fds.facility_id
         AND fm.is_active_flag = 'Y'
-      WHERE fds.as_of_date = :as_of_date
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fds.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: EXP-010-V01
-  type: NOT_NULL
-  description: No null delinquency_rate_pct values
-  severity: ERROR
+  - rule_id: "EXP-010-V01"
+    type: NOT_NULL
+    description: "No null delinquency rate values"
+    severity: ERROR
+  - rule_id: "EXP-010-V02"
+    type: THRESHOLD
+    description: "Delinquency rate must be between 0 and 100 percent"
+    severity: ERROR
+    params:
+      min_value: 0
+      max_value: 100
+  - rule_id: "EXP-010-V03"
+    type: RECONCILIATION
+    description: "Delinquency rate at counterparty level should reconcile with facility-level flags"
+    severity: WARNING
+    params:
+      levels_to_compare: [facility, counterparty]
+      tolerance_pct: 0.01
+  - rule_id: "EXP-010-V04"
+    type: PERIOD_OVER_PERIOD
+    description: "Flag significant delinquency rate changes between periods"
+    severity: WARNING
+    params:
+      max_change_pct: 20.0
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-024
-  abbreviation: DR
-  insight: |
-    Credit quality indicator
-  rollup_strategy: weighted-avg
-  primary_value_field: delinquency_rate_pct
-tags:
-- exposure
-- risk-metrics
-dashboard_pages: []
+  item_id: "MET-024"
+  abbreviation: "DR"
+  insight: >
+    Credit quality indicator — percentage of facilities in delinquency
+    status. Rising rates signal portfolio stress.
+  rollup_strategy: "sum-ratio"
+  primary_value_field: "delinquency_rate_pct"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "risk-metrics", "delinquency", "credit-quality"]
+dashboard_pages: ["P7"]
 legacy_metric_ids: []

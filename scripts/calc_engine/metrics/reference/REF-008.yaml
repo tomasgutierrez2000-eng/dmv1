@@ -5,26 +5,31 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-008"
 name: "Days Until Maturity"
-version: "1.0.0"
+version: "1.1.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "reference"
 sub_domain: "master-data"
-metric_class: CALCULATED
+metric_class: SOURCED
 direction: NEUTRAL
 unit_type: DAYS
 display_format: ",.0f"
 description: >
-  Number of calendar days remaining until contractual maturity, calculated as
-  (Maturity Date – Today's Date). Derived tenor metric providing insight into
-  rollover risk and portfolio duration concentration.
+  Number of calendar days remaining until contractual maturity, sourced from
+  the facility exposure snapshot. At aggregate levels, reports the minimum
+  (nearest) maturity across constituent facilities to highlight the most
+  imminent rollover risk and refinancing pressure.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "Pillar 3 — Maturity Analysis"
+    description: "Contractual maturity for liquidity and rollover risk assessment"
+  - framework: "FR Y-14Q"
+    section: "Schedule H.1 — Corporate Loan"
+    description: "Maturity date reporting for supervisory stress testing"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -38,6 +43,7 @@ source_tables:
         role: FILTER
       - name: days_until_maturity
         role: MEASURE
+        description: "Pre-computed (maturity_date - as_of_date) in calendar days"
   - schema: l2
     table: facility_master
     alias: fm
@@ -52,6 +58,8 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -62,106 +70,104 @@ source_tables:
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: CUSTOM
+    aggregation_type: RAW
     formula_text: >
-      [Maturity_Date] - Today()  OR [facility_master.effective_start_date] -
-      Today()
+      Read days_until_maturity from facility_exposure_snapshot for each active,
+      current facility as of the reporting date.
     formula_sql: |
       SELECT
         fes.facility_id AS dimension_key,
-        fes.days_until_maturity AS metric_value
-      FROM l3.facility_exposure_calc fes
+        COALESCE(fes.days_until_maturity, 0) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: MIN
     formula_text: >
-      SUM(facility-level days_until_maturity) per counterparty.
+      Minimum days_until_maturity across all facilities per counterparty —
+      nearest maturity indicates most urgent rollover risk.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.days_until_maturity AS metric_value
-        FROM l3.facility_exposure_calc fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        MIN(COALESCE(fes.days_until_maturity, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: MIN
     formula_text: >
-      SUM of facility-level days_until_maturity per L3 desk segment.
+      Minimum days_until_maturity across all facilities per L3 desk segment —
+      nearest maturity in the segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.days_until_maturity AS metric_value
-        FROM l3.facility_exposure_calc fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        MIN(COALESCE(fes.days_until_maturity, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: MIN
     formula_text: >
-      SUM of facility-level days_until_maturity per L2 portfolio segment.
+      Minimum days_until_maturity across all facilities per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.days_until_maturity AS metric_value
-        FROM l3.facility_exposure_calc fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        MIN(COALESCE(fes.days_until_maturity, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: MIN
     formula_text: >
-      SUM of facility-level days_until_maturity per L1 business segment segment.
+      Minimum days_until_maturity across all facilities per L1 business segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.days_until_maturity AS metric_value
-        FROM l3.facility_exposure_calc fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        MIN(COALESCE(fes.days_until_maturity, 0)) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -174,15 +180,32 @@ validations:
     type: NOT_NULL
     description: "No null days_until_maturity values"
     severity: ERROR
+  - rule_id: "REF-008-V02"
+    type: NON_NEGATIVE
+    description: "Days until maturity must be >= 0 for active facilities"
+    severity: WARNING
+  - rule_id: "REF-008-V03"
+    type: THRESHOLD
+    description: "Days until maturity should not exceed 40 years (14600 days)"
+    severity: WARNING
+    params:
+      max_value: 14600
+  - rule_id: "REF-008-V04"
+    type: PERIOD_OVER_PERIOD
+    description: "Flag significant maturity tenor changes between periods"
+    severity: WARNING
+    params:
+      max_change_pct: 25.0
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-023"
   abbreviation: "DUM"
   insight: >
-    Refinancing risk and liquidity management
-  rollup_strategy: "direct-sum"
+    Refinancing risk and liquidity management — shows nearest maturity
+    at aggregate levels to highlight imminent rollover pressure.
+  rollup_strategy: "worst-case"
   primary_value_field: "days_until_maturity"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["reference", "master-data"]
-dashboard_pages: []
+tags: ["reference", "master-data", "maturity", "rollover-risk"]
+dashboard_pages: ["P7"]
 legacy_metric_ids: []

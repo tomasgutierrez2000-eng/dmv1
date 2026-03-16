@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS l1.entity_type_dim (
   entity_type_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   is_financial_institution VARCHAR(255),
   is_sovereign VARCHAR(100),
   regulatory_counterparty_class VARCHAR(50)
@@ -64,14 +64,14 @@ CREATE TABLE IF NOT EXISTS l1.credit_event_type_dim (
   credit_event_type_code BIGINT NOT NULL PRIMARY KEY,
   credit_event_type_id BIGINT NOT NULL,
   credit_event_type_name VARCHAR(200),
-  default_trigger_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N'))
+  is_default_trigger_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N'))
 );
 
 CREATE TABLE IF NOT EXISTS l1.credit_status_dim (
   credit_status_code BIGINT NOT NULL PRIMARY KEY,
   credit_status_name VARCHAR(200),
-  default_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_default_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   delinquency_bucket VARCHAR(100),
   status_category VARCHAR(50) NOT NULL
 );
@@ -82,10 +82,10 @@ CREATE TABLE IF NOT EXISTS l1.exposure_type_dim (
   exposure_type_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   basel_exposure_class VARCHAR(100),
   ccf_pct DECIMAL(10,4),
-  off_balance_sheet_flag CHAR(1),
+  is_off_balance_sheet_flag CHAR(1),
   product_id BIGINT,
   sa_ccr_asset_class VARCHAR(50)
 );
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS l1.amendment_status_dim (
   amendment_status_name VARCHAR(200),
   status_group VARCHAR(100),
   is_terminal_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP
 );
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS l1.amendment_type_dim (
   amendment_type_code VARCHAR(20) NOT NULL PRIMARY KEY,
   amendment_type_name VARCHAR(200),
   description VARCHAR(2000),
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP
 );
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS l1.default_definition_dim (
   description VARCHAR(2000),
   jurisdiction_code VARCHAR(20),
   days_past_due_threshold INTEGER,
-  credit_event_trigger_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_credit_event_trigger_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   materiality_threshold_amt DECIMAL(18,2)
 );
 
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS l1.internal_risk_rating_bucket_dim (
   rating_score_min INTEGER,
   rating_score_max INTEGER,
   display_order INTEGER,
-  active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
 );
 
 CREATE TABLE IF NOT EXISTS l1.pricing_tier_dim (
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS l1.pricing_tier_dim (
   tier_name VARCHAR(200),
   tier_ordinal INTEGER,
   display_order INTEGER,
-  active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N'))
 );
 
 CREATE TABLE IF NOT EXISTS l1.maturity_bucket_dim (
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS l1.maturity_bucket_dim (
   bucket_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   bucket_end_days INTEGER,
   bucket_start_days INTEGER,
   jurisdiction_code VARCHAR(20),
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS l1.fr2590_category_dim (
   category_name VARCHAR(200),
   definition VARCHAR(100),
   display_order INTEGER,
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP
 );
@@ -175,10 +175,10 @@ CREATE TABLE IF NOT EXISTS l1.rating_scale_dim (
   scale_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
-  default_flag CHAR(1),
+  is_active_flag CHAR(1),
+  is_default_flag CHAR(1),
   display_color_hex VARCHAR(100),
-  investment_grade_flag CHAR(1),
+  is_investment_grade_flag CHAR(1),
   pd_implied DECIMAL(10,6),
   rating_grade_id BIGINT,
   rating_notch VARCHAR(100),
@@ -191,10 +191,10 @@ CREATE TABLE IF NOT EXISTS l1.crm_type_dim (
   crm_type_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   basel_recognition_method VARCHAR(255),
   crm_category VARCHAR(50),
-  eligible_flag CHAR(1),
+  is_eligible_flag CHAR(1),
   risk_mitigant_subtype_code VARCHAR(20)
 );
 
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS l1.source_system_registry (
   data_domain VARCHAR(100),
   ingestion_frequency VARCHAR(30),
   system_owner VARCHAR(100),
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS l1.regulatory_capital_basis_dim (
   basis_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   description VARCHAR(2000),
   effective_from_date DATE,
   effective_to_date DATE,
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS l1.industry_dim (
   industry_level VARCHAR(100),
   industry_standard VARCHAR(100),
   parent_industry_id BIGINT NOT NULL,
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
@@ -293,6 +293,7 @@ CREATE TABLE IF NOT EXISTS l1.enterprise_business_taxonomy (
   substatus INTEGER,
   substatus_effective_to_date DATE,
   tree_level INTEGER,
+  is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -318,6 +319,7 @@ CREATE TABLE IF NOT EXISTS l1.enterprise_product_taxonomy (
   substatus INTEGER,
   substatus_effective_to_date DATE,
   tree_level INTEGER,
+  is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -328,7 +330,7 @@ CREATE TABLE IF NOT EXISTS l1.portfolio_dim (
   portfolio_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   lob_segment_id BIGINT,
   parent_portfolio_id BIGINT,
   portfolio_type VARCHAR(50),
@@ -360,7 +362,7 @@ CREATE TABLE IF NOT EXISTS l1.rating_source (
   source_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   priority_rank INTEGER,
   rating_source_name VARCHAR(200),
   rating_source_type VARCHAR(50),
@@ -376,7 +378,7 @@ CREATE TABLE IF NOT EXISTS l1.rating_grade_dim (
   grade_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  default_flag CHAR(1),
+  is_default_flag CHAR(1),
   effective_from_date DATE,
   effective_to_date DATE,
   is_current VARCHAR(100),
@@ -398,7 +400,7 @@ CREATE TABLE IF NOT EXISTS l1.collateral_type (
   name VARCHAR(200),
   collateral_category VARCHAR(50) NOT NULL,
   description VARCHAR(2000),
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
   basel_rwa_weight VARCHAR(100),
@@ -419,7 +421,7 @@ CREATE TABLE IF NOT EXISTS l1.interest_rate_index_dim (
   index_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   cessation_date DATE,
   compounding_method VARCHAR(100),
   currency_code VARCHAR(20),
@@ -444,7 +446,7 @@ CREATE TABLE IF NOT EXISTS l1.ledger_account_dim (
   account_category VARCHAR(50),
   account_type VARCHAR(20),
   is_balance_sheet_flag BOOLEAN,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   currency_code VARCHAR(20),
   effective_from_date DATE,
   effective_to_date DATE,
@@ -522,6 +524,7 @@ CREATE TABLE IF NOT EXISTS l1.counterparty (
   regulatory_counterparty_type VARCHAR(50),
   updated_ts TIMESTAMP,
   y14_obligor_type VARCHAR(50),
+  revenue_amt DECIMAL(18,2),
   effective_start_date DATE NOT NULL,
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
@@ -537,7 +540,7 @@ CREATE TABLE IF NOT EXISTS l1.legal_entity (
   legal_name VARCHAR(200),
   legal_entity_name VARCHAR(200),
   country_code VARCHAR(20) NOT NULL,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   entity_type_code VARCHAR(20),
   functional_currency_code VARCHAR(20),
   institution_id BIGINT,
@@ -560,7 +563,7 @@ CREATE TABLE IF NOT EXISTS l1.instrument_master (
   instrument_id BIGINT NOT NULL PRIMARY KEY,
   country_code VARCHAR(20) NOT NULL,
   currency_code VARCHAR(20) NOT NULL,
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   coupon_frequency VARCHAR(30),
   coupon_rate DECIMAL(10,4),
   instrument_name VARCHAR(200),
@@ -595,7 +598,6 @@ CREATE TABLE IF NOT EXISTS l1.instrument_identifier (
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (instrument_id, id_type, effective_start_date)
 ,
-  CONSTRAINT fk_instrument_identifier_instrument_id FOREIGN KEY (instrument_id) REFERENCES l1.instrument_master(instrument_id),
   CONSTRAINT fk_instrument_identifier_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
 
@@ -614,8 +616,6 @@ CREATE TABLE IF NOT EXISTS l1.credit_agreement_master (
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_credit_agreement_master_borrower_counterparty_id FOREIGN KEY (borrower_counterparty_id) REFERENCES l1.counterparty(counterparty_id),
-  CONSTRAINT fk_credit_agreement_master_lender_legal_entity_id FOREIGN KEY (lender_legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
   CONSTRAINT fk_credit_agreement_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -648,20 +648,19 @@ CREATE TABLE IF NOT EXISTS l1.facility_master (
   interest_rate_type VARCHAR(20),
   next_repricing_date DATE,
   payment_frequency VARCHAR(30),
-  prepayment_penalty_flag CHAR(1),
+  is_prepayment_penalty_flag CHAR(1),
   product_id BIGINT,
   rate_cap_pct DECIMAL(10,4),
   rate_floor_pct DECIMAL(10,4),
   region_code VARCHAR(20),
-  revolving_flag CHAR(1),
-  active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
+  is_revolving_flag CHAR(1),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
+  revenue_amt DECIMAL(18,2),
   effective_start_date DATE NOT NULL,
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_facility_master_credit_agreement_id FOREIGN KEY (credit_agreement_id) REFERENCES l1.credit_agreement_master(credit_agreement_id),
-  CONSTRAINT fk_facility_master_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_facility_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
   CONSTRAINT fk_facility_master_portfolio_id FOREIGN KEY (portfolio_id) REFERENCES l1.portfolio_dim(portfolio_id),
   CONSTRAINT fk_facility_master_lob_segment_id FOREIGN KEY (lob_segment_id) REFERENCES l1.enterprise_business_taxonomy(managed_segment_id),
@@ -708,14 +707,12 @@ CREATE TABLE IF NOT EXISTS l1.netting_agreement (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_netting_agreement_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.netting_set (
   netting_set_id BIGINT NOT NULL PRIMARY KEY,
   netting_agreement_id BIGINT NOT NULL,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   counterparty_id BIGINT,
   governing_law VARCHAR(100),
   is_enforceable_flag CHAR(1),
@@ -727,8 +724,6 @@ CREATE TABLE IF NOT EXISTS l1.netting_set (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_netting_set_netting_agreement_id FOREIGN KEY (netting_agreement_id) REFERENCES l1.netting_agreement(netting_agreement_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.netting_set_link (
@@ -742,9 +737,6 @@ CREATE TABLE IF NOT EXISTS l1.netting_set_link (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_netting_set_link_netting_set_id FOREIGN KEY (netting_set_id) REFERENCES l1.netting_set(netting_set_id),
-  CONSTRAINT fk_netting_set_link_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.csa_master (
@@ -763,8 +755,6 @@ CREATE TABLE IF NOT EXISTS l1.csa_master (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_csa_master_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.margin_agreement (
@@ -783,8 +773,6 @@ CREATE TABLE IF NOT EXISTS l1.margin_agreement (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_margin_agreement_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.collateral_asset_master (
@@ -800,13 +788,13 @@ CREATE TABLE IF NOT EXISTS l1.collateral_asset_master (
   collateral_status VARCHAR(30),
   description VARCHAR(2000),
   insurance_expiry_date DATE,
-  insurance_flag CHAR(1),
+  is_insurance_flag CHAR(1),
   lien_priority INTEGER,
   location_country_code VARCHAR(20),
   location_description VARCHAR(2000),
   maturity_date DATE,
   original_cost DECIMAL(18,2),
-  regulatory_eligible_flag CHAR(1),
+  is_regulatory_eligible_flag CHAR(1),
   revaluation_frequency VARCHAR(255),
   source_record_id BIGINT,
   updated_ts TIMESTAMP,
@@ -818,10 +806,8 @@ CREATE TABLE IF NOT EXISTS l1.collateral_asset_master (
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
   CONSTRAINT fk_collateral_asset_master_collateral_type_id FOREIGN KEY (collateral_type_id) REFERENCES l1.collateral_type(collateral_type_id),
-  CONSTRAINT fk_collateral_asset_master_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_collateral_asset_master_country_code FOREIGN KEY (country_code) REFERENCES l1.country_dim(country_code),
-  CONSTRAINT fk_collateral_asset_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
-  CONSTRAINT fk_collateral_asset_master_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id)
+  CONSTRAINT fk_collateral_asset_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
 CREATE TABLE IF NOT EXISTS l1.collateral_link (
@@ -838,7 +824,6 @@ CREATE TABLE IF NOT EXISTS l1.collateral_link (
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_collateral_link_collateral_asset_id FOREIGN KEY (collateral_asset_id) REFERENCES l1.collateral_asset_master(collateral_asset_id),
   CONSTRAINT fk_collateral_link_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
 
@@ -847,7 +832,7 @@ CREATE TABLE IF NOT EXISTS l1.collateral_eligibility_dim (
   collateral_type_id BIGINT NOT NULL,
   effective_from_date DATE NOT NULL,
   effective_to_date DATE,
-  eligible_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_eligible_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   jurisdiction_code VARCHAR(20) NOT NULL,
   regulatory_capital_basis_id BIGINT NOT NULL,
   haircut_method VARCHAR(100),
@@ -883,7 +868,7 @@ CREATE TABLE IF NOT EXISTS l1.crm_eligibility_dim (
   crm_type_code VARCHAR(20) NOT NULL,
   effective_from_date DATE NOT NULL,
   effective_to_date DATE,
-  eligible_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_eligible_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   jurisdiction_code VARCHAR(20) NOT NULL,
   regulatory_capital_basis_id BIGINT NOT NULL,
   source_system_id BIGINT NOT NULL,
@@ -904,7 +889,7 @@ CREATE TABLE IF NOT EXISTS l1.crm_protection_master (
   currency_code VARCHAR(20) NOT NULL,
   notional_amount DECIMAL(18,2),
   maturity_date DATE NOT NULL,
-  enforceable_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_enforceable_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   coverage_pct DECIMAL(10,4),
   governing_law_jurisdiction_id BIGINT,
   protection_provider_counterparty_id BIGINT,
@@ -916,7 +901,6 @@ CREATE TABLE IF NOT EXISTS l1.crm_protection_master (
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
   CONSTRAINT fk_crm_protection_master_crm_type_code FOREIGN KEY (crm_type_code) REFERENCES l1.crm_type_dim(crm_type_code),
-  CONSTRAINT fk_crm_protection_master_beneficiary_legal_entity_id FOREIGN KEY (beneficiary_legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
   CONSTRAINT fk_crm_protection_master_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -934,9 +918,6 @@ CREATE TABLE IF NOT EXISTS l1.protection_link (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_protection_link_protection_id FOREIGN KEY (protection_id) REFERENCES l1.crm_protection_master(protection_id),
-  CONSTRAINT fk_protection_link_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.risk_mitigant_type_dim (
@@ -944,9 +925,9 @@ CREATE TABLE IF NOT EXISTS l1.risk_mitigant_type_dim (
   subtype_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   display_order INTEGER,
-  eligible_flag CHAR(1),
+  is_eligible_flag CHAR(1),
   mitigant_category VARCHAR(50),
   parent_group_code VARCHAR(20),
   parent_group_name VARCHAR(200),
@@ -973,7 +954,6 @@ CREATE TABLE IF NOT EXISTS l1.risk_mitigant_master (
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_risk_mitigant_master_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_risk_mitigant_master_risk_mitigant_subtype_code FOREIGN KEY (risk_mitigant_subtype_code) REFERENCES l1.risk_mitigant_type_dim(risk_mitigant_subtype_code)
 );
 
@@ -988,9 +968,6 @@ CREATE TABLE IF NOT EXISTS l1.risk_mitigant_link (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_risk_mitigant_link_risk_mitigant_id FOREIGN KEY (risk_mitigant_id) REFERENCES l1.risk_mitigant_master(risk_mitigant_id),
-  CONSTRAINT fk_risk_mitigant_link_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.collateral_portfolio (
@@ -998,7 +975,7 @@ CREATE TABLE IF NOT EXISTS l1.collateral_portfolio (
   portfolio_id BIGINT NOT NULL,
   description VARCHAR(2000),
   lob_segment_id BIGINT NOT NULL,
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   portfolio_name_override VARCHAR(255),
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -1015,10 +992,6 @@ CREATE TABLE IF NOT EXISTS l1.counterparty_hierarchy (
   ownership_pct DECIMAL(10,4),
   as_of_date DATE NOT NULL,
   PRIMARY KEY (counterparty_id, as_of_date)
-,
-  CONSTRAINT fk_counterparty_hierarchy_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
-  CONSTRAINT fk_counterparty_hierarchy_immediate_parent_id FOREIGN KEY (immediate_parent_id) REFERENCES l1.counterparty(counterparty_id),
-  CONSTRAINT fk_counterparty_hierarchy_ultimate_parent_id FOREIGN KEY (ultimate_parent_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.legal_entity_hierarchy (
@@ -1035,9 +1008,6 @@ CREATE TABLE IF NOT EXISTS l1.legal_entity_hierarchy (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_legal_entity_hierarchy_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id),
-  CONSTRAINT fk_legal_entity_hierarchy_parent_legal_entity_id FOREIGN KEY (parent_legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.control_relationship (
@@ -1053,9 +1023,6 @@ CREATE TABLE IF NOT EXISTS l1.control_relationship (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_control_relationship_parent_counterparty_id FOREIGN KEY (parent_counterparty_id) REFERENCES l1.counterparty(counterparty_id),
-  CONSTRAINT fk_control_relationship_subsidiary_counterparty_id FOREIGN KEY (subsidiary_counterparty_id) REFERENCES l1.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.economic_interdependence_relationship (
@@ -1071,8 +1038,6 @@ CREATE TABLE IF NOT EXISTS l1.economic_interdependence_relationship (
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_economic_interdependence_relationship_counterparty_id_1 FOREIGN KEY (counterparty_id_1) REFERENCES l1.counterparty(counterparty_id),
-  CONSTRAINT fk_economic_interdependence_relationship_counterparty_id_2 FOREIGN KEY (counterparty_id_2) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_economic_interdependence_relationship_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
 
@@ -1090,8 +1055,6 @@ CREATE TABLE IF NOT EXISTS l1.credit_agreement_counterparty_participation (
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_credit_agreement_counterparty_participation_credit_agreement_id FOREIGN KEY (credit_agreement_id) REFERENCES l1.credit_agreement_master(credit_agreement_id),
-  CONSTRAINT fk_credit_agreement_counterparty_participation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_credit_agreement_counterparty_participation_counterparty_role_code FOREIGN KEY (counterparty_role_code) REFERENCES l1.counterparty_role_dim(counterparty_role_code)
 );
 
@@ -1109,8 +1072,6 @@ CREATE TABLE IF NOT EXISTS l1.facility_counterparty_participation (
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_facility_counterparty_participation_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_facility_counterparty_participation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
   CONSTRAINT fk_facility_counterparty_participation_counterparty_role_code FOREIGN KEY (counterparty_role_code) REFERENCES l1.counterparty_role_dim(counterparty_role_code)
 );
 
@@ -1127,9 +1088,6 @@ CREATE TABLE IF NOT EXISTS l1.facility_lender_allocation (
   effective_end_date DATE,
   is_current_flag CHAR(1) DEFAULT 'Y',
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_facility_lender_allocation_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_facility_lender_allocation_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.sccl_counterparty_group (
@@ -1156,7 +1114,7 @@ CREATE TABLE IF NOT EXISTS l1.sccl_counterparty_group_member (
   updated_ts TIMESTAMP,
   effective_end_date DATE,
   effective_start_date DATE,
-  included_flag CHAR(1),
+  is_included_flag CHAR(1),
   member_role_code VARCHAR(20),
   ownership_pct DECIMAL(10,4),
   sccl_group_member_id BIGINT,
@@ -1164,8 +1122,7 @@ CREATE TABLE IF NOT EXISTS l1.sccl_counterparty_group_member (
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
-  CONSTRAINT fk_sccl_counterparty_group_member_sccl_group_id FOREIGN KEY (sccl_group_id) REFERENCES l1.sccl_counterparty_group(sccl_group_id),
-  CONSTRAINT fk_sccl_counterparty_group_member_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+  CONSTRAINT fk_sccl_counterparty_group_member_sccl_group_id FOREIGN KEY (sccl_group_id) REFERENCES l1.sccl_counterparty_group(sccl_group_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.limit_rule (
@@ -1195,7 +1152,7 @@ CREATE TABLE IF NOT EXISTS l1.limit_threshold (
   threshold_value DECIMAL(18,2),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   direction VARCHAR(100),
   effective_from_date DATE,
   effective_to_date DATE,
@@ -1209,34 +1166,6 @@ CREATE TABLE IF NOT EXISTS l1.limit_threshold (
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
   CONSTRAINT fk_limit_threshold_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id)
-);
-
--- metric_threshold demoted from L2 (pure configuration/reference data).
-CREATE TABLE IF NOT EXISTS l1.metric_threshold (
-  threshold_id BIGINT NOT NULL PRIMARY KEY,
-  metric_definition_id BIGINT NOT NULL,
-  threshold_type VARCHAR(50),
-  threshold_value NUMERIC(18,4),
-  effective_from_date DATE,
-  effective_to_date DATE,
-  active_flag CHAR(1),
-  inner_threshold_pct NUMERIC(10,4),
-  last_threshold_updated_date DATE,
-  limit_type VARCHAR(50),
-  limit_value NUMERIC(18,4),
-  lod1_sponsor VARCHAR(100),
-  lod2_sponsor VARCHAR(100),
-  metric_category VARCHAR(50),
-  metric_code VARCHAR(20),
-  metric_description VARCHAR(2000),
-  metric_id_display VARCHAR(100),
-  metric_name VARCHAR(200),
-  metric_owner VARCHAR(100),
-  metric_threshold_id BIGINT,
-  outer_threshold_pct NUMERIC(10,4),
-  report_deadline VARCHAR(100),
-  report_frequency VARCHAR(30),
-  CONSTRAINT fk_metric_threshold_metric_definition_id FOREIGN KEY (metric_definition_id) REFERENCES l1.metric_definition_dim(metric_definition_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.fx_rate (
@@ -1281,7 +1210,7 @@ CREATE TABLE IF NOT EXISTS l1.report_registry (
   report_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   effective_from_date DATE,
   effective_to_date DATE,
   frequency VARCHAR(30),
@@ -1299,8 +1228,8 @@ CREATE TABLE IF NOT EXISTS l1.reporting_calendar_dim (
   updated_ts TIMESTAMP,
   as_of_date DATE,
   cutoff_ts TIMESTAMP,
-  fiscal_quarter DATE,
-  fiscal_year DATE,
+  fiscal_quarter_date DATE,
+  fiscal_year_date DATE,
   is_period_end CHAR(1),
   period_end_date DATE,
   period_start_date DATE,
@@ -1314,7 +1243,7 @@ CREATE TABLE IF NOT EXISTS l1.reporting_entity_dim (
   legal_entity_id BIGINT NOT NULL,
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   consolidation_basis VARCHAR(50),
   effective_from_date DATE,
   effective_to_date DATE,
@@ -1325,8 +1254,6 @@ CREATE TABLE IF NOT EXISTS l1.reporting_entity_dim (
   reporting_entity_name VARCHAR(200),
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-,
-  CONSTRAINT fk_reporting_entity_dim_legal_entity_id FOREIGN KEY (legal_entity_id) REFERENCES l1.legal_entity(legal_entity_id)
 );
 
 CREATE TABLE IF NOT EXISTS l1.model_registry_dim (
@@ -1342,7 +1269,7 @@ CREATE TABLE IF NOT EXISTS l1.model_registry_dim (
   model_type VARCHAR(50),
   model_version VARCHAR(100),
   owner_org_unit_id BIGINT,
-  regulatory_approved_flag CHAR(1),
+  is_regulatory_approved_flag CHAR(1),
   validation_status VARCHAR(30),
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -1354,7 +1281,7 @@ CREATE TABLE IF NOT EXISTS l1.rule_registry (
   rule_name VARCHAR(200),
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   approved_by VARCHAR(100),
   approved_ts TIMESTAMP,
   effective_from_date DATE,
@@ -1376,7 +1303,7 @@ CREATE TABLE IF NOT EXISTS l1.validation_check_registry (
   target_column VARCHAR(100),
   severity VARCHAR(100),
   owner_id BIGINT,
-  active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'N' CHECK (value IN ('Y','N')),
   validation_check_id BIGINT,
   created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -1446,7 +1373,7 @@ CREATE TABLE IF NOT EXISTS l1.report_cell_definition (
   cell_definition TEXT,
   created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_ts TIMESTAMP,
-  active_flag CHAR(1),
+  is_active_flag CHAR(1),
   calculation_rule_id BIGINT,
   cell_datatype VARCHAR(100),
   cell_id BIGINT,
@@ -1507,4 +1434,45 @@ CREATE TABLE IF NOT EXISTS l1.scenario_dim (
   updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ,
   CONSTRAINT fk_scenario_dim_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
+);
+
+CREATE TABLE IF NOT EXISTS l1.lob_hierarchy_config (
+  hierarchy_id VARCHAR(64) NOT NULL PRIMARY KEY,
+  hierarchy_name VARCHAR(200),
+  hierarchy_type VARCHAR(50),
+  root_segment_id BIGINT,
+  is_active CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_ts TIMESTAMP,
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_lob_hierarchy_config_root_segment_id FOREIGN KEY (root_segment_id) REFERENCES l1.enterprise_business_taxonomy(managed_segment_id)
+);
+
+CREATE TABLE IF NOT EXISTS l1.limit_assignment (
+  limit_assignment_id BIGINT NOT NULL PRIMARY KEY,
+  limit_rule_id BIGINT NOT NULL,
+  facility_id BIGINT,
+  counterparty_id BIGINT,
+  lob_segment_id BIGINT,
+  assigned_limit_amt DECIMAL(18,2),
+  effective_from_date DATE,
+  effective_to_date DATE,
+  is_active CHAR(1) DEFAULT 'Y',
+  created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_ts TIMESTAMP,
+  created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+,
+  CONSTRAINT fk_limit_assignment_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
+  CONSTRAINT fk_limit_assignment_lob_segment_id FOREIGN KEY (lob_segment_id) REFERENCES l1.enterprise_business_taxonomy(managed_segment_id)
+);
+
+CREATE TABLE IF NOT EXISTS l1.pipeline_stage_dim (
+  pipeline_stage_code VARCHAR(30) NOT NULL PRIMARY KEY,
+  stage_name VARCHAR(200),
+  stage_order INTEGER,
+  is_active CHAR(1) DEFAULT 'Y',
+  description VARCHAR(500)
 );

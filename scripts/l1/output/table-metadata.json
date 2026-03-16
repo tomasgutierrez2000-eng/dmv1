@@ -236,7 +236,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -280,13 +280,13 @@
       "fk": null,
       "nullable": true
     },
-    "default_trigger_flag": {
+    "is_default_trigger_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -306,7 +306,7 @@
       "fk": null,
       "nullable": true
     },
-    "default_flag": {
+    "is_default_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -356,7 +356,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -374,7 +374,7 @@
       "fk": null,
       "nullable": true
     },
-    "off_balance_sheet_flag": {
+    "is_off_balance_sheet_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -418,7 +418,7 @@
       "fk": null,
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -456,7 +456,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -506,7 +506,7 @@
       "fk": null,
       "nullable": true
     },
-    "credit_event_trigger_flag": {
+    "is_credit_event_trigger_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -550,7 +550,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -582,7 +582,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -620,7 +620,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -676,7 +676,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -770,13 +770,13 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
-    "default_flag": {
+    "is_default_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -788,7 +788,7 @@
       "fk": null,
       "nullable": true
     },
-    "investment_grade_flag": {
+    "is_investment_grade_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -850,7 +850,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -868,7 +868,7 @@
       "fk": null,
       "nullable": true
     },
-    "eligible_flag": {
+    "is_eligible_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -912,7 +912,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1128,7 +1128,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1196,7 +1196,7 @@
       "fk": "l1.industry_dim(industry_id)",
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1314,6 +1314,12 @@
     },
     "tree_level": {
       "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_current_flag": {
+      "type": "CHAR(1)",
       "pk": false,
       "fk": null,
       "nullable": true
@@ -1439,6 +1445,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "is_current_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L1.portfolio_dim": {
@@ -1472,7 +1484,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1608,7 +1620,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1676,7 +1688,7 @@
       "fk": null,
       "nullable": true
     },
-    "default_flag": {
+    "is_default_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1768,7 +1780,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1866,7 +1878,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -1977,12 +1989,18 @@
       "nullable": true
     },
     "account_type": {
-      "type": "VARCHAR(50)",
+      "type": "VARCHAR(20)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_balance_sheet_flag": {
+      "type": "BOOLEAN",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -2365,6 +2383,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "revenue_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L1.legal_entity": {
@@ -2392,7 +2416,7 @@
       "fk": "l1.country_dim(country_code)",
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -2478,7 +2502,7 @@
       "fk": "l1.currency_dim(currency_code)",
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -2561,7 +2585,7 @@
     "instrument_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.instrument_master(instrument_id)",
+      "fk": "l2.instrument_master(instrument_id)",
       "nullable": false
     },
     "id_type": {
@@ -2617,13 +2641,13 @@
     "borrower_counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "lender_legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "currency_code": {
@@ -2673,13 +2697,13 @@
     "credit_agreement_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.credit_agreement_master(credit_agreement_id)",
+      "fk": "l2.credit_agreement_master(credit_agreement_id)",
       "nullable": false
     },
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "currency_code": {
@@ -2832,7 +2856,7 @@
       "fk": null,
       "nullable": true
     },
-    "prepayment_penalty_flag": {
+    "is_prepayment_penalty_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -2862,17 +2886,23 @@
       "fk": null,
       "nullable": true
     },
-    "revolving_flag": {
+    "is_revolving_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
       "nullable": false
+    },
+    "revenue_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L1.contract_master": {
@@ -2971,7 +3001,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "governing_law": {
@@ -3045,10 +3075,10 @@
     "netting_agreement_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.netting_agreement(netting_agreement_id)",
+      "fk": "l2.netting_agreement(netting_agreement_id)",
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3107,13 +3137,13 @@
     "netting_set_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.netting_set(netting_set_id)",
+      "fk": "l2.netting_set(netting_set_id)",
       "nullable": false
     },
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "anchor_id": {
@@ -3145,7 +3175,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "csa_type": {
@@ -3213,7 +3243,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -3287,7 +3317,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "country_code": {
@@ -3305,7 +3335,7 @@
     "legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "charge_type": {
@@ -3344,7 +3374,7 @@
       "fk": null,
       "nullable": true
     },
-    "insurance_flag": {
+    "is_insurance_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3380,7 +3410,7 @@
       "fk": null,
       "nullable": true
     },
-    "regulatory_eligible_flag": {
+    "is_regulatory_eligible_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3427,7 +3457,7 @@
     "collateral_asset_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.collateral_asset_master(collateral_asset_id)",
+      "fk": "l2.collateral_asset_master(collateral_asset_id)",
       "nullable": false
     },
     "anchor_id": {
@@ -3492,7 +3522,7 @@
       "fk": null,
       "nullable": true
     },
-    "eligible_flag": {
+    "is_eligible_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3598,7 +3628,7 @@
       "fk": null,
       "nullable": true
     },
-    "eligible_flag": {
+    "is_eligible_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3645,7 +3675,7 @@
     "beneficiary_legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "currency_code": {
@@ -3666,7 +3696,7 @@
       "fk": null,
       "nullable": false
     },
-    "enforceable_flag": {
+    "is_enforceable_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3713,13 +3743,13 @@
     "protection_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.crm_protection_master(protection_id)",
+      "fk": "l2.crm_protection_master(protection_id)",
       "nullable": false
     },
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "allocated_amount": {
@@ -3784,7 +3814,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3796,7 +3826,7 @@
       "fk": null,
       "nullable": true
     },
-    "eligible_flag": {
+    "is_eligible_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3837,7 +3867,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "risk_mitigant_subtype_code": {
@@ -3923,13 +3953,13 @@
     "risk_mitigant_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.risk_mitigant_master(risk_mitigant_id)",
+      "fk": "l2.risk_mitigant_master(risk_mitigant_id)",
       "nullable": false
     },
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "anchor_id": {
@@ -3976,7 +4006,7 @@
       "fk": "l1.enterprise_business_taxonomy(managed_segment_id)",
       "nullable": false
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -3993,7 +4023,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": true,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -4005,13 +4035,13 @@
     "immediate_parent_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "ultimate_parent_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "ownership_pct": {
@@ -4031,13 +4061,13 @@
     "legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "parent_legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "as_of_date": {
@@ -4087,13 +4117,13 @@
     "parent_counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "subsidiary_counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "control_type_code": {
@@ -4137,13 +4167,13 @@
     "counterparty_id_1": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "counterparty_id_2": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "source_system_id": {
@@ -4181,13 +4211,13 @@
     "credit_agreement_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.credit_agreement_master(credit_agreement_id)",
+      "fk": "l2.credit_agreement_master(credit_agreement_id)",
       "nullable": false
     },
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "counterparty_role_code": {
@@ -4231,13 +4261,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "counterparty_role_code": {
@@ -4281,13 +4311,13 @@
     "facility_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.facility_master(facility_id)",
+      "fk": "l2.facility_master(facility_id)",
       "nullable": false
     },
     "legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "bank_share_pct": {
@@ -4405,7 +4435,7 @@
     "counterparty_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.counterparty(counterparty_id)",
+      "fk": "l2.counterparty(counterparty_id)",
       "nullable": false
     },
     "created_ts": {
@@ -4432,7 +4462,7 @@
       "fk": null,
       "nullable": true
     },
-    "included_flag": {
+    "is_included_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -4592,7 +4622,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -4820,7 +4850,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -4900,13 +4930,13 @@
       "fk": null,
       "nullable": true
     },
-    "fiscal_quarter": {
+    "fiscal_quarter_date": {
       "type": "DATE",
       "pk": false,
       "fk": null,
       "nullable": true
     },
-    "fiscal_year": {
+    "fiscal_year_date": {
       "type": "DATE",
       "pk": false,
       "fk": null,
@@ -4959,7 +4989,7 @@
     "legal_entity_id": {
       "type": "BIGINT",
       "pk": false,
-      "fk": "l1.legal_entity(legal_entity_id)",
+      "fk": "l2.legal_entity(legal_entity_id)",
       "nullable": false
     },
     "created_ts": {
@@ -4974,7 +5004,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -5102,7 +5132,7 @@
       "fk": null,
       "nullable": true
     },
-    "regulatory_approved_flag": {
+    "is_regulatory_approved_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -5146,7 +5176,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -5250,7 +5280,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -5550,7 +5580,7 @@
       "fk": null,
       "nullable": true
     },
-    "active_flag": {
+    "is_active_flag": {
       "type": "CHAR(1)",
       "pk": false,
       "fk": null,
@@ -5796,6 +5826,150 @@
     },
     "shock_parameters_json": {
       "type": "VARCHAR(255)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.lob_hierarchy_config": {
+    "hierarchy_id": {
+      "type": "VARCHAR(64)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "hierarchy_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "hierarchy_type": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "root_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_business_taxonomy(managed_segment_id)",
+      "nullable": true
+    },
+    "is_active": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.limit_assignment": {
+    "limit_assignment_id": {
+      "type": "BIGINT",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "limit_rule_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.limit_rule(limit_rule_id)",
+      "nullable": false
+    },
+    "facility_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.facility_master(facility_id)",
+      "nullable": true
+    },
+    "counterparty_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l2.counterparty(counterparty_id)",
+      "nullable": true
+    },
+    "lob_segment_id": {
+      "type": "BIGINT",
+      "pk": false,
+      "fk": "l1.enterprise_business_taxonomy(managed_segment_id)",
+      "nullable": true
+    },
+    "assigned_limit_amt": {
+      "type": "DECIMAL(18,2)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "effective_from_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "effective_to_date": {
+      "type": "DATE",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
+  "L1.pipeline_stage_dim": {
+    "pipeline_stage_code": {
+      "type": "VARCHAR(30)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "stage_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "stage_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "description": {
+      "type": "VARCHAR(500)",
       "pk": false,
       "fk": null,
       "nullable": true

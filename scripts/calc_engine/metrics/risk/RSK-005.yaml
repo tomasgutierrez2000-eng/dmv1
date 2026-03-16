@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Risk Rating Status - External Change - Steps (e.g. AAA to A = -2 steps)
+# Risk Rating Status - External Change Steps
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "RSK-005"
 name: "Risk Rating Status - External Change - Steps (e.g. AAA to A = -2 steps)"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -15,22 +15,24 @@ domain: "risk"
 sub_domain: "credit-ratings"
 metric_class: CALCULATED
 direction: NEUTRAL
-unit_type: ORDINAL
-display_format: "s"
+unit_type: RATIO
+display_format: "+.1f"
 description: >
-  Numerical representation of external risk rating migration (month over month
-  changes) expressed in notch movement (positive or negative). Positive step
-  changes are identified when there is an upgrade, from A to AA and the step
-  change is +1, where as the negative step change is identified when there is a
-  downgrade from B+ to B- and the step change is -1. Note when this is displayed
-  at an aggregated Line of Business or portfolio level, it is determined by the
-  month-over-month change of the average rating at this level. Quantifies
-  magnitude of credit change and enables portfolio-level migration analysis,
-  stress testing sensitivity, and risk trend measurement.
+  Mean external rating notch change (month-over-month) expressed as
+  a numeric step count. Positive values indicate upgrades (e.g., A→AA = +1),
+  negative values indicate downgrades (e.g., B+→B- = -2). Sourced from
+  counterparty_rating_observation.risk_rating_change_steps, filtered to
+  external agency observations only (is_internal_flag = 'N').
+  At counterparty level: AVG across agency observations for that counterparty.
+  At aggregate levels: AVG across unique counterparties in the LOB segment,
+  consistent with spec requirement that LOB-level steps reflect the
+  average rating at that level, not the sum.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Credit migration analysis and stress testing sensitivity"
+  - framework: "OCC 2020-36"
+    description: "Rating migration magnitude for portfolio risk assessment"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -38,17 +40,21 @@ source_tables:
     alias: cro
     join_type: BASE
     fields:
-      - name: facility_id
+      - name: counterparty_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
       - name: risk_rating_change_steps
         role: MEASURE
+        description: "Integer notch change (positive=upgrade, negative=downgrade)"
+      - name: is_internal_flag
+        role: FILTER
+        description: "Filter to external ratings only (= 'N')"
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = cro.facility_id"
+    join_on: "fm.counterparty_id = cro.counterparty_id AND fm.is_active_flag = 'Y' AND fm.is_current_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -58,117 +64,147 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Read risk_rating_change_steps from counterparty_rating_observation for each
-      facility as-of reporting date.
+      Not directly applicable — ratings are per counterparty, not facility.
+      Passthrough: assigns counterparty's AVG external rating change steps
+      to each of its facilities via facility_master.counterparty_id join.
     formula_sql: |
       SELECT
-        cro.facility_id AS dimension_key,
-        cro.risk_rating_change_steps AS metric_value
-      FROM l2.counterparty_rating_observation cro
-      WHERE cro.as_of_date = :as_of_date
+        fm.facility_id AS dimension_key,
+        AVG(cro.risk_rating_change_steps * 1.0) AS metric_value
+      FROM l2.facility_master fm
+      INNER JOIN l2.counterparty_rating_observation cro
+        ON cro.counterparty_id = fm.counterparty_id
+        AND cro.is_internal_flag = 'N'
+        AND cro.as_of_date = :as_of_date
+      WHERE fm.is_active_flag = 'Y'
+        AND fm.is_current_flag = 'Y'
+      GROUP BY fm.facility_id
   counterparty:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_change_steps per counterparty.
+      AVG of external rating change steps per counterparty, across all
+      agency observations (Moody's, S&P, Fitch) for the reporting date.
     formula_sql: |
       SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_change_steps AS metric_value
-        FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+        cro.counterparty_id AS dimension_key,
+        AVG(cro.risk_rating_change_steps * 1.0) AS metric_value
+      FROM l2.counterparty_rating_observation cro
+      WHERE cro.is_internal_flag = 'N'
+        AND cro.as_of_date = :as_of_date
+      GROUP BY cro.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_change_steps per L3 desk segment.
+      AVG of counterparty-level external rating change steps across all
+      unique counterparties in the L3 desk segment. Each counterparty
+      counted once per LOB (deduplicated via DISTINCT on counterparty_id
+      + lob_segment_id from facility_master).
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        AVG(cp_rating.change_steps) AS metric_value
       FROM (
         SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_change_steps AS metric_value
+          cro.counterparty_id,
+          AVG(cro.risk_rating_change_steps * 1.0) AS change_steps
         FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        WHERE cro.is_internal_flag = 'N'
+          AND cro.as_of_date = :as_of_date
+        GROUP BY cro.counterparty_id
+      ) cp_rating
+      INNER JOIN (
+        SELECT DISTINCT counterparty_id, lob_segment_id
+        FROM l2.facility_master
+        WHERE is_active_flag = 'Y'
+          AND is_current_flag = 'Y'
+      ) fm ON fm.counterparty_id = cp_rating.counterparty_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_change_steps per L2 portfolio segment.
+      AVG of counterparty-level external rating change steps across all
+      unique counterparties in the L2 portfolio segment (one hop up in EBT).
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        AVG(cp_rating.change_steps) AS metric_value
       FROM (
         SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_change_steps AS metric_value
+          cro.counterparty_id,
+          AVG(cro.risk_rating_change_steps * 1.0) AS change_steps
         FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        WHERE cro.is_internal_flag = 'N'
+          AND cro.as_of_date = :as_of_date
+        GROUP BY cro.counterparty_id
+      ) cp_rating
+      INNER JOIN (
+        SELECT DISTINCT counterparty_id, lob_segment_id
+        FROM l2.facility_master
+        WHERE is_active_flag = 'Y'
+          AND is_current_flag = 'Y'
+      ) fm ON fm.counterparty_id = cp_rating.counterparty_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level risk_rating_change_steps per L1 business segment
-      segment.
+      AVG of counterparty-level external rating change steps across all
+      unique counterparties in the L1 business segment (two hops up in EBT).
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
+        AVG(cp_rating.change_steps) AS metric_value
       FROM (
         SELECT
-          cro.facility_id AS dimension_key,
-          cro.risk_rating_change_steps AS metric_value
+          cro.counterparty_id,
+          AVG(cro.risk_rating_change_steps * 1.0) AS change_steps
         FROM l2.counterparty_rating_observation cro
-        WHERE cro.as_of_date = :as_of_date
-      ) fac
-      INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
-        AND fm.is_active_flag = 'Y'
+        WHERE cro.is_internal_flag = 'N'
+          AND cro.as_of_date = :as_of_date
+        GROUP BY cro.counterparty_id
+      ) cp_rating
+      INNER JOIN (
+        SELECT DISTINCT counterparty_id, lob_segment_id
+        FROM l2.facility_master
+        WHERE is_active_flag = 'Y'
+          AND is_current_flag = 'Y'
+      ) fm ON fm.counterparty_id = cp_rating.counterparty_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -179,17 +215,32 @@ output:
 validations:
   - rule_id: "RSK-005-V01"
     type: NOT_NULL
-    description: "No null risk_rating_change_steps values"
+    description: "No null change step values for counterparties with observations"
     severity: ERROR
+  - rule_id: "RSK-005-V02"
+    type: THRESHOLD
+    description: "Rating change steps typically within -10 to +10 notch range"
+    severity: WARNING
+    params:
+      min: -10
+      max: 10
+  - rule_id: "RSK-005-V03"
+    type: PERIOD_OVER_PERIOD
+    description: "Average rating change should not swing more than 3 notches month-to-month at LOB level"
+    severity: WARNING
+    params:
+      max_change_pct: 300
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-072"
-  abbreviation: "RRSE"
+  abbreviation: "RRCS"
   insight: >
-    Magnitude of credit quality changes
-  rollup_strategy: "direct-sum"
+    Magnitude of credit quality changes — mean external rating notch
+    movement. Quantifies portfolio-level migration for stress testing
+    and trend analysis.
+  rollup_strategy: "weighted-avg"
   primary_value_field: "risk_rating_change_steps"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["risk", "credit-ratings"]
+tags: ["risk", "credit-ratings", "migration", "notch-change", "external-rating"]
 dashboard_pages: []
 legacy_metric_ids: []

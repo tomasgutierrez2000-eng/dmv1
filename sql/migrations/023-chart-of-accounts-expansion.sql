@@ -47,7 +47,7 @@ INSERT INTO l1.ledger_account_dim (
 (510016, 'CAT-REV', 'Operating Revenues',          'REVENUE',   'REVENUE',           false, true, 'USD', 'CR', NULL, '2020-01-01', '9999-12-31', false, 1, 400001, 9, NOW(), NOW(), true),
 (510017, 'CAT-COGS','Cost of Goods Sold',          'EXPENSE',   'COGS',              false, true, 'USD', 'DR', NULL, '2020-01-01', '9999-12-31', false, 1, 400001, 9, NOW(), NOW(), true),
 (510018, 'CAT-OPEX','Operating Expenses',           'EXPENSE',   'OPERATING_EXPENSE', false, true, 'USD', 'DR', NULL, '2020-01-01', '9999-12-31', false, 1, 400001, 9, NOW(), NOW(), true),
-(510019, 'CAT-OTH', 'Other Income and Expenses',   'REVENUE',   'OTHER',             false, true, 'USD', 'DR', NULL, '2020-01-01', '9999-12-31', false, 1, 400001, 9, NOW(), NOW(), true),
+(510019, 'CAT-OTH', 'Other Income and Expenses',   'REVENUE',   'OTHER',             false, true, 'USD', 'CR', NULL, '2020-01-01', '9999-12-31', false, 1, 400001, 9, NOW(), NOW(), true),
 -- Banking sub-category under Current Assets for existing banking accounts
 (510020, 'CAT-BANK','Banking Book Assets',          'ASSET',     'BANKING_BOOK',      true,  true, 'USD', 'DR', 510011, '2020-01-01', '9999-12-31', true, 1, 400001, 9, NOW(), NOW(), true),
 (510021, 'CAT-BKLB','Banking Book Liabilities',     'LIABILITY', 'BANKING_BOOK',      true,  true, 'USD', 'CR', 510013, '2020-01-01', '9999-12-31', true, 1, 400001, 9, NOW(), NOW(), true);

@@ -65,7 +65,7 @@ source_tables:
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION

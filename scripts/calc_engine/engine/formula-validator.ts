@@ -81,9 +81,12 @@ const SCD2_TABLES = new Set([
 export async function validateFormulas(
   opts: ValidateFormulaOptions
 ): Promise<FormulaValidationSummary> {
-  const { metrics, errors } = loadMetricDefinitions();
+  const { metrics, errors, warnings: yamlWarnings } = loadMetricDefinitions();
   if (errors.length > 0 && opts.verbose) {
-    for (const err of errors) console.warn(`  YAML warning: ${err}`);
+    for (const err of errors) console.warn(`  YAML error: ${err}`);
+  }
+  if (yamlWarnings.length > 0 && opts.verbose) {
+    for (const w of yamlWarnings) console.warn(`  YAML lint: ${w}`);
   }
 
   // Filter metrics
@@ -224,14 +227,21 @@ async function validateSingleFormula(
 ): Promise<ExtendedCheckResult> {
   const warnings: string[] = [];
 
-  // Structural check 1: SCD2 filtering
+  // Structural check 1: SCD2 filtering (per-alias — generic sql.includes misses
+  // cases where is_current_flag appears for one table but not another)
   for (const st of metric.source_tables) {
     const qualifiedName = `${st.schema}.${st.table}`;
     if (SCD2_TABLES.has(qualifiedName)) {
-      const hasScdFilter =
-        sql.includes('is_current_flag') || sql.includes('is_active_flag');
-      if (!hasScdFilter) {
-        warnings.push(`SCD2: ${qualifiedName} used but no is_current_flag/is_active_flag filter`);
+      const alias = st.alias ?? st.table;
+      // Check that this specific alias has its own is_current_flag or is_active_flag filter
+      const aliasCurrentRegex = new RegExp(`${alias}\\.is_current_flag`, 'i');
+      const aliasActiveRegex = new RegExp(`${alias}\\.is_active_flag`, 'i');
+      // Also check join_on in source_tables definition (not just formula_sql)
+      const joinOn = st.join_on ?? '';
+      const hasScdInSql = aliasCurrentRegex.test(sql) || aliasActiveRegex.test(sql);
+      const hasScdInJoinOn = aliasCurrentRegex.test(joinOn) || aliasActiveRegex.test(joinOn);
+      if (!hasScdInSql && !hasScdInJoinOn) {
+        warnings.push(`SCD2: ${qualifiedName} (alias: ${alias}) used but no ${alias}.is_current_flag/${alias}.is_active_flag filter`);
       }
     }
   }

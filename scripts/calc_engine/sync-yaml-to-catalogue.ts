@@ -340,6 +340,160 @@ function createCatalogueItem(metric: MetricDefinition): CatalogueItem {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Traversal source data generation from YAML
+// ═══════════════════════════════════════════════════════════════
+
+const CATALOGUE_LEVEL_MAP: Record<string, string> = {
+  facility: 'facility',
+  counterparty: 'counterparty',
+  desk: 'desk',
+  portfolio: 'portfolio',
+  business_segment: 'lob',
+};
+
+interface TraversalSourceTableJson {
+  alias: string;
+  qualified_name: string;
+  table_name: string;
+  layer: 'L1' | 'L2' | 'L3';
+  join_type: 'BASE' | 'INNER' | 'LEFT';
+  join_on: string | null;
+  fields: Array<{ name: string; role: string; description: string }>;
+  purpose: string;
+}
+
+interface TraversalSourceDataJson {
+  source_tables: TraversalSourceTableJson[];
+  per_level_tables: Record<string, string[]>;
+  narration_context: {
+    metric_description: string;
+    formula_text: string;
+    aggregation_type_by_level: Record<string, string>;
+  };
+}
+
+/** Generate business narration explaining WHY this table is joined. */
+function inferTablePurpose(st: MetricDefinition['source_tables'][0]): string {
+  const measureFields = st.fields.filter((f) => f.role === 'MEASURE');
+  const dimFields = st.fields.filter((f) => f.role === 'DIMENSION');
+  const tableName = st.table.replace(/_/g, ' ');
+
+  if (st.table === 'enterprise_business_taxonomy') {
+    return 'Resolves the organizational hierarchy (desk \u2192 portfolio \u2192 business segment) for rollup grouping';
+  }
+  if (st.table === 'fx_rate') {
+    return 'Converts local currency amounts to USD reporting currency for cross-currency aggregation';
+  }
+  if (st.table === 'facility_master') {
+    const dims = dimFields.map((f) => f.name.replace(/_id/, '').replace(/_/g, ' ')).filter(Boolean);
+    const measures = measureFields.map((f) => f.description ?? f.name.replace(/_/g, ' '));
+    const parts: string[] = [];
+    if (measures.length > 0) parts.push(`provides ${measures.join(', ')}`);
+    if (dims.length > 0) parts.push(`links to ${dims.join(', ')} for rollup grouping`);
+    return parts.length > 0
+      ? parts[0][0].toUpperCase() + parts.join('; ').slice(1)
+      : `Links facilities to counterparty and segment for rollup grouping`;
+  }
+
+  if (measureFields.length > 0) {
+    const descs = measureFields.map((f) => f.description ?? f.name.replace(/_/g, ' '));
+    return `Provides ${descs.join(', ')}`;
+  }
+  if (dimFields.length > 0) {
+    const descs = dimFields.map((f) => f.name.replace(/_id/, '').replace(/_/g, ' '));
+    return `Provides grouping by ${descs.join(', ')} from ${tableName}`;
+  }
+  return `Provides supporting data from ${tableName}`;
+}
+
+/**
+ * Parse formula_sql to detect which table aliases are actually referenced.
+ * Returns alias list (e.g. ["fes", "fm", "fla", "ebt_l3", "ebt_l2"]).
+ */
+function detectSqlTableAliases(sql: string): string[] {
+  const aliases = new Set<string>();
+  // Match FROM/JOIN schema.table alias patterns
+  const pattern = /(?:FROM|JOIN)\s+(?:l[123]\.)?(\w+)\s+(\w+)/gi;
+  let match;
+  while ((match = pattern.exec(sql)) !== null) {
+    aliases.add(match[2]);
+  }
+  // Also match subquery aliases that reference outer aliases
+  // and inline subqueries like (SELECT ... FROM l2.table alias ...)
+  return Array.from(aliases);
+}
+
+/** Build traversal source data from a YAML MetricDefinition. */
+function buildTraversalSourceData(metric: MetricDefinition): TraversalSourceDataJson {
+  // 1. Map source_tables to TraversalSourceTable format
+  const sourceTables: TraversalSourceTableJson[] = metric.source_tables.map((st) => ({
+    alias: st.alias,
+    qualified_name: `${st.schema}.${st.table}`,
+    table_name: st.table,
+    layer: st.schema.toUpperCase() as 'L1' | 'L2' | 'L3',
+    join_type: st.join_type === 'CROSS' ? 'LEFT' as const : st.join_type as 'BASE' | 'INNER' | 'LEFT',
+    join_on: st.join_on ?? null,
+    fields: st.fields.map((f) => ({
+      name: f.name,
+      role: f.role,
+      description: f.description ?? f.name,
+    })),
+    purpose: inferTablePurpose(st),
+  }));
+
+  // 2. Detect per-level table usage from formula_sql
+  const perLevelTables: Record<string, string[]> = {};
+  const aggByLevel: Record<string, string> = {};
+
+  for (const [yamlLevel, formula] of Object.entries(metric.levels)) {
+    const catLevel = CATALOGUE_LEVEL_MAP[yamlLevel] ?? yamlLevel;
+    aggByLevel[catLevel] = formula.aggregation_type;
+
+    if (formula.formula_sql) {
+      const sqlAliases = detectSqlTableAliases(formula.formula_sql);
+      // Match SQL aliases to source table aliases, including EBT self-joins
+      const knownAliases = sourceTables.map((st) => st.alias);
+      const activeAliases: string[] = [];
+
+      for (const sqlAlias of sqlAliases) {
+        // Direct match (e.g. "fm", "fla", "pos")
+        if (knownAliases.includes(sqlAlias)) {
+          activeAliases.push(sqlAlias);
+          continue;
+        }
+        // EBT self-join variants (ebt_l3, ebt_l2, ebt_l1)
+        if (sqlAlias.startsWith('ebt')) {
+          activeAliases.push(sqlAlias);
+          continue;
+        }
+        // Subquery alias referencing a known table (e.g. cs_inner for collateral_snapshot)
+        const matchingTable = sourceTables.find((st) =>
+          sqlAlias.startsWith(st.alias) || st.table_name.startsWith(sqlAlias.replace(/_inner|_sub/g, '')),
+        );
+        if (matchingTable) {
+          activeAliases.push(matchingTable.alias);
+        }
+      }
+
+      perLevelTables[catLevel] = [...new Set(activeAliases)];
+    } else {
+      // No SQL — use all source tables
+      perLevelTables[catLevel] = sourceTables.map((st) => st.alias);
+    }
+  }
+
+  return {
+    source_tables: sourceTables,
+    per_level_tables: perLevelTables,
+    narration_context: {
+      metric_description: metric.description,
+      formula_text: metric.levels.facility?.formula_text ?? metric.description,
+      aggregation_type_by_level: aggByLevel,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Visualization config preset generation
 // ═══════════════════════════════════════════════════════════════
 
@@ -385,6 +539,57 @@ function fieldToHeader(fieldName: string): string {
     .replace(/ Bps$/, ' (bps)');
 }
 
+/**
+ * For ratio/weighted-avg metrics, split MEASURE fields into numerator vs denominator
+ * by parsing the facility-level formula_sql for the division pattern.
+ */
+function splitNumeratorDenominator(
+  metric: MetricDefinition,
+  measureFields: Array<{ field: string; table: string; layer: string; description: string }>,
+): { numerator: typeof measureFields; denominator: typeof measureFields } {
+  const strategy = metric.catalogue?.rollup_strategy;
+
+  // Only split for ratio/weighted strategies
+  if (strategy !== 'sum-ratio' && strategy !== 'count-ratio' && strategy !== 'weighted-avg') {
+    return { numerator: measureFields, denominator: [] };
+  }
+
+  const sql = metric.levels.facility?.formula_sql ?? '';
+
+  // For sum-ratio/count-ratio: look for / NULLIF(SUM(<field>), 0) pattern
+  if (strategy === 'sum-ratio' || strategy === 'count-ratio') {
+    // Match field after division: / NULLIF(SUM(alias.field), 0) or / NULLIF(COUNT(*), 0)
+    const divMatch = sql.match(/\/\s*NULLIF\s*\(\s*(?:SUM|COUNT)\s*\(\s*(?:\w+\.)?([\w*]+)\s*\)/i);
+    if (divMatch) {
+      const denomFieldName = divMatch[1];
+      if (denomFieldName === '*') {
+        // COUNT(*) denominator — no specific field, keep all in numerator
+        return { numerator: measureFields, denominator: [] };
+      }
+      const denomFields = measureFields.filter((f) => f.field === denomFieldName);
+      const numFields = measureFields.filter((f) => f.field !== denomFieldName);
+      if (denomFields.length > 0) {
+        return { numerator: numFields, denominator: denomFields };
+      }
+    }
+  }
+
+  // For weighted-avg: the weighting_field is the denominator (weight)
+  if (strategy === 'weighted-avg') {
+    const weightField = metric.levels.facility?.weighting_field;
+    if (weightField) {
+      const denomFields = measureFields.filter((f) => f.field === weightField);
+      const numFields = measureFields.filter((f) => f.field !== weightField);
+      if (denomFields.length > 0) {
+        return { numerator: numFields, denominator: denomFields };
+      }
+    }
+  }
+
+  // Fallback: all in numerator
+  return { numerator: measureFields, denominator: [] };
+}
+
 function buildVisualizationPreset(metric: MetricDefinition): VizPreset | null {
   const cat = metric.catalogue;
   if (!cat?.rollup_strategy && !cat?.primary_value_field) return null;
@@ -402,16 +607,18 @@ function buildVisualizationPreset(metric: MetricDefinition): VizPreset | null {
   // Auto-build formula_decomposition from MEASURE fields
   const measureFields = buildIngredientFields(metric);
   if (measureFields.length > 0) {
+    const { numerator: numFields, denominator: denFields } = splitNumeratorDenominator(metric, measureFields);
+    const mapField = (f: typeof measureFields[0]) => ({
+      op: '*' as const,
+      field: f.field,
+      label: f.description,
+      sample_value: 0,
+      source_table: f.table,
+      source_layer: f.layer,
+    });
     preset.formula_decomposition = {
-      numerator: measureFields.map((f) => ({
-        op: '*',
-        field: f.field,
-        label: f.description,
-        sample_value: 0,
-        source_table: f.table,
-        source_layer: f.layer,
-      })),
-      denominator: [],
+      numerator: numFields.map(mapField),
+      denominator: denFields.map(mapField),
       result_format: metric.unit_type === 'CURRENCY' ? 'currency'
         : metric.unit_type === 'PERCENTAGE' ? 'percentage'
         : metric.unit_type === 'RATIO' ? 'ratio'
@@ -434,7 +641,11 @@ function buildVisualizationPreset(metric: MetricDefinition): VizPreset | null {
         header: fieldToHeader(cat.primary_value_field),
         format: fieldToFormat(cat.primary_value_field),
         is_result: true,
-        subtotal_fn: 'sum',
+        subtotal_fn: (cat.rollup_strategy === 'sum-ratio' || cat.rollup_strategy === 'count-ratio')
+          ? 'none'
+          : cat.rollup_strategy === 'weighted-avg'
+            ? 'weighted-avg'
+            : 'sum',
       });
     } else {
       const resultCol = columns.find((c) => c.field === cat.primary_value_field);
@@ -487,11 +698,16 @@ function findMatchingCatalogueItem(
 function main(): void {
   const dryRun = process.argv.includes('--dry-run');
 
-  const { metrics, errors } = loadMetricDefinitions();
+  const { metrics, errors, warnings } = loadMetricDefinitions();
   if (errors.length > 0) {
     console.error('YAML load errors:');
     errors.forEach((e) => console.error('  ', e));
     process.exit(1);
+  }
+  if (warnings.length > 0) {
+    console.warn(`\n⚠ Formula linter warnings (${warnings.length}):`);
+    warnings.forEach((w) => console.warn('  ', w));
+    console.warn('');
   }
 
   const active = metrics.filter((m) => m.status === 'ACTIVE' || m.status === 'DRAFT');
@@ -575,18 +791,24 @@ function main(): void {
 
     // Generate visualization config preset if YAML specifies overrides
     const vizPreset = buildVisualizationPreset(metric);
+    const vizKey = item.item_id;
     if (vizPreset) {
-      const vizKey = item.item_id;
       vizConfigs[vizKey] = vizPreset;
       vizUpdated++;
     }
+
+    // Always generate traversal source data (not gated by rollup_strategy)
+    const traversalData = buildTraversalSourceData(metric);
+    if (!vizConfigs[vizKey]) vizConfigs[vizKey] = {};
+    (vizConfigs[vizKey] as Record<string, unknown>).traversal_source_data = traversalData;
+    if (!vizPreset) vizUpdated++; // count if we hadn't already
   }
 
   if (!dryRun && (updated > 0 || created > 0)) {
     fs.writeFileSync(cataloguePath, JSON.stringify(catalogue, null, 2) + '\n', 'utf-8');
   }
 
-  if (!dryRun && vizUpdated > 0) {
+  if (!dryRun && (vizUpdated > 0 || active.length > 0)) {
     fs.writeFileSync(vizConfigPath, JSON.stringify(vizConfigs, null, 2) + '\n', 'utf-8');
   }
 

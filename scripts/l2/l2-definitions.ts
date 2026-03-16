@@ -134,6 +134,7 @@ export const L2_TABLES: L2TableDef[] = [
       // limit_status_code, internal_risk_rating_bucket_code, rwa_amt
       { name: 'bank_share_pct', type: 'DECIMAL(10,4)', nullable: true },
       { name: 'total_collateral_mv_usd', type: 'DECIMAL(18,2)', nullable: true },
+      { name: 'limit_status_code', type: 'VARCHAR(50)', nullable: true },
     ],
   },
   {

@@ -1463,3 +1463,15 @@ INSERT INTO l1.pipeline_stage_dim (pipeline_stage_code, stage_name, stage_order,
 INSERT INTO l1.pipeline_stage_dim (pipeline_stage_code, stage_name, stage_order, is_active, description) VALUES ('pipeline_stage_dim_8', 'stage_name_8', 8, 'N', 'description_8');
 INSERT INTO l1.pipeline_stage_dim (pipeline_stage_code, stage_name, stage_order, is_active, description) VALUES ('pipeline_stage_dim_9', 'stage_name_9', 9, 'Y', 'description_9');
 INSERT INTO l1.pipeline_stage_dim (pipeline_stage_code, stage_name, stage_order, is_active, description) VALUES ('pipeline_stage_dim_10', 'stage_name_10', 10, 'N', 'description_10');
+
+-- utilization_status_dim (10 rows)
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES ('NO_BREACH', 'No Breach', 0, 74.99, 1, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES ('ELEVATED', 'Elevated Utilization', 75, 89.99, 2, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES ('WARNING', 'Warning', 90, 99.99, 3, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES ('FULLY_UTILIZED', 'Fully Utilized', 100, 100, 4, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES ('BREACH', 'Breach', 100.01, 999, 5, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES (NULL, NULL, NULL, NULL, 6, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES (NULL, NULL, NULL, NULL, 7, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES (NULL, NULL, NULL, NULL, 8, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES (NULL, NULL, NULL, NULL, 9, 'Y');
+INSERT INTO l1.utilization_status_dim (utilization_status_code, status_name, utilization_min_pct, utilization_max_pct, display_order, is_active_flag) VALUES (NULL, NULL, NULL, NULL, 10, 'Y');

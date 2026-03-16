@@ -2297,6 +2297,21 @@ export function getSeedValue(tableName: string, columnName: string, rowIndex: nu
       if (columnName === 'scale_type') return SCALE_TYPES[idx];
       break;
 
+    /* ──────────── utilization_status_dim ──────────── */
+    case 'utilization_status_dim': {
+      const UTIL_CODES = ['NO_BREACH', 'ELEVATED', 'WARNING', 'FULLY_UTILIZED', 'BREACH'];
+      const UTIL_NAMES = ['No Breach', 'Elevated Utilization', 'Warning', 'Fully Utilized', 'Breach'];
+      const UTIL_MIN   = [0, 75.0, 90.0, 100.0, 100.01];
+      const UTIL_MAX   = [74.99, 89.99, 99.99, 100.0, 999.0];
+      if (columnName === 'utilization_status_code') return UTIL_CODES[idx];
+      if (columnName === 'status_name') return UTIL_NAMES[idx];
+      if (columnName === 'utilization_min_pct') return UTIL_MIN[idx];
+      if (columnName === 'utilization_max_pct') return UTIL_MAX[idx];
+      if (columnName === 'display_order') return idx + 1;
+      if (columnName === 'is_active_flag') return 'Y';
+      break;
+    }
+
     /* ──────────── crm_type_dim ──────────── */
     case 'crm_type_dim':
       if (columnName === 'crm_type_code') return CRM_TYPE_CODES[idx];

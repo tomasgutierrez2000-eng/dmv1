@@ -611,6 +611,12 @@
       "pk": false,
       "fk": null,
       "nullable": true
+    },
+    "limit_status_code": {
+      "type": "VARCHAR(50)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
     }
   },
   "L2.netting_set_exposure_snapshot": {

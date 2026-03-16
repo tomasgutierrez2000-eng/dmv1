@@ -1499,4 +1499,16 @@ export const L1_TABLES: TableDef[] = [
       { name: 'description', type: 'VARCHAR(500)', nullable: true },
     ],
   },
+  {
+    tableName: 'utilization_status_dim',
+    scd: 'SCD-0',
+    columns: [
+      { name: 'utilization_status_code', type: 'VARCHAR(20)', nullable: false, pk: true },
+      { name: 'status_name', type: 'VARCHAR(200)', nullable: true },
+      { name: 'utilization_min_pct', type: 'DECIMAL(10,6)', nullable: true },
+      { name: 'utilization_max_pct', type: 'DECIMAL(10,6)', nullable: true },
+      { name: 'display_order', type: 'INTEGER', nullable: true },
+      { name: 'is_active_flag', type: 'CHAR(1)', nullable: false, default: "'Y'" },
+    ],
+  },
 ];

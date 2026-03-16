@@ -23763,5 +23763,97 @@
         "description_10"
       ]
     ]
+  },
+  "L1.utilization_status_dim": {
+    "columns": [
+      "utilization_status_code",
+      "status_name",
+      "utilization_min_pct",
+      "utilization_max_pct",
+      "display_order",
+      "is_active_flag"
+    ],
+    "rows": [
+      [
+        "NO_BREACH",
+        "No Breach",
+        0,
+        74.99,
+        1,
+        "Y"
+      ],
+      [
+        "ELEVATED",
+        "Elevated Utilization",
+        75,
+        89.99,
+        2,
+        "Y"
+      ],
+      [
+        "WARNING",
+        "Warning",
+        90,
+        99.99,
+        3,
+        "Y"
+      ],
+      [
+        "FULLY_UTILIZED",
+        "Fully Utilized",
+        100,
+        100,
+        4,
+        "Y"
+      ],
+      [
+        "BREACH",
+        "Breach",
+        100.01,
+        999,
+        5,
+        "Y"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        6,
+        "Y"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        7,
+        "Y"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        8,
+        "Y"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        9,
+        "Y"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        10,
+        "Y"
+      ]
+    ]
   }
 }

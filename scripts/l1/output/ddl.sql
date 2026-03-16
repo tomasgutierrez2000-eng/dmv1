@@ -1488,3 +1488,12 @@ CREATE TABLE IF NOT EXISTS l1.pipeline_stage_dim (
   is_active CHAR(1) DEFAULT 'Y',
   description VARCHAR(500)
 );
+
+CREATE TABLE IF NOT EXISTS l1.utilization_status_dim (
+  utilization_status_code VARCHAR(20) NOT NULL PRIMARY KEY,
+  status_name VARCHAR(200),
+  utilization_min_pct DECIMAL(10,6),
+  utilization_max_pct DECIMAL(10,6),
+  display_order INTEGER,
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y'
+);

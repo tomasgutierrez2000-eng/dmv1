@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "REF-017"
 name: "Legal Entity ID"
-version: "1.0.0"
+version: "1.1.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,11 +18,13 @@ direction: NEUTRAL
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Unique identifier assigned to legal entity in enterprise systems.
+  Unique identifier for the booking legal entity. At facility level returns
+  the entity ID. At aggregate levels returns count of distinct booking
+  entities for entity concentration tracking.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "Entity-level tracking for capital and regulatory reporting"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -65,8 +67,7 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: >
-      Read legal_entity_id from facility_exposure_snapshot for each facility as-of
-      reporting date.
+      Read legal_entity_id from facility_exposure_snapshot for each facility.
     formula_sql: |
       SELECT
         fes.facility_id AS dimension_key,
@@ -74,79 +75,64 @@ levels:
       FROM l2.facility_exposure_snapshot fes
       WHERE fes.as_of_date = :as_of_date
   counterparty:
-    aggregation_type: RAW
+    aggregation_type: CUSTOM
     formula_text: >
-      Read legal_entity_id per counterparty.
+      Count of distinct booking legal entities per counterparty.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        fes.legal_entity_id AS metric_value
+        COUNT(DISTINCT fes.legal_entity_id) AS metric_value
       FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
       WHERE fes.as_of_date = :as_of_date
+      GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level legal_entity_id per L3 desk segment.
+      Count of distinct booking legal entities per L3 desk segment.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.legal_entity_id AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        COUNT(DISTINCT fes.legal_entity_id) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level legal_entity_id per L2 portfolio segment.
+      Count of distinct booking legal entities per L2 portfolio segment.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.legal_entity_id AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        COUNT(DISTINCT fes.legal_entity_id) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
+    aggregation_type: CUSTOM
     formula_text: >
-      SUM of facility-level legal_entity_id per L1 business segment segment.
+      Count of distinct booking legal entities per L1 business segment.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id AS dimension_key,
-          fes.legal_entity_id AS metric_value
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) fac
+        COUNT(DISTINCT fes.legal_entity_id) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -154,6 +140,7 @@ levels:
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -164,7 +151,7 @@ output:
 validations:
   - rule_id: "REF-017-V01"
     type: NOT_NULL
-    description: "No null legal_entity_id values"
+    description: "No null legal_entity_id values at facility level"
     severity: ERROR
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:

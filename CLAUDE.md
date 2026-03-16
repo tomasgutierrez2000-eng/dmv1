@@ -273,6 +273,10 @@ against PostgreSQL, rollup reconciliation passed, GSIB risk sanity checked.
 | Missing COALESCE | `fes.bank_share_pct / 100` (NULL if missing) | `COALESCE(fes.bank_share_pct, 100.0) / 100.0` |
 | Missing NULLIF | `SUM(x) / SUM(y)` (div-by-zero) | `SUM(x) / NULLIF(SUM(y), 0)` |
 | FX at facility level | `* fx.rate` in facility formula | FX only at aggregate levels; facility stays local currency |
+| sql.js vs PG schema drift | `net_income_amt` exists in sql.js L2 but only in L3 in PG | Always test `formula_sql` against PostgreSQL — sql.js sample data adds fields to L2 tables that only exist in L3 in PG. Formulas pass sql.js but fail PG |
+| FK value range mismatch | `counterparty.industry_id = 1-10` but `industry_dim` uses NAICS codes 11+ | Verify FK values actually exist in parent dim PK range — values may be syntactically valid BIGINT but semantically wrong (no matching PK row) |
+| NULL weight column | `gross_exposure_usd` NULL for 347/2753 FES rows | Weighted avg returns NULL for entire segments when weight column has NULL gaps — verify weight columns have 100% coverage, not just formula correctness |
+| ROW_NUMBER for string rollup | `SUM(industry_name)` invalid at segment level | Use `ROW_NUMBER() OVER (PARTITION BY segment ORDER BY SUM(exposure) DESC)` to find dominant string value by exposure weight |
 
 ### Legacy manual workflow (still works)
 1. Add CatalogueItem to `data/metric-library/catalogue.json` with `item_id`, `level_definitions`, `ingredient_fields`

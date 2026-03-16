@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-016"
 name: "Expected Loss ($)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,21 +18,95 @@ direction: LOWER_BETTER
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  PD × LGD × Exposure expressed in USD. Calculated forward-looking loss metric
-  supporting provisioning, capital planning, and stress testing analytics.
+  Expected Loss in dollar terms: PD × LGD × Committed Exposure × Bank Share.
+  Computed from L2 atomic risk parameters and exposure data — NOT from stressed
+  scenarios. This is the base (unstressed) expected credit loss, the foundation
+  for provisioning, capital planning, and CECL/IFRS 9 reserve estimation.
+
+  Ingredient derivation:
+    - PD (pd_pct): L2 facility_risk_snapshot — probability of default (%)
+    - LGD (lgd_pct): L2 facility_risk_snapshot — loss given default (%)
+    - Committed Exposure (committed_amount): L2 facility_exposure_snapshot — raw
+    - Bank Share (bank_share_pct): L2 facility_exposure_snapshot — participation %
+    - EL = (PD/100) × (LGD/100) × Committed × (Bank Share/100)
+
+  Rollup uses direct-sum: SUM(facility EL) at each aggregate level.
+  FX conversion applied at aggregate levels for multi-currency portfolios.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "CRE31"
+    description: "Expected loss computation — PD × LGD × EAD for IRB portfolios"
+  - framework: "CECL / ASC 326"
+    description: "Current expected credit losses — lifetime loss estimation"
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Expected loss reporting for CCAR/DFAST stress testing"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-  - schema: l3
-    table: facility_stress_test_calc
-    alias: str_res
+  - schema: l2
+    table: facility_risk_snapshot
+    alias: frs
     join_type: BASE
     fields:
-      - name: stressed_expected_loss
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: pd_pct
         role: MEASURE
+        description: "Probability of default — annualized, as percentage"
+      - name: lgd_pct
+        role: MEASURE
+        description: "Loss given default — as percentage"
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = frs.facility_id AND fes.as_of_date = frs.as_of_date"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: JOIN_KEY
+      - name: committed_amount
+        role: MEASURE
+        description: "Total committed exposure — EAD proxy"
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's participation percentage of the facility"
+      - name: currency_code
+        role: JOIN_KEY
+        description: "Original currency for FX conversion at aggregate levels"
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.facility_id = frs.facility_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: from_currency_code
+        role: JOIN_KEY
+      - name: to_currency_code
+        role: FILTER
+      - name: rate
+        role: MEASURE
+        description: "Spot FX rate for converting to USD reporting currency"
+      - name: as_of_date
+        role: JOIN_KEY
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -46,143 +120,156 @@ source_tables:
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: SUM
-    formula_text: >
-      SUM(stressed_expected_loss) per facility from stress_test_result. Weighted by
-      bank share percentage.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each facility:
+        1. LOAD pd_pct, lgd_pct from l2.facility_risk_snapshot
+        2. LOAD committed_amount, bank_share_pct from l2.facility_exposure_snapshot
+        3. COMPUTE EL = (PD/100) × (LGD/100) × Committed × (Bank Share/100)
+      Ingredients: pd_pct (L2), lgd_pct (L2), committed_amount (L2), bank_share_pct (L2)
+    formula_sql: |-
       SELECT
-        str_res.facility_id AS dimension_key,
-        SUM(str_res.stressed_expected_loss
-          * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-      FROM l3.facility_stress_test_calc str_res
+        frs.facility_id AS dimension_key,
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0)
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = str_res.facility_id
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
-      LEFT JOIN l2.facility_lender_allocation fla
-        ON fla.facility_id = str_res.facility_id
-        AND fla.is_current_flag = 'Y'
-      WHERE str_res.as_of_date = :as_of_date
-      GROUP BY str_res.facility_id
+      WHERE frs.as_of_date = :as_of_date
+      GROUP BY frs.facility_id
   counterparty:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level stressed_expected_loss per counterparty.
-    formula_sql: |
+    formula_text: |
+      For each counterparty:
+        1. LOAD facility-level EL for all facilities of this counterparty
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(facility EL × FX rate) = Counterparty EL (USD)
+      Direct-sum rollup with FX conversion.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          str_res.facility_id AS dimension_key,
-          SUM(str_res.stressed_expected_loss
-            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.facility_stress_test_calc str_res
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = str_res.facility_id
-          AND fm.is_active_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = str_res.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE str_res.as_of_date = :as_of_date
-        GROUP BY str_res.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1))
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level stressed_expected_loss per L3 desk segment.
-    formula_sql: |
+    formula_text: |
+      For each L3 Desk segment:
+        1. LOOKUP managed_segment_id from enterprise_business_taxonomy
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(facility EL × FX rate) per desk
+      Direct-sum rollup with FX conversion.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          str_res.facility_id AS dimension_key,
-          SUM(str_res.stressed_expected_loss
-            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.facility_stress_test_calc str_res
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = str_res.facility_id
-          AND fm.is_active_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = str_res.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE str_res.as_of_date = :as_of_date
-        GROUP BY str_res.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1))
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level stressed_expected_loss per L2 portfolio segment.
-    formula_sql: |
+    formula_text: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(facility EL × FX rate) per portfolio
+      Direct-sum rollup with FX conversion.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          str_res.facility_id AS dimension_key,
-          SUM(str_res.stressed_expected_loss
-            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.facility_stress_test_calc str_res
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = str_res.facility_id
-          AND fm.is_active_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = str_res.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE str_res.as_of_date = :as_of_date
-        GROUP BY str_res.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1))
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level stressed_expected_loss per L1 business segment segment.
-    formula_sql: |
+    formula_text: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(facility EL × FX rate) per business segment
+      Direct-sum rollup with FX conversion.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          str_res.facility_id AS dimension_key,
-          SUM(str_res.stressed_expected_loss
-            * COALESCE(fla.bank_share_pct, 100.0) / 100.0) AS metric_value
-        FROM l3.facility_stress_test_calc str_res
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = str_res.facility_id
-          AND fm.is_active_flag = 'Y'
-        LEFT JOIN l2.facility_lender_allocation fla
-          ON fla.facility_id = str_res.facility_id
-          AND fla.is_current_flag = 'Y'
-        WHERE str_res.as_of_date = :as_of_date
-        GROUP BY str_res.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(fx.rate, 1))
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -193,21 +280,34 @@ output:
 validations:
   - rule_id: "EXP-016-V01"
     type: NOT_NULL
-    description: "No null stressed_expected_loss values"
+    description: "Expected loss must not be null for active facilities with risk data"
     severity: ERROR
   - rule_id: "EXP-016-V02"
     type: NON_NEGATIVE
-    description: "stressed_expected_loss must be >= 0"
+    description: "Expected loss must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-016-V03"
+    type: RECONCILIATION
+    description: "SUM of facility EL should equal counterparty EL (direct-sum consistency)"
+    severity: WARNING
+  - rule_id: "EXP-016-V04"
+    type: PERIOD_OVER_PERIOD
+    description: "Month-over-month EL change exceeding 50% warrants investigation"
+    severity: WARNING
+    params:
+      max_change_pct: 50
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-032"
   abbreviation: "EL"
   insight: >
-    Risk of loss estimation
+    Risk of loss estimation. Base expected credit loss computed from
+    PD × LGD × Committed Exposure × Bank Share. Foundation for
+    CECL/IFRS 9 provisioning and CCAR stress testing. Direct-sum
+    rollup enables drill-down from portfolio to individual facility.
   rollup_strategy: "direct-sum"
-  primary_value_field: "stressed_expected_loss"
+  primary_value_field: "expected_loss_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "credit-risk", "el", "provisioning"]
 dashboard_pages: []
 legacy_metric_ids: []

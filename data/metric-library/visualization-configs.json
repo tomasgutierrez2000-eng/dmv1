@@ -1072,7 +1072,7 @@
     ]
   },
   "MET-030": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "expected_loss_rate_pct"
     },
@@ -1080,54 +1080,164 @@
       "numerator": [
         {
           "op": "*",
-          "field": "expected_loss_rate_pct",
-          "label": "expected_loss_rate_pct",
+          "field": "pd_pct",
+          "label": "Probability of default — annualized, as percentage",
           "sample_value": 0,
           "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "lgd_pct",
+          "label": "Loss given default — as percentage",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "Total committed exposure — denominator for EL rate",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "Spot FX rate for converting to USD reporting currency",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Exposure-weighted average of expected_loss_rate_pct per facility.\n"
+      "formula_display": "For each facility:\n  1. LOAD pd_pct, lgd_pct from l2.facility_risk_snapshot\n  2. LOAD committed_amount from l2.facility_exposure_snapshot\n  3. COMPUTE EL Rate = SUM(PD/100 × LGD/100 × Committed) / SUM(Committed) × 100\n     At facility grain, committed cancels → EL Rate ≈ PD × LGD / 100\nIngredients: pd_pct (L2), lgd_pct (L2), committed_amount (L2)\n"
     },
     "worked_example_columns": [
+      {
+        "field": "pd_pct",
+        "header": "Pd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "lgd_pct",
+        "header": "Lgd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
       {
         "field": "expected_loss_rate_pct",
         "header": "Expected Loss Rate (%)",
         "format": "percentage",
-        "subtotal_fn": "none",
-        "is_result": true
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
   "MET-032": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "stressed_expected_loss"
+      "primary_value": "expected_loss_usd"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "stressed_expected_loss",
-          "label": "stressed_expected_loss",
+          "field": "pd_pct",
+          "label": "Probability of default — annualized, as percentage",
           "sample_value": 0,
-          "source_table": "facility_stress_test_calc",
-          "source_layer": "L3"
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "lgd_pct",
+          "label": "Loss given default — as percentage",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "Total committed exposure — EAD proxy",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's participation percentage of the facility",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "Spot FX rate for converting to USD reporting currency",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "SUM(stressed_expected_loss) per facility from stress_test_result. Weighted by bank share percentage.\n"
+      "formula_display": "For each facility:\n  1. LOAD pd_pct, lgd_pct from l2.facility_risk_snapshot\n  2. LOAD committed_amount, bank_share_pct from l2.facility_exposure_snapshot\n  3. COMPUTE EL = (PD/100) × (LGD/100) × Committed × (Bank Share/100)\nIngredients: pd_pct (L2), lgd_pct (L2), committed_amount (L2), bank_share_pct (L2)\n"
     },
     "worked_example_columns": [
       {
-        "field": "stressed_expected_loss",
-        "header": "Stressed Expected Loss",
+        "field": "pd_pct",
+        "header": "Pd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "lgd_pct",
+        "header": "Lgd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "expected_loss_usd",
+        "header": "Expected Loss Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -2498,7 +2608,7 @@
     ]
   },
   "MET-031": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "exception_rate_pct"
     },
@@ -2506,21 +2616,21 @@
       "numerator": [
         {
           "op": "*",
-          "field": "pricing_exception_flag",
-          "label": "pricing_exception_flag",
+          "field": "is_pricing_exception_flag",
+          "label": "Boolean flag indicating pricing exception approval",
           "sample_value": 0,
-          "source_table": "facility_pricing_calc",
-          "source_layer": "L3"
+          "source_table": "facility_pricing_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Binary flag: 1 if pricing exception, 0 otherwise.\n"
+      "formula_display": "Binary flag: 1.0 if pricing exception approved, 0.0 otherwise.\nIngredients: is_pricing_exception_flag (L2 facility_pricing_snapshot)\n"
     },
     "worked_example_columns": [
       {
-        "field": "pricing_exception_flag",
-        "header": "Pricing Exception Flag",
+        "field": "is_pricing_exception_flag",
+        "header": "Is Pricing Exception Flag",
         "format": "number",
         "subtotal_fn": "none"
       },
@@ -2935,7 +3045,7 @@
         {
           "op": "*",
           "field": "origination_date",
-          "label": "origination_date",
+          "label": "Date the contract became legally effective",
           "sample_value": 0,
           "source_table": "facility_master",
           "source_layer": "L2"
@@ -2943,7 +3053,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of origination_date from facility_master.\n"
+      "formula_display": "Direct lookup of origination_date from facility_master.\nIngredients: origination_date (L2 facility_master — raw field)\n"
     },
     "worked_example_columns": [
       {

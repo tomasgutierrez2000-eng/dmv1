@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-015"
 name: "Expected Loss Rate (%)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -16,15 +16,30 @@ sub_domain: "risk-metrics"
 metric_class: CALCULATED
 direction: LOWER_BETTER
 unit_type: PERCENTAGE
-display_format: ".2f"
+display_format: ".4f"
 description: >
-  Expected Loss divided by Exposure. Derived KPI measuring loss intensity
-  relative to exposure size, enabling comparative risk ranking across facilities
-  or counterparties.
+  Expected Loss as a percentage of committed exposure. Computed from
+  L2 atomic risk parameters: PD (probability of default) × LGD (loss given
+  default). At aggregate levels, uses sum-ratio rollup: SUM(PD × LGD ×
+  Committed) / SUM(Committed) × 100 — the exposure-weighted average EL rate.
+  This ensures mathematically consistent aggregation (never averages
+  pre-computed rates). Key credit risk quantification metric for comparing
+  loss intensity across facilities, counterparties, and business segments.
+
+  Ingredient derivation:
+    - PD (pd_pct): L2 facility_risk_snapshot — probability of default (%)
+    - LGD (lgd_pct): L2 facility_risk_snapshot — loss given default (%)
+    - Committed Exposure (committed_amount): L2 facility_exposure_snapshot — raw
+    - EL Rate = PD × LGD (at facility level, committed cancels in ratio)
+    - Aggregate EL Rate = SUM(PD × LGD × Committed) / SUM(Committed) × 100
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    section: "CRE31"
+    description: "Expected loss computation for IRB portfolios"
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Expected loss rate reporting for CCAR/DFAST"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -36,8 +51,28 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: expected_loss_rate_pct
+      - name: pd_pct
         role: MEASURE
+        description: "Probability of default — annualized, as percentage"
+      - name: lgd_pct
+        role: MEASURE
+        description: "Loss given default — as percentage"
+  - schema: l2
+    table: facility_exposure_snapshot
+    alias: fes
+    join_type: INNER
+    join_on: "fes.facility_id = frs.facility_id AND fes.as_of_date = frs.as_of_date"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: JOIN_KEY
+      - name: committed_amount
+        role: MEASURE
+        description: "Total committed exposure — denominator for EL rate"
+      - name: currency_code
+        role: JOIN_KEY
+        description: "Original currency for FX conversion at aggregate levels"
   - schema: l2
     table: facility_master
     alias: fm
@@ -52,6 +87,21 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: from_currency_code
+        role: JOIN_KEY
+      - name: to_currency_code
+        role: FILTER
+      - name: rate
+        role: MEASURE
+        description: "Spot FX rate for converting to USD reporting currency"
+      - name: as_of_date
+        role: JOIN_KEY
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -65,113 +115,153 @@ source_tables:
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      Exposure-weighted average of expected_loss_rate_pct per facility.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each facility:
+        1. LOAD pd_pct, lgd_pct from l2.facility_risk_snapshot
+        2. LOAD committed_amount from l2.facility_exposure_snapshot
+        3. COMPUTE EL Rate = SUM(PD/100 × LGD/100 × Committed) / SUM(Committed) × 100
+           At facility grain, committed cancels → EL Rate ≈ PD × LGD / 100
+      Ingredients: pd_pct (L2), lgd_pct (L2), committed_amount (L2)
+    formula_sql: |-
       SELECT
         frs.facility_id AS dimension_key,
-        SUM(frs.expected_loss_rate_pct * frs.committed_amount)
-          / NULLIF(SUM(frs.committed_amount), 0) AS metric_value
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0 * fes.committed_amount)
+          / NULLIF(SUM(fes.committed_amount), 0) * 100.0
+          AS metric_value
       FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = frs.facility_id
+        AND fm.is_active_flag = 'Y'
       WHERE frs.as_of_date = :as_of_date
       GROUP BY frs.facility_id
   counterparty:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level expected_loss_rate_pct per counterparty.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each counterparty:
+        1. LOAD pd_pct, lgd_pct for all facilities belonging to this counterparty
+        2. LOAD committed_amount for each facility
+        3. CONVERT to USD via l2.fx_rate spot rate
+        4. COMPUTE SUM(PD × LGD × Committed × FX) / SUM(Committed × FX) × 100
+      Sum-ratio rollup with FX: exposure-weighted average EL rate in USD terms.
+    formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          SUM(frs.expected_loss_rate_pct * frs.committed_amount)
-            / NULLIF(SUM(frs.committed_amount), 0) AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-        GROUP BY frs.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      AVG of facility-level expected_loss_rate_pct per L3 desk segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L3 Desk segment:
+        1. LOOKUP managed_segment_id from enterprise_business_taxonomy
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(PD × LGD × Committed × FX) / SUM(Committed × FX) × 100
+      Sum-ratio rollup: exposure-weighted average EL rate per desk.
+    formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          SUM(frs.expected_loss_rate_pct * frs.committed_amount)
-            / NULLIF(SUM(frs.committed_amount), 0) AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-        GROUP BY frs.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level expected_loss_rate_pct per L2 portfolio segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L2 Portfolio segment:
+        1. Walk UP hierarchy: L3 desk → L2 portfolio via parent_segment_id
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(PD × LGD × Committed × FX) / SUM(Committed × FX) × 100
+      Sum-ratio rollup: exposure-weighted average EL rate per portfolio.
+    formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          SUM(frs.expected_loss_rate_pct * frs.committed_amount)
-            / NULLIF(SUM(frs.committed_amount), 0) AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-        GROUP BY frs.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level expected_loss_rate_pct per L1 business segment
-      segment.
-    formula_sql: |
+    aggregation_type: CUSTOM
+    formula_text: |
+      For each L1 Business Segment / LoB:
+        1. Walk UP hierarchy: L3 → L2 → L1 via parent_segment_id chain
+        2. CONVERT to USD via l2.fx_rate spot rate
+        3. COMPUTE SUM(PD × LGD × Committed × FX) / SUM(Committed × FX) × 100
+      Sum-ratio rollup: exposure-weighted average EL rate per segment.
+    formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          frs.facility_id AS dimension_key,
-          SUM(frs.expected_loss_rate_pct * frs.committed_amount)
-            / NULLIF(SUM(frs.committed_amount), 0) AS metric_value
-        FROM l2.facility_risk_snapshot frs
-        WHERE frs.as_of_date = :as_of_date
-        GROUP BY frs.facility_id
-      ) fac
+        SUM(frs.pd_pct / 100.0 * frs.lgd_pct / 100.0
+            * fes.committed_amount * COALESCE(fx.rate, 1))
+          / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1)), 0) * 100.0
+          AS metric_value
+      FROM l2.facility_risk_snapshot frs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = frs.facility_id
+        AND fes.as_of_date = frs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = frs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE frs.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -182,17 +272,36 @@ output:
 validations:
   - rule_id: "EXP-015-V01"
     type: NOT_NULL
-    description: "No null expected_loss_rate_pct values"
+    description: "PD and LGD must not be null for active facilities"
     severity: ERROR
+  - rule_id: "EXP-015-V02"
+    type: NON_NEGATIVE
+    description: "EL rate must be >= 0"
+    severity: ERROR
+  - rule_id: "EXP-015-V03"
+    type: THRESHOLD
+    description: "EL rate should be between 0% and 100%"
+    severity: WARNING
+    params:
+      min: 0
+      max: 100
+  - rule_id: "EXP-015-V04"
+    type: RECONCILIATION
+    description: "Sum-ratio at counterparty level must equal re-derived rate from facility components"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-030"
   abbreviation: "ELR"
   insight: >
-    Credit risk quantification
-  rollup_strategy: "weighted-avg"
+    Credit risk quantification: expected loss intensity relative to
+    exposure. Exposure-weighted sum-ratio rollup ensures mathematically
+    consistent aggregation — SUM(EL) / SUM(Committed) at every level.
+    EL Rate below 1% is typical for investment-grade; above 5% signals
+    elevated portfolio stress.
+  rollup_strategy: "sum-ratio"
   primary_value_field: "expected_loss_rate_pct"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "credit-risk", "el"]
 dashboard_pages: []
 legacy_metric_ids: []

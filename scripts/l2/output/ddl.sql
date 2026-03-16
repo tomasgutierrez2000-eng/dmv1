@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS l2.position (
   as_of_date DATE NOT NULL,
   facility_id BIGINT,
   instrument_id BIGINT,
-  position_type VARCHAR(50),
+  product_code VARCHAR(50),
   balance_amount NUMERIC(18,2),
   currency_code VARCHAR(20),
   source_system_id BIGINT,
@@ -30,11 +30,11 @@ CREATE TABLE IF NOT EXISTS l2.position (
   notional_amount NUMERIC(18,2),
   pd_estimate VARCHAR(100),
   position_currency VARCHAR(100),
-  trading_banking_book_flag CHAR(1),
+  is_trading_banking_book_flag CHAR(1),
   ultimate_parent_id BIGINT,
   product_node_id BIGINT,
-  CONSTRAINT fk_position_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_position_instrument_id FOREIGN KEY (instrument_id) REFERENCES l1.instrument_master(instrument_id),
+  CONSTRAINT fk_position_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_position_instrument_id FOREIGN KEY (instrument_id) REFERENCES l2.instrument_master(instrument_id),
   CONSTRAINT fk_position_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code),
   CONSTRAINT fk_position_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id),
   CONSTRAINT fk_position_product_node_id FOREIGN KEY (product_node_id) REFERENCES l1.enterprise_product_taxonomy(product_node_id)
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS l2.position_detail (
   credit_conversion_factor NUMERIC(10,6),
   lgd_pct NUMERIC(10,6),
   risk_weight_pct NUMERIC(10,6),
-  delinquent_payment_flag CHAR(1),
+  is_delinquent_payment_flag CHAR(1),
   overdue_amt_0_30 NUMERIC(18,2),
   overdue_amt_31_60 NUMERIC(18,2),
   overdue_amt_61_90_plus NUMERIC(18,2),
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS l2.exposure_counterparty_attribution (
   risk_shifted_from_counterparty_id BIGINT,
   PRIMARY KEY (attribution_id, as_of_date),
   CONSTRAINT fk_exposure_counterparty_attribution_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
-  CONSTRAINT fk_exposure_counterparty_attribution_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_exposure_counterparty_attribution_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_exposure_counterparty_attribution_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -123,19 +123,12 @@ CREATE TABLE IF NOT EXISTS l2.facility_exposure_snapshot (
   product_node_id BIGINT,
   outstanding_balance_amt NUMERIC(18,2),
   undrawn_commitment_amt NUMERIC(18,2),
-  number_of_loans INTEGER,
-  number_of_facilities INTEGER,
-  days_until_maturity INTEGER,
-  facility_utilization_status VARCHAR(30),
-  limit_status_code VARCHAR(30),
-  rwa_amt NUMERIC(18,2),
-  internal_risk_rating_bucket_code VARCHAR(20),
+  bank_share_pct NUMERIC(10,4),
   total_collateral_mv_usd NUMERIC(18,2),
   PRIMARY KEY (facility_id, as_of_date),
-  CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_exposure_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_exposure_snapshot_exposure_type_id FOREIGN KEY (exposure_type_id) REFERENCES l1.exposure_type_dim(exposure_type_id),
-  CONSTRAINT fk_facility_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id),
-  CONSTRAINT fk_facility_exposure_snapshot_internal_risk_rating_bucket_code FOREIGN KEY (internal_risk_rating_bucket_code) REFERENCES l1.internal_risk_rating_bucket_dim(internal_risk_rating_bucket_code)
+  CONSTRAINT fk_facility_exposure_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.netting_set_exposure_snapshot (
@@ -152,7 +145,7 @@ CREATE TABLE IF NOT EXISTS l2.netting_set_exposure_snapshot (
   pfe_usd NUMERIC(18,2),
   netting_benefit_amt NUMERIC(18,2),
   PRIMARY KEY (netting_set_id, as_of_date),
-  CONSTRAINT fk_netting_set_exposure_snapshot_netting_set_id FOREIGN KEY (netting_set_id) REFERENCES l1.netting_set(netting_set_id),
+  CONSTRAINT fk_netting_set_exposure_snapshot_netting_set_id FOREIGN KEY (netting_set_id) REFERENCES l2.netting_set(netting_set_id),
   CONSTRAINT fk_netting_set_exposure_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -167,7 +160,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_lob_attribution (
   attribution_type VARCHAR(50),
   lob_node_id BIGINT,
   hierarchy_id VARCHAR(64),
-  CONSTRAINT fk_facility_lob_attribution_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_lob_attribution_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_lob_attribution_lob_segment_id FOREIGN KEY (lob_segment_id) REFERENCES l1.enterprise_business_taxonomy(managed_segment_id)
 );
 
@@ -187,9 +180,9 @@ CREATE TABLE IF NOT EXISTS l2.collateral_snapshot (
   mitigant_group_code VARCHAR(20),
   mitigant_subtype VARCHAR(100),
   original_valuation_usd NUMERIC(18,2),
-  risk_shifting_flag CHAR(1),
+  is_risk_shifting_flag CHAR(1),
   PRIMARY KEY (collateral_asset_id, as_of_date),
-  CONSTRAINT fk_collateral_snapshot_collateral_asset_id FOREIGN KEY (collateral_asset_id) REFERENCES l1.collateral_asset_master(collateral_asset_id),
+  CONSTRAINT fk_collateral_snapshot_collateral_asset_id FOREIGN KEY (collateral_asset_id) REFERENCES l2.collateral_asset_master(collateral_asset_id),
   CONSTRAINT fk_collateral_snapshot_source_system_id FOREIGN KEY (source_system_id) REFERENCES l1.source_system_registry(source_system_id)
 );
 
@@ -208,9 +201,8 @@ CREATE TABLE IF NOT EXISTS l2.cash_flow (
   flow_direction VARCHAR(100),
   flow_id BIGINT,
   flow_type VARCHAR(50),
-  maturity_bucket_id BIGINT,
   position_id BIGINT,
-  CONSTRAINT fk_cash_flow_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_cash_flow_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_cash_flow_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -233,7 +225,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_financial_snapshot (
   net_income_amt NUMERIC(18,2),
   interest_rate_sensitivity_pct NUMERIC(10,6),
   PRIMARY KEY (facility_id, as_of_date),
-  CONSTRAINT fk_facility_financial_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
+  CONSTRAINT fk_facility_financial_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.facility_delinquency_snapshot (
@@ -241,7 +233,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_delinquency_snapshot (
   as_of_date DATE NOT NULL,
   credit_status_code BIGINT NOT NULL,
   days_past_due INTEGER,
-  watch_list_flag CHAR(1),
+  is_watch_list_flag CHAR(1),
   counterparty_id BIGINT,
   currency_code VARCHAR(20),
   days_past_due_max INTEGER,
@@ -251,12 +243,12 @@ CREATE TABLE IF NOT EXISTS l2.facility_delinquency_snapshot (
   last_payment_received_date DATE,
   overdue_interest_amt NUMERIC(18,2),
   overdue_principal_amt NUMERIC(18,2),
-  delinquent_payment_flag CHAR(1),
+  is_delinquent_payment_flag CHAR(1),
   overdue_amt_0_30 NUMERIC(18,2),
   overdue_amt_31_60 NUMERIC(18,2),
   overdue_amt_61_90_plus NUMERIC(18,2),
   PRIMARY KEY (facility_id, as_of_date),
-  CONSTRAINT fk_facility_delinquency_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_delinquency_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_delinquency_snapshot_credit_status_code FOREIGN KEY (credit_status_code) REFERENCES l1.credit_status_dim(credit_status_code)
 );
 
@@ -272,17 +264,15 @@ CREATE TABLE IF NOT EXISTS l2.facility_pricing_snapshot (
   facility_pricing_id BIGINT,
   min_spread_threshold_bps NUMERIC(8,2),
   payment_frequency VARCHAR(30),
-  prepayment_penalty_flag CHAR(1),
+  is_prepayment_penalty_flag CHAR(1),
   rate_cap_pct NUMERIC(10,4),
   rate_index_code VARCHAR(20),
-  pricing_tier VARCHAR(20),
-  pricing_exception_flag CHAR(1),
+  is_pricing_exception_flag CHAR(1),
   fee_rate_pct NUMERIC(10,6),
   cost_of_funds_pct NUMERIC(10,6),
   PRIMARY KEY (facility_id, as_of_date),
-  CONSTRAINT fk_facility_pricing_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_facility_pricing_snapshot_rate_index_id FOREIGN KEY (rate_index_id) REFERENCES l1.interest_rate_index_dim(rate_index_id),
-  CONSTRAINT fk_facility_pricing_snapshot_pricing_tier FOREIGN KEY (pricing_tier) REFERENCES l1.pricing_tier_dim(pricing_tier_code)
+  CONSTRAINT fk_facility_pricing_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_facility_pricing_snapshot_rate_index_id FOREIGN KEY (rate_index_id) REFERENCES l1.interest_rate_index_dim(rate_index_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.facility_profitability_snapshot (
@@ -299,7 +289,7 @@ CREATE TABLE IF NOT EXISTS l2.facility_profitability_snapshot (
   interest_income_amt NUMERIC(18,2),
   profitability_snapshot_id BIGINT,
   PRIMARY KEY (facility_id, as_of_date),
-  CONSTRAINT fk_facility_profitability_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_facility_profitability_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_facility_profitability_snapshot_ledger_account_id FOREIGN KEY (ledger_account_id) REFERENCES l1.ledger_account_dim(ledger_account_id)
 );
 
@@ -315,7 +305,7 @@ CREATE TABLE IF NOT EXISTS l2.limit_contribution_snapshot (
   facility_id BIGINT,
   PRIMARY KEY (limit_rule_id, counterparty_id, as_of_date),
   CONSTRAINT fk_limit_contribution_snapshot_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
-  CONSTRAINT fk_limit_contribution_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_limit_contribution_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_limit_contribution_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -330,7 +320,7 @@ CREATE TABLE IF NOT EXISTS l2.limit_utilization_event (
   utilized_amount_usd NUMERIC(18,2),
   PRIMARY KEY (limit_rule_id, as_of_date),
   CONSTRAINT fk_limit_utilization_event_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
-  CONSTRAINT fk_limit_utilization_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+  CONSTRAINT fk_limit_utilization_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.amendment_change_detail (
@@ -364,8 +354,8 @@ CREATE TABLE IF NOT EXISTS l2.amendment_event (
   counterparty_id BIGINT,
   identified_date DATE,
   last_updated_ts TIMESTAMP,
-  CONSTRAINT fk_amendment_event_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_amendment_event_credit_agreement_id FOREIGN KEY (credit_agreement_id) REFERENCES l1.credit_agreement_master(credit_agreement_id),
+  CONSTRAINT fk_amendment_event_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_amendment_event_credit_agreement_id FOREIGN KEY (credit_agreement_id) REFERENCES l2.credit_agreement_master(credit_agreement_id),
   CONSTRAINT fk_amendment_event_amendment_type_code FOREIGN KEY (amendment_type_code) REFERENCES l1.amendment_type_dim(amendment_type_code),
   CONSTRAINT fk_amendment_event_amendment_status_code FOREIGN KEY (amendment_status_code) REFERENCES l1.amendment_status_dim(amendment_status_code)
 );
@@ -383,7 +373,7 @@ CREATE TABLE IF NOT EXISTS l2.credit_event (
   event_summary VARCHAR(2000),
   loss_amount_usd NUMERIC(18,2),
   recovery_amount_usd NUMERIC(18,2),
-  CONSTRAINT fk_credit_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_credit_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_credit_event_credit_event_type_code FOREIGN KEY (credit_event_type_code) REFERENCES l1.credit_event_type_dim(credit_event_type_code),
   CONSTRAINT fk_credit_event_default_definition_id FOREIGN KEY (default_definition_id) REFERENCES l1.default_definition_dim(default_definition_id)
 );
@@ -397,7 +387,7 @@ CREATE TABLE IF NOT EXISTS l2.credit_event_facility_link (
   estimated_loss_usd NUMERIC(18,2),
   impact_pct NUMERIC(10,4),
   CONSTRAINT fk_credit_event_facility_link_credit_event_id FOREIGN KEY (credit_event_id) REFERENCES l2.credit_event(credit_event_id),
-  CONSTRAINT fk_credit_event_facility_link_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id)
+  CONSTRAINT fk_credit_event_facility_link_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.stress_test_breach (
@@ -416,7 +406,7 @@ CREATE TABLE IF NOT EXISTS l2.stress_test_breach (
   stress_test_result_id BIGINT,
   CONSTRAINT fk_stress_test_breach_scenario_id FOREIGN KEY (scenario_id) REFERENCES l1.scenario_dim(scenario_id),
   CONSTRAINT fk_stress_test_breach_limit_rule_id FOREIGN KEY (limit_rule_id) REFERENCES l1.limit_rule(limit_rule_id),
-  CONSTRAINT fk_stress_test_breach_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+  CONSTRAINT fk_stress_test_breach_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.deal_pipeline_fact (
@@ -440,7 +430,7 @@ CREATE TABLE IF NOT EXISTS l2.deal_pipeline_fact (
   pipeline_stage VARCHAR(100),
   pipeline_status VARCHAR(30),
   record_level_code VARCHAR(20),
-  CONSTRAINT fk_deal_pipeline_fact_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_deal_pipeline_fact_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_deal_pipeline_fact_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -459,7 +449,7 @@ CREATE TABLE IF NOT EXISTS l2.counterparty_rating_observation (
   rating_value VARCHAR(20),
   risk_rating_status VARCHAR(30),
   risk_rating_change_steps INTEGER,
-  CONSTRAINT fk_counterparty_rating_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_counterparty_rating_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_counterparty_rating_observation_rating_grade_id FOREIGN KEY (rating_grade_id) REFERENCES l1.rating_grade_dim(rating_grade_id),
   CONSTRAINT fk_counterparty_rating_observation_rating_source_id FOREIGN KEY (rating_source_id) REFERENCES l1.rating_source(rating_source_id)
 );
@@ -479,8 +469,8 @@ CREATE TABLE IF NOT EXISTS l2.financial_metric_observation (
   metric_value NUMERIC(18,4),
   metric_value_usd NUMERIC(18,2),
   period_end_date DATE,
-  CONSTRAINT fk_financial_metric_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
-  CONSTRAINT fk_financial_metric_observation_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
+  CONSTRAINT fk_financial_metric_observation_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
+  CONSTRAINT fk_financial_metric_observation_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
   CONSTRAINT fk_financial_metric_observation_metric_definition_id FOREIGN KEY (metric_definition_id) REFERENCES l1.metric_definition_dim(metric_definition_id),
   CONSTRAINT fk_financial_metric_observation_context_id FOREIGN KEY (context_id) REFERENCES l1.context_dim(context_id)
 );
@@ -511,8 +501,8 @@ CREATE TABLE IF NOT EXISTS l2.exception_event (
   remediation_plan VARCHAR(2000),
   target_remediation_date DATE,
   threshold_value NUMERIC(18,4),
-  CONSTRAINT fk_exception_event_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_exception_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+  CONSTRAINT fk_exception_event_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_exception_event_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.risk_flag (
@@ -529,8 +519,8 @@ CREATE TABLE IF NOT EXISTS l2.risk_flag (
   flag_scope VARCHAR(30),
   flag_severity VARCHAR(100),
   flag_trigger_value NUMERIC(18,4),
-  CONSTRAINT fk_risk_flag_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_risk_flag_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+  CONSTRAINT fk_risk_flag_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_risk_flag_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id)
 );
 
 CREATE TABLE IF NOT EXISTS l2.counterparty_financial_snapshot (
@@ -541,7 +531,6 @@ CREATE TABLE IF NOT EXISTS l2.counterparty_financial_snapshot (
   currency_code VARCHAR(20),
   revenue_amt NUMERIC(18,2),
   operating_expense_amt NUMERIC(18,2),
-  net_income_amt NUMERIC(18,2),
   interest_expense_amt NUMERIC(18,2),
   tax_expense_amt NUMERIC(18,2),
   depreciation_amt NUMERIC(18,2),
@@ -549,10 +538,10 @@ CREATE TABLE IF NOT EXISTS l2.counterparty_financial_snapshot (
   total_assets_amt NUMERIC(18,2),
   total_liabilities_amt NUMERIC(18,2),
   shareholders_equity_amt NUMERIC(18,2),
-  ebitda_amt NUMERIC(18,2),
-  noi_amt NUMERIC(18,2),
-  total_debt_service_amt NUMERIC(18,2),
-  CONSTRAINT fk_counterparty_financial_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  expected_drawdown_amt NUMERIC(18,2),
+  fee_income_amt NUMERIC(18,2),
+  tangible_net_worth_usd NUMERIC(18,2),
+  CONSTRAINT fk_counterparty_financial_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_counterparty_financial_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -570,8 +559,8 @@ CREATE TABLE IF NOT EXISTS l2.facility_risk_snapshot (
   internal_risk_rating VARCHAR(100),
   currency_code VARCHAR(20),
   PRIMARY KEY (facility_id, as_of_date),
-  CONSTRAINT fk_facility_risk_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_facility_risk_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id),
+  CONSTRAINT fk_facility_risk_snapshot_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_facility_risk_snapshot_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id),
   CONSTRAINT fk_facility_risk_snapshot_currency_code FOREIGN KEY (currency_code) REFERENCES l1.currency_dim(currency_code)
 );
 
@@ -583,13 +572,13 @@ CREATE TABLE IF NOT EXISTS l2.facility_credit_approval (
   approval_status VARCHAR(30),
   approval_date DATE,
   approved_amount NUMERIC(18,2),
-  exception_flag CHAR(1),
+  is_exception_flag CHAR(1),
   exception_type VARCHAR(50),
   exception_type_code VARCHAR(30),
   exception_severity VARCHAR(30),
   exception_reason VARCHAR(500),
   approved_by VARCHAR(100),
   expiry_date DATE,
-  CONSTRAINT fk_facility_credit_approval_facility_id FOREIGN KEY (facility_id) REFERENCES l1.facility_master(facility_id),
-  CONSTRAINT fk_facility_credit_approval_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l1.counterparty(counterparty_id)
+  CONSTRAINT fk_facility_credit_approval_facility_id FOREIGN KEY (facility_id) REFERENCES l2.facility_master(facility_id),
+  CONSTRAINT fk_facility_credit_approval_counterparty_id FOREIGN KEY (counterparty_id) REFERENCES l2.counterparty(counterparty_id)
 );

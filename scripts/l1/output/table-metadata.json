@@ -651,6 +651,62 @@
       "nullable": true
     }
   },
+  "L1.utilization_status_dim": {
+    "utilization_status_code": {
+      "type": "VARCHAR(20)",
+      "pk": true,
+      "fk": null,
+      "nullable": false
+    },
+    "status_name": {
+      "type": "VARCHAR(200)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilization_min_pct": {
+      "type": "NUMERIC(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "utilization_max_pct": {
+      "type": "NUMERIC(10,6)",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "display_order": {
+      "type": "INTEGER",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    },
+    "is_active_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "is_current_flag": {
+      "type": "CHAR(1)",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "created_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": false
+    },
+    "updated_ts": {
+      "type": "TIMESTAMP",
+      "pk": false,
+      "fk": null,
+      "nullable": true
+    }
+  },
   "L1.fr2590_category_dim": {
     "fr2590_category_code": {
       "type": "BIGINT",

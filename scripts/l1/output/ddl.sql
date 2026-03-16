@@ -149,6 +149,18 @@ CREATE TABLE IF NOT EXISTS l1.maturity_bucket_dim (
   regulatory_framework VARCHAR(100)
 );
 
+CREATE TABLE IF NOT EXISTS l1.utilization_status_dim (
+  utilization_status_code VARCHAR(20) NOT NULL PRIMARY KEY,
+  status_name VARCHAR(200),
+  utilization_min_pct NUMERIC(10,6),
+  utilization_max_pct NUMERIC(10,6),
+  display_order INTEGER,
+  is_active_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
+  is_current_flag CHAR(1) NOT NULL DEFAULT 'Y' CHECK (value IN ('Y','N')),
+  created_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_ts TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS l1.fr2590_category_dim (
   fr2590_category_code BIGINT NOT NULL PRIMARY KEY,
   category_name VARCHAR(200),

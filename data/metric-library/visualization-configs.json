@@ -1482,35 +1482,83 @@
   "MET-051": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "lgd_estimate"
+      "primary_value": "lgd_amount"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "lgd_estimate",
-          "label": "lgd_estimate",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
           "sample_value": 0,
-          "source_table": "position",
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "bank_share_pct",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "lgd_pct",
+          "label": "lgd_pct",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "EAD * LGD (in Percentage) for all facilities across Counterparties\n"
+      "formula_display": "EAD (bank share) x LGD% per facility in local currency.\n"
     },
     "worked_example_columns": [
       {
-        "field": "lgd_estimate",
-        "header": "Lgd Estimate",
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "lgd_pct",
+        "header": "Lgd (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "lgd_amount",
+        "header": "Lgd Amount",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
   "MET-052": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "count-ratio",
     "metric_fields": {
       "primary_value": "limit_status_code"
     },
@@ -1523,11 +1571,43 @@
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "committed_amount",
+          "label": "committed_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "utilization_status_code",
+          "label": "utilization_status_code",
+          "sample_value": 0,
+          "source_table": "utilization_status_dim",
+          "source_layer": "L1"
+        },
+        {
+          "op": "*",
+          "field": "rate",
+          "label": "rate",
+          "sample_value": 0,
+          "source_table": "fx_rate",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Calculated limit_status_code per facility.\n"
+      "formula_display": "Read pre-computed limit_status_code from facility_exposure_snapshot.\n"
     },
     "worked_example_columns": [
       {
@@ -1536,6 +1616,30 @@
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
+      },
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "committed_amount",
+        "header": "Committed Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "utilization_status_code",
+        "header": "Utilization Status Code",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rate",
+        "header": "Rate",
+        "format": "number",
+        "subtotal_fn": "none"
       }
     ]
   },
@@ -3170,27 +3274,27 @@
   "MET-049": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "legal_name"
+      "primary_value": "legal_entity_name"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "legal_name",
-          "label": "legal_name",
+          "field": "legal_entity_name",
+          "label": "legal_entity_name",
           "sample_value": 0,
-          "source_table": "counterparty",
+          "source_table": "legal_entity",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Direct lookup of legal_name from counterparty.\n"
+      "formula_display": "Lookup legal_entity_name from legal_entity table via facility_exposure_snapshot.legal_entity_id.\n"
     },
     "worked_example_columns": [
       {
-        "field": "legal_name",
-        "header": "Legal Name",
+        "field": "legal_entity_name",
+        "header": "Legal Entity Name",
         "format": "number",
         "subtotal_fn": "none",
         "is_result": true
@@ -3215,7 +3319,7 @@
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read legal_entity_id from facility_exposure_snapshot for each facility as-of reporting date.\n"
+      "formula_display": "Read legal_entity_id from facility_exposure_snapshot for each facility.\n"
     },
     "worked_example_columns": [
       {

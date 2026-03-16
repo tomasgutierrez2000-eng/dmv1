@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-023"
 name: "Loss Given Default ($)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "1.1.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,31 +18,46 @@ direction: LOWER_BETTER
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Exposure × LGD expressed in dollar terms weighted based on facility-level
-  exposure. Derived loss severity metric estimating expected recovery-adjusted
-  loss magnitude.
+  Expected dollar loss given default. Computed as EAD (drawn amount, bank
+  share) multiplied by LGD percentage from facility risk snapshot. Expressed
+  in local currency at facility level and FX-converted to USD at aggregate
+  levels. Quantifies loss severity per facility and across rollup hierarchy.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "CRE31 — LGD estimation for IRB approach"
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: position
-    alias: pos
+    table: facility_exposure_snapshot
+    alias: fes
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: lgd_estimate
+      - name: drawn_amount
+        role: MEASURE
+      - name: bank_share_pct
+        role: MEASURE
+      - name: currency_code
+        role: DIMENSION
+  - schema: l2
+    table: facility_risk_snapshot
+    alias: frs
+    join_type: INNER
+    join_on: "frs.facility_id = fes.facility_id AND frs.as_of_date = fes.as_of_date"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: lgd_pct
         role: MEASURE
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = pos.facility_id"
+    join_on: "fm.facility_id = fes.facility_id"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -52,6 +67,14 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: fx_rate
+    alias: fx
+    join_type: LEFT
+    join_on: "fx.from_currency_code = fes.currency_code AND fx.to_currency_code = 'USD' AND fx.as_of_date = fes.as_of_date"
+    fields:
+      - name: rate
+        role: MEASURE
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
@@ -67,100 +90,133 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      EAD * LGD (in Percentage) for all facilities across Counterparties
+      EAD (bank share) x LGD% per facility in local currency.
     formula_sql: |
       SELECT
-        pos.facility_id AS dimension_key,
-        pos.lgd_estimate AS metric_value
-      FROM l2.position pos
-      WHERE pos.as_of_date = :as_of_date
+        fes.facility_id AS dimension_key,
+        fes.drawn_amount
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+          * COALESCE(frs.lgd_pct, 0) / 100.0 AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
+      WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level lgd_estimate per counterparty.
+      SUM of facility-level LGD$ per counterparty, FX-converted to USD.
     formula_sql: |
       SELECT
         fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.lgd_estimate AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(frs.lgd_pct, 0) / 100.0
+            * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level lgd_estimate per L3 desk segment.
+      SUM of facility-level LGD$ per L3 desk segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.lgd_estimate AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(frs.lgd_pct, 0) / 100.0
+            * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level lgd_estimate per L2 portfolio segment.
+      SUM of facility-level LGD$ per L2 portfolio segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.lgd_estimate AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(frs.lgd_pct, 0) / 100.0
+            * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
     formula_text: >
-      SUM of facility-level lgd_estimate per L1 business segment segment.
+      SUM of facility-level LGD$ per L1 business segment, FX-converted to USD.
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.lgd_estimate AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          fes.drawn_amount
+            * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+            * COALESCE(frs.lgd_pct, 0) / 100.0
+            * COALESCE(fx.rate, 1)
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.fx_rate fx
+        ON fx.from_currency_code = fes.currency_code
+        AND fx.to_currency_code = 'USD'
+        AND fx.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -171,12 +227,16 @@ output:
 validations:
   - rule_id: "EXP-023-V01"
     type: NOT_NULL
-    description: "No null lgd_estimate values"
+    description: "No null LGD$ values"
     severity: ERROR
   - rule_id: "EXP-023-V02"
     type: NON_NEGATIVE
-    description: "lgd_estimate must be >= 0"
+    description: "LGD$ must be >= 0"
     severity: ERROR
+  - rule_id: "EXP-023-V03"
+    type: RECONCILIATION
+    description: "Facility sum should equal counterparty sum for same-currency counterparties"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-051"
@@ -184,7 +244,7 @@ catalogue:
   insight: >
     Quantifies loss severity
   rollup_strategy: "direct-sum"
-  primary_value_field: "lgd_estimate"
+  primary_value_field: "lgd_amount"
 # ── METADATA ──────────────────────────────────────────────────
 tags: ["exposure", "risk-metrics"]
 dashboard_pages: []

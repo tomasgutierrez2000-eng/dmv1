@@ -2,7 +2,7 @@ metric_id: REF-015
 name: Syndicated Deal Flag
 version: 1.0.0
 owner: credit-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: reference

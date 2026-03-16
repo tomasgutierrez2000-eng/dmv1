@@ -1,13 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # GSIB Metric Definition
-# Exposure at Default ($)
+# Exposure at Default ($) — EAD
 # ═══════════════════════════════════════════════════════════════
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-020"
 name: "Exposure at Default ($)"
-version: "1.0.0"
-owner: "market-risk"
-status: DRAFT
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -18,30 +18,53 @@ direction: NEUTRAL
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  The estimated exposure amount (in USD) expected to be outstanding if the
-  borrower defaults.
+  Estimated exposure amount outstanding if the borrower defaults, computed
+  from L2 atomic inputs per Basel III: EAD = OB + CCF × Undrawn, where
+  OB = drawn/funded amount, CCF = credit conversion factor from
+  facility_risk_snapshot, and Undrawn = committed minus drawn from
+  facility_exposure_snapshot. Bank-share adjusted via facility_exposure_snapshot.
+  At counterparty level, weighted by participation_pct from
+  facility_counterparty_participation per FR Y-14Q requirements.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "CRE 32.1 — EAD = OB + LEQ*(C-OB). On-balance-sheet EAD = outstanding balance. Off-balance-sheet EAD = committed amount * CCF."
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Fields 24-27 — committed, utilized, and EAD components for wholesale credit."
+  - framework: "CCAR/DFAST"
+    description: "EAD(i) in the loss estimation formula: ECL = PD × LGD × EAD. Uses Fed-prescribed CCFs for undrawn commitments."
+  - framework: "CRR2/CRD5"
+    description: "Article 166 — IRB on-balance-sheet EAD; Article 111 — SA EAD using supervisory CCFs (0%, 20%, 50%, 100%)."
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
-    table: credit_event_facility_link
-    alias: cefl
+    table: facility_exposure_snapshot
+    alias: fes
     join_type: BASE
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: exposure_at_default
+      - name: drawn_amount
         role: MEASURE
+        description: "Currently utilized/funded amount"
+      - name: undrawn_amount
+        role: MEASURE
+        description: "Unfunded/undrawn commitment amount"
+      - name: bank_share_pct
+        role: MEASURE
+        description: "Bank's pro-rata share of the facility (%)"
+      - name: counterparty_id
+        role: DIMENSION
+      - name: currency_code
+        role: DIMENSION
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = cefl.facility_id"
+    join_on: "fm.facility_id = fes.facility_id AND fm.is_active_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -51,116 +74,214 @@ source_tables:
         role: DIMENSION
       - name: is_active_flag
         role: FILTER
+  - schema: l2
+    table: facility_risk_snapshot
+    alias: frs
+    join_type: LEFT
+    join_on: "frs.facility_id = fes.facility_id AND frs.as_of_date = fes.as_of_date"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: FILTER
+      - name: ccf
+        role: MEASURE
+        description: "Credit conversion factor — probability of undrawn converting to drawn"
+  - schema: l2
+    table: facility_counterparty_participation
+    alias: fcp
+    join_type: INNER
+    join_on: "fcp.facility_id = fes.facility_id AND fcp.is_current_flag = 'Y'"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: participation_pct
+        role: MEASURE
+        description: "Counterparty participation share"
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
-    aggregation_type: RAW
-    formula_text: >
-      Read exposure_at_default from credit_event_facility_link for each facility
-      as-of reporting date.
+    aggregation_type: CUSTOM
+    formula_text: |
+      1. LOAD  l2.facility_exposure_snapshot  (fes)
+         WHERE fes.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = fes.facility_id
+         WHERE fm.is_active_flag = 'Y'
+      3. LEFT JOIN  l2.facility_risk_snapshot  (frs)
+         ON    frs.facility_id = fes.facility_id
+         AND   frs.as_of_date = fes.as_of_date
+      4. GROUP BY fes.facility_id
+      5. COMPUTE
+         metric_value = (drawn_amount + CCF * undrawn_amount)
+                        * bank_share_pct / 100
     formula_sql: |
       SELECT
-        cefl.facility_id AS dimension_key,
-        cefl.exposure_at_default AS metric_value
-      FROM l3.facility_risk_calc cefl
-      WHERE cefl.as_of_date = :as_of_date
-  counterparty:
-    aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level exposure_at_default per counterparty.
-    formula_sql: |
-      SELECT
-        fm.counterparty_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          cefl.facility_id AS dimension_key,
-          cefl.exposure_at_default AS metric_value
-        FROM l3.facility_risk_calc cefl
-        WHERE cefl.as_of_date = :as_of_date
-      ) fac
+        fes.facility_id AS dimension_key,
+        (COALESCE(fes.drawn_amount, 0)
+          + COALESCE(frs.ccf, 0) * COALESCE(fes.undrawn_amount, 0))
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0 AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
-      GROUP BY fm.counterparty_id
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
+      WHERE fes.as_of_date = :as_of_date
+  counterparty:
+    aggregation_type: CUSTOM
+    formula_text: |
+      1. LOAD  l2.facility_exposure_snapshot  (fes)
+         WHERE fes.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = fes.facility_id
+      3. LEFT JOIN  l2.facility_risk_snapshot  (frs)
+         ON    frs.facility_id = fes.facility_id
+      4. JOIN  l2.facility_counterparty_participation  (fcp)
+         ON    fcp.facility_id = fes.facility_id
+         AND   fcp.is_current_flag = 'Y'
+      5. GROUP BY fcp.counterparty_id
+      6. COMPUTE
+         metric_value = SUM((drawn + CCF * undrawn) * bank_share / 100
+                        * participation_pct)
+    formula_sql: |
+      SELECT
+        fcp.counterparty_id AS dimension_key,
+        SUM(
+          (COALESCE(fes.drawn_amount, 0)
+            + COALESCE(frs.ccf, 0) * COALESCE(fes.undrawn_amount, 0))
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+          * COALESCE(fcp.participation_pct, 1.0)
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = fes.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
+      INNER JOIN l2.facility_counterparty_participation fcp
+        ON fcp.facility_id = fes.facility_id
+        AND fcp.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
+      GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level exposure_at_default per L3 desk segment.
+    formula_text: |
+      1. LOAD  facility-level EAD (subquery)
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = fac.facility_id
+      3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
+         ON    ebt.managed_segment_id = fm.lob_segment_id
+         AND   ebt.is_current_flag = 'Y'
+      4. GROUP BY ebt.managed_segment_id
+      5. COMPUTE
+         metric_value = SUM(facility_ead)
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          cefl.facility_id AS dimension_key,
-          cefl.exposure_at_default AS metric_value
-        FROM l3.facility_risk_calc cefl
-        WHERE cefl.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(fes.drawn_amount, 0)
+            + COALESCE(frs.ccf, 0) * COALESCE(fes.undrawn_amount, 0))
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level exposure_at_default per L2 portfolio segment.
+    formula_text: |
+      1. LOAD  facility-level EAD (subquery)
+      2. JOIN  l2.facility_master  (fm)
+      3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3, ebt_l2)
+         Traverse L3 -> L2 via parent_segment_id
+      4. GROUP BY ebt_l2.managed_segment_id
+      5. COMPUTE
+         metric_value = SUM(facility_ead)
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          cefl.facility_id AS dimension_key,
-          cefl.exposure_at_default AS metric_value
-        FROM l3.facility_risk_calc cefl
-        WHERE cefl.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(fes.drawn_amount, 0)
+            + COALESCE(frs.ccf, 0) * COALESCE(fes.undrawn_amount, 0))
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
-    formula_text: >
-      SUM of facility-level exposure_at_default per L1 business segment segment.
+    formula_text: |
+      1. LOAD  facility-level EAD (subquery)
+      2. JOIN  l2.facility_master  (fm)
+      3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3, ebt_l2, ebt_l1)
+         Traverse L3 -> L2 -> L1 via parent_segment_id chain
+      4. GROUP BY ebt_l1.managed_segment_id
+      5. COMPUTE
+         metric_value = SUM(facility_ead)
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        SUM(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          cefl.facility_id AS dimension_key,
-          cefl.exposure_at_default AS metric_value
-        FROM l3.facility_risk_calc cefl
-        WHERE cefl.as_of_date = :as_of_date
-      ) fac
+        SUM(
+          (COALESCE(fes.drawn_amount, 0)
+            + COALESCE(frs.ccf, 0) * COALESCE(fes.undrawn_amount, 0))
+          * COALESCE(fes.bank_share_pct, 100.0) / 100.0
+        ) AS metric_value
+      FROM l2.facility_exposure_snapshot fes
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = fes.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fes.facility_id
+        AND frs.as_of_date = fes.as_of_date
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -175,17 +296,30 @@ validations:
     severity: ERROR
   - rule_id: "EXP-020-V02"
     type: NON_NEGATIVE
-    description: "exposure_at_default must be >= 0"
+    description: "EAD must be >= 0 (negative EAD is not economically meaningful)"
     severity: ERROR
+  - rule_id: "EXP-020-V03"
+    type: RECONCILIATION
+    description: "SUM(facility EAD) should reconcile to SUM(business_segment EAD)"
+    severity: WARNING
+    params:
+      levels_to_compare: ["facility", "business_segment"]
+      tolerance_pct: 0.01
+  - rule_id: "EXP-020-V04"
+    type: THRESHOLD
+    description: "EAD should be >= drawn_amount (CCF contribution should be non-negative)"
+    severity: WARNING
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-036"
   abbreviation: "EAD"
   insight: >
-    Credit amount at risk in default
+    Credit amount at risk in default — combines outstanding balance with
+    expected drawdown of unfunded commitments using credit conversion factors.
+    Key input to ECL = PD x LGD x EAD.
   rollup_strategy: "direct-sum"
-  primary_value_field: "exposure_at_default"
+  primary_value_field: "exposure_at_default_usd"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["exposure", "risk-metrics"]
+tags: ["exposure", "risk-metrics", "basel-iii", "ccar", "ead"]
 dashboard_pages: []
 legacy_metric_ids: []

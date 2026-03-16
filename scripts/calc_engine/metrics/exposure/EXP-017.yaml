@@ -5,9 +5,9 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-017"
 name: "Undrawn Exposure ($)"
-version: "2.1.0"
+version: "3.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
@@ -60,6 +60,8 @@ source_tables:
         role: FILTER
       - name: funded_amount
         role: MEASURE
+      - name: detail_type
+        role: FILTER
   - schema: l2
     table: facility_master
     alias: fm
@@ -81,47 +83,63 @@ source_tables:
     table: facility_lender_allocation
     alias: fla
     join_type: LEFT
-    join_on: "fla.facility_id = fm.facility_id"
+    join_on: "fla.facility_id = fm.facility_id AND fla.is_current_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
       - name: bank_share_pct
         role: MEASURE
         description: "Bank's participation share of the facility (%)"
+      - name: is_current_flag
+        role: FILTER
   - schema: l2
     table: facility_counterparty_participation
     alias: fcp
     join_type: INNER
-    join_on: "fcp.facility_id = fm.facility_id"
+    join_on: "fcp.facility_id = fm.facility_id AND fcp.is_current_flag = 'Y'"
     fields:
       - name: counterparty_id
         role: DIMENSION
       - name: participation_pct
         role: MEASURE
+      - name: is_current_flag
+        role: FILTER
   - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: |
-      For each active facility:
-      1. SUM(funded_amount) from PRINCIPAL position_detail rows per facility
-      2. Subtract from committed_facility_amt to get unfunded amount
-      3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation
-      Ensures: Committed Exposure = Outstanding Exposure + Undrawn Exposure
+      1. LOAD  l2.position  (pos)
+         WHERE pos.as_of_date = :as_of_date
+      2. JOIN  l2.position_detail  (pdtl)
+         ON    pdtl.position_id = pos.position_id
+         AND   pdtl.detail_type = 'PRINCIPAL'
+      3. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = pos.facility_id
+         WHERE fm.is_active_flag = 'Y'
+      4. LEFT JOIN  l2.facility_lender_allocation  (fla)
+         ON    fla.facility_id = fm.facility_id
+         AND   fla.is_current_flag = 'Y'
+      5. GROUP BY fm.facility_id
+      6. COMPUTE
+         metric_value = (committed_facility_amt - SUM(funded_amount))
+                        * COALESCE(bank_share_pct, 100) / 100
     formula_sql: |
       SELECT
         fm.facility_id AS dimension_key,
-        (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
+        (COALESCE(fm.committed_facility_amt, 0) - COALESCE(funded.funded_sum, 0))
           * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
       FROM l2.facility_master fm
       LEFT JOIN (
@@ -138,12 +156,18 @@ levels:
       ) funded ON funded.facility_id = fm.facility_id
       LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = fm.facility_id
+        AND fla.is_current_flag = 'Y'
       WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: CUSTOM
     formula_text: |
-      For each counterparty, sum facility-level undrawn exposure weighted
-      by participation_pct from facility_counterparty_participation.
+      1. LOAD  facility-level undrawn exposure (subquery)
+      2. JOIN  l2.facility_counterparty_participation  (fcp)
+         ON    fcp.facility_id = fac.facility_id
+         AND   fcp.is_current_flag = 'Y'
+      3. GROUP BY fcp.counterparty_id
+      4. COMPUTE
+         metric_value = SUM(facility_undrawn * participation_pct)
     formula_sql: |
       SELECT
         fcp.counterparty_id AS dimension_key,
@@ -151,7 +175,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id,
-          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
+          (COALESCE(fm.committed_facility_amt, 0) - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN (
@@ -168,16 +192,25 @@ levels:
         ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_counterparty_participation fcp
         ON fcp.facility_id = fac.facility_id
+        AND fcp.is_current_flag = 'Y'
       GROUP BY fcp.counterparty_id
   desk:
     aggregation_type: SUM
     formula_text: |
-      SUM of facility-level undrawn exposure per L3 desk segment.
-      Joins facility_master.lob_segment_id to enterprise_business_taxonomy.managed_segment_id.
+      1. LOAD  facility-level undrawn exposure (subquery)
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = fac.facility_id
+      3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
+         ON    ebt.managed_segment_id = fm.lob_segment_id
+         AND   ebt.is_current_flag = 'Y'
+      4. GROUP BY ebt.managed_segment_id
+      5. COMPUTE
+         metric_value = SUM(facility_undrawn)
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
@@ -185,7 +218,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id,
-          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
+          (COALESCE(fm.committed_facility_amt, 0) - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN (
@@ -202,18 +235,28 @@ levels:
         ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: SUM
     formula_text: |
-      SUM of facility-level undrawn exposure per L2 portfolio segment.
-      Traverses L3 -> L2 via parent_segment_id.
+      1. LOAD  facility-level undrawn exposure (subquery)
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = fac.facility_id
+      3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3)
+         ON    ebt_l3.managed_segment_id = fm.lob_segment_id
+      4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l2)
+         ON    ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      5. GROUP BY ebt_l2.managed_segment_id
+      6. COMPUTE
+         metric_value = SUM(facility_undrawn)
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
@@ -221,7 +264,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id,
-          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
+          (COALESCE(fm.committed_facility_amt, 0) - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN (
@@ -238,20 +281,33 @@ levels:
         ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: SUM
     formula_text: |
-      SUM of facility-level undrawn exposure per L1 business segment.
-      Traverses L3 -> L2 -> L1 via parent_segment_id chain.
+      1. LOAD  facility-level undrawn exposure (subquery)
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = fac.facility_id
+      3. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3)
+         ON    ebt_l3.managed_segment_id = fm.lob_segment_id
+      4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l2)
+         ON    ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+      5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l1)
+         ON    ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+      6. GROUP BY ebt_l1.managed_segment_id
+      7. COMPUTE
+         metric_value = SUM(facility_undrawn)
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
@@ -259,7 +315,7 @@ levels:
       FROM (
         SELECT
           fm.facility_id,
-          (fm.committed_facility_amt - COALESCE(funded.funded_sum, 0))
+          (COALESCE(fm.committed_facility_amt, 0) - COALESCE(funded.funded_sum, 0))
             * COALESCE(fla.bank_share_pct, 100.0) / 100.0 AS metric_value
         FROM l2.facility_master fm
         LEFT JOIN (
@@ -276,16 +332,20 @@ levels:
         ) funded ON funded.facility_id = fm.facility_id
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = fm.facility_id
+          AND fla.is_current_flag = 'Y'
         WHERE fm.is_active_flag = 'Y'
       ) fac
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fac.facility_id
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []

@@ -1,135 +1,201 @@
-metric_id: EXP-019
-name: Exposure Limit ($)
-version: 1.0.0
-owner: credit-risk
-status: DRAFT
-effective_date: '2026-01-01'
+# ═══════════════════════════════════════════════════════════════
+# GSIB Metric Definition
+# Exposure Limit ($)
+# ═══════════════════════════════════════════════════════════════
+# ── IDENTIFICATION ────────────────────────────────────────────
+metric_id: "EXP-019"
+name: "Exposure Limit ($)"
+version: "2.0.0"
+owner: "credit-risk"
+status: ACTIVE
+effective_date: "2026-01-01"
 supersedes: null
-domain: exposure
-sub_domain: risk-metrics
+# ── CLASSIFICATION ────────────────────────────────────────────
+domain: "exposure"
+sub_domain: "risk-metrics"
 metric_class: SOURCED
 direction: NEUTRAL
 unit_type: CURRENCY
-display_format: $,.0f
-description: 'Maximum approved credit exposure authorized for the counterparty or Line of Business segment in USD. Represents
-  formal risk appetite allocation and governance control threshold.
-
-  '
+display_format: "$,.0f"
+description: >
+  Maximum approved credit exposure authorized for the counterparty or
+  Line of Business segment in USD. Sourced directly from the limit_rule
+  reference table. Represents formal risk appetite allocation and
+  governance control threshold set by the Credit Risk Committee.
+  Not applicable at individual facility level — limits are set at
+  counterparty and organizational hierarchy levels.
+# ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
-- framework: Basel III
-  description: ''
+  - framework: "Basel III"
+    description: "Large exposure framework — single counterparty limit of 25% Tier 1 capital (CRE 31). GSIB interconnectedness limits of 15% Tier 1 for inter-GSIB exposures."
+  - framework: "OCC 2013-9"
+    description: "Concentration risk management guidance — institutions must establish and monitor exposure limits."
+  - framework: "FR Y-14A"
+    schedule: "Summary"
+    description: "Counterparty credit limits as part of CCAR stress testing and capital adequacy."
+# ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
-- schema: l2
-  table: facility_exposure_snapshot
-  alias: fes
-  join_type: BASE
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: as_of_date
-    role: FILTER
-  - name: committed_amount
-    role: MEASURE
-- schema: l2
-  table: facility_master
-  alias: fm
-  join_type: INNER
-  join_on: fm.facility_id = fes.facility_id
-  fields:
-  - name: facility_id
-    role: JOIN_KEY
-  - name: counterparty_id
-    role: DIMENSION
-  - name: lob_segment_id
-    role: DIMENSION
-  - name: is_active_flag
-    role: FILTER
-- schema: l1
-  table: enterprise_business_taxonomy
-  alias: ebt
-  join_type: LEFT
-  join_on: ebt.managed_segment_id = fm.lob_segment_id
-  fields:
-  - name: managed_segment_id
-    role: DIMENSION
-  - name: parent_segment_id
-    role: DIMENSION
+  - schema: l1
+    table: limit_rule
+    alias: lr
+    join_type: BASE
+    fields:
+      - name: limit_rule_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: lob_segment_id
+        role: DIMENSION
+      - name: limit_amount_usd
+        role: MEASURE
+        description: "Approved exposure limit in USD"
+      - name: is_current_flag
+        role: FILTER
+  - schema: l2
+    table: facility_master
+    alias: fm
+    join_type: INNER
+    join_on: "fm.counterparty_id = lr.counterparty_id"
+    fields:
+      - name: facility_id
+        role: JOIN_KEY
+      - name: counterparty_id
+        role: DIMENSION
+      - name: is_active_flag
+        role: FILTER
+  - schema: l1
+    table: enterprise_business_taxonomy
+    alias: ebt
+    join_type: LEFT
+    join_on: "ebt.managed_segment_id = lr.lob_segment_id AND ebt.is_current_flag = 'Y'"
+    fields:
+      - name: managed_segment_id
+        role: DIMENSION
+      - name: parent_segment_id
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+# ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
-    formula_text: 'Read limit_amt from lob_exposure_summary for each facility as-of reporting date.
-
-      '
-    formula_sql: "SELECT\n  fes.facility_id AS dimension_key,\n  fes.committed_amount AS metric_value\nFROM l2.facility_exposure_snapshot\
-      \ fes\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fes.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fes.as_of_date\
-      \ = :as_of_date"
+    formula_text: |
+      Not applicable — exposure limits are set at counterparty and
+      organizational levels, not per individual facility. Returns NULL.
+    formula_sql: |
+      SELECT
+        fm.facility_id AS dimension_key,
+        NULL AS metric_value
+      FROM l2.facility_master fm
+      WHERE fm.is_active_flag = 'Y'
   counterparty:
     aggregation_type: RAW
-    formula_text: 'Read limit_amt per counterparty.
-
-      '
-    formula_sql: "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
-      \    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
-      \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+    formula_text: |
+      1. LOAD  l1.limit_rule  (lr)
+         WHERE lr.is_current_flag = 'Y'
+         AND   lr.counterparty_id IS NOT NULL
+      2. GROUP BY lr.counterparty_id
+      3. COMPUTE
+         metric_value = SUM(limit_amount_usd)
+    formula_sql: |
+      SELECT
+        lr.counterparty_id AS dimension_key,
+        SUM(COALESCE(lr.limit_amount_usd, 0)) AS metric_value
+      FROM l1.limit_rule lr
+      WHERE lr.is_current_flag = 'Y'
+        AND lr.counterparty_id IS NOT NULL
+      GROUP BY lr.counterparty_id
   desk:
-    aggregation_type: SUM
-    formula_text: 'SUM of facility-level limit_amt per L3 desk segment.
-
-      '
-    formula_sql: "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n  SELECT\n\
-      \    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
-      \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n\
-      GROUP BY ebt.managed_segment_id"
+    aggregation_type: RAW
+    formula_text: |
+      1. LOAD  l1.limit_rule  (lr)
+         WHERE lr.is_current_flag = 'Y'
+         AND   lr.lob_segment_id IS NOT NULL
+      2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
+         ON    ebt.managed_segment_id = lr.lob_segment_id
+         AND   ebt.is_current_flag = 'Y'
+      3. GROUP BY lr.lob_segment_id
+      4. COMPUTE
+         metric_value = SUM(limit_amount_usd)
+    formula_sql: |
+      SELECT
+        lr.lob_segment_id AS dimension_key,
+        SUM(COALESCE(lr.limit_amount_usd, 0)) AS metric_value
+      FROM l1.limit_rule lr
+      WHERE lr.is_current_flag = 'Y'
+        AND lr.lob_segment_id IS NOT NULL
+      GROUP BY lr.lob_segment_id
   portfolio:
-    aggregation_type: SUM
-    formula_text: 'SUM of facility-level limit_amt per L2 portfolio segment.
-
-      '
-    formula_sql: "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
-      \  SELECT\n    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
-      \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nGROUP BY\
-      \ ebt_l2.managed_segment_id"
+    aggregation_type: RAW
+    formula_text: |
+      1. LOAD  l1.limit_rule  (lr)
+         WHERE lr.is_current_flag = 'Y'
+         AND   lr.lob_segment_id IS NOT NULL
+      2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
+         ON    ebt.managed_segment_id = lr.lob_segment_id
+         AND   ebt.is_current_flag = 'Y'
+      3. GROUP BY lr.lob_segment_id
+      4. COMPUTE
+         metric_value = SUM(limit_amount_usd)
+    formula_sql: |
+      SELECT
+        lr.lob_segment_id AS dimension_key,
+        SUM(COALESCE(lr.limit_amount_usd, 0)) AS metric_value
+      FROM l1.limit_rule lr
+      WHERE lr.is_current_flag = 'Y'
+        AND lr.lob_segment_id IS NOT NULL
+      GROUP BY lr.lob_segment_id
   business_segment:
-    aggregation_type: SUM
-    formula_text: 'SUM of facility-level limit_amt per L1 business segment segment.
-
-      '
-    formula_sql: "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fac.metric_value) AS metric_value\nFROM (\n\
-      \  SELECT\n    fes.facility_id AS dimension_key,\n    fes.committed_amount AS metric_value\n  FROM l2.facility_exposure_snapshot\
-      \ fes\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fes.facility_id\n    AND fm.is_active_flag = 'Y'\n \
-      \ WHERE fes.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.dimension_key\n\
-      \  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n\
-      LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\nLEFT JOIN\
-      \ l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\nGROUP BY ebt_l1.managed_segment_id"
+    aggregation_type: RAW
+    formula_text: |
+      1. LOAD  l1.limit_rule  (lr)
+         WHERE lr.is_current_flag = 'Y'
+         AND   lr.lob_segment_id IS NOT NULL
+      2. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
+         ON    ebt.managed_segment_id = lr.lob_segment_id
+         AND   ebt.is_current_flag = 'Y'
+      3. GROUP BY lr.lob_segment_id
+      4. COMPUTE
+         metric_value = SUM(limit_amount_usd)
+    formula_sql: |
+      SELECT
+        lr.lob_segment_id AS dimension_key,
+        SUM(COALESCE(lr.limit_amount_usd, 0)) AS metric_value
+      FROM l1.limit_rule lr
+      WHERE lr.is_current_flag = 'Y'
+        AND lr.lob_segment_id IS NOT NULL
+      GROUP BY lr.lob_segment_id
+# ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
+# ── OUTPUT ────────────────────────────────────────────────────
 output:
   table: metric_result
+# ── VALIDATION RULES ──────────────────────────────────────────
 validations:
-- rule_id: EXP-019-V01
-  type: NOT_NULL
-  description: No null limit_amt values
-  severity: ERROR
-- rule_id: EXP-019-V02
-  type: NON_NEGATIVE
-  description: limit_amt must be >= 0
-  severity: ERROR
+  - rule_id: "EXP-019-V01"
+    type: NOT_NULL
+    description: "No null limit_amount_usd values at counterparty level"
+    severity: WARNING
+  - rule_id: "EXP-019-V02"
+    type: NON_NEGATIVE
+    description: "limit_amount_usd must be >= 0"
+    severity: ERROR
+  - rule_id: "EXP-019-V03"
+    type: THRESHOLD
+    description: "Counterparty limit should not exceed 25% of Tier 1 capital (Basel III large exposure)"
+    severity: WARNING
+    params:
+      max_value: 999999999999
+# ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
-  item_id: MET-035
-  abbreviation: EL
-  insight: 'Credit line usage rate
-
-    '
-  rollup_strategy: direct-sum
-  primary_value_field: limit_amt
-tags:
-- exposure
-- risk-metrics
+  item_id: "MET-035"
+  abbreviation: "EXPL"
+  insight: >
+    Credit line usage rate — governance control threshold representing
+    maximum approved exposure per counterparty or organizational unit.
+  rollup_strategy: "direct-sum"
+  primary_value_field: "limit_amount_usd"
+# ── METADATA ──────────────────────────────────────────────────
+tags: ["exposure", "risk-metrics", "governance", "limits"]
 dashboard_pages: []
 legacy_metric_ids: []

@@ -1253,7 +1253,7 @@
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each active facility:\n1. SUM(funded_amount) from PRINCIPAL position_detail rows per facility\n2. Subtract from committed_facility_amt to get unfunded amount\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\nEnsures: Committed Exposure = Outstanding Exposure + Undrawn Exposure\n"
+      "formula_display": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.detail_type = 'PRINCIPAL'\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   WHERE fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n   AND   fla.is_current_flag = 'Y'\n5. GROUP BY fm.facility_id\n6. COMPUTE\n   metric_value = (committed_facility_amt - SUM(funded_amount))\n                  * COALESCE(bank_share_pct, 100) / 100\n"
     },
     "worked_example_columns": [
       {
@@ -1314,16 +1314,16 @@
         },
         {
           "op": "*",
-          "field": "participation_pct",
-          "label": "participation_pct",
+          "field": "attribution_pct",
+          "label": "Risk-weighted exposure attribution percentage per counterparty",
           "sample_value": 0,
-          "source_table": "facility_counterparty_participation",
+          "source_table": "exposure_counterparty_attribution",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "For each active facility:\n1. Join position -> position_detail on position_id (both as_of_date filtered)\n2. SUM(funded_amount) across all positions for the facility\n3. Multiply by COALESCE(bank_share_pct, 100) / 100 from facility_lender_allocation\n"
+      "formula_display": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.position_detail  (pdtl)\n   ON    pdtl.position_id = pos.position_id\n   AND   pdtl.detail_type = 'PRINCIPAL'\n3. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   WHERE fm.is_active_flag = 'Y'\n4. LEFT JOIN  l2.facility_lender_allocation  (fla)\n   ON    fla.facility_id = fm.facility_id\n   AND   fla.is_current_flag = 'Y'\n5. GROUP BY pos.facility_id\n6. COMPUTE\n   metric_value = SUM(funded_amount)\n                  * COALESCE(bank_share_pct, 100) / 100\n"
     },
     "worked_example_columns": [
       {
@@ -1339,8 +1339,8 @@
         "subtotal_fn": "none"
       },
       {
-        "field": "participation_pct",
-        "header": "Participation (%)",
+        "field": "attribution_pct",
+        "header": "Attribution (%)",
         "format": "percentage",
         "subtotal_fn": "none"
       },
@@ -1356,66 +1356,122 @@
   "MET-035": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "limit_amt"
+      "primary_value": "limit_amount_usd"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "committed_amount",
-          "label": "committed_amount",
+          "field": "limit_amount_usd",
+          "label": "Approved exposure limit in USD",
           "sample_value": 0,
-          "source_table": "facility_exposure_snapshot",
-          "source_layer": "L2"
+          "source_table": "limit_rule",
+          "source_layer": "L1"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "Read limit_amt from lob_exposure_summary for each facility as-of reporting date.\n"
+      "formula_display": "Not applicable — exposure limits are set at counterparty and\norganizational levels, not per individual facility. Returns NULL.\n"
     },
     "worked_example_columns": [
       {
-        "field": "committed_amount",
-        "header": "Committed Amount",
+        "field": "limit_amount_usd",
+        "header": "Limit Amount Usd",
         "format": "number",
-        "subtotal_fn": "none"
-      },
-      {
-        "field": "limit_amt",
-        "header": "Limit ($)",
-        "format": "currency",
-        "is_result": true,
-        "subtotal_fn": "sum"
+        "subtotal_fn": "none",
+        "is_result": true
       }
     ]
   },
   "MET-036": {
     "rollup_strategy": "direct-sum",
     "metric_fields": {
-      "primary_value": "exposure_at_default"
+      "primary_value": "exposure_at_default_usd"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
-          "field": "exposure_at_default",
-          "label": "exposure_at_default",
+          "field": "drawn_amount",
+          "label": "Currently utilized/funded amount",
           "sample_value": 0,
-          "source_table": "credit_event_facility_link",
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "undrawn_amount",
+          "label": "Unfunded/undrawn commitment amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "bank_share_pct",
+          "label": "Bank's pro-rata share of the facility (%)",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "ccf",
+          "label": "Credit conversion factor — probability of undrawn converting to drawn",
+          "sample_value": 0,
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "participation_pct",
+          "label": "Counterparty participation share",
+          "sample_value": 0,
+          "source_table": "facility_counterparty_participation",
           "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "currency",
-      "formula_display": "Read exposure_at_default from credit_event_facility_link for each facility as-of reporting date.\n"
+      "formula_display": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n   WHERE fm.is_active_flag = 'Y'\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = fes.facility_id\n   AND   frs.as_of_date = fes.as_of_date\n4. GROUP BY fes.facility_id\n5. COMPUTE\n   metric_value = (drawn_amount + CCF * undrawn_amount)\n                  * bank_share_pct / 100\n"
     },
     "worked_example_columns": [
       {
-        "field": "exposure_at_default",
-        "header": "Exposure At Default",
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "undrawn_amount",
+        "header": "Undrawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "bank_share_pct",
+        "header": "Bank Share (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "ccf",
+        "header": "Ccf",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "participation_pct",
+        "header": "Participation (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "exposure_at_default_usd",
+        "header": "Exposure At Default Usd",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },
@@ -3776,32 +3832,52 @@
     ]
   },
   "MET-037": {
-    "rollup_strategy": "direct-sum",
+    "rollup_strategy": "weighted-avg",
     "metric_fields": {
-      "primary_value": "external_risk_rating"
+      "primary_value": "external_rating_notch"
     },
     "formula_decomposition": {
       "numerator": [
         {
           "op": "*",
           "field": "external_risk_rating",
-          "label": "external_risk_rating",
+          "label": "External agency rating string (e.g., AAA, AA+, BBB-)",
           "sample_value": 0,
           "source_table": "position",
           "source_layer": "L2"
+        },
+        {
+          "op": "*",
+          "field": "rating_value",
+          "label": "Numeric rating value (lower = better, e.g., 1=AAA, 21=D)",
+          "sample_value": 0,
+          "source_table": "rating_scale_dim",
+          "source_layer": "L1"
         }
       ],
       "denominator": [],
       "result_format": "number",
-      "formula_display": "Read external_risk_rating from position for each facility as-of reporting date.\n"
+      "formula_display": "1. LOAD  l2.position  (pos)\n   WHERE pos.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = pos.facility_id\n   WHERE fm.is_active_flag = 'Y'\n3. LEFT JOIN  l1.rating_scale_dim  (rs)\n   ON    rs.rating_notch = pos.external_risk_rating\n   AND   rs.is_current_flag = 'Y'\n4. COMPUTE\n   metric_value = rs.rating_value\n"
     },
     "worked_example_columns": [
       {
         "field": "external_risk_rating",
         "header": "External Risk Rating",
         "format": "number",
-        "subtotal_fn": "none",
-        "is_result": true
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "rating_value",
+        "header": "Rating Value",
+        "format": "number",
+        "subtotal_fn": "none"
+      },
+      {
+        "field": "external_rating_notch",
+        "header": "External Rating Notch",
+        "format": "number",
+        "is_result": true,
+        "subtotal_fn": "sum"
       }
     ]
   },

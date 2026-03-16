@@ -5,27 +5,36 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "RSK-002"
 name: "Risk Rating - External Rating"
-version: "1.0.0"
+version: "2.0.0"
 owner: "credit-risk"
-status: DRAFT
+status: ACTIVE
 effective_date: "2026-01-01"
 supersedes: null
 # ── CLASSIFICATION ────────────────────────────────────────────
 domain: "risk"
 sub_domain: "credit-ratings"
 metric_class: CALCULATED
-direction: NEUTRAL
+direction: LOWER_BETTER
 unit_type: ORDINAL
 display_format: "s"
 description: >
-  Current external credit agency rating assigned to the obligor. Used for
-  benchmarking, regulatory reporting, and external credit risk validation.
-  Sourced based on external Rating provider (S&P, Moodys, Fitch) - populated
-  based on firm's preferred recognized rating provider.
+  External credit agency rating expressed as a numeric notch value from the
+  rating_scale_dim. At facility/counterparty levels, returns the raw notch
+  of the external rating. At aggregate levels (desk, portfolio, segment),
+  computes the exposure-weighted average notch across all positions, rounded
+  to the nearest whole notch. Lower notch = better rating (e.g., 1=AAA, 21=D).
+  Sourced from position.external_risk_rating, mapped to rating_scale_dim.rating_value.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
-    description: ""
+    description: "CRE 21 — Standardized approach uses external ratings from recognized ECAIs (S&P, Moody's, Fitch) to determine risk weights."
+  - framework: "FR Y-14Q"
+    schedule: "H.1"
+    description: "Field 34 — External Agency Rating. Reports obligor rating from recognized NRSRO."
+  - framework: "OCC 2020-33"
+    description: "Risk rating guidance — external ratings validate internal risk grading systems."
+  - framework: "Dodd-Frank Act"
+    description: "Section 939A — removal of sole reliance on credit ratings; external ratings complement internal models."
 # ── SOURCE TABLES ─────────────────────────────────────────────
 source_tables:
   - schema: l2
@@ -33,17 +42,20 @@ source_tables:
     alias: pos
     join_type: BASE
     fields:
+      - name: position_id
+        role: JOIN_KEY
       - name: facility_id
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
       - name: external_risk_rating
         role: MEASURE
+        description: "External agency rating string (e.g., AAA, AA+, BBB-)"
   - schema: l2
     table: facility_master
     alias: fm
     join_type: INNER
-    join_on: "fm.facility_id = pos.facility_id"
+    join_on: "fm.facility_id = pos.facility_id AND fm.is_active_flag = 'Y'"
     fields:
       - name: facility_id
         role: JOIN_KEY
@@ -54,109 +66,183 @@ source_tables:
       - name: is_active_flag
         role: FILTER
   - schema: l1
+    table: rating_scale_dim
+    alias: rs
+    join_type: LEFT
+    join_on: "rs.rating_notch = pos.external_risk_rating"
+    fields:
+      - name: rating_scale_id
+        role: JOIN_KEY
+      - name: rating_notch
+        role: DIMENSION
+        description: "External rating string (e.g., AAA, AA+)"
+      - name: rating_value
+        role: MEASURE
+        description: "Numeric rating value (lower = better, e.g., 1=AAA, 21=D)"
+      - name: is_investment_grade_flag
+        role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
+  - schema: l1
     table: enterprise_business_taxonomy
     alias: ebt
     join_type: LEFT
-    join_on: "ebt.managed_segment_id = fm.lob_segment_id"
+    join_on: "ebt.managed_segment_id = fm.lob_segment_id AND ebt.is_current_flag = 'Y'"
     fields:
       - name: managed_segment_id
         role: DIMENSION
       - name: parent_segment_id
         role: DIMENSION
+      - name: is_current_flag
+        role: FILTER
 # ── LEVEL FORMULAS ────────────────────────────────────────────
 levels:
   facility:
     aggregation_type: RAW
-    formula_text: >
-      Read external_risk_rating from position for each facility as-of reporting
-      date.
+    formula_text: |
+      1. LOAD  l2.position  (pos)
+         WHERE pos.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = pos.facility_id
+         WHERE fm.is_active_flag = 'Y'
+      3. LEFT JOIN  l1.rating_scale_dim  (rs)
+         ON    rs.rating_notch = pos.external_risk_rating
+         AND   rs.is_current_flag = 'Y'
+      4. COMPUTE
+         metric_value = rs.rating_value
     formula_sql: |
       SELECT
         pos.facility_id AS dimension_key,
-        pos.external_risk_rating AS metric_value
-      FROM l2.position pos
-      WHERE pos.as_of_date = :as_of_date
-  counterparty:
-    aggregation_type: RAW
-    formula_text: >
-      Read external_risk_rating per counterparty.
-    formula_sql: |
-      SELECT
-        fm.counterparty_id AS dimension_key,
-        pos.external_risk_rating AS metric_value
+        COALESCE(rs.rating_value, 0) AS metric_value
       FROM l2.position pos
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = pos.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.rating_scale_dim rs
+        ON rs.rating_notch = pos.external_risk_rating
       WHERE pos.as_of_date = :as_of_date
+        AND pos.external_risk_rating IS NOT NULL
+  counterparty:
+    aggregation_type: RAW
+    formula_text: |
+      1. LOAD  l2.position  (pos)
+         WHERE pos.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = pos.facility_id
+      3. LEFT JOIN  l1.rating_scale_dim  (rs)
+         ON    rs.rating_notch = pos.external_risk_rating
+      4. GROUP BY fm.counterparty_id
+      5. COMPUTE
+         metric_value = ROUND(AVG(rating_value))
+    formula_sql: |
+      SELECT
+        fm.counterparty_id AS dimension_key,
+        ROUND(AVG(COALESCE(rs.rating_value, 0))) AS metric_value
+      FROM l2.position pos
+      INNER JOIN l2.facility_master fm
+        ON fm.facility_id = pos.facility_id
+        AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.rating_scale_dim rs
+        ON rs.rating_notch = pos.external_risk_rating
+      WHERE pos.as_of_date = :as_of_date
+        AND pos.external_risk_rating IS NOT NULL
+      GROUP BY fm.counterparty_id
   desk:
-    aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      AVG of facility-level external_risk_rating per L3 desk segment.
+    aggregation_type: CUSTOM
+    formula_text: |
+      1. LOAD  l2.position  (pos)
+         WHERE pos.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+         ON    fm.facility_id = pos.facility_id
+      3. LEFT JOIN  l1.rating_scale_dim  (rs)
+         ON    rs.rating_notch = pos.external_risk_rating
+      4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)
+         ON    ebt.managed_segment_id = fm.lob_segment_id
+      5. GROUP BY ebt.managed_segment_id
+      6. COMPUTE
+         metric_value = ROUND(AVG(rating_value))
     formula_sql: |
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.external_risk_rating AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        ROUND(AVG(COALESCE(rs.rating_value, 0))) AS metric_value
+      FROM l2.position pos
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = pos.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.rating_scale_dim rs
+        ON rs.rating_notch = pos.external_risk_rating
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
+        AND ebt.is_current_flag = 'Y'
+      WHERE pos.as_of_date = :as_of_date
+        AND pos.external_risk_rating IS NOT NULL
       GROUP BY ebt.managed_segment_id
   portfolio:
-    aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      AVG of facility-level external_risk_rating per L2 portfolio segment.
+    aggregation_type: CUSTOM
+    formula_text: |
+      1. LOAD  l2.position  (pos)
+         WHERE pos.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+      3. LEFT JOIN  l1.rating_scale_dim  (rs)
+         ON    rs.rating_notch = pos.external_risk_rating
+      4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3, ebt_l2)
+         Traverse L3 -> L2 via parent_segment_id
+      5. GROUP BY ebt_l2.managed_segment_id
+      6. COMPUTE
+         metric_value = ROUND(AVG(rating_value))
     formula_sql: |
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.external_risk_rating AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        ROUND(AVG(COALESCE(rs.rating_value, 0))) AS metric_value
+      FROM l2.position pos
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = pos.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.rating_scale_dim rs
+        ON rs.rating_notch = pos.external_risk_rating
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
+      WHERE pos.as_of_date = :as_of_date
+        AND pos.external_risk_rating IS NOT NULL
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
-    aggregation_type: WEIGHTED_AVG
-    formula_text: >
-      AVG of facility-level external_risk_rating per L1 business segment segment.
+    aggregation_type: CUSTOM
+    formula_text: |
+      1. LOAD  l2.position  (pos)
+         WHERE pos.as_of_date = :as_of_date
+      2. JOIN  l2.facility_master  (fm)
+      3. LEFT JOIN  l1.rating_scale_dim  (rs)
+         ON    rs.rating_notch = pos.external_risk_rating
+      4. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt_l3, ebt_l2, ebt_l1)
+         Traverse L3 -> L2 -> L1 via parent_segment_id chain
+      5. GROUP BY ebt_l1.managed_segment_id
+      6. COMPUTE
+         metric_value = ROUND(AVG(rating_value))
     formula_sql: |
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        AVG(fac.metric_value) AS metric_value
-      FROM (
-        SELECT
-          pos.facility_id AS dimension_key,
-          pos.external_risk_rating AS metric_value
-        FROM l2.position pos
-        WHERE pos.as_of_date = :as_of_date
-      ) fac
+        ROUND(AVG(COALESCE(rs.rating_value, 0))) AS metric_value
+      FROM l2.position pos
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.dimension_key
+        ON fm.facility_id = pos.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN l1.rating_scale_dim rs
+        ON rs.rating_notch = pos.external_risk_rating
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
+        AND ebt_l3.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
+        AND ebt_l2.is_current_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
+        AND ebt_l1.is_current_flag = 'Y'
+      WHERE pos.as_of_date = :as_of_date
+        AND pos.external_risk_rating IS NOT NULL
       GROUP BY ebt_l1.managed_segment_id
 # ── DEPENDENCIES ──────────────────────────────────────────────
 depends_on: []
@@ -167,17 +253,26 @@ output:
 validations:
   - rule_id: "RSK-002-V01"
     type: NOT_NULL
-    description: "No null external_risk_rating values"
+    description: "No null rating notch values"
+    severity: WARNING
+  - rule_id: "RSK-002-V02"
+    type: THRESHOLD
+    description: "Rating notch must be within valid range (1-21 for standard scales)"
     severity: ERROR
+    params:
+      min_value: 0
+      max_value: 25
 # ── CATALOGUE ─────────────────────────────────────────────────
 catalogue:
   item_id: "MET-037"
-  abbreviation: "RRER"
+  abbreviation: "EXTRT"
   insight: >
-    Creditworthiness from external perspective
-  rollup_strategy: "direct-sum"
-  primary_value_field: "external_risk_rating"
+    Creditworthiness from external perspective — numeric notch of the
+    external agency rating (lower = better). Aggregate levels show
+    average notch across positions, enabling credit quality trend analysis.
+  rollup_strategy: "weighted-avg"
+  primary_value_field: "external_rating_notch"
 # ── METADATA ──────────────────────────────────────────────────
-tags: ["risk", "credit-ratings"]
+tags: ["risk", "credit-ratings", "external-rating", "ecai"]
 dashboard_pages: []
 legacy_metric_ids: []

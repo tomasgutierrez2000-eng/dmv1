@@ -101,7 +101,7 @@ export default function LibraryMainView() {
               placeholder="Search by name, abbreviation, definition, or source field…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow"
             />
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
           </div>
@@ -207,7 +207,7 @@ export default function LibraryMainView() {
                 <Link
                   key={item.item_id}
                   href={`/metrics/library/${encodeURIComponent(item.item_id)}`}
-                  className="bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
+                  className="bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:shadow-md cursor-pointer transition-all duration-200 block overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 no-underline"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">

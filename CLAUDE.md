@@ -366,6 +366,7 @@ npm run db:introspect    # Introspect PostgreSQL → update data dictionary
 npm run sync:data-model  # Sync model from DDL (offline fallback) or DB
 npm run export:data-model # Export to Excel
 npm run validate         # Validate cross-referential integrity
+npm run validate:l1      # Validate L1 reference data quality rules
 npm run doc:sync         # Sync table/metric counts in CLAUDE.md + playbook docs
 ```
 
@@ -441,6 +442,118 @@ postgresql://postgres:<password>@localhost:5433/postgres_capital
 psql -d postgres -f sql/migrations/002-capital-metrics.sql
 psql -d postgres -f sql/migrations/002a-capital-metrics-seed.sql
 ```
+
+## L1 Reference Data Quality Rules
+
+L1 reference data is the foundation of all metric calculations and rollups. Errors in L1 silently corrupt L2/L3 outputs. These rules codify lessons from the GSIB L1 audit and MUST be followed when adding or modifying L1 tables and seed data.
+
+### EBT Hierarchy Rules
+- Root node (400249 "Enterprise") MUST have `parent_segment_id = NULL` — any other value creates circular references or orphaned subtrees
+- All `facility_master.lob_segment_id` values MUST point to **LEAF nodes** (nodes with no children in `enterprise_business_taxonomy`) — never assign facilities to parent/portfolio/segment-level EBT nodes
+- Verify leaf status: `SELECT managed_segment_id FROM l1.enterprise_business_taxonomy WHERE managed_segment_id NOT IN (SELECT DISTINCT parent_segment_id FROM l1.enterprise_business_taxonomy WHERE parent_segment_id IS NOT NULL)`
+- All EBT joins MUST include `AND ebt.is_current_flag = 'Y'` — without it, historical/inactive nodes pollute rollup results
+- After any EBT data change, verify the hierarchy is a proper tree (no cycles, single root, all leaves reachable)
+
+### Agreement-Facility Counterparty Alignment
+- `credit_agreement_master.borrower_counterparty_id` MUST match `facility_master.counterparty_id` for all facilities under that agreement
+- **Exception:** Syndicated facilities where the `credit_agreement_counterparty_participation` (CACP) table documents the multi-party relationship
+- Verify alignment after bulk data loads:
+  ```sql
+  SELECT fm.facility_id, fm.counterparty_id, ca.borrower_counterparty_id
+  FROM l1.facility_master fm
+  JOIN l1.credit_agreement_master ca ON fm.credit_agreement_id = ca.credit_agreement_id
+  WHERE fm.counterparty_id != ca.borrower_counterparty_id
+  ```
+  Non-zero results (outside syndicated deals) indicate broken FK chains that will cause incorrect counterparty-level rollups
+
+### Benchmark Rate Transition Rules
+- Ceased benchmarks (CDOR, SOR, LIBOR) MUST have `is_active_flag = FALSE` and a populated `cessation_date`
+- Replacement rates (CORRA, SORA, TONA, ESTR) must be present and `is_active_flag = TRUE`
+- Every rate index MUST have these fields populated: `cessation_date` (NULL if still active), `fallback_to_index_id` (FK to replacement rate), `is_bmu_compliant_flag`
+- IBOR transition completeness: verify no active facilities reference ceased benchmark rates
+
+### Basel III Exposure Type Rules (CCF Requirements)
+Credit Conversion Factors per CRE 20.93 and Basel III Standardized Approach:
+
+| Facility Type | `ccf_pct` | Regulation |
+|--------------|-----------|------------|
+| Financial guarantees (GUAR, SBLC) | 100% | CRE 20.93 |
+| Performance guarantees (PERF_GUAR) | 50% | CRE 20.93 |
+| Commercial letters of credit (COMM_LC) | 20% | CRE 20.93 |
+| Unconditional commitments (COMMIT) | 40% | CRE 20.93 |
+
+- All `facility_type_dim` entries with off-balance-sheet exposure types MUST have a `ccf_pct` consistent with these regulatory requirements
+- RWA calculations in L3 depend on correct CCF values — errors here cascade to all capital metrics
+
+### Counterparty Country Field Convention
+- `country_code` (VARCHAR, ISO 3166-1 alpha-2, e.g., `'US'`, `'GB'`) is the **canonical FK** to `country_dim`
+- `country_of_domicile`, `country_of_incorporation`, `country_of_risk` are **legacy INTEGER columns** storing ISO 3166-1 numeric codes (e.g., `840` for US)
+- **Always use `country_code`** for new metric formulas, joins, and reporting — the alpha-2 code is human-readable and the standard FK target
+- Never mix alpha-2 and numeric codes in the same join chain
+
+### DPD Bucket Standard (FFIEC Alignment)
+Days Past Due buckets must follow FFIEC Call Report granularity:
+
+| Bucket Code | DPD Range | Purpose |
+|-------------|-----------|---------|
+| `CURRENT` | 0 DPD | Performing, no delinquency |
+| `1-29` | 1-29 DPD | Early delinquency detection |
+| `30-59` | 30-59 DPD | Past due, not yet classified |
+| `60-89` | 60-89 DPD | Substandard trigger |
+| `90+` | 90+ DPD | Non-accrual / default trigger |
+
+- The legacy `0-30` bucket code has been narrowed to `CURRENT` (0 DPD only)
+- The `1-29` bucket was added for early delinquency detection per FFIEC guidance
+- All delinquency metrics MUST use these 5 buckets for consistent regulatory reporting
+
+### Rating Tier PD Boundaries (GSIB Calibration)
+Internal rating tiers must map to probability of default ranges consistent with GSIB calibration standards:
+
+| Tier | PD Range | Basel III Equivalent |
+|------|----------|---------------------|
+| Investment Grade | PD <= 0.40% | Low default risk |
+| Standard | 0.40% - 2.0% | Moderate risk |
+| Substandard | 2.0% - 10.0% | Elevated risk |
+| Doubtful | 10.0% - 30.0% | High default risk |
+| Loss | 30.0% - 100.0% | Impaired / default |
+
+- Investment Grade ceiling is 0.40% (not 0.05%) — the tighter bound applies only to sovereign/bank exposures
+- `rating_scale_dim` PD boundaries must align with these tiers for consistent metric thresholding
+- Metrics using PD-based bucketing (e.g., migration matrices, EL tiering) depend on these exact boundaries
+
+### Entity Type Completeness
+`entity_type_dim` must include all Basel III exposure classes:
+
+| Code | Description | Basel III Treatment |
+|------|-------------|-------------------|
+| `CORP` | Corporate | Standard corporate RW |
+| `BANK` | Bank/FI regulated | Preferential RW (SCRA) |
+| `FI` | Financial Institution (non-bank) | Corporate RW |
+| `SOV` | Sovereign | 0-150% RW by rating |
+| `PSE` | Public Sector Entity | Preferential RW |
+| `MDB` | Multilateral Development Bank | 0% RW (qualifying) |
+| `FUND` | Investment Fund | Look-through or 1250% |
+| `INS` | Insurance | Corporate RW |
+| `PE` | Private Equity | 400% RW (speculative) |
+| `RE` | Real Estate SPV | Specialized lending |
+| `SPE` | Special Purpose Entity | Depends on structure |
+| `OTH` | Other | Conservative treatment |
+
+- PSE and MDB have preferential Basel III risk weights — missing these codes causes incorrect RWA calculations
+- All counterparties MUST have a valid `entity_type_code` FK — NULL entity types default to the most conservative capital treatment
+
+### L1 Validation Script
+Run `npm run validate:l1` after any L1 data changes (dim table modifications, seed data updates, EBT restructuring). The script checks all rules above and exits with code 1 on CRITICAL failures. Add to CI/CD pipeline for automated regression prevention.
+
+**What `validate:l1` checks:**
+- EBT hierarchy integrity (single root, no cycles, facilities on leaf nodes only)
+- Agreement-facility counterparty alignment
+- Benchmark rate transition completeness
+- CCF values for off-balance-sheet exposure types
+- DPD bucket coverage (all 5 FFIEC buckets present)
+- Rating tier PD boundary consistency
+- Entity type completeness
+- Country code FK integrity (alpha-2 format, valid `country_dim` references)
 
 ## Database Recon Indicators (Visualizer)
 The visualizer shows live reconciliation between the data dictionary and PostgreSQL:

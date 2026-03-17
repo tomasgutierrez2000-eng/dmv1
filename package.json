@@ -37,6 +37,7 @@
     "export:data-model": "tsx scripts/export-data-model-excel.ts",
     "validate": "tsx scripts/validate-data-model.ts",
     "validate:arch": "tsx scripts/validate-data-model.ts --group=9",
+    "validate:l1": "npx tsx scripts/validate-l1-data-quality.ts",
     "lint:sql": "tsx scripts/lint-sql.ts",
     "calc:run": "tsx scripts/calc_engine/cli.ts run",
     "calc:validate": "tsx scripts/calc_engine/cli.ts validate",

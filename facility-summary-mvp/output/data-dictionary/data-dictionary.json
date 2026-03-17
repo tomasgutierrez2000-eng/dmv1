@@ -34219,6 +34219,239 @@
           "data_type": "TIMESTAMP"
         }
       ]
+    },
+    {
+      "name": "metric_change_log",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "change_id",
+          "description": "",
+          "data_type": "BIGSERIAL",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "item_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "change_type",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "changed_by_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "changed_by_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "changed_by_role",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "change_reason",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "ticket_reference",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "before_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "after_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "diff_summary",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "governance_status",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "metric_sandbox_run",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "sandbox_run_id",
+          "description": "",
+          "data_type": "BIGSERIAL",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "item_id",
+          "description": "",
+          "data_type": "VARCHAR(64)"
+        },
+        {
+          "name": "run_by_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "run_by_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "level",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "proposed_sql",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "current_sql",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "proposed_row_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "current_row_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "proposed_total",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "current_total",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "reconciliation_pass",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "duration_ms",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "result_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "schema_change_log",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "change_id",
+          "description": "",
+          "data_type": "BIGSERIAL",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "change_type",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "layer",
+          "description": "",
+          "data_type": "VARCHAR(5)"
+        },
+        {
+          "name": "table_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "field_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "changed_by_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "changed_by_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "change_reason",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "before_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "after_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
     }
   ],
   "relationships": [

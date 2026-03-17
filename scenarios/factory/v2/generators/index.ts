@@ -166,12 +166,13 @@ export function generateV2Data(
   tableBreakdown['position'] = positions.length;
   tableBreakdown['position_detail'] = positionDetails.length;
 
-  // 6. Cash Flow
-  const cashFlowRows = generateCashFlowRows(stateMap, facilityIds, dates, registry);
-  if (cashFlowRows.length > 0) {
-    tables.push({ schema: 'l2', table: 'cash_flow', rows: cashFlowRows });
-    tableBreakdown['cash_flow'] = cashFlowRows.length;
-  }
+  // 6. Cash Flow — SKIPPED: l2.cash_flow table does not exist in PostgreSQL schema.
+  //    Re-enable when table is created via DDL migration.
+  // const cashFlowRows = generateCashFlowRows(stateMap, facilityIds, dates, registry);
+  // if (cashFlowRows.length > 0) {
+  //   tables.push({ schema: 'l2', table: 'cash_flow', rows: cashFlowRows });
+  //   tableBreakdown['cash_flow'] = cashFlowRows.length;
+  // }
 
   // 7. Delinquency
   const delinquencyRows = generateDelinquencyRows(stateMap, facilityIds, dates, registry);
@@ -267,12 +268,13 @@ export function generateV2Data(
   tables.push({ schema: 'l2', table: 'counterparty_financial_snapshot', rows: cpFinRows });
   tableBreakdown['counterparty_financial_snapshot'] = cpFinRows.length;
 
-  // 15. Provision (IFRS 9 ECL)
-  const provisionRows = generateProvisionRows(stateMap, facilityIds, dates, registry);
-  if (provisionRows.length > 0) {
-    tables.push({ schema: 'l2', table: 'ecl_provision_snapshot', rows: provisionRows });
-    tableBreakdown['ecl_provision_snapshot'] = provisionRows.length;
-  }
+  // 15. Provision (IFRS 9 ECL) — SKIPPED: l2.ecl_provision_snapshot table does not exist
+  //     in PostgreSQL schema. Re-enable when table is created via DDL migration.
+  // const provisionRows = generateProvisionRows(stateMap, facilityIds, dates, registry);
+  // if (provisionRows.length > 0) {
+  //   tables.push({ schema: 'l2', table: 'ecl_provision_snapshot', rows: provisionRows });
+  //   tableBreakdown['ecl_provision_snapshot'] = provisionRows.length;
+  // }
 
   // 16. Stress Test (result + breach)
   const stressRows = generateStressTestRows(

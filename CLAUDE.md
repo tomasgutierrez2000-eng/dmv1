@@ -924,3 +924,90 @@ A reusable skill for running comprehensive GSIB-level effective challenge review
 - After adding new metrics or metric domains
 - Periodic regulatory readiness review
 - Before major releases or regulatory submissions
+
+## Data Factory (Scenario & Time-Series Generator)
+
+The data factory generates GSIB-quality L2 data at scale — both scenario-based narratives and weekly time-series snapshots. Located in `scenarios/factory/`.
+
+### Architecture
+```
+scenarios/factory/
+  scenario-runner.ts      # Orchestrator: YAML → ID alloc → chain → V2 → validate → SQL
+  schema-validator.ts     # Systemic schema drift prevention (reads DD, validates all output)
+  sql-emitter.ts          # Converts validated rows → SQL INSERT statements
+  validator.ts            # FK integrity, PK uniqueness, referential checks
+  seed-time-series.ts     # Phase 2: weekly time-series for seed facilities
+  chain-builder.ts        # L1 FK chain construction (CP → agreement → facility)
+  id-registry.ts          # Central ID allocation (no collisions)
+  v2/                     # V2 state machine engine
+    time-series.ts        # Monthly step function driving all generators
+    facility-state.ts     # Per-facility mutable state (drawn amt, PD, rating, etc.)
+    generators/           # Per-table row generators (exposure, risk, pricing, etc.)
+    db-writer.ts          # Direct PG writer (alternative to SQL file output)
+```
+
+### Pipeline Flow
+1. Parse YAML scenario configs → `scenario-config.ts`
+2. Allocate IDs via central registry → `id-registry.ts`
+3. Build L1 FK chain (counterparty → agreement → facility) → `chain-builder.ts`
+4. Run V2 state machine (monthly steps, all generators) → `v2/time-series.ts`
+5. **Schema validation** (DD-based, systemic) → `schema-validator.ts`
+6. Structural validation (FK/PK/dedup) → `validator.ts`
+7. Quality controls → `quality-controls.ts`
+8. SQL emission → `sql-emitter.ts`
+
+### Schema Drift Prevention (CRITICAL)
+
+The `schema-validator.ts` module provides **systemic** protection against schema drift between the data factory and PostgreSQL. It reads the golden-source data dictionary and validates all generated data before SQL emission.
+
+**How it works:**
+1. On pipeline startup, `SchemaRegistry.fromDataDictionary()` loads `facility-summary-mvp/output/data-dictionary/data-dictionary.json`
+2. Builds an in-memory `Map<"schema.table", Set<column>>` from the DD's L1/L2/L3 arrays
+3. `validateLoadOrder()` checks that every table in `LOAD_ORDER` exists in the DD
+4. `validateAgainstSchema()` checks every generated row's table and columns against the DD
+5. Failed validation halts the pipeline with specific error messages + Levenshtein suggestions
+
+**When DDL changes (new columns, renamed fields, new tables):**
+1. Run `npm run db:introspect` (or let the PostToolUse hook auto-run it)
+2. The schema-validator will **automatically catch** any factory generators that emit columns not in the updated DD
+3. Fix the generator(s) — the error messages tell you exactly which table/column drifted
+4. No manual cross-referencing needed — the validator is the safety net
+
+**Common drift patterns caught by the validator:**
+- `is_active` → `is_active_flag` (boolean columns use `_flag` suffix in PG)
+- `is_developed_market` → `is_developed_market_flag`
+- `credit_event_facility_link_id` → `link_id` (PK field renamed)
+- `change_field` → `change_type` (column renamed in DDL migration)
+- `risk_shifting_flag` → `is_risk_shifting_flag` (missing `is_` prefix)
+
+### Running the Factory
+
+```bash
+# Generate all scenarios (S19-S56) → SQL file
+cd scenarios/factory && npx tsx scenario-runner.ts
+
+# Generate weekly time-series for seed facilities → SQL file
+cd scenarios/factory && npx tsx seed-time-series.ts
+
+# Load into PostgreSQL
+source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" -f sql/gsib-export/06-factory-scenarios-v2.sql
+source /Users/tomas/120/.env && /opt/homebrew/Cellar/postgresql@18/18.3/bin/psql "$DATABASE_URL" -f sql/gsib-export/07-seed-time-series.sql
+```
+
+### SQL Output Files
+- `sql/gsib-export/06-factory-scenarios-v2.sql` — 38 scenarios, ~16K rows
+- `sql/gsib-export/07-seed-time-series.sql` — weekly time-series, ~128K rows
+
+### Factory-Specific Lessons Learned
+
+| Bug | Example | Fix |
+|-----|---------|-----|
+| Duplicate SQL templates | `FACTORY_COUNTRY_SETUP` in both `sql-emitter.ts` AND `db-writer.ts` | Always search for duplicated constant arrays — fix in ALL locations |
+| PG returns NUMERIC as strings | `state.pd_annual.toFixed is not a function` | Use `numericize()` to convert PG query results before passing to V2 engine |
+| PG returns DATE as JS Date objects | `"time zone gmt-0400 not recognized"` in SQL | Convert Date objects to `YYYY-MM-DD` strings before SQL emission |
+| ESM/CJS pg import | `new Client()` fails with SCRAM error | Use `(pg as any).default?.Client ?? (pg as any).Client` pattern |
+| Rating tier enum mismatch | `INVESTMENT_GRADE` vs `IG_HIGH` | Always check actual enum values in V2 types, not human-readable labels |
+| Size profile enum mismatch | `MEDIUM` vs `MID` | Same — check `SizeProfile` type definition for valid values |
+| `_flag` suffix convention | `is_active` column doesn't exist | ALL boolean columns in PG use `_flag` suffix — `is_active_flag`, `is_developed_market_flag`, etc. |
+| search_path for cross-schema queries | `l1.collateral_asset_master` not found | Set `search_path TO l1, l2, public` before querying, OR remove schema prefixes |
+| ON CONFLICT for idempotent loads | Weekly data overlaps existing monthly dates | Use `ON CONFLICT DO NOTHING` so re-runs don't fail on existing data |

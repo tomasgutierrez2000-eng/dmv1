@@ -808,7 +808,7 @@ function guessPKFields(table: string, sampleRow: Record<string, unknown>): strin
   }
 
   // Common single PK field names
-  for (const f of ['position_id', 'credit_event_id', 'risk_flag_id', 'amendment_id', 'exception_id', 'cash_flow_id', 'approval_id', 'observation_id', 'attribution_id', 'provision_id']) {
+  for (const f of ['link_id', 'position_id', 'credit_event_id', 'risk_flag_id', 'amendment_id', 'exception_id', 'cash_flow_id', 'approval_id', 'observation_id', 'attribution_id', 'provision_id', 'change_detail_id']) {
     if (f in sampleRow) return [f];
   }
 

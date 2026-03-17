@@ -30,6 +30,8 @@ import type { TableData as V2TableData } from './v2/types';
 import { validateV2Output } from './validator';
 import { ReferenceDataRegistry } from './reference-data-registry';
 import { runAllQualityControls, runDriftDetection } from './quality-controls';
+import { SchemaRegistry, validateAgainstSchema, validateLoadOrder } from './schema-validator';
+import { LOAD_ORDER } from './sql-emitter';
 import type { StoryArc, RatingTier, SizeProfile } from '../../scripts/shared/mvp-config';
 import type { TimeFrequency } from './v2/types';
 
@@ -311,6 +313,28 @@ async function main() {
     console.log('Quality controls: SKIPPED (--skip-quality-controls)');
   }
 
+  // ── Schema Registry — validate generated data against data dictionary ──
+  let schemaRegistry: SchemaRegistry | undefined;
+  try {
+    schemaRegistry = SchemaRegistry.fromDataDictionary();
+    const schemaSummary = schemaRegistry.summary();
+    console.log(`Schema Registry: ${schemaSummary.tables} tables, ${schemaSummary.totalColumns} columns from DD`);
+
+    // Validate LOAD_ORDER against DD (fail-fast on stale table references)
+    const loadOrderCheck = validateLoadOrder(LOAD_ORDER, schemaRegistry);
+    if (!loadOrderCheck.valid) {
+      console.log(`\n⚠ LOAD_ORDER schema drift detected:`);
+      for (const err of loadOrderCheck.errors) {
+        console.log(`  ✗ ${err}`);
+      }
+      console.log(`Fix LOAD_ORDER in sql-emitter.ts to match the current PostgreSQL schema.`);
+      process.exit(1);
+    }
+  } catch (err) {
+    console.log(`⚠ Schema registry: ${err instanceof Error ? err.message : String(err)}`);
+    console.log('  Schema validation will be skipped — generated data may have column drift.');
+  }
+
   // Determine output mode
   const dbWriter = new DBWriter();
   const useDb = dbWriter.isAvailable() && args.output === null;
@@ -353,6 +377,24 @@ async function main() {
 
       // Generate L2 data via v2 engine
       const v2Output = generateV2Data(chain, v2Config, registry);
+
+      // Schema validation — catches table/column drift against data dictionary
+      if (schemaRegistry) {
+        const l1Tables = chainToV2Tables(chain);
+        const allGenTables = [...l1Tables, ...v2Output.tables];
+        const schemaCheck = validateAgainstSchema(allGenTables, schemaRegistry);
+        if (!schemaCheck.valid) {
+          console.log(`   ✗ SCHEMA DRIFT: ${schemaCheck.errors.length} error(s)`);
+          for (const err of schemaCheck.errors.slice(0, 10)) {
+            console.log(`     ${err}`);
+          }
+          if (schemaCheck.errors.length > 10) {
+            console.log(`     ... and ${schemaCheck.errors.length - 10} more`);
+          }
+          allValid = false;
+          continue; // Skip this scenario — column names don't match PG
+        }
+      }
 
       // Validate before any write — catches FK, PK, financial, covenant, IFRS9 issues
       const validation = validateV2Output(chain, v2Output, config);

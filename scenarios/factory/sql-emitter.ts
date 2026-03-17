@@ -48,7 +48,7 @@ export const LOAD_ORDER: string[] = [
   'l2.collateral_snapshot',
   'l2.counterparty_rating_observation',
   'l2.counterparty_financial_snapshot',
-  'l2.ecl_provision_snapshot',
+  // 'l2.ecl_provision_snapshot',  // Table does not exist in PG — re-enable after DDL migration
   'l2.financial_metric_observation',
   'l2.limit_contribution_snapshot',
   'l2.limit_utilization_event',
@@ -61,7 +61,7 @@ export const LOAD_ORDER: string[] = [
   // L2 position tables (position before position_detail)
   'l2.position',
   'l2.position_detail',
-  'l2.cash_flow',
+  // 'l2.cash_flow',  // Table does not exist in PG — re-enable after DDL migration
 
   // L2 events
   'l2.credit_event',
@@ -264,18 +264,18 @@ export function emitScenarioSql(tables: TableData[], opts: EmitOptions): string 
  * These INSERTs are idempotent (ON CONFLICT DO NOTHING).
  */
 const FACTORY_COUNTRY_SETUP = `-- Factory prerequisite: additional country_dim entries
-INSERT INTO l1.country_dim (country_code, country_name, is_active, region_code, basel_country_risk_weight, is_developed_market, is_fatf_high_risk, is_ofac_sanctioned, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('BR', 'Brazil', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'BRA', '076', 11) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active, region_code, basel_country_risk_weight, is_developed_market, is_fatf_high_risk, is_ofac_sanctioned, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('IN', 'India', 'Y', 'APAC', '50%', 'N', 'N', 'N', 'IND', '356', 12) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active, region_code, basel_country_risk_weight, is_developed_market, is_fatf_high_risk, is_ofac_sanctioned, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('MX', 'Mexico', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'MEX', '484', 13) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active, region_code, basel_country_risk_weight, is_developed_market, is_fatf_high_risk, is_ofac_sanctioned, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('AE', 'United Arab Emirates', 'Y', 'EMEA', '50%', 'N', 'N', 'N', 'ARE', '784', 14) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active, region_code, basel_country_risk_weight, is_developed_market, is_fatf_high_risk, is_ofac_sanctioned, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('KR', 'South Korea', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'KOR', '410', 15) ON CONFLICT (country_code) DO NOTHING;
-INSERT INTO l1.country_dim (country_code, country_name, is_active, region_code, basel_country_risk_weight, is_developed_market, is_fatf_high_risk, is_ofac_sanctioned, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('HK', 'Hong Kong', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'HKG', '344', 16) ON CONFLICT (country_code) DO NOTHING;
+INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('BR', 'Brazil', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'BRA', '076', 11) ON CONFLICT (country_code) DO NOTHING;
+INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('IN', 'India', 'Y', 'APAC', '50%', 'N', 'N', 'N', 'IND', '356', 12) ON CONFLICT (country_code) DO NOTHING;
+INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('MX', 'Mexico', 'Y', 'AMER', '50%', 'N', 'N', 'N', 'MEX', '484', 13) ON CONFLICT (country_code) DO NOTHING;
+INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('AE', 'United Arab Emirates', 'Y', 'EMEA', '50%', 'N', 'N', 'N', 'ARE', '784', 14) ON CONFLICT (country_code) DO NOTHING;
+INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('KR', 'South Korea', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'KOR', '410', 15) ON CONFLICT (country_code) DO NOTHING;
+INSERT INTO l1.country_dim (country_code, country_name, is_active_flag, region_code, basel_country_risk_weight, is_developed_market_flag, is_fatf_high_risk_flag, is_ofac_sanctioned_flag, iso_alpha_3, iso_numeric, jurisdiction_id) VALUES ('HK', 'Hong Kong', 'Y', 'APAC', '0%', 'Y', 'N', 'N', 'HKG', '344', 16) ON CONFLICT (country_code) DO NOTHING;
 -- Factory prerequisite: additional currency_dim entries
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('BRL', 'Brazilian Real', 'R$', 'Y', '986', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('INR', 'Indian Rupee', 'Rs', 'Y', '356', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('MXN', 'Mexican Peso', 'Mex$', 'Y', '484', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('AED', 'UAE Dirham', 'AED', 'Y', '784', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
-INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active, iso_numeric, minor_unit_decimals, is_g10_currency) VALUES ('KRW', 'South Korean Won', 'W', 'Y', '410', 0, 'N') ON CONFLICT (currency_code) DO NOTHING;
+INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('BRL', 'Brazilian Real', 'R$', 'Y', '986', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
+INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('INR', 'Indian Rupee', 'Rs', 'Y', '356', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
+INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('MXN', 'Mexican Peso', 'Mex$', 'Y', '484', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
+INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('AED', 'UAE Dirham', 'AED', 'Y', '784', 2, 'N') ON CONFLICT (currency_code) DO NOTHING;
+INSERT INTO l1.currency_dim (currency_code, currency_name, currency_symbol, is_active_flag, iso_numeric, minor_unit_decimals, is_g10_currency_flag) VALUES ('KRW', 'South Korean Won', 'W', 'Y', '410', 0, 'N') ON CONFLICT (currency_code) DO NOTHING;
 -- Factory prerequisite: l1.metric_threshold seed data
 INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (1, 1, 'WARNING', 1.25, '2024-01-01', 'Y', 'DSCR', 'Debt Service Coverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;
 INSERT INTO l1.metric_threshold (threshold_id, metric_definition_id, threshold_type, threshold_value, effective_from_date, is_active_flag, metric_code, metric_name, metric_category) VALUES (2, 1, 'BREACH', 1.00, '2024-01-01', 'Y', 'DSCR', 'Debt Service Coverage Ratio', 'CREDIT') ON CONFLICT (threshold_id) DO NOTHING;

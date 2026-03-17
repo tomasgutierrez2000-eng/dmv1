@@ -111,7 +111,7 @@ export function generateCollateralRows(
         crm_type_code: CRM_TYPE_MAP[state.collateral_type] ?? 'UNSECURED',
         mitigant_group_code: MITIGANT_GROUP_MAP[state.collateral_type] ?? 'NONE',
         mitigant_subtype: state.collateral_type,
-        risk_shifting_flag: state.collateral_type === 'CASH' ? 'Y' : 'N',
+        is_risk_shifting_flag: state.collateral_type === 'CASH' ? 'Y' : 'N',
         source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',

@@ -69,7 +69,7 @@ export function generateEventRows(
         for (const linkFacId of affectedFacilities) {
           const linkId = registry.allocate('credit_event_facility_link', 1)[0];
           creditEventFacilityLinks.push({
-            credit_event_facility_link_id: linkId,
+            link_id: linkId,
             credit_event_id: eventId,
             facility_id: linkFacId,
             as_of_date: evt.date,
@@ -127,7 +127,7 @@ export function generateEventRows(
         amendmentChangeDetails.push({
           change_detail_id: detailId,
           amendment_id: amendId,
-          change_field: changeField,
+          change_type: changeField,
           old_value: oldValue,
           new_value: newValue,
           source_system_id: FACTORY_SOURCE_SYSTEM_ID,

@@ -136,6 +136,9 @@ export async function executeCalculatorQuery(
 /**
  * Substitute :param bind parameters with safe literals for PREPARE validation.
  * PostgreSQL PREPARE does not support :param style; we use placeholder values.
+ *
+ * IMPORTANT: The fallback regex uses negative lookbehind (?<!:) to avoid
+ * corrupting PostgreSQL :: type casts (e.g., '2025-01-31'::date → '2025-01-31':NULL).
  */
 function substituteBindParamsForValidation(sql: string): string {
   const KNOWN_PARAMS: Record<string, string> = {
@@ -147,8 +150,9 @@ function substituteBindParamsForValidation(sql: string): string {
     const re = new RegExp(`:${name}\\b`, 'g');
     result = result.replace(re, literal);
   }
-  // Replace any remaining :param with NULL for validation (syntax check only)
-  result = result.replace(/:([a-zA-Z_][a-zA-Z0-9_]*)/g, 'NULL');
+  // Replace any remaining :param with NULL for validation (syntax check only).
+  // Negative lookbehind (?<!:) prevents matching :: casts (e.g., ::date, ::numeric).
+  result = result.replace(/(?<!:):([a-zA-Z_][a-zA-Z0-9_]*)/g, 'NULL');
   return result;
 }
 

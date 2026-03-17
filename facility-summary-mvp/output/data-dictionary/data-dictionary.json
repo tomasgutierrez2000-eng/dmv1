@@ -8724,7 +8724,7 @@
         {
           "name": "equity_allocation_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -19211,7 +19211,7 @@
         {
           "name": "ecl_staging_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -19369,7 +19369,7 @@
         {
           "name": "forbearance_event_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -19877,7 +19877,7 @@
         {
           "name": "watchlist_entry_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -20523,7 +20523,7 @@
         {
           "name": "allowance_movement_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -20648,7 +20648,7 @@
         {
           "name": "ecl_provision_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -21297,7 +21297,7 @@
         {
           "name": "movement_summary_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -21411,7 +21411,7 @@
           "name": "exposure_metric_cube_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -21641,7 +21641,7 @@
           "name": "risk_metric_cube_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -21857,7 +21857,7 @@
           "name": "counterparty_exposure_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -22177,7 +22177,7 @@
           "name": "facility_exposure_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -22364,7 +22364,7 @@
           "name": "portfolio_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -22517,7 +22517,7 @@
           "name": "crm_allocation_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -22719,7 +22719,7 @@
           "name": "collateral_portfolio_valuation_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -22858,7 +22858,7 @@
           "name": "limit_current_state_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23060,7 +23060,7 @@
           "name": "limit_utilization_timeseries_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23178,7 +23178,7 @@
           "name": "limit_attribution_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23331,7 +23331,7 @@
           "name": "limit_breach_fact_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23456,7 +23456,7 @@
           "name": "credit_event_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23636,7 +23636,7 @@
           "name": "rating_migration_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23768,7 +23768,7 @@
           "name": "default_loss_recovery_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -23900,7 +23900,7 @@
           "name": "report_run_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24018,7 +24018,7 @@
           "name": "report_cell_value_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24122,7 +24122,7 @@
           "name": "report_cell_contribution_fact_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24247,7 +24247,7 @@
           "name": "report_cell_rule_execution_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24372,7 +24372,7 @@
           "name": "report_validation_result_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24489,7 +24489,7 @@
           "name": "fr2590_position_snapshot_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24670,7 +24670,7 @@
           "name": "fr2590_counterparty_aggregate_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -24809,7 +24809,7 @@
           "name": "lob_exposure_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -25074,7 +25074,7 @@
           "name": "lob_profitability_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -25290,7 +25290,7 @@
           "name": "lob_pricing_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -25451,7 +25451,7 @@
           "name": "lob_delinquency_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -25633,7 +25633,7 @@
           "name": "lob_profitability_allocation_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -25787,7 +25787,7 @@
           "name": "deal_pipeline_stage_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -25913,7 +25913,7 @@
           "name": "lob_credit_quality_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -26088,7 +26088,7 @@
           "name": "kpi_period_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -26227,7 +26227,7 @@
           "name": "risk_appetite_metric_state_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -26450,7 +26450,7 @@
           "name": "executive_highlight_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -26575,7 +26575,7 @@
           "name": "counterparty_detail_snapshot_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -26882,7 +26882,7 @@
           "name": "limit_tier_status_matrix_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27021,7 +27021,7 @@
           "name": "limit_counterparty_movement_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27146,7 +27146,7 @@
           "name": "data_quality_score_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27285,7 +27285,7 @@
           "name": "legal_entity_risk_profile_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27465,7 +27465,7 @@
           "name": "data_quality_attribute_score_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27576,7 +27576,7 @@
           "name": "data_quality_trend_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27673,7 +27673,7 @@
           "name": "stress_test_result_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27854,7 +27854,7 @@
           "name": "stress_test_breach_detail_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -27986,7 +27986,7 @@
           "name": "regulatory_compliance_state_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -28111,7 +28111,7 @@
           "name": "facility_timeline_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -28222,7 +28222,7 @@
           "name": "amendment_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -28333,7 +28333,7 @@
           "name": "amendment_detail_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -28472,7 +28472,7 @@
           "name": "facility_detail_snapshot_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -28848,7 +28848,7 @@
           "name": "lob_risk_ratio_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -28980,7 +28980,7 @@
           "name": "lob_deterioration_summary_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -29147,7 +29147,7 @@
           "name": "lob_rating_distribution_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -29265,7 +29265,7 @@
           "name": "lob_top_contributors_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -29397,7 +29397,7 @@
           "name": "metric_value_fact_sk",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -30415,7 +30415,7 @@
           "name": "facility_stress_test_calc_id",
           "description": "",
           "why_required": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -30735,12 +30735,16 @@
         {
           "name": "ebitda_amt",
           "description": "",
-          "data_type": "NUMERIC(20,4)"
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)",
+          "category": "Counterparty & Entity"
         },
         {
           "name": "noi_amt",
           "description": "",
-          "data_type": "NUMERIC(20,4)"
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)",
+          "category": "Counterparty & Entity"
         }
       ]
     },
@@ -30823,7 +30827,7 @@
         {
           "name": "counterparty_derived_sk",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -31404,7 +31408,7 @@
         {
           "name": "desk_derived_sk",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -31997,7 +32001,7 @@
         {
           "name": "facility_derived_sk",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -32584,7 +32588,7 @@
         {
           "name": "portfolio_derived_sk",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -33159,7 +33163,7 @@
         {
           "name": "segment_derived_sk",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
@@ -33723,75 +33727,99 @@
     {
       "name": "data_quality_score_calc",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Data Quality & Infrastructure",
       "fields": [
         {
           "name": "table_name",
           "description": "",
+          "why_required": "",
           "data_type": "VARCHAR(100)",
           "pk_fk": {
             "is_pk": true,
             "is_composite": true
-          }
+          },
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "as_of_date",
           "description": "",
+          "why_required": "",
           "data_type": "DATE",
           "pk_fk": {
             "is_pk": true,
             "is_composite": true
-          }
+          },
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "completeness_score_pct",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "accuracy_score_pct",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "timeliness_score_pct",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "overall_dq_score_pct",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "total_row_count",
           "description": "",
-          "data_type": "INTEGER"
+          "why_required": "",
+          "data_type": "INTEGER",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "null_field_count",
           "description": "",
-          "data_type": "INTEGER"
+          "why_required": "",
+          "data_type": "INTEGER",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "anomaly_count",
           "description": "",
-          "data_type": "INTEGER"
+          "why_required": "",
+          "data_type": "INTEGER",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "created_ts",
           "description": "",
-          "data_type": "TIMESTAMP"
+          "why_required": "",
+          "data_type": "TIMESTAMP",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "updated_ts",
           "description": "",
-          "data_type": "TIMESTAMP"
+          "why_required": "",
+          "data_type": "TIMESTAMP",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "created_by",
           "description": "",
-          "data_type": "VARCHAR(100)"
+          "why_required": "",
+          "data_type": "VARCHAR(100)",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "record_source",
@@ -33811,71 +33839,220 @@
         {
           "name": "run_id",
           "description": "",
-          "data_type": "VARCHAR(64)"
+          "why_required": "",
+          "data_type": "VARCHAR(64)",
+          "category": "Data Quality & Infrastructure"
         },
         {
           "name": "model_version",
           "description": "",
-          "data_type": "VARCHAR(64)"
+          "why_required": "",
+          "data_type": "VARCHAR(64)",
+          "category": "Data Quality & Infrastructure"
         }
       ]
     },
     {
       "name": "stress_test_result_calc",
       "layer": "L3",
-      "category": "Uncategorized",
+      "category": "Stress Testing",
       "fields": [
         {
           "name": "stress_test_result_id",
           "description": "",
-          "data_type": "BIGSERIAL",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          },
+          "category": "Stress Testing"
+        },
+        {
+          "name": "position_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "facility_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "counterparty_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "scenario_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "BIGINT",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "why_required": "",
+          "data_type": "DATE",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "stressed_exposure_amt",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "stressed_expected_loss",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(20,4)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "capital_impact_pct",
+          "description": "",
+          "why_required": "",
+          "data_type": "NUMERIC(10,6)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "currency_code",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(30)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "updated_ts",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "created_by",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(100)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "record_source",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(100)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "load_timestamp",
+          "description": "",
+          "why_required": "",
+          "data_type": "TIMESTAMP",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "load_batch_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "run_id",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)",
+          "category": "Stress Testing"
+        },
+        {
+          "name": "model_version",
+          "description": "",
+          "why_required": "",
+          "data_type": "VARCHAR(64)",
+          "category": "Stress Testing"
+        }
+      ]
+    },
+    {
+      "name": "metric_change_log",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "change_id",
+          "description": "",
+          "data_type": "BIGINT",
           "pk_fk": {
             "is_pk": true,
             "is_composite": false
           }
         },
         {
-          "name": "position_id",
+          "name": "item_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(64)"
         },
         {
-          "name": "facility_id",
+          "name": "change_type",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(30)"
         },
         {
-          "name": "counterparty_id",
+          "name": "changed_by_id",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(100)"
         },
         {
-          "name": "scenario_id",
+          "name": "changed_by_name",
           "description": "",
-          "data_type": "BIGINT"
+          "data_type": "VARCHAR(200)"
         },
         {
-          "name": "as_of_date",
+          "name": "changed_by_role",
           "description": "",
-          "data_type": "DATE"
+          "data_type": "VARCHAR(30)"
         },
         {
-          "name": "stressed_exposure_amt",
+          "name": "change_reason",
           "description": "",
-          "data_type": "NUMERIC(20,4)"
+          "data_type": "TEXT"
         },
         {
-          "name": "stressed_expected_loss",
+          "name": "ticket_reference",
           "description": "",
-          "data_type": "NUMERIC(20,4)"
+          "data_type": "VARCHAR(100)"
         },
         {
-          "name": "capital_impact_pct",
+          "name": "before_snapshot",
           "description": "",
-          "data_type": "NUMERIC(10,6)"
+          "data_type": "JSONB"
         },
         {
-          "name": "currency_code",
+          "name": "after_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "diff_summary",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "governance_status",
           "description": "",
           "data_type": "VARCHAR(30)"
         },
@@ -33883,41 +34060,163 @@
           "name": "created_ts",
           "description": "",
           "data_type": "TIMESTAMP"
-        },
+        }
+      ]
+    },
+    {
+      "name": "metric_sandbox_run",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
         {
-          "name": "updated_ts",
+          "name": "sandbox_run_id",
           "description": "",
-          "data_type": "TIMESTAMP"
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
         },
         {
-          "name": "created_by",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "record_source",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "load_timestamp",
-          "description": "",
-          "data_type": "TIMESTAMP"
-        },
-        {
-          "name": "load_batch_id",
-          "description": "",
-          "data_type": "VARCHAR(100)"
-        },
-        {
-          "name": "run_id",
+          "name": "item_id",
           "description": "",
           "data_type": "VARCHAR(64)"
         },
         {
-          "name": "model_version",
+          "name": "run_by_name",
           "description": "",
-          "data_type": "VARCHAR(64)"
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "run_by_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "level",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "as_of_date",
+          "description": "",
+          "data_type": "DATE"
+        },
+        {
+          "name": "proposed_sql",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "current_sql",
+          "description": "",
+          "data_type": "TEXT"
+        },
+        {
+          "name": "proposed_row_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "current_row_count",
+          "description": "",
+          "data_type": "INTEGER"
+        },
+        {
+          "name": "proposed_total",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "current_total",
+          "description": "",
+          "data_type": "NUMERIC(20,6)"
+        },
+        {
+          "name": "reconciliation_pass",
+          "description": "",
+          "data_type": "BOOLEAN"
+        },
+        {
+          "name": "duration_ms",
+          "description": "",
+          "data_type": "BIGINT"
+        },
+        {
+          "name": "result_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "name": "schema_change_log",
+      "layer": "L3",
+      "category": "Uncategorized",
+      "fields": [
+        {
+          "name": "change_id",
+          "description": "",
+          "data_type": "BIGINT",
+          "pk_fk": {
+            "is_pk": true,
+            "is_composite": false
+          }
+        },
+        {
+          "name": "change_type",
+          "description": "",
+          "data_type": "VARCHAR(30)"
+        },
+        {
+          "name": "layer",
+          "description": "",
+          "data_type": "VARCHAR(5)"
+        },
+        {
+          "name": "table_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "field_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "changed_by_id",
+          "description": "",
+          "data_type": "VARCHAR(100)"
+        },
+        {
+          "name": "changed_by_name",
+          "description": "",
+          "data_type": "VARCHAR(200)"
+        },
+        {
+          "name": "change_reason",
+          "description": "",
+          "data_type": "VARCHAR(2000)"
+        },
+        {
+          "name": "before_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "after_snapshot",
+          "description": "",
+          "data_type": "JSONB"
+        },
+        {
+          "name": "created_ts",
+          "description": "",
+          "data_type": "TIMESTAMP"
         }
       ]
     }

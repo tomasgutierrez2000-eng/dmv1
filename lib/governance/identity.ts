@@ -1,9 +1,18 @@
 /**
  * Governance Identity — lightweight user identity for audit trail.
  *
- * No auth system exists. Identity is stored in localStorage and sent
- * as an HTTP header. Sufficient for audit trail and maker-checker
- * enforcement. Upgradeable to SSO later without schema changes.
+ * CURRENT: Identity is stored in localStorage and sent as an HTTP header.
+ * Sufficient for audit trail and maker-checker enforcement in dev/demo.
+ *
+ * SSO UPGRADE PATH (no schema changes needed):
+ * 1. Add Next-Auth or Auth.js middleware with OIDC/SAML provider
+ * 2. Replace parseGovernanceUser() to read from session JWT instead of X-Governance-User header
+ * 3. Map IdP claims to GovernanceUser: { user_id: sub, display_name: name, role: groups[0], email }
+ * 4. Remove localStorage functions (getStoredIdentity, setStoredIdentity, clearStoredIdentity)
+ * 5. Add middleware to reject unauthenticated requests to mutation endpoints
+ * 6. Existing audit trail schema (metric_change_log, schema_change_log) works unchanged
+ *
+ * The GovernanceUser type, role system, and all audit consumers are SSO-ready.
  */
 
 import type { NextRequest } from 'next/server';

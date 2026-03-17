@@ -11,6 +11,7 @@ import {
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
 import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { logSchemaChange, extractSchemaUser } from '@/lib/governance/schema-change-logger';
 
 /** Request body for adding a table. */
 interface AddTableBody {
@@ -102,6 +103,17 @@ export async function POST(request: NextRequest) {
       relationships,
     };
     writeDataDictionary(updated);
+
+    // Audit: log schema change
+    const user = extractSchemaUser(request);
+    logSchemaChange({
+      change_type: 'ADD_TABLE',
+      layer,
+      table_name: tableName,
+      changed_by_id: user.id,
+      changed_by_name: user.name,
+      after_snapshot: newTable,
+    }).catch(() => {}); // fire-and-forget
 
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'add-table', layer, tableName });

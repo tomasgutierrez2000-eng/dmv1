@@ -67,7 +67,7 @@ export async function GET() {
 
     const buf = await generateBlankTemplateBuffer();
 
-    return new Response(buf, {
+    return new Response(new Uint8Array(buf), {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

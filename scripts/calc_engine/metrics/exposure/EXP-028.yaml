@@ -92,7 +92,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
              ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
-                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
+                  / NULLIF(SUM(COALESCE(fps.avg_earning_assets_amt, 0)), 0) * 100.0
         END AS metric_value
       FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -109,7 +109,7 @@ levels:
         ebt.managed_segment_id AS dimension_key,
         CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
              ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
-                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
+                  / NULLIF(SUM(COALESCE(fps.avg_earning_assets_amt, 0)), 0) * 100.0
         END AS metric_value
       FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -129,7 +129,7 @@ levels:
         ebt_l2.managed_segment_id AS dimension_key,
         CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
              ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
-                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
+                  / NULLIF(SUM(COALESCE(fps.avg_earning_assets_amt, 0)), 0) * 100.0
         END AS metric_value
       FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -152,7 +152,7 @@ levels:
         ebt_l1.managed_segment_id AS dimension_key,
         CASE WHEN SUM(COALESCE(fps.avg_earning_assets_amt, 0)) = 0 THEN NULL
              ELSE SUM(COALESCE(fps.interest_income_amt, 0) - COALESCE(fps.interest_expense_amt, 0))
-                  / SUM(COALESCE(fps.avg_earning_assets_amt, 0)) * 100.0
+                  / NULLIF(SUM(COALESCE(fps.avg_earning_assets_amt, 0)), 0) * 100.0
         END AS metric_value
       FROM l2.facility_profitability_snapshot fps
       INNER JOIN l2.facility_master fm

@@ -63,7 +63,7 @@ function createEmptyItem(): Partial<CatalogueItem> {
     domain_ids: [],
     insight: '',
     ingredient_fields: [],
-    level_definitions: [],
+    level_definitions: createDefaultLevelDefs(),
     number_of_instances: 1,
     directly_displayed: true,
     status: 'ACTIVE' as const,
@@ -94,11 +94,6 @@ export default function MetricWizard() {
   const [item, setItem] = useState<Partial<CatalogueItem>>(createEmptyItem);
   const [saving, setSaving] = useState(false);
   const [saveResult, setSaveResult] = useState<{ ok: boolean; message: string } | null>(null);
-
-  // Initialize level definitions if empty
-  if (!item.level_definitions?.length) {
-    setItem(prev => ({ ...prev, level_definitions: createDefaultLevelDefs() }));
-  }
 
   const stepIdx = STEPS.findIndex(s => s.key === currentStep);
   const canGoNext = stepIdx < STEPS.length - 1;

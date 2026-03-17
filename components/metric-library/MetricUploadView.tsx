@@ -70,10 +70,13 @@ export default function MetricUploadView() {
   // Chat scroll ref
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Upload error state
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   // Deploy state
   const [deploying, setDeploying] = useState(false);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
-  // Demo data auto-populated from live DB during deploy (no user toggle needed)
+  const [deployProgress, setDeployProgress] = useState<DeployStep[]>([]);
 
   // ─── Handlers ──────────────────────────────────────────────────────
 
@@ -84,7 +87,9 @@ export default function MetricUploadView() {
       setValidation(null);
       setMetrics(null);
       setDeployResult(null);
+      setDeployProgress([]);
       setChatMessages([]);
+      setUploadError(null);
     }
   }, []);
 
@@ -93,33 +98,36 @@ export default function MetricUploadView() {
     const f = e.dataTransfer.files[0];
     if (f && (f.name.endsWith('.xlsx') || f.name.endsWith('.xls'))) {
       if (f.size > 50 * 1024 * 1024) {
-        setValidation({ metrics: [], summary: { total: 0, valid: 0, warnings: 0, errors: 1 } });
+        setUploadError('File too large — maximum size is 50 MB.');
         return;
       }
       setFile(f);
       setValidation(null);
       setMetrics(null);
       setDeployResult(null);
+      setDeployProgress([]);
       setChatMessages([]);
+      setUploadError(null);
     }
   }, []);
 
   const handleUpload = useCallback(async () => {
     if (!file) return;
     setUploading(true);
+    setUploadError(null);
     try {
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/metrics/library/upload', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.ok === false) {
-        setValidation({ metrics: [], summary: { total: 0, valid: 0, warnings: 0, errors: 1 } });
+        setUploadError(data.error ?? data.details ?? 'Upload failed — the server returned an error.');
       } else {
         setValidation(data.validation ?? data.data?.validation);
         setMetrics(data.metrics ?? data.data?.metrics);
       }
-    } catch {
-      setValidation({ metrics: [], summary: { total: 0, valid: 0, warnings: 0, errors: 1 } });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Network error — could not reach the server.');
     } finally {
       setUploading(false);
     }
@@ -180,7 +188,16 @@ export default function MetricUploadView() {
   const handleDeploy = useCallback(async () => {
     if (!metrics) return;
     setDeploying(true);
+    setDeployProgress([]);
+    setDeployResult(null);
+
+    // Show progressive steps as deploy runs
+    const addStep = (step: DeployStep) => setDeployProgress((prev) => [...prev, step]);
+
+    addStep({ name: 'YAML Generation', status: 'success', message: 'Writing metric definitions...', duration_ms: 0 });
+
     try {
+      const start = performance.now();
       const res = await fetch('/api/metrics/library/upload/deploy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -189,10 +206,24 @@ export default function MetricUploadView() {
           dry_run: false,
         }),
       });
+      const elapsed = Math.round(performance.now() - start);
       const data = await res.json();
-      setDeployResult(data.data ?? data);
-    } catch {
-      setDeployResult({ steps: [{ name: 'Deploy', status: 'failed', message: 'Network error', duration_ms: 0 }], overall: 'failed', deployed_metrics: [] });
+      const result: DeployResult = data.data ?? data;
+
+      // Replace progress with actual steps from server
+      setDeployProgress(result.steps ?? []);
+      setDeployResult(result);
+
+      // Update the YAML generation step with actual timing
+      if (result.steps?.length > 0) {
+        setDeployProgress(result.steps);
+      } else {
+        addStep({ name: 'Deploy', status: result.overall === 'failed' ? 'failed' : 'success', message: result.overall === 'failed' ? 'Deploy failed' : 'Complete', duration_ms: elapsed });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Network error';
+      addStep({ name: 'Deploy', status: 'failed', message: msg, duration_ms: 0 });
+      setDeployResult({ steps: [{ name: 'Deploy', status: 'failed', message: msg, duration_ms: 0 }], overall: 'failed', deployed_metrics: [] });
     } finally {
       setDeploying(false);
     }
@@ -293,6 +324,23 @@ export default function MetricUploadView() {
             </button>
           )}
         </section>
+
+        {/* Upload Error Banner */}
+        {uploadError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-red-800">Upload failed</p>
+              <p className="text-sm text-red-700 mt-1">{uploadError}</p>
+            </div>
+            <button
+              onClick={() => { setUploadError(null); setFile(null); }}
+              className="text-sm text-red-600 hover:text-red-800 font-medium"
+            >
+              Try again
+            </button>
+          </div>
+        )}
 
         {/* Section 3: Validation Report */}
         {hasValidation && (
@@ -447,14 +495,36 @@ export default function MetricUploadView() {
               All metrics passed validation. Deploy will generate YAML definitions, sync the catalogue, and auto-populate demo data from the live database.
             </p>
 
-            <button
-              onClick={handleDeploy}
-              disabled={deploying}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50"
-            >
-              {deploying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Rocket className="w-4 h-4" />}
-              {deploying ? 'Deploying...' : 'Deploy to Data Model'}
-            </button>
+            {!deploying && deployProgress.length === 0 && (
+              <button
+                onClick={handleDeploy}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700"
+              >
+                <Rocket className="w-4 h-4" />
+                Deploy to Data Model
+              </button>
+            )}
+
+            {/* Deploy progress stepper */}
+            {(deploying || deployProgress.length > 0) && !deployResult && (
+              <div className="space-y-2">
+                {deployProgress.map((step, idx) => (
+                  <div key={idx} className="flex items-center gap-3 text-sm">
+                    {step.status === 'success' ? <CheckCircle className="w-4 h-4 text-green-600 shrink-0" /> :
+                     step.status === 'failed' ? <XCircle className="w-4 h-4 text-red-600 shrink-0" /> :
+                     <Loader2 className="w-4 h-4 text-blue-600 animate-spin shrink-0" />}
+                    <span className="font-medium text-gray-700">{step.name}</span>
+                    <span className="text-gray-500">{step.message}</span>
+                  </div>
+                ))}
+                {deploying && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Loader2 className="w-4 h-4 text-blue-600 animate-spin shrink-0" />
+                    <span className="text-gray-500">Processing...</span>
+                  </div>
+                )}
+              </div>
+            )}
           </section>
         )}
 

@@ -130,7 +130,7 @@ levels:
         fm.counterparty_id AS dimension_key,
         CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
              ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
-                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -159,7 +159,7 @@ levels:
         ebt.managed_segment_id AS dimension_key,
         CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
              ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
-                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -191,7 +191,7 @@ levels:
         ebt_l2.managed_segment_id AS dimension_key,
         CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
              ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
-                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -226,7 +226,7 @@ levels:
         ebt_l1.managed_segment_id AS dimension_key,
         CASE WHEN SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0) = 0 THEN NULL
              ELSE SUM(fps.base_rate_pct * fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
-                  / SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0)
+                  / NULLIF(SUM(fes.committed_amount * COALESCE(fx.rate, 1) * COALESCE(fla.bank_share_pct, 100.0) / 100.0), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm

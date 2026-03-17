@@ -90,15 +90,15 @@ levels:
       SELECT
         pl.facility_id AS dimension_key,
         CASE
-          WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 61 THEN 3
-          WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 31 THEN 2
+          WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 61 THEN 3
+          WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 31 THEN 2
           ELSE 1
         END AS metric_value
       FROM l2.payment_ledger pl
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = pl.facility_id
         AND fm.is_active_flag = 'Y'
-      WHERE pl.payment_due_date < :as_of_date::DATE
+      WHERE pl.payment_due_date < :as_of_date
         AND pl.payment_applied_amt < pl.payment_amount_due
       GROUP BY pl.facility_id
   counterparty:
@@ -114,12 +114,12 @@ levels:
         SELECT
           pl.facility_id,
           CASE
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 61 THEN 3
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 31 THEN 2
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 61 THEN 3
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 31 THEN 2
             ELSE 1
           END AS metric_value
         FROM l2.payment_ledger pl
-        WHERE pl.payment_due_date < :as_of_date::DATE
+        WHERE pl.payment_due_date < :as_of_date
           AND pl.payment_applied_amt < pl.payment_amount_due
         GROUP BY pl.facility_id
       ) fac
@@ -140,12 +140,12 @@ levels:
         SELECT
           pl.facility_id,
           CASE
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 61 THEN 3
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 31 THEN 2
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 61 THEN 3
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 31 THEN 2
             ELSE 1
           END AS metric_value
         FROM l2.payment_ledger pl
-        WHERE pl.payment_due_date < :as_of_date::DATE
+        WHERE pl.payment_due_date < :as_of_date
           AND pl.payment_applied_amt < pl.payment_amount_due
         GROUP BY pl.facility_id
       ) fac
@@ -169,12 +169,12 @@ levels:
         SELECT
           pl.facility_id,
           CASE
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 61 THEN 3
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 31 THEN 2
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 61 THEN 3
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 31 THEN 2
             ELSE 1
           END AS metric_value
         FROM l2.payment_ledger pl
-        WHERE pl.payment_due_date < :as_of_date::DATE
+        WHERE pl.payment_due_date < :as_of_date
           AND pl.payment_applied_amt < pl.payment_amount_due
         GROUP BY pl.facility_id
       ) fac
@@ -201,12 +201,12 @@ levels:
         SELECT
           pl.facility_id,
           CASE
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 61 THEN 3
-            WHEN MAX(:as_of_date::DATE - pl.payment_due_date::DATE) >= 31 THEN 2
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 61 THEN 3
+            WHEN MAX(julianday(:as_of_date) - julianday(pl.payment_due_date)) >= 31 THEN 2
             ELSE 1
           END AS metric_value
         FROM l2.payment_ledger pl
-        WHERE pl.payment_due_date < :as_of_date::DATE
+        WHERE pl.payment_due_date < :as_of_date
           AND pl.payment_applied_amt < pl.payment_amount_due
         GROUP BY pl.facility_id
       ) fac

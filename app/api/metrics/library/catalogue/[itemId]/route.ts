@@ -17,7 +17,11 @@ export async function GET(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   const { itemId } = await params;
-  const item = getCatalogueItem(decodeURIComponent(itemId));
+  const decodedId = decodeURIComponent(itemId);
+  if (decodedId.length > 100) {
+    return jsonError('Invalid item ID', { status: 400 });
+  }
+  const item = getCatalogueItem(decodedId);
   if (!item) {
     return jsonError('Not found', { status: 404 });
   }

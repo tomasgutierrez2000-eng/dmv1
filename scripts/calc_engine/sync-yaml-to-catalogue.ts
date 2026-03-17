@@ -20,6 +20,21 @@ import { getMetricLibraryDir } from '../../lib/config';
 import type { MetricDefinition } from './types';
 import type { AggregationLevel } from './types';
 
+/**
+ * Atomic JSON file write: write to temp file then rename.
+ * Prevents corruption if process crashes mid-write during bulk operations.
+ */
+function atomicWriteJson(filePath: string, data: unknown): void {
+  const tmpPath = `${filePath}.${Date.now()}.${process.pid}.tmp`;
+  try {
+    fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2) + '\n', 'utf-8');
+    fs.renameSync(tmpPath, filePath);
+  } catch (e) {
+    try { fs.unlinkSync(tmpPath); } catch { /* ignore cleanup error */ }
+    throw e;
+  }
+}
+
 const CATALOGUE_LEVELS = ['facility', 'counterparty', 'desk', 'portfolio', 'lob'] as const;
 const YAML_TO_CATALOGUE: Record<string, (typeof CATALOGUE_LEVELS)[number]> = {
   facility: 'facility',
@@ -805,11 +820,11 @@ function main(): void {
   }
 
   if (!dryRun && (updated > 0 || created > 0)) {
-    fs.writeFileSync(cataloguePath, JSON.stringify(catalogue, null, 2) + '\n', 'utf-8');
+    atomicWriteJson(cataloguePath, catalogue);
   }
 
   if (!dryRun && (vizUpdated > 0 || active.length > 0)) {
-    fs.writeFileSync(vizConfigPath, JSON.stringify(vizConfigs, null, 2) + '\n', 'utf-8');
+    atomicWriteJson(vizConfigPath, vizConfigs);
   }
 
   const parts = [];

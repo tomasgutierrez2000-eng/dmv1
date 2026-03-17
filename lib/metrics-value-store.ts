@@ -76,7 +76,8 @@ export async function getMetricValueRowsFromDb(params: {
     } finally {
       await client.end();
     }
-  } catch {
+  } catch (err) {
+    console.error('[metric-value-store] Query failed:', err instanceof Error ? err.message : String(err));
     return null;
   }
 }

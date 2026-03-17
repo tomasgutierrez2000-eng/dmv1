@@ -32,7 +32,8 @@ function readJson<T>(filePath: string, defaultValue: T): T {
   try {
     const raw = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(raw) as T;
-  } catch {
+  } catch (err) {
+    console.error(`[metric-library] Failed to parse ${path.basename(filePath)}:`, err instanceof Error ? err.message : String(err));
     return defaultValue;
   }
 }
@@ -80,10 +81,10 @@ export function getCatalogueItems(filters?: {
         item.item_name.toLowerCase().includes(q) ||
         item.abbreviation.toLowerCase().includes(q) ||
         item.definition.toLowerCase().includes(q) ||
-        item.ingredient_fields.some(
+        item.ingredient_fields?.some(
           (f) =>
-            f.table.toLowerCase().includes(q) ||
-            f.field.toLowerCase().includes(q)
+            f?.table?.toLowerCase().includes(q) ||
+            f?.field?.toLowerCase().includes(q)
         )
     );
   }

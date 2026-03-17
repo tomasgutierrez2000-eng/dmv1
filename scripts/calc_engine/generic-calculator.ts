@@ -190,10 +190,19 @@ function extractTableRefs(sql: string): Array<{ schema: string; table: string }>
   return refs;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// sql.js WASM engine cache — avoid expensive WASM re-init per metric
+// ═══════════════════════════════════════════════════════════════
+
+let cachedSqlJs: { Database: new () => any } | null = null;
+
 /**
- * Initialize sql.js WASM engine (matches pattern from lib/metrics-calculation/sql-runner.ts).
+ * Initialize sql.js WASM engine (cached across calls).
+ * Matches pattern from lib/metrics-calculation/sql-runner.ts.
  */
 async function initSqlJsEngine(): Promise<{ Database: new () => any }> {
+  if (cachedSqlJs) return cachedSqlJs;
+
   const sqljsDir = findSqljsDistDir();
   const locateFile = (file: string) => nodePath.join(sqljsDir, file);
 
@@ -201,7 +210,8 @@ async function initSqlJsEngine(): Promise<{ Database: new () => any }> {
     const mod = await import('sql.js/dist/sql-wasm.js');
     const fn = (mod as { default?: unknown }).default ?? mod;
     if (typeof fn === 'function') {
-      return await (fn as any)({ locateFile });
+      cachedSqlJs = await (fn as any)({ locateFile });
+      return cachedSqlJs!;
     }
   } catch { /* fall through */ }
 
@@ -211,7 +221,8 @@ async function initSqlJsEngine(): Promise<{ Database: new () => any }> {
     const mod = req('sql.js') as { default?: unknown };
     const fn = mod.default ?? mod;
     if (typeof fn === 'function') {
-      return await (fn as any)({ locateFile });
+      cachedSqlJs = await (fn as any)({ locateFile });
+      return cachedSqlJs!;
     }
   } catch { /* fall through */ }
 
@@ -220,7 +231,8 @@ async function initSqlJsEngine(): Promise<{ Database: new () => any }> {
   if (typeof fn !== 'function') {
     throw new Error('Unable to initialize sql.js runtime');
   }
-  return await (fn as any)({ locateFile });
+  cachedSqlJs = await (fn as any)({ locateFile });
+  return cachedSqlJs!;
 }
 
 /**

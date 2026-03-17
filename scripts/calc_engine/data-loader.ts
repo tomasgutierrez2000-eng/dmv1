@@ -80,7 +80,9 @@ export class DataLoader {
         idleTimeoutMillis: 60_000,
         connectionTimeoutMillis: 30_000,
       });
-      this.pool.on('error', () => {}); // suppress unhandled pool errors
+      this.pool.on('error', (err) => {
+        console.error('[DataLoader] Unexpected pool error:', err instanceof Error ? err.message : String(err));
+      });
     }
     return this.pool;
   }

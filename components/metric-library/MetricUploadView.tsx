@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Upload, Download, FileText, ChevronLeft, CheckCircle, AlertTriangle,
@@ -67,6 +67,9 @@ export default function MetricUploadView() {
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
 
+  // Chat scroll ref
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
   // Deploy state
   const [deploying, setDeploying] = useState(false);
   const [deployResult, setDeployResult] = useState<DeployResult | null>(null);
@@ -89,6 +92,10 @@ export default function MetricUploadView() {
     e.preventDefault();
     const f = e.dataTransfer.files[0];
     if (f && (f.name.endsWith('.xlsx') || f.name.endsWith('.xls'))) {
+      if (f.size > 50 * 1024 * 1024) {
+        setValidation({ metrics: [], summary: { total: 0, valid: 0, warnings: 0, errors: 1 } });
+        return;
+      }
       setFile(f);
       setValidation(null);
       setMetrics(null);
@@ -149,18 +156,19 @@ export default function MetricUploadView() {
       const reply = data.reply ?? data.data?.reply ?? 'No response.';
       setChatMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
 
-      // If AI returned fixed metrics, update state
+      // If AI returned fixed metrics, validate first, then update state
       const fixed = data.fixed_metrics ?? data.data?.fixed_metrics;
       if (fixed && Array.isArray(fixed)) {
-        setMetrics(fixed);
-        // Re-validate
         const vRes = await fetch('/api/metrics/library/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ metrics: fixed }),
         });
         const vData = await vRes.json();
-        if (vData.validation) setValidation(vData.validation);
+        if (vData.validation) {
+          setMetrics(fixed);
+          setValidation(vData.validation);
+        }
       }
     } catch {
       setChatMessages((prev) => [...prev, { role: 'assistant', content: 'Failed to get AI response.' }]);
@@ -191,6 +199,11 @@ export default function MetricUploadView() {
   }, [metrics]);
 
   // ─── Derived state ─────────────────────────────────────────────────
+
+  // Auto-scroll chat to bottom on new messages
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
   const allValid = validation && validation.summary.errors === 0;
   const hasValidation = validation !== null;
@@ -401,6 +414,7 @@ export default function MetricUploadView() {
                   <Loader2 className="w-4 h-4 animate-spin" /> Thinking...
                 </div>
               )}
+              <div ref={chatEndRef} />
             </div>
 
             <div className="flex gap-2">

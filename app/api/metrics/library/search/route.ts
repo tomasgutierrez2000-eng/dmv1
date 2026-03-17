@@ -4,13 +4,16 @@ import {
   getParentMetrics,
   getVariants,
 } from '@/lib/metric-library/store';
-import { jsonSuccess } from '@/lib/api-response';
+import { jsonSuccess, jsonError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = (searchParams.get('q') ?? '').trim().toLowerCase();
   if (!q) {
     return jsonSuccess({ parents: [], variants: [] });
+  }
+  if (q.length > 200) {
+    return jsonError('Search query too long (max 200 characters)', { status: 400 });
   }
 
   const parents = getParentMetrics();

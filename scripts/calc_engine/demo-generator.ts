@@ -250,52 +250,86 @@ function selectDiverse(
     merged.sort((a, b) => Number(a[primaryValueCol]) - Number(b[primaryValueCol]));
     const n = merged.length;
 
-    // Pick from percentiles
-    const percentileIndices = [...new Set([
+    // Pick from percentiles — deduplicate indices when n is small
+    const rawIndices = [
       0,
       Math.max(0, Math.floor(n / 4)),
       Math.max(0, Math.floor(n / 2)),
       Math.max(0, Math.floor(3 * n / 4)),
       n - 1,
-    ])].sort((a, b) => a - b);
+    ];
+    const percentileIndices = [...new Set(rawIndices)].sort((a, b) => a - b);
 
-    // Prefer different counterparties
-    const selectedIds: number[] = [];
+    // Prefer different counterparties, but always prefer unique facilities
+    const selectedIds = new Set<number>();
     const seenCps = new Set<number>();
+
+    // Pass 1: pick from percentiles, prefer different counterparties
     for (const idx of percentileIndices) {
+      if (selectedIds.size >= count) break;
       const row = merged[idx]!;
+      const fid = toNum(row['facility_id']);
       const cp = toNum(row['counterparty_id']);
-      if (!seenCps.has(cp) && selectedIds.length < count) {
-        selectedIds.push(toNum(row['facility_id']));
+      if (!selectedIds.has(fid) && !seenCps.has(cp)) {
+        selectedIds.add(fid);
         seenCps.add(cp);
       }
     }
 
-    // Backfill if needed
-    if (selectedIds.length < count) {
-      for (const row of merged) {
+    // Pass 2: relax counterparty uniqueness, still from percentiles
+    if (selectedIds.size < count) {
+      for (const idx of percentileIndices) {
+        if (selectedIds.size >= count) break;
+        const row = merged[idx]!;
         const fid = toNum(row['facility_id']);
-        if (!selectedIds.includes(fid) && selectedIds.length < count) {
-          selectedIds.push(fid);
+        if (!selectedIds.has(fid)) {
+          selectedIds.add(fid);
         }
       }
     }
 
-    const selectedSet = new Set(selectedIds);
-    return fmRows.filter(f => selectedSet.has(toNum(f['facility_id'])));
+    // Pass 3: backfill from remaining merged rows
+    if (selectedIds.size < count) {
+      for (const row of merged) {
+        if (selectedIds.size >= count) break;
+        const fid = toNum(row['facility_id']);
+        if (!selectedIds.has(fid)) {
+          selectedIds.add(fid);
+        }
+      }
+    }
+
+    return fmRows.filter(f => selectedIds.has(toNum(f['facility_id'])));
   }
 
-  // No metric data — pick by counterparty diversity
+  // No metric data — pick by counterparty diversity, then backfill
+  const selected = new Set<number>();
   const seenCps = new Set<number>();
-  const selected: Record<string, unknown>[] = [];
+
+  // First pass: one per counterparty
   for (const row of fmRows) {
+    if (selected.size >= count) break;
+    const fid = toNum(row['facility_id']);
     const cp = toNum(row['counterparty_id']);
-    if (!seenCps.has(cp) && selected.length < count) {
-      selected.push(row);
+    if (!seenCps.has(cp)) {
+      selected.add(fid);
       seenCps.add(cp);
     }
   }
-  return selected.length > 0 ? selected : fmRows.slice(0, count);
+
+  // Backfill: any remaining unique facilities
+  if (selected.size < count) {
+    for (const row of fmRows) {
+      if (selected.size >= count) break;
+      const fid = toNum(row['facility_id']);
+      if (!selected.has(fid)) {
+        selected.add(fid);
+      }
+    }
+  }
+
+  const result = fmRows.filter(f => selected.has(toNum(f['facility_id'])));
+  return result.length > 0 ? result : fmRows.slice(0, count);
 }
 
 function selectRangeSpread(
@@ -469,15 +503,61 @@ function lookupIngredient(
   return String(val);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// YAML metric cache — avoids re-parsing 110 YAML files per item
+// ═══════════════════════════════════════════════════════════════
+
+let cachedMetrics: MetricDefinition[] | null = null;
+let cachedMetricIndex: Map<string, MetricDefinition> | null = null;
+
+/**
+ * Pre-load and cache all YAML metric definitions.
+ * Call once before bulk operations to avoid 109× re-parsing.
+ */
+export function preloadMetricDefinitions(): void {
+  const { metrics } = loadMetricDefinitions();
+  cachedMetrics = metrics;
+  cachedMetricIndex = new Map();
+  for (const m of metrics) {
+    // Index by metric_id
+    cachedMetricIndex.set(m.metric_id, m);
+    // Index by catalogue item_id if present
+    if (m.catalogue?.item_id) {
+      cachedMetricIndex.set(m.catalogue.item_id, m);
+    }
+    // Index by legacy IDs
+    for (const legacyId of m.legacy_metric_ids ?? []) {
+      cachedMetricIndex.set(legacyId, m);
+    }
+  }
+}
+
+/** Clear the metric cache (useful for testing). */
+export function clearMetricCache(): void {
+  cachedMetrics = null;
+  cachedMetricIndex = null;
+}
+
 /**
  * Find the MetricDefinition that corresponds to a CatalogueItem.
+ * Uses pre-built index if available (bulk mode), falls back to full load.
  */
 function findMetricForItem(item: CatalogueItem): MetricDefinition | null {
+  // Use cached index if available (bulk mode)
+  if (cachedMetricIndex) {
+    for (const searchId of [item.executable_metric_id, item.item_id]) {
+      if (!searchId) continue;
+      const found = cachedMetricIndex.get(searchId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  // Single-metric fallback: load once
   const { metrics } = loadMetricDefinitions();
   const execId = item.executable_metric_id;
   const itemId = item.item_id;
 
-  // Try executable_metric_id first, then item_id
   for (const searchId of [execId, itemId]) {
     if (!searchId) continue;
     const found = metrics.find(m =>

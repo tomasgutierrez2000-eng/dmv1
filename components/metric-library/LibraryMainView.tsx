@@ -21,14 +21,20 @@ export default function LibraryMainView() {
     setError(null);
     setLoading(true);
     Promise.all([
-      fetch('/api/metrics/library/domains').then((r) => r.json()),
-      fetch('/api/metrics/library/catalogue?status=ACTIVE').then((r) => r.json()),
+      fetch('/api/metrics/library/domains').then((r) => {
+        if (!r.ok) throw new Error(`Domains API returned ${r.status}`);
+        return r.json();
+      }),
+      fetch('/api/metrics/library/catalogue?status=ACTIVE').then((r) => {
+        if (!r.ok) throw new Error(`Catalogue API returned ${r.status}`);
+        return r.json();
+      }),
     ])
       .then(([d, c]) => {
         setDomains(Array.isArray(d) ? d : []);
         setItems(Array.isArray(c) ? c : []);
       })
-      .catch(() => setError('Could not load the data catalogue.'))
+      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load the data catalogue.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -52,8 +58,8 @@ export default function LibraryMainView() {
         item.item_name.toLowerCase().includes(q) ||
         item.abbreviation.toLowerCase().includes(q) ||
         item.definition.toLowerCase().includes(q) ||
-        item.ingredient_fields.some(
-          (f) => f.table.toLowerCase().includes(q) || f.field.toLowerCase().includes(q)
+        item.ingredient_fields?.some(
+          (f) => f?.table?.toLowerCase().includes(q) || f?.field?.toLowerCase().includes(q)
         )
     );
   }

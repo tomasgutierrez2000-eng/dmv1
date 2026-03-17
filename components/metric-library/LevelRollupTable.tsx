@@ -245,15 +245,16 @@ export default function LevelRollupTable({ levels }: { levels: LevelDefinition[]
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" role="region" aria-label="Level rollup definitions">
       <table className="w-full text-sm">
+        <caption className="sr-only">How this metric is computed at each rollup level</caption>
         <thead>
           <tr className="border-b border-gray-700 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
-            <th className="py-2 pr-4 whitespace-nowrap">Level</th>
-            <th className="py-2 pr-4 whitespace-nowrap">Display Name</th>
-            <th className="py-2 pr-4 text-center whitespace-nowrap">In Record</th>
-            <th className="py-2 pr-4 whitespace-nowrap">Sourcing</th>
-            <th className="py-2 whitespace-nowrap">Level Logic</th>
+            <th scope="col" className="py-2 pr-4 whitespace-nowrap">Level</th>
+            <th scope="col" className="py-2 pr-4 whitespace-nowrap">Display Name</th>
+            <th scope="col" className="py-2 pr-4 text-center whitespace-nowrap">In Record</th>
+            <th scope="col" className="py-2 pr-4 whitespace-nowrap">Sourcing</th>
+            <th scope="col" className="py-2 whitespace-nowrap">Level Logic</th>
           </tr>
         </thead>
         <tbody>

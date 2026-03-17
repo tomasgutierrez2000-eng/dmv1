@@ -17,9 +17,15 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { getMetricLibraryDir } from '@/lib/config';
 import { DataLoader } from './data-loader';
-import { generateDemoData } from './demo-generator';
+import { generateDemoData, preloadMetricDefinitions, clearMetricCache } from './demo-generator';
 import { loadMetricDefinitions } from './loader';
 import type { CatalogueItem } from '@/lib/metric-library/types';
+
+/** Default checkpoint interval — save every N successful metrics in batch mode */
+const CHECKPOINT_INTERVAL = 20;
+
+/** Default per-metric timeout in ms (2 minutes) */
+const PER_METRIC_TIMEOUT_MS = 120_000;
 
 const DEFAULT_AS_OF_DATE = process.env.DEFAULT_AS_OF_DATE ?? '2025-01-31';
 
@@ -114,51 +120,169 @@ async function generateSingle(
   }
 }
 
+/**
+ * Wrap a promise with a timeout. Rejects with a timeout error if not resolved in time.
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`Timeout after ${ms}ms: ${label}`)), ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
 async function generateAll(
   catalogue: CatalogueItem[],
   loader: DataLoader,
-  args: { count: number; strategy: string; asOfDate: string; persist: boolean; force: boolean },
+  args: {
+    count: number;
+    strategy: string;
+    asOfDate: string;
+    persist: boolean;
+    force: boolean;
+    parallel?: number;
+    checkpointInterval?: number;
+    timeoutMs?: number;
+  },
 ): Promise<void> {
+  const startTime = Date.now();
   let generated = 0;
   let skipped = 0;
   let failed = 0;
+  let timedOut = 0;
+  let sinceLastCheckpoint = 0;
 
-  for (const item of catalogue) {
-    // Skip items without executable metric
-    if (!item.executable_metric_id && !item.item_id) continue;
+  const checkpointInterval = args.checkpointInterval ?? CHECKPOINT_INTERVAL;
+  const timeoutMs = args.timeoutMs ?? PER_METRIC_TIMEOUT_MS;
+  const parallelism = args.parallel ?? 1;
 
-    // Skip if already has demo data
+  // Pre-load YAML metrics once (avoids 109× re-parsing)
+  preloadMetricDefinitions();
+
+  // Filter eligible items
+  const eligible = catalogue.filter(item => {
+    if (!item.executable_metric_id && !item.item_id) return false;
     if (!args.force && item.demo_data?.facilities?.length) {
-      console.log(`[${item.item_id}] Skipping — already has demo_data`);
       skipped++;
-      continue;
+      return false;
     }
+    return true;
+  });
 
-    console.log(`[${item.item_id}] Generating...`);
-    const result = await generateDemoData(item, loader, {
-      facilityCount: args.count,
-      strategy: args.strategy as 'diverse' | 'range-spread' | 'top-values',
-      asOfDate: args.asOfDate,
-    });
+  const total = eligible.length;
+  if (total === 0) {
+    console.log('No eligible items to process.');
+    console.log(`  Skipped: ${skipped}`);
+    return;
+  }
 
-    if (result.ok) {
-      item.demo_data = result.demoData;
-      generated++;
-      console.log(`  OK — ${result.diagnostics?.facilitiesSelected} facilities`);
-    } else {
-      failed++;
-      console.log(`  FAILED — ${result.error}`);
+  console.log(`Processing ${total} metrics (${skipped} skipped, parallelism=${parallelism})...\n`);
+
+  const failedItems: Array<{ id: string; error: string }> = [];
+
+  /** Process a single catalogue item with timeout protection */
+  async function processItem(item: CatalogueItem, index: number): Promise<boolean> {
+    const progress = `[${index + 1}/${total}]`;
+    const itemId = item.item_id;
+
+    try {
+      const result = await withTimeout(
+        generateDemoData(item, loader, {
+          facilityCount: args.count,
+          strategy: args.strategy as 'diverse' | 'range-spread' | 'top-values',
+          asOfDate: args.asOfDate,
+        }),
+        timeoutMs,
+        itemId,
+      );
+
+      if (result.ok) {
+        item.demo_data = result.demoData;
+        console.log(`${progress} ${itemId} — OK (${result.diagnostics?.facilitiesSelected} facilities)`);
+        return true;
+      } else {
+        failedItems.push({ id: itemId, error: result.error ?? 'Unknown error' });
+        console.log(`${progress} ${itemId} — FAILED: ${result.error}`);
+        return false;
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isTimeout = msg.startsWith('Timeout after');
+      if (isTimeout) timedOut++;
+      failedItems.push({ id: itemId, error: msg });
+      console.log(`${progress} ${itemId} — ${isTimeout ? 'TIMEOUT' : 'ERROR'}: ${msg}`);
+      return false;
     }
   }
 
+  // Sequential or parallel processing
+  if (parallelism <= 1) {
+    // Sequential mode (default)
+    for (let i = 0; i < eligible.length; i++) {
+      const ok = await processItem(eligible[i]!, i);
+      if (ok) {
+        generated++;
+        sinceLastCheckpoint++;
+      } else {
+        failed++;
+      }
+
+      // Incremental checkpoint save
+      if (args.persist && sinceLastCheckpoint >= checkpointInterval) {
+        saveCatalogue(catalogue);
+        console.log(`  [checkpoint] Saved after ${generated} generated\n`);
+        sinceLastCheckpoint = 0;
+      }
+    }
+  } else {
+    // Parallel mode — process in batches of `parallelism`
+    for (let batchStart = 0; batchStart < eligible.length; batchStart += parallelism) {
+      const batch = eligible.slice(batchStart, batchStart + parallelism);
+      const results = await Promise.allSettled(
+        batch.map((item, j) => processItem(item, batchStart + j))
+      );
+
+      for (const r of results) {
+        if (r.status === 'fulfilled' && r.value) {
+          generated++;
+          sinceLastCheckpoint++;
+        } else {
+          failed++;
+        }
+      }
+
+      // Checkpoint after each batch
+      if (args.persist && sinceLastCheckpoint >= checkpointInterval) {
+        saveCatalogue(catalogue);
+        console.log(`  [checkpoint] Saved after ${generated} generated\n`);
+        sinceLastCheckpoint = 0;
+      }
+    }
+  }
+
+  // Final save
   if (args.persist && generated > 0) {
     saveCatalogue(catalogue);
   }
 
+  // Clear the metric cache
+  clearMetricCache();
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log('\n=== Summary ===');
   console.log(`  Generated: ${generated}`);
   console.log(`  Skipped:   ${skipped}`);
-  console.log(`  Failed:    ${failed}`);
+  console.log(`  Failed:    ${failed}${timedOut > 0 ? ` (${timedOut} timed out)` : ''}`);
+  console.log(`  Elapsed:   ${elapsed}s`);
+
+  if (failedItems.length > 0) {
+    console.log('\n--- Failed Items ---');
+    for (const f of failedItems) {
+      console.log(`  ${f.id}: ${f.error}`);
+    }
+  }
 }
 
 /**
@@ -332,9 +456,27 @@ async function main(): Promise<void> {
       default: false,
       describe: 'Generate demo data from live DB instead of sample data',
     })
+    .option('parallel', {
+      type: 'number',
+      default: 1,
+      describe: 'Number of metrics to process in parallel (for --all)',
+    })
+    .option('checkpoint', {
+      type: 'number',
+      default: CHECKPOINT_INTERVAL,
+      describe: 'Save progress every N successful metrics (for --all --persist)',
+    })
+    .option('timeout', {
+      type: 'number',
+      default: PER_METRIC_TIMEOUT_MS,
+      describe: 'Per-metric timeout in ms (for --all)',
+    })
     .check((argv) => {
       if (!argv.metric && !argv.all && !argv.validate) {
         throw new Error('--metric, --all, or --validate is required');
+      }
+      if (argv.parallel && argv.parallel < 1) {
+        throw new Error('--parallel must be >= 1');
       }
       return true;
     })
@@ -361,6 +503,9 @@ async function main(): Promise<void> {
         asOfDate: argv['as-of-date'],
         persist: argv.persist,
         force: argv.force,
+        parallel: argv.parallel,
+        checkpointInterval: argv.checkpoint,
+        timeoutMs: argv.timeout,
       });
     } else {
       await generateSingle(catalogue, loader, {

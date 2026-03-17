@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { X, FileCode, ChevronDown, ChevronRight, Download } from 'lucide-react';
+import { X, FileCode, ChevronDown, ChevronRight, Download, Package } from 'lucide-react';
 import type { DataModel, TableDef } from '../../types/model';
 
 interface Props {
@@ -17,6 +17,7 @@ export default function SampleDataSqlExportModal({ model, onClose, onSuccess, on
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
   const [expandedLayers, setExpandedLayers] = useState<Set<string>>(new Set(['L1', 'L2', 'L3']));
   const [downloading, setDownloading] = useState(false);
+  const [downloadingZip, setDownloadingZip] = useState(false);
 
   const tablesByLayer = useMemo(() => {
     const grouped: Record<LayerKey, TableDef[]> = { L1: [], L2: [], L3: [] };
@@ -68,6 +69,33 @@ export default function SampleDataSqlExportModal({ model, onClose, onSuccess, on
     }
   };
 
+  const handleDownloadZip = async () => {
+    setDownloadingZip(true);
+    try {
+      const res = await fetch('/api/sample-data/export-package');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        onError(body?.error ?? res.statusText);
+        return;
+      }
+      const blob = await res.blob();
+      const disposition = res.headers.get('Content-Disposition');
+      const match = disposition?.match(/filename="?([^";\n]+)"?/);
+      const filename = match ? match[1].trim() : `credit-data-warehouse-${new Date().toISOString().slice(0, 10)}.zip`;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      onSuccess('all');
+      onClose();
+    } catch (e) {
+      onError(e instanceof Error ? e.message : 'ZIP export failed');
+    } finally {
+      setDownloadingZip(false);
+    }
+  };
+
   const layerLabels: Record<LayerKey, { label: string; color: string; bg: string; border: string }> = {
     L1: { label: 'L1 - Source / Reference', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
     L2: { label: 'L2 - Staging / Enriched', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30' },
@@ -94,9 +122,25 @@ export default function SampleDataSqlExportModal({ model, onClose, onSuccess, on
           </button>
         </div>
 
-        <p className="px-4 py-2 text-sm text-pwc-gray-light border-b border-pwc-gray-light">
-          Select one table to download its sample data as INSERT statements in a .sql file.
-        </p>
+        <div className="px-4 py-3 border-b border-pwc-gray-light space-y-2">
+          <button
+            type="button"
+            onClick={handleDownloadZip}
+            disabled={downloadingZip}
+            className="w-full px-4 py-2.5 rounded-lg bg-pwc-orange hover:bg-pwc-orange-light text-pwc-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+          >
+            <Package className="w-4 h-4" />
+            {downloadingZip ? 'Generating ZIP...' : 'Download All — DDL + Data (ZIP)'}
+          </button>
+          <p className="text-xs text-pwc-gray-light text-center">
+            DDL (all layers) + L1/L2 sample data + load script. L3 tables created empty (derived by calc engine).
+          </p>
+          <div className="border-t border-pwc-gray-light pt-2 mt-2">
+            <p className="text-sm text-pwc-gray-light">
+              Or select a single table below to download its data as SQL:
+            </p>
+          </div>
+        </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {(['L1', 'L2', 'L3'] as LayerKey[]).map((layer) => {

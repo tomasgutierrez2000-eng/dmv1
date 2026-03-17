@@ -29,7 +29,7 @@ import SchemaImportModal from './SchemaImportModal';
 import DdlExportModal from './DdlExportModal';
 import { useToast } from '../ui/Toast';
 
-type ExportFormat = 'png' | 'svg' | 'sql' | 'sql-postgres' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2';
+type ExportFormat = 'png' | 'svg' | 'sql' | 'sql-postgres' | 'mermaid' | 'dbml' | 'schema-json' | 'schema-excel' | 'sample-L1' | 'sample-L2' | 'db-package';
 
 function ToolbarTooltip({ children, label }: { children: React.ReactNode; label: string }) {
   return (
@@ -165,6 +165,29 @@ export default function Toolbar() {
         a.click();
         URL.revokeObjectURL(a.href);
         toast({ type: 'success', title: 'Schema exported', description: 'Excel file with 5 tabs downloaded.' });
+      }
+      return;
+    }
+    if (format === 'db-package') {
+      try {
+        const res = await fetch('/api/sample-data/export-package');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || res.statusText);
+        }
+        const blob = await res.blob();
+        const disposition = res.headers.get('Content-Disposition');
+        const match = disposition?.match(/filename="?([^";\n]+)"?/);
+        const filename = match ? match[1].trim() : `credit-data-warehouse-${new Date().toISOString().slice(0, 10)}.zip`;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast({ type: 'success', title: 'Database package exported', description: 'ZIP file with DDL, sample data, and load instructions downloaded.' });
+      } catch (e) {
+        console.error(e);
+        toast({ type: 'error', title: 'Export failed', description: e instanceof Error ? e.message : 'Failed to generate database package.' });
       }
       return;
     }
@@ -491,9 +514,8 @@ export default function Toolbar() {
                     <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">DDL</div>
                     <button onClick={() => handleExport('sql-postgres')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">PostgreSQL DDL (Cloud SQL Studio)</button>
                     <div className="h-px bg-gray-100 my-1" />
-                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Sample Data</div>
-                    <button onClick={() => handleExport('sample-L1')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L1 sample data (Excel)</button>
-                    <button onClick={() => handleExport('sample-L2')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">L2 sample data (Excel)</button>
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Database Package</div>
+                    <button onClick={() => handleExport('db-package')} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors" role="menuitem">DDL + Sample Data (ZIP)</button>
                   </div>
                 </>
               )}

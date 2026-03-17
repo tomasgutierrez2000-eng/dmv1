@@ -70,7 +70,8 @@ const ROW_COUNTS_QUERY = `
 
 const COLUMNS_QUERY = `
   SELECT table_schema, table_name, column_name, data_type,
-         character_maximum_length, numeric_precision, numeric_scale, udt_name
+         character_maximum_length, numeric_precision, numeric_scale, udt_name,
+         column_default
   FROM information_schema.columns
   WHERE table_schema IN ('l1', 'l2', 'l3')
   ORDER BY table_schema, table_name, ordinal_position
@@ -134,13 +135,14 @@ function flattenDd(dd: DataDictionary) {
  * the same formatting used when writing data-dictionary.json. This eliminates
  * any drift caused by formatter divergence.
  */
-function formatPgColumnType(row: { data_type: string; character_maximum_length?: number | null; numeric_precision?: number | null; numeric_scale?: number | null; udt_name?: string }): string {
+function formatPgColumnType(row: { data_type: string; character_maximum_length?: number | null; numeric_precision?: number | null; numeric_scale?: number | null; udt_name?: string; column_default?: string | null }): string {
   return formatPgType(
     row.data_type ?? '',
     row.character_maximum_length ?? null,
     row.numeric_precision ?? null,
     row.numeric_scale ?? null,
     row.udt_name ?? '',
+    row.column_default ?? null,
   );
 }
 

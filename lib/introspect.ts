@@ -76,6 +76,7 @@ export function formatPgType(
   numericPrecision: number | null,
   numericScale: number | null,
   udtName: string,
+  columnDefault?: string | null,
 ): string {
   switch (dataType) {
     case 'character varying':
@@ -89,8 +90,10 @@ export function formatPgType(
       if (numericPrecision != null) return `NUMERIC(${numericPrecision})`;
       return 'NUMERIC';
     case 'integer':
+      if (columnDefault && columnDefault.includes('nextval(')) return 'SERIAL';
       return 'INTEGER';
     case 'bigint':
+      if (columnDefault && columnDefault.includes('nextval(')) return 'BIGSERIAL';
       return 'BIGINT';
     case 'smallint':
       return 'SMALLINT';
@@ -203,6 +206,7 @@ export function columnToField(
     col.numeric_precision,
     col.numeric_scale,
     col.udt_name,
+    col.column_default,
   );
   const isPK = pkColumns.has(col.column_name);
   const fkKey = `${schema}.${tableName}.${col.column_name}`;
@@ -320,6 +324,7 @@ export function mergeIntoDataDictionary(
             col.numeric_precision,
             col.numeric_scale,
             col.udt_name,
+            col.column_default,
           );
           const isPK = pkColumns.has(col.column_name);
           const fkKey = `${schema}.${tableName}.${col.column_name}`;

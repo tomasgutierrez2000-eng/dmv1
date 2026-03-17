@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { jsonError, normalizeCaughtError } from '@/lib/api-response';
-import { readDataDictionary } from '@/lib/data-dictionary';
+import { readDataDictionary, type DataDictionary } from '@/lib/data-dictionary';
 import { generateLayerDdl } from '@/lib/ddl-generator';
 import { tableKeyToDbTable } from '@/lib/db-table-mapping';
 import path from 'path';
@@ -32,11 +32,79 @@ function readSampleData(filePath: string): SampleDataFile {
   }
 }
 
+/**
+ * Topological sort of table keys by FK dependencies (Kahn's algorithm).
+ * Parents (referenced tables) come before children (referencing tables).
+ *
+ * Note: Sample data keys use the file's layer prefix (e.g. "L1.counterparty")
+ * which may differ from the DD's canonical layer (e.g. counterparty is L2 in DD).
+ * We match relationships by table name alone, checking all keys.
+ */
+function topoSortTableKeys(tableKeys: string[], dd: DataDictionary): string[] {
+  // Map: bare table name → sample data key (e.g. "counterparty" → "L1.counterparty")
+  const nameToKey = new Map<string, string>();
+  for (const k of tableKeys) {
+    const name = k.split('.').slice(1).join('.');
+    nameToKey.set(name, k);
+  }
+
+  // Build adjacency: child key → Set<parent key>
+  const deps = new Map<string, Set<string>>();
+  for (const k of tableKeys) deps.set(k, new Set());
+
+  for (const rel of dd.relationships) {
+    const childKey = nameToKey.get(rel.from_table);
+    const parentKey = nameToKey.get(rel.to_table);
+    if (childKey && parentKey && childKey !== parentKey) {
+      deps.get(childKey)!.add(parentKey);
+    }
+  }
+
+  // Kahn's algorithm
+  const inDegree = new Map<string, number>();
+  for (const k of tableKeys) inDegree.set(k, deps.get(k)!.size);
+
+  const reverseAdj = new Map<string, Set<string>>();
+  for (const k of tableKeys) {
+    for (const parent of deps.get(k)!) {
+      if (!reverseAdj.has(parent)) reverseAdj.set(parent, new Set());
+      reverseAdj.get(parent)!.add(k);
+    }
+  }
+
+  // Start with tables that have no dependencies
+  const queue: string[] = [];
+  for (const [k, deg] of inDegree) {
+    if (deg === 0) queue.push(k);
+  }
+  queue.sort(); // Alphabetical within same topo level for determinism
+
+  const result: string[] = [];
+  let head = 0;
+  while (head < queue.length) {
+    const k = queue[head++];
+    result.push(k);
+    for (const child of reverseAdj.get(k) ?? []) {
+      const newDeg = (inDegree.get(child) ?? 1) - 1;
+      inDegree.set(child, newDeg);
+      if (newDeg === 0) queue.push(child);
+    }
+  }
+
+  // Append any remaining tables (cycles — shouldn't happen but safety net)
+  for (const k of tableKeys) {
+    if (!result.includes(k)) result.push(k);
+  }
+
+  return result;
+}
+
 /** Generate INSERT statements for all tables in a sample data file for a given layer prefix. */
 function generateDataSql(
   sampleData: SampleDataFile,
   layerPrefix: string,
   layerLabel: string,
+  dd: DataDictionary,
 ): string {
   const lines: string[] = [
     `-- ${layerLabel} Sample Data`,
@@ -44,9 +112,10 @@ function generateDataSql(
     '',
   ];
 
-  const tableKeys = Object.keys(sampleData)
-    .filter((k) => k.startsWith(`${layerPrefix}.`))
-    .sort();
+  const tableKeys = topoSortTableKeys(
+    Object.keys(sampleData).filter((k) => k.startsWith(`${layerPrefix}.`)),
+    dd,
+  );
 
   if (tableKeys.length === 0) {
     lines.push(`-- No sample data available for ${layerLabel}`);
@@ -104,8 +173,8 @@ export async function GET() {
     const l1SampleData = readSampleData(L1_SAMPLE_DATA_PATH);
     const l2SampleData = readSampleData(L2_SAMPLE_DATA_PATH);
 
-    const l1DataSql = generateDataSql(l1SampleData, 'L1', 'L1 Reference Data');
-    const l2DataSql = generateDataSql(l2SampleData, 'L2', 'L2 Atomic Data');
+    const l1DataSql = generateDataSql(l1SampleData, 'L1', 'L1 Reference Data', dd);
+    const l2DataSql = generateDataSql(l2SampleData, 'L2', 'L2 Atomic Data', dd);
 
     const l1DataTables = Object.keys(l1SampleData).filter((k) => k.startsWith('L1.')).length;
     const l2DataTables = Object.keys(l2SampleData).filter((k) => k.startsWith('L2.')).length;

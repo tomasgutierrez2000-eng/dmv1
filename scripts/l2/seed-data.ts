@@ -1253,6 +1253,9 @@ export function getL2SeedValue(
       if (columnName === 'expected_loss_amt') return Math.round(eadVal * pdVal / 100 * lgdVal / 100);
       if (columnName === 'rwa_amt') return Math.round(eadVal * rwPct / 100);
       if (columnName === 'risk_weight_pct') return Math.round(rwPct * 100) / 100;
+      if (columnName === 'risk_weight_std_pct') return Math.round(rwPct * 100) / 100;
+      if (columnName === 'risk_weight_erba_pct') return Math.round(rwPct * 0.8 * 100) / 100;
+      if (columnName === 'is_defaulted_flag') return idx % 20 === 0 ? 'Y' : 'N';
       if (columnName === 'internal_risk_rating') return intRating(idx);
       if (columnName === 'currency_code') return currency(idx);
       break;

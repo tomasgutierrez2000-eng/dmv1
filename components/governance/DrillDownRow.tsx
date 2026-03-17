@@ -67,6 +67,8 @@ export default function DrillDownRow({
       {/* Main row */}
       <tr
         onClick={canDrillDown ? () => onToggleExpand(pathKey, level, dimKey) : undefined}
+        aria-expanded={canDrillDown ? isExpanded : undefined}
+        role={canDrillDown ? 'button' : undefined}
         className={`group/row border-b border-pwc-gray-light/20 hover:bg-pwc-gray-light/10 transition-colors
           ${canDrillDown ? 'cursor-pointer' : ''}
           ${isExpanded ? DEPTH_BG[Math.min(depth, DEPTH_BG.length - 1)] : ''}
@@ -79,8 +81,8 @@ export default function DrillDownRow({
           <span className="flex items-center gap-1.5">
             {canDrillDown ? (
               isExpanded
-                ? <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" />
-                : <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                ? <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" aria-label="Collapse" />
+                : <ChevronRight className="w-3 h-3 text-gray-500 flex-shrink-0" aria-label="Expand" />
             ) : (
               <span className="w-3 h-3 flex-shrink-0" />
             )}

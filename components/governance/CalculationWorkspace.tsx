@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Play, Loader2, Code2, AlertTriangle, ArrowUpDown, Pencil, Search,
+  Download, XCircle, Timer, Filter,
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import FormulaEditor from './FormulaEditor';
@@ -23,110 +24,7 @@ const TAB_TO_LEVEL: Record<string, string> = {
   business_segment: 'lob',
 };
 
-/* ── LTV fallback formulas (when item has no formula_sql) ──────────────────── */
-
-const LTV_FALLBACK_FORMULAS: Record<string, { sql: string; description: string }> = {
-  facility: {
-    description: 'Aggregate collateral per facility, then compute LTV = committed_amt / SUM(collateral) × 100',
-    sql: `SELECT
-  fm.facility_id AS dimension_key,
-  fm.committed_facility_amt
-    / NULLIF(SUM(cs.current_valuation_usd), 0) * 100.0 AS metric_value
-FROM l2.facility_master fm
-INNER JOIN l2.collateral_snapshot cs
-  ON cs.facility_id = fm.facility_id
-  AND cs.as_of_date = :as_of_date
-GROUP BY fm.facility_id, fm.committed_facility_amt`,
-  },
-  counterparty: {
-    description: 'SUM(committed_amt) / SUM(collateral) × 100 per counterparty. Re-derives ratio from summed components.',
-    sql: `SELECT
-  fm.counterparty_id AS dimension_key,
-  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-  END AS metric_value
-FROM (
-  SELECT
-    fm.facility_id,
-    fm.committed_facility_amt AS numerator_val,
-    SUM(cs.current_valuation_usd) AS denominator_val
-  FROM l2.facility_master fm
-  INNER JOIN l2.collateral_snapshot cs
-    ON cs.facility_id = fm.facility_id
-    AND cs.as_of_date = :as_of_date
-  GROUP BY fm.facility_id, fm.committed_facility_amt
-) fac
-INNER JOIN l2.facility_master fm
-  ON fm.facility_id = fac.facility_id
-GROUP BY fm.counterparty_id`,
-  },
-  desk: {
-    description: 'SUM(committed_amt) / SUM(collateral) × 100 per L3 desk segment.',
-    sql: `SELECT
-  ebt.managed_segment_id AS dimension_key,
-  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-  END AS metric_value
-FROM (
-  SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val,
-         SUM(cs.current_valuation_usd) AS denominator_val
-  FROM l2.facility_master fm
-  INNER JOIN l2.collateral_snapshot cs
-    ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date
-  GROUP BY fm.facility_id, fm.committed_facility_amt
-) fac
-INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt
-  ON ebt.managed_segment_id = fm.lob_segment_id
-GROUP BY ebt.managed_segment_id`,
-  },
-  portfolio: {
-    description: 'SUM(committed_amt) / SUM(collateral) × 100 per L2 portfolio segment.',
-    sql: `SELECT
-  ebt_l2.managed_segment_id AS dimension_key,
-  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-  END AS metric_value
-FROM (
-  SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val,
-         SUM(cs.current_valuation_usd) AS denominator_val
-  FROM l2.facility_master fm
-  INNER JOIN l2.collateral_snapshot cs
-    ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date
-  GROUP BY fm.facility_id, fm.committed_facility_amt
-) fac
-INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-  ON ebt_l3.managed_segment_id = fm.lob_segment_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-GROUP BY ebt_l2.managed_segment_id`,
-  },
-  business_segment: {
-    description: 'SUM(committed_amt) / SUM(collateral) × 100 per L1 business segment.',
-    sql: `SELECT
-  ebt_l1.managed_segment_id AS dimension_key,
-  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-  END AS metric_value
-FROM (
-  SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val,
-         SUM(cs.current_valuation_usd) AS denominator_val
-  FROM l2.facility_master fm
-  INNER JOIN l2.collateral_snapshot cs
-    ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date
-  GROUP BY fm.facility_id, fm.committed_facility_amt
-) fac
-INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
-  ON ebt_l3.managed_segment_id = fm.lob_segment_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
-  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
-LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
-  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
-GROUP BY ebt_l1.managed_segment_id`,
-  },
-};
+/* ── No more hardcoded LTV fallback — formulas come from catalogue only ── */
 
 const LEVEL_TABS = [
   { key: 'facility', label: 'Facility' },
@@ -137,22 +35,104 @@ const LEVEL_TABS = [
 ];
 
 export function getFormulasForItem(item: CatalogueItem | null | undefined): Record<string, { sql: string; description: string }> {
-  if (!item?.level_definitions?.length) return LTV_FALLBACK_FORMULAS;
+  if (!item?.level_definitions?.length) return {};
   const result: Record<string, { sql: string; description: string }> = {};
   for (const tab of LEVEL_TABS) {
     const levelKey = TAB_TO_LEVEL[tab.key] ?? tab.key;
     const def = item.level_definitions.find((d: LevelDefinition) => d.level === levelKey);
-    const fallback = LTV_FALLBACK_FORMULAS[tab.key];
     if (def?.formula_sql?.trim()) {
       result[tab.key] = {
         sql: def.formula_sql,
-        description: (def.level_logic || def.dashboard_display_name || fallback?.description) ?? '',
+        description: (def.level_logic || def.dashboard_display_name) ?? '',
       };
-    } else if (fallback) {
-      result[tab.key] = fallback;
     }
   }
-  return Object.keys(result).length > 0 ? result : LTV_FALLBACK_FORMULAS;
+  return result;
+}
+
+/* ── CSV Export helper ──────────────────────────────────────────────────── */
+
+function exportResultsToCSV(
+  rows: ResultRow[],
+  meta: { metricId?: string; level: string; asOfDate?: string | null; timestamp: string },
+) {
+  const keys = rows.length > 0
+    ? Object.keys(rows[0]).filter(k => k !== 'dimension_label')
+    : ['dimension_key', 'metric_value'];
+  const headerComment = [
+    `# Metric: ${meta.metricId ?? 'unknown'}`,
+    `# Level: ${meta.level}`,
+    `# as_of_date: ${meta.asOfDate ?? 'N/A'}`,
+    `# Exported: ${meta.timestamp}`,
+    `# Rows: ${rows.length}`,
+  ].join('\n');
+  const csvHeader = keys.join(',');
+  const csvRows = rows.map(r =>
+    keys.map(k => {
+      const v = r[k];
+      if (v === null || v === undefined) return '';
+      const s = String(v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"` : s;
+    }).join(','),
+  );
+  const blob = new Blob(
+    [headerComment + '\n' + csvHeader + '\n' + csvRows.join('\n')],
+    { type: 'text/csv;charset=utf-8;' },
+  );
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${meta.metricId ?? 'metric'}_${meta.level}_${meta.asOfDate ?? 'all'}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── Statistical helpers ───────────────────────────────────────────────── */
+
+function computeStats(values: number[]) {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const sum = sorted.reduce((a, b) => a + b, 0);
+  const mean = sum / sorted.length;
+  const median = sorted.length % 2 === 0
+    ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+    : sorted[Math.floor(sorted.length / 2)];
+  const variance = sorted.reduce((acc, v) => acc + (v - mean) ** 2, 0) / sorted.length;
+  const stdDev = Math.sqrt(variance);
+  const outliers = sorted.filter(v => Math.abs(v - mean) > 2 * stdDev).length;
+  return {
+    min: sorted[0], max: sorted[sorted.length - 1],
+    mean, median, stdDev, outliers, count: sorted.length,
+    p25: sorted[Math.floor(sorted.length * 0.25)],
+    p75: sorted[Math.floor(sorted.length * 0.75)],
+  };
+}
+
+/* ── Error classification ──────────────────────────────────────────────── */
+
+interface ClassifiedError {
+  message: string;
+  code: string;
+  severity: 'error' | 'warning' | 'info';
+  hint?: string;
+}
+
+function classifyError(err: unknown, status?: number): ClassifiedError {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (status === 503 || msg.includes('ECONNREFUSED') || msg.includes('connection'))
+    return { message: 'Database unavailable', code: 'DB_UNAVAILABLE', severity: 'warning',
+      hint: 'Check PostgreSQL connection status. The database may be restarting.' };
+  if (msg.includes('timeout') || msg.includes('exceeded'))
+    return { message: 'Query exceeded timeout', code: 'TIMEOUT', severity: 'warning',
+      hint: 'Simplify the formula or narrow the date range.' };
+  if (msg.includes('syntax') || msg.includes('near') || msg.includes('no such column') || msg.includes('no such table'))
+    return { message: msg, code: 'FORMULA_INVALID', severity: 'error',
+      hint: 'Check SQL syntax. Verify all table and column names exist in the data dictionary.' };
+  if (msg.includes('SAMPLE_DATA_MISSING') || msg.includes('sample data'))
+    return { message: 'No sample data found', code: 'SAMPLE_DATA_MISSING', severity: 'info',
+      hint: 'Run `npm run generate:l2` to populate sample data.' };
+  return { message: msg, code: 'UNKNOWN', severity: 'error' };
 }
 
 interface ResultRow {
@@ -204,12 +184,15 @@ export default function CalculationWorkspace({
 }: CalculationWorkspaceProps) {
   const [activeLevel, setActiveLevel] = useState('facility');
   const [rows, setRows] = useState<ResultRow[]>([]);
+  const [totalRowCount, setTotalRowCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [classifiedError, setClassifiedError] = useState<ClassifiedError | null>(null);
   const [durationMs, setDurationMs] = useState<number | null>(null);
   const [showSql, setShowSql] = useState(false);
   const [sortAsc, setSortAsc] = useState(true);
   const [showFormulaEditor, setShowFormulaEditor] = useState(false);
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const [filterText, setFilterText] = useState('');
 
   // Drill-down state
   const [drillDownMap, setDrillDownMap] = useState<Map<string, DrillDownNode>>(new Map());
@@ -221,18 +204,57 @@ export default function CalculationWorkspace({
     dimension_key: string; level: string;
   } | null>(null);
 
+  // Abort controller for cancellation
+  const abortRef = useRef<AbortController | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const levelFormulas = getFormulasForItem(item);
-  const formula = levelFormulas[activeLevel] ?? LTV_FALLBACK_FORMULAS[activeLevel];
+  const formula = levelFormulas[activeLevel];
   const metricColorFn = (v: number) => metricColor(v, item?.unit_type, item?.direction);
 
+  // Keyboard shortcut: Cmd/Ctrl+Enter to run
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!loading && asOfDate) runCalculation();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  });
+
+  const cancelCalculation = useCallback(() => {
+    abortRef.current?.abort();
+    if (timerRef.current) clearInterval(timerRef.current);
+    setLoading(false);
+    setElapsedSec(0);
+  }, []);
+
   const runCalculation = useCallback(async () => {
-    if (!asOfDate) return;
+    if (!asOfDate || !formula) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
-    setError(null);
+    setClassifiedError(null);
     setRows([]);
+    setTotalRowCount(null);
     setDurationMs(null);
     setDrillDownMap(new Map());
     setExpandedPaths(new Set());
+    setElapsedSec(0);
+    setFilterText('');
+
+    // Elapsed timer
+    const start = Date.now();
+    timerRef.current = setInterval(() => {
+      setElapsedSec(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+
+    // Timeout after 30s
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
 
     try {
       const res = await fetch('/api/metrics/governance/calculator', {
@@ -244,15 +266,20 @@ export default function CalculationWorkspace({
           level: activeLevel,
           max_rows: 1000,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || `HTTP ${res.status}`);
+        setClassifiedError(classifyError(data.error || `HTTP ${res.status}`, res.status));
+        return;
       }
 
       const resultRows = (data.rows ?? []) as ResultRow[];
       setRows(resultRows);
+      setTotalRowCount(data.total_count ?? resultRows.length);
       setDurationMs(data.duration_ms ?? null);
       onResultsChange?.(activeLevel, resultRows);
 
@@ -260,9 +287,16 @@ export default function CalculationWorkspace({
       setInspectorShouldFetch(true);
       setInspectorScopedRow(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Calculation failed');
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setClassifiedError({ message: 'Calculation timed out after 30 seconds', code: 'TIMEOUT', severity: 'warning',
+          hint: 'Try simplifying the formula or narrowing the date range. Complex JOINs with large datasets may exceed the time limit.' });
+      } else {
+        setClassifiedError(classifyError(err));
+      }
     } finally {
+      if (timerRef.current) clearInterval(timerRef.current);
       setLoading(false);
+      setElapsedSec(0);
     }
   }, [asOfDate, activeLevel, formula, onResultsChange]);
 
@@ -365,7 +399,11 @@ export default function CalculationWorkspace({
     setInspectorShouldFetch(true);
   }, [activeLevel]);
 
-  const sortedRows = [...rows].sort((a, b) => {
+  // Apply text filter then sort
+  const filteredRows = filterText
+    ? rows.filter(r => String(r.dimension_key ?? '').toLowerCase().includes(filterText.toLowerCase()))
+    : rows;
+  const sortedRows = [...filteredRows].sort((a, b) => {
     const va = Number(a.metric_value) || 0;
     const vb = Number(b.metric_value) || 0;
     return sortAsc ? va - vb : vb - va;
@@ -373,7 +411,7 @@ export default function CalculationWorkspace({
 
   // Compute summary stats
   const values = rows.map(r => Number(r.metric_value)).filter(v => !isNaN(v) && v !== null);
-  const avgValue = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+  const stats = computeStats(values);
   const isPctType = item?.unit_type === 'PERCENTAGE' || item?.unit_type === 'RATIO' || item?.unit_type === 'RATE';
   const highPctCount = isPctType ? values.filter(v => v > 100).length : 0;
 
@@ -385,7 +423,7 @@ export default function CalculationWorkspace({
           <button
             key={tab.key}
             type="button"
-            onClick={() => { setActiveLevel(tab.key); setRows([]); setError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); }}
+            onClick={() => { setActiveLevel(tab.key); setRows([]); setClassifiedError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors
               ${activeLevel === tab.key
                 ? 'bg-pwc-orange/20 text-pwc-orange border border-pwc-orange/40'
@@ -396,55 +434,71 @@ export default function CalculationWorkspace({
           </button>
         ))}
 
-        {/* Run button */}
-        <button
-          type="button"
-          onClick={runCalculation}
-          disabled={loading || !asOfDate}
-          className="ml-auto flex items-center gap-1.5 px-4 py-1.5 bg-pwc-orange text-white rounded-lg text-xs font-medium
-                     hover:bg-pwc-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
+        {/* Run / Cancel button */}
+        {loading ? (
+          <button
+            type="button"
+            onClick={cancelCalculation}
+            className="ml-auto flex items-center gap-1.5 px-4 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium
+                       hover:bg-red-500 transition-colors"
+          >
+            <XCircle className="w-3.5 h-3.5" />
+            Cancel{elapsedSec > 0 ? ` (${elapsedSec}s)` : ''}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={runCalculation}
+            disabled={!asOfDate || !formula}
+            className="ml-auto flex items-center gap-1.5 px-4 py-1.5 bg-pwc-orange text-white rounded-lg text-xs font-medium
+                       hover:bg-pwc-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Run Calculation (⌘↵)"
+          >
             <Play className="w-3.5 h-3.5" />
-          )}
-          {loading ? 'Running...' : 'Run Calculation'}
-        </button>
+            Run
+            <kbd className="ml-1 px-1 py-0.5 text-[9px] bg-white/20 rounded font-mono">⌘↵</kbd>
+          </button>
+        )}
       </div>
 
       {/* Formula description */}
       <div className="px-4 py-2 border-b border-pwc-gray-light/50 shrink-0">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-gray-400 flex-1 min-w-0">{formula.description}</p>
-          {itemId && onFormulaSave && (
+        {formula ? (
+          <>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-gray-400 flex-1 min-w-0">{formula.description}</p>
+              {itemId && onFormulaSave && (
+                <button
+                  type="button"
+                  onClick={() => setShowFormulaEditor(true)}
+                  className="flex items-center gap-1 px-2 py-1 text-[10px] text-pwc-orange hover:bg-pwc-orange/10 rounded transition-colors shrink-0"
+                >
+                  <Pencil className="w-3 h-3" />
+                  Edit formula
+                </button>
+              )}
+            </div>
             <button
               type="button"
-              onClick={() => setShowFormulaEditor(true)}
-              className="flex items-center gap-1 px-2 py-1 text-[10px] text-pwc-orange hover:bg-pwc-orange/10 rounded transition-colors shrink-0"
+              onClick={() => setShowSql(!showSql)}
+              className="flex items-center gap-1 mt-1 text-[10px] text-gray-500 hover:text-gray-400 transition-colors"
             >
-              <Pencil className="w-3 h-3" />
-              Edit formula
+              <Code2 className="w-3 h-3" />
+              {showSql ? 'Hide SQL' : 'Show SQL'}
             </button>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowSql(!showSql)}
-          className="flex items-center gap-1 mt-1 text-[10px] text-gray-500 hover:text-gray-400 transition-colors"
-        >
-          <Code2 className="w-3 h-3" />
-          {showSql ? 'Hide SQL' : 'Show SQL'}
-        </button>
-        {showSql && (
-          <pre className="mt-2 p-3 bg-pwc-black rounded-lg text-[11px] text-gray-400 font-mono overflow-x-auto whitespace-pre-wrap max-h-48">
-            {formula.sql}
-          </pre>
+            {showSql && (
+              <pre className="mt-2 p-3 bg-pwc-black rounded-lg text-[11px] text-gray-400 font-mono overflow-x-auto whitespace-pre-wrap max-h-48">
+                {formula.sql}
+              </pre>
+            )}
+          </>
+        ) : (
+          <p className="text-xs text-amber-400">No formula defined for this level. Use the Formula Editor to create one.</p>
         )}
       </div>
 
       {/* Formula Editor Modal */}
-      {showFormulaEditor && itemId && (
+      {showFormulaEditor && itemId && formula && (
         <Modal
           open={showFormulaEditor}
           onClose={() => setShowFormulaEditor(false)}
@@ -471,16 +525,34 @@ export default function CalculationWorkspace({
       <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Results table area */}
         <div className="flex-1 overflow-y-auto min-h-0">
-          {/* Error */}
-          {error && (
-            <div className="m-4 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-              {error}
+          {/* Error — classified by type */}
+          {classifiedError && (
+            <div className={`m-4 px-3 py-2 rounded-lg text-sm flex flex-col gap-1 ${
+              classifiedError.severity === 'error' ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+              : classifiedError.severity === 'warning' ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+              : 'bg-blue-500/10 border border-blue-500/30 text-blue-400'
+            }`}>
+              <div className="flex items-center gap-2">
+                {classifiedError.severity === 'error' ? <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  : classifiedError.severity === 'warning' ? <Timer className="w-4 h-4 flex-shrink-0" />
+                  : <AlertTriangle className="w-4 h-4 flex-shrink-0" />}
+                <span className="font-medium">{classifiedError.code === 'FORMULA_INVALID' ? 'Formula Error' : classifiedError.message}</span>
+              </div>
+              {classifiedError.code === 'FORMULA_INVALID' && (
+                <pre className="text-xs font-mono mt-1 p-2 rounded bg-black/30 whitespace-pre-wrap">{classifiedError.message}</pre>
+              )}
+              {classifiedError.hint && (
+                <p className="text-xs opacity-80">{classifiedError.hint}</p>
+              )}
+              <button type="button" onClick={runCalculation}
+                className="self-start mt-1 px-2 py-0.5 text-xs rounded bg-white/10 hover:bg-white/20 transition-colors">
+                Retry
+              </button>
             </div>
           )}
 
           {/* Empty state */}
-          {!loading && !error && rows.length === 0 && (
+          {!loading && !classifiedError && rows.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-gray-500">
               <Play className="w-8 h-8 mb-3 text-gray-600" />
               <p className="text-sm">Click &ldquo;Run Calculation&rdquo; to execute</p>
@@ -489,28 +561,84 @@ export default function CalculationWorkspace({
             </div>
           )}
 
-          {/* Loading */}
+          {/* Loading with elapsed timer */}
           {loading && (
-            <div className="flex items-center justify-center py-16">
+            <div className="flex flex-col items-center justify-center py-16 gap-2">
               <Loader2 className="w-6 h-6 text-pwc-orange animate-spin" />
-              <span className="ml-2 text-sm text-gray-400">Executing against PostgreSQL...</span>
+              <span className="text-sm text-gray-400">
+                Executing against PostgreSQL...
+                {elapsedSec >= 5 && <span className="text-amber-400 ml-1">({elapsedSec}s)</span>}
+              </span>
+              {elapsedSec >= 10 && (
+                <span className="text-xs text-amber-400/70 animate-pulse">Still running — complex queries may take up to 30s</span>
+              )}
             </div>
           )}
 
           {/* Results table */}
           {rows.length > 0 && (
             <>
-              {/* Summary bar */}
-              <div className="px-4 py-2 bg-pwc-black/30 border-b border-pwc-gray-light/30 flex items-center gap-4 text-xs text-gray-500 shrink-0">
-                <span>{rows.length} results</span>
-                {durationMs !== null && <span>{durationMs}ms</span>}
-                {asOfDate && <span>as_of: {asOfDate}</span>}
-                <span>Avg: <span className={metricColorFn(avgValue)}>{formatMetricValue(avgValue, item?.unit_type)}</span></span>
-                {highPctCount > 0 && (
-                  <span className="text-red-400">
-                    {highPctCount} &gt;100%
-                  </span>
+              {/* Summary bar with export & stats */}
+              <div className="px-4 py-2 bg-pwc-black/30 border-b border-pwc-gray-light/30 shrink-0 space-y-1.5">
+                <div className="flex items-center gap-4 text-xs text-gray-500">
+                  <span>{rows.length}{totalRowCount && totalRowCount > rows.length ? ` of ${totalRowCount}` : ''} results</span>
+                  {totalRowCount && totalRowCount > rows.length && (
+                    <span className="text-amber-400">(truncated)</span>
+                  )}
+                  {durationMs !== null && <span>{durationMs}ms</span>}
+                  {asOfDate && <span>as_of: {asOfDate}</span>}
+                  {stats && (
+                    <>
+                      <span>Avg: <span className={metricColorFn(stats.mean)}>{formatMetricValue(stats.mean, item?.unit_type)}</span></span>
+                      <span>Med: <span className={metricColorFn(stats.median)}>{formatMetricValue(stats.median, item?.unit_type)}</span></span>
+                    </>
+                  )}
+                  {highPctCount > 0 && (
+                    <span className="text-red-400">{highPctCount} &gt;100%</span>
+                  )}
+                  {stats && stats.outliers > 0 && (
+                    <span className="text-amber-400" title={`${stats.outliers} values more than 2 std dev from mean`}>
+                      {stats.outliers} outlier{stats.outliers !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {/* Export button */}
+                  <button
+                    type="button"
+                    onClick={() => exportResultsToCSV(rows, {
+                      metricId: itemId, level: activeLevel, asOfDate,
+                      timestamp: new Date().toISOString(),
+                    })}
+                    className="ml-auto flex items-center gap-1 px-2 py-0.5 text-gray-400 hover:text-pwc-white hover:bg-pwc-gray-light/30 rounded transition-colors"
+                    title="Export results as CSV"
+                  >
+                    <Download className="w-3 h-3" />
+                    CSV
+                  </button>
+                </div>
+                {/* Extended stats row */}
+                {stats && (
+                  <div className="flex items-center gap-3 text-[10px] text-gray-600">
+                    <span>Min: {formatMetricValue(stats.min, item?.unit_type)}</span>
+                    <span>P25: {formatMetricValue(stats.p25, item?.unit_type)}</span>
+                    <span>P75: {formatMetricValue(stats.p75, item?.unit_type)}</span>
+                    <span>Max: {formatMetricValue(stats.max, item?.unit_type)}</span>
+                    <span>StdDev: {formatNumber(stats.stdDev)}</span>
+                  </div>
                 )}
+                {/* Filter input */}
+                <div className="flex items-center gap-2">
+                  <Filter className="w-3 h-3 text-gray-600" />
+                  <input
+                    type="text"
+                    placeholder="Filter by dimension key..."
+                    value={filterText}
+                    onChange={e => setFilterText(e.target.value)}
+                    className="flex-1 bg-transparent text-xs text-gray-300 placeholder-gray-600 outline-none border-b border-transparent focus:border-pwc-orange/40 transition-colors"
+                  />
+                  {filterText && (
+                    <span className="text-[10px] text-gray-500">{filteredRows.length} matches</span>
+                  )}
+                </div>
               </div>
 
               <table className="w-full text-sm">
@@ -570,7 +698,7 @@ export default function CalculationWorkspace({
         </div>
 
         {/* Input Data Inspector (collapsible bottom panel) */}
-        {rows.length > 0 && (
+        {rows.length > 0 && formula && (
           <InputDataInspector
             itemId={itemId ?? ''}
             asOfDate={asOfDate}

@@ -1,8 +1,8 @@
 metric_id: CAP-001
 name: Capital Adequacy Ratio (%)
-version: 1.0.0
+version: 1.1.0
 owner: market-risk
-status: DRAFT
+status: ACTIVE
 effective_date: '2026-01-01'
 supersedes: null
 domain: capital
@@ -13,9 +13,10 @@ unit_type: PERCENTAGE
 display_format: .2f
 description: |
   Assesses capital buffer relative to risk (RWA); indicates solvency cushion and capacity to absorb losses and support growth.
+  CAR = SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100
 regulatory_references:
 - framework: Basel III
-  description: ''
+  description: 'Minimum CET1 ratio 4.5%, Tier 1 ratio 6%, Total Capital ratio 8%'
 source_tables:
 - schema: l2
   table: facility_profitability_snapshot
@@ -34,15 +35,15 @@ source_tables:
   join_type: INNER
   join_on: fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date
   fields:
-  - name: rwa_amt
+  - name: drawn_amount
     role: MEASURE
-- schema: l3
-  table: facility_exposure_calc
-  alias: fec
+- schema: l2
+  table: facility_risk_snapshot
+  alias: frs
   join_type: LEFT
-  join_on: fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date
+  join_on: frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date
   fields:
-  - name: rwa_amt
+  - name: risk_weight_pct
     role: MEASURE
 - schema: l2
   table: facility_master
@@ -72,18 +73,20 @@ levels:
   facility:
     aggregation_type: RAW
     formula_text: |
-      Read capital_adequacy_ratio_pct from lob_risk_ratio_summary for each facility as-of reporting date.
+      Allocated equity / computed RWA (drawn × risk weight) per facility as-of reporting date.
     formula_sql: |-
       SELECT
         fprs.facility_id AS dimension_key,
-        fprs.allocated_equity_amt / NULLIF(COALESCE(fec.rwa_amt, fes.rwa_amt), 0) * 100.0 AS metric_value
+        fprs.allocated_equity_amt
+          / NULLIF(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0, 0)
+          * 100.0 AS metric_value
       FROM l2.facility_profitability_snapshot fprs
       INNER JOIN l2.facility_exposure_snapshot fes
         ON fes.facility_id = fprs.facility_id
         AND fes.as_of_date = fprs.as_of_date
-      LEFT JOIN l3.facility_exposure_calc fec
-        ON fec.facility_id = fprs.facility_id
-        AND fec.as_of_date = fprs.as_of_date
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fprs.facility_id
+        AND frs.as_of_date = fprs.as_of_date
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
@@ -91,97 +94,69 @@ levels:
   counterparty:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(allocated_equity) / SUM(rwa) * 100.0 per counterparty.
+      SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100 per counterparty.
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          fprs.allocated_equity_amt AS numerator_val,
-          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fprs.facility_id
-          AND fes.as_of_date = fprs.as_of_date
-        LEFT JOIN l3.facility_exposure_calc fec
-          ON fec.facility_id = fprs.facility_id
-          AND fec.as_of_date = fprs.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+        SUM(fprs.allocated_equity_amt)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          * 100.0 AS metric_value
+      FROM l2.facility_profitability_snapshot fprs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fprs.facility_id
+        AND fes.as_of_date = fprs.as_of_date
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fprs.facility_id
+        AND frs.as_of_date = fprs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
+      WHERE fprs.as_of_date = :as_of_date
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(allocated_equity) / SUM(rwa) * 100.0 per L3 desk segment.
+      SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100 per L3 desk segment.
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          fprs.allocated_equity_amt AS numerator_val,
-          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fprs.facility_id
-          AND fes.as_of_date = fprs.as_of_date
-        LEFT JOIN l3.facility_exposure_calc fec
-          ON fec.facility_id = fprs.facility_id
-          AND fec.as_of_date = fprs.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+        SUM(fprs.allocated_equity_amt)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          * 100.0 AS metric_value
+      FROM l2.facility_profitability_snapshot fprs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fprs.facility_id
+        AND fes.as_of_date = fprs.as_of_date
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fprs.facility_id
+        AND frs.as_of_date = fprs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt
         ON ebt.managed_segment_id = fm.lob_segment_id
           AND ebt.is_current_flag = 'Y'
+      WHERE fprs.as_of_date = :as_of_date
       GROUP BY ebt.managed_segment_id
   portfolio:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(allocated_equity) / SUM(rwa) * 100.0 per L2 portfolio segment.
+      SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100 per L2 portfolio segment.
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          fprs.allocated_equity_amt AS numerator_val,
-          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fprs.facility_id
-          AND fes.as_of_date = fprs.as_of_date
-        LEFT JOIN l3.facility_exposure_calc fec
-          ON fec.facility_id = fprs.facility_id
-          AND fec.as_of_date = fprs.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+        SUM(fprs.allocated_equity_amt)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          * 100.0 AS metric_value
+      FROM l2.facility_profitability_snapshot fprs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fprs.facility_id
+        AND fes.as_of_date = fprs.as_of_date
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fprs.facility_id
+        AND frs.as_of_date = fprs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -189,36 +164,27 @@ levels:
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l2
         ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id
           AND ebt_l2.is_current_flag = 'Y'
+      WHERE fprs.as_of_date = :as_of_date
       GROUP BY ebt_l2.managed_segment_id
   business_segment:
     aggregation_type: CUSTOM
     formula_text: |
-      SUM(allocated_equity) / SUM(rwa) * 100.0 per L1 business segment.
+      SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100 per L1 business segment.
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
-      FROM (
-        SELECT
-          fprs.facility_id,
-          fprs.allocated_equity_amt AS numerator_val,
-          COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val
-        FROM l2.facility_profitability_snapshot fprs
-        INNER JOIN l2.facility_exposure_snapshot fes
-          ON fes.facility_id = fprs.facility_id
-          AND fes.as_of_date = fprs.as_of_date
-        LEFT JOIN l3.facility_exposure_calc fec
-          ON fec.facility_id = fprs.facility_id
-          AND fec.as_of_date = fprs.as_of_date
-        INNER JOIN l2.facility_master fm
-          ON fm.facility_id = fprs.facility_id
-          AND fm.is_active_flag = 'Y'
-        WHERE fprs.as_of_date = :as_of_date
-      ) fac
+        SUM(fprs.allocated_equity_amt)
+          / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)
+          * 100.0 AS metric_value
+      FROM l2.facility_profitability_snapshot fprs
+      INNER JOIN l2.facility_exposure_snapshot fes
+        ON fes.facility_id = fprs.facility_id
+        AND fes.as_of_date = fprs.as_of_date
+      LEFT JOIN l2.facility_risk_snapshot frs
+        ON frs.facility_id = fprs.facility_id
+        AND frs.as_of_date = fprs.as_of_date
       INNER JOIN l2.facility_master fm
-        ON fm.facility_id = fac.facility_id
+        ON fm.facility_id = fprs.facility_id
         AND fm.is_active_flag = 'Y'
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l3
         ON ebt_l3.managed_segment_id = fm.lob_segment_id
@@ -229,6 +195,7 @@ levels:
       LEFT JOIN l1.enterprise_business_taxonomy ebt_l1
         ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id
           AND ebt_l1.is_current_flag = 'Y'
+      WHERE fprs.as_of_date = :as_of_date
       GROUP BY ebt_l1.managed_segment_id
 depends_on: []
 output:
@@ -238,12 +205,19 @@ validations:
   type: NOT_NULL
   description: No null capital_adequacy_ratio_pct values
   severity: ERROR
+- rule_id: CAP-001-V02
+  type: THRESHOLD
+  description: CAR typically 8-20% for well-capitalized institutions
+  severity: WARNING
+  params:
+    min_value: 0
+    max_value: 100
 catalogue:
   item_id: MET-097
   abbreviation: CAR
   insight: |
     Capital buffer relative to risk-weighted assets; indicates solvency, regulatory compliance, and loss-absorbing capacity.
-  rollup_strategy: weighted-avg
+  rollup_strategy: sum-ratio
   primary_value_field: capital_adequacy_ratio_pct
 tags:
 - capital

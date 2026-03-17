@@ -550,9 +550,16 @@ export default function GenericTableTraversalDemo({
         </div>
       )}
 
-      {/* SVG Diagram */}
+      {/* SVG Diagram — responsive: scales down on small screens, scrolls if needed */}
       <div className="px-2 pt-6 pb-3 overflow-x-auto overflow-y-hidden">
-        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="block" style={{ minWidth: svgW }}>
+        <svg
+          width="100%"
+          height={svgH}
+          viewBox={`0 0 ${svgW} ${svgH}`}
+          preserveAspectRatio="xMinYMin meet"
+          className="block"
+          style={{ minWidth: Math.min(svgW, 600) }}
+        >
           <defs>
             <marker id="arrow-active" markerWidth={8} markerHeight={8} refX={7} refY={4} orient="auto">
               <polygon points="0 0, 8 4, 0 8" fill="#a855f7" />

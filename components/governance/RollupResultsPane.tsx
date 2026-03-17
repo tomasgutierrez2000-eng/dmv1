@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   GitBranch, Loader2, CheckCircle2, XCircle, Play,
-  BarChart3, AlertTriangle,
+  BarChart3, AlertTriangle, Download, Clock,
 } from 'lucide-react';
 import { formatMetricValue } from '@/lib/governance/drill-down';
 
@@ -28,7 +28,11 @@ interface RollupResultsPaneProps {
   /** Formulas per level for Run All (from catalogue). Falls back to LTV if not provided. */
   levelFormulas?: Record<string, { sql: string; description: string }>;
   /** Catalogue item for metric-agnostic labels and rollup strategy */
-  item?: { unit_type?: string; direction?: string; abbreviation?: string; reconciliation_tolerance_pct?: number } | null;
+  item?: {
+    unit_type?: string; direction?: string; abbreviation?: string;
+    reconciliation_tolerance_pct?: number; rollup_strategy?: string;
+    item_id?: string;
+  } | null;
 }
 
 const LEVELS = [
@@ -66,13 +70,7 @@ function computeWeightedAvg(rows: ResultRow[]): number | null {
 /**
  * Right pane: shows rollup results across all levels and reconciliation status.
  */
-const LTV_FALLBACK_SQLS: Record<string, string> = {
-  facility: `SELECT fm.facility_id AS dimension_key, fm.committed_facility_amt / NULLIF(SUM(cs.current_valuation_usd), 0) * 100.0 AS metric_value FROM l2.facility_master fm INNER JOIN l2.collateral_snapshot cs ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date GROUP BY fm.facility_id, fm.committed_facility_amt`,
-  counterparty: `SELECT fm.counterparty_id AS dimension_key, CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END AS metric_value FROM (SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val, SUM(cs.current_valuation_usd) AS denominator_val FROM l2.facility_master fm INNER JOIN l2.collateral_snapshot cs ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date GROUP BY fm.facility_id, fm.committed_facility_amt) fac INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id GROUP BY fm.counterparty_id`,
-  desk: `SELECT ebt.managed_segment_id AS dimension_key, CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END AS metric_value FROM (SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val, SUM(cs.current_valuation_usd) AS denominator_val FROM l2.facility_master fm INNER JOIN l2.collateral_snapshot cs ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date GROUP BY fm.facility_id, fm.committed_facility_amt) fac INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id LEFT JOIN l1.enterprise_business_taxonomy ebt ON ebt.managed_segment_id = fm.lob_segment_id GROUP BY ebt.managed_segment_id`,
-  portfolio: `SELECT ebt_l2.managed_segment_id AS dimension_key, CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END AS metric_value FROM (SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val, SUM(cs.current_valuation_usd) AS denominator_val FROM l2.facility_master fm INNER JOIN l2.collateral_snapshot cs ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date GROUP BY fm.facility_id, fm.committed_facility_amt) fac INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id LEFT JOIN l1.enterprise_business_taxonomy ebt_l3 ON ebt_l3.managed_segment_id = fm.lob_segment_id LEFT JOIN l1.enterprise_business_taxonomy ebt_l2 ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id GROUP BY ebt_l2.managed_segment_id`,
-  business_segment: `SELECT ebt_l1.managed_segment_id AS dimension_key, CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END AS metric_value FROM (SELECT fm.facility_id, fm.committed_facility_amt AS numerator_val, SUM(cs.current_valuation_usd) AS denominator_val FROM l2.facility_master fm INNER JOIN l2.collateral_snapshot cs ON cs.facility_id = fm.facility_id AND cs.as_of_date = :as_of_date GROUP BY fm.facility_id, fm.committed_facility_amt) fac INNER JOIN l2.facility_master fm ON fm.facility_id = fac.facility_id LEFT JOIN l1.enterprise_business_taxonomy ebt_l3 ON ebt_l3.managed_segment_id = fm.lob_segment_id LEFT JOIN l1.enterprise_business_taxonomy ebt_l2 ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id LEFT JOIN l1.enterprise_business_taxonomy ebt_l1 ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id GROUP BY ebt_l1.managed_segment_id`,
-};
+/* Formulas come from catalogue via levelFormulas prop — no hardcoded fallbacks */
 
 export default function RollupResultsPane({
   asOfDate,
@@ -82,8 +80,25 @@ export default function RollupResultsPane({
 }: RollupResultsPaneProps) {
   const [levelResults, setLevelResults] = useState<Map<string, LevelResult>>(new Map());
   const [runningAll, setRunningAll] = useState(false);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [restoredFromCache, setRestoredFromCache] = useState(false);
   const tolerance = item?.reconciliation_tolerance_pct ?? 5.0;
   const colorFn = (v: number) => metricColor(v, item?.unit_type, item?.direction);
+  const cacheKey = item?.item_id ? `rollup_cache_${item.item_id}` : null;
+
+  // Restore cached results on mount
+  useEffect(() => {
+    if (!cacheKey) return;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached) as { results: [string, LevelResult][]; timestamp: string };
+        const map = new Map<string, LevelResult>(parsed.results);
+        setLevelResults(map);
+        setRestoredFromCache(true);
+      }
+    } catch { /* ignore parse errors */ }
+  }, [cacheKey]);
 
   // Update when center pane pushes results
   useEffect(() => {
@@ -102,13 +117,18 @@ export default function RollupResultsPane({
     }
   }, [activeResults]);
 
-  // Run all levels for reconciliation
+  // Run all levels for reconciliation — with per-level progress tracking
   const runAllLevels = useCallback(async () => {
     if (!asOfDate) return;
     setRunningAll(true);
+    setCompletedCount(0);
+    setRestoredFromCache(false);
+
+    const newResults = new Map<string, LevelResult>();
+
     const results = await Promise.allSettled(
       LEVELS.map(async (lvl) => {
-        const sql = levelFormulas?.[lvl.key]?.sql ?? LTV_FALLBACK_SQLS[lvl.key];
+        const sql = levelFormulas?.[lvl.key]?.sql;
         if (!sql) return { level: lvl.key, rows: [], durationMs: null };
         const res = await fetch('/api/metrics/governance/calculator', {
           method: 'POST',
@@ -121,11 +141,11 @@ export default function RollupResultsPane({
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
+        setCompletedCount(c => c + 1);
         return { level: lvl.key, rows: data.rows, durationMs: data.duration_ms };
       }),
     );
 
-    const newResults = new Map<string, LevelResult>();
     results.forEach((r, i) => {
       if (r.status === 'fulfilled') {
         newResults.set(LEVELS[i].key, {
@@ -147,7 +167,17 @@ export default function RollupResultsPane({
     });
     setLevelResults(newResults);
     setRunningAll(false);
-  }, [asOfDate, levelFormulas]);
+
+    // Cache results in sessionStorage
+    if (cacheKey) {
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          results: Array.from(newResults.entries()),
+          timestamp: new Date().toISOString(),
+        }));
+      } catch { /* storage full — ignore */ }
+    }
+  }, [asOfDate, levelFormulas, cacheKey]);
 
   const hasAllResults = LEVELS.every(l => levelResults.has(l.key));
 
@@ -164,10 +194,28 @@ export default function RollupResultsPane({
           className="ml-auto flex items-center gap-1 px-2.5 py-1 bg-pwc-orange/20 text-pwc-orange rounded text-[10px] font-medium
                      hover:bg-pwc-orange/30 disabled:opacity-50 transition-colors"
         >
-          {runningAll ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
-          Run All
+          {runningAll ? (
+            <>
+              <Loader2 className="w-3 h-3 animate-spin" />
+              {completedCount}/{LEVELS.length}
+            </>
+          ) : (
+            <>
+              <Play className="w-3 h-3" />
+              Run All
+            </>
+          )}
         </button>
       </div>
+
+      {/* Cache restoration banner */}
+      {restoredFromCache && (
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 border-b border-blue-500/20 text-[10px] text-blue-400">
+          <Clock className="w-3 h-3" />
+          Restored from session cache
+          <button type="button" onClick={runAllLevels} className="ml-auto underline hover:text-blue-300">Re-run</button>
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
@@ -214,40 +262,71 @@ export default function RollupResultsPane({
           );
         })}
 
-        {/* Reconciliation */}
+        {/* Reconciliation — enhanced with sum-based checks */}
         {hasAllResults && (
-          <div className="rounded-lg border border-pwc-gray-light/50 bg-pwc-black/30 p-3" title={`Avg-diff reconciliation (${tolerance}% tolerance). Sum-ratio reconciliation is a future enhancement.`}>
+          <div className="rounded-lg border border-pwc-gray-light/50 bg-pwc-black/30 p-3">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span className="text-xs font-semibold text-gray-300">Reconciliation</span>
+              <span className="text-[9px] text-gray-600 ml-auto">
+                {item?.rollup_strategy === 'direct-sum' ? 'Sum-based' : 'Avg-diff'} ({tolerance}% tol.)
+              </span>
             </div>
 
             <div className="space-y-1.5">
               {LEVELS.slice(0, -1).map((lvl, i) => {
                 const currentResult = levelResults.get(lvl.key);
                 const nextResult = levelResults.get(LEVELS[i + 1].key);
-                const currentAvg = currentResult?.rows ? computeWeightedAvg(currentResult.rows) : null;
-                const nextAvg = nextResult?.rows ? computeWeightedAvg(nextResult.rows) : null;
+                const currentVals = (currentResult?.rows ?? []).map(r => Number(r.metric_value)).filter(v => !isNaN(v));
+                const nextVals = (nextResult?.rows ?? []).map(r => Number(r.metric_value)).filter(v => !isNaN(v));
 
-                // Simple reconciliation: check if averages are within tolerance
-                const delta = currentAvg !== null && nextAvg !== null ? Math.abs(currentAvg - nextAvg) : null;
-                const pass = delta !== null && delta < tolerance;
+                let pass = false;
+                let delta: number | null = null;
+                let detail = '';
+
+                if (item?.rollup_strategy === 'direct-sum') {
+                  // Sum-based reconciliation: SUM at lower level should equal SUM at upper level
+                  const currentSum = currentVals.reduce((a, b) => a + b, 0);
+                  const nextSum = nextVals.reduce((a, b) => a + b, 0);
+                  if (currentVals.length > 0 && nextVals.length > 0) {
+                    const denom = Math.max(Math.abs(currentSum), Math.abs(nextSum), 1);
+                    delta = Math.abs(currentSum - nextSum) / denom * 100;
+                    pass = delta < tolerance;
+                    detail = `Σ${lvl.short}: ${formatMetricValue(currentSum, item?.unit_type)} | Σ${LEVELS[i + 1].short}: ${formatMetricValue(nextSum, item?.unit_type)}`;
+                  }
+                } else {
+                  // Avg-diff reconciliation (default)
+                  const currentAvg = currentVals.length > 0 ? currentVals.reduce((a, b) => a + b, 0) / currentVals.length : null;
+                  const nextAvg = nextVals.length > 0 ? nextVals.reduce((a, b) => a + b, 0) / nextVals.length : null;
+                  if (currentAvg !== null && nextAvg !== null) {
+                    delta = Math.abs(currentAvg - nextAvg);
+                    pass = delta < tolerance;
+                  }
+                }
 
                 return (
-                  <div key={lvl.key} className="flex items-center gap-2 text-[10px]">
-                    {pass ? (
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    ) : delta !== null ? (
-                      <AlertTriangle className="w-3 h-3 text-amber-400" />
-                    ) : (
-                      <XCircle className="w-3 h-3 text-gray-600" />
-                    )}
-                    <span className="text-gray-400">
-                      {lvl.short} → {LEVELS[i + 1].short}
-                    </span>
-                    {delta !== null && (
-                      <span className={pass ? 'text-emerald-400' : 'text-amber-400'}>
-                        {pass ? 'OK' : `Δ${formatMetricValue(delta, item?.unit_type)}`}
+                  <div key={lvl.key} className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2 text-[10px]">
+                      {delta !== null ? (
+                        pass ? <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        : delta < tolerance * 5 ? <AlertTriangle className="w-3 h-3 text-amber-400" />
+                        : <XCircle className="w-3 h-3 text-red-400" />
+                      ) : (
+                        <XCircle className="w-3 h-3 text-gray-600" />
+                      )}
+                      <span className="text-gray-400">
+                        {lvl.short} → {LEVELS[i + 1].short}
+                      </span>
+                      {delta !== null && (
+                        <span className={pass ? 'text-emerald-400' : 'text-amber-400'}>
+                          {pass ? 'OK' : `Δ${item?.rollup_strategy === 'direct-sum' ? delta.toFixed(1) + '%' : formatMetricValue(delta, item?.unit_type)}`}
+                        </span>
+                      )}
+                    </div>
+                    {detail && !pass && (
+                      <span className="text-[9px] text-gray-600 ml-5">
+                        {detail}
+                        {delta !== null && delta >= 1 && delta < 5 && ' (FX-driven difference expected for multi-currency)'}
                       </span>
                     )}
                   </div>

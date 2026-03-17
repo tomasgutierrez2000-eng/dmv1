@@ -17,6 +17,17 @@ import type { CatalogueItem } from '@/lib/metric-library/types';
 import { getFormulasForItem } from '@/components/governance/CalculationWorkspace';
 import type { GovernanceStatus } from '@/lib/governance/status-machine';
 
+/** Infer rollup strategy from level definitions sourcing types. */
+function inferRollupStrategy(defs: CatalogueItem['level_definitions']): string | undefined {
+  if (!defs?.length) return undefined;
+  const types = defs.map(d => d.sourcing_type);
+  if (types.includes('Avg')) return 'weighted-avg';
+  if (types.includes('Calc') && types.includes('Agg')) return 'sum-ratio';
+  if (types.every(t => t === 'Agg' || t === 'Raw')) return 'direct-sum';
+  if (types.every(t => t === 'Calc')) return 'sum-ratio';
+  return 'direct-sum';
+}
+
 interface ResultRow {
   dimension_key: unknown;
   metric_value: unknown;
@@ -270,7 +281,11 @@ export default function CalculatorPage() {
             asOfDate={asOfDate}
             activeResults={activeResults}
             levelFormulas={item ? getFormulasForItem(item) : undefined}
-            item={item}
+            item={item ? {
+              ...item,
+              item_id: item.item_id,
+              rollup_strategy: inferRollupStrategy(item.level_definitions),
+            } : null}
           />
         </div>
       </div>

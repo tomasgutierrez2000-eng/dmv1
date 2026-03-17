@@ -7490,8 +7490,8 @@
     "item_name": "Capital Adequacy Ratio (%)",
     "abbreviation": "CAR",
     "kind": "METRIC",
-    "definition": "Assesses capital buffer relative to risk (RWA); indicates solvency cushion and capacity to absorb losses and support growth.\n",
-    "generic_formula": "Read capital_adequacy_ratio_pct from lob_risk_ratio_summary for each facility as-of reporting date.\n",
+    "definition": "Assesses capital buffer relative to risk (RWA); indicates solvency cushion and capacity to absorb losses and support growth.\nCAR = SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100\n",
+    "generic_formula": "Allocated equity / computed RWA (drawn × risk weight) per facility as-of reporting date.\n",
     "data_type": "NUMERIC(10,6)",
     "unit_type": "PERCENTAGE",
     "direction": "NEUTRAL",
@@ -7505,7 +7505,7 @@
     "insight": "Capital buffer relative to risk-weighted assets; indicates solvency, regulatory compliance, and loss-absorbing capacity.\n",
     "number_of_instances": 5,
     "directly_displayed": false,
-    "status": "DRAFT",
+    "status": "ACTIVE",
     "executable_metric_id": "CAP-001",
     "normalized_de_name": "Capital Adequacy Ratio (%)",
     "data_element_in_dm": "capital_adequacy_ratio_pct",
@@ -7541,7 +7541,7 @@
         "dashboard_display_name": "Capital Adequacy Ratio (%) (facility)",
         "in_record": true,
         "sourcing_type": "Raw",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = fprs.allocated_equity_amt / NULLIF(COALESCE(fec.rwa_amt, fes.rwa_amt), 0) * 100.0",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. COMPUTE\n   metric_value = fprs.allocated_equity_amt / NULLIF(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0, 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -7564,14 +7564,14 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "field": "drawn_amount",
+            "description": "drawn_amount"
           },
           {
-            "layer": "L3",
-            "table": "facility_exposure_calc",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "risk_weight_pct",
+            "description": "risk_weight_pct"
           },
           {
             "layer": "L2",
@@ -7610,14 +7610,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fprs.facility_id AS dimension_key,\n  fprs.allocated_equity_amt / NULLIF(COALESCE(fec.rwa_amt, fes.rwa_amt), 0) * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fprs\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fprs.facility_id\n  AND fes.as_of_date = fprs.as_of_date\nLEFT JOIN l3.facility_exposure_calc fec\n  ON fec.facility_id = fprs.facility_id\n  AND fec.as_of_date = fprs.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date"
+        "formula_sql": "SELECT\n  fprs.facility_id AS dimension_key,\n  fprs.allocated_equity_amt\n    / NULLIF(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0, 0)\n    * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fprs\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fprs.facility_id\n  AND fes.as_of_date = fprs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = fprs.facility_id\n  AND frs.as_of_date = fprs.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date"
       },
       {
         "level": "counterparty",
         "dashboard_display_name": "Capital Adequacy Ratio (%) (counterparty)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY fm.counterparty_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY fm.counterparty_id\n7. COMPUTE\n   metric_value = SUM(fprs.allocated_equity_amt) / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -7640,14 +7640,14 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "field": "drawn_amount",
+            "description": "drawn_amount"
           },
           {
-            "layer": "L3",
-            "table": "facility_exposure_calc",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "risk_weight_pct",
+            "description": "risk_weight_pct"
           },
           {
             "layer": "L2",
@@ -7686,14 +7686,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    fprs.allocated_equity_amt AS numerator_val,\n    COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val\n  FROM l2.facility_profitability_snapshot fprs\n  INNER JOIN l2.facility_exposure_snapshot fes\n    ON fes.facility_id = fprs.facility_id\n    AND fes.as_of_date = fprs.as_of_date\n  LEFT JOIN l3.facility_exposure_calc fec\n    ON fec.facility_id = fprs.facility_id\n    AND fec.as_of_date = fprs.as_of_date\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nGROUP BY fm.counterparty_id"
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fprs.allocated_equity_amt)\n    / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)\n    * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fprs\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fprs.facility_id\n  AND fes.as_of_date = fprs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = fprs.facility_id\n  AND frs.as_of_date = fprs.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id"
       },
       {
         "level": "desk",
         "dashboard_display_name": "Capital Adequacy Ratio (%) (desk)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(fprs.allocated_equity_amt) / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -7716,14 +7716,14 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "field": "drawn_amount",
+            "description": "drawn_amount"
           },
           {
-            "layer": "L3",
-            "table": "facility_exposure_calc",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "risk_weight_pct",
+            "description": "risk_weight_pct"
           },
           {
             "layer": "L2",
@@ -7762,14 +7762,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    fprs.allocated_equity_amt AS numerator_val,\n    COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val\n  FROM l2.facility_profitability_snapshot fprs\n  INNER JOIN l2.facility_exposure_snapshot fes\n    ON fes.facility_id = fprs.facility_id\n    AND fes.as_of_date = fprs.as_of_date\n  LEFT JOIN l3.facility_exposure_calc fec\n    ON fec.facility_id = fprs.facility_id\n    AND fec.as_of_date = fprs.as_of_date\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nGROUP BY ebt.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fprs.allocated_equity_amt)\n    / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)\n    * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fprs\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fprs.facility_id\n  AND fes.as_of_date = fprs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = fprs.facility_id\n  AND frs.as_of_date = fprs.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt\n  ON ebt.managed_segment_id = fm.lob_segment_id\n    AND ebt.is_current_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id"
       },
       {
         "level": "portfolio",
         "dashboard_display_name": "Capital Adequacy Ratio (%) (portfolio)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l2.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(fprs.allocated_equity_amt) / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -7792,14 +7792,14 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "field": "drawn_amount",
+            "description": "drawn_amount"
           },
           {
-            "layer": "L3",
-            "table": "facility_exposure_calc",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "risk_weight_pct",
+            "description": "risk_weight_pct"
           },
           {
             "layer": "L2",
@@ -7838,14 +7838,14 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    fprs.allocated_equity_amt AS numerator_val,\n    COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val\n  FROM l2.facility_profitability_snapshot fprs\n  INNER JOIN l2.facility_exposure_snapshot fes\n    ON fes.facility_id = fprs.facility_id\n    AND fes.as_of_date = fprs.as_of_date\n  LEFT JOIN l3.facility_exposure_calc fec\n    ON fec.facility_id = fprs.facility_id\n    AND fec.as_of_date = fprs.as_of_date\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nGROUP BY ebt_l2.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fprs.allocated_equity_amt)\n    / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)\n    * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fprs\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fprs.facility_id\n  AND fes.as_of_date = fprs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = fprs.facility_id\n  AND frs.as_of_date = fprs.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id"
       },
       {
         "level": "lob",
         "dashboard_display_name": "Capital Adequacy Ratio (%) (lob)",
         "in_record": true,
         "sourcing_type": "Calc",
-        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l3.facility_exposure_calc  (fec)\n   ON    fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0 END",
+        "level_logic": "1. LOAD  l2.facility_profitability_snapshot  (fprs)\n   WHERE fprs.as_of_date = :as_of_date\n2. JOIN  l2.facility_exposure_snapshot  (fes)\n   ON    fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date\n3. LEFT JOIN  l2.facility_risk_snapshot  (frs)\n   ON    frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date\n4. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fprs.facility_id\n   AND   fm.is_active_flag = 'Y'\n5. LEFT JOIN  l1.enterprise_business_taxonomy  (ebt)\n   ON    ebt.managed_segment_id = fm.lob_segment_id\n6. GROUP BY ebt_l1.managed_segment_id\n7. COMPUTE\n   metric_value = SUM(fprs.allocated_equity_amt) / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0) * 100.0",
         "source_references": [
           {
             "layer": "L2",
@@ -7868,14 +7868,14 @@
           {
             "layer": "L2",
             "table": "facility_exposure_snapshot",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "field": "drawn_amount",
+            "description": "drawn_amount"
           },
           {
-            "layer": "L3",
-            "table": "facility_exposure_calc",
-            "field": "rwa_amt",
-            "description": "rwa_amt"
+            "layer": "L2",
+            "table": "facility_risk_snapshot",
+            "field": "risk_weight_pct",
+            "description": "risk_weight_pct"
           },
           {
             "layer": "L2",
@@ -7914,7 +7914,7 @@
             "description": "parent_segment_id"
           }
         ],
-        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL\n       ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0\n  END AS metric_value\nFROM (\n  SELECT\n    fprs.facility_id,\n    fprs.allocated_equity_amt AS numerator_val,\n    COALESCE(fec.rwa_amt, fes.rwa_amt) AS denominator_val\n  FROM l2.facility_profitability_snapshot fprs\n  INNER JOIN l2.facility_exposure_snapshot fes\n    ON fes.facility_id = fprs.facility_id\n    AND fes.as_of_date = fprs.as_of_date\n  LEFT JOIN l3.facility_exposure_calc fec\n    ON fec.facility_id = fprs.facility_id\n    AND fec.as_of_date = fprs.as_of_date\n  INNER JOIN l2.facility_master fm\n    ON fm.facility_id = fprs.facility_id\n    AND fm.is_active_flag = 'Y'\n  WHERE fprs.as_of_date = :as_of_date\n) fac\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fac.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nGROUP BY ebt_l1.managed_segment_id"
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fprs.allocated_equity_amt)\n    / NULLIF(SUM(fes.drawn_amount * COALESCE(frs.risk_weight_pct, 100.0) / 100.0), 0)\n    * 100.0 AS metric_value\nFROM l2.facility_profitability_snapshot fprs\nINNER JOIN l2.facility_exposure_snapshot fes\n  ON fes.facility_id = fprs.facility_id\n  AND fes.as_of_date = fprs.as_of_date\nLEFT JOIN l2.facility_risk_snapshot frs\n  ON frs.facility_id = fprs.facility_id\n  AND frs.as_of_date = fprs.as_of_date\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fprs.facility_id\n  AND fm.is_active_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n  ON ebt_l3.managed_segment_id = fm.lob_segment_id\n    AND ebt_l3.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n  ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n    AND ebt_l2.is_current_flag = 'Y'\nLEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n  ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n    AND ebt_l1.is_current_flag = 'Y'\nWHERE fprs.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id"
       }
     ],
     "demo_data": {
@@ -7969,6 +7969,7 @@
             }
           ],
           "extra_fields": {
+            "metric_value": 43636.3636,
             "allocated_equity_amt": 9600000
           }
         },
@@ -8022,166 +8023,169 @@
             }
           ],
           "extra_fields": {
+            "metric_value": 9302.3256,
             "allocated_equity_amt": 36000000
           }
         },
         {
-          "facility_id": "F-3",
-          "facility_name": "Pacific Ridge — Multi-Currency RCF",
-          "counterparty_id": "CP-3",
-          "counterparty_name": "Pacific Ridge Energy LLC",
-          "lob_segment_id": "SEG-3",
-          "desk_name": "Global Corporate Coverage Desk",
+          "facility_id": "F-6",
+          "facility_name": "Greenfield Consumer — Syndicated RCF",
+          "counterparty_id": "CP-6",
+          "counterparty_name": "Greenfield Consumer Brands Inc.",
+          "lob_segment_id": "SEG-6",
+          "desk_name": "Public Company Coverage Desk",
           "portfolio_name": "Large Corporate Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 1000000000,
-          "collateral_value": 425566666,
-          "ltv_pct": 234.98,
+          "committed_amt": 1500000000,
+          "collateral_value": 2283000000,
+          "ltv_pct": 65.7,
           "positions": [
             {
-              "position_id": "P-3",
-              "facility_id": "F-3",
+              "position_id": "P-6",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 800000000,
+              "balance_amount": 1200000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-13",
-              "facility_id": "F-3",
+              "position_id": "P-16",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 820000000,
+              "balance_amount": 1180000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-23",
-              "facility_id": "F-3",
+              "position_id": "P-26",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 780000000,
+              "balance_amount": 1220000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-33",
-              "facility_id": "F-3",
+              "position_id": "P-36",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 750000000,
+              "balance_amount": 1150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-43",
-              "facility_id": "F-3",
+              "position_id": "P-46",
+              "facility_id": "F-6",
               "product_code": "LOAN",
-              "balance_amount": 790000000,
+              "balance_amount": 1190000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "allocated_equity_amt": 64000000
+            "metric_value": 83478.2609,
+            "allocated_equity_amt": 96000000
           }
         },
         {
-          "facility_id": "F-4",
-          "facility_name": "Silverton Financial — Bridge Facility",
-          "counterparty_id": "CP-4",
-          "counterparty_name": "Silverton Financial Group",
-          "lob_segment_id": "SEG-4",
-          "desk_name": "Domestic Large-Cap Corporates Desk",
-          "portfolio_name": "Large Corporate Banking",
+          "facility_id": "F-9",
+          "facility_name": "Ironclad Infrastructure — Global Revolver",
+          "counterparty_id": "CP-9",
+          "counterparty_name": "Ironclad Infrastructure Partners LP",
+          "lob_segment_id": "SEG-9",
+          "desk_name": "Upper Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 2500000000,
-          "collateral_value": 1028000000,
-          "ltv_pct": 243.19,
+          "committed_amt": 600000000,
+          "collateral_value": 558066666,
+          "ltv_pct": 107.51,
           "positions": [
             {
-              "position_id": "P-4",
-              "facility_id": "F-4",
+              "position_id": "P-9",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 600000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-14",
-              "facility_id": "F-4",
+              "position_id": "P-19",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 580000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-24",
-              "facility_id": "F-4",
+              "position_id": "P-29",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 620000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-34",
-              "facility_id": "F-4",
+              "position_id": "P-39",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 560000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-44",
-              "facility_id": "F-4",
+              "position_id": "P-49",
+              "facility_id": "F-9",
               "product_code": "LOAN",
-              "balance_amount": 0,
+              "balance_amount": 590000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "allocated_equity_amt": 0
+            "metric_value": 9523.8095,
+            "allocated_equity_amt": 48000000
           }
         },
         {
-          "facility_id": "F-5",
-          "facility_name": "Atlas Industrial — Working Capital RCF",
-          "counterparty_id": "CP-5",
-          "counterparty_name": "Atlas Industrial Technologies Inc.",
-          "lob_segment_id": "SEG-5",
-          "desk_name": "Multi-national / Cross-Border Corporates Desk",
-          "portfolio_name": "Large Corporate Banking",
+          "facility_id": "F-10",
+          "facility_name": "Crestview REIT — Credit Facility",
+          "counterparty_id": "CP-10",
+          "counterparty_name": "Crestview Real Estate Investment Trust",
+          "lob_segment_id": "SEG-10",
+          "desk_name": "Core Middle Market Desk",
+          "portfolio_name": "Middle Market Banking",
           "lob_name": "Corporate Banking",
-          "committed_amt": 750000000,
-          "collateral_value": 149200000,
-          "ltv_pct": 502.68,
+          "committed_amt": 5000000000,
+          "collateral_value": 1602133334,
+          "ltv_pct": 312.08,
           "positions": [
             {
-              "position_id": "P-5",
-              "facility_id": "F-5",
+              "position_id": "P-10",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 275000000,
+              "balance_amount": 2100000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-15",
-              "facility_id": "F-5",
+              "position_id": "P-20",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 320000000,
+              "balance_amount": 2050000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-25",
-              "facility_id": "F-5",
+              "position_id": "P-30",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 380000000,
+              "balance_amount": 2150000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-35",
-              "facility_id": "F-5",
+              "position_id": "P-40",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 400000000,
+              "balance_amount": 2000000000,
               "description": "Position exposure"
             },
             {
-              "position_id": "P-45",
-              "facility_id": "F-5",
+              "position_id": "P-50",
+              "facility_id": "F-10",
               "product_code": "LOAN",
-              "balance_amount": 350000000,
+              "balance_amount": 2080000000,
               "description": "Position exposure"
             }
           ],
           "extra_fields": {
-            "allocated_equity_amt": 22000000
+            "allocated_equity_amt": 168000000
           }
         }
       ]

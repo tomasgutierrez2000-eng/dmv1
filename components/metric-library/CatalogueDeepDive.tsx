@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
   Layers,
   Table2,
@@ -260,9 +260,9 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
         />
       )}
 
-      {/* Tab bar */}
+      {/* Tab bar — with keyboard navigation (ArrowLeft/Right) */}
       <div className="flex gap-1.5 flex-wrap" role="tablist" aria-label="Deep-dive level tabs">
-        {TABS.map((tab) => {
+        {TABS.map((tab, idx) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
           return (
@@ -270,7 +270,22 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
               key={tab.key}
               role="tab"
               aria-selected={isActive}
+              tabIndex={isActive ? 0 : -1}
+              id={`tab-${tab.key}`}
+              aria-controls={`tabpanel-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
+              onKeyDown={(e) => {
+                let target: number | null = null;
+                if (e.key === 'ArrowRight') target = (idx + 1) % TABS.length;
+                else if (e.key === 'ArrowLeft') target = (idx - 1 + TABS.length) % TABS.length;
+                else if (e.key === 'Home') target = 0;
+                else if (e.key === 'End') target = TABS.length - 1;
+                if (target !== null) {
+                  e.preventDefault();
+                  setActiveTab(TABS[target].key);
+                  document.getElementById(`tab-${TABS[target].key}`)?.focus();
+                }
+              }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
                 isActive
                   ? `${tab.activeBg} ${tab.activeText} shadow-md`
@@ -291,7 +306,7 @@ export default function CatalogueDeepDive({ item }: { item: CatalogueItem }) {
       </div>
 
       {/* Tab content */}
-      <div role="tabpanel">
+      <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         {activeTab === 'position' && (
           <div className="space-y-4">
             <LevelStepWalkthrough

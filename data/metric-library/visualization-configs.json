@@ -1124,7 +1124,7 @@
     }
   },
   "MET-097": {
-    "rollup_strategy": "weighted-avg",
+    "rollup_strategy": "sum-ratio",
     "metric_fields": {
       "primary_value": "capital_adequacy_ratio_pct"
     },
@@ -1140,24 +1140,24 @@
         },
         {
           "op": "*",
-          "field": "rwa_amt",
-          "label": "rwa_amt",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
           "sample_value": 0,
           "source_table": "facility_exposure_snapshot",
           "source_layer": "L2"
         },
         {
           "op": "*",
-          "field": "rwa_amt",
-          "label": "rwa_amt",
+          "field": "risk_weight_pct",
+          "label": "risk_weight_pct",
           "sample_value": 0,
-          "source_table": "facility_exposure_calc",
-          "source_layer": "L3"
+          "source_table": "facility_risk_snapshot",
+          "source_layer": "L2"
         }
       ],
       "denominator": [],
       "result_format": "percentage",
-      "formula_display": "Read capital_adequacy_ratio_pct from lob_risk_ratio_summary for each facility as-of reporting date.\n"
+      "formula_display": "Allocated equity / computed RWA (drawn × risk weight) per facility as-of reporting date.\n"
     },
     "worked_example_columns": [
       {
@@ -1167,23 +1167,23 @@
         "subtotal_fn": "sum"
       },
       {
-        "field": "rwa_amt",
-        "header": "Rwa ($)",
-        "format": "currency",
-        "subtotal_fn": "sum"
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
       },
       {
-        "field": "rwa_amt",
-        "header": "Rwa ($)",
-        "format": "currency",
-        "subtotal_fn": "sum"
+        "field": "risk_weight_pct",
+        "header": "Risk Weight (%)",
+        "format": "percentage",
+        "subtotal_fn": "none"
       },
       {
         "field": "capital_adequacy_ratio_pct",
         "header": "Capital Adequacy Ratio (%)",
         "format": "percentage",
         "is_result": true,
-        "subtotal_fn": "weighted-avg"
+        "subtotal_fn": "none"
       }
     ],
     "traversal_source_data": {
@@ -1223,28 +1223,28 @@
           "join_on": "fes.facility_id = fprs.facility_id AND fes.as_of_date = fprs.as_of_date",
           "fields": [
             {
-              "name": "rwa_amt",
+              "name": "drawn_amount",
               "role": "MEASURE",
-              "description": "rwa_amt"
+              "description": "drawn_amount"
             }
           ],
-          "purpose": "Provides rwa amt"
+          "purpose": "Provides drawn amount"
         },
         {
-          "alias": "fec",
-          "qualified_name": "l3.facility_exposure_calc",
-          "table_name": "facility_exposure_calc",
-          "layer": "L3",
+          "alias": "frs",
+          "qualified_name": "l2.facility_risk_snapshot",
+          "table_name": "facility_risk_snapshot",
+          "layer": "L2",
           "join_type": "LEFT",
-          "join_on": "fec.facility_id = fes.facility_id AND fec.as_of_date = fes.as_of_date",
+          "join_on": "frs.facility_id = fprs.facility_id AND frs.as_of_date = fprs.as_of_date",
           "fields": [
             {
-              "name": "rwa_amt",
+              "name": "risk_weight_pct",
               "role": "MEASURE",
-              "description": "rwa_amt"
+              "description": "risk_weight_pct"
             }
           ],
-          "purpose": "Provides rwa amt"
+          "purpose": "Provides risk weight pct"
         },
         {
           "alias": "fm",
@@ -1303,26 +1303,26 @@
         "facility": [
           "fprs",
           "fes",
-          "fec",
+          "frs",
           "fm"
         ],
         "counterparty": [
           "fprs",
           "fes",
-          "fec",
+          "frs",
           "fm"
         ],
         "desk": [
           "fprs",
           "fes",
-          "fec",
+          "frs",
           "fm",
           "ebt"
         ],
         "portfolio": [
           "fprs",
           "fes",
-          "fec",
+          "frs",
           "fm",
           "ebt_l3",
           "ebt_l2"
@@ -1330,7 +1330,7 @@
         "lob": [
           "fprs",
           "fes",
-          "fec",
+          "frs",
           "fm",
           "ebt_l3",
           "ebt_l2",
@@ -1338,8 +1338,8 @@
         ]
       },
       "narration_context": {
-        "metric_description": "Assesses capital buffer relative to risk (RWA); indicates solvency cushion and capacity to absorb losses and support growth.\n",
-        "formula_text": "Read capital_adequacy_ratio_pct from lob_risk_ratio_summary for each facility as-of reporting date.\n",
+        "metric_description": "Assesses capital buffer relative to risk (RWA); indicates solvency cushion and capacity to absorb losses and support growth.\nCAR = SUM(allocated_equity) / SUM(drawn × risk_weight / 100) × 100\n",
+        "formula_text": "Allocated equity / computed RWA (drawn × risk weight) per facility as-of reporting date.\n",
         "aggregation_type_by_level": {
           "facility": "RAW",
           "counterparty": "CUSTOM",

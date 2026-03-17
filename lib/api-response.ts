@@ -76,6 +76,32 @@ export function normalizeCaughtError(err: unknown): {
     return { message: 'Invalid API key', details: msg, status: 401, code: 'AUTH' };
   }
 
+  // PostgreSQL-specific errors: surface details for formula debugging
+  const pgCode = err && typeof err === 'object' && 'code' in err ? String((err as { code: string }).code) : undefined;
+  if (pgCode) {
+    // 42P01 = undefined table, 42703 = undefined column, 42601 = syntax error, 42804 = type mismatch
+    if (pgCode === '42P01' || msg.includes('does not exist')) {
+      return { message: 'Table or column not found', details: msg, status: 400, code: 'PG_NOT_FOUND' };
+    }
+    if (pgCode === '42703') {
+      return { message: 'Column not found', details: msg, status: 400, code: 'PG_COLUMN_NOT_FOUND' };
+    }
+    if (pgCode === '42601' || msg.includes('syntax error')) {
+      return { message: 'SQL syntax error', details: msg, status: 400, code: 'PG_SYNTAX_ERROR' };
+    }
+    if (pgCode === '42804') {
+      return { message: 'Type mismatch', details: msg, status: 400, code: 'PG_TYPE_MISMATCH' };
+    }
+    if (pgCode === '57014' || msg.includes('statement timeout')) {
+      return { message: 'Query timed out', details: 'Try narrowing your filters or simplifying the formula.', status: 408, code: 'PG_TIMEOUT' };
+    }
+    if (msg.includes('ECONNREFUSED') || msg.includes('ECONNRESET')) {
+      return { message: 'Database connection failed', details: 'Please try again.', status: 503, code: 'DB_UNAVAILABLE' };
+    }
+    // Other PG errors: surface the error message directly
+    return { message: msg, status: 400, code: `PG_${pgCode}` };
+  }
+
   return { message: 'An unexpected error occurred', details: msg, status: 500 };
 }
 

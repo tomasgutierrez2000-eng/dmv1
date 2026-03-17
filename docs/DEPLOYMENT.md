@@ -38,8 +38,32 @@ File I/O for the data model and metrics uses paths derived from **project root**
 - **File I/O**: Data dictionary, metrics, catalogue are file-based. Read-heavy routes can be cached; write routes require writable filesystem.
 - **Concurrent users**: Demo deployment handles moderate traffic; for production, consider CDN caching for static/schema endpoints and horizontal scaling behind a load balancer.
 
+## Database Migrations
+
+When deploying with `DATABASE_URL`, the following migrations must be applied in order. Each is idempotent (safe to re-run).
+
+```bash
+# Core governance tables (metric audit trail + sandbox runs)
+psql "$DATABASE_URL" -f sql/migrations/011-metric-governance.sql
+
+# Tamper-evident audit (append-only rules + schema change log table)
+psql "$DATABASE_URL" -f sql/migrations/024-tamper-evident-audit.sql
+```
+
+**Verification after deployment:**
+```bash
+# Confirm governance tables exist
+psql "$DATABASE_URL" -c "SELECT tablename FROM pg_tables WHERE schemaname = 'l3' AND tablename IN ('metric_change_log', 'metric_sandbox_run', 'schema_change_log') ORDER BY tablename"
+
+# Confirm append-only rules are active
+psql "$DATABASE_URL" -c "SELECT tablename, rulename FROM pg_rules WHERE schemaname = 'l3' ORDER BY tablename"
+```
+
+Expected: 3 tables, 6 rules (2 per table: no_update + no_delete).
+
 ## Summary
 
 1. Set `DATA_MODEL_ROOT` (or specific path vars) if the app does not run with `cwd` equal to the project root.
 2. For serverless/read-only: point path vars to a read-only mount or pre-bundled data; expect 503 on any route that tries to write to disk.
 3. For full functionality (custom metrics, schema edits, upload): ensure the process can write to the data directory and, if using apply-ddl, set `DATABASE_URL`.
+4. Apply required database migrations (see above) when deploying with PostgreSQL.

@@ -9,6 +9,7 @@ import {
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
 import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { logSchemaChange, extractSchemaUser } from '@/lib/governance/schema-change-logger';
 
 type Layer = 'L1' | 'L2' | 'L3';
 
@@ -92,6 +93,18 @@ export async function POST(
       relationships,
     };
     writeDataDictionary(updated);
+
+    // Audit: log schema change
+    const user = extractSchemaUser(request);
+    logSchemaChange({
+      change_type: 'ADD_FIELD',
+      layer,
+      table_name: tableName,
+      field_name: fieldName,
+      changed_by_id: user.id,
+      changed_by_name: user.name,
+      after_snapshot: newField,
+    }).catch(() => {}); // fire-and-forget
 
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'add-field', layer, tableName, fieldName });

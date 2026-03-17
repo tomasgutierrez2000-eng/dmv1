@@ -8,6 +8,7 @@ import {
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
 import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { logSchemaChange, extractSchemaUser } from '@/lib/governance/schema-change-logger';
 
 type Layer = 'L1' | 'L2' | 'L3';
 
@@ -92,6 +93,19 @@ export async function PATCH(
     };
     writeDataDictionary(updated);
 
+    // Audit: log schema change
+    const user = extractSchemaUser(request);
+    logSchemaChange({
+      change_type: 'UPDATE_FIELD',
+      layer,
+      table_name: tableName,
+      field_name: newName,
+      changed_by_id: user.id,
+      changed_by_name: user.name,
+      before_snapshot: existing,
+      after_snapshot: updatedField,
+    }).catch(() => {}); // fire-and-forget
+
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, {
       kind: 'update-field',
@@ -115,7 +129,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ layer: string; tableName: string; fieldName: string }> }
 ) {
   try {
@@ -157,6 +171,19 @@ export async function DELETE(
       relationships: updatedRelationships,
     };
     writeDataDictionary(updated);
+
+    // Audit: log schema change
+    const user = extractSchemaUser(request);
+    const deletedField = table.fields.find((f) => f.name === fieldName);
+    logSchemaChange({
+      change_type: 'DELETE_FIELD',
+      layer,
+      table_name: tableName,
+      field_name: fieldName,
+      changed_by_id: user.id,
+      changed_by_name: user.name,
+      before_snapshot: deletedField,
+    }).catch(() => {}); // fire-and-forget
 
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'delete-field', layer, tableName, fieldName });

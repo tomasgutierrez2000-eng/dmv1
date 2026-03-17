@@ -7,6 +7,7 @@ import {
 } from '@/lib/data-dictionary';
 import { postMutationSync } from '@/lib/data-model-sync';
 import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { logSchemaChange, extractSchemaUser } from '@/lib/governance/schema-change-logger';
 
 type Layer = 'L1' | 'L2' | 'L3';
 
@@ -51,6 +52,18 @@ export async function PATCH(
     };
     writeDataDictionary(updated);
 
+    // Audit: log schema change
+    const user = extractSchemaUser(request);
+    logSchemaChange({
+      change_type: 'UPDATE_TABLE',
+      layer,
+      table_name: tableName,
+      changed_by_id: user.id,
+      changed_by_name: user.name,
+      before_snapshot: { category: table.category },
+      after_snapshot: { category: category || table.category },
+    }).catch(() => {}); // fire-and-forget
+
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'update-table', layer, tableName });
 
@@ -67,7 +80,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ layer: string; tableName: string }> }
 ) {
   try {
@@ -108,6 +121,17 @@ export async function DELETE(
       derivation_dag: updatedDerivationDag,
     };
     writeDataDictionary(updated);
+
+    // Audit: log schema change
+    const user = extractSchemaUser(request);
+    logSchemaChange({
+      change_type: 'DELETE_TABLE',
+      layer,
+      table_name: tableName,
+      changed_by_id: user.id,
+      changed_by_name: user.name,
+      before_snapshot: table,
+    }).catch(() => {}); // fire-and-forget
 
     // Sync: DDL files → PostgreSQL → introspect round-trip
     const syncResult = await postMutationSync(updated, { kind: 'delete-table', layer, tableName });

@@ -163,14 +163,19 @@ WHERE dimension_key ${filter}`;
 
 /* ── Label resolution ──────────────────────────────────────────── */
 
-/** SQL to look up human-readable labels for dimension_key values at each level. */
+/**
+ * SQL to look up human-readable labels for dimension_key values at each level.
+ * All dim_key values are cast to TEXT to ensure consistent type matching
+ * with dimension_key values from formula results (pg returns BIGINT as string).
+ * EBT queries filter is_current_flag = 'Y' to avoid duplicate segment IDs.
+ */
 const LABEL_QUERIES: Record<string, string> = {
-  facility: `SELECT facility_id AS dim_key, facility_name AS dim_label FROM l2.facility_master`,
-  counterparty: `SELECT counterparty_id AS dim_key, legal_name AS dim_label FROM l1.counterparty`,
-  desk: `SELECT managed_segment_id AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy`,
-  portfolio: `SELECT managed_segment_id AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy`,
-  business_segment: `SELECT managed_segment_id AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy`,
-  position: `SELECT position_id AS dim_key, product_code AS dim_label FROM l2.position WHERE as_of_date = :as_of_date`,
+  facility: `SELECT facility_id::text AS dim_key, facility_name AS dim_label FROM l2.facility_master`,
+  counterparty: `SELECT counterparty_id::text AS dim_key, legal_name AS dim_label FROM l1.counterparty`,
+  desk: `SELECT managed_segment_id::text AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy WHERE is_current_flag = 'Y'`,
+  portfolio: `SELECT managed_segment_id::text AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy WHERE is_current_flag = 'Y'`,
+  business_segment: `SELECT managed_segment_id::text AS dim_key, segment_name AS dim_label FROM l1.enterprise_business_taxonomy WHERE is_current_flag = 'Y'`,
+  position: `SELECT position_id::text AS dim_key, product_code AS dim_label FROM l2.position WHERE as_of_date = :as_of_date`,
 };
 
 /**

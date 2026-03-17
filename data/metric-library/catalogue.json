@@ -1134,7 +1134,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "committed_facility_amt",
-        "description": "committed_facility_amt",
+        "description": "Total committed (approved) amount of the credit facility",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -2038,8 +2038,8 @@
         "layer": "L2",
         "table": "position_detail",
         "field": "unfunded_amount",
-        "description": "unfunded_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Unfunded/undrawn amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -3057,8 +3057,8 @@
         "layer": "L2",
         "table": "position_detail",
         "field": "funded_amount",
-        "description": "funded_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Funded/drawn amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -4045,7 +4045,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "interest_income_amt",
-        "description": "interest_income_amt",
+        "description": "Interest income for the period",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -5477,13 +5477,15 @@
         "layer": "L2",
         "table": "amendment_event",
         "field": "amendment_status_code",
-        "description": "Status code of the amendment in its approval lifecycle"
+        "description": "Status code of the amendment in its approval lifecycle",
+        "data_type": "VARCHAR(20)"
       },
       {
         "layer": "L1",
         "table": "amendment_status_dim",
         "field": "amendment_status_name",
-        "description": "Human-readable amendment status label"
+        "description": "Human-readable amendment status label",
+        "data_type": "VARCHAR(200)"
       }
     ],
     "level_definitions": [
@@ -6883,7 +6885,7 @@
         "layer": "L2",
         "table": "amendment_event",
         "field": "amendment_event_id",
-        "description": "amendment_event_id",
+        "description": "Unique amendment event identifier",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -7514,15 +7516,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "allocated_equity_amt",
-        "description": "allocated_equity_amt",
-        "data_type": "NUMERIC(20,4)",
-        "sample_value": ""
-      },
-      {
-        "layer": "L2",
-        "table": "facility_exposure_snapshot",
-        "field": "rwa_amt",
-        "description": "rwa_amt",
+        "description": "Allocated equity (ROE denominator)",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -7530,7 +7524,7 @@
         "layer": "L3",
         "table": "facility_exposure_calc",
         "field": "rwa_amt",
-        "description": "rwa_amt",
+        "description": "Risk-weighted asset amount at facility level",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -8220,15 +8214,7 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "net_income_amt",
-        "description": "net_income_amt",
-        "data_type": "NUMERIC(20,4)",
-        "sample_value": ""
-      },
-      {
-        "layer": "L2",
-        "table": "facility_exposure_snapshot",
-        "field": "rwa_amt",
-        "description": "rwa_amt",
+        "description": "Net income (profit/loss) for the period",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -8236,7 +8222,7 @@
         "layer": "L3",
         "table": "facility_exposure_calc",
         "field": "rwa_amt",
-        "description": "rwa_amt",
+        "description": "Risk-weighted asset amount at facility level",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -8920,9 +8906,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_risk_snapshot",
+        "table": "position_detail",
         "field": "risk_weight_pct",
-        "description": "risk_weight_pct",
+        "description": "Basel III risk weight percentage assigned to the position",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -10377,9 +10363,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "cash_flow",
+        "table": "cash_flow_projection",
         "field": "contractual_amt",
-        "description": "contractual_amt",
+        "description": "Contractual scheduled cash flow amount",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -11281,8 +11267,8 @@
         "layer": "L2",
         "table": "position_detail",
         "field": "funded_amount",
-        "description": "funded_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Funded/drawn amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -12297,9 +12283,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_counterparty_participation",
+        "table": "facility_lender_allocation",
         "field": "allocation_pct",
-        "description": "allocation_pct",
+        "description": "Bank's share allocation percentage of the facility",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -13046,7 +13032,7 @@
         "layer": "L2",
         "table": "risk_flag",
         "field": "flag_code",
-        "description": "flag_code",
+        "description": "Flag code (DETERIORATED, WATCH_LIST, COVENANT_BREACH, BELOW_THRESHOLD_SPREAD, CRITICIZED)",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -13703,15 +13689,15 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "committed_amount",
-        "description": "committed_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Total committed exposure amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
         "layer": "L2",
         "table": "facility_lender_allocation",
         "field": "bank_share_pct",
-        "description": "bank_share_pct",
+        "description": "Bank's participation share of the facility (%)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -14434,7 +14420,7 @@
         "layer": "L2",
         "table": "payment_ledger",
         "field": "payment_due_date",
-        "description": "payment_due_date",
+        "description": "Scheduled date the payment is due",
         "data_type": "DATE",
         "sample_value": ""
       },
@@ -14442,15 +14428,15 @@
         "layer": "L2",
         "table": "payment_ledger",
         "field": "payment_amount_due",
-        "description": "payment_amount_due",
-        "data_type": "VARCHAR(64)",
+        "description": "Payment amount due on the scheduled date",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
         "layer": "L2",
         "table": "payment_ledger",
         "field": "payment_applied_amt",
-        "description": "payment_applied_amt",
+        "description": "Actual payment amount applied/received",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -15118,15 +15104,15 @@
         "layer": "L2",
         "table": "facility_delinquency_snapshot",
         "field": "days_past_due",
-        "description": "days_past_due",
-        "data_type": "VARCHAR(64)",
+        "description": "Number of days the payment is past due",
+        "data_type": "INTEGER",
         "sample_value": ""
       },
       {
-        "layer": "L2",
-        "table": "facility_delinquency_snapshot",
+        "layer": "L3",
+        "table": "facility_derived",
         "field": "delinquent_payment_flag",
-        "description": "delinquent_payment_flag",
+        "description": "Boolean flag indicating facility has delinquent payment",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -15845,10 +15831,10 @@
     "data_element_in_dm": "delinquent_payment_flag",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_delinquency_snapshot",
+        "layer": "L3",
+        "table": "facility_derived",
         "field": "delinquent_payment_flag",
-        "description": "delinquent_payment_flag",
+        "description": "Boolean flag indicating facility has delinquent payment",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -16536,7 +16522,7 @@
         "layer": "L2",
         "table": "facility_delinquency_snapshot",
         "field": "overdue_principal_amt",
-        "description": "overdue_principal_amt",
+        "description": "Overdue principal amount",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -16544,7 +16530,7 @@
         "layer": "L2",
         "table": "facility_delinquency_snapshot",
         "field": "overdue_interest_amt",
-        "description": "overdue_interest_amt",
+        "description": "Overdue interest amount",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -17271,7 +17257,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "risk_rating_status",
-        "description": "risk_rating_status",
+        "description": "Current risk rating movement status (upgrade/stable/downgrade)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -18042,15 +18028,15 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "noi_amt",
-        "description": "noi_amt",
+        "description": "Net operating income amount",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
-        "layer": "L2",
-        "table": "facility_financial_snapshot",
+        "layer": "L3",
+        "table": "facility_financial_calc",
         "field": "total_debt_service_amt",
-        "description": "total_debt_service_amt",
+        "description": "Total debt service amount — principal plus interest payments",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -18058,8 +18044,8 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "drawn_amount",
-        "description": "drawn_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Drawn/outstanding amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -18907,10 +18893,10 @@
     "data_element_in_dm": "expected_loss_rate_pct",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_risk_snapshot",
+        "layer": "L3",
+        "table": "facility_risk_calc",
         "field": "expected_loss_rate_pct",
-        "description": "expected_loss_rate_pct",
+        "description": "Expected loss rate as percentage of exposure (PD × LGD)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -19808,8 +19794,8 @@
         "layer": "L3",
         "table": "facility_stress_test_calc",
         "field": "stressed_expected_loss",
-        "description": "stressed_expected_loss",
-        "data_type": "VARCHAR(64)",
+        "description": "Stressed expected loss under adverse scenario",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -20736,8 +20722,8 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "committed_amount",
-        "description": "committed_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Total committed exposure amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -21422,11 +21408,11 @@
     "data_element_in_dm": "exposure_at_default",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "credit_event_facility_link",
+        "layer": "L3",
+        "table": "facility_risk_calc",
         "field": "exposure_at_default",
-        "description": "exposure_at_default",
-        "data_type": "VARCHAR(64)",
+        "description": "Exposure at default — total exposure at time of credit event",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -22417,7 +22403,7 @@
         "layer": "L3",
         "table": "facility_detail_snapshot",
         "field": "utilization_status_code",
-        "description": "utilization_status_code",
+        "description": "Utilization classification status code",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -23341,7 +23327,7 @@
         "layer": "L3",
         "table": "counterparty_exposure_summary",
         "field": "has_cross_entity_flag",
-        "description": "has_cross_entity_flag",
+        "description": "Flag indicating cross-entity exposure exists",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -24579,7 +24565,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "limit_status_code",
-        "description": "limit_status_code",
+        "description": "Limit utilization status code (e.g., within limit, breach)",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -25453,7 +25439,7 @@
         "layer": "L2",
         "table": "facility_risk_snapshot",
         "field": "lgd_pct",
-        "description": "lgd_pct",
+        "description": "Loss given default — estimated loss severity (%)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -26411,10 +26397,10 @@
     "data_element_in_dm": "ltv_pct",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_financial_snapshot",
+        "layer": "L3",
+        "table": "facility_financial_calc",
         "field": "ltv_pct",
-        "description": "ltv_pct",
+        "description": "Loan-to-value ratio as a percentage",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -27040,7 +27026,7 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "noi_amt",
-        "description": "noi_amt",
+        "description": "Net operating income amount",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -27048,7 +27034,7 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "interest_expense_amt",
-        "description": "interest_expense_amt",
+        "description": "Interest expense amount for the period",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -27056,7 +27042,7 @@
         "layer": "L2",
         "table": "facility_risk_snapshot",
         "field": "pd_pct",
-        "description": "pd_pct",
+        "description": "Probability of default — annualized default likelihood (%)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       },
@@ -27064,7 +27050,7 @@
         "layer": "L2",
         "table": "facility_risk_snapshot",
         "field": "lgd_pct",
-        "description": "lgd_pct",
+        "description": "Loss given default — estimated loss severity (%)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       },
@@ -27072,16 +27058,16 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "committed_amount",
-        "description": "committed_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Total committed exposure amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
         "layer": "L2",
         "table": "fx_rate",
         "field": "rate",
-        "description": "rate",
-        "data_type": "VARCHAR(64)",
+        "description": "Foreign exchange conversion rate",
+        "data_type": "NUMERIC(12,6)",
         "sample_value": ""
       }
     ],
@@ -27911,7 +27897,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "interest_income_amt",
-        "description": "interest_income_amt",
+        "description": "Interest income for the period",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -27919,7 +27905,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "interest_expense_amt",
-        "description": "interest_expense_amt",
+        "description": "Interest expense / funding cost",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -27927,7 +27913,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "avg_earning_assets_amt",
-        "description": "avg_earning_assets_amt",
+        "description": "Average earning assets (NIM denominator)",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -28628,7 +28614,7 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "operating_expense_amt",
-        "description": "operating_expense_amt",
+        "description": "Total operating expenses for the period",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -29322,7 +29308,7 @@
         "layer": "L2",
         "table": "facility_risk_snapshot",
         "field": "pd_pct",
-        "description": "pd_pct",
+        "description": "Probability of default — annualized default likelihood (%)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -30042,9 +30028,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_financial_snapshot",
+        "table": "counterparty_financial_snapshot",
         "field": "revenue_amt",
-        "description": "revenue_amt",
+        "description": "Total revenue amount for the counterparty",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -30885,7 +30871,7 @@
         "layer": "L2",
         "table": "collateral_snapshot",
         "field": "original_valuation_usd",
-        "description": "original_valuation_usd",
+        "description": "Original valuation amount (USD)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -31606,7 +31592,7 @@
         "layer": "L1",
         "table": "risk_mitigant_type_dim",
         "field": "risk_mitigant_subtype_code",
-        "description": "risk_mitigant_subtype_code",
+        "description": "Primary key for conformed mitigant taxonomy.",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -32380,9 +32366,9 @@
     "ingredient_fields": [
       {
         "layer": "L1",
-        "table": "risk_mitigant_master",
+        "table": "collateral_asset_master",
         "field": "risk_mitigant_id",
-        "description": "risk_mitigant_id",
+        "description": "Unique identifier for risk mitigant / collateral asset",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -33161,9 +33147,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "counterparty_financial_snapshot",
+        "table": "facility_financial_snapshot",
         "field": "net_income_amt",
-        "description": "net_income_amt",
+        "description": "Net income amount from facility financial snapshot",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -33171,7 +33157,7 @@
         "layer": "L2",
         "table": "counterparty_financial_snapshot",
         "field": "total_assets_amt",
-        "description": "total_assets_amt",
+        "description": "Total assets on the counterparty balance sheet",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -34190,9 +34176,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "counterparty_financial_snapshot",
+        "table": "facility_financial_snapshot",
         "field": "net_income_amt",
-        "description": "net_income_amt",
+        "description": "Net income amount from facility financial snapshot",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -34200,7 +34186,7 @@
         "layer": "L2",
         "table": "counterparty_financial_snapshot",
         "field": "shareholders_equity_amt",
-        "description": "shareholders_equity_amt",
+        "description": "Total shareholders' equity",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -35218,10 +35204,10 @@
     "data_element_in_dm": "total_debt_service_amt",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_financial_snapshot",
+        "layer": "L3",
+        "table": "facility_financial_calc",
         "field": "total_debt_service_amt",
-        "description": "total_debt_service_amt",
+        "description": "Total debt service amount — principal plus interest payments",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -36062,16 +36048,16 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "drawn_amount",
-        "description": "drawn_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Drawn/outstanding amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
       {
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "committed_amount",
-        "description": "committed_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Total committed exposure amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -36736,7 +36722,7 @@
         "layer": "L2",
         "table": "limit_utilization_event",
         "field": "utilized_amount_usd",
-        "description": "utilized_amount_usd",
+        "description": "Utilized amount reported by source system (USD)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -37362,7 +37348,7 @@
         "layer": "L2",
         "table": "counterparty_financial_snapshot",
         "field": "total_assets_amt",
-        "description": "total_assets_amt",
+        "description": "Total assets on the counterparty balance sheet",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -37988,7 +37974,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "allocated_equity_amt",
-        "description": "allocated_equity_amt",
+        "description": "Allocated equity (ROE denominator)",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -38619,7 +38605,7 @@
         "layer": "L2",
         "table": "facility_profitability_snapshot",
         "field": "avg_earning_assets_amt",
-        "description": "avg_earning_assets_amt",
+        "description": "Average earning assets (NIM denominator)",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -39242,10 +39228,10 @@
     "data_element_in_dm": "rwa_density_pct",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_exposure_snapshot",
+        "layer": "L3",
+        "table": "facility_exposure_calc",
         "field": "rwa_amt",
-        "description": "rwa_amt",
+        "description": "Risk-weighted asset amount at facility level",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -39253,16 +39239,8 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "gross_exposure_usd",
-        "description": "gross_exposure_usd",
+        "description": "Gross exposure amount (USD)",
         "data_type": "VARCHAR(64)",
-        "sample_value": ""
-      },
-      {
-        "layer": "L3",
-        "table": "facility_exposure_calc",
-        "field": "rwa_amt",
-        "description": "rwa_amt",
-        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],
@@ -40007,7 +39985,7 @@
         "layer": "L3",
         "table": "facility_exposure_calc",
         "field": "rwa_amt",
-        "description": "rwa_amt",
+        "description": "Risk-weighted asset amount (Basel III)",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -40615,10 +40593,10 @@
     "data_element_in_dm": "fccr_value",
     "ingredient_fields": [
       {
-        "layer": "L3",
-        "table": "facility_financial_calc",
+        "layer": "L2",
+        "table": "facility_financial_snapshot",
         "field": "ebitda_amt",
-        "description": "ebitda_amt",
+        "description": "Earnings before interest, taxes, depreciation, and amortization",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -40626,7 +40604,7 @@
         "layer": "L3",
         "table": "facility_financial_calc",
         "field": "total_debt_service_amt",
-        "description": "total_debt_service_amt",
+        "description": "Total debt service — principal plus interest payments",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -41387,7 +41365,7 @@
         "layer": "L2",
         "table": "facility_financial_snapshot",
         "field": "principal_payment_amt",
-        "description": "principal_payment_amt",
+        "description": "Principal repayment amount for the period",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
@@ -42945,7 +42923,7 @@
         "layer": "L2",
         "table": "facility_pricing_snapshot",
         "field": "base_rate_pct",
-        "description": "base_rate_pct",
+        "description": "Reference/base rate percentage (e.g., SOFR)",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -43814,10 +43792,10 @@
     "data_element_in_dm": "exception_rate_pct",
     "ingredient_fields": [
       {
-        "layer": "L3",
-        "table": "facility_pricing_calc",
+        "layer": "L2",
+        "table": "facility_pricing_snapshot",
         "field": "pricing_exception_flag",
-        "description": "pricing_exception_flag",
+        "description": "Flag indicating pricing exception applied to facility",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -44443,7 +44421,7 @@
         "layer": "L2",
         "table": "facility_pricing_snapshot",
         "field": "fee_rate_pct",
-        "description": "fee_rate_pct",
+        "description": "Fee rate percentage charged on the facility",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -45194,7 +45172,7 @@
         "layer": "L2",
         "table": "facility_pricing_snapshot",
         "field": "pricing_exception_status",
-        "description": "pricing_exception_status",
+        "description": "Status of pricing exception (approved/pending/rejected)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -45851,7 +45829,7 @@
         "layer": "L3",
         "table": "facility_detail_snapshot",
         "field": "pricing_tier_code",
-        "description": "pricing_tier_code",
+        "description": "Pricing tier classification code for the facility",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -46657,7 +46635,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "interest_rate_spread_bps",
-        "description": "interest_rate_spread_bps",
+        "description": "Interest rate spread over benchmark in basis points",
         "data_type": "NUMERIC(10,4)",
         "sample_value": ""
       }
@@ -47375,10 +47353,10 @@
     "data_element_in_dm": "interest_rate_sensitivity_pct",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_financial_snapshot",
+        "layer": "L3",
+        "table": "facility_financial_calc",
         "field": "interest_rate_sensitivity_pct",
-        "description": "interest_rate_sensitivity_pct",
+        "description": "Interest rate sensitivity as percentage — impact of rate change on facility value",
         "data_type": "NUMERIC(10,6)",
         "sample_value": ""
       }
@@ -48010,7 +47988,7 @@
         "layer": "L2",
         "table": "facility_pricing_snapshot",
         "field": "pricing_exception_flag",
-        "description": "pricing_exception_flag",
+        "description": "Flag indicating pricing exception applied to facility",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -49330,7 +49308,8 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "as_of_date",
-        "description": "Snapshot date used as temporal reference for all reporting"
+        "description": "Snapshot date used as temporal reference for all reporting",
+        "data_type": "DATE"
       }
     ],
     "level_definitions": [
@@ -49981,7 +49960,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "origination_date",
-        "description": "origination_date",
+        "description": "Date the facility was originally booked/originated",
         "data_type": "DATE",
         "sample_value": ""
       },
@@ -49989,7 +49968,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "maturity_date",
-        "description": "maturity_date",
+        "description": "Contractual maturity date of the facility",
         "data_type": "DATE",
         "sample_value": ""
       }
@@ -50656,7 +50635,7 @@
         "layer": "L2",
         "table": "counterparty",
         "field": "counterparty_id",
-        "description": "counterparty_id",
+        "description": "Unique identifier for the counterparty/borrower",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -51313,7 +51292,7 @@
         "layer": "L2",
         "table": "counterparty",
         "field": "legal_name",
-        "description": "legal_name",
+        "description": "Legal entity name of the counterparty",
         "data_type": "VARCHAR(500)",
         "sample_value": ""
       }
@@ -52006,7 +51985,7 @@
         "layer": "L1",
         "table": "country_dim",
         "field": "country_name",
-        "description": "country_name",
+        "description": "Full country name",
         "data_type": "VARCHAR(500)",
         "sample_value": ""
       }
@@ -52753,7 +52732,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "credit_agreement_id",
-        "description": "credit_agreement_id",
+        "description": "FK to the governing credit agreement",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -53260,7 +53239,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "days_until_maturity",
-        "description": "days_until_maturity",
+        "description": "Number of days remaining until facility maturity",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -53952,7 +53931,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "origination_date",
-        "description": "origination_date",
+        "description": "Date the facility was originally booked/originated",
         "data_type": "DATE",
         "sample_value": ""
       }
@@ -54552,7 +54531,8 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "facility_id",
-        "description": "Unique identifier for the lending facility"
+        "description": "Unique identifier for the lending facility",
+        "data_type": "BIGINT"
       }
     ],
     "level_definitions": [
@@ -55056,7 +55036,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "facility_name",
-        "description": "facility_name",
+        "description": "Human-readable name of the credit facility",
         "data_type": "VARCHAR(500)",
         "sample_value": ""
       }
@@ -55594,9 +55574,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_exposure_snapshot",
+        "table": "facility_master",
         "field": "facility_type",
-        "description": "facility_type",
+        "description": "Type classification of the credit facility",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -56400,7 +56380,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "fr2590_category_code",
-        "description": "fr2590_category_code",
+        "description": "FR 2590 category code",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -56906,7 +56886,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "is_active_flag",
-        "description": "is_active_flag",
+        "description": "Boolean flag indicating if facility/record is currently active",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -57383,16 +57363,18 @@
     "data_element_in_dm": "is_syndicated_flag",
     "ingredient_fields": [
       {
-        "layer": "L2",
-        "table": "facility_master",
+        "layer": "L3",
+        "table": "facility_detail_snapshot",
         "field": "is_syndicated_flag",
-        "description": "Boolean flag indicating whether the facility is part of a syndicated deal"
+        "description": "Boolean flag indicating whether the facility is part of a syndicated deal",
+        "data_type": "BOOLEAN"
       },
       {
         "layer": "L2",
         "table": "credit_agreement_counterparty_participation",
         "field": "counterparty_id",
-        "description": "Participating lender identifier used to determine syndication"
+        "description": "Participating lender identifier used to determine syndication",
+        "data_type": "BIGINT"
       }
     ],
     "level_definitions": [
@@ -58625,7 +58607,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "legal_entity_id",
-        "description": "legal_entity_id",
+        "description": "Reporting legal entity",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -59257,7 +59239,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent",
-        "description": "parent",
+        "description": "FK to parent managed_segment_id in same table",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -59851,7 +59833,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent",
-        "description": "parent",
+        "description": "FK to parent managed_segment_id in same table",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -60445,7 +60427,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent",
-        "description": "parent",
+        "description": "FK to parent managed_segment_id in same table",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -61039,7 +61021,7 @@
         "layer": "L1",
         "table": "enterprise_business_taxonomy",
         "field": "parent",
-        "description": "parent",
+        "description": "FK to parent managed_segment_id in same table",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -61632,7 +61614,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "maturity_date",
-        "description": "maturity_date",
+        "description": "Contractual maturity date of the facility",
         "data_type": "DATE",
         "sample_value": ""
       }
@@ -62202,7 +62184,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "origination_date",
-        "description": "origination_date",
+        "description": "Date the facility was originally booked/originated",
         "data_type": "DATE",
         "sample_value": ""
       }
@@ -62713,7 +62695,7 @@
         "layer": "L2",
         "table": "counterparty",
         "field": "counterparty_id",
-        "description": "counterparty_id",
+        "description": "Unique identifier for the counterparty/borrower",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -63278,9 +63260,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_exposure_snapshot",
+        "table": "facility_master",
         "field": "product_id",
-        "description": "product_id",
+        "description": "Product identifier linking facility to product taxonomy",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -64144,7 +64126,7 @@
         "layer": "L2",
         "table": "counterparty",
         "field": "region_code",
-        "description": "region_code",
+        "description": "Geographic region code for the counterparty",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -65097,7 +65079,7 @@
         "layer": "L1",
         "table": "industry_dim",
         "field": "industry_name",
-        "description": "industry_name",
+        "description": "Industry name",
         "data_type": "VARCHAR(500)",
         "sample_value": ""
       }
@@ -65798,8 +65780,8 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "number_of_facilities",
-        "description": "number_of_facilities",
-        "data_type": "VARCHAR(64)",
+        "description": "Count of distinct facilities under the entity",
+        "data_type": "INTEGER",
         "sample_value": ""
       }
     ],
@@ -66410,7 +66392,7 @@
         "layer": "L2",
         "table": "counterparty_financial_snapshot",
         "field": "tangible_net_worth_usd",
-        "description": "tangible_net_worth_usd",
+        "description": "Tangible net worth in USD (assets less intangibles less liabilities)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -67282,7 +67264,7 @@
         "layer": "L1",
         "table": "maturity_bucket_dim",
         "field": "maturity_bucket_id",
-        "description": "maturity_bucket_id",
+        "description": "Unique maturity bucket identifier",
         "data_type": "BIGINT",
         "sample_value": ""
       }
@@ -68227,9 +68209,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_master",
+        "table": "amendment_event",
         "field": "effective_date",
-        "description": "effective_date",
+        "description": "Date the amendment or change became effective",
         "data_type": "DATE",
         "sample_value": ""
       }
@@ -68718,9 +68700,9 @@
     "ingredient_fields": [
       {
         "layer": "L2",
-        "table": "facility_master",
+        "table": "amendment_event",
         "field": "effective_date",
-        "description": "effective_date",
+        "description": "Date the amendment or change became effective",
         "data_type": "DATE",
         "sample_value": ""
       }
@@ -69211,7 +69193,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "is_active_flag",
-        "description": "is_active_flag",
+        "description": "Boolean flag indicating if facility/record is currently active",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -69694,7 +69676,7 @@
         "layer": "L2",
         "table": "counterparty",
         "field": "pd_annual",
-        "description": "pd_annual",
+        "description": "Annualized probability of default for the counterparty",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       },
@@ -69702,7 +69684,7 @@
         "layer": "L1",
         "table": "risk_rating_tier_dim",
         "field": "display_order",
-        "description": "display_order",
+        "description": "Sort order for display in UI/reports",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -70456,7 +70438,7 @@
         "layer": "L2",
         "table": "position",
         "field": "external_risk_rating",
-        "description": "external_risk_rating",
+        "description": "External rating (CCC to AA scale)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -71297,7 +71279,7 @@
         "layer": "L2",
         "table": "facility_risk_snapshot",
         "field": "internal_risk_rating",
-        "description": "internal_risk_rating",
+        "description": "Internal risk rating code assigned by credit risk",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -71929,7 +71911,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "risk_rating_status",
-        "description": "risk_rating_status",
+        "description": "Current risk rating movement status (upgrade/stable/downgrade)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -72649,7 +72631,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "risk_rating_change_steps",
-        "description": "risk_rating_change_steps",
+        "description": "Number of rating notches changed (positive = upgrade, negative = downgrade)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -73361,7 +73343,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "risk_rating_status",
-        "description": "risk_rating_status",
+        "description": "Current risk rating movement status (upgrade/stable/downgrade)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -74049,7 +74031,7 @@
         "layer": "L2",
         "table": "counterparty_rating_observation",
         "field": "risk_rating_change_steps",
-        "description": "risk_rating_change_steps",
+        "description": "Number of rating notches changed (positive = upgrade, negative = downgrade)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -74706,7 +74688,7 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "internal_risk_rating_bucket_code",
-        "description": "internal_risk_rating_bucket_code",
+        "description": "Bucketed internal risk rating classification code",
         "data_type": "VARCHAR(30)",
         "sample_value": ""
       }
@@ -75332,7 +75314,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "committed_facility_amt",
-        "description": "committed_facility_amt",
+        "description": "Total committed (approved) amount of the credit facility",
         "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       },
@@ -75340,7 +75322,7 @@
         "layer": "L2",
         "table": "collateral_snapshot",
         "field": "current_valuation_usd",
-        "description": "current_valuation_usd",
+        "description": "Current valuation amount (USD)",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       }
@@ -76872,7 +76854,32 @@
     "executable_metric_id": "EXP-049",
     "normalized_de_name": "Cross Entity Exposure Flag",
     "data_element_in_dm": "has_cross_entity_flag",
-    "ingredient_fields": [],
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_counterparty_participation",
+        "field": "facility_id",
+        "description": "Unique identifier for the credit facility",
+        "data_type": "BIGINT",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_counterparty_participation",
+        "field": "counterparty_id",
+        "description": "Unique identifier for the counterparty/borrower",
+        "data_type": "BIGINT",
+        "sample_value": ""
+      },
+      {
+        "layer": "L2",
+        "table": "facility_counterparty_participation",
+        "field": "is_current_flag",
+        "description": "Flag indicating this is the current/active record version",
+        "data_type": "BOOLEAN",
+        "sample_value": ""
+      }
+    ],
     "level_definitions": [
       {
         "level": "facility",
@@ -77345,7 +77352,7 @@
         "layer": "L2",
         "table": "facility_master",
         "field": "is_active_flag",
-        "description": "is_active_flag",
+        "description": "Boolean flag indicating if facility/record is currently active",
         "data_type": "BOOLEAN",
         "sample_value": ""
       }
@@ -77799,7 +77806,7 @@
         "layer": "L2",
         "table": "facility_risk_snapshot",
         "field": "internal_risk_rating",
-        "description": "internal_risk_rating",
+        "description": "Internal risk rating code assigned by credit risk",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       },
@@ -77807,7 +77814,7 @@
         "layer": "L2",
         "table": "counterparty",
         "field": "internal_risk_rating",
-        "description": "internal_risk_rating",
+        "description": "Internal risk rating code assigned by credit risk",
         "data_type": "VARCHAR(64)",
         "sample_value": ""
       },
@@ -77815,7 +77822,7 @@
         "layer": "L1",
         "table": "rating_scale_dim",
         "field": "rating_value",
-        "description": "rating_value",
+        "description": "Display label for the rating grade (e.g., \"AA\", \"BBB\", \"3\", \"CCC\")",
         "data_type": "NUMERIC(12,6)",
         "sample_value": ""
       }
@@ -78657,8 +78664,8 @@
         "layer": "L2",
         "table": "facility_exposure_snapshot",
         "field": "drawn_amount",
-        "description": "drawn_amount",
-        "data_type": "VARCHAR(64)",
+        "description": "Drawn/outstanding amount",
+        "data_type": "NUMERIC(20,4)",
         "sample_value": ""
       }
     ],

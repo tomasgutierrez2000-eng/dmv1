@@ -21,7 +21,8 @@ import fs from 'fs';
 import { stringify as yamlStringify } from 'yaml';
 
 // Dynamic xlsx import — works in both tsx CLI and Next.js API routes
-async function getXLSX() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getXLSX(): Promise<any> {
   const mod = await import('xlsx');
   // Next.js webpack: named exports (utils, readFile, etc.) are on mod directly
   // tsx/Node.js CJS: named exports may only be on mod.default

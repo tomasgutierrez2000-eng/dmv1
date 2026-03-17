@@ -138,7 +138,7 @@ levels:
         ebt.managed_segment_id AS dimension_key,
         CASE WHEN SUM(fes.gross_exposure_usd) = 0 THEN NULL
              ELSE SUM(cp_roe.metric_value * fes.gross_exposure_usd)
-                  / SUM(fes.gross_exposure_usd)
+                  / NULLIF(SUM(fes.gross_exposure_usd), 0)
         END AS metric_value
       FROM (
         SELECT
@@ -168,7 +168,7 @@ levels:
         ebt_l2.managed_segment_id AS dimension_key,
         CASE WHEN SUM(fes.gross_exposure_usd) = 0 THEN NULL
              ELSE SUM(cp_roe.metric_value * fes.gross_exposure_usd)
-                  / SUM(fes.gross_exposure_usd)
+                  / NULLIF(SUM(fes.gross_exposure_usd), 0)
         END AS metric_value
       FROM (
         SELECT
@@ -201,7 +201,7 @@ levels:
         ebt_l1.managed_segment_id AS dimension_key,
         CASE WHEN SUM(fes.gross_exposure_usd) = 0 THEN NULL
              ELSE SUM(cp_roe.metric_value * fes.gross_exposure_usd)
-                  / SUM(fes.gross_exposure_usd)
+                  / NULLIF(SUM(fes.gross_exposure_usd), 0)
         END AS metric_value
       FROM (
         SELECT

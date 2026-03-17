@@ -75,9 +75,7 @@ levels:
     formula_sql: |-
       SELECT
         fm.counterparty_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
+        SUM(fac.numerator_val) / NULLIF(SUM(fac.denominator_val), 0) * 100.0 AS metric_value
       FROM (
         SELECT
           fes.facility_id,
@@ -100,9 +98,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
+        SUM(fac.numerator_val) / NULLIF(SUM(fac.denominator_val), 0) * 100.0 AS metric_value
       FROM (
         SELECT
           fes.facility_id,
@@ -128,9 +124,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
+        SUM(fac.numerator_val) / NULLIF(SUM(fac.denominator_val), 0) * 100.0 AS metric_value
       FROM (
         SELECT
           fes.facility_id,
@@ -159,9 +153,7 @@ levels:
     formula_sql: |-
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
-        CASE WHEN SUM(fac.denominator_val) = 0 THEN NULL
-             ELSE SUM(fac.numerator_val) / SUM(fac.denominator_val) * 100.0
-        END AS metric_value
+        SUM(fac.numerator_val) / NULLIF(SUM(fac.denominator_val), 0) * 100.0 AS metric_value
       FROM (
         SELECT
           fes.facility_id,

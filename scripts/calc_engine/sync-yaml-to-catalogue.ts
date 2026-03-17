@@ -712,6 +712,7 @@ function findMatchingCatalogueItem(
 
 function main(): void {
   const dryRun = process.argv.includes('--dry-run');
+  const strict = process.argv.includes('--strict');
 
   const { metrics, errors, warnings } = loadMetricDefinitions();
   if (errors.length > 0) {
@@ -723,6 +724,10 @@ function main(): void {
     console.warn(`\n⚠ Formula linter warnings (${warnings.length}):`);
     warnings.forEach((w) => console.warn('  ', w));
     console.warn('');
+    if (strict) {
+      console.error(`\n✗ --strict mode: ${warnings.length} warning(s) treated as errors. Fix all warnings before syncing.`);
+      process.exit(1);
+    }
   }
 
   const active = metrics.filter((m) => m.status === 'ACTIVE' || m.status === 'DRAFT');
@@ -831,7 +836,32 @@ function main(): void {
   if (updated > 0) parts.push(`${updated} updated`);
   if (created > 0) parts.push(`${created} created`);
   if (vizUpdated > 0) parts.push(`${vizUpdated} viz configs`);
-  console.log(`Synced ${parts.join(', ')} from ${active.length} YAML metrics${dryRun ? ' (dry-run)' : ''}.`);
+  console.log(`\n✓ Synced ${parts.join(', ')} from ${active.length} YAML metrics${dryRun ? ' (dry-run)' : ''}.`);
+
+  // Post-sync reminders
+  if (!dryRun && (updated > 0 || created > 0)) {
+    const syncedIds = active.map((m) => m.metric_id).join(', ');
+    console.log(`\n  ─── Post-Sync Checklist ───`);
+    console.log(`  Synced metrics: ${syncedIds}`);
+    console.log(`\n  1. Validate formula SQL execution:`);
+    console.log(`     npm run test:calc-engine`);
+    console.log(`\n  2. Generate demo data for new/changed metrics:`);
+    const catalogueIds = active
+      .map((m) => {
+        const match = findMatchingCatalogueItem(catalogue, m);
+        return match?.item_id ?? m.metric_id;
+      })
+      .filter((id) => id.startsWith('MET-'));
+    if (catalogueIds.length > 0) {
+      for (const id of catalogueIds.slice(0, 5)) {
+        console.log(`     npm run calc:demo -- --metric ${id} --persist --force`);
+      }
+      if (catalogueIds.length > 5) {
+        console.log(`     ... and ${catalogueIds.length - 5} more`);
+      }
+    }
+    console.log(`  ────────────────────────────\n`);
+  }
 }
 
 main();

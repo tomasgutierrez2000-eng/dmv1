@@ -101,7 +101,7 @@ levels:
         CASE WHEN COUNT(*) = 0 THEN NULL
              ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
                             THEN 1 ELSE 0 END) * 100.0
-                  / COUNT(*)
+                  / NULLIF(COUNT(*), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -122,7 +122,7 @@ levels:
         CASE WHEN COUNT(*) = 0 THEN NULL
              ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
                             THEN 1 ELSE 0 END) * 100.0
-                  / COUNT(*)
+                  / NULLIF(COUNT(*), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -146,7 +146,7 @@ levels:
         CASE WHEN COUNT(*) = 0 THEN NULL
              ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
                             THEN 1 ELSE 0 END) * 100.0
-                  / COUNT(*)
+                  / NULLIF(COUNT(*), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm
@@ -173,7 +173,7 @@ levels:
         CASE WHEN COUNT(*) = 0 THEN NULL
              ELSE SUM(CASE WHEN fps.is_pricing_exception_flag = 'Y'
                             THEN 1 ELSE 0 END) * 100.0
-                  / COUNT(*)
+                  / NULLIF(COUNT(*), 0)
         END AS metric_value
       FROM l2.facility_pricing_snapshot fps
       INNER JOIN l2.facility_master fm

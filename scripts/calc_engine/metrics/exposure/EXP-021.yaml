@@ -110,21 +110,17 @@ levels:
       (utilization_min_pct <= pct < utilization_max_pct) to return status_name.
     formula_sql: |
       SELECT
-        util.facility_id AS dimension_key,
+        fes.facility_id AS dimension_key,
         usd.status_name AS metric_value
-      FROM (
-        SELECT
-          fes.facility_id,
-          COALESCE(fes.drawn_amount, 0) * 100.0
-            / NULLIF(fes.committed_amount, 0) AS utilization_pct
-        FROM l2.facility_exposure_snapshot fes
-        WHERE fes.as_of_date = :as_of_date
-      ) util
+      FROM l2.facility_exposure_snapshot fes
       LEFT JOIN l1.utilization_status_dim usd
-        ON util.utilization_pct >= usd.utilization_min_pct
-        AND util.utilization_pct < usd.utilization_max_pct
+        ON COALESCE(fes.drawn_amount, 0) * 100.0
+           / NULLIF(fes.committed_amount, 0) >= usd.utilization_min_pct
+        AND COALESCE(fes.drawn_amount, 0) * 100.0
+           / NULLIF(fes.committed_amount, 0) < usd.utilization_max_pct
         AND usd.is_active_flag = 'Y'
         AND usd.is_current_flag = 'Y'
+      WHERE fes.as_of_date = :as_of_date
   counterparty:
     aggregation_type: CUSTOM
     formula_text: >

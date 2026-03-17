@@ -112,7 +112,7 @@ levels:
       LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = cd.facility_id
         AND fla.is_current_flag = 'Y'
-      WHERE cd.has_cross_entity_flag = true
+      WHERE cd.has_cross_entity_flag = 'Y'
       GROUP BY cd.facility_id
   counterparty:
     aggregation_type: SUM
@@ -134,7 +134,7 @@ levels:
       LEFT JOIN l2.facility_lender_allocation fla
         ON fla.facility_id = cd.facility_id
         AND fla.is_current_flag = 'Y'
-      WHERE cd.has_cross_entity_flag = true
+      WHERE cd.has_cross_entity_flag = 'Y'
       GROUP BY fm.counterparty_id
   desk:
     aggregation_type: SUM
@@ -160,7 +160,7 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = cd.facility_id
           AND fla.is_current_flag = 'Y'
-        WHERE cd.has_cross_entity_flag = true
+        WHERE cd.has_cross_entity_flag = 'Y'
         GROUP BY cd.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
@@ -194,7 +194,7 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = cd.facility_id
           AND fla.is_current_flag = 'Y'
-        WHERE cd.has_cross_entity_flag = true
+        WHERE cd.has_cross_entity_flag = 'Y'
         GROUP BY cd.facility_id
       ) fac
       INNER JOIN l2.facility_master fm
@@ -231,7 +231,7 @@ levels:
         LEFT JOIN l2.facility_lender_allocation fla
           ON fla.facility_id = cd.facility_id
           AND fla.is_current_flag = 'Y'
-        WHERE cd.has_cross_entity_flag = true
+        WHERE cd.has_cross_entity_flag = 'Y'
         GROUP BY cd.facility_id
       ) fac
       INNER JOIN l2.facility_master fm

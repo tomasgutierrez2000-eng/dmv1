@@ -107,15 +107,34 @@ function validateFormulaLogic(metric: MetricDefinition): string[] {
       );
     }
 
-    // Rule 5: WHERE before last JOIN
-    const withoutStrings = sql.replace(/'[^']*'/g, '');
-    const whereIdx = withoutStrings.search(/\bWHERE\b/i);
-    const joinMatches = [...withoutStrings.matchAll(/\b(?:LEFT\s+|INNER\s+|CROSS\s+)?JOIN\b/gi)];
-    const lastJoinIdx = joinMatches.length > 0 ? Math.max(...joinMatches.map((jm) => jm.index ?? -1)) : -1;
-    if (whereIdx > -1 && lastJoinIdx > -1 && whereIdx < lastJoinIdx) {
-      warnings.push(
-        `${metric.metric_id}.${level}: WHERE clause before last JOIN — SQL syntax error`
-      );
+    // Rule 5: WHERE before last JOIN (parenthesis-aware — only flags at the same nesting depth)
+    {
+      const clean = sql.replace(/'[^']*'/g, '');
+      let depth = 0;
+      let firstWhereAtDepth0 = -1;
+      let lastJoinAtDepth0 = -1;
+      for (let ci = 0; ci < clean.length; ci++) {
+        if (clean[ci] === '(') { depth++; continue; }
+        if (clean[ci] === ')') { depth--; continue; }
+        if (depth !== 0) continue;
+        // Check for WHERE keyword at depth 0
+        if (firstWhereAtDepth0 === -1) {
+          const slice = clean.slice(ci, ci + 6);
+          if (/^\bWHERE\b/i.test(slice)) {
+            firstWhereAtDepth0 = ci;
+          }
+        }
+        // Check for JOIN keyword at depth 0
+        const joinSlice = clean.slice(ci, ci + 15);
+        if (/^(?:LEFT\s+|INNER\s+|CROSS\s+)?JOIN\b/i.test(joinSlice)) {
+          lastJoinAtDepth0 = ci;
+        }
+      }
+      if (firstWhereAtDepth0 > -1 && lastJoinAtDepth0 > -1 && firstWhereAtDepth0 < lastJoinAtDepth0) {
+        warnings.push(
+          `${metric.metric_id}.${level}: WHERE clause before last JOIN — SQL syntax error`
+        );
+      }
     }
 
     // Rule 6: FX rate without COALESCE
@@ -137,6 +156,67 @@ function validateFormulaLogic(metric: MetricDefinition): string[] {
       warnings.push(
         `${metric.metric_id}.${level}: AVG() of ratio/pct at aggregate level — use sum-ratio to avoid Simpson's paradox`
       );
+    }
+
+    // Rule 9: SUM of string/text fields (meaningless aggregation)
+    if (/\bSUM\s*\(\s*\w+\.\w+_(name|desc|text|code)\b/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: SUM() of text/name/code field — use COUNT(DISTINCT) or MIN() for strings`
+      );
+    }
+
+    // Rule 10: SUM of ID fields (meaningless aggregation — but allow inside CASE WHEN)
+    const sumIdMatch = sql.match(/\bSUM\s*\(\s*(\w+\.\w+_id)\b/i);
+    if (sumIdMatch) {
+      // Check that this SUM(_id) is NOT inside a CASE WHEN or COUNT(DISTINCT) context
+      const contextBefore = sql.substring(Math.max(0, sql.indexOf(sumIdMatch[0]) - 30), sql.indexOf(sumIdMatch[0]));
+      if (!/CASE\s+WHEN/i.test(contextBefore)) {
+        warnings.push(
+          `${metric.metric_id}.${level}: SUM() of ID field "${sumIdMatch[1]}" — use COUNT(DISTINCT) instead`
+        );
+      }
+    }
+
+    // Rule 11: CTE usage (formula_sql must start with SELECT, not WITH...AS)
+    if (/^\s*WITH\b/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: formula_sql must start with SELECT — convert CTEs to inline subqueries`
+      );
+    }
+
+    // Rule 12: Wrong EBT join key (facility_id/counterparty_id don't exist on EBT)
+    if (/ebt\w*\.(facility_id|counterparty_id|agreement_id)/i.test(sql)) {
+      warnings.push(
+        `${metric.metric_id}.${level}: EBT join on non-existent field — use ebt.managed_segment_id = fm.lob_segment_id`
+      );
+    }
+
+    // Rule 13: Missing COALESCE on nullable weight fields in weighted-avg patterns
+    // Detects SUM(x * y) where y could be NULL and is not wrapped in COALESCE
+    const weightedProductRegex = /\bSUM\s*\(\s*\w+\.\w+\s*\*\s*(?!COALESCE)(\w+\.(?:outstanding_balance_amt|gross_exposure_usd|committed_facility_amt))/gi;
+    let wm;
+    while ((wm = weightedProductRegex.exec(sql)) !== null) {
+      warnings.push(
+        `${metric.metric_id}.${level}: "${wm[1]}" used as weight without COALESCE — NULL values will nullify entire term`
+      );
+    }
+
+    // Rule 14: Duplicate table aliases (same alias for different tables)
+    const aliasMatches = [...sql.matchAll(/\b(?:FROM|JOIN)\s+\w+\.\w+\s+(\w+)\b/gi)];
+    const aliasToTable = new Map<string, string>();
+    for (const am of aliasMatches) {
+      const alias = am[1].toLowerCase();
+      const fullMatch = am[0].toLowerCase();
+      const tableMatch = fullMatch.match(/(?:from|join)\s+(\w+\.\w+)/i);
+      if (tableMatch) {
+        const table = tableMatch[1];
+        if (aliasToTable.has(alias) && aliasToTable.get(alias) !== table) {
+          warnings.push(
+            `${metric.metric_id}.${level}: duplicate alias "${am[1]}" used for both "${aliasToTable.get(alias)}" and "${table}"`
+          );
+        }
+        aliasToTable.set(alias, table);
+      }
     }
   }
 
@@ -195,8 +275,38 @@ export function loadMetricDefinitions(metricsDir?: string): LoadResult {
         continue;
       }
 
-      // Formula logic linting (warnings — non-blocking, does not prevent metric loading)
+      // Formula logic linting — critical rules block ACTIVE metrics from loading
       const logicWarnings = validateFormulaLogic(metric);
+
+      // These rule fragments cause SQL execution failures — block ACTIVE metrics
+      const BLOCKING_RULE_FRAGMENTS = [
+        'WHERE clause before last JOIN',   // SQL syntax error
+        'PostgreSQL-specific cast',        // Breaks sql.js
+        "use = 'Y' for boolean flags",     // Breaks sql.js
+        'must start with SELECT',          // CTE breaks sync validator
+        'non-existent field',              // EBT join on wrong field
+      ];
+
+      if (metric.status === 'ACTIVE' && logicWarnings.length > 0) {
+        const blockers = logicWarnings.filter((w) =>
+          BLOCKING_RULE_FRAGMENTS.some((frag) => w.includes(frag))
+        );
+        if (blockers.length > 0) {
+          for (const b of blockers) {
+            errors.push(`${relPath}: BLOCKED (ACTIVE) — ${b}`);
+          }
+          // Still add non-blocking warnings for visibility
+          const nonBlockers = logicWarnings.filter(
+            (w) => !BLOCKING_RULE_FRAGMENTS.some((frag) => w.includes(frag))
+          );
+          for (const w of nonBlockers) {
+            warnings.push(`${relPath}: ${w}`);
+          }
+          continue; // Don't load this metric — must fix before syncing
+        }
+      }
+
+      // Non-blocking warnings for all metrics
       if (logicWarnings.length > 0) {
         for (const w of logicWarnings) {
           warnings.push(`${relPath}: ${w}`);
@@ -219,6 +329,22 @@ export function loadMetricDefinitions(metricsDir?: string): LoadResult {
         errors.push(
           `${metric.metric_id}: depends_on references unknown metric "${depId}"`
         );
+      }
+    }
+  }
+
+  // Cross-metric validation: catalogue abbreviation uniqueness
+  const seenAbbreviations = new Map<string, string>();
+  for (const metric of metrics) {
+    const abbr = (metric as { catalogue?: { abbreviation?: string } }).catalogue?.abbreviation;
+    if (abbr) {
+      const existing = seenAbbreviations.get(abbr);
+      if (existing) {
+        warnings.push(
+          `${metric.metric_id}: duplicate catalogue abbreviation "${abbr}" (also used by ${existing})`
+        );
+      } else {
+        seenAbbreviations.set(abbr, metric.metric_id);
       }
     }
   }

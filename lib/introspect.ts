@@ -389,7 +389,13 @@ export function mergeIntoDataDictionary(
       }
     }
 
-    dd[layer] = ddTables.filter(t => dbNames.has(t.name));
+    // Filter to DB-present tables and deduplicate by name
+    const seen = new Set<string>();
+    dd[layer] = ddTables.filter(t => {
+      if (!dbNames.has(t.name) || seen.has(t.name)) return false;
+      seen.add(t.name);
+      return true;
+    });
 
     report.totalTables[layer] = dbNames.size;
     report.totalFields[layer] = [...dbNames].reduce(

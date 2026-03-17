@@ -1,5 +1,5 @@
 /**
- * L3 Table manifest — 77 tables.
+ * L3 Table manifest — 79 tables.
  * Matches sql/l3/01_DDL_all_tables.sql and execution order in 06_ORCHESTRATOR.sql.
  * T51-T52: Calculated overlay tables (derived fields split from L2 snapshots).
  * T53-T54: Promoted from L2 (entirely computed tables).
@@ -87,7 +87,6 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T57', name: 'counterparty_rating_calc',            category: 'Credit Risk & Ratings',          tier: 1 },
   { id: 'T58', name: 'facility_pricing_calc',               category: 'Financial Performance',          tier: 1 },
   { id: 'T60', name: 'collateral_calc',                     category: 'Collateral & Risk Mitigation',   tier: 1 },
-  { id: 'T61', name: 'cash_flow_calc',                      category: 'Financial Performance',          tier: 1 },
   // T62: GL calculated overlay (derived fields split from L2 gl_account_balance_snapshot)
   { id: 'T62', name: 'gl_account_balance_calc',             category: 'Financial Performance',          tier: 1 },
   // T63-T66: Calculation engine infrastructure tables
@@ -115,6 +114,11 @@ export const L3_TABLES: L3TableDef[] = [
   { id: 'T83', name: 'capital_position_calc',                category: 'Regulatory & Capital',           tier: 1 },
   { id: 'T84', name: 'counterparty_financial_calc',          category: 'Counterparty & Entity',          tier: 1 },
   { id: 'T85', name: 'exception_event_calc',                 category: 'Limits & Risk Appetite',         tier: 1 },
+
+  // ── Metric Governance (migration 011) ──
+  { id: 'T86', name: 'metric_change_log',                    category: 'Data Quality & Infrastructure',  tier: 1 },
+  { id: 'T87', name: 'metric_sandbox_run',                   category: 'Data Quality & Infrastructure',  tier: 1 },
+  { id: 'T88', name: 'schema_change_log',                    category: 'Data Quality & Infrastructure',  tier: 1 },
 ];
 
 export const L3_TABLE_BY_NAME = new Map(L3_TABLES.map(t => [t.name, t]));

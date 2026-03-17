@@ -78061,5 +78061,246 @@
         }
       ]
     }
+  },
+  {
+    "item_id": "MET-114",
+    "item_name": "Gross Drawn Exposure",
+    "abbreviation": "GDE",
+    "kind": "METRIC",
+    "definition": "Total drawn amount across all facilities, bank-share adjusted",
+    "generic_formula": "Total drawn amount across all facilities, bank-share adjusted",
+    "data_type": "NUMERIC(20,4)",
+    "unit_type": "CURRENCY",
+    "direction": "NEUTRAL",
+    "metric_class": "CALCULATED",
+    "domain_ids": [
+      "exposure"
+    ],
+    "regulatory_references": [
+      "Basel III CRE22",
+      "FR Y-14Q H.1"
+    ],
+    "insight": "Tracks deployed credit risk",
+    "number_of_instances": 5,
+    "directly_displayed": false,
+    "status": "DRAFT",
+    "executable_metric_id": "EXP-050",
+    "normalized_de_name": "Gross Drawn Exposure",
+    "data_element_in_dm": "",
+    "ingredient_fields": [
+      {
+        "layer": "L2",
+        "table": "facility_exposure_snapshot",
+        "field": "drawn_amount",
+        "description": "drawn_amount",
+        "data_type": "VARCHAR(64)",
+        "sample_value": ""
+      }
+    ],
+    "level_definitions": [
+      {
+        "level": "facility",
+        "dashboard_display_name": "Gross Drawn Exposure (facility)",
+        "in_record": true,
+        "sourcing_type": "Raw",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n3. GROUP BY fes.facility_id\n4. COMPUTE\n   metric_value = SUM(fes.drawn_amount)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          }
+        ],
+        "formula_sql": "SELECT\n  fes.facility_id AS dimension_key,\n  SUM(fes.drawn_amount) AS metric_value\nFROM l2.facility_exposure_snapshot fes\nWHERE fes.as_of_date = :as_of_date\nGROUP BY fes.facility_id"
+      },
+      {
+        "level": "counterparty",
+        "dashboard_display_name": "Gross Drawn Exposure (counterparty)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n3. GROUP BY fm.counterparty_id\n4. COMPUTE\n   metric_value = SUM(fes.drawn_amount)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          }
+        ],
+        "formula_sql": "SELECT\n  fm.counterparty_id AS dimension_key,\n  SUM(fes.drawn_amount) AS metric_value\nFROM l2.facility_exposure_snapshot fes\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fes.facility_id\nWHERE fes.as_of_date = :as_of_date\nGROUP BY fm.counterparty_id"
+      },
+      {
+        "level": "desk",
+        "dashboard_display_name": "Gross Drawn Exposure (desk)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n3. GROUP BY ebt.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fes.drawn_amount) * COALESCE(fx.rate, 1)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          }
+        ],
+        "formula_sql": "SELECT\n  ebt.managed_segment_id AS dimension_key,\n  SUM(fes.drawn_amount) * COALESCE(fx.rate, 1) AS metric_value\nFROM l2.facility_exposure_snapshot fes\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fes.facility_id\n\n  LEFT JOIN l1.enterprise_business_taxonomy ebt\n    ON ebt.managed_segment_id = fm.lob_segment_id\n      AND ebt.is_current_flag = 'Y'\n  \n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = fes.currency_code\n      AND fx.to_currency_code = 'USD'\n      AND fx.as_of_date = fes.as_of_date\n  WHERE fes.as_of_date = :as_of_date\nGROUP BY ebt.managed_segment_id"
+      },
+      {
+        "level": "portfolio",
+        "dashboard_display_name": "Gross Drawn Exposure (portfolio)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n3. GROUP BY ebt_l2.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fes.drawn_amount) * COALESCE(fx.rate, 1)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          }
+        ],
+        "formula_sql": "SELECT\n  ebt_l2.managed_segment_id AS dimension_key,\n  SUM(fes.drawn_amount) * COALESCE(fx.rate, 1) AS metric_value\nFROM l2.facility_exposure_snapshot fes\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fes.facility_id\n\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n    ON ebt_l3.managed_segment_id = fm.lob_segment_id\n      AND ebt_l3.is_current_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n    ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n      AND ebt_l2.is_current_flag = 'Y'\n  \n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = fes.currency_code\n      AND fx.to_currency_code = 'USD'\n      AND fx.as_of_date = fes.as_of_date\n  WHERE fes.as_of_date = :as_of_date\nGROUP BY ebt_l2.managed_segment_id"
+      },
+      {
+        "level": "lob",
+        "dashboard_display_name": "Gross Drawn Exposure (lob)",
+        "in_record": true,
+        "sourcing_type": "Agg",
+        "level_logic": "1. LOAD  l2.facility_exposure_snapshot  (fes)\n   WHERE fes.as_of_date = :as_of_date\n2. JOIN  l2.facility_master  (fm)\n   ON    fm.facility_id = fes.facility_id\n3. GROUP BY ebt_l1.managed_segment_id\n4. COMPUTE\n   metric_value = SUM(fes.drawn_amount) * COALESCE(fx.rate, 1)",
+        "source_references": [
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "facility_id",
+            "description": "facility_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "drawn_amount",
+            "description": "drawn_amount"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_exposure_snapshot",
+            "field": "as_of_date",
+            "description": "as_of_date"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "counterparty_id",
+            "description": "counterparty_id"
+          },
+          {
+            "layer": "L2",
+            "table": "facility_master",
+            "field": "facility_id",
+            "description": "facility_id"
+          }
+        ],
+        "formula_sql": "SELECT\n  ebt_l1.managed_segment_id AS dimension_key,\n  SUM(fes.drawn_amount) * COALESCE(fx.rate, 1) AS metric_value\nFROM l2.facility_exposure_snapshot fes\nINNER JOIN l2.facility_master fm\n  ON fm.facility_id = fes.facility_id\n\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l3\n    ON ebt_l3.managed_segment_id = fm.lob_segment_id\n      AND ebt_l3.is_current_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l2\n    ON ebt_l2.managed_segment_id = ebt_l3.parent_segment_id\n      AND ebt_l2.is_current_flag = 'Y'\n  LEFT JOIN l1.enterprise_business_taxonomy ebt_l1\n    ON ebt_l1.managed_segment_id = ebt_l2.parent_segment_id\n      AND ebt_l1.is_current_flag = 'Y'\n  \n  LEFT JOIN l2.fx_rate fx\n    ON fx.from_currency_code = fes.currency_code\n      AND fx.to_currency_code = 'USD'\n      AND fx.as_of_date = fes.as_of_date\n  WHERE fes.as_of_date = :as_of_date\nGROUP BY ebt_l1.managed_segment_id"
+      }
+    ],
+    "demo_data": {
+      "facilities": []
+    }
   }
 ]

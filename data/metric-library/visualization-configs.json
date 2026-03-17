@@ -20996,5 +20996,120 @@
         }
       }
     }
+  },
+  "MET-114": {
+    "rollup_strategy": "direct-sum",
+    "formula_decomposition": {
+      "numerator": [
+        {
+          "op": "*",
+          "field": "drawn_amount",
+          "label": "drawn_amount",
+          "sample_value": 0,
+          "source_table": "facility_exposure_snapshot",
+          "source_layer": "L2"
+        }
+      ],
+      "denominator": [],
+      "result_format": "currency",
+      "formula_display": "Total drawn amount across all facilities, bank-share adjusted"
+    },
+    "worked_example_columns": [
+      {
+        "field": "drawn_amount",
+        "header": "Drawn Amount",
+        "format": "number",
+        "subtotal_fn": "none"
+      }
+    ],
+    "traversal_source_data": {
+      "source_tables": [
+        {
+          "alias": "fes",
+          "qualified_name": "l2.facility_exposure_snapshot",
+          "table_name": "facility_exposure_snapshot",
+          "layer": "L2",
+          "join_type": "BASE",
+          "join_on": null,
+          "fields": [
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            },
+            {
+              "name": "drawn_amount",
+              "role": "MEASURE",
+              "description": "drawn_amount"
+            },
+            {
+              "name": "as_of_date",
+              "role": "FILTER",
+              "description": "as_of_date"
+            }
+          ],
+          "purpose": "Provides drawn amount"
+        },
+        {
+          "alias": "fm",
+          "qualified_name": "l2.facility_master",
+          "table_name": "facility_master",
+          "layer": "L2",
+          "join_type": "INNER",
+          "join_on": "fm.facility_id = fes.facility_id",
+          "fields": [
+            {
+              "name": "counterparty_id",
+              "role": "DIMENSION",
+              "description": "counterparty_id"
+            },
+            {
+              "name": "facility_id",
+              "role": "JOIN_KEY",
+              "description": "facility_id"
+            }
+          ],
+          "purpose": "Links to counterparty for rollup grouping"
+        }
+      ],
+      "per_level_tables": {
+        "facility": [
+          "fes"
+        ],
+        "counterparty": [
+          "fes",
+          "fm"
+        ],
+        "desk": [
+          "fes",
+          "fm",
+          "ebt"
+        ],
+        "portfolio": [
+          "fes",
+          "fm",
+          "ebt_l3",
+          "ebt_l2"
+        ],
+        "lob": [
+          "fes",
+          "fm",
+          "ebt_l3",
+          "ebt_l2",
+          "ebt_l1"
+        ]
+      },
+      "narration_context": {
+        "metric_description": "Total drawn amount across all facilities, bank-share adjusted",
+        "formula_text": "Total drawn amount across all facilities, bank-share adjusted",
+        "aggregation_type_by_level": {
+          "facility": "RAW",
+          "counterparty": "SUM",
+          "desk": "SUM",
+          "portfolio": "SUM",
+          "lob": "SUM"
+        }
+      }
+    }
   }
 }

@@ -170,11 +170,11 @@ async function readSeedChainFromPG(): Promise<L1Chain> {
     });
 
     return {
-      counterparties: numericize(cpResult.rows),
-      agreements: numericize(agrResult.rows),
-      facilities: numericize(facResult.rows),
-      collateral_assets: collResult.rows.length > 0 ? numericize(collResult.rows) : undefined,
-      limit_rules: limitResult.rows.length > 0 ? numericize(limitResult.rows) : undefined,
+      counterparties: numericize(cpResult.rows) as unknown as L1Chain['counterparties'],
+      agreements: numericize(agrResult.rows) as unknown as L1Chain['agreements'],
+      facilities: numericize(facResult.rows) as unknown as L1Chain['facilities'],
+      collateral_assets: collResult.rows.length > 0 ? numericize(collResult.rows) as unknown as L1Chain['collateral_assets'] : undefined,
+      limit_rules: limitResult.rows.length > 0 ? numericize(limitResult.rows) as unknown as L1Chain['limit_rules'] : undefined,
     };
   } finally {
     await client.end();
@@ -233,11 +233,11 @@ function assignStoryArcs(chain: L1Chain): {
     const arcIndex = id % 6;
     const arcs: StoryArc[] = [
       'STABLE_IG',           // ~17% — investment grade, steady
-      'STABLE_HY',           // ~17% — high yield, steady
-      'SLOW_DETERIORATION',  // ~17% — gradual decline
+      'STEADY_HY',           // ~17% — high yield, steady
+      'DETERIORATING',       // ~17% — gradual decline
       'RECOVERING',          // ~17% — improving from stress
-      'RAPID_DETERIORATION', // ~17% — sharp decline (exciting for demo)
-      'RESTRUCTURING',       // ~17% — workout/turnaround
+      'STRESSED_SECTOR',     // ~17% — sharp decline (sector stress)
+      'NEW_RELATIONSHIP',    // ~17% — new/growing relationship
     ];
     storyArcs.set(id, arcs[arcIndex]);
   }

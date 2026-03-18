@@ -3,10 +3,11 @@ import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response
 import path from 'path';
 import fs from 'fs';
 import { tableKeyToDbTable } from '@/lib/db-table-mapping';
+import { getSampleDataL1Path, getSampleDataL2Path, getProjectRoot } from '@/lib/config';
 
-const L1_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
-const L2_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l2/output/sample-data.json');
-const L3_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l3/output/l3-sample-data.json');
+const L1_SAMPLE_DATA_PATH = getSampleDataL1Path();
+const L2_SAMPLE_DATA_PATH = getSampleDataL2Path();
+const L3_SAMPLE_DATA_PATH = path.join(getProjectRoot(), 'scripts/l3/output/l3-sample-data.json');
 
 export async function GET(request: NextRequest) {
   const tableKey = request.nextUrl.searchParams.get('tableKey');

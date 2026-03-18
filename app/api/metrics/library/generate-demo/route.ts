@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Run the Python generator using execFile (no shell — prevents injection)
-    const projectRoot = process.cwd();
+    const { getProjectRoot } = await import('@/lib/config');
+    const projectRoot = getProjectRoot();
     const args = [
       '-m', 'scripts.calc_engine.generate_demo_data',
       '--metric', item_id,

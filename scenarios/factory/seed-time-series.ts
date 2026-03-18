@@ -171,11 +171,11 @@ async function readSeedChainFromPG(): Promise<L1Chain> {
     });
 
     return {
-      counterparties: numericize(cpResult.rows) as unknown as EnrichedCounterparty[],
-      agreements: numericize(agrResult.rows) as unknown as EnrichedAgreement[],
-      facilities: numericize(facResult.rows) as unknown as EnrichedFacility[],
-      collateral_assets: collResult.rows.length > 0 ? numericize(collResult.rows) as unknown as CollateralAssetRow[] : undefined,
-      limit_rules: limitResult.rows.length > 0 ? numericize(limitResult.rows) as unknown as LimitRuleRow[] : undefined,
+      counterparties: numericize(cpResult.rows) as unknown as L1Chain['counterparties'],
+      agreements: numericize(agrResult.rows) as unknown as L1Chain['agreements'],
+      facilities: numericize(facResult.rows) as unknown as L1Chain['facilities'],
+      collateral_assets: collResult.rows.length > 0 ? numericize(collResult.rows) as unknown as L1Chain['collateral_assets'] : undefined,
+      limit_rules: limitResult.rows.length > 0 ? numericize(limitResult.rows) as unknown as L1Chain['limit_rules'] : undefined,
     };
   } finally {
     await client.end();

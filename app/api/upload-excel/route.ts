@@ -6,6 +6,7 @@ import { readDataDictionary } from '@/lib/data-dictionary';
 import { writeDdlFiles, executeDdl } from '@/lib/data-model-sync';
 import { findColumnIndex, getDetectedColumns } from './column-mapping';
 import { jsonSuccess, jsonError, normalizeCaughtError } from '@/lib/api-response';
+import { getDataDictionaryDir } from '@/lib/config';
 
 interface FieldDefinition {
   name: string;
@@ -57,7 +58,7 @@ interface DataDictionary {
   derivation_dag: Record<string, string[]>; // table -> dependencies
 }
 
-const OUTPUT_ROOT = path.join(process.cwd(), 'facility-summary-mvp', 'output', 'data-dictionary');
+const OUTPUT_ROOT = getDataDictionaryDir();
 
 const ensureDir = (dir: string) => {
   if (!fs.existsSync(dir)) {

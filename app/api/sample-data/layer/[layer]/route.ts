@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { jsonSuccess, jsonError } from '@/lib/api-response';
-import path from 'path';
 import fs from 'fs';
+import { getSampleDataL1Path, getSampleDataL2Path } from '@/lib/config';
 
-const L1_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l1/output/sample-data.json');
-const L2_SAMPLE_DATA_PATH = path.join(process.cwd(), 'scripts/l2/output/sample-data.json');
+const L1_SAMPLE_DATA_PATH = getSampleDataL1Path();
+const L2_SAMPLE_DATA_PATH = getSampleDataL2Path();
 
 export async function GET(
   _request: NextRequest,

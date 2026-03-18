@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jsonError } from '@/lib/api-response';
 import path from 'path';
 import fs from 'fs';
+import { getSqlLayerDir } from '@/lib/config';
 
-const L3_SQL_DIR = path.join(process.cwd(), 'sql', 'l3');
+const L3_SQL_DIR = getSqlLayerDir('l3');
 const ALLOWED_FILES = [
   '00_README.md',
   '01_DDL_all_tables.sql',

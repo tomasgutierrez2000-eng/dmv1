@@ -192,6 +192,7 @@ export const L2_TABLES: L2TableDef[] = [
       { name: 'mitigant_subtype', type: 'VARCHAR(100)', nullable: true },
       { name: 'original_valuation_usd', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'is_risk_shifting_flag', type: 'CHAR(1)', nullable: true },
+      { name: 'noi_current_amt', type: 'DECIMAL(18,2)', nullable: true },
     ],
   },
   {
@@ -222,7 +223,6 @@ export const L2_TABLES: L2TableDef[] = [
     columns: [
       { name: 'facility_id', type: 'BIGINT', nullable: false, pk: true, fk: 'l2.facility_master(facility_id)' },
       { name: 'as_of_date', type: 'DATE', nullable: false, pk: true },
-      { name: 'noi_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'total_debt_service_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'revenue_amt', type: 'DECIMAL(18,2)', nullable: true },
       { name: 'operating_expense_amt', type: 'DECIMAL(18,2)', nullable: true },

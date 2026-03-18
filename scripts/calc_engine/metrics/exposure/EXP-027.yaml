@@ -5,7 +5,7 @@
 # ── IDENTIFICATION ────────────────────────────────────────────
 metric_id: "EXP-027"
 name: "Net Income ($)"
-version: "2.1.0"
+version: "3.0.0"
 owner: "credit-risk"
 status: ACTIVE
 effective_date: "2026-01-01"
@@ -18,9 +18,10 @@ direction: HIGHER_BETTER
 unit_type: CURRENCY
 display_format: "$,.0f"
 description: >
-  Net income computed from L2 atomic inputs: NOI (Net Operating Income, which
-  equals Revenue minus Operating Expense) minus Interest Expense minus Expected
-  Loss (PD × LGD × Committed Amount). Indicator of facility-level profitability.
+  Net income computed from collateral-level NOI (from collateral_snapshot) minus
+  Interest Expense (from facility_financial_snapshot) minus Expected Loss
+  (PD × LGD × Committed Amount). Indicator of facility-level profitability
+  for secured lending with income-producing collateral.
 # ── REGULATORY REFERENCES ─────────────────────────────────────
 regulatory_references:
   - framework: "Basel III"
@@ -36,12 +37,23 @@ source_tables:
         role: JOIN_KEY
       - name: as_of_date
         role: FILTER
-      - name: noi_amt
-        role: MEASURE
       - name: interest_expense_amt
         role: MEASURE
       - name: currency_code
         role: DIMENSION
+  - schema: l2
+    table: collateral_snapshot
+    alias: cs
+    join_type: LEFT
+    join_on: "cs.facility_id = ffs.facility_id AND cs.as_of_date = ffs.as_of_date"
+    fields:
+      - name: noi_current_amt
+        role: MEASURE
+        description: "Property-level Net Operating Income"
+      - name: facility_id
+        role: JOIN_KEY
+      - name: as_of_date
+        role: JOIN_KEY
   - schema: l2
     table: facility_master
     alias: fm
@@ -97,12 +109,12 @@ levels:
   facility:
     aggregation_type: CUSTOM
     formula_text: >
-      Net Income = NOI (Revenue - OpEx) - Interest Expense - Expected Loss
-      (PD × LGD × Committed Amount). All sourced from L2 atomic tables.
+      Net Income = SUM(collateral NOI) - Interest Expense - Expected Loss
+      (PD × LGD × Committed Amount). NOI sourced from collateral_snapshot.
     formula_sql: |
       SELECT
         ffs.facility_id AS dimension_key,
-        COALESCE(ffs.noi_amt, 0)
+        COALESCE(cs_noi.total_noi, 0)
           - COALESCE(ffs.interest_expense_amt, 0)
           - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
             * COALESCE(fes.committed_amount, 0)
@@ -111,6 +123,14 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN (
+        SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
+        FROM l2.collateral_snapshot cs
+        WHERE cs.noi_current_amt IS NOT NULL
+        GROUP BY cs.facility_id, cs.as_of_date
+      ) cs_noi
+        ON cs_noi.facility_id = ffs.facility_id
+        AND cs_noi.as_of_date = ffs.as_of_date
       LEFT JOIN l2.facility_risk_snapshot frs
         ON frs.facility_id = ffs.facility_id
         AND frs.as_of_date = ffs.as_of_date
@@ -126,7 +146,7 @@ levels:
       SELECT
         fm.counterparty_id AS dimension_key,
         SUM(
-          (COALESCE(ffs.noi_amt, 0)
+          (COALESCE(cs_noi.total_noi, 0)
            - COALESCE(ffs.interest_expense_amt, 0)
            - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
              * COALESCE(fes.committed_amount, 0))
@@ -136,6 +156,14 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN (
+        SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
+        FROM l2.collateral_snapshot cs
+        WHERE cs.noi_current_amt IS NOT NULL
+        GROUP BY cs.facility_id, cs.as_of_date
+      ) cs_noi
+        ON cs_noi.facility_id = ffs.facility_id
+        AND cs_noi.as_of_date = ffs.as_of_date
       LEFT JOIN l2.facility_risk_snapshot frs
         ON frs.facility_id = ffs.facility_id
         AND frs.as_of_date = ffs.as_of_date
@@ -156,7 +184,7 @@ levels:
       SELECT
         ebt.managed_segment_id AS dimension_key,
         SUM(
-          (COALESCE(ffs.noi_amt, 0)
+          (COALESCE(cs_noi.total_noi, 0)
            - COALESCE(ffs.interest_expense_amt, 0)
            - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
              * COALESCE(fes.committed_amount, 0))
@@ -166,6 +194,14 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN (
+        SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
+        FROM l2.collateral_snapshot cs
+        WHERE cs.noi_current_amt IS NOT NULL
+        GROUP BY cs.facility_id, cs.as_of_date
+      ) cs_noi
+        ON cs_noi.facility_id = ffs.facility_id
+        AND cs_noi.as_of_date = ffs.as_of_date
       LEFT JOIN l2.facility_risk_snapshot frs
         ON frs.facility_id = ffs.facility_id
         AND frs.as_of_date = ffs.as_of_date
@@ -189,7 +225,7 @@ levels:
       SELECT
         ebt_l2.managed_segment_id AS dimension_key,
         SUM(
-          (COALESCE(ffs.noi_amt, 0)
+          (COALESCE(cs_noi.total_noi, 0)
            - COALESCE(ffs.interest_expense_amt, 0)
            - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
              * COALESCE(fes.committed_amount, 0))
@@ -199,6 +235,14 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN (
+        SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
+        FROM l2.collateral_snapshot cs
+        WHERE cs.noi_current_amt IS NOT NULL
+        GROUP BY cs.facility_id, cs.as_of_date
+      ) cs_noi
+        ON cs_noi.facility_id = ffs.facility_id
+        AND cs_noi.as_of_date = ffs.as_of_date
       LEFT JOIN l2.facility_risk_snapshot frs
         ON frs.facility_id = ffs.facility_id
         AND frs.as_of_date = ffs.as_of_date
@@ -225,7 +269,7 @@ levels:
       SELECT
         ebt_l1.managed_segment_id AS dimension_key,
         SUM(
-          (COALESCE(ffs.noi_amt, 0)
+          (COALESCE(cs_noi.total_noi, 0)
            - COALESCE(ffs.interest_expense_amt, 0)
            - COALESCE(frs.pd_pct, 0) * 0.01 * COALESCE(frs.lgd_pct, 0) * 0.01
              * COALESCE(fes.committed_amount, 0))
@@ -235,6 +279,14 @@ levels:
       INNER JOIN l2.facility_master fm
         ON fm.facility_id = ffs.facility_id
         AND fm.is_active_flag = 'Y'
+      LEFT JOIN (
+        SELECT cs.facility_id, cs.as_of_date, SUM(cs.noi_current_amt) AS total_noi
+        FROM l2.collateral_snapshot cs
+        WHERE cs.noi_current_amt IS NOT NULL
+        GROUP BY cs.facility_id, cs.as_of_date
+      ) cs_noi
+        ON cs_noi.facility_id = ffs.facility_id
+        AND cs_noi.as_of_date = ffs.as_of_date
       LEFT JOIN l2.facility_risk_snapshot frs
         ON frs.facility_id = ffs.facility_id
         AND frs.as_of_date = ffs.as_of_date
@@ -278,7 +330,7 @@ catalogue:
   item_id: "MET-060"
   abbreviation: "NI"
   insight: >
-    Profitability efficiency — NOI minus Interest Expense minus Expected Loss
+    Profitability efficiency — Collateral NOI minus Interest Expense minus Expected Loss
   rollup_strategy: "direct-sum"
   primary_value_field: "net_income_amt"
 # ── METADATA ──────────────────────────────────────────────────

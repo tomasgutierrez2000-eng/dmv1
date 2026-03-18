@@ -1,5 +1,661 @@
 [
   {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "collateral_snapshot",
+    "field": "noi_current_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.collateral_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "net_income_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "counterparty_financial_snapshot",
+    "field": "total_assets_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.counterparty_financial_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "facility_risk_snapshot",
+    "field": "defaulted_flag",
+    "changeType": "Added",
+    "rationale": "Field added to L2.facility_risk_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "collateral_asset_master",
+    "field": "noi_at_origination_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.collateral_asset_master"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "cet1_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "tier1_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "total_capital_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "tier1_leverage_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "leverage_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "tlac_ratio_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "slr_pct",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "total_capital_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "rwa_std_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "rwa_erba_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "ebitda_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "counterparty_financial_calc",
+    "field": "noi_amt",
+    "changeType": "Added",
+    "rationale": "Field added to L3.counterparty_financial_calc"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "change_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "item_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "change_type",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "changed_by_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "changed_by_name",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "changed_by_role",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "change_reason",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "ticket_reference",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "before_snapshot",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "after_snapshot",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "diff_summary",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "governance_status",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_change_log",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "sandbox_run_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "item_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "run_by_name",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "run_by_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "level",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "as_of_date",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "proposed_sql",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "current_sql",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "proposed_row_count",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "current_row_count",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "proposed_total",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "current_total",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "reconciliation_pass",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "duration_ms",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "result_snapshot",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "metric_sandbox_run",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.metric_sandbox_run"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "(new table)",
+    "changeType": "Added",
+    "rationale": "New L3 table added"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "change_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "change_type",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "layer",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "table_name",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "field_name",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "changed_by_id",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "changed_by_name",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "change_reason",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "before_snapshot",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "after_snapshot",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "schema_change_log",
+    "field": "created_ts",
+    "changeType": "Added",
+    "rationale": "Field added to new L3.schema_change_log"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "noi_amt",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_financial_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "facility_master",
+    "field": "org_unit_id",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.facility_master"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "created_by",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "load_batch_id",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "source_system_id",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "raw_record_id",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "capital_position_snapshot",
+    "field": "record_source",
+    "changeType": "Removed",
+    "rationale": "Field removed from L2.capital_position_snapshot"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "cash_flow",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L2 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "cash_flow_calc",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "capital_binding_constraint",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "counterparty_capital_consumption",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "desk_capital_consumption",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "facility_capital_consumption",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "facility_rwa_calc",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "portfolio_capital_consumption",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L3",
+    "table": "segment_capital_consumption",
+    "field": "(entire table)",
+    "changeType": "Removed",
+    "rationale": "L3 table removed"
+  },
+  {
+    "date": "2026-03-18",
+    "layer": "L2",
+    "table": "collateral_asset_master",
+    "field": "original_cost",
+    "changeType": "Data Fix",
+    "rationale": "Systemic fix: populated original_cost for all REAL_ESTATE collateral assets. Required as basis for noi_at_origination_amt derivation (5.5% cap rate). Factory generator updated to always set original_cost for RE assets on creation."
+  },
+  {
+    "date": "2026-03-17",
+    "layer": "L2",
+    "table": "collateral_asset_master",
+    "field": "noi_at_origination_amt",
+    "changeType": "Added",
+    "rationale": "NOI at origination is static reference data (captured once at loan closing from underwriting appraisal). Moved from collateral_snapshot to master record per L1/L2 convention — static attributes belong on the master, not repeated on every snapshot date. Aligns with FR Y-14Q CRE H.1 reporting."
+  },
+  {
+    "date": "2026-03-17",
+    "layer": "L2",
+    "table": "collateral_snapshot",
+    "field": "noi_at_origination_amt",
+    "changeType": "Removed",
+    "rationale": "Moved to collateral_asset_master — origination NOI is static reference data, not a time-varying snapshot field."
+  },
+  {
+    "date": "2026-03-17",
+    "layer": "L2",
+    "table": "collateral_snapshot",
+    "field": "noi_current_amt",
+    "changeType": "Added",
+    "rationale": "Current-period Net Operating Income for collateral asset (CRE property income). NOI is property-level, not facility-level — migrated from facility_financial_snapshot."
+  },
+  {
+    "date": "2026-03-17",
+    "layer": "L2",
+    "table": "collateral_snapshot",
+    "field": "noi_at_origination_amt",
+    "changeType": "Added",
+    "rationale": "Net Operating Income at loan origination for collateral asset. Used for DSCR trending and origination-vs-current analysis."
+  },
+  {
+    "date": "2026-03-17",
+    "layer": "L2",
+    "table": "facility_financial_snapshot",
+    "field": "noi_amt",
+    "changeType": "Removed",
+    "rationale": "NOI is property-level income (per collateral asset), not a facility attribute. Moved to collateral_snapshot.noi_current_amt. Counterparty-level noi_amt on counterparty_financial_snapshot retained as borrower financial statement NOI (different concept)."
+  },
+  {
     "date": "2026-03-14",
     "layer": "L2",
     "table": "facility_master",

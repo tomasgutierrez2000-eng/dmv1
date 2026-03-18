@@ -79,6 +79,14 @@ export function generateCollateralRows(
           collateral_status: 'ACTIVE',
           is_current_flag: true,
           is_regulatory_eligible_flag: true,
+          // original_cost required for RE assets — basis for origination NOI derivation
+          original_cost: state.collateral_type === 'RE'
+            ? round(state.collateral_value * 1.05, 2)  // original appraisal value
+            : null,
+          // NOI at origination = static value from underwriting appraisal (FR Y-14Q CRE H.1)
+          noi_at_origination_amt: state.collateral_type === 'RE'
+            ? round(state.collateral_value * 1.05 * 0.055, 2)  // ~5.5% cap rate on original value
+            : null,
           source_system_id: FACTORY_SOURCE_SYSTEM_ID,
           record_source: 'DATA_FACTORY_V2',
           created_by: 'factory_v2',
@@ -112,6 +120,10 @@ export function generateCollateralRows(
         mitigant_group_code: MITIGANT_GROUP_MAP[state.collateral_type] ?? 'NONE',
         mitigant_subtype: state.collateral_type,
         is_risk_shifting_flag: state.collateral_type === 'CASH' ? 'Y' : 'N',
+        // NOI current = time-varying income from collateral asset (CRE property)
+        noi_current_amt: state.collateral_type === 'RE'
+          ? round(state.collateral_value * 0.06, 2)  // ~6% cap rate for CRE
+          : null,
         source_system_id: FACTORY_SOURCE_SYSTEM_ID,
         record_source: 'DATA_FACTORY_V2',
         created_by: 'factory_v2',

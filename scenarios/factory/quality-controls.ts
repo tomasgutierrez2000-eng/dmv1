@@ -1393,10 +1393,10 @@ export function runAntiSyntheticChecks(
     const lastDate = output.dates[output.dates.length - 1];
     const lastRows = financialTable.rows.filter(r => r.as_of_date === lastDate);
     if (lastRows.length >= 3) {
-      // Check that EBITDA margins aren't all identical
+      // Check that EBITDA margins aren't all identical (use ebitda / opex ratio)
       const margins = lastRows
-        .filter(r => (r.ebitda_amt as number) > 0 && (r.noi_amt as number) > 0)
-        .map(r => ((r.ebitda_amt as number) / ((r.noi_amt as number) / 0.65)).toFixed(3));
+        .filter(r => (r.ebitda_amt as number) > 0 && (r.operating_expense_amt as number) > 0)
+        .map(r => ((r.ebitda_amt as number) / (r.operating_expense_amt as number)).toFixed(3));
       const uniqueMargins = new Set(margins);
       if (margins.length >= 3 && uniqueMargins.size === 1) {
         warnings.push(`Anti-synthetic: all financial snapshots have identical EBITDA margin — expected variation`);

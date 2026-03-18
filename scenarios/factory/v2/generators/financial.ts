@@ -37,7 +37,6 @@ export function generateFinancialRows(
         : revenue * 0.65, 2);
       const ebitda = round(revenue - opex, 2);
       const interestExp = round(state.drawn_amount * state.all_in_rate_pct, 2);
-      const noi = round(revenue * 0.65, 2);
       const principalPayment = state.amortization_schedule
         ? round(state.original_committed * 0.025, 2) // Quarterly amort
         : 0;
@@ -48,7 +47,6 @@ export function generateFinancialRows(
         as_of_date: date,
         counterparty_id: state.counterparty_id,
         currency_code: state.currency_code,
-        noi_amt: noi,
         operating_expense_amt: opex,
         ebitda_amt: ebitda,
         interest_expense_amt: interestExp,

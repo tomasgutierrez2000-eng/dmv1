@@ -226,6 +226,7 @@ CREATE TABLE IF NOT EXISTS "l2"."collateral_snapshot" (
     "mitigant_subtype" VARCHAR(100),
     "original_valuation_usd" NUMERIC(18,2),
     "is_risk_shifting_flag" BOOLEAN,
+    "noi_current_amt" NUMERIC(18,2),
     "updated_ts" TIMESTAMP,
     "created_ts" TIMESTAMP,
     "created_by" VARCHAR(100),
@@ -662,7 +663,6 @@ CREATE TABLE IF NOT EXISTS "l2"."risk_flag" (
 CREATE TABLE IF NOT EXISTS "l2"."facility_financial_snapshot" (
     "facility_id" BIGINT NOT NULL,
     "as_of_date" DATE NOT NULL,
-    "noi_amt" NUMERIC(18,2),
     "operating_expense_amt" NUMERIC(18,2),
     "ebitda_amt" NUMERIC(18,2),
     "interest_expense_amt" NUMERIC(18,2),
@@ -1137,6 +1137,7 @@ CREATE TABLE IF NOT EXISTS "l2"."collateral_asset_master" (
     "is_regulatory_eligible_flag" BOOLEAN,
     "revaluation_frequency" VARCHAR(255),
     "source_record_id" BIGINT,
+    "noi_at_origination_amt" NUMERIC(18,2),
     "updated_ts" TIMESTAMP,
     "valuation_currency_code" VARCHAR(20),
     "vintage_date" DATE,

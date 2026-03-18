@@ -15,10 +15,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 OUTPUT_DIR="$ROOT_DIR"
+AUTO_YES=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     --output-dir) OUTPUT_DIR="$2"; shift 2;;
+    --yes|-y) AUTO_YES=true; shift;;
     *) echo "Unknown arg: $1"; exit 1;;
   esac
 done
@@ -100,12 +102,16 @@ if [[ $MISSING -gt 0 ]]; then
   echo "    npm run generate:l1 && npm run generate:l2   # sample data"
   echo "    npm run db:introspect                         # data dictionary"
   echo "    npm run calc:sync                             # catalogue"
-  echo ""
-  read -p "  Continue anyway? (y/N) " -n 1 -r
-  echo ""
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Aborted."
-    exit 1
+  if [[ "$AUTO_YES" == "true" ]]; then
+    echo "  Continuing (--yes flag set)..."
+  else
+    echo ""
+    read -p "  Continue anyway? (y/N) " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Aborted."
+      exit 1
+    fi
   fi
 fi
 

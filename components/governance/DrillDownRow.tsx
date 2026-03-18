@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, ChevronDown, ChevronRight, AlertTriangle, Search } from 'lucide-react';
+import { Loader2, ChevronDown, ChevronRight, AlertTriangle, Search, GitBranch } from 'lucide-react';
 import {
   CHILD_LEVEL, formatNumber, formatMetricValue,
   type DrillLevel, type DrillDownNode,
@@ -25,6 +25,7 @@ interface DrillDownRowProps {
   extraKeys: string[];
   unitType?: string;
   onScopeToRow?: (dimKey: string) => void;
+  onTraceRow?: (dimKey: string) => void;
 }
 
 const DEPTH_BG = [
@@ -48,6 +49,7 @@ export default function DrillDownRow({
   extraKeys,
   unitType,
   onScopeToRow,
+  onTraceRow,
 }: DrillDownRowProps) {
   const dimKey = String(row.dimension_key ?? '');
   const pathKey = pathPrefix ? `${pathPrefix}/${level}:${dimKey}` : `${level}:${dimKey}`;
@@ -94,15 +96,29 @@ export default function DrillDownRow({
                 </span>
               )}
             </span>
-            {onScopeToRow && depth === 0 && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onScopeToRow(dimKey); }}
-                className="ml-auto p-0.5 rounded text-gray-600 hover:text-pwc-orange hover:bg-pwc-orange/10 transition-colors opacity-0 group-hover/row:opacity-100"
-                title="Scope input data to this row"
-              >
-                <Search className="w-3 h-3" />
-              </button>
+            {depth === 0 && (
+              <span className="ml-auto flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100">
+                {onTraceRow && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onTraceRow(dimKey); }}
+                    className="p-0.5 rounded text-gray-600 hover:text-emerald-400 hover:bg-emerald-400/10 transition-colors"
+                    title="Trace this calculation"
+                  >
+                    <GitBranch className="w-3 h-3" />
+                  </button>
+                )}
+                {onScopeToRow && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onScopeToRow(dimKey); }}
+                    className="p-0.5 rounded text-gray-600 hover:text-pwc-orange hover:bg-pwc-orange/10 transition-colors"
+                    title="Scope input data to this row"
+                  >
+                    <Search className="w-3 h-3" />
+                  </button>
+                )}
+              </span>
             )}
           </span>
         </td>
@@ -177,6 +193,7 @@ export default function DrillDownRow({
                     extraKeys={childExtraKeys}
                     unitType={unitType}
                     onScopeToRow={onScopeToRow}
+                    onTraceRow={onTraceRow}
                   />
                 );
               })}

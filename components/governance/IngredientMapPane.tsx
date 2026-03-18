@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Database, Table2, ArrowRight, Loader2, Layers } from 'lucide-react';
+import { Database, Table2, ArrowRight, Loader2, Layers, XCircle } from 'lucide-react';
 
 interface IngredientTable {
   key: string;
@@ -42,10 +42,12 @@ const FIELD_ROLE_COLORS: Record<string, string> = {
 
 /** Infer field role from name for highlighting */
 function inferRole(field: string, table: string): string {
-  if (field.endsWith('_amt') || field === 'current_valuation_usd') return 'MEASURE';
-  if (field.endsWith('_id') && field === `${table.replace(/_/g, '_')}_id`) return 'JOIN_KEY';
+  if (field.endsWith('_amt') || field.endsWith('_pct') || field.endsWith('_bps') || field.endsWith('_value') || field === 'current_valuation_usd') return 'MEASURE';
+  // Strip common table suffixes to detect PK (e.g., facility_master → facility_id)
+  const baseName = table.replace(/_(master|dim|snapshot|link|calc|observation|type|event|detail|fact)$/, '');
+  if (field.endsWith('_id') && field === `${baseName}_id`) return 'JOIN_KEY';
   if (field.endsWith('_id')) return 'DIMENSION';
-  if (field === 'as_of_date') return 'FILTER';
+  if (field === 'as_of_date' || field.endsWith('_flag')) return 'FILTER';
   return '';
 }
 
@@ -105,9 +107,13 @@ export default function IngredientMapPane({ itemId }: IngredientMapPaneProps) {
   const [tables, setTables] = useState<IngredientTable[]>([]);
   const [joinRelationships, setJoinRelationships] = useState<JoinRelationship[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dbConnected, setDbConnected] = useState(false);
+  const [fetchKey, setFetchKey] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     async function load() {
       try {
         const res = await fetch(`/api/metrics/governance/ingredients?item_id=${encodeURIComponent(itemId)}`);
@@ -116,12 +122,16 @@ export default function IngredientMapPane({ itemId }: IngredientMapPaneProps) {
           setTables(data.tables ?? []);
           setJoinRelationships(data.join_relationships ?? []);
           setDbConnected(data.db_connected ?? false);
+        } else {
+          setError(`Server returned ${res.status}`);
         }
-      } catch { /* ignore */ }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load ingredient data');
+      }
       setLoading(false);
     }
     load();
-  }, [itemId]);
+  }, [itemId, fetchKey]);
 
   // Sort: L2 tables first (atomic data), then L1 (reference)
   const sortedTables = [...tables].sort((a, b) => {
@@ -146,8 +156,35 @@ export default function IngredientMapPane({ itemId }: IngredientMapPaneProps) {
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="rounded-lg border border-gray-700/50 bg-gray-800/30 overflow-hidden animate-pulse">
+                <div className="px-3 py-2 flex items-center gap-2">
+                  <div className="w-3.5 h-3.5 rounded bg-gray-700" />
+                  <div className="w-8 h-3 rounded bg-gray-700" />
+                  <div className="w-24 h-3 rounded bg-gray-700" />
+                </div>
+                <div className="px-3 pb-2 space-y-1">
+                  {[1, 2].map(j => (
+                    <div key={j} className="flex items-center gap-2 py-0.5">
+                      <div className="w-28 h-2.5 rounded bg-gray-700/50" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center gap-3 py-8 text-center">
+            <XCircle className="w-6 h-6 text-red-400" />
+            <p className="text-xs text-red-400">{error}</p>
+            <button
+              type="button"
+              onClick={() => setFetchKey(k => k + 1)}
+              className="text-[10px] text-pwc-orange hover:text-pwc-orange/80 underline"
+            >
+              Retry
+            </button>
           </div>
         ) : (
           <>

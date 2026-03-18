@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Play, Loader2, Code2, AlertTriangle, ArrowUpDown, Pencil, Search,
   Download, XCircle, Timer, Filter,
@@ -23,6 +24,46 @@ const TAB_TO_LEVEL: Record<string, string> = {
   portfolio: 'portfolio',
   business_segment: 'lob',
 };
+
+/* ── SQL syntax highlighting ─────────────────────────────────────────── */
+
+function highlightSql(sql: string): string {
+  // Escape HTML first
+  const escaped = sql.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Tokenize to avoid highlighting inside previously-inserted HTML spans.
+  // Process each "word" boundary token and wrap with appropriate color class.
+  const KEYWORDS = new Set([
+    'SELECT','FROM','WHERE','JOIN','LEFT','INNER','RIGHT','CROSS','ON','AND','OR','AS',
+    'GROUP','BY','ORDER','HAVING','UNION','CASE','WHEN','THEN','ELSE','END','IN','NOT',
+    'IS','NULL','BETWEEN','LIKE','LIMIT','OFFSET','DISTINCT','EXISTS','WITH','OVER',
+    'PARTITION',
+  ]);
+  const FUNCTIONS = new Set([
+    'SUM','COUNT','AVG','MIN','MAX','COALESCE','NULLIF','ROUND','ABS','CAST',
+    'ROW_NUMBER','RANK','DENSE_RANK','LAG','LEAD','GREATEST','LEAST','EXTRACT',
+    'DATE_TRUNC','CURRENT_DATE',
+  ]);
+
+  // Single-pass regex: match tokens in priority order
+  // Note: input is HTML-escaped so single quotes are literal '
+  const TOKEN_RE = /(:as_of_date|:param\w*)|('(?:[^']*)')|(l[123]\.\w+)|(\b[A-Z_]{2,}\b)|(\b\d+(?:\.\d+)?\b)/gi;
+
+  const result = escaped.replace(TOKEN_RE, (match: string, bind: string, str: string, tblRef: string, upper: string, num: string) => {
+    if (bind) return `<span class="text-pwc-orange">${match}</span>`;
+    if (str) return `<span class="text-amber-300">${match}</span>`;
+    if (tblRef) return `<span class="text-emerald-400">${match}</span>`;
+    if (upper) {
+      const u = match.toUpperCase();
+      if (FUNCTIONS.has(u)) return `<span class="text-purple-400">${match}</span>`;
+      if (KEYWORDS.has(u)) return `<span class="text-blue-400">${match}</span>`;
+    }
+    if (num) return `<span class="text-cyan-300">${match}</span>`;
+    return match;
+  });
+
+  return result;
+}
 
 /* ── No more hardcoded LTV fallback — formulas come from catalogue only ── */
 
@@ -212,17 +253,12 @@ export default function CalculationWorkspace({
   const formula = levelFormulas[activeLevel];
   const metricColorFn = (v: number) => metricColor(v, item?.unit_type, item?.direction);
 
-  // Keyboard shortcut: Cmd/Ctrl+Enter to run
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        e.preventDefault();
-        if (!loading && asOfDate) runCalculation();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  });
+  // Detect Mac platform for shortcut label
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+  const shortcutLabel = isMac ? '⌘↵' : 'Ctrl↵';
+
+  // Keyboard shortcut ref (populated after runCalculation is defined)
+  const runCalcRef = useRef<() => void>();
 
   const cancelCalculation = useCallback(() => {
     abortRef.current?.abort();
@@ -300,6 +336,19 @@ export default function CalculationWorkspace({
     }
   }, [asOfDate, activeLevel, formula, onResultsChange]);
 
+  // Keyboard shortcut: Cmd/Ctrl+Enter to run
+  runCalcRef.current = runCalculation;
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runCalcRef.current?.();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   /** Fetch child-level data for a drill-down expansion. */
   const fetchDrillDown = useCallback(async (
     pathKey: string,
@@ -327,12 +376,17 @@ export default function CalculationWorkspace({
       // Get the child-level formula SQL (for position level, API uses direct query)
       const childTabKey = drillLevelToTab(childLevel);
       const childFormula = childTabKey ? levelFormulas[childTabKey] : null;
+      const drillSql = childFormula?.sql ?? (childLevel === 'position' ? formula.sql : null);
+
+      if (!drillSql) {
+        throw new Error(`No formula defined for ${childLevel} level — cannot drill down`);
+      }
 
       const res = await fetch('/api/metrics/governance/calculator', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sql: childFormula?.sql ?? formula.sql,
+          sql: drillSql,
           as_of_date: asOfDate,
           level: childLevel,
           max_rows: 200,
@@ -393,6 +447,19 @@ export default function CalculationWorkspace({
     });
   }, [drillDownMap, fetchDrillDown]);
 
+  const router = useRouter();
+
+  /** Navigate to Calculation Trace for a specific entity. */
+  const handleTraceRow = useCallback((dimKey: string) => {
+    if (!itemId) return;
+    const params = new URLSearchParams({
+      level: activeLevel,
+      key: dimKey,
+      ...(asOfDate ? { date: asOfDate } : {}),
+    });
+    router.push(`/metrics/library/${encodeURIComponent(itemId)}/trace?${params.toString()}`);
+  }, [itemId, activeLevel, asOfDate, router]);
+
   /** Scope the Input Data Inspector to a specific result row. */
   const handleScopeToRow = useCallback((dimKey: string) => {
     setInspectorScopedRow({ dimension_key: dimKey, level: activeLevel });
@@ -410,7 +477,10 @@ export default function CalculationWorkspace({
   });
 
   // Compute summary stats
-  const values = rows.map(r => Number(r.metric_value)).filter(v => !isNaN(v) && v !== null);
+  const values = rows
+    .filter(r => r.metric_value != null && r.metric_value !== '')
+    .map(r => Number(r.metric_value))
+    .filter(v => Number.isFinite(v));
   const stats = computeStats(values);
   const isPctType = item?.unit_type === 'PERCENTAGE' || item?.unit_type === 'RATIO' || item?.unit_type === 'RATE';
   const highPctCount = isPctType ? values.filter(v => v > 100).length : 0;
@@ -423,7 +493,7 @@ export default function CalculationWorkspace({
           <button
             key={tab.key}
             type="button"
-            onClick={() => { setActiveLevel(tab.key); setRows([]); setClassifiedError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); }}
+            onClick={() => { setActiveLevel(tab.key); setRows([]); setClassifiedError(null); setDrillDownMap(new Map()); setExpandedPaths(new Set()); setFilterText(''); }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors
               ${activeLevel === tab.key
                 ? 'bg-pwc-orange/20 text-pwc-orange border border-pwc-orange/40'
@@ -452,11 +522,11 @@ export default function CalculationWorkspace({
             disabled={!asOfDate || !formula}
             className="ml-auto flex items-center gap-1.5 px-4 py-1.5 bg-pwc-orange text-white rounded-lg text-xs font-medium
                        hover:bg-pwc-orange/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Run Calculation (⌘↵)"
+            title={!asOfDate ? 'Select a date first' : !formula ? 'No formula defined for this level' : `Run Calculation (${shortcutLabel})`}
           >
             <Play className="w-3.5 h-3.5" />
             Run
-            <kbd className="ml-1 px-1 py-0.5 text-[9px] bg-white/20 rounded font-mono">⌘↵</kbd>
+            <kbd className="ml-1 px-1 py-0.5 text-[9px] bg-white/20 rounded font-mono">{shortcutLabel}</kbd>
           </button>
         )}
       </div>
@@ -487,9 +557,10 @@ export default function CalculationWorkspace({
               {showSql ? 'Hide SQL' : 'Show SQL'}
             </button>
             {showSql && (
-              <pre className="mt-2 p-3 bg-pwc-black rounded-lg text-[11px] text-gray-400 font-mono overflow-x-auto whitespace-pre-wrap max-h-48">
-                {formula.sql}
-              </pre>
+              <pre
+                className="mt-2 p-3 bg-pwc-black rounded-lg text-[11px] font-mono overflow-x-auto whitespace-pre-wrap max-h-48"
+                dangerouslySetInnerHTML={{ __html: highlightSql(formula.sql) }}
+              />
             )}
           </>
         ) : (
@@ -676,7 +747,7 @@ export default function CalculationWorkspace({
 
                     return (
                       <DrillDownRow
-                        key={idx}
+                        key={`${activeLevel}:${String(row.dimension_key ?? idx)}`}
                         level={activeLevel as DrillLevel}
                         row={row}
                         depth={0}
@@ -688,6 +759,7 @@ export default function CalculationWorkspace({
                         extraKeys={topExtraKeys}
                         unitType={item?.unit_type}
                         onScopeToRow={handleScopeToRow}
+                        onTraceRow={handleTraceRow}
                       />
                     );
                   })}

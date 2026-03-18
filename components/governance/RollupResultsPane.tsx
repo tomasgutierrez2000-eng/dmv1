@@ -61,8 +61,11 @@ function metricColor(val: number, unitType?: string, direction?: string): string
   return 'text-gray-300';
 }
 
-function computeWeightedAvg(rows: ResultRow[]): number | null {
-  const vals = rows.map(r => Number(r.metric_value)).filter(v => !isNaN(v));
+function computeSimpleAvg(rows: ResultRow[]): number | null {
+  const vals = rows
+    .filter(r => r.metric_value != null && r.metric_value !== '')
+    .map(r => Number(r.metric_value))
+    .filter(v => Number.isFinite(v));
   if (vals.length === 0) return null;
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
@@ -84,7 +87,7 @@ export default function RollupResultsPane({
   const [restoredFromCache, setRestoredFromCache] = useState(false);
   const tolerance = item?.reconciliation_tolerance_pct ?? 5.0;
   const colorFn = (v: number) => metricColor(v, item?.unit_type, item?.direction);
-  const cacheKey = item?.item_id ? `rollup_cache_${item.item_id}` : null;
+  const cacheKey = item?.item_id && asOfDate ? `rollup_cache_${item.item_id}_${asOfDate}` : (item?.item_id ? `rollup_cache_${item.item_id}_none` : null);
 
   // Restore cached results on mount
   useEffect(() => {
@@ -191,20 +194,29 @@ export default function RollupResultsPane({
           type="button"
           onClick={runAllLevels}
           disabled={runningAll || !asOfDate}
+          title={!asOfDate ? 'Select a date first' : runningAll ? `Running ${completedCount}/${LEVELS.length}` : 'Run formula at all 5 levels'}
           className="ml-auto flex items-center gap-1 px-2.5 py-1 bg-pwc-orange/20 text-pwc-orange rounded text-[10px] font-medium
-                     hover:bg-pwc-orange/30 disabled:opacity-50 transition-colors"
+                     hover:bg-pwc-orange/30 disabled:opacity-50 transition-colors relative overflow-hidden"
         >
-          {runningAll ? (
-            <>
-              <Loader2 className="w-3 h-3 animate-spin" />
-              {completedCount}/{LEVELS.length}
-            </>
-          ) : (
-            <>
-              <Play className="w-3 h-3" />
-              Run All
-            </>
+          {runningAll && (
+            <span
+              className="absolute left-0 top-0 bottom-0 bg-pwc-orange/20 transition-all duration-300"
+              style={{ width: `${(completedCount / LEVELS.length) * 100}%` }}
+            />
           )}
+          <span className="relative flex items-center gap-1">
+            {runningAll ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                {completedCount}/{LEVELS.length}
+              </>
+            ) : (
+              <>
+                <Play className="w-3 h-3" />
+                Run All
+              </>
+            )}
+          </span>
         </button>
       </div>
 
@@ -222,7 +234,7 @@ export default function RollupResultsPane({
         {/* Level summary cards */}
         {LEVELS.map(lvl => {
           const result = levelResults.get(lvl.key);
-          const avg = result?.rows ? computeWeightedAvg(result.rows) : null;
+          const avg = result?.rows ? computeSimpleAvg(result.rows) : null;
           const count = result?.rows?.length ?? 0;
 
           return (
@@ -268,8 +280,8 @@ export default function RollupResultsPane({
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span className="text-xs font-semibold text-gray-300">Reconciliation</span>
-              <span className="text-[9px] text-gray-600 ml-auto">
-                {item?.rollup_strategy === 'direct-sum' ? 'Sum-based' : 'Avg-diff'} ({tolerance}% tol.)
+              <span className="text-[9px] text-gray-600 ml-auto" title={item?.rollup_strategy === 'direct-sum' ? 'Compares SUM at each level' : 'Compares simple average of formula outputs — not weighted. FX differences expected for multi-currency.'}>
+                {item?.rollup_strategy === 'direct-sum' ? 'Sum-based' : 'Output avg'} ({tolerance}% tol.)
               </span>
             </div>
 
@@ -277,8 +289,12 @@ export default function RollupResultsPane({
               {LEVELS.slice(0, -1).map((lvl, i) => {
                 const currentResult = levelResults.get(lvl.key);
                 const nextResult = levelResults.get(LEVELS[i + 1].key);
-                const currentVals = (currentResult?.rows ?? []).map(r => Number(r.metric_value)).filter(v => !isNaN(v));
-                const nextVals = (nextResult?.rows ?? []).map(r => Number(r.metric_value)).filter(v => !isNaN(v));
+                const currentVals = (currentResult?.rows ?? [])
+                  .filter(r => r.metric_value != null && r.metric_value !== '')
+                  .map(r => Number(r.metric_value)).filter(v => Number.isFinite(v));
+                const nextVals = (nextResult?.rows ?? [])
+                  .filter(r => r.metric_value != null && r.metric_value !== '')
+                  .map(r => Number(r.metric_value)).filter(v => Number.isFinite(v));
 
                 let pass = false;
                 let delta: number | null = null;
@@ -289,9 +305,15 @@ export default function RollupResultsPane({
                   const currentSum = currentVals.reduce((a, b) => a + b, 0);
                   const nextSum = nextVals.reduce((a, b) => a + b, 0);
                   if (currentVals.length > 0 && nextVals.length > 0) {
-                    const denom = Math.max(Math.abs(currentSum), Math.abs(nextSum), 1);
-                    delta = Math.abs(currentSum - nextSum) / denom * 100;
-                    pass = delta < tolerance;
+                    // Handle zero-sum edge case
+                    if (Math.abs(currentSum) < 0.001 && Math.abs(nextSum) < 0.001) {
+                      delta = 0;
+                      pass = true;
+                    } else {
+                      const denom = Math.max(Math.abs(currentSum), Math.abs(nextSum), 0.01);
+                      delta = Math.abs(currentSum - nextSum) / denom * 100;
+                      pass = delta < tolerance;
+                    }
                     detail = `Σ${lvl.short}: ${formatMetricValue(currentSum, item?.unit_type)} | Σ${LEVELS[i + 1].short}: ${formatMetricValue(nextSum, item?.unit_type)}`;
                   }
                 } else {

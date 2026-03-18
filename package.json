@@ -57,7 +57,11 @@
     "factory:generate:one": "tsx scenarios/factory/scenario-runner.ts --scenario",
     "factory:validate": "tsx scenarios/factory/scenario-runner.ts --validate --all",
     "factory:dry-run": "tsx scenarios/factory/scenario-runner.ts --dry-run --all",
-    "doc:sync": "tsx scripts/sync-doc-counts.ts"
+    "doc:sync": "tsx scripts/sync-doc-counts.ts",
+    "stripe:create": "tsx scripts/create-stripe-db.ts",
+    "stripe:sync": "tsx scripts/sync-stripe-db.ts",
+    "stripe:diff": "tsx scripts/diff-stripe-db.ts",
+    "test:stripe": "tsx scripts/test-stripe-db.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

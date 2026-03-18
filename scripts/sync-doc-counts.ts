@@ -11,9 +11,10 @@
  *
  * Updates:
  *   CLAUDE.md
+ *   docs/playbook/README.md
  *   docs/playbook/01-data-model-overview.md
  *   docs/playbook/02-platform-capabilities.md
- *   docs/playbook/README.md
+ *   docs/playbook/06-build-on-the-model.md  (AUTO blocks)
  *
  * Usage: npm run doc:sync
  */
@@ -144,6 +145,113 @@ function buildReplacements(): Replacement[] {
   ];
 }
 
+// ── AUTO block updater ────────────────────────────────────────────────
+
+interface AutoBlock {
+  name: string;
+  content: string;
+}
+
+function buildAutoBlocks(): AutoBlock[] {
+  const blocks: AutoBlock[] = [];
+
+  // AUTO:TABLE_COUNTS — current L1/L2/L3 counts
+  blocks.push({
+    name: 'TABLE_COUNTS',
+    content: [
+      `The current data model contains:`,
+      `- **L1 — Reference Data (${l1Count} tables):** Dimensions, masters, lookups, hierarchies`,
+      `- **L2 — Atomic Data (${l2Count} tables):** Raw snapshots and events`,
+      `- **L3 — Derived Data (${l3Count} tables):** Calculated and aggregated data`,
+      `- **Total: all ${totalCount}+ tables** across the three layers`,
+    ].join('\n'),
+  });
+
+  // AUTO:DOMAIN_LIST — current metric domains table
+  const domainsPath = path.join(ROOT, 'data/metric-library/domains.json');
+  if (fs.existsSync(domainsPath)) {
+    const domains: Array<{ domain_id: string; domain_name: string; description: string }> =
+      JSON.parse(fs.readFileSync(domainsPath, 'utf-8'));
+    const rows = domains.map(
+      d => `| ${d.domain_id} | ${d.domain_name} | ${d.description} |`
+    );
+    blocks.push({
+      name: 'DOMAIN_LIST',
+      content: [
+        '| Domain | Name | Description |',
+        '|--------|------|-------------|',
+        ...rows,
+      ].join('\n'),
+    });
+  }
+
+  // AUTO:NAMING_CONVENTION — suffix → type mapping
+  blocks.push({
+    name: 'NAMING_CONVENTION',
+    content: [
+      '| Suffix | SQL Type | Example |',
+      '|--------|----------|---------|',
+      '| `_id` | BIGINT | `counterparty_id`, `facility_id` |',
+      '| `_code` | VARCHAR(30) | `currency_code`, `fr2590_category_code` |',
+      '| `_name`, `_desc`, `_text` | VARCHAR(500) | `facility_name` |',
+      '| `_amt` | NUMERIC(20,4) | `committed_facility_amt` |',
+      '| `_pct` | NUMERIC(10,6) | `coverage_ratio_pct` |',
+      '| `_value` | NUMERIC(12,6) | metric output values |',
+      '| `_date` | DATE | `maturity_date` |',
+      '| `_ts` | TIMESTAMP | `created_ts` |',
+      '| `_flag` | BOOLEAN | `is_active_flag` |',
+      '| `_count` | INTEGER | `number_of_loans` |',
+      '| `_bps` | NUMERIC(10,4) | `interest_rate_spread_bps` |',
+    ].join('\n'),
+  });
+
+  // AUTO:STRIPE_CLI — stripe command reference
+  blocks.push({
+    name: 'STRIPE_CLI',
+    content: [
+      '| Command | Description |',
+      '|---------|-------------|',
+      '| `npm run stripe:create -- --name X` | Create isolated stripe database (full clone) |',
+      '| `npm run stripe:create -- --name X --schema-only` | Clone schema without data |',
+      '| `npm run stripe:create -- --name X --force` | Drop and recreate |',
+      '| `npm run stripe:sync -- --name X` | Dry-run: show pending changes from main |',
+      '| `npm run stripe:sync -- --name X --yes` | Apply pending changes from main |',
+      '| `npm run stripe:diff -- --name X` | Generate migration SQL (stripe → main) |',
+      '| `npm run stripe:diff -- --name X --stdout` | Print migration to terminal |',
+      '| `npm run stripe:diff -- --name X --include-data` | Include L1 seed INSERT statements |',
+      '| `npm run test:stripe` | Run stripe tooling integration tests |',
+    ].join('\n'),
+  });
+
+  return blocks;
+}
+
+function updateAutoBlocks(relPath: string, blocks: AutoBlock[]): number {
+  const absPath = path.join(ROOT, relPath);
+  if (!fs.existsSync(absPath)) return 0;
+
+  let content = fs.readFileSync(absPath, 'utf-8');
+  const original = content;
+  let changes = 0;
+
+  for (const block of blocks) {
+    const regex = new RegExp(
+      `(<!-- AUTO:${block.name} -->)\\n[\\s\\S]*?\\n(<!-- /AUTO:${block.name} -->)`,
+      'g'
+    );
+    const before = content;
+    content = content.replace(regex, `$1\n${block.content}\n$2`);
+    if (content !== before) changes++;
+  }
+
+  if (content !== original) {
+    fs.writeFileSync(absPath, content, 'utf-8');
+    console.log(`  UPDATED ${relPath} (${changes} auto-blocks)`);
+  }
+
+  return changes;
+}
+
 // ── File updater ────────────────────────────────────────────────────────
 
 function updateFile(relPath: string, replacements: Replacement[]): number {
@@ -183,6 +291,7 @@ const files = [
   'docs/playbook/README.md',
   'docs/playbook/01-data-model-overview.md',
   'docs/playbook/02-platform-capabilities.md',
+  'docs/playbook/06-build-on-the-model.md',
 ];
 
 console.log(`  Updating documentation files...`);
@@ -191,9 +300,18 @@ for (const f of files) {
   totalChanges += updateFile(f, replacements);
 }
 
+// Update AUTO blocks in chapter 06
+const autoBlocks = buildAutoBlocks();
+const autoFiles = [
+  'docs/playbook/06-build-on-the-model.md',
+];
+for (const f of autoFiles) {
+  totalChanges += updateAutoBlocks(f, autoBlocks);
+}
+
 console.log();
 if (totalChanges > 0) {
-  console.log(`  Done — ${totalChanges} total replacements across ${files.length} files.`);
+  console.log(`  Done — ${totalChanges} total replacements across ${files.length + autoFiles.length} files.`);
 } else {
   console.log(`  Done — all files already up to date.`);
 }

@@ -40,6 +40,11 @@ if [ "$MATCHED" = true ]; then
     exit 0
   fi
 
+  # Don't trigger for stripe operations (they target stripe DBs, not main)
+  if echo "$CMD" | grep -qE "stripe:create|stripe:sync|stripe:diff|test:stripe"; then
+    exit 0
+  fi
+
   # Don't sync capital if the command was already targeting postgres_capital
   if echo "$CMD" | grep -q "postgres_capital"; then
     exit 0

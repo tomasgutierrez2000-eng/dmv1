@@ -9,6 +9,7 @@ import {
 import IngredientMapPane from '@/components/governance/IngredientMapPane';
 import CalculationWorkspace from '@/components/governance/CalculationWorkspace';
 import RollupResultsPane from '@/components/governance/RollupResultsPane';
+import ErrorBoundary from '@/components/governance/ErrorBoundary';
 import GovernanceStatusBanner from '@/components/governance/GovernanceStatusBanner';
 import UserIdentitySetup from '@/components/governance/UserIdentitySetup';
 import { useToast } from '@/components/ui/Toast';
@@ -46,11 +47,11 @@ export default function CalculatorPage() {
 
   const [item, setItem] = useState<CatalogueItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [asOfDate, setAsOfDate] = useState<string | null>(null);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [dbConnected, setDbConnected] = useState<boolean | null>(null);
   const [activeResults, setActiveResults] = useState<{ level: string; rows: ResultRow[] } | undefined>();
-  const [activeLevel, setActiveLevel] = useState('facility');
   const [showIdentitySetup, setShowIdentitySetup] = useState(false);
 
   // Fetch catalogue item
@@ -61,8 +62,15 @@ export default function CalculatorPage() {
         if (res.ok) {
           const data = await res.json();
           setItem(data);
+          setLoadError(null);
+        } else if (res.status === 404) {
+          setLoadError('not_found');
+        } else {
+          setLoadError(`Server error (${res.status})`);
         }
-      } catch { /* ignore */ }
+      } catch (err) {
+        setLoadError(err instanceof Error ? err.message : 'Network error');
+      }
       setLoading(false);
     }
     if (itemId) loadItem();
@@ -152,18 +160,32 @@ export default function CalculatorPage() {
   }
 
   if (!item) {
+    const isNotFound = loadError === 'not_found' || !loadError;
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-pwc-black text-gray-500">
         <Calculator className="w-12 h-12 mb-4" />
-        <h2 className="text-lg font-semibold text-gray-400">Metric not found</h2>
-        <p className="text-sm mt-1">{itemId}</p>
-        <button
-          type="button"
-          onClick={() => router.push('/metrics/library')}
-          className="mt-4 px-4 py-2 bg-pwc-gray border border-pwc-gray-light rounded-lg text-sm text-gray-300 hover:text-pwc-white transition-colors"
-        >
-          Back to Library
-        </button>
+        <h2 className="text-lg font-semibold text-gray-400">
+          {isNotFound ? 'Metric not found' : 'Failed to load metric'}
+        </h2>
+        <p className="text-sm mt-1">{isNotFound ? itemId : loadError}</p>
+        <div className="flex gap-3 mt-4">
+          {!isNotFound && (
+            <button
+              type="button"
+              onClick={() => { setLoading(true); setLoadError(null); }}
+              className="px-4 py-2 bg-pwc-orange text-white rounded-lg text-sm hover:bg-pwc-orange/90 transition-colors"
+            >
+              Retry
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => router.push('/metrics/library')}
+            className="px-4 py-2 bg-pwc-gray border border-pwc-gray-light rounded-lg text-sm text-gray-300 hover:text-pwc-white transition-colors"
+          >
+            Back to Library
+          </button>
+        </div>
       </div>
     );
   }
@@ -262,34 +284,38 @@ export default function CalculatorPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Pane: Ingredient Map */}
         <div className="w-72 shrink-0 border-r border-pwc-gray-light bg-pwc-gray overflow-hidden">
-          <IngredientMapPane itemId={itemId} level={activeLevel} />
+          <ErrorBoundary paneName="Ingredient Map">
+            <IngredientMapPane itemId={itemId} />
+          </ErrorBoundary>
         </div>
 
         {/* Center Pane: Calculation Workspace */}
         <div className="flex-1 bg-pwc-gray overflow-hidden">
-          <CalculationWorkspace
-            asOfDate={asOfDate}
-            itemId={itemId}
-            item={item}
-            activeLevel={activeLevel}
-            onLevelChange={setActiveLevel}
-            onResultsChange={handleResultsChange}
-            onFormulaSave={handleFormulaSave}
-          />
+          <ErrorBoundary paneName="Calculation Workspace">
+            <CalculationWorkspace
+              asOfDate={asOfDate}
+              itemId={itemId}
+              item={item}
+              onResultsChange={handleResultsChange}
+              onFormulaSave={handleFormulaSave}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Right Pane: Rollup Results */}
         <div className="w-72 shrink-0 border-l border-pwc-gray-light bg-pwc-gray overflow-hidden">
-          <RollupResultsPane
-            asOfDate={asOfDate}
-            activeResults={activeResults}
-            levelFormulas={item ? getFormulasForItem(item) : undefined}
-            item={item ? {
-              ...item,
-              item_id: item.item_id,
-              rollup_strategy: inferRollupStrategy(item.level_definitions),
-            } : null}
-          />
+          <ErrorBoundary paneName="Rollup Results">
+            <RollupResultsPane
+              asOfDate={asOfDate}
+              activeResults={activeResults}
+              levelFormulas={item ? getFormulasForItem(item) : undefined}
+              item={item ? {
+                ...item,
+                item_id: item.item_id,
+                rollup_strategy: inferRollupStrategy(item.level_definitions),
+              } : null}
+            />
+          </ErrorBoundary>
         </div>
       </div>
 

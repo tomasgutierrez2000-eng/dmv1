@@ -80,13 +80,18 @@ export default function FormulaEditor({
     } catch { /* ignore localStorage errors */ }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-save draft to localStorage
+  // Auto-save draft to localStorage (debounced to avoid lag)
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => {
-    try {
-      localStorage.setItem(draftKey(itemId, level), JSON.stringify({
-        mode, nlPrompt, sqlText, generatedSql,
-      }));
-    } catch { /* ignore */ }
+    clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(draftKey(itemId, level), JSON.stringify({
+          mode, nlPrompt, sqlText, generatedSql,
+        }));
+      } catch { /* ignore */ }
+    }, 500);
+    return () => clearTimeout(draftTimerRef.current);
   }, [mode, nlPrompt, sqlText, generatedSql, itemId, level]);
 
   // Reset validation when active SQL changes
